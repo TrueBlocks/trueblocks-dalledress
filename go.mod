@@ -7,6 +7,7 @@ toolchain go1.21.1
 require (
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20240117023219-2b5b03ec34c9
 	github.com/ethereum/go-ethereum v1.12.2
+	github.com/joho/godotenv v1.5.1
 	github.com/wailsapp/wails/v2 v2.7.1
 )
 

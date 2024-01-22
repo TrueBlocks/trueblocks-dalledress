@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
 	"math/big"
+	"os"
 	"strings"
 	"text/template"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/rpc"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/joho/godotenv"
 )
 
 // App struct
@@ -28,6 +31,7 @@ type App struct {
 	styles     []string
 	pTemplate  *template.Template
 	dTemplate  *template.Template
+	apiKey     string
 }
 
 func NewApp() *App {
@@ -56,48 +60,56 @@ func (a *App) startup(ctx context.Context) {
 	if a.dTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
 		logger.Fatal("could not create data template:", err)
 	}
+	if err = godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	} else if a.apiKey = os.Getenv("OPENAI_API_KEY"); a.apiKey == "" {
+		log.Fatal("No API key found in .env")
+	}
 }
 
 type Dalledress struct {
-	Ens            string `json:"ens"`
-	Addr           string `json:"addr"`
-	Seed           string `json:"seed"`
-	Adverb         string `json:"adverb"`
-	AdverbSeed     string `json:"adverbSeed"`
-	AdverbNum      int    `json:"adverbNum"`
-	Adjective      string `json:"adjective"`
-	AdjectiveSeed  string `json:"adjectiveSeed"`
-	AdjectiveNum   int    `json:"adjectiveNum"`
-	Noun           string `json:"noun"`
-	NounSeed       string `json:"nounSeed"`
-	NounNum        int    `json:"nounNum"`
-	Style          string `json:"style"`
-	StyleSeed      string `json:"styleSeed"`
-	StyleNum       int    `json:"styleNum"`
-	Color1         string `json:"color1"`
-	Color1Seed     string `json:"color1Seed"`
-	Color1Num      int    `json:"color1Num"`
-	Color2         string `json:"color2"`
-	Color2Seed     string `json:"color2Seed"`
-	Color2Num      int    `json:"color2Num"`
-	Color3         string `json:"color3"`
-	Color3Seed     string `json:"color3Seed"`
-	Color3Num      int    `json:"color3Num"`
-	Variant1       string `json:"variant1"`
-	Variant1Seed   string `json:"variant1Seed"`
-	Variant1Num    int    `json:"variant1Num"`
-	Variant2       string `json:"variant2"`
-	Variant2Seed   string `json:"variant2Seed"`
-	Variant2Num    int    `json:"variant2Num"`
-	Variant3       string `json:"variant3"`
-	Variant3Seed   string `json:"variant3Seed"`
-	Variant3Num    int    `json:"variant3Num"`
-	Style2         string `json:"style2"`
-	Style2Seed     string `json:"style2Seed"`
-	Style2Num      int    `json:"style2Num"`
-	Background     string `json:"background"`
-	BackgroundSeed string `json:"backgroundSeed"`
-	BackgroundNum  int    `json:"backgroundNum"`
+	Ens             string `json:"ens"`
+	Addr            string `json:"addr"`
+	Seed            string `json:"seed"`
+	Adverb          string `json:"adverb"`
+	AdverbSeed      string `json:"adverbSeed"`
+	AdverbNum       int    `json:"adverbNum"`
+	Adjective       string `json:"adjective"`
+	AdjectiveSeed   string `json:"adjectiveSeed"`
+	AdjectiveNum    int    `json:"adjectiveNum"`
+	Noun            string `json:"noun"`
+	NounSeed        string `json:"nounSeed"`
+	NounNum         int    `json:"nounNum"`
+	Style           string `json:"style"`
+	StyleSeed       string `json:"styleSeed"`
+	StyleNum        int    `json:"styleNum"`
+	Color1          string `json:"color1"`
+	Color1Seed      string `json:"color1Seed"`
+	Color1Num       int    `json:"color1Num"`
+	Color2          string `json:"color2"`
+	Color2Seed      string `json:"color2Seed"`
+	Color2Num       int    `json:"color2Num"`
+	Color3          string `json:"color3"`
+	Color3Seed      string `json:"color3Seed"`
+	Color3Num       int    `json:"color3Num"`
+	Variant1        string `json:"variant1"`
+	Variant1Seed    string `json:"variant1Seed"`
+	Variant1Num     int    `json:"variant1Num"`
+	Variant2        string `json:"variant2"`
+	Variant2Seed    string `json:"variant2Seed"`
+	Variant2Num     int    `json:"variant2Num"`
+	Variant3        string `json:"variant3"`
+	Variant3Seed    string `json:"variant3Seed"`
+	Variant3Num     int    `json:"variant3Num"`
+	Style2          string `json:"style2"`
+	Style2Seed      string `json:"style2Seed"`
+	Style2Num       int    `json:"style2Num"`
+	Background      string `json:"background"`
+	BackgroundSeed  string `json:"backgroundSeed"`
+	BackgroundNum   int    `json:"backgroundNum"`
+	Orientation     string `json:"orientation"`
+	OrientationSeed string `json:"orientationSeed"`
+	OrientationNum  int    `json:"orientationNum"`
 }
 
 // var promptTemplate = `For {{.Addr}} ({{.Ens}}), draw an image of a primarily {{.Color1}} and
@@ -111,7 +123,7 @@ type Dalledress struct {
 var promptTemplate = `Draw an image of using a unique fusion of {{.Style}} and {{.Style2}},
 primarily in {{.Color1}} and {{.Color2}}, against a {{.Color3}} background. The composition
 should embody the adverb {{.Adverb}}, the adjective {{.Adjective}}, and the noun {{.Noun}},
-creating a special and unique portrayal. DO NOT put any words in the image.{{.Background}}`
+creating a special and unique portrayal. DO NOT put any words in the image.{{.Background}}{{.Orientation}}`
 
 // var dataTemplate = `Given this data [{{.Addr}},{{.Ens}},{{.Seed}},
 // {{.Adverb}},{{.AdverbSeed}},{{.AdverbNum}},
@@ -126,17 +138,21 @@ creating a special and unique portrayal. DO NOT put any words in the image.{{.Ba
 // {{.Variant3}},{{.Variant3Seed}},{{.Variant3Num}},
 // {{.Style2}},{{.Style2Seed}},{{.Style2Num}}] dig as deeply as you can in your memory to find the object
 // that mostly closely matches the data. Allow your mind to roam as deeply and as freely as possible.
-// Find the nearest thing. Draw it.{{.Background}}
+// Find the nearest thing. Draw it.{{.Background}}{{.Orientation}}
 // `
 
-var dataTemplate = `Given this data [{{.Ens}},{{.Addr}},
+var dataTemplate = `Given this data
+{{.Ens}},{{.Addr}},
 Adverb: {{.Adverb}},{{.AdverbNum}},
 Adjective: {{.Adjective}},{{.AdjectiveNum}},
 Noun: {{.Noun}},{{.NounNum}},
 Style: {{.Style}},{{.StyleNum}},
-{{.Style2}},{{.Style2Num}}] dig as deeply as you can in your memory to find the object
+Style2: {{.Style2}},{{.Style2Num}}]
+BG: {{.BackgroundSeed}} {{.BackgroundNum}}
+Orientation: {{.OrientationSeed}} {{.OrientationNum}}
+dig as deeply as you can in your memory to find the object
 that mostly closely matches the data. Allow your mind to roam as deeply and as freely as possible.
-Find the nearest thing. Draw it.{{.Background}}
+Find the nearest thing. Draw it. Write a detailed description of the image.{{.Background}}{{.Orientation}}
 `
 
 // var dataTemplate = `Given this data [{{.Ens}},{{.Addr}},
@@ -152,7 +168,7 @@ Find the nearest thing. Draw it.{{.Background}}
 // {{.Variant3}},{{.Variant3Num}},
 // {{.Style2}},{{.Style2Num}}] dig as deeply as you can in your memory to find the object
 // that mostly closely matches the data. Allow your mind to roam as deeply and as freely as possible.
-// Find the nearest thing. Draw it.{{.Background}}
+// Find the nearest thing. Draw it.{{.Background}}{{.Orientation}}
 // `
 
 func (a *App) generatePrompt(d Dalledress, t *template.Template, f func(s string) string) (string, error) {
@@ -211,21 +227,22 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	}
 
 	dd := Dalledress{
-		Ens:            ensOrAddr,
-		Addr:           addr,
-		Seed:           seed,
-		AdverbSeed:     seed[0:16],
-		AdjectiveSeed:  seed[16:32],
-		NounSeed:       seed[32:48],
-		StyleSeed:      seed[48:64],
-		Color1Seed:     seed[64:76],
-		Color2Seed:     seed[76:88],
-		Color3Seed:     seed[88:100],
-		Variant1Seed:   seed[100:104],
-		Variant2Seed:   seed[101:104] + seed[100:100],
-		Variant3Seed:   seed[102:104] + seed[100:101],
-		Style2Seed:     seed[103:104] + seed[100:102],
-		BackgroundSeed: hash[2:3],
+		Ens:             ensOrAddr,
+		Addr:            addr,
+		Seed:            seed,
+		AdverbSeed:      seed[0:16],
+		AdjectiveSeed:   seed[16:32],
+		NounSeed:        seed[32:48],
+		StyleSeed:       seed[48:64],
+		Color1Seed:      seed[64:76],
+		Color2Seed:      seed[76:88],
+		Color3Seed:      seed[88:100],
+		Variant1Seed:    seed[100:104],
+		Variant2Seed:    seed[101:104] + seed[100:100],
+		Variant3Seed:    seed[102:104] + seed[100:101],
+		Style2Seed:      seed[103:104] + seed[100:102],
+		BackgroundSeed:  hash[2:4],
+		OrientationSeed: hash[4:8],
 	}
 
 	hexStringToBigIntModulo := func(hexString string, modulo int) int {
@@ -247,7 +264,8 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Variant2Num = hexStringToBigIntModulo(dd.Variant2Seed, lens[7])
 	dd.Variant3Num = hexStringToBigIntModulo(dd.Variant3Seed, lens[7])
 	dd.Style2Num = hexStringToBigIntModulo(dd.Style2Seed, lens[7])
-	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, 2)
+	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, 4)
+	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, 4)
 
 	getColor := func(colors []string, index int) string {
 		ret := colors[index]
@@ -266,10 +284,25 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Variant2 = a.styles[dd.Variant2Num]
 	dd.Variant3 = a.styles[dd.Variant3Num]
 	dd.Style2 = a.styles[dd.Style2Num]
-	if dd.BackgroundNum == 1 {
-		dd.Background = " The background should be a solid color."
-	} else {
-		dd.Background = " The background should reflect the artistic style."
+	switch dd.BackgroundNum {
+	case 0:
+		dd.Background = " The background should be transparent. "
+	case 1:
+		dd.Background = " The background should reflect the artistic style. "
+	case 2:
+		dd.Background = " The background should subtly stripped or checked. "
+	default:
+		dd.Background = " The background should be a solid color. "
+	}
+	switch dd.OrientationNum {
+	case 0:
+		dd.Orientation = " The image should be oriented vertically. "
+	case 1:
+		dd.Orientation = " The image should be oriented horizontally. "
+	case 2:
+		dd.Orientation = " The image should be oriented diagonally. "
+	default:
+		dd.Orientation = " The image should be oriented in a unique way. "
 	}
 
 	return dd, nil

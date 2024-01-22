@@ -40,6 +40,9 @@ export namespace main {
 	    background: string;
 	    backgroundSeed: string;
 	    backgroundNum: number;
+	    orientation: string;
+	    orientationSeed: string;
+	    orientationNum: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new Dalledress(source);
@@ -86,6 +89,9 @@ export namespace main {
 	        this.background = source["background"];
 	        this.backgroundSeed = source["backgroundSeed"];
 	        this.backgroundNum = source["backgroundNum"];
+	        this.orientation = source["orientation"];
+	        this.orientationSeed = source["orientationSeed"];
+	        this.orientationNum = source["orientationNum"];
 	    }
 	}
 

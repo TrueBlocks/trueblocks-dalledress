@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
@@ -72,43 +73,43 @@ type Dalledress struct {
 	Addr            string `json:"addr"`
 	Seed            string `json:"seed"`
 	Adverb          string `json:"adverb"`
-	AdverbSeed      string `json:"adverbSeed"`
+	AdverbSeed      string `json:"-"`
 	AdverbNum       int    `json:"adverbNum"`
 	Adjective       string `json:"adjective"`
-	AdjectiveSeed   string `json:"adjectiveSeed"`
+	AdjectiveSeed   string `json:"-"`
 	AdjectiveNum    int    `json:"adjectiveNum"`
 	Noun            string `json:"noun"`
-	NounSeed        string `json:"nounSeed"`
+	NounSeed        string `json:"-"`
 	NounNum         int    `json:"nounNum"`
 	Style           string `json:"style"`
-	StyleSeed       string `json:"styleSeed"`
+	StyleSeed       string `json:"-"`
 	StyleNum        int    `json:"styleNum"`
 	Color1          string `json:"color1"`
-	Color1Seed      string `json:"color1Seed"`
+	Color1Seed      string `json:"-"`
 	Color1Num       int    `json:"color1Num"`
 	Color2          string `json:"color2"`
-	Color2Seed      string `json:"color2Seed"`
+	Color2Seed      string `json:"-"`
 	Color2Num       int    `json:"color2Num"`
 	Color3          string `json:"color3"`
-	Color3Seed      string `json:"color3Seed"`
+	Color3Seed      string `json:"-"`
 	Color3Num       int    `json:"color3Num"`
 	Variant1        string `json:"variant1"`
-	Variant1Seed    string `json:"variant1Seed"`
+	Variant1Seed    string `json:"-"`
 	Variant1Num     int    `json:"variant1Num"`
 	Variant2        string `json:"variant2"`
-	Variant2Seed    string `json:"variant2Seed"`
+	Variant2Seed    string `json:"-"`
 	Variant2Num     int    `json:"variant2Num"`
 	Variant3        string `json:"variant3"`
-	Variant3Seed    string `json:"variant3Seed"`
+	Variant3Seed    string `json:"-"`
 	Variant3Num     int    `json:"variant3Num"`
 	Style2          string `json:"style2"`
-	Style2Seed      string `json:"style2Seed"`
+	Style2Seed      string `json:"-"`
 	Style2Num       int    `json:"style2Num"`
 	Background      string `json:"background"`
-	BackgroundSeed  string `json:"backgroundSeed"`
+	BackgroundSeed  string `json:"-"`
 	BackgroundNum   int    `json:"backgroundNum"`
 	Orientation     string `json:"orientation"`
-	OrientationSeed string `json:"orientationSeed"`
+	OrientationSeed string `json:"-"`
 	OrientationNum  int    `json:"orientationNum"`
 }
 
@@ -202,6 +203,15 @@ func (a *App) GetData(ensOrAddr string) string {
 			s += fmt.Sprintf("%s", err)
 		}
 		return s
+	}
+}
+
+func (a *App) GetJson(ensOrAddr string) string {
+	if dd, err := a.GetDalledress(ensOrAddr); err != nil {
+		return fmt.Sprintf("{\"error\": \"%s\"}", err)
+	} else {
+		bytes, _ := json.Marshal(dd)
+		return string(bytes)
 	}
 }
 

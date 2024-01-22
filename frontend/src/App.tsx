@@ -11,12 +11,13 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useClipboard } from "@mantine/hooks";
-import { GetPrompt, GetData } from "../wailsjs/go/main/App";
+import { GetPrompt, GetData, GetJson } from "../wailsjs/go/main/App";
 
 export default function App() {
   const [email, setEmail] = useState<string>("");
   const [prompt, setPrompt] = useState<string>("");
   const [data, setData] = useState<string>("");
+  const [json, setJson] = useState<string>("");
 
   const form = useForm({
     initialValues: {
@@ -31,6 +32,9 @@ export default function App() {
     });
     GetData(form.values["email"]).then((value: string) => {
       setData(value);
+    });
+    GetJson(form.values["email"]).then((value: string) => {
+      setJson(value);
     });
   }, [form.values]);
 
@@ -53,6 +57,7 @@ export default function App() {
           <Text>{email ? email : "Working..."}</Text>
           <CopyText prompt={prompt ? prompt : "Working..."} />
           <CopyText prompt={data ? data : "Working..."} />
+          <CopyText prompt={json ? json : "Working..."} />
         </Paper>
       </MantineProvider>
     </div>

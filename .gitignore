@@ -1,3 +1,6 @@
+.DS_Store
+shit*
+
 build/bin
 node_modules
 frontend/dist

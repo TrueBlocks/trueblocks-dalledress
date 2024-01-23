@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconCopy, IconCheck } from "@tabler/icons-react";
-import { GetPrompt, GetData, GetJson } from "../wailsjs/go/main/App";
+import { GetPrompt, GetData, GetJson, GetImage } from "../wailsjs/go/main/App";
 import "./App.css";
 import "@mantine/core/styles.css";
 
@@ -41,6 +41,10 @@ export default function App() {
     });
   }, [form.values]);
 
+  const openImage = (email: string) => {
+    GetImage(email);
+  };
+
   return (
     <div id="App" style={{ width: "98vw", margin: "auto" }}>
       <Box mx="auto">
@@ -55,6 +59,7 @@ export default function App() {
           </Group>
         </form>
       </Box>
+      <Button onClick={() => openImage(email)}>Generate</Button>
       <Paper
         shadow="xs"
         p="md"

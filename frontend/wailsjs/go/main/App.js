@@ -14,6 +14,10 @@ export function GetData(arg1) {
   return window['go']['main']['App']['GetData'](arg1);
 }
 
+export function GetImage(arg1) {
+  return window['go']['main']['App']['GetImage'](arg1);
+}
+
 export function GetJson(arg1) {
   return window['go']['main']['App']['GetJson'](arg1);
 }

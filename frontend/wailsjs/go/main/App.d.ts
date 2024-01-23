@@ -8,6 +8,8 @@ export function GetDalledress(arg1:string):Promise<main.Dalledress>;
 
 export function GetData(arg1:string):Promise<string>;
 
+export function GetImage(arg1:string):Promise<void>;
+
 export function GetJson(arg1:string):Promise<string>;
 
 export function GetPrompt(arg1:string):Promise<string>;

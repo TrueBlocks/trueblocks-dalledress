@@ -79,6 +79,5 @@
     justify-items:flex-end;
     justify-content: right;
     border: 1px solid black;
-    background-color: green;
     overflow: auto;
 }

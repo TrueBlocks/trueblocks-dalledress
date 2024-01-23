@@ -68,6 +68,22 @@ export namespace main {
 	        this.orientationNum = source["orientationNum"];
 	    }
 	}
+	export class Settings {
+	    title: string;
+	    width: number;
+	    height: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Settings(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.title = source["title"];
+	        this.width = source["width"];
+	        this.height = source["height"];
+	    }
+	}
 
 }
 

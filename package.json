@@ -2,7 +2,7 @@
     "scripts": {
         "dev": "wails dev --debounce 500 2>&1 | grep -v AssetHandler"
     },
-    "name": "trueblocks-dalledress",
+    "name": "trueblocks-dapplet",
     "version": "1.0.0",
     "license": "GPL-3.0"
 }

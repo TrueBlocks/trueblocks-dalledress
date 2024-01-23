@@ -1,6 +1,6 @@
 {
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "true"
     },
     "eslint.validate": [
         "javascript",
@@ -11,7 +11,7 @@
     "[go]": {
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true
+            "source.organizeImports": "true"
         }
     },
     "go.formatTool": "gofmt"

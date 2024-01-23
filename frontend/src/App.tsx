@@ -12,7 +12,13 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconCopy, IconCheck } from "@tabler/icons-react";
-import { GetPrompt, GetData, GetJson, GetImage } from "../wailsjs/go/main/App";
+import {
+  GetPrompt,
+  GetData,
+  GetJson,
+  GetImage,
+  GetModeration
+} from "../wailsjs/go/main/App";
 import "./App.css";
 import "@mantine/core/styles.css";
 
@@ -21,6 +27,7 @@ export default function App() {
   const [prompt, setPrompt] = useState<string>("");
   const [data, setData] = useState<string>("");
   const [json, setJson] = useState<string>("");
+  const [moderation, setModeration] = useState<string>("");
 
   const form = useForm({
     initialValues: {
@@ -39,7 +46,10 @@ export default function App() {
     GetJson(form.values["email"]).then((value: string) => {
       setJson(value);
     });
-  }, [form.values]);
+    GetModeration(form.values["email"]).then((value: string) => {
+      setModeration(value);
+    });
+  }, [email]);
 
   const openImage = (email: string) => {
     GetImage(email);
@@ -48,7 +58,10 @@ export default function App() {
   return (
     <div id="App" style={{ width: "98vw", margin: "auto" }}>
       <Box mx="auto">
-        <form onSubmit={form.onSubmit((values) => setEmail(values["email"]))}>
+        <form
+          onSubmit={form.onSubmit((values) => setEmail(values["email"]))}
+          onBlur={form.onSubmit((values) => setEmail(values["email"]))}
+        >
           <TextInput
             label="Email"
             placeholder="your@email.com"
@@ -60,6 +73,7 @@ export default function App() {
         </form>
       </Box>
       <Button onClick={() => openImage(email)}>Generate</Button>
+      {/* <div>{moderation}</div> */}
       <Paper
         shadow="xs"
         p="md"
@@ -70,8 +84,8 @@ export default function App() {
         }}
       >
         <Text>{email ? email : "Working..."}</Text>
-        <CopyText prompt={prompt ? prompt : "Working..."} />
         <CopyText prompt={data ? data : "Working..."} />
+        <CopyText prompt={prompt ? prompt : "Working..."} />
         <CopyText prompt={json ? json : "Working..."} />
       </Paper>
     </div>

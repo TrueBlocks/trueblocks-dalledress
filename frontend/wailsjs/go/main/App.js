@@ -22,6 +22,22 @@ export function GetJson(arg1) {
   return window['go']['main']['App']['GetJson'](arg1);
 }
 
+export function GetModeration(arg1) {
+  return window['go']['main']['App']['GetModeration'](arg1);
+}
+
 export function GetPrompt(arg1) {
   return window['go']['main']['App']['GetPrompt'](arg1);
+}
+
+export function GetSettings() {
+  return window['go']['main']['App']['GetSettings']();
+}
+
+export function GetTypes() {
+  return window['go']['main']['App']['GetTypes']();
+}
+
+export function SaveSettings() {
+  return window['go']['main']['App']['SaveSettings']();
 }

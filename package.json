@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "dev": "wails dev --debounce 500 2>&1 | grep -v AssetHandler"
+    }
+}

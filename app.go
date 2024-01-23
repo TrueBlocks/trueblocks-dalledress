@@ -121,7 +121,7 @@ type Dalledress struct {
 // {{.Color2}} {{.Adverb}} {{.Adjective}} {{.Noun}} in the {{.Style}} style.
 // Color the background {{.Color3}} and use {{.Variant3}} style. Try very hard to make the image unique and special.`
 
-var promptTemplate = `Draw an image of using a unique fusion of {{.Style}} and {{.Style2}},
+var promptTemplate = `Draw an image of a {{.Noun}} using a unique fusion of {{.Style}} and {{.Style2}},
 primarily in {{.Color1}} and {{.Color2}}, against a {{.Color3}} background. The composition
 should embody the adverb {{.Adverb}}, the adjective {{.Adjective}}, and the noun {{.Noun}},
 creating a special and unique portrayal. DO NOT put any words in the image.{{.Background}}{{.Orientation}}`
@@ -142,35 +142,21 @@ creating a special and unique portrayal. DO NOT put any words in the image.{{.Ba
 // Find the nearest thing. Draw it.{{.Background}}{{.Orientation}}
 // `
 
-var dataTemplate = `Given this data
-{{.Ens}},{{.Addr}},
+var dataTemplate = `Given this data {{.Addr}},
+Domain: {{.Ens}},
 Adverb: {{.Adverb}},{{.AdverbNum}},
 Adjective: {{.Adjective}},{{.AdjectiveNum}},
 Noun: {{.Noun}},{{.NounNum}},
 Style: {{.Style}},{{.StyleNum}},
 Style2: {{.Style2}},{{.Style2Num}}]
-BG: {{.BackgroundSeed}} {{.BackgroundNum}}
-Orientation: {{.OrientationSeed}} {{.OrientationNum}}
-dig as deeply as you can in your memory to find the object
-that mostly closely matches the data. Allow your mind to roam as deeply and as freely as possible.
-Find the nearest thing. Draw it. Write a detailed description of the image.{{.Background}}{{.Orientation}}
+Background: {{.Background}} {{.BackgroundNum}}
+Orientation: {{.Orientation}} {{.OrientationNum}}
+Colors: {{.Color1}},{{.Color2}},{{.Color3}},
+In addition to the denotative meaning of the noun, the adjective, and the adverb; consider the two most obvious connotations of each of these words and incorporate those ideas in the image. Allow your mind to roam as deeply and as freely as possible. Dig deeply. Find the object that mostly closely matches the data. 
+{{.Background}}
+{{.Orientation}}
+Write a detailed description then draw the image, please.
 `
-
-// var dataTemplate = `Given this data [{{.Ens}},{{.Addr}},
-// Adverb: {{.Adverb}},{{.AdverbNum}},
-// Adjective: {{.Adjective}},{{.AdjectiveNum}},
-// Noun: {{.Noun}},{{.NounNum}},
-// Style: {{.Style}},{{.StyleNum}},
-// {{.Color1}},{{.Color1Num}},
-// {{.Color2}},{{.Color2Num}},
-// {{.Color3}},{{.Color3Num}},
-// {{.Variant1}},{{.Variant1Num}},
-// {{.Variant2}},{{.Variant2Num}},
-// {{.Variant3}},{{.Variant3Num}},
-// {{.Style2}},{{.Style2Num}}] dig as deeply as you can in your memory to find the object
-// that mostly closely matches the data. Allow your mind to roam as deeply and as freely as possible.
-// Find the nearest thing. Draw it.{{.Background}}{{.Orientation}}
-// `
 
 func (a *App) generatePrompt(d Dalledress, t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
@@ -211,7 +197,7 @@ func (a *App) GetJson(ensOrAddr string) string {
 		return fmt.Sprintf("{\"error\": \"%s\"}", err)
 	} else {
 		bytes, _ := json.Marshal(dd)
-		return string(bytes)
+		return strings.Replace(string(bytes), ",", ", ", -1)
 	}
 }
 
@@ -237,7 +223,7 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	}
 
 	dd := Dalledress{
-		Ens:             ensOrAddr,
+		Ens:             strings.Replace(ensOrAddr, ".eth", "", -1),
 		Addr:            addr,
 		Seed:            seed,
 		AdverbSeed:      seed[0:16],
@@ -317,71 +303,3 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 
 	return dd, nil
 }
-
-/*
-google.eth
-amazon.eth
-mail.eth
-disney.eth
-yahoo.eth
-skype.eth
-nvidia.eth
-airbnb.eth
-github.eth
-orange.eth
-medium.eth
-intel.eth
-nokia.eth
-office.eth
-gmail.eth
-oracle.eth
-adobe.eth
-cisco.eth
-mirror.eth
-change.eth
-house.eth
-target.eth
-metro.eth
-forbes.eth
-people.eth
-twitch.eth
-terra.eth
-unesco.eth
-alexa.eth
-naver.eth
-europa.eth
-sakura.eth
-vimeo.eth
-webmd.eth
-flickr.eth
-daniel.eth
-love.eth
-bell.eth
-cain.eth
-rich.eth
-dean.eth
-owen.eth
-chase.eth
-church.eth
-smith.eth
-tim.eth
-daniel.eth
-peter.eth
-phil.eth
-andres.eth
-jose.eth
-alex.eth
-jeff.eth
-jack.eth
-dave.eth
-amy.eth
-angel.eth
-sage.eth
-lucy.eth
-sofia.eth
-paris.eth
-chloe.eth
-sophie.eth
-hadley.eth
-dylan.eth
-*/

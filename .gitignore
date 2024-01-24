@@ -5,9 +5,8 @@ two
 shit*
 dalledress.csv
 settings.json
-generated/*
+generated/0x*
 
 build/bin
 node_modules
 frontend/dist
-

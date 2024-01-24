@@ -359,7 +359,6 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 		}
 
 		imageURL := dalleResp.Data[0].Url
-		// fmt.Println("imageURL:", imageURL)
 
 		// Download the image
 		imageResp, err := http.Get(imageURL)

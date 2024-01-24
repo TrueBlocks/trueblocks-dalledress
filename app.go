@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"os"
 	"strings"
@@ -37,14 +38,39 @@ func NewApp() *App {
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.conn = rpc.NewConnection("mainnet", false, map[string]bool{})
-	a.adverbs = file.AsciiFileToLines("/Users/jrush/Desktop/Animals.1/adverbs.csv")
-	a.adjectives = file.AsciiFileToLines("/Users/jrush/Desktop/Animals.1/adjectives.csv")
-	a.emotions1 = file.AsciiFileToLines("/Users/jrush/Desktop/Animals.1/emotions.csv")
+	if a.conn = rpc.NewConnection("mainnet", true, map[string]bool{
+		"blocks":       true,
+		"receipts":     true,
+		"transactions": true,
+		"traces":       true,
+		"logs":         true,
+		"statements":   true,
+		"state":        true,
+		"tokens":       true,
+		"results":      true,
+	}); a.conn == nil {
+		logger.Error("Could not find rpc server.")
+	}
+
+	var err error
+	if a.adverbs, err = toLines("/Users/jrush/Desktop/Animals.1/adverbs.csv"); err != nil {
+		logger.Fatal(err)
+	}
+	if a.adjectives, err = toLines("/Users/jrush/Desktop/Animals.1/adjectives.csv"); err != nil {
+		logger.Fatal(err)
+	}
+	if a.emotions1, err = toLines("/Users/jrush/Desktop/Animals.1/emotions.csv"); err != nil {
+	}
 x	a.emotions2 = a.emotions1
-	a.nouns = file.AsciiFileToLines("/Users/jrush/Desktop/Animals.1/nouns.csv")
-	a.colors = file.AsciiFileToLines("/Users/jrush/Desktop/Animals.1/colors.csv")
-	a.styles = file.AsciiFileToLines("/Users/jrush/Desktop/Animals.1/styles.csv")
+	if a.nouns, err = toLines("/Users/jrush/Desktop/Animals.1/nouns.csv"); err != nil {
+		logger.Fatal(err)
+	}
+	if a.colors, err = toLines("/Users/jrush/Desktop/Animals.1/colors.csv"); err != nil {
+		logger.Fatal(err)
+	}
+	if a.styles, err = toLines("/Users/jrush/Desktop/Animals.1/styles.csv"); err != nil {
+		logger.Fatal(err)
+	}
 	x := make([]string, 0, len(a.styles))
 	for _, s := range a.styles {
 		if !strings.Contains(s, "sensitive") { // remove culturally sensitive styles
@@ -52,18 +78,27 @@ x	a.emotions2 = a.emotions1
 		}
 	}
 	a.styles = x
-	var err error
-	if a.pTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
+
+	pT := "I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: " + promptTemplate
+	if a.pTemplate, err = template.New("prompt").Parse(pT); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}
-	if a.dTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
+	dT := "I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: " + dataTemplate
+	if a.dTemplate, err = template.New("data").Parse(dT); err != nil {
 		logger.Fatal("could not create data template:", err)
 	}
+
 	if err = godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	} else if a.apiKey = os.Getenv("OPENAI_API_KEY"); a.apiKey == "" {
 		log.Fatal("No API key found in .env")
 	}
+}
+
+func (a *App) GetTypes() []interface{} {
+	ret := make([]interface{}, 0)
+	ret = append(ret, a)
+	return ret
 }
 
 type Settings struct {
@@ -72,32 +107,42 @@ type Settings struct {
 	Height int    `json:"height"`
 	X      int    `json:"x"`
 	Y      int    `json:"y"`
+	loaded bool   `json:"-"`
 }
 
 var settings = Settings{
-	Title:  "Chifra",
+	Title:  "TrueBlocks Dapplet",
 	Width:  800,
 	Height: 600,
 	X:      0,
 	Y:      0,
+	loaded: false,
 }
 
 func (a *App) GetSettings() *Settings {
+	if !settings.loaded {
+		contents := file.AsciiFileToString("./settings.json")
+		if contents != "" {
+			json.Unmarshal([]byte(contents), &settings)
+		}
+		settings.loaded = true
+	}
 	return &settings
 }
 
-func (a *App) GetTypes() []interface{} {
-	return []interface{}{
-		a,
-	}
-}
-
 func (a *App) domReady(ctx context.Context) {
-	runtime.WindowSetPosition(a.ctx, settings.X, settings.Y)
+	runtime.WindowSetPosition(a.ctx, a.GetSettings().X, a.GetSettings().Y)
 	runtime.WindowShow(ctx)
 }
 
 func (a *App) shutdown(ctx context.Context) {
 	settings.Width, settings.Height = runtime.WindowGetSize(ctx)
 	settings.X, settings.Y = runtime.WindowGetPosition(ctx)
+	SaveSettings()
 }
+
+func (a *App) SaveSettings() {
+	bytes, _ := json.Marshal(settings)
+	file.StringToAsciiFile("./settings.json", string(bytes))
+}
+

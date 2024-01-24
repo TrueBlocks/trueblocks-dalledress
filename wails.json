@@ -1,6 +1,6 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "TrueBlocks Account Browser",
+  "name": "TrueBlocks Dapplet",
   "outputfilename": "trueblocks-browse",
   "frontend:install": "yarn install",
   "frontend:build": "yarn run build",
@@ -8,6 +8,6 @@
   "frontend:dev:serverUrl": "auto",
   "author": {
     "name": "TrueBlocks, LLC",
-    "email": "jrush@quickblocks.io"
+    "email": "info@quickblocks.io"
   }
 }

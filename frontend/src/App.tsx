@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { ActionIcon } from "@mantine/core";
-import {
-  MantineProvider,
-  Paper,
-  Button,
-  Group,
-  Box,
-  TextInput,
-  Text
-} from "@mantine/core";
+import { ActionIcon, MantineProvider } from "@mantine/core";
+import { Paper, Button, Group, Box, TextInput, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useClipboard } from "@mantine/hooks";
 import { GetPrompt, GetData, GetJson } from "../wailsjs/go/main/App";

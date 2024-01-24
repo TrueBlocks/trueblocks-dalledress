@@ -101,8 +101,6 @@ It's very important that you DO NOT PUT ANY TEXT ON THE IMAGE.
 Write a detailed description of the image before drawing it, then draw the image.
 `
 
-// As the last part of creating the image, cover the bottom 1/10 of the image, across its whole width, with a solid white rectrangle.
-
 func (a *App) generatePrompt(d Dalledress, t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
 	if err := t.Execute(&buffer, d); err != nil {
@@ -153,17 +151,10 @@ func (a *App) GetAddress(index int) string {
 	return a.addresses[index%len(a.addresses)]
 }
 
-// var val = 1
-
 func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	if len(a.adverbs) == 0 {
 		return Dalledress{}, fmt.Errorf("adverbs not loaded")
 	}
-
-	// if len(ensOrAddr) < 6 {
-	// 	ensOrAddr = fmt.Sprintf("0x%040x", val)
-	// 	val++
-	// }
 
 	addr, _ := a.conn.GetEnsAddress(ensOrAddr)
 	if base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
@@ -210,8 +201,6 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	}
 
 	lens := []int{len(a.adverbs), len(a.adjectives), len(a.emotions1), len(a.nouns), len(a.styles), len(a.colors), len(a.colors), len(a.colors), len(a.styles)}
-	fmt.Println(lens)
-	// os.Exit(0)
 
 	dd.AdverbNum = hexStringToBigIntModulo(dd.AdverbSeed, lens[0])
 	dd.AdjectiveNum = hexStringToBigIntModulo(dd.AdjectiveSeed, lens[1])
@@ -228,12 +217,6 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Style2Num = hexStringToBigIntModulo(dd.Style2Seed, lens[8])
 	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, 4)
 	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, 4)
-
-	// getColor := func(colors []string, index int) string {
-	// 	ret := colors[index]
-	// 	parts := strings.Split(ret, "|")
-	// 	return parts[0]
-	// }
 
 	dd.Adverb = a.adverbs[dd.AdverbNum]
 	dd.Adjective = a.adjectives[dd.AdjectiveNum]
@@ -289,11 +272,6 @@ type DalleResponse struct {
 }
 
 func (a *App) GetImage(ensOrAddr string, replace bool) {
-	// if len(ensOrAddr) < 6 {
-	// 	ensOrAddr = fmt.Sprintf("0x%040x", val)
-	// 	val++
-	// }
-
 	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
 		logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
 		return
@@ -451,19 +429,6 @@ func (a *App) GetModeration(ensOrAddr string) string {
 	}
 
 	return string(body)
-	// var dalleResp ModerationObject
-	// err = json.Unmarshal(body, &dalleResp)
-	// if err != nil {
-	// 	return fmt.Sprintf("Error: %s", err)
-	// }
-
-	// if resp.StatusCode != 200 {
-	// 	fmt.Println("Error:", resp.Status, resp.StatusCode, string(body))
-	// 	return string(body)
-	// }
-
-	// fmt.Println(dalleResp)
-	// return string(body)
 }
 
 func toLines(filename string) ([]string, error) {

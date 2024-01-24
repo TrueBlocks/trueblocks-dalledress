@@ -8,6 +8,10 @@ export namespace main {
 	    adverbNum: number;
 	    adjective: string;
 	    adjectiveNum: number;
+	    emotion1: string;
+	    emotion1Num: number;
+	    emotion2: string;
+	    emotion2Num: number;
 	    noun: string;
 	    nounNum: number;
 	    style: string;
@@ -44,6 +48,10 @@ export namespace main {
 	        this.adverbNum = source["adverbNum"];
 	        this.adjective = source["adjective"];
 	        this.adjectiveNum = source["adjectiveNum"];
+	        this.emotion1 = source["emotion1"];
+	        this.emotion1Num = source["emotion1Num"];
+	        this.emotion2 = source["emotion2"];
+	        this.emotion2Num = source["emotion2Num"];
 	        this.noun = source["noun"];
 	        this.nounNum = source["nounNum"];
 	        this.style = source["style"];
@@ -66,6 +74,26 @@ export namespace main {
 	        this.backgroundNum = source["backgroundNum"];
 	        this.orientation = source["orientation"];
 	        this.orientationNum = source["orientationNum"];
+	    }
+	}
+	export class Settings {
+	    title: string;
+	    width: number;
+	    height: number;
+	    x: number;
+	    y: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Settings(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.title = source["title"];
+	        this.width = source["width"];
+	        this.height = source["height"];
+	        this.x = source["x"];
+	        this.y = source["y"];
 	    }
 	}
 

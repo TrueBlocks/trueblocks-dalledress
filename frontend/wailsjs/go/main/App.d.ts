@@ -8,6 +8,14 @@ export function GetDalledress(arg1:string):Promise<main.Dalledress>;
 
 export function GetData(arg1:string):Promise<string>;
 
+export function GetImage(arg1:string,arg2:boolean):Promise<void>;
+
 export function GetJson(arg1:string):Promise<string>;
 
+export function GetModeration(arg1:string):Promise<string>;
+
 export function GetPrompt(arg1:string):Promise<string>;
+
+export function GetSettings():Promise<main.Settings>;
+
+export function GetTypes():Promise<Array<any>>;

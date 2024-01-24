@@ -3,7 +3,11 @@ two
 .env
 .DS_Store
 shit*
+dalledress.csv
+settings.json
+generated/*
 
 build/bin
 node_modules
 frontend/dist
+

@@ -59,9 +59,15 @@ func (a *App) startup(ctx context.Context) {
 	if a.adjectives, err = toLines("/Users/jrush/Desktop/Animals.1/adjectives.csv"); err != nil {
 		logger.Fatal(err)
 	}
-	if a.emotions1, err = toLines("/Users/jrush/Desktop/Animals.1/emotions.csv"); err != nil {
+	if a.emotions2, err = toLines("/Users/jrush/Desktop/Animals.1/emotions.csv"); err != nil {
+		logger.Fatal(err)
 	}
-x	a.emotions2 = a.emotions1
+	for _, e := range a.emotions2 {
+		parts := strings.Split(e, ",")
+		if len(parts) > 0 {
+			a.emotions1 = append(a.emoptions1, parts[0])
+		}
+	}
 	if a.nouns, err = toLines("/Users/jrush/Desktop/Animals.1/nouns.csv"); err != nil {
 		logger.Fatal(err)
 	}
@@ -145,4 +151,3 @@ func (a *App) SaveSettings() {
 	bytes, _ := json.Marshal(settings)
 	file.StringToAsciiFile("./settings.json", string(bytes))
 }
-

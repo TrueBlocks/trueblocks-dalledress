@@ -65,7 +65,7 @@ func (a *App) startup(ctx context.Context) {
 	for _, e := range a.emotions2 {
 		parts := strings.Split(e, ",")
 		if len(parts) > 0 {
-			a.emotions1 = append(a.emoptions1, parts[0])
+			a.emotions1 = append(a.emotions1, parts[0])
 		}
 	}
 	if a.nouns, err = toLines("/Users/jrush/Desktop/Animals.1/nouns.csv"); err != nil {
@@ -144,7 +144,7 @@ func (a *App) domReady(ctx context.Context) {
 func (a *App) shutdown(ctx context.Context) {
 	settings.Width, settings.Height = runtime.WindowGetSize(ctx)
 	settings.X, settings.Y = runtime.WindowGetPosition(ctx)
-	SaveSettings()
+	a.SaveSettings()
 }
 
 func (a *App) SaveSettings() {

@@ -37,3 +37,7 @@ export function GetSettings() {
 export function GetTypes() {
   return window['go']['main']['App']['GetTypes']();
 }
+
+export function SaveSettings() {
+  return window['go']['main']['App']['SaveSettings']();
+}

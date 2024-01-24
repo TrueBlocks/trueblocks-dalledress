@@ -16,18 +16,18 @@ import {
   GetPrompt,
   GetData,
   GetJson,
-  GetImage,
-  GetModeration
+  GetImage
+  // GetModeration
 } from "../wailsjs/go/main/App";
 import "./App.css";
 import "@mantine/core/styles.css";
 
 export default function App() {
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>("trueblocks.eth");
   const [prompt, setPrompt] = useState<string>("");
   const [data, setData] = useState<string>("");
   const [json, setJson] = useState<string>("");
-  const [moderation, setModeration] = useState<string>("");
+  // const [moderation, setModeration] = useState<string>("");
 
   const form = useForm({
     initialValues: {
@@ -46,13 +46,13 @@ export default function App() {
     GetJson(form.values["email"]).then((value: string) => {
       setJson(value);
     });
-    GetModeration(form.values["email"]).then((value: string) => {
-      setModeration(value);
-    });
+    // GetModeration(form.values["email"]).then((value: string) => {
+    //   setModeration(value);
+    // });
   }, [email]);
 
-  const openImage = (email: string) => {
-    GetImage(email);
+  const openImage = (email: string, replace: boolean) => {
+    GetImage(email, replace);
   };
 
   return (
@@ -72,7 +72,8 @@ export default function App() {
           </Group>
         </form>
       </Box>
-      <Button onClick={() => openImage(email)}>Generate</Button>
+      <Button onClick={() => openImage(email, false)}>Generate</Button>{" "}
+      <Button onClick={() => openImage(email, true)}>Regenerate</Button>
       {/* <div>{moderation}</div> */}
       <Paper
         shadow="xs"

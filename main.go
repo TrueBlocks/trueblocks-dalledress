@@ -14,16 +14,18 @@ var assets embed.FS
 func main() {
 	app := NewApp()
 	opts := options.App{
-		Title:  "trueblocks-browse",
-		Width:  1024,
-		Height: 768,
-		AssetServer: &assetserver.Options{
-			Assets: assets,
-		},
+		Title:            "trueblocks-browse",
+		Width:            1024,
+		Height:           768,
 		BackgroundColour: &options.RGBA{R: 33, G: 37, B: 41, A: 1},
 		OnStartup:        app.startup,
+		OnDomReady:       app.domReady,
+		OnShutdown:       app.shutdown,
 		Bind: []interface{}{
 			app,
+		},
+		AssetServer: &assetserver.Options{
+			Assets: assets,
 		},
 	}
 

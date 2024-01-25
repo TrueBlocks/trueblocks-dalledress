@@ -20,3 +20,8 @@ wails dev
 ```[bash]
 wails build
 ```
+
+## Api Keys
+
+If you intend to use features that require OpenAI, rename the `.env.example` file to `.env` and add your OpenAI API key. The
+features will not work otherwise.

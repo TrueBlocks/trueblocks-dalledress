@@ -85,8 +85,8 @@ export default function App() {
         }}
       >
         <Text>{email ? email : "Working..."}</Text>
-        <CopyText prompt={data ? data : "Working..."} />
         <CopyText prompt={prompt ? prompt : "Working..."} />
+        <CopyText prompt={data ? data : "Working..."} />
         <CopyText prompt={json ? json : "Working..."} />
       </Paper>
     </div>

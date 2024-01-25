@@ -74,31 +74,51 @@ type Dalledress struct {
 	OrientationNum  int    `json:"orientationNum"`
 }
 
-var promptTemplate = `Draw an image of a {{.Noun}} using a unique fusion of {{.Style}} and {{.Style2}},
-primarily in {{.Color1}} and {{.Color2}}, against a {{.Color3}} background. The composition
-should embody the adverb {{.Adverb}}, the adjective {{.Adjective}}, and the noun {{.Noun}},
-creating a special and unique portrayal. DO NOT put any words in the image.{{.Background}}{{.Orientation}}`
-
-var dataTemplate = `Please draw an image for the following data:
+var promptTemplate = `
+I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail,  just use it AS-IS: 
+Please draw an image for the following data:
 Petname: {{.Ens}}-{{.Adverb}}-{{.Adjective}}-{{.Noun}} feeling {{.Emotion1}}
 Adverb: {{.Adverb}}
 Adjective: {{.Adjective}}
 Emotion: {{.Emotion2}}
 Noun: {{.Noun}}
 Style: {{.Style}}
+Colors: {{.Color1}} and {{.Color2}}
 Orientation: {{.Orientation}}
 Background: {{.Background}}
-Colors: {{.Color1}} and {{.Color2}}
 BGStyle: {{.Style2}}
 BgColor: {{.Color3}}
-Address: {{.Addr}}
-In addition to the denotative meaning of the noun {{.Noun}}, the emotion {{.Emotion2}}, the adjective {{.Adjective}}, and
-the adverb {{.Adverb}}; consider the two most obvious connotations of each of these words and
-incorporate those ideas in the image as well. Allow your mind to roam as deeply and as freely
-as possible. Find the object that most closely matches the data. Focus on the petname
-"{{.Ens}}-{{.Adverb}}-{{.Adjective}}-{{.Noun}} feeling {{.Emotion1}}" and the first style "{{.Style}}".
-It's very important that you DO NOT PUT ANY TEXT ON THE IMAGE.
-Write a detailed description of the image before drawing it, then draw the image.
+In addition to the denotative meaning of the noun "{{.Noun}}", the emotion {{.Emotion2}},
+the adjective {{.Adjective}}, and the adverb {{.Adverb}}; consider the two most obvious connotations
+of each of these words and incorporate those ideas in the image as well. Allow your mind to roam as
+deeply into the world as possible. Find something unique. Find the object that most
+closely matches the data. Focus on the petname "{{.Ens}}-{{.Adverb}}-{{.Adjective}}-{{.Noun}} feeling {{.Emotion1}}"
+and the first style {{.Style}}.
+It's very important that you DO NOT PUT ANY TEXT ON THE IMAGE. Write a detailed description of
+the image before drawing it, then draw the image.
+`
+
+// Address: {{.Addr}}
+
+var dataTemplate = `
+{{.Ens}}
+{{.Addr}}
+{{.Seed}}
+{{.AdverbSeed}}|{{.AdverbNum}}|{{.Adverb}}
+{{.AdjectiveSeed}}|{{.AdjectiveNum}}|{{.Adjective}}
+{{.NounSeed}}|{{.NounNum}}|{{.Noun}}
+{{.StyleSeed}}|{{.StyleNum}}|{{.Style}}
+{{.Color1Seed}}|{{.Color1Num}}|{{.Color1}}|
+{{.Color2Seed}}|{{.Color2Num}}|{{.Color2}}|
+{{.Color3Seed}}|{{.Color3Num}}|{{.Color3}}|
+{{.Variant1Seed}}|{{.Variant1Num}}|{{.Variant1}}|
+{{.Variant2Seed}}|{{.Variant2Num}}|{{.Variant2}}|
+{{.Variant3Seed}}|{{.Variant3Num}}|{{.Variant3}}|
+{{.Style2Seed}}|{{.Style2Num}}|{{.Style2}}|
+{{.Emotion1Seed}}|{{.Emotion1Num}}|{{.Emotion1}}|
+{{.Emotion2Seed}}|{{.Emotion2Num}}|{{.Emotion2}}|
+{{.BackgroundSeed}}|{{.BackgroundNum}}|{{.Background}}|
+{{.OrientationSeed}}|{{.OrientationNum}}|{{.Orientation}}|
 `
 
 func (a *App) generatePrompt(d Dalledress, t *template.Template, f func(s string) string) (string, error) {
@@ -173,21 +193,21 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		Ens:             strings.Replace(ensOrAddr, ".eth", "", -1),
 		Addr:            addr,
 		Seed:            seed,
-		AdverbSeed:      seed[0:16],
-		AdjectiveSeed:   seed[16:32],
-		Emotion1Seed:    seed[24:40],
-		Emotion2Seed:    seed[24:40],
-		NounSeed:        seed[32:48],
-		StyleSeed:       seed[48:64],
-		Color1Seed:      seed[64:76],
-		Color2Seed:      seed[76:88],
-		Color3Seed:      seed[88:100],
-		Variant1Seed:    seed[100:104],
-		Variant2Seed:    seed[101:104] + seed[100:100],
-		Variant3Seed:    seed[102:104] + seed[100:101],
-		Style2Seed:      seed[103:104] + seed[100:102],
-		BackgroundSeed:  hash[2:4],
-		OrientationSeed: hash[4:8],
+		AdverbSeed:      seed[0:12],
+		AdjectiveSeed:   seed[12:24],
+		Emotion1Seed:    seed[24:36],
+		Emotion2Seed:    seed[36:48],
+		NounSeed:        seed[48:60],
+		StyleSeed:       seed[60:72],
+		Color1Seed:      seed[72:84],
+		Color2Seed:      seed[84:96],
+		Color3Seed:      seed[92:104],
+		Variant1Seed:    seed[80:92],
+		Variant2Seed:    seed[68:80],
+		Variant3Seed:    seed[56:68],
+		Style2Seed:      seed[44:56],
+		BackgroundSeed:  hash[32:44],
+		OrientationSeed: hash[20:32],
 	}
 
 	hexStringToBigIntModulo := func(hexString string, modulo int) int {
@@ -215,8 +235,8 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Variant2Num = hexStringToBigIntModulo(dd.Variant2Seed, lens[8])
 	dd.Variant3Num = hexStringToBigIntModulo(dd.Variant3Seed, lens[8])
 	dd.Style2Num = hexStringToBigIntModulo(dd.Style2Seed, lens[8])
-	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, 4)
-	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, 4)
+	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, 8)
+	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, 8)
 
 	dd.Adverb = a.adverbs[dd.AdverbNum]
 	dd.Adjective = a.adjectives[dd.AdjectiveNum]
@@ -233,13 +253,23 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Style2 = strings.Replace(a.styles[dd.Style2Num], ",", " from the", -1)
 	switch dd.BackgroundNum {
 	case 0:
-		dd.Background = " The background should be transparent. "
+		fallthrough
 	case 1:
-		dd.Background = " The background should reflect the value of the BG Style. "
+		dd.Background = " The background should be transparent. "
 	case 2:
+		dd.Background = " The background should be a solid color. "
+	case 3:
+		fallthrough
+	case 4:
+		fallthrough
+	case 5:
+		fallthrough
+	case 6:
+		dd.Background = " The background should reflect the value of the BG Style. "
+	case 7:
 		dd.Background = " The background should subtly stripped or checked. "
 	default:
-		dd.Background = " The background should be a solid color. "
+		logger.Fatal("Invalid background number: ", dd.BackgroundNum)
 	}
 	switch dd.OrientationNum {
 	case 0:
@@ -290,7 +320,7 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 			return
 		}
 
-		prompt := a.GetData(ensOrAddr)
+		prompt := a.GetPrompt(ensOrAddr)
 		size := "1024x1024"
 		if strings.Contains(prompt, "horizontal") {
 			size = "1792x1024"
@@ -396,7 +426,7 @@ func (a *App) GetModeration(ensOrAddr string) string {
 	}
 	fmt.Println("API key found", apiKey)
 
-	prompt := a.GetData(ensOrAddr)
+	prompt := a.GetPrompt(ensOrAddr)
 	url := "https://api.openai.com/v1/moderations"
 	payload := DalleRequest{
 		Input: prompt,

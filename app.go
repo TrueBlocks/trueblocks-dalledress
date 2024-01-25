@@ -62,9 +62,11 @@ func (a *App) startup(ctx context.Context) {
 	if a.emotions2, err = toLines("/Users/jrush/Desktop/Animals.1/emotions.csv"); err != nil {
 		logger.Fatal(err)
 	}
-	for _, e := range a.emotions2 {
-		parts := strings.Split(e, ",")
-		if len(parts) > 0 {
+	for i := 0; i < len(a.emotions2); i++ {
+		e2 := a.emotions2[i]
+		parts := strings.Split(e2, ",")
+		if len(parts) > 2 {
+			a.emotions2[i] = parts[0] + " (" + strings.Replace(parts[2], ".", "", -1) + ")"
 			a.emotions1 = append(a.emotions1, parts[0])
 		}
 	}
@@ -77,20 +79,13 @@ func (a *App) startup(ctx context.Context) {
 	if a.styles, err = toLines("/Users/jrush/Desktop/Animals.1/styles.csv"); err != nil {
 		logger.Fatal(err)
 	}
-	x := make([]string, 0, len(a.styles))
-	for _, s := range a.styles {
-		if !strings.Contains(s, "sensitive") { // remove culturally sensitive styles
-			x = append(x, s)
-		}
+	for i := 0; i < len(a.styles); i++ {
+		a.styles[i] = strings.Replace(a.styles[i], ",", " style from ", -1)
 	}
-	a.styles = x
-
-	pT := "I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: " + promptTemplate
-	if a.pTemplate, err = template.New("prompt").Parse(pT); err != nil {
+	if a.pTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}
-	dT := "I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: " + dataTemplate
-	if a.dTemplate, err = template.New("data").Parse(dT); err != nil {
+	if a.dTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
 		logger.Fatal("could not create data template:", err)
 	}
 

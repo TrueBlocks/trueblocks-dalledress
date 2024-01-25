@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 
+	"github.com/TrueBlocks/trueblocks-browse/app"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -12,18 +13,18 @@ import (
 var assets embed.FS
 
 func main() {
-	app := NewApp()
+	app := app.NewApp()
 	opts := options.App{
-		Title:            "trueblocks-browse",
-		Width:            1024,
-		Height:           768,
-		BackgroundColour: &options.RGBA{R: 33, G: 37, B: 41, A: 1},
-		OnStartup:        app.startup,
-		OnDomReady:       app.domReady,
-		OnShutdown:       app.shutdown,
+		Title:      "TrueBlocks Browse",
+		Width:      app.GetSession().Width,
+		Height:     app.GetSession().Height,
+		OnStartup:  app.Startup,
+		OnDomReady: app.DomReady,
+		OnShutdown: app.Shutdown,
 		Bind: []interface{}{
 			app,
 		},
+		StartHidden: true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

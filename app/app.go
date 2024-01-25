@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"context"
@@ -12,14 +12,14 @@ func NewApp() *App {
 	return &App{}
 }
 
-func (a *App) startup(ctx context.Context) {
+func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) domReady(ctx context.Context) {
+func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 }
 
-func (a *App) shutdown(ctx context.Context) {
+func (a *App) Shutdown(ctx context.Context) {
 	a.ctx = ctx
 }

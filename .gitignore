@@ -1,5 +1,6 @@
 .DS_Store
 shit*
+.env
 
 build/bin
 node_modules

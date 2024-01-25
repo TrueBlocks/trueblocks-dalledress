@@ -1,8 +1,6 @@
-module changeme
+module github.com/TrueBlocks/trueblocks-browse
 
 go 1.21
-
-toolchain go1.21.1
 
 require github.com/wailsapp/wails/v2 v2.7.1
 

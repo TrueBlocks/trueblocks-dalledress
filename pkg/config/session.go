@@ -49,7 +49,7 @@ func (s *Session) Save() {
 
 // getSessionFn returns the session file name.
 func getSessionFn() string {
-	if configDir, err := paths.GetConfigDir(); err != nil {
+	if configDir, err := paths.GetConfigDir("TrueBlocks/browse"); err != nil {
 		return "./session.json"
 	} else {
 		return filepath.Join(configDir, "session.json")

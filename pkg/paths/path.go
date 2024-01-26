@@ -10,11 +10,11 @@ import (
 
 // GetConfigDir returns the operating system's configuration folder for the current user.
 // If the folder does not exist, it is created.
-func GetConfigDir() (string, error) {
+func GetConfigDir(appDir string) (string, error) {
 	if configPath, err := os.UserConfigDir(); err != nil {
 		return "", err
 	} else {
-		path := filepath.Join(configPath, "TrueBlocks/browse")
+		path := filepath.Join(configPath, appDir)
 		file.EstablishFolder(path)
 		return path, nil
 	}
@@ -22,11 +22,11 @@ func GetConfigDir() (string, error) {
 
 // GetCacheDir returns the operating system's cache folder for the current user.
 // If the folder does not exist, it is created.
-func GetCacheDir() (string, error) {
+func GetCacheDir(appDir string) (string, error) {
 	if cachePath, err := os.UserCacheDir(); err != nil {
 		return "", err
 	} else {
-		path := filepath.Join(cachePath, "TrueBlocks/browse")
+		path := filepath.Join(cachePath, appDir)
 		file.EstablishFolder(path)
 		return path, nil
 	}

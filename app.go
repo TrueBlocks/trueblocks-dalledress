@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/rpc"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/paths"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -26,7 +28,6 @@ type App struct {
 	emotions2  []string
 	literary   []string
 	nouns      []string
-	colors     []string
 	styles     []string
 	pTemplate  *template.Template
 	dTemplate  *template.Template
@@ -53,14 +54,16 @@ func (a *App) startup(ctx context.Context) {
 		logger.Error("Could not find rpc server.")
 	}
 
+	dbFolder, _ := paths.GetConfigDir("TrueBlocks/dalledress/databases")
+
 	var err error
-	if a.adverbs, err = toLines("/Users/jrush/Desktop/Animals.1/adverbs.csv"); err != nil {
+	if a.adverbs, err = toLines(filepath.Join(dbFolder, "adverbs.csv")); err != nil {
 		logger.Fatal(err)
 	}
-	if a.adjectives, err = toLines("/Users/jrush/Desktop/Animals.1/adjectives.csv"); err != nil {
+	if a.adjectives, err = toLines(filepath.Join(dbFolder, "adjectives.csv")); err != nil {
 		logger.Fatal(err)
 	}
-	if a.emotions2, err = toLines("/Users/jrush/Desktop/Animals.1/emotions.csv"); err != nil {
+	if a.emotions2, err = toLines(filepath.Join(dbFolder, "emotions.csv")); err != nil {
 		logger.Fatal(err)
 	}
 	for i := 0; i < len(a.emotions2); i++ {
@@ -71,7 +74,7 @@ func (a *App) startup(ctx context.Context) {
 			a.emotions1 = append(a.emotions1, parts[0])
 		}
 	}
-	if lines, err := toLines("/Users/jrush/Desktop/Animals.1/literarystyles.csv"); err != nil {
+	if lines, err := toLines(filepath.Join(dbFolder, "literarystyles.csv")); err != nil {
 		logger.Fatal(err)
 	} else {
 		for _, line := range lines {
@@ -81,18 +84,16 @@ func (a *App) startup(ctx context.Context) {
 			}
 		}
 	}
-	if a.nouns, err = toLines("/Users/jrush/Desktop/Animals.1/nouns.csv"); err != nil {
+	if a.nouns, err = toLines(filepath.Join(dbFolder, "nouns.csv")); err != nil {
 		logger.Fatal(err)
 	}
-	if a.colors, err = toLines("/Users/jrush/Desktop/Animals.1/colors.csv"); err != nil {
-		logger.Fatal(err)
-	}
-	if a.styles, err = toLines("/Users/jrush/Desktop/Animals.1/styles.csv"); err != nil {
+	if a.styles, err = toLines(filepath.Join(dbFolder, "styles.csv")); err != nil {
 		logger.Fatal(err)
 	}
 	for i := 0; i < len(a.styles); i++ {
-		a.styles[i] = strings.Replace(a.styles[i], ",", " style from ", -1)
+		a.styles[i] = strings.Replace(a.styles[i], ",", " from the ", -1)
 	}
+
 	if a.pTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}

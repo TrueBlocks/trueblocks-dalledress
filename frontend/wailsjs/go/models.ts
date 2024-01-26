@@ -19,11 +19,8 @@ export namespace main {
 	    style: string;
 	    styleNum: number;
 	    color1: string;
-	    color1Num: number;
 	    color2: string;
-	    color2Num: number;
 	    color3: string;
-	    color3Num: number;
 	    variant1: string;
 	    variant1Num: number;
 	    variant2: string;
@@ -61,11 +58,8 @@ export namespace main {
 	        this.style = source["style"];
 	        this.styleNum = source["styleNum"];
 	        this.color1 = source["color1"];
-	        this.color1Num = source["color1Num"];
 	        this.color2 = source["color2"];
-	        this.color2Num = source["color2Num"];
 	        this.color3 = source["color3"];
-	        this.color3Num = source["color3Num"];
 	        this.variant1 = source["variant1"];
 	        this.variant1Num = source["variant1Num"];
 	        this.variant2 = source["variant2"];

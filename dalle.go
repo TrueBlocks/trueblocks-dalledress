@@ -52,13 +52,10 @@ type Dalledress struct {
 	StyleNum        int    `json:"styleNum"`
 	Color1          string `json:"color1"`
 	Color1Seed      string `json:"-"`
-	Color1Num       int    `json:"color1Num"`
 	Color2          string `json:"color2"`
 	Color2Seed      string `json:"-"`
-	Color2Num       int    `json:"color2Num"`
 	Color3          string `json:"color3"`
 	Color3Seed      string `json:"-"`
-	Color3Num       int    `json:"color3Num"`
 	Variant1        string `json:"variant1"`
 	Variant1Seed    string `json:"-"`
 	Variant1Num     int    `json:"variant1Num"`
@@ -82,18 +79,16 @@ type Dalledress struct {
 // I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail,  just use it AS-IS:
 // Please draw an image for the following data:
 
-var promptTemplate = `
+var promptTemplate1 = `
 Petname: {{.Adverb}}-{{.Adjective}}-{{.Noun}} feeling {{.Emotion1}}{{.Ens}}
 Adverb: {{.Adverb}}
 Adjective: {{.Adjective}}
 Emotion: {{.Emotion2}}
 Noun: {{.Noun}}
 Style: {{.Style}}
-Colors: {{.Color1}} and {{.Color2}}
-Orientation: {{.Orientation}}
-Background: {{.Background}}
-BGStyle: {{.Style2}}
-BgColor: {{.Color3}}
+Use only the colors {{.Color1}} and {{.Color2}}.
+{{.Orientation}}
+{{.Background}}
 In addition to the denotative meaning of the noun {{.Noun}}, the emotion {{.Emotion2}}, the
 adjective {{.Adjective}}, and the adverb {{.Adverb}}; consider the two most obvious connotations
 of each of these words and incorporate those ideas in the image as well. Allow your mind to roam as
@@ -102,6 +97,25 @@ the data. Focus on the petname {{.Adverb}}-{{.Adjective}}-{{.Noun}} feeling {{.E
 and the first style {{.Style}}. It is very important that you DO NOT PUT ANY TEXT ON THE IMAGE.
 Write a detailed description of the image in the literary style {{.Literary}}.
 `
+
+var promptTemplate = `
+Petname: {{.Adverb}}-{{.Adjective}}-{{.Noun}} feeling {{.Emotion1}}{{.Ens}}
+Noun: {{.Noun}}
+Emotion: {{.Emotion2}}
+Style: {{.Style}}
+Use only the colors {{.Color1}} and {{.Color2}}.
+{{.Orientation}}
+{{.Background}}
+Find the two most relevant connotative meanings of the noun {{.Noun}}, the emotion
+{{.Emotion2}}, the adjective {{.Adjective}}, and the adverb {{.Adverb}}. Use these
+ideas in your image. Allow your mind to roam as deeply into your world as possible.
+Find something unique. Find the single object that most closely matches the data.
+Focus on the petname {{.Adverb}}-{{.Adjective}}-{{.Noun}}, the emotion {{.Emotion1}},
+and the primary style {{.Style}}. Please DO NOT PUT ANY TEXT ON THE IMAGE. Write a
+detailed description of the image using the literary style {{.Literary}}.
+`
+
+// BGStyle: {{.Style2}}
 
 // Throw in slight hints of one or more of these additional artistic styles {{.Variant1}}, {{.Variant2}}, {{.Variant3}}.
 // Address: {{.Addr}}
@@ -114,9 +128,9 @@ var dataTemplate = `
 {{.AdjectiveSeed}}|{{.AdjectiveNum}}|{{.Adjective}}
 {{.NounSeed}}|{{.NounNum}}|{{.Noun}}
 {{.StyleSeed}}|{{.StyleNum}}|{{.Style}}
-{{.Color1Seed}}|{{.Color1Num}}|{{.Color1}}|
-{{.Color2Seed}}|{{.Color2Num}}|{{.Color2}}|
-{{.Color3Seed}}|{{.Color3Num}}|{{.Color3}}|
+{{.Color1Seed}}||{{.Color1}}|
+{{.Color2Seed}}||{{.Color2}}|
+{{.Color3Seed}}||{{.Color3}}|
 {{.Variant1Seed}}|{{.Variant1Num}}|{{.Variant1}}|
 {{.Variant2Seed}}|{{.Variant2Num}}|{{.Variant2}}|
 {{.Variant3Seed}}|{{.Variant3Num}}|{{.Variant3}}|
@@ -209,13 +223,13 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		LiterarySeed:    seed[48:60],
 		NounSeed:        seed[60:72],
 		StyleSeed:       seed[72:84],
-		Color1Seed:      seed[84:96],
-		Color2Seed:      seed[92:104],
-		Color3Seed:      seed[80:92],
-		Variant1Seed:    seed[68:80],
-		Variant2Seed:    seed[56:68],
-		Variant3Seed:    seed[44:56],
-		Style2Seed:      seed[32:44],
+		Style2Seed:      seed[84:96],
+		Color1Seed:      seed[92:104],
+		Color2Seed:      seed[80:92],
+		Color3Seed:      seed[68:80],
+		Variant1Seed:    seed[56:68],
+		Variant2Seed:    seed[44:56],
+		Variant3Seed:    seed[32:44],
 		BackgroundSeed:  hash[20:32],
 		OrientationSeed: hash[8:20],
 	}
@@ -230,24 +244,29 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		return int(intValue.Mod(intValue, modValue).Int64())
 	}
 
-	lens := []int{len(a.adverbs), len(a.adjectives), len(a.emotions1), len(a.literary), len(a.nouns), len(a.styles), len(a.colors), len(a.colors), len(a.colors), len(a.styles)}
+	lengths := []int{
+		len(a.adverbs),    // 0
+		len(a.adjectives), // 1
+		len(a.emotions1),  // 2
+		len(a.literary),   // 3
+		len(a.nouns),      // 4
+		len(a.styles),     // 5
+		8,                 // 6
+	}
 
-	dd.AdverbNum = hexStringToBigIntModulo(dd.AdverbSeed, lens[0])
-	dd.AdjectiveNum = hexStringToBigIntModulo(dd.AdjectiveSeed, lens[1])
-	dd.Emotion1Num = hexStringToBigIntModulo(dd.Emotion1Seed, lens[2])
-	dd.Emotion2Num = hexStringToBigIntModulo(dd.Emotion2Seed, lens[2])
-	dd.LiteraryNum = hexStringToBigIntModulo(dd.LiterarySeed, lens[3])
-	dd.NounNum = hexStringToBigIntModulo(dd.NounSeed, lens[4])
-	dd.StyleNum = hexStringToBigIntModulo(dd.StyleSeed, lens[5])
-	dd.Color1Num = hexStringToBigIntModulo(dd.Color1Seed, lens[6])
-	dd.Color2Num = hexStringToBigIntModulo(dd.Color2Seed, lens[7])
-	dd.Color3Num = hexStringToBigIntModulo(dd.Color3Seed, lens[8])
-	dd.Variant1Num = hexStringToBigIntModulo(dd.Variant1Seed, lens[9])
-	dd.Variant2Num = hexStringToBigIntModulo(dd.Variant2Seed, lens[9])
-	dd.Variant3Num = hexStringToBigIntModulo(dd.Variant3Seed, lens[9])
-	dd.Style2Num = hexStringToBigIntModulo(dd.Style2Seed, lens[9])
-	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, 8)
-	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, 8)
+	dd.AdverbNum = hexStringToBigIntModulo(dd.AdverbSeed, lengths[0])
+	dd.AdjectiveNum = hexStringToBigIntModulo(dd.AdjectiveSeed, lengths[1])
+	dd.Emotion1Num = hexStringToBigIntModulo(dd.Emotion1Seed, lengths[2])
+	dd.Emotion2Num = hexStringToBigIntModulo(dd.Emotion2Seed, lengths[2])
+	dd.LiteraryNum = hexStringToBigIntModulo(dd.LiterarySeed, lengths[3])
+	dd.NounNum = hexStringToBigIntModulo(dd.NounSeed, lengths[4])
+	dd.StyleNum = hexStringToBigIntModulo(dd.StyleSeed, lengths[5])
+	dd.Variant1Num = hexStringToBigIntModulo(dd.Variant1Seed, lengths[5])
+	dd.Variant2Num = hexStringToBigIntModulo(dd.Variant2Seed, lengths[5])
+	dd.Variant3Num = hexStringToBigIntModulo(dd.Variant3Seed, lengths[5])
+	dd.Style2Num = hexStringToBigIntModulo(dd.Style2Seed, lengths[5])
+	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, lengths[6])
+	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, lengths[6])
 
 	dd.Adverb = a.adverbs[dd.AdverbNum]
 	dd.Adjective = a.adjectives[dd.AdjectiveNum]
@@ -255,21 +274,22 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Emotion2 = a.emotions2[dd.Emotion2Num]
 	dd.Literary = a.literary[dd.LiteraryNum]
 	dd.Noun = a.nouns[dd.NounNum]
-	dd.Style = strings.Replace(a.styles[dd.StyleNum], ",", " from the", -1)
-	dd.Color1 = "#" + muteColor(dd.Color1Seed[:8], dd.Color1Seed[2:2]) //getColor(a.colors, dd.Color1Num)
-	dd.Color2 = "#" + muteColor(dd.Color2Seed[:8], dd.Color2Seed[3:3]) // getColor(a.colors, dd.Color2Num)
-	dd.Color3 = "#" + muteColor(dd.Color3Seed[:8], dd.Color3Seed[4:4]) // getColor(a.colors, dd.Color3Num)
+	dd.Style = a.styles[dd.StyleNum]
+	dd.Color1 = "#" + muteColor(dd.Color1Seed[:8], dd.Color1Seed[2:2])
+	dd.Color2 = "#" + muteColor(dd.Color2Seed[:8], dd.Color2Seed[3:3])
+	dd.Color3 = "#" + muteColor(dd.Color3Seed[:8], dd.Color3Seed[4:4])
 	dd.Variant1 = a.styles[dd.Variant1Num]
 	dd.Variant2 = a.styles[dd.Variant2Num]
 	dd.Variant3 = a.styles[dd.Variant3Num]
-	dd.Style2 = strings.Replace(a.styles[dd.Style2Num], ",", " from the", -1)
+	dd.Style2 = a.styles[dd.Style2Num]
+
 	switch dd.BackgroundNum {
 	case 0:
-		dd.Background = " The background should be transparent. "
+		dd.Background = "The background should be transparent."
 	case 1:
-		dd.Background = " The background should reflect the value of the BG Style. "
+		dd.Background = "The background should be this color {{.Color3}} and pay homage to this style {{.Style2}}."
 	case 2:
-		dd.Background = " The background should subtly stripped or checked. "
+		dd.Background = " The background should be this color {{.Color3}} and subtly patterned."
 	case 3:
 		fallthrough
 	case 4:
@@ -279,31 +299,39 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	case 6:
 		fallthrough
 	case 7:
-		dd.Background = " The background should be a solid color. "
+		dd.Background = "The background should be solid and colored with this color: {{.Color3}}."
 	default:
 		logger.Fatal("Invalid background number: ", dd.BackgroundNum)
 	}
+	dd.Background = strings.Replace(dd.Background, "{{.Color3}}", dd.Color3, -1)
+	dd.Background = strings.Replace(dd.Background, "{{.Style2}}", dd.Style2, -1)
+
+	ori, gaze, sym := "", "", ""
 	switch dd.OrientationNum {
 	case 0:
-		dd.Orientation = " The image should be oriented vertically. The {{.Noun}} should be facing into the camera."
+		ori, gaze, sym = "vertically", "into the camera", "symmetrical"
 	case 1:
-		dd.Orientation = " The image should be oriented horizontally. The {{.Noun}} should be facing left. "
+		ori, gaze, sym = "horizontally", "left", "asymmetrical"
 	case 2:
-		dd.Orientation = " The image should be oriented diagonally. The {{.Noun}} should be facing into the camera. "
+		ori, gaze, sym = "diagonally", "into the camera", "symmetrical"
 	case 3:
-		dd.Orientation = " The image should be oriented in a unique way. The {{.Noun}} should be facing right. "
+		ori, gaze, sym = "in a unique way", "right", "asymmetrical"
 	case 4:
-		dd.Orientation = " The image should be oriented vertically. The {{.Noun}} should be facing into the camera."
+		ori, gaze, sym = "vertically", "into the camera", "symmetrical"
 	case 5:
-		dd.Orientation = " The image should be oriented horizontally. The {{.Noun}} should be facing right. "
+		ori, gaze, sym = "horizontally", "right", "asymmetrical"
 	case 6:
-		dd.Orientation = " The image should be oriented diagonally. The {{.Noun}} should be facing into the camera. "
+		ori, gaze, sym = "diagonally", "into the camera", "symmetrical"
 	case 7:
-		dd.Orientation = " The image should be oriented in a unique way. The {{.Noun}} should be facing left. "
+		ori, gaze, sym = "in a unique way", "left", "asymmetrical"
 	default:
 		logger.Fatal("Invalid orientation number: ", dd.OrientationNum)
 	}
-
+	dd.Orientation = "The primary action in the image should be oriented {Ori} and {Sym}. The {{.Noun}} should be facing {Gaze}."
+	dd.Orientation = strings.Replace(dd.Orientation, "{Ori}", ori, -1)
+	dd.Orientation = strings.Replace(dd.Orientation, "{Sym}", sym, -1)
+	dd.Orientation = strings.Replace(dd.Orientation, "{Gaze}", gaze, -1)
+	dd.Orientation = strings.Replace(dd.Orientation, "{{.Noun}}", dd.Noun, -1)
 	return dd, nil
 }
 
@@ -420,6 +448,7 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 
 		logger.Info("Generated image: ", fn)
 
+		logger.Info("DalleResponse: ", string(body))
 		var dalleResp DalleResponse
 		err = json.Unmarshal(body, &dalleResp)
 		if err != nil {
@@ -477,7 +506,7 @@ func (a *App) GetModeration(ensOrAddr string) string {
 	if apiKey == "" {
 		log.Fatal("No API key found in .env")
 	}
-	fmt.Println("API key found", apiKey)
+	// fmt.Println("API key found", apiKey)
 
 	prompt := a.GetPrompt(ensOrAddr)
 	url := "https://api.openai.com/v1/moderations"
@@ -522,10 +551,10 @@ func (a *App) GetImprovedPrompt(ensOrAddr string) string {
 	if apiKey == "" {
 		log.Fatal("No API key found in .env")
 	}
-	fmt.Println("API key found", apiKey)
+	// fmt.Println("API key found", apiKey)
 
 	prompt := a.GetPrompt(ensOrAddr)
-	prompt = "You the best artist in the world. I will send you a description of an image and I want you to respond with a very detailed, improved description after having considered everything I have told you. My description will be a series of attributes. Here's my description: " + prompt
+	prompt = "You the best artist in the world. Given a description, respond with a detailed and description taking account of everything I tell you. My description: " + prompt
 	url := "https://api.openai.com/v1/chat/completions"
 	payload := DalleRequest{
 		Model: "gpt-3.5-turbo",

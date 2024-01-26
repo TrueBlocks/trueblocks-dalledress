@@ -17,6 +17,7 @@ import {
   GetData,
   GetJson,
   GetImage
+  // GetImprovedPrompt,
   // GetModeration
 } from "../wailsjs/go/main/App";
 import "./App.css";
@@ -28,6 +29,7 @@ export default function App() {
   const [data, setData] = useState<string>("");
   const [json, setJson] = useState<string>("");
   // const [moderation, setModeration] = useState<string>("");
+  // const [improvedPrompt, setImprovedPrompt] = useState<string>("");
 
   const form = useForm({
     initialValues: {
@@ -48,6 +50,9 @@ export default function App() {
     });
     // GetModeration(form.values["email"]).then((value: string) => {
     //   setModeration(value);
+    // });
+    // GetImprovedPrompt(form.values["email"]).then((value: string) => {
+    //   setImprovedPrompt(value);
     // });
   }, [email]);
 
@@ -74,6 +79,7 @@ export default function App() {
       </Box>
       <Button onClick={() => openImage(email, false)}>Generate</Button>{" "}
       <Button onClick={() => openImage(email, true)}>Regenerate</Button>
+      {/* <div>{improvedPrompt}</div> */}
       {/* <div>{moderation}</div> */}
       <Paper
         shadow="xs"

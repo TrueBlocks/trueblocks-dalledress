@@ -5,9 +5,11 @@ two
 shit*
 dalledress.csv
 settings.json
-generated*
+*generated*
 saved*
 
 build/bin
 node_modules
 frontend/dist
+file*
+x

@@ -12,6 +12,8 @@ export namespace main {
 	    emotion1Num: number;
 	    emotion2: string;
 	    emotion2Num: number;
+	    literary: string;
+	    literaryNum: number;
 	    noun: string;
 	    nounNum: number;
 	    style: string;
@@ -52,6 +54,8 @@ export namespace main {
 	        this.emotion1Num = source["emotion1Num"];
 	        this.emotion2 = source["emotion2"];
 	        this.emotion2Num = source["emotion2Num"];
+	        this.literary = source["literary"];
+	        this.literaryNum = source["literaryNum"];
 	        this.noun = source["noun"];
 	        this.nounNum = source["nounNum"];
 	        this.style = source["style"];

@@ -18,6 +18,10 @@ export function GetImage(arg1, arg2) {
   return window['go']['main']['App']['GetImage'](arg1, arg2);
 }
 
+export function GetImprovedPrompt(arg1) {
+  return window['go']['main']['App']['GetImprovedPrompt'](arg1);
+}
+
 export function GetJson(arg1) {
   return window['go']['main']['App']['GetJson'](arg1);
 }

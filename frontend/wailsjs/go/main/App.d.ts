@@ -10,6 +10,8 @@ export function GetData(arg1:string):Promise<string>;
 
 export function GetImage(arg1:string,arg2:boolean):Promise<void>;
 
+export function GetImprovedPrompt(arg1:string):Promise<string>;
+
 export function GetJson(arg1:string):Promise<string>;
 
 export function GetModeration(arg1:string):Promise<string>;

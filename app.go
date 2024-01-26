@@ -24,6 +24,7 @@ type App struct {
 	adjectives []string
 	emotions1  []string
 	emotions2  []string
+	literary   []string
 	nouns      []string
 	colors     []string
 	styles     []string
@@ -68,6 +69,16 @@ func (a *App) startup(ctx context.Context) {
 		if len(parts) > 2 {
 			a.emotions2[i] = parts[0] + " (" + strings.Replace(parts[2], ".", "", -1) + ")"
 			a.emotions1 = append(a.emotions1, parts[0])
+		}
+	}
+	if lines, err := toLines("/Users/jrush/Desktop/Animals.1/literarystyles.csv"); err != nil {
+		logger.Fatal(err)
+	} else {
+		for _, line := range lines {
+			parts := strings.Split(line, ",")
+			if len(parts) > 1 {
+				a.literary = append(a.literary, parts[0]+" ("+strings.Replace(parts[1], ".", "", -1)+")")
+			}
 		}
 	}
 	if a.nouns, err = toLines("/Users/jrush/Desktop/Animals.1/nouns.csv"); err != nil {

@@ -39,3 +39,14 @@ type ModerationObject struct {
 	Model   string    `json:"model"`
 	Results []Results `json:"results"`
 }
+
+type ChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+type ChatRequest struct {
+	Model    string        `json:"model"`
+	Seed     int           `json:"seed"`
+	Messages []ChatMessage `json:"messages"`
+}

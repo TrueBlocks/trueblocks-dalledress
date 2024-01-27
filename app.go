@@ -35,8 +35,21 @@ type App struct {
 	apiKey     string
 }
 
+var lock sync.Mutex
+
 func doOne(wg *sync.WaitGroup, app *App, arg string) {
 	defer wg.Done()
+	// thing := strings.Repeat("-", 80)
+	// data := app.GetData(arg)
+	// prompt := app.GetPrompt(arg)
+	// improved := app.GetImprovedPrompt(prompt)
+	// if strings.Contains(data, "0x3b161d57f482cd2dfbb626f0307ef92b3b094fce") {
+	// 	lock.Lock()
+	// 	fmt.Printf("%s\nData\n%s\n%s\n", thing, thing, data)
+	// 	fmt.Printf("%s\nPrompt\n%s\n%s\n", thing, thing, prompt)
+	//  fmt.Printf("%s\nPrompt\n%s\n%s\n", thing, thing, improved) // GetImage(arg, false)
+	// 	lock.Unlock()
+	// }
 	app.GetImage(arg, false)
 }
 

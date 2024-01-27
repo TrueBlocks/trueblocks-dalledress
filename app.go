@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
@@ -32,6 +33,11 @@ type App struct {
 	pTemplate  *template.Template
 	dTemplate  *template.Template
 	apiKey     string
+}
+
+func doOne(wg *sync.WaitGroup, app *App, arg string) {
+	defer wg.Done()
+	app.GetImage(arg, false)
 }
 
 func NewApp() *App {

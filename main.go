@@ -14,11 +14,6 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
-func doOne(wg *sync.WaitGroup, app *App, arg string) {
-	defer wg.Done()
-	app.GetImage(arg, false)
-}
-
 func main() {
 	app := NewApp()
 	if len(os.Args) > 0 {

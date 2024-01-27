@@ -192,6 +192,19 @@ func (a *App) GetAddress(index int) string {
 	return a.addresses[index%len(a.addresses)]
 }
 
+func hexStringToBigIntModulo(hexString string, seedBump, modulo int) int {
+	intValue := new(big.Int)
+	seedValue := new(big.Int)
+	intValue.SetString(hexString, 16)
+	seedValue.SetInt64(int64(seedBump))
+	modValue := big.NewInt(int64(modulo))
+	if modValue == big.NewInt(0) {
+		modValue = big.NewInt(1)
+	}
+	intValue = intValue.Add(intValue, seedValue)
+	return int(intValue.Mod(intValue, modValue).Int64())
+}
+
 func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	if len(a.adverbs) == 0 {
 		return Dalledress{}, fmt.Errorf("adverbs not loaded")
@@ -234,16 +247,6 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		OrientationSeed: hash[8:20],
 	}
 
-	hexStringToBigIntModulo := func(hexString string, modulo int) int {
-		intValue := new(big.Int)
-		intValue.SetString(hexString, 16)
-		modValue := big.NewInt(int64(modulo))
-		if modValue == big.NewInt(0) {
-			modValue = big.NewInt(1)
-		}
-		return int(intValue.Mod(intValue, modValue).Int64())
-	}
-
 	lengths := []int{
 		len(a.adverbs),    // 0
 		len(a.adjectives), // 1
@@ -254,19 +257,19 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		8,                 // 6
 	}
 
-	dd.AdverbNum = hexStringToBigIntModulo(dd.AdverbSeed, lengths[0])
-	dd.AdjectiveNum = hexStringToBigIntModulo(dd.AdjectiveSeed, lengths[1])
-	dd.Emotion1Num = hexStringToBigIntModulo(dd.Emotion1Seed, lengths[2])
-	dd.Emotion2Num = hexStringToBigIntModulo(dd.Emotion2Seed, lengths[2])
-	dd.LiteraryNum = hexStringToBigIntModulo(dd.LiterarySeed, lengths[3])
-	dd.NounNum = hexStringToBigIntModulo(dd.NounSeed, lengths[4])
-	dd.StyleNum = hexStringToBigIntModulo(dd.StyleSeed, lengths[5])
-	dd.Variant1Num = hexStringToBigIntModulo(dd.Variant1Seed, lengths[5])
-	dd.Variant2Num = hexStringToBigIntModulo(dd.Variant2Seed, lengths[5])
-	dd.Variant3Num = hexStringToBigIntModulo(dd.Variant3Seed, lengths[5])
-	dd.Style2Num = hexStringToBigIntModulo(dd.Style2Seed, lengths[5])
-	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, lengths[6])
-	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, lengths[6])
+	dd.AdverbNum = hexStringToBigIntModulo(dd.AdverbSeed, SeedBump, lengths[0])
+	dd.AdjectiveNum = hexStringToBigIntModulo(dd.AdjectiveSeed, SeedBump, lengths[1])
+	dd.Emotion1Num = hexStringToBigIntModulo(dd.Emotion1Seed, 0, lengths[2])
+	dd.Emotion2Num = hexStringToBigIntModulo(dd.Emotion2Seed, 0, lengths[2])
+	dd.LiteraryNum = hexStringToBigIntModulo(dd.LiterarySeed, 0, lengths[3])
+	dd.NounNum = hexStringToBigIntModulo(dd.NounSeed, 0, lengths[4])
+	dd.StyleNum = hexStringToBigIntModulo(dd.StyleSeed, 0, lengths[5])
+	dd.Variant1Num = hexStringToBigIntModulo(dd.Variant1Seed, 0, lengths[5])
+	dd.Variant2Num = hexStringToBigIntModulo(dd.Variant2Seed, 0, lengths[5])
+	dd.Variant3Num = hexStringToBigIntModulo(dd.Variant3Seed, 0, lengths[5])
+	dd.Style2Num = hexStringToBigIntModulo(dd.Style2Seed, 0, lengths[5])
+	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, 0, lengths[6])
+	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, 0, lengths[6])
 
 	dd.Adverb = a.adverbs[dd.AdverbNum]
 	dd.Adjective = a.adjectives[dd.AdjectiveNum]
@@ -358,6 +361,8 @@ type DalleResponse struct {
 	} `json:"data"`
 }
 
+var SeedBump = int(0)
+
 var fM sync.Mutex
 var reserved = make(map[string]bool)
 
@@ -373,12 +378,13 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 		fn := ""
 		for {
 			fn = filepath.Join(folder, fmt.Sprintf("%s-%05d.png", addr, cnt))
+			fM.Lock()
 			if !file.FileExists(fn) && !reserved[fn] {
-				fM.Lock()
 				reserved[fn] = true
 				fM.Unlock()
 				break
 			}
+			fM.Unlock()
 			cnt++
 		}
 		msg := fmt.Sprintf("%s,%s,%s,image\n", utils.FormattedDate(time.Now().Unix()), addr, strings.ToLower(ensOrAddr))

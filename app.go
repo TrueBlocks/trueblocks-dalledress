@@ -144,14 +144,18 @@ func (a *App) GetSettings() *Settings {
 }
 
 func (a *App) domReady(ctx context.Context) {
-	runtime.WindowSetPosition(a.ctx, a.GetSettings().X, a.GetSettings().Y)
-	runtime.WindowShow(ctx)
+	if a.ctx != context.Background() {
+		runtime.WindowSetPosition(a.ctx, a.GetSettings().X, a.GetSettings().Y)
+		runtime.WindowShow(ctx)
+	}
 }
 
 func (a *App) shutdown(ctx context.Context) {
-	settings.Width, settings.Height = runtime.WindowGetSize(ctx)
-	settings.X, settings.Y = runtime.WindowGetPosition(ctx)
-	a.SaveSettings()
+	if a.ctx != context.Background() {
+		settings.Width, settings.Height = runtime.WindowGetSize(ctx)
+		settings.X, settings.Y = runtime.WindowGetPosition(ctx)
+		a.SaveSettings()
+	}
 }
 
 func (a *App) SaveSettings() {

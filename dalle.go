@@ -82,10 +82,12 @@ type Dalledress struct {
 	Orientation     string    `json:"orientation"`
 	OrientationSeed string    `json:"-"`
 	OrientationNum  int       `json:"orientationNum"`
-	Data            string    `json:"data"`
-	DataError       error     `json:"dataError"`
 	Prompt          string    `json:"prompt"`
 	PromptError     error     `json:"promptError"`
+	Data            string    `json:"data"`
+	DataError       error     `json:"dataError"`
+	Terse           string    `json:"terse"`
+	TerseError      error     `json:"terseError"`
 }
 
 // I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail,  just use it AS-IS:
@@ -130,25 +132,19 @@ Write in the literary style {{.Literary}}.`
 // Throw in slight hints of one or more of these additional artistic styles {{.Variant1}}, {{.Variant2}}, {{.Variant3}}.
 // Address: {{.Addr}}
 
-var dataTemplate = `Ens:         {{.Ens}}.
-Address:     {{.Addr}}.
+var dataTemplate = `
+Address:     {{.Addr}} Ens: {{.Ens}}.
 Seed:        {{.Seed}}.
-Adverb:      {{.Adverb.Seed}}|{{.Adverb.Num}}|{{.Adverb.Val}}.
-Adjective:   {{.AdjectiveSeed}}|{{.AdjectiveNum}}|{{.Adjective}}.
-Emotion1:    {{.Emotion1Seed}}|{{.Emotion1Num}}|{{.Emotion1}}.
-Emotion2:    {{.Emotion2Seed}}|{{.Emotion2Num}}|{{.Emotion2}}.
-Literary:    {{.LiterarySeed}}|{{.LiteraryNum}}|{{.Literary}}.
-Noun:        {{.NounSeed}}|{{.NounNum}}|{{.Noun}}.
-Style1:      {{.StyleSeed}}|{{.StyleNum}}|{{.Style}}.
-Color1:      {{.Color1Seed}}||{{.Color1}}.
-Color2:      {{.Color2Seed}}||{{.Color2}}.
-Color3:      {{.Color3Seed}}||{{.Color3}}.
-Variant1:    {{.Variant1Seed}}|{{.Variant1Num}}|{{.Variant1}}.
-Variant2:    {{.Variant2Seed}}|{{.Variant2Num}}|{{.Variant2}}.
-Variant3:    {{.Variant3Seed}}|{{.Variant3Num}}|{{.Variant3}}.
-Style2:      {{.Style2Seed}}|{{.Style2Num}}|{{.Style2}}.
-Background:  {{.BackgroundSeed}}|{{.BackgroundNum}}|{{.Background}}.
-Orientation: {{.OrientationSeed}}|{{.OrientationNum}}|{{.Orientation}}.`
+Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective}} Noun: {{.Noun}}.
+Emotion1:    {{.Emotion1}} Literary: {{.Literary}}.
+Style1:      {{.Style}}.
+Color1:      {{.Color1}} Color2: {{.Color2}} Color3: {{.Color3}}.
+Variant1:    {{.Variant1}} Variant2: {{.Variant2}} Variant3: {{.Variant3}}.
+Style2:      {{.Style2}}.
+Background:  {{.Background}}.
+Orientation: {{.Orientation}}.`
+
+var terseTemplate = `{{.Adverb.Val}} {{.Adjective}} {{.Noun}} feeling {{.Emotion1}} {{.Orientation}}`
 
 func (d *Dalledress) generatePrompt(t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
@@ -169,6 +165,20 @@ func (a *App) GetPrompt(ensOrAddr string) string {
 			return dd.PromptError.Error()
 		}
 		return dd.Prompt
+	}
+}
+
+func (a *App) GetTerse(ensOrAddr string) string {
+	clean := func(s string) string {
+		return strings.Replace(strings.Replace(strings.Replace(s, ". ", "\n", -1), "|", "\t", -1), "+\n", " ", -1)
+	}
+	if dd, err := a.GetDalledress(ensOrAddr); err != nil {
+		return fmt.Sprintf("Error generating data: %s\n", err)
+	} else {
+		if dd.Terse, dd.TerseError = dd.generatePrompt(a.tTemplate, clean); dd.TerseError != nil {
+			return dd.TerseError.Error()
+		}
+		return dd.Terse
 	}
 }
 
@@ -213,6 +223,11 @@ func hexStringToBigIntModulo(hexString string, seedBump, modulo int) int {
 	}
 	intValue = intValue.Add(intValue, seedValue)
 	return int(intValue.Mod(intValue, modValue).Int64())
+}
+
+func clip(s string) string {
+	parts := strings.Split(s, " from the ")
+	return parts[0]
 }
 
 func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
@@ -291,9 +306,9 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Color1 = "#" + muteColor(dd.Color1Seed[:8], dd.Color1Seed[2:2])
 	dd.Color2 = "#" + muteColor(dd.Color2Seed[:8], dd.Color2Seed[3:3])
 	dd.Color3 = "#" + muteColor(dd.Color3Seed[:8], dd.Color3Seed[4:4])
-	dd.Variant1 = a.styles[dd.Variant1Num]
-	dd.Variant2 = a.styles[dd.Variant2Num]
-	dd.Variant3 = a.styles[dd.Variant3Num]
+	dd.Variant1 = clip(a.styles[dd.Variant1Num])
+	dd.Variant2 = clip(a.styles[dd.Variant2Num])
+	dd.Variant3 = clip(a.styles[dd.Variant3Num])
 	dd.Style2 = a.styles[dd.Style2Num]
 
 	switch dd.BackgroundNum {

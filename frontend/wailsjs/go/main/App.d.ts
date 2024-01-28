@@ -20,6 +20,8 @@ export function GetPrompt(arg1:string):Promise<string>;
 
 export function GetSettings():Promise<main.Settings>;
 
+export function GetTerse(arg1:string):Promise<string>;
+
 export function GetTypes():Promise<Array<any>>;
 
 export function SaveSettings():Promise<void>;

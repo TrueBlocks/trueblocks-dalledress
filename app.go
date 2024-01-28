@@ -32,6 +32,7 @@ type App struct {
 	styles     []string
 	pTemplate  *template.Template
 	dTemplate  *template.Template
+	tTemplate  *template.Template
 	apiKey     string
 }
 
@@ -118,6 +119,9 @@ func (a *App) startup(ctx context.Context) {
 	}
 	if a.dTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
 		logger.Fatal("could not create data template:", err)
+	}
+	if a.tTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
+		logger.Fatal("could not create terse template:", err)
 	}
 
 	if err = godotenv.Load(); err != nil {

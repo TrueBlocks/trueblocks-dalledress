@@ -38,6 +38,10 @@ export function GetSettings() {
   return window['go']['main']['App']['GetSettings']();
 }
 
+export function GetTerse(arg1) {
+  return window['go']['main']['App']['GetTerse'](arg1);
+}
+
 export function GetTypes() {
   return window['go']['main']['App']['GetTypes']();
 }

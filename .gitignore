@@ -9,6 +9,7 @@ dalledress.csv
 settings.json
 *generated*
 saved*
+annotated*
 
 build/bin
 node_modules

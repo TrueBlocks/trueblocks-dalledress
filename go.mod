@@ -7,6 +7,7 @@ toolchain go1.21.1
 require (
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20240117023219-2b5b03ec34c9
 	github.com/ethereum/go-ethereum v1.12.2
+	github.com/fogleman/gg v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/wailsapp/wails/v2 v2.7.1
@@ -21,7 +22,6 @@ require (
 	github.com/crackcomm/go-gitignore v0.0.0-20170627025303-887ab5e44cc3 // indirect
 	github.com/deckarep/golang-set/v2 v2.1.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
-	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect

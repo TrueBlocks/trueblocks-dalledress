@@ -1,11 +1,26 @@
 export namespace main {
 	
+	export class Attribute {
+	    seed: string;
+	    num: number;
+	    val: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Attribute(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.seed = source["seed"];
+	        this.num = source["num"];
+	        this.val = source["val"];
+	    }
+	}
 	export class Dalledress {
 	    ens: string;
 	    addr: string;
 	    seed: string;
-	    adverb: string;
-	    adverbNum: number;
+	    adverb: Attribute;
 	    adjective: string;
 	    adjectiveNum: number;
 	    emotion1: string;
@@ -19,8 +34,11 @@ export namespace main {
 	    style: string;
 	    styleNum: number;
 	    color1: string;
+	    color1Num: number;
 	    color2: string;
+	    color2Num: number;
 	    color3: string;
+	    color3Num: number;
 	    variant1: string;
 	    variant1Num: number;
 	    variant2: string;
@@ -33,6 +51,12 @@ export namespace main {
 	    backgroundNum: number;
 	    orientation: string;
 	    orientationNum: number;
+	    prompt: string;
+	    promptError: any;
+	    data: string;
+	    dataError: any;
+	    terse: string;
+	    terseError: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new Dalledress(source);
@@ -43,8 +67,7 @@ export namespace main {
 	        this.ens = source["ens"];
 	        this.addr = source["addr"];
 	        this.seed = source["seed"];
-	        this.adverb = source["adverb"];
-	        this.adverbNum = source["adverbNum"];
+	        this.adverb = this.convertValues(source["adverb"], Attribute);
 	        this.adjective = source["adjective"];
 	        this.adjectiveNum = source["adjectiveNum"];
 	        this.emotion1 = source["emotion1"];
@@ -58,8 +81,11 @@ export namespace main {
 	        this.style = source["style"];
 	        this.styleNum = source["styleNum"];
 	        this.color1 = source["color1"];
+	        this.color1Num = source["color1Num"];
 	        this.color2 = source["color2"];
+	        this.color2Num = source["color2Num"];
 	        this.color3 = source["color3"];
+	        this.color3Num = source["color3Num"];
 	        this.variant1 = source["variant1"];
 	        this.variant1Num = source["variant1Num"];
 	        this.variant2 = source["variant2"];
@@ -72,7 +98,31 @@ export namespace main {
 	        this.backgroundNum = source["backgroundNum"];
 	        this.orientation = source["orientation"];
 	        this.orientationNum = source["orientationNum"];
+	        this.prompt = source["prompt"];
+	        this.promptError = source["promptError"];
+	        this.data = source["data"];
+	        this.dataError = source["dataError"];
+	        this.terse = source["terse"];
+	        this.terseError = source["terseError"];
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class Settings {
 	    title: string;

@@ -20,37 +20,24 @@ import (
 
 // App struct
 type App struct {
-	ctx        context.Context
-	conn       *rpc.Connection
-	addresses  []string
-	adverbs    []string
-	adjectives []string
-	emotions1  []string
-	emotions2  []string
-	literary   []string
-	nouns      []string
-	styles     []string
-	pTemplate  *template.Template
-	dTemplate  *template.Template
-	tTemplate  *template.Template
-	apiKey     string
+	ctx           context.Context
+	conn          *rpc.Connection
+	addresses     []string
+	adverbs       []string
+	adjectives    []string
+	emotionsShort []string
+	emotions      []string
+	literary      []string
+	nouns         []string
+	styles        []string
+	pTemplate     *template.Template
+	dTemplate     *template.Template
+	tTemplate     *template.Template
+	apiKey        string
 }
-
-var lock sync.Mutex
 
 func doOne(wg *sync.WaitGroup, app *App, arg string) {
 	defer wg.Done()
-	// thing := strings.Repeat("-", 80)
-	// data := app.GetData(arg)
-	// prompt := app.GetPrompt(arg)
-	// improved := app.GetImprovedPrompt(prompt)
-	// if strings.Contains(data, "0x3b161d57f482cd2dfbb626f0307ef92b3b094fce") {
-	// 	lock.Lock()
-	// 	fmt.Printf("%s\nData\n%s\n%s\n", thing, thing, data)
-	// 	fmt.Printf("%s\nPrompt\n%s\n%s\n", thing, thing, prompt)
-	//  fmt.Printf("%s\nPrompt\n%s\n%s\n", thing, thing, improved) // GetImage(arg, false)
-	// 	lock.Unlock()
-	// }
 	app.GetImage(arg, false)
 }
 
@@ -83,15 +70,15 @@ func (a *App) startup(ctx context.Context) {
 	if a.adjectives, err = toLines(filepath.Join(dbFolder, "adjectives.csv")); err != nil {
 		logger.Fatal(err)
 	}
-	if a.emotions2, err = toLines(filepath.Join(dbFolder, "emotions.csv")); err != nil {
+	if a.emotions, err = toLines(filepath.Join(dbFolder, "emotions.csv")); err != nil {
 		logger.Fatal(err)
 	}
-	for i := 0; i < len(a.emotions2); i++ {
-		e2 := a.emotions2[i]
+	for i := 0; i < len(a.emotions); i++ {
+		e2 := a.emotions[i]
 		parts := strings.Split(e2, ",")
 		if len(parts) > 2 {
-			a.emotions2[i] = parts[0] + " (" + strings.Replace(parts[2], ".", "", -1) + ")"
-			a.emotions1 = append(a.emotions1, parts[0])
+			a.emotions[i] = parts[0] + " (" + strings.Replace(parts[2], ".", "", -1) + ")"
+			a.emotionsShort = append(a.emotionsShort, parts[0])
 		}
 	}
 	if lines, err := toLines(filepath.Join(dbFolder, "literarystyles.csv")); err != nil {

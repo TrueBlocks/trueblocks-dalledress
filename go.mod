@@ -6,6 +6,7 @@ toolchain go1.21.1
 
 require (
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20240117023219-2b5b03ec34c9
+	github.com/disintegration/imaging v1.6.2
 	github.com/ethereum/go-ethereum v1.12.2
 	github.com/fogleman/gg v1.3.0
 	github.com/joho/godotenv v1.5.1
@@ -90,7 +91,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb // indirect
-	golang.org/x/image v0.12.0 // indirect
+	golang.org/x/image v0.15.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect

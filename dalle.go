@@ -32,119 +32,69 @@ type Attribute struct {
 	Val  string `json:"val"`
 }
 
-type Dalledress struct {
-	Ens             string    `json:"ens"`
-	Addr            string    `json:"addr"`
-	Seed            string    `json:"seed"`
-	Adverb          Attribute `json:"adverb"`
-	Adjective       string    `json:"adjective"`
-	AdjectiveSeed   string    `json:"-"`
-	AdjectiveNum    int       `json:"adjectiveNum"`
-	Emotion1        string    `json:"emotion1"`
-	Emotion1Seed    string    `json:"-"`
-	Emotion1Num     int       `json:"emotion1Num"`
-	Emotion2        string    `json:"emotion2"`
-	Emotion2Seed    string    `json:"-"`
-	Emotion2Num     int       `json:"emotion2Num"`
-	Literary        string    `json:"literary"`
-	LiterarySeed    string    `json:"-"`
-	LiteraryNum     int       `json:"literaryNum"`
-	Noun            string    `json:"noun"`
-	NounSeed        string    `json:"-"`
-	NounNum         int       `json:"nounNum"`
-	Style           string    `json:"style"`
-	StyleSeed       string    `json:"-"`
-	StyleNum        int       `json:"styleNum"`
-	Color1          string    `json:"color1"`
-	Color1Seed      string    `json:"-"`
-	Color1Num       int       `json:"color1Num"`
-	Color2          string    `json:"color2"`
-	Color2Seed      string    `json:"-"`
-	Color2Num       int       `json:"color2Num"`
-	Color3          string    `json:"color3"`
-	Color3Seed      string    `json:"-"`
-	Color3Num       int       `json:"color3Num"`
-	Variant1        string    `json:"variant1"`
-	Variant1Seed    string    `json:"-"`
-	Variant1Num     int       `json:"variant1Num"`
-	Variant2        string    `json:"variant2"`
-	Variant2Seed    string    `json:"-"`
-	Variant2Num     int       `json:"variant2Num"`
-	Variant3        string    `json:"variant3"`
-	Variant3Seed    string    `json:"-"`
-	Variant3Num     int       `json:"variant3Num"`
-	Style2          string    `json:"style2"`
-	Style2Seed      string    `json:"-"`
-	Style2Num       int       `json:"style2Num"`
-	Background      string    `json:"background"`
-	BackgroundSeed  string    `json:"-"`
-	BackgroundNum   int       `json:"backgroundNum"`
-	Orientation     string    `json:"orientation"`
-	OrientationSeed string    `json:"-"`
-	OrientationNum  int       `json:"orientationNum"`
-	Prompt          string    `json:"prompt"`
-	PromptError     error     `json:"promptError"`
-	Data            string    `json:"data"`
-	DataError       error     `json:"dataError"`
-	Terse           string    `json:"terse"`
-	TerseError      error     `json:"terseError"`
+type Value struct {
+	Val   string `json:"val"`
+	Error error  `json:"error"`
 }
 
-// I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail,  just use it AS-IS:
-// Please draw an image for the following data:
+type Dalledress struct {
+	Ens          string    `json:"ens"`
+	Addr         string    `json:"addr"`
+	Seed         string    `json:"seed"`
+	Adverb       Attribute `json:"adverb"`
+	Adjective    Attribute `json:"adjective"`
+	EmotionShort Attribute `json:"emotionShort"`
+	Emotion      Attribute `json:"emotion"`
+	Literary     Attribute `json:"literary"`
+	Noun         Attribute `json:"noun"`
+	Style        Attribute `json:"style"`
+	Style2       Attribute `json:"style2"`
+	Color1       Attribute `json:"color1"`
+	Color2       Attribute `json:"color2"`
+	Color3       Attribute `json:"color3"`
+	Variant1     Attribute `json:"variant1"`
+	Variant2     Attribute `json:"variant2"`
+	Variant3     Attribute `json:"variant3"`
+	Background   Attribute `json:"background"`
+	Orientation  Attribute `json:"orientation"`
+	Prompt       Value     `json:"prompt"`
+	Data         Value     `json:"data"`
+	Terse        Value     `json:"terse"`
+}
 
-// var promptTemplate1 = `
-// Petname: {{.Adverb.Val}}-{{.Adjective}}-{{.Noun}} feeling {{.Emotion1}}{{.Ens}}
-// Adverb: {{.Adverb.Val}}
-// Adjective: {{.Adjective}}
-// Emotion: {{.Emotion2}}
-// Noun: {{.Noun}}
-// Style: {{.Style}}
-// Use only the colors {{.Color1}} and {{.Color2}}.
-// {{.Orientation}}.
-// {{.Background}}.
-// In addition to the denotative meaning of the noun {{.Noun}}, the emotion {{.Emotion2}}, the
-// adjective {{.Adjective}}, and the adverb {{.Adverb.Val}}; consider the two most obvious connotations
-// of each of these words and incorporate those ideas in the image as well. Allow your mind to roam as
-// deeply into the world as possible. Find something unique. Find the object that most closely matches
-// the data. Focus on the petname {{.Adverb.Val}}-{{.Adjective}}-{{.Noun}} feeling {{.Emotion1}}{{.Ens}}
-// and the first style {{.Style}}. It is very important that you DO NOT PUT ANY TEXT ON THE IMAGE.
-// Write a detailed description of the image in the literary style {{.Literary}}.
-// `
-
-var promptTemplate = `Petname: {{.Adverb.Val}} {{.Adjective}} {{.Noun}} feeling {{.Emotion1}}{{.Ens}}.
-Noun: {{.Noun}}.
-Emotion: {{.Emotion2}}.
-Primary style: {{.Style}}.
-Use only the colors {{.Color1}} and {{.Color2}}.
-{{.Orientation}}.
-{{.Background}}.
-Find the two most relevant connotative meanings of the noun {{.Noun}},+
-the emotion {{.Emotion2}}, the adjective {{.Adjective}}, and the adverb {{.Adverb.Val}}.
+var promptTemplate = `Petname: {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} feeling {{.EmotionShort.Val}}{{.Ens}}.
+Noun: {{.Noun.Val}}.
+Emotion: {{.Emotion.Val}}.
+Primary style: {{.Style.Val}}.
+Use only the colors {{.Color1.Val}} and {{.Color2.Val}}.
+{{.Orientation.Val}}.
+{{.Background.Val}}.
+Find the two most relevant connotative meanings of the noun {{.Noun.Val}},+
+the emotion {{.Emotion.Val}}, the adjective {{.Adjective.Val}}, and the adverb {{.Adverb.Val}}.
 Allow your mind to roam as deeply into the language model as possible.
 Find the single object that most closely matches the description.
 Focus on the Petname, the Emotion, and the Primary style.
 DO NOT PUT ANY TEXT ON THE IMAGE.
-Write in the literary style {{.Literary}}.`
+Write in the literary style {{.Literary.Val}}.`
 
-// BGStyle: {{.Style2}}
+// BGStyle: {{.Style2.Val}}
 
-// Throw in slight hints of one or more of these additional artistic styles {{.Variant1}}, {{.Variant2}}, {{.Variant3}}.
+// Throw in slight hints of one or more of these additional artistic styles {{.Variant1.Val}}, {{.Variant2.Val}}, {{.Variant3.Val}}.
 // Address: {{.Addr}}
 
 var dataTemplate = `
 Address:     {{.Addr}} Ens: {{.Ens}}.
 Seed:        {{.Seed}}.
-Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective}} Noun: {{.Noun}}.
-Emotion1:    {{.Emotion1}} Literary: {{.Literary}}.
-Style1:      {{.Style}}.
-Color1:      {{.Color1}} Color2: {{.Color2}} Color3: {{.Color3}}.
-Variant1:    {{.Variant1}} Variant2: {{.Variant2}} Variant3: {{.Variant3}}.
-Style2:      {{.Style2}}.
-Background:  {{.Background}}.
-Orientation: {{.Orientation}}.`
+Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective.Val}} Noun: {{.Noun.Val}}.
+Emotion:     {{.EmotionShort.Val}} Literary: {{.Literary.Val}}.
+Style1:      {{.Style.Val}}.
+Color1:      {{.Color1.Val}} Color2: {{.Color2.Val}} Color3: {{.Color3.Val}}.
+Variant1:    {{.Variant1.Val}} Variant2: {{.Variant2.Val}} Variant3: {{.Variant3.Val}}.
+Style2:      {{.Style2.Val}}.
+Background:  {{.Background.Val}}.
+Orientation: {{.Orientation.Val}}.`
 
-var terseTemplate = `{{.Adverb.Val}} {{.Adjective}} {{.Noun}} feeling {{.Emotion1}} {{.Orientation}}`
+var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} feeling {{.EmotionShort.Val}} {{.Orientation.Val}}`
 
 func (d *Dalledress) generatePrompt(t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
@@ -161,10 +111,10 @@ func (a *App) GetPrompt(ensOrAddr string) string {
 	if dd, err := a.GetDalledress(ensOrAddr); err != nil {
 		return fmt.Sprintf("Error generating prompt: %s\n", err)
 	} else {
-		if dd.Prompt, dd.PromptError = dd.generatePrompt(a.pTemplate, clean); dd.PromptError != nil {
-			return dd.PromptError.Error()
+		if dd.Prompt.Val, dd.Prompt.Error = dd.generatePrompt(a.pTemplate, clean); dd.Prompt.Error != nil {
+			return dd.Prompt.Error.Error()
 		}
-		return dd.Prompt
+		return dd.Prompt.Val
 	}
 }
 
@@ -175,10 +125,10 @@ func (a *App) GetTerse(ensOrAddr string) string {
 	if dd, err := a.GetDalledress(ensOrAddr); err != nil {
 		return fmt.Sprintf("Error generating data: %s\n", err)
 	} else {
-		if dd.Terse, dd.TerseError = dd.generatePrompt(a.tTemplate, clean); dd.TerseError != nil {
-			return dd.TerseError.Error()
+		if dd.Terse.Val, dd.Terse.Error = dd.generatePrompt(a.tTemplate, clean); dd.Terse.Error != nil {
+			return dd.Terse.Error.Error()
 		}
-		return dd.Terse
+		return dd.Terse.Val
 	}
 }
 
@@ -189,10 +139,10 @@ func (a *App) GetData(ensOrAddr string) string {
 	if dd, err := a.GetDalledress(ensOrAddr); err != nil {
 		return fmt.Sprintf("Error generating data: %s\n", err)
 	} else {
-		if dd.Data, dd.DataError = dd.generatePrompt(a.dTemplate, clean); dd.DataError != nil {
-			return dd.DataError.Error()
+		if dd.Data.Val, dd.Data.Error = dd.generatePrompt(a.dTemplate, clean); dd.Data.Error != nil {
+			return dd.Data.Error.Error()
 		}
-		return dd.Data
+		return dd.Data.Val
 	}
 }
 
@@ -251,73 +201,73 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	}
 
 	dd := Dalledress{
-		Ens:             ensOrAddr,
-		Addr:            addr,
-		Seed:            seed,
-		Adverb:          Attribute{Seed: seed[0:12]},
-		AdjectiveSeed:   seed[12:24],
-		Emotion1Seed:    seed[24:36],
-		Emotion2Seed:    seed[36:48],
-		LiterarySeed:    seed[48:60],
-		NounSeed:        seed[60:72],
-		StyleSeed:       seed[72:84],
-		Style2Seed:      seed[84:96],
-		Color1Seed:      seed[92:104],
-		Color2Seed:      seed[80:92],
-		Color3Seed:      seed[68:80],
-		Variant1Seed:    seed[56:68],
-		Variant2Seed:    seed[44:56],
-		Variant3Seed:    seed[32:44],
-		BackgroundSeed:  hash[20:32],
-		OrientationSeed: hash[8:20],
+		Ens:          ensOrAddr,
+		Addr:         addr,
+		Seed:         seed,
+		Adverb:       Attribute{Seed: seed[0:12]},
+		Adjective:    Attribute{Seed: seed[12:24]},
+		EmotionShort: Attribute{Seed: seed[24:36]},
+		Emotion:      Attribute{Seed: seed[36:48]},
+		Literary:     Attribute{Seed: seed[48:60]},
+		Noun:         Attribute{Seed: seed[60:72]},
+		Style:        Attribute{Seed: seed[72:84]},
+		Style2:       Attribute{Seed: seed[84:96]},
+		Color1:       Attribute{Seed: seed[92:104]},
+		Color2:       Attribute{Seed: seed[80:92]},
+		Color3:       Attribute{Seed: seed[68:80]},
+		Variant1:     Attribute{Seed: seed[56:68]},
+		Variant2:     Attribute{Seed: seed[44:56]},
+		Variant3:     Attribute{Seed: seed[32:44]},
+		Background:   Attribute{Seed: hash[20:32]},
+		Orientation:  Attribute{Seed: hash[8:20]},
 	}
 
 	lengths := []int{
-		len(a.adverbs),    // 0
-		len(a.adjectives), // 1
-		len(a.emotions1),  // 2
-		len(a.literary),   // 3
-		len(a.nouns),      // 4
-		len(a.styles),     // 5
-		8,                 // 6
+		len(a.adverbs),       // 0
+		len(a.adjectives),    // 1
+		len(a.emotionsShort), // 2
+		len(a.literary),      // 3
+		len(a.nouns),         // 4
+		len(a.styles),        // 5
+		8,                    // 6
 	}
 
 	dd.Adverb.Num = hexStringToBigIntModulo(dd.Adverb.Seed, SeedBump, lengths[0])
-	dd.AdjectiveNum = hexStringToBigIntModulo(dd.AdjectiveSeed, SeedBump, lengths[1])
-	dd.Emotion1Num = hexStringToBigIntModulo(dd.Emotion1Seed, 0, lengths[2])
-	dd.Emotion2Num = hexStringToBigIntModulo(dd.Emotion2Seed, 0, lengths[2])
-	dd.LiteraryNum = hexStringToBigIntModulo(dd.LiterarySeed, 0, lengths[3])
-	dd.NounNum = hexStringToBigIntModulo(dd.NounSeed, 0, lengths[4])
-	dd.StyleNum = hexStringToBigIntModulo(dd.StyleSeed, 0, lengths[5])
-	dd.Variant1Num = hexStringToBigIntModulo(dd.Variant1Seed, 0, lengths[5])
-	dd.Variant2Num = hexStringToBigIntModulo(dd.Variant2Seed, 0, lengths[5])
-	dd.Variant3Num = hexStringToBigIntModulo(dd.Variant3Seed, 0, lengths[5])
-	dd.Style2Num = hexStringToBigIntModulo(dd.Style2Seed, 0, lengths[5])
-	dd.BackgroundNum = hexStringToBigIntModulo(dd.BackgroundSeed, 0, lengths[6])
-	dd.OrientationNum = hexStringToBigIntModulo(dd.OrientationSeed, 0, lengths[6])
+	dd.Adjective.Num = hexStringToBigIntModulo(dd.Adjective.Seed, SeedBump, lengths[1])
+	dd.EmotionShort.Num = hexStringToBigIntModulo(dd.EmotionShort.Seed, 0, lengths[2])
+	dd.Emotion.Num = hexStringToBigIntModulo(dd.Emotion.Seed, 0, lengths[2])
+	dd.Literary.Num = hexStringToBigIntModulo(dd.Literary.Seed, 0, lengths[3])
+	dd.Noun.Num = hexStringToBigIntModulo(dd.Noun.Seed, 0, lengths[4])
+	dd.Style.Num = hexStringToBigIntModulo(dd.Style.Seed, 0, lengths[5])
+	dd.Style2.Num = hexStringToBigIntModulo(dd.Style2.Seed, 0, lengths[5])
+	dd.Variant1.Num = hexStringToBigIntModulo(dd.Variant1.Seed, 0, lengths[5])
+	dd.Variant2.Num = hexStringToBigIntModulo(dd.Variant2.Seed, 0, lengths[5])
+	dd.Variant3.Num = hexStringToBigIntModulo(dd.Variant3.Seed, 0, lengths[5])
+	dd.Background.Num = hexStringToBigIntModulo(dd.Background.Seed, 0, lengths[6])
+	dd.Orientation.Num = hexStringToBigIntModulo(dd.Orientation.Seed, 0, lengths[6])
 
 	dd.Adverb.Val = a.adverbs[dd.Adverb.Num]
-	dd.Adjective = a.adjectives[dd.AdjectiveNum]
-	dd.Emotion1 = a.emotions1[dd.Emotion1Num]
-	dd.Emotion2 = a.emotions2[dd.Emotion2Num]
-	dd.Literary = a.literary[dd.LiteraryNum]
-	dd.Noun = a.nouns[dd.NounNum]
-	dd.Style = a.styles[dd.StyleNum]
-	dd.Color1 = "#" + muteColor(dd.Color1Seed[:8], dd.Color1Seed[2:2])
-	dd.Color2 = "#" + muteColor(dd.Color2Seed[:8], dd.Color2Seed[3:3])
-	dd.Color3 = "#" + muteColor(dd.Color3Seed[:8], dd.Color3Seed[4:4])
-	dd.Variant1 = clip(a.styles[dd.Variant1Num])
-	dd.Variant2 = clip(a.styles[dd.Variant2Num])
-	dd.Variant3 = clip(a.styles[dd.Variant3Num])
-	dd.Style2 = a.styles[dd.Style2Num]
+	dd.Adjective.Val = a.adjectives[dd.Adjective.Num]
+	dd.EmotionShort.Val = a.emotionsShort[dd.EmotionShort.Num]
+	dd.Emotion.Val = a.emotions[dd.Emotion.Num]
+	dd.Literary.Val = a.literary[dd.Literary.Num]
+	dd.Noun.Val = a.nouns[dd.Noun.Num]
+	dd.Style.Val = a.styles[dd.Style.Num]
+	dd.Style2.Val = a.styles[dd.Style2.Num]
+	dd.Color1.Val = "#" + muteColor(dd.Color1.Seed[:8], dd.Color1.Seed[2:2])
+	dd.Color2.Val = "#" + muteColor(dd.Color2.Seed[:8], dd.Color2.Seed[3:3])
+	dd.Color3.Val = "#" + muteColor(dd.Color3.Seed[:8], dd.Color3.Seed[4:4])
+	dd.Variant1.Val = clip(a.styles[dd.Variant1.Num])
+	dd.Variant2.Val = clip(a.styles[dd.Variant2.Num])
+	dd.Variant3.Val = clip(a.styles[dd.Variant3.Num])
 
-	switch dd.BackgroundNum {
+	switch dd.Background.Num {
 	case 0:
-		dd.Background = "The background should be transparent"
+		dd.Background.Val = "The background should be transparent"
 	case 1:
-		dd.Background = "The background should be this color {{.Color3}} and pay homage to this style {{.Style2}}"
+		dd.Background.Val = "The background should be this color {{.Color3.Val}} and pay homage to this style {{.Style2.Val}}"
 	case 2:
-		dd.Background = " The background should be this color {{.Color3}} and subtly patterned"
+		dd.Background.Val = " The background should be this color {{.Color3.Val}} and subtly patterned"
 	case 3:
 		fallthrough
 	case 4:
@@ -327,15 +277,15 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	case 6:
 		fallthrough
 	case 7:
-		dd.Background = "The background should be solid and colored with this color: {{.Color3}}"
+		dd.Background.Val = "The background should be solid and colored with this color: {{.Color3.Val}}"
 	default:
-		logger.Fatal("Invalid background number: ", dd.BackgroundNum)
+		logger.Fatal("Invalid background number: ", dd.Background.Num)
 	}
-	dd.Background = strings.Replace(dd.Background, "{{.Color3}}", dd.Color3, -1)
-	dd.Background = strings.Replace(dd.Background, "{{.Style2}}", dd.Style2, -1)
+	dd.Background.Val = strings.Replace(dd.Background.Val, "{{.Color3.Val}}", dd.Color3.Val, -1)
+	dd.Background.Val = strings.Replace(dd.Background.Val, "{{.Style2.Val}}", dd.Style2.Val, -1)
 
 	ori, gaze, sym := "", "", ""
-	switch dd.OrientationNum {
+	switch dd.Orientation.Num {
 	case 0:
 		ori, gaze, sym = "vertically", "into the camera", "symmetrically"
 	case 1:
@@ -353,13 +303,13 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	case 7:
 		ori, gaze, sym = "in a unique way", "to the left", "asymmetrically"
 	default:
-		logger.Fatal("Invalid orientation number: ", dd.OrientationNum)
+		logger.Fatal("Invalid orientation number: ", dd.Orientation.Num)
 	}
-	dd.Orientation = "Orient the scene {Ori} and {Sym} and make sure the {{.Noun}} is facing {Gaze}"
-	dd.Orientation = strings.Replace(dd.Orientation, "{Ori}", ori, -1)
-	dd.Orientation = strings.Replace(dd.Orientation, "{Sym}", sym, -1)
-	dd.Orientation = strings.Replace(dd.Orientation, "{Gaze}", gaze, -1)
-	dd.Orientation = strings.Replace(dd.Orientation, "{{.Noun}}", dd.Noun, -1)
+	dd.Orientation.Val = "Orient the scene {Ori} and {Sym} and make sure the {{.Noun.Val}} is facing {Gaze}"
+	dd.Orientation.Val = strings.Replace(dd.Orientation.Val, "{Ori}", ori, -1)
+	dd.Orientation.Val = strings.Replace(dd.Orientation.Val, "{Sym}", sym, -1)
+	dd.Orientation.Val = strings.Replace(dd.Orientation.Val, "{Gaze}", gaze, -1)
+	dd.Orientation.Val = strings.Replace(dd.Orientation.Val, "{{.Noun.Val}}", dd.Noun.Val, -1)
 	return dd, nil
 }
 
@@ -584,7 +534,7 @@ func (a *App) GetImprovedPrompt(ensOrAddr string) string {
 	// fmt.Println("API key found", apiKey)
 
 	prompt := a.GetPrompt(ensOrAddr)
-	prompt = "Please give me a detailed, but terse, rewriting of this description of an image. Be imaginative. " + prompt
+	prompt = "Please give me a detailed, but terse, rewriting of this description of an image. Be imaginative. " + prompt + " Mute the colors."
 	url := "https://api.openai.com/v1/chat/completions"
 	payload := DalleRequest{
 		Model: "gpt-3.5-turbo",

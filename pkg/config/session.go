@@ -6,6 +6,7 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-browse/pkg/paths"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 )
 
 // Session stores ephemeral things such as last window position, last view, and recent file
@@ -50,6 +51,7 @@ func (s *Session) Save() {
 // getSessionFn returns the session file name.
 func getSessionFn() string {
 	if configDir, err := paths.GetConfigDir("TrueBlocks/browse"); err != nil {
+		logger.Error("paths.GetConfigDir returned an error", err)
 		return "./session.json"
 	} else {
 		return filepath.Join(configDir, "session.json")

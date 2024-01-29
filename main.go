@@ -13,16 +13,16 @@ import (
 var assets embed.FS
 
 func main() {
-	app := app.NewApp()
+	a := app.NewApp()
 	opts := options.App{
 		Title:      "TrueBlocks Browse",
-		Width:      app.GetSession().Width,
-		Height:     app.GetSession().Height,
-		OnStartup:  app.Startup,
-		OnDomReady: app.DomReady,
-		OnShutdown: app.Shutdown,
+		Width:      a.GetSession().Width,
+		Height:     a.GetSession().Height,
+		OnStartup:  a.Startup,
+		OnDomReady: a.DomReady,
+		OnShutdown: a.Shutdown,
 		Bind: []interface{}{
-			app,
+			a,
 		},
 		StartHidden: true,
 		AssetServer: &assetserver.Options{

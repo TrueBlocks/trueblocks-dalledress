@@ -13,9 +13,8 @@ type App struct {
 }
 
 func NewApp() *App {
-	return &App{
-		session: config.NewSession(),
-	}
+	var a App
+	return &a
 }
 
 func (a *App) Startup(ctx context.Context) {

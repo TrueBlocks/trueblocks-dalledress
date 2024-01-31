@@ -1,41 +1,20 @@
-import React, { useState } from "react";
-import { Greet } from "../wailsjs/go/app/App";
-import logo from "./assets/images/logo-universal.png";
-import "./App.css";
+import React from "react";
+import { AppShell } from "@mantine/core";
+import GlobalNavbar from "./components/global/GlobalNavbar";
+import Routes from "./components/global/Routes";
 
 function App() {
-  const [resultText, setResultText] = useState(
-    "Please enter your name below 👇"
-  );
-  const [name, setName] = useState("");
-  const updateName = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setName(e.target.value);
-  const updateResultText = (result: string) => setResultText(result);
-
-  function greet() {
-    Greet(name).then(updateResultText);
-  }
-
   return (
-    <div id="App">
-      <img src={logo} id="logo" alt="logo" />
-      <div id="result" className="result">
-        {resultText}
-      </div>
-      <div id="input" className="input-box">
-        <input
-          id="name"
-          className="input"
-          onChange={updateName}
-          autoComplete="off"
-          name="input"
-          type="text"
-        />
-        <button className="btn" onClick={greet}>
-          Greet
-        </button>
-      </div>
-    </div>
+    <AppShell navbar={{ width: "15rem", breakpoint: 0 }}>
+      <AppShell.Navbar>
+        {/* To change menu items, go to 'GlobalMenu' component */}
+        <GlobalNavbar />
+      </AppShell.Navbar>
+      <AppShell.Main>
+        {/* To add new views, go to 'Routes' component */}
+        <Routes />
+      </AppShell.Main>
+    </AppShell>
   );
 }
 

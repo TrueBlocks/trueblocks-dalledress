@@ -9,12 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tabler/icons-react": "^2.46.0",
     "dirname": "^0.1.0",
     "path": "^0.12.7",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "wouter": "^2.12.1"
   },
   "devDependencies": {
+    "@mantine/core": "^7.5.0",
+    "@mantine/hooks": "^7.5.0",
     "@types/node": "^20.11.5",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",

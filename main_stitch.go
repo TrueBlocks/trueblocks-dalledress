@@ -9,13 +9,19 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	"github.com/disintegration/imaging"
 )
 
 func main_stitch() {
 	parts := strings.Split(os.Args[1], "-")
-	imagePaths := make([]string, 0, 5)
-	for i := 0; i < 5; i++ {
+	imagePaths := make([]string, 0, 3)
+	start := utils.MustParseInt(os.Getenv("STITCH_START"))
+	cnt := utils.MustParseInt(os.Getenv("STITCH_CNT"))
+	if cnt == 0 {
+		cnt = 3
+	}
+	for i := start; i < start+cnt; i++ {
 		imagePaths = append(imagePaths, parts[0]+"-"+fmt.Sprintf("%05d", i)+".png")
 	}
 
@@ -26,7 +32,8 @@ func main_stitch() {
 	for _, path := range imagePaths {
 		img, err := imaging.Open(path)
 		if err != nil {
-			log.Fatalf("failed to open image: %v", err)
+			logger.Error("failed to open image:", err)
+			continue
 		}
 
 		// Resize the image to the specified height while preserving the aspect ratio.
@@ -54,9 +61,11 @@ func main_stitch() {
 
 	// Save the resulting image.
 	stitchedPath := strings.Replace(parts[0]+".png", "annotated/", "stitched/", -1)
+	stitchedPath = strings.Replace(stitchedPath, ".png", fmt.Sprintf("-%05d.png", start), -1)
 	logger.Info("Stitched image saved to", stitchedPath)
 	err := imaging.Save(newImg, stitchedPath)
 	if err != nil {
 		log.Fatalf("failed to save image: %v", err)
 	}
+	utils.System("open " + stitchedPath)
 }

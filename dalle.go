@@ -13,7 +13,6 @@ import (
 	"strings"
 	"sync"
 	"text/template"
-	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
@@ -22,7 +21,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/joho/godotenv"
 	"github.com/lucasb-eyer/go-colorful"
 )
 
@@ -73,20 +71,15 @@ Find the two most relevant connotative meanings of the noun {{.Noun.Val}},+
 the emotion {{.Emotion.Val}}, the adjective {{.Adjective.Val}}, and the adverb {{.Adverb.Val}}.
 Allow your mind to roam as deeply into the language model as possible.
 Find the single object that most closely matches the description.
-Focus on the Petname, the Emotion, and the Primary style.
-DO NOT PUT ANY TEXT ON THE IMAGE.
-Write in the literary style {{.Literary.Val}}.`
-
-// BGStyle: {{.Style2.Val}}
-
-// Throw in slight hints of one or more of these additional artistic styles {{.Variant1.Val}}, {{.Variant2.Val}}, {{.Variant3.Val}}.
-// Address: {{.Addr}}
+Focus on the Petname, the Emotion, and the Primary style.{{.Literary.Val}}
+DO NOT PUT ANY TEXT ON THE IMAGE.`
 
 var dataTemplate = `
 Address:     {{.Addr}} Ens: {{.Ens}}.
 Seed:        {{.Seed}}.
 Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective.Val}} Noun: {{.Noun.Val}}.
-Emotion:     {{.EmotionShort.Val}} Literary: {{.Literary.Val}}.
+Emotion:     {{.EmotionShort.Val}}.
+Literary:    {{.Literary.Val}}.
 Style1:      {{.Style.Val}}.
 Color1:      {{.Color1.Val}} Color2: {{.Color2.Val}} Color3: {{.Color3.Val}}.
 Variant1:    {{.Variant1.Val}} Variant2: {{.Variant2.Val}} Variant3: {{.Variant3.Val}}.
@@ -250,7 +243,7 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Adjective.Val = a.adjectives[dd.Adjective.Num]
 	dd.EmotionShort.Val = a.emotionsShort[dd.EmotionShort.Num]
 	dd.Emotion.Val = a.emotions[dd.Emotion.Num]
-	dd.Literary.Val = a.literary[dd.Literary.Num]
+	dd.Literary.Val = " Write in the literary style {{.Literary.Val}}."
 	dd.Noun.Val = a.nouns[dd.Noun.Num]
 	dd.Style.Val = a.styles[dd.Style.Num]
 	dd.Style2.Val = a.styles[dd.Style2.Num]
@@ -260,6 +253,12 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Variant1.Val = clip(a.styles[dd.Variant1.Num])
 	dd.Variant2.Val = clip(a.styles[dd.Variant2.Num])
 	dd.Variant3.Val = clip(a.styles[dd.Variant3.Num])
+
+	e := os.Getenv("DALLE_NO_LITERARY")
+	if e != "" {
+		dd.Literary.Val = ""
+	}
+	dd.Literary.Val = strings.Replace(dd.Literary.Val, "{{.Literary.Val}}", a.literary[dd.Literary.Num], -1)
 
 	switch dd.Background.Num {
 	case 0:
@@ -280,6 +279,16 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		dd.Background.Val = "The background should be solid and colored with this color: {{.Color3.Val}}"
 	default:
 		logger.Fatal("Invalid background number: ", dd.Background.Num)
+	}
+
+	e = os.Getenv("DALLE_BACKGROUND")
+	if e != "" {
+		switch e {
+		case "solid":
+			dd.Background.Val = "Make the image's background a solid color: {{.Color3.Val}}"
+		default:
+			logger.Fatal("Invalid DALLE_BACKGROUND: ", e)
+		}
 	}
 	dd.Background.Val = strings.Replace(dd.Background.Val, "{{.Color3.Val}}", dd.Color3.Val, -1)
 	dd.Background.Val = strings.Replace(dd.Background.Val, "{{.Style2.Val}}", dd.Style2.Val, -1)
@@ -306,6 +315,10 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		logger.Fatal("Invalid orientation number: ", dd.Orientation.Num)
 	}
 	dd.Orientation.Val = "Orient the scene {Ori} and {Sym} and make sure the {{.Noun.Val}} is facing {Gaze}"
+	e = os.Getenv("DALLE_ORIENTATION")
+	if e != "" {
+		dd.Orientation.Val = e
+	}
 	dd.Orientation.Val = strings.Replace(dd.Orientation.Val, "{Ori}", ori, -1)
 	dd.Orientation.Val = strings.Replace(dd.Orientation.Val, "{Sym}", sym, -1)
 	dd.Orientation.Val = strings.Replace(dd.Orientation.Val, "{Gaze}", gaze, -1)
@@ -341,7 +354,7 @@ var SeedBump = int(0)
 var fM sync.Mutex
 var reserved = make(map[string]bool)
 
-func (a *App) GetImage(ensOrAddr string, replace bool) {
+func (a *App) GetImage(ensOrAddr string) {
 	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
 		logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
 		return
@@ -349,6 +362,8 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 		folder := "./generated/"
 		file.EstablishFolder(folder)
 		file.EstablishFolder(strings.Replace(folder, "/generated", "/txt-generated", -1))
+		file.EstablishFolder(strings.Replace(folder, "/generated", "/annotated", -1))
+		file.EstablishFolder(strings.Replace(folder, "/generated", "/stitched", -1))
 		cnt := 0
 		fn := ""
 		for {
@@ -362,12 +377,8 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 			fM.Unlock()
 			cnt++
 		}
-		msg := fmt.Sprintf("%s,%s,%s,image\n", utils.FormattedDate(time.Now().Unix()), addr, strings.ToLower(ensOrAddr))
-		if replace {
-			os.Remove(fn)
-			msg = fmt.Sprintf("%s,%s,%s,replace image\n", utils.FormattedDate(time.Now().Unix()), addr, strings.ToLower(ensOrAddr))
-		}
-		file.AppendToAsciiFile("dalledress.csv", msg)
+		// msg := fmt.Sprintf("%s,%s,%s,image\n", utils.FormattedDate(time.Now().Unix()), addr, strings.ToLower(ensOrAddr))
+		// file.AppendToAsciiFile("dalledress.csv", msg)
 		if file.FileExists(fn) {
 			utils.System("open " + fn)
 			return
@@ -383,11 +394,16 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 			size = "1024x1792"
 		}
 
+		quality := "standard"
+		if os.Getenv("DALLE_QUALITY") != "" {
+			quality = os.Getenv("DALLE_QUALITY")
+		}
+
 		url := "https://api.openai.com/v1/images/generations"
 		payload := DalleRequest{
 			Prompt:  prompt,
 			N:       1,
-			Quality: "hd",
+			Quality: quality,
 			Style:   "vivid",
 			Model:   "dall-e-3",
 			Size:    size,
@@ -398,13 +414,9 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 			panic(err)
 		}
 
-		err = godotenv.Load()
-		if err != nil {
-			logger.Fatal("Error loading .env file")
-		}
 		apiKey := os.Getenv("OPENAI_API_KEY")
 		if apiKey == "" {
-			logger.Fatal("No API key found in .env")
+			log.Fatal("No OPENAI_API_KEY key found")
 		}
 
 		logger.Info(colors.Cyan, addr, colors.Yellow, "- generating the image...", colors.Off)
@@ -456,7 +468,7 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 
 		txtFn := strings.Replace(strings.Replace(fn, ".png", ".txt", -1), "generated", "txt-generated", -1)
 		file.StringToAsciiFile(txtFn, prompt)
-		utils.System("open " + txtFn)
+		// utils.System("open " + txtFn)
 
 		os.Remove(fn)
 		file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
@@ -471,20 +483,21 @@ func (a *App) GetImage(ensOrAddr string, replace bool) {
 			panic(err)
 		}
 
-		logger.Info(colors.Cyan, addr, colors.Green, "- image saved as", colors.White+strings.Trim(fn, " "), colors.Off)
-		utils.System("open " + fn)
+		path, err := annotate(fn, "bottom", 0.2)
+		if err != nil {
+			fmt.Println("Error annotating image:", err)
+			return
+		}
+		logger.Info(colors.Cyan, addr, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
+		utils.System("open " + path)
 	}
 
 }
 
 func (a *App) GetModeration(ensOrAddr string) string {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	if apiKey == "" {
-		log.Fatal("No API key found in .env")
+		log.Fatal("No OPENAI_API_KEY key found")
 	}
 	// fmt.Println("API key found", apiKey)
 
@@ -523,13 +536,9 @@ func (a *App) GetModeration(ensOrAddr string) string {
 }
 
 func (a *App) GetImprovedPrompt(ensOrAddr string) string {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	if apiKey == "" {
-		log.Fatal("No API key found in .env")
+		log.Fatal("No OPENAI_API_KEY key found")
 	}
 	// fmt.Println("API key found", apiKey)
 

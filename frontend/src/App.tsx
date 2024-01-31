@@ -16,7 +16,8 @@ import {
   GetPrompt,
   GetData,
   GetJson,
-  GetImage
+  GetImage,
+  GetImageData
   // GetImprovedPrompt,
   // GetModeration
 } from "../wailsjs/go/main/App";
@@ -56,8 +57,8 @@ export default function App() {
     // });
   }, [email]);
 
-  const openImage = (email: string, replace: boolean) => {
-    GetImage(email, replace);
+  const openImage = (email: string) => {
+    GetImage(email);
   };
 
   return (
@@ -77,8 +78,7 @@ export default function App() {
           </Group>
         </form>
       </Box>
-      <Button onClick={() => openImage(email, false)}>Generate</Button>{" "}
-      <Button onClick={() => openImage(email, true)}>Regenerate</Button>
+      <Button onClick={() => openImage(email)}>Generate</Button>{" "}
       {/* <div>{improvedPrompt}</div> */}
       {/* <div>{moderation}</div> */}
       <Paper
@@ -104,6 +104,7 @@ export const CopyText = ({ prompt }: { prompt?: string }) => {
 
   return (
     <div className="shit-container">
+      <ImageDisplay />
       <div className="shit">{promptText}</div>
       <CopyButton value={promptText} timeout={2000}>
         {({ copied, copy }) => (
@@ -129,3 +130,19 @@ export const CopyText = ({ prompt }: { prompt?: string }) => {
     </div>
   );
 };
+
+function ImageDisplay() {
+  const [imageSrc, setImageSrc] = useState("");
+
+  const fetchImage = async () => {
+    const imageData = await GetImageData(); // Adjust based on your actual IPC call
+    setImageSrc(imageData);
+  };
+
+  return (
+    <div>
+      <button onClick={fetchImage}>Load Image</button>
+      {imageSrc && <img src={imageSrc} alt="Dynamically loaded" />}
+    </div>
+  );
+}

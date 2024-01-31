@@ -21,7 +21,6 @@ func main_images() {
 	if len(lines) > 0 {
 		wg := sync.WaitGroup{}
 		for i := 0; i < len(lines); i++ {
-			// fmt.Println(lines[i])
 			wg.Add(1)
 			go doOne(&wg, app, lines[i])
 			if (i+1)%5 == 0 {

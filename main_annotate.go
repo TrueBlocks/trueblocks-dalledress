@@ -204,7 +204,6 @@ func annotate(fileName, location string, annoPct float64) (ret string, err error
 }
 
 func main_annotate() {
-	// Example usage
 	path, err := annotate(os.Args[1], "bottom", 0.2)
 	if err != nil {
 		fmt.Println("Error annotating image:", err)

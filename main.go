@@ -1,14 +1,32 @@
 package main
 
+import "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+
 func main() {
-	i := 3
-	if i == 1 {
-		main_annotate()
-	} else if i == 2 {
+	// i := Images
+	// i := Annotate // Stitch
+	i := Stitch
+
+	switch i {
+	case Images:
 		main_images()
-	} else if i == 3 {
-		main_wails()
-	} else {
+	case Annotate:
+		main_annotate()
+	case Stitch:
 		main_stitch()
+	case Wails:
+		main_wails()
+	default:
+		logger.Panic("Invalid mode")
 	}
 }
+
+type Mode int
+
+const (
+	Unused Mode = iota
+	Images
+	Annotate
+	Stitch
+	Wails
+)

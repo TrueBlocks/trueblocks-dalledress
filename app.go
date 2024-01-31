@@ -38,7 +38,7 @@ type App struct {
 
 func doOne(wg *sync.WaitGroup, app *App, arg string) {
 	defer wg.Done()
-	app.GetImage(arg, false)
+	app.GetImage(arg)
 }
 
 func NewApp() *App {
@@ -114,7 +114,7 @@ func (a *App) startup(ctx context.Context) {
 	if err = godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	} else if a.apiKey = os.Getenv("OPENAI_API_KEY"); a.apiKey == "" {
-		log.Fatal("No API key found in .env")
+		log.Fatal("No OPENAI_API_KEY key found")
 	}
 }
 

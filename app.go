@@ -30,6 +30,8 @@ type App struct {
 	literary      []string
 	nouns         []string
 	styles        []string
+	shortStyles   []string
+	colors        []string
 	pTemplate     *template.Template
 	dTemplate     *template.Template
 	tTemplate     *template.Template
@@ -98,7 +100,16 @@ func (a *App) startup(ctx context.Context) {
 		logger.Fatal(err)
 	}
 	for i := 0; i < len(a.styles); i++ {
+		parts := strings.Split(a.styles[i], ",")
+		a.shortStyles = append(a.shortStyles, parts[0])
 		a.styles[i] = strings.Replace(a.styles[i], ",", " from the ", -1)
+	}
+	if a.colors, err = toLines(filepath.Join(dbFolder, "colors.csv")); err != nil {
+		logger.Fatal(err)
+	}
+	for i := 0; i < len(a.colors); i++ {
+		a.colors[i] = strings.Replace(a.colors[i], ",", " (", -1) + ")"
+		// fmt.Println(a.colors[i])
 	}
 
 	if a.pTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {

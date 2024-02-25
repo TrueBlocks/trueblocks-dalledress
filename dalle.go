@@ -46,6 +46,7 @@ type Dalledress struct {
 	Literary     Attribute `json:"literary"`
 	Noun         Attribute `json:"noun"`
 	Style        Attribute `json:"style"`
+	ShortStyle   string    `json:"shortStyle"`
 	Style2       Attribute `json:"style2"`
 	Color1       Attribute `json:"color1"`
 	Color2       Attribute `json:"color2"`
@@ -60,34 +61,31 @@ type Dalledress struct {
 	Terse        Value     `json:"terse"`
 }
 
-var promptTemplate = `Petname: {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} feeling {{.EmotionShort.Val}}{{.Ens}}.
-Noun: {{.Noun.Val}}.
+var promptTemplate = `Draw a human-like and {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} feeling {{.EmotionShort.Val}}{{.Ens}}.
+Noun: human-like {{.Noun.Val}}.
 Emotion: {{.Emotion.Val}}.
 Primary style: {{.Style.Val}}.
 Use only the colors {{.Color1.Val}} and {{.Color2.Val}}.
 {{.Orientation.Val}}.
 {{.Background.Val}}.
-Find the two most relevant connotative meanings of the noun {{.Noun.Val}},+
-the emotion {{.Emotion.Val}}, the adjective {{.Adjective.Val}}, and the adverb {{.Adverb.Val}}.
-Allow your mind to roam as deeply into the language model as possible.
-Find the single object that most closely matches the description.
-Focus on the Petname, the Emotion, and the Primary style.{{.Literary.Val}}
-DO NOT PUT ANY TEXT ON THE IMAGE.`
+Expand upon the most relevant connotative meanings of {{.Noun.Val}}, {{.Emotion.Val}}, {{.Adjective.Val}}, and {{.Adverb.Val}}.
+Find the representation that most closely matches the description.
+Focus on the Noun, the Emotion, and Primary style.{{.Literary.Val}}
+DO NOT PUT ANY TEXT IN THE IMAGE.`
 
 var dataTemplate = `
 Address:     {{.Addr}} Ens: {{.Ens}}.
 Seed:        {{.Seed}}.
-Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective.Val}} Noun: {{.Noun.Val}}.
+Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective.Val}} Noun: human-like {{.Noun.Val}}.
 Emotion:     {{.EmotionShort.Val}}.
 Literary:    {{.Literary.Val}}.
-Style1:      {{.Style.Val}}.
+Style:       {{.Style.Val}}.
 Color1:      {{.Color1.Val}} Color2: {{.Color2.Val}} Color3: {{.Color3.Val}}.
 Variant1:    {{.Variant1.Val}} Variant2: {{.Variant2.Val}} Variant3: {{.Variant3.Val}}.
-Style2:      {{.Style2.Val}}.
 Background:  {{.Background.Val}}.
 Orientation: {{.Orientation.Val}}.`
 
-var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} feeling {{.EmotionShort.Val}} {{.Orientation.Val}}`
+var terseTemplate = `Human-like {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} feeling {{.Emotion.Val}} in the style of {{.ShortStyle}}`
 
 func (d *Dalledress) generatePrompt(t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
@@ -222,7 +220,8 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		len(a.literary),      // 3
 		len(a.nouns),         // 4
 		len(a.styles),        // 5
-		8,                    // 6
+		len(a.colors),        // 6
+		8,                    // 7
 	}
 
 	dd.Adverb.Num = hexStringToBigIntModulo(dd.Adverb.Seed, SeedBump, lengths[0])
@@ -236,8 +235,11 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Variant1.Num = hexStringToBigIntModulo(dd.Variant1.Seed, 0, lengths[5])
 	dd.Variant2.Num = hexStringToBigIntModulo(dd.Variant2.Seed, 0, lengths[5])
 	dd.Variant3.Num = hexStringToBigIntModulo(dd.Variant3.Seed, 0, lengths[5])
-	dd.Background.Num = hexStringToBigIntModulo(dd.Background.Seed, 0, lengths[6])
-	dd.Orientation.Num = hexStringToBigIntModulo(dd.Orientation.Seed, 0, lengths[6])
+	dd.Color1.Num = hexStringToBigIntModulo(dd.Color1.Seed, 0, lengths[6])
+	dd.Color2.Num = hexStringToBigIntModulo(dd.Color2.Seed, 0, lengths[6])
+	dd.Color3.Num = hexStringToBigIntModulo(dd.Color3.Seed, 0, lengths[6])
+	dd.Background.Num = hexStringToBigIntModulo(dd.Background.Seed, 0, lengths[7])
+	dd.Orientation.Num = hexStringToBigIntModulo(dd.Orientation.Seed, 0, lengths[7])
 
 	dd.Adverb.Val = a.adverbs[dd.Adverb.Num]
 	dd.Adjective.Val = a.adjectives[dd.Adjective.Num]
@@ -246,9 +248,10 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Literary.Val = " Write in the literary style {{.Literary.Val}}."
 	dd.Noun.Val = a.nouns[dd.Noun.Num]
 	dd.Style.Val = a.styles[dd.Style.Num]
+	dd.ShortStyle = a.shortStyles[dd.Style.Num]
 	dd.Style2.Val = a.styles[dd.Style2.Num]
-	dd.Color1.Val = "#" + muteColor(dd.Color1.Seed[:8], dd.Color1.Seed[2:2])
-	dd.Color2.Val = "#" + muteColor(dd.Color2.Seed[:8], dd.Color2.Seed[3:3])
+	dd.Color1.Val = a.colors[dd.Color1.Num] // "#" + muteColor(dd.Color1.Seed[:8], dd.Color1.Seed[2:2])
+	dd.Color2.Val = a.colors[dd.Color1.Num] // "#" + muteColor(dd.Color2.Seed[:8], dd.Color2.Seed[3:3])
 	dd.Color3.Val = "#" + muteColor(dd.Color3.Seed[:8], dd.Color3.Seed[4:4])
 	dd.Variant1.Val = clip(a.styles[dd.Variant1.Num])
 	dd.Variant2.Val = clip(a.styles[dd.Variant2.Num])
@@ -314,7 +317,7 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	default:
 		logger.Fatal("Invalid orientation number: ", dd.Orientation.Num)
 	}
-	dd.Orientation.Val = "Orient the scene {Ori} and {Sym} and make sure the {{.Noun.Val}} is facing {Gaze}"
+	dd.Orientation.Val = "Orient the scene {Ori} and {Sym} and make sure the human-like {{.Noun.Val}} is facing {Gaze}"
 	e = os.Getenv("DALLE_ORIENTATION")
 	if e != "" {
 		dd.Orientation.Val = e

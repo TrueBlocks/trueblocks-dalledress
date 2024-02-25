@@ -104,7 +104,6 @@ export const CopyText = ({ prompt }: { prompt?: string }) => {
 
   return (
     <div className="shit-container">
-      <ImageDisplay />
       <div className="shit">{promptText}</div>
       <CopyButton value={promptText} timeout={2000}>
         {({ copied, copy }) => (
@@ -131,18 +130,18 @@ export const CopyText = ({ prompt }: { prompt?: string }) => {
   );
 };
 
-function ImageDisplay() {
-  const [imageSrc, setImageSrc] = useState("");
+// function ImageDisplay() {
+//   const [imageSrc, setImageSrc] = useState("");
 
-  const fetchImage = async () => {
-    const imageData = await GetImageData(); // Adjust based on your actual IPC call
-    setImageSrc(imageData);
-  };
+//   const fetchImage = async () => {
+//     const imageData = await GetImageData(); // Adjust based on your actual IPC call
+//     setImageSrc(imageData);
+//   };
 
-  return (
-    <div>
-      <button onClick={fetchImage}>Load Image</button>
-      {imageSrc && <img src={imageSrc} alt="Dynamically loaded" />}
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       <button onClick={fetchImage}>Load Image</button>
+//       {imageSrc && <img src={imageSrc} alt="Dynamically loaded" />}
+//     </div>
+//   );
+// }

@@ -41,6 +41,7 @@ export namespace main {
 	    literary: Attribute;
 	    noun: Attribute;
 	    style: Attribute;
+	    shortStyle: string;
 	    style2: Attribute;
 	    color1: Attribute;
 	    color2: Attribute;
@@ -70,6 +71,7 @@ export namespace main {
 	        this.literary = this.convertValues(source["literary"], Attribute);
 	        this.noun = this.convertValues(source["noun"], Attribute);
 	        this.style = this.convertValues(source["style"], Attribute);
+	        this.shortStyle = source["shortStyle"];
 	        this.style2 = this.convertValues(source["style2"], Attribute);
 	        this.color1 = this.convertValues(source["color1"], Attribute);
 	        this.color2 = this.convertValues(source["color2"], Attribute);

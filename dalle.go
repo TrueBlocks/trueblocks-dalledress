@@ -14,7 +14,6 @@ import (
 	"sync"
 	"text/template"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
@@ -177,12 +176,12 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	}
 
 	addr, _ := a.conn.GetEnsAddress(ensOrAddr)
-	if base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
-		return Dalledress{}, fmt.Errorf("ENS not registered: %s", ensOrAddr)
-	}
+	// if base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
+	// 	return Dalledress{}, fmt.Errorf("ENS not registered: %s", ensOrAddr)
+	// }
 	hash := hexutil.Encode(crypto.Keccak256([]byte(addr)))
 	seed := hash[2:] + addr[2:]
-	if len(seed) != 104 {
+	if len(seed) < 104 {
 		return Dalledress{}, fmt.Errorf("invalid seed: %s", seed)
 	}
 	if ensOrAddr == addr {
@@ -358,7 +357,7 @@ var fM sync.Mutex
 var reserved = make(map[string]bool)
 
 func (a *App) GetImage(ensOrAddr string) {
-	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
+	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
 		logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
 		return
 	} else {

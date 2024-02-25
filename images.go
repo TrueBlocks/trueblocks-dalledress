@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 )
@@ -29,7 +28,7 @@ func loadImageAsBase64(path string) (string, error) {
 }
 
 func (a *App) GetImageData(ensOrAddr string) string {
-	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
+	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
 		logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
 		return ""
 	} else {

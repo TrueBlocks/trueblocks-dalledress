@@ -3,10 +3,10 @@ package main
 import "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 
 func main() {
-	// i := Images
+	i := Images
 	// i := Annotate // Stitch
 	// i := Stitch
-	i := Wails
+	// i := Wails
 
 	switch i {
 	case Images:

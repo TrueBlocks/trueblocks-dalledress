@@ -357,6 +357,7 @@ var fM sync.Mutex
 var reserved = make(map[string]bool)
 
 func (a *App) GetImage(ensOrAddr string) {
+	// logger.Info("Generating image for", ensOrAddr)
 	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
 		logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
 		return

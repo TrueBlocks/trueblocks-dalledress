@@ -2,32 +2,15 @@ package main
 
 import (
 	"fmt"
-	"strings"
-
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 var ErrInvalidAddress = fmt.Errorf("not a valid address")
 var ErrInvalidSeed = fmt.Errorf("invalid seed")
 
 func (a *App) Chopper(input string) (string, map[string]string, error) {
-	if !base.IsValidAddress(input) {
-		return "", map[string]string{}, ErrInvalidAddress
-	}
-
-	if strings.HasSuffix(input, ".eth") {
-		var ok bool
-		if input, ok = a.conn.GetEnsAddress(input); !ok {
-			return "", map[string]string{}, ErrInvalidAddress
-		}
-	}
-
-	hash := hexutil.Encode(crypto.Keccak256([]byte(input)))
-	seed := hash[2:] + input[2:]
-	if len(seed) < 104 {
-		return "", map[string]string{}, ErrInvalidSeed
+	_, seed, err := a.SeedBuilder(input)
+	if err != nil {
+		return "", map[string]string{}, err
 	}
 
 	keys := []string{"adverb", "adjective", "emotionshort", "emotion", "literary", "noun", "style", "style2", "color1", "color2", "color3", "variant1", "variant2", "variant3", "background", "orientation"}

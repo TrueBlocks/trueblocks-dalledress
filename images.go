@@ -28,22 +28,22 @@ func loadImageAsBase64(path string) (string, error) {
 }
 
 func (a *App) GetImageData(ensOrAddr string) string {
-	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
-		logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
-		return ""
-	} else {
-		folder := "./generated/"
-		fn := filepath.Join(folder, fmt.Sprintf("%s.png", addr))
-		if file.FileExists(fn) {
-
-			base64Image, err := loadImageAsBase64("path/to/your/image.png")
-			if err != nil {
-				return ""
-			}
-			return "data:image/png;base64," + base64Image
-		} else {
-			logger.Fatal(fn + " not found")
+	addr := ensOrAddr
+	// if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
+	// 	logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
+	// 	return ""
+	// } else {
+	folder := "./generated/"
+	fn := filepath.Join(folder, fmt.Sprintf("%s.png", addr))
+	if file.FileExists(fn) {
+		base64Image, err := loadImageAsBase64("path/to/your/image.png")
+		if err != nil {
+			return ""
 		}
+		return "data:image/png;base64," + base64Image
+	} else {
+		logger.Fatal(fn + " not found")
 	}
+	// }
 	return ""
 }

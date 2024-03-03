@@ -175,7 +175,8 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		return Dalledress{}, fmt.Errorf("adverbs not loaded")
 	}
 
-	addr, _ := a.conn.GetEnsAddress(ensOrAddr)
+	// addr, _ := a.conn.GetEnsAddress(ensOrAddr)
+	addr := ensOrAddr
 	// if base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
 	// 	return Dalledress{}, fmt.Errorf("ENS not registered: %s", ensOrAddr)
 	// }
@@ -208,8 +209,8 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		Variant1:     Attribute{Seed: seed[56:68]},
 		Variant2:     Attribute{Seed: seed[44:56]},
 		Variant3:     Attribute{Seed: seed[32:44]},
-		Background:   Attribute{Seed: hash[20:32]},
-		Orientation:  Attribute{Seed: hash[8:20]},
+		Background:   Attribute{Seed: seed[20:32]},
+		Orientation:  Attribute{Seed: seed[8:20]},
 	}
 
 	lengths := []int{
@@ -249,8 +250,8 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Style.Val = a.styles[dd.Style.Num]
 	dd.ShortStyle = a.shortStyles[dd.Style.Num]
 	dd.Style2.Val = a.styles[dd.Style2.Num]
-	dd.Color1.Val = a.colors[dd.Color1.Num] // "#" + muteColor(dd.Color1.Seed[:8], dd.Color1.Seed[2:2])
-	dd.Color2.Val = a.colors[dd.Color1.Num] // "#" + muteColor(dd.Color2.Seed[:8], dd.Color2.Seed[3:3])
+	dd.Color1.Val = a.colors[dd.Color1.Num]
+	dd.Color2.Val = a.colors[dd.Color2.Num]
 	dd.Color3.Val = "#" + muteColor(dd.Color3.Seed[:8], dd.Color3.Seed[4:4])
 	dd.Variant1.Val = clip(a.styles[dd.Variant1.Num])
 	dd.Variant2.Val = clip(a.styles[dd.Variant2.Num])
@@ -358,143 +359,143 @@ var reserved = make(map[string]bool)
 
 func (a *App) GetImage(ensOrAddr string) {
 	// logger.Info("Generating image for", ensOrAddr)
-	if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
-		logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
-		return
-	} else {
-		folder := "./generated/"
-		file.EstablishFolder(folder)
-		file.EstablishFolder(strings.Replace(folder, "/generated", "/txt-generated", -1))
-		file.EstablishFolder(strings.Replace(folder, "/generated", "/annotated", -1))
-		file.EstablishFolder(strings.Replace(folder, "/generated", "/stitched", -1))
-		cnt := 0
-		fn := ""
-		for {
-			fn = filepath.Join(folder, fmt.Sprintf("%s-%05d.png", addr, cnt))
-			fM.Lock()
-			if !file.FileExists(fn) && !reserved[fn] {
-				reserved[fn] = true
-				fM.Unlock()
-				break
-			}
+	addr := ensOrAddr
+	// if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
+	// 	logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
+	// 	return
+	// } else {
+	folder := "./generated/"
+	file.EstablishFolder(folder)
+	file.EstablishFolder(strings.Replace(folder, "/generated", "/txt-generated", -1))
+	file.EstablishFolder(strings.Replace(folder, "/generated", "/annotated", -1))
+	file.EstablishFolder(strings.Replace(folder, "/generated", "/stitched", -1))
+	cnt := 0
+	fn := ""
+	for {
+		fn = filepath.Join(folder, fmt.Sprintf("%s-%05d.png", addr, cnt))
+		fM.Lock()
+		if !file.FileExists(fn) && !reserved[fn] {
+			reserved[fn] = true
 			fM.Unlock()
-			cnt++
+			break
 		}
-		// msg := fmt.Sprintf("%s,%s,%s,image\n", utils.FormattedDate(time.Now().Unix()), addr, strings.ToLower(ensOrAddr))
-		// file.AppendToAsciiFile("dalledress.csv", msg)
-		if file.FileExists(fn) {
-			utils.System("open " + fn)
-			return
-		}
-
-		logger.Info(colors.Cyan, addr, colors.Yellow, "- improving the prompt...", colors.Off)
-
-		prompt := a.GetImprovedPrompt(ensOrAddr)
-		size := "1024x1024"
-		if strings.Contains(prompt, "horizontal") {
-			size = "1792x1024"
-		} else if strings.Contains(prompt, "vertical") {
-			size = "1024x1792"
-		}
-
-		quality := "standard"
-		if os.Getenv("DALLE_QUALITY") != "" {
-			quality = os.Getenv("DALLE_QUALITY")
-		}
-
-		url := "https://api.openai.com/v1/images/generations"
-		payload := DalleRequest{
-			Prompt:  prompt,
-			N:       1,
-			Quality: quality,
-			Style:   "vivid",
-			Model:   "dall-e-3",
-			Size:    size,
-		}
-
-		payloadBytes, err := json.Marshal(payload)
-		if err != nil {
-			panic(err)
-		}
-
-		apiKey := os.Getenv("OPENAI_API_KEY")
-		if apiKey == "" {
-			log.Fatal("No OPENAI_API_KEY key found")
-		}
-
-		logger.Info(colors.Cyan, addr, colors.Yellow, "- generating the image...", colors.Off)
-
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
-		if err != nil {
-			panic(err)
-		}
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Authorization", "Bearer "+apiKey)
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			panic(err)
-		}
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			panic(err)
-		}
-
-		// logger.Info("DalleResponse: ", string(body))
-		var dalleResp DalleResponse
-		err = json.Unmarshal(body, &dalleResp)
-		if err != nil {
-			panic(err)
-		}
-
-		if resp.StatusCode != 200 {
-			fmt.Println("Error:", resp.Status, resp.StatusCode, string(body))
-			return
-		}
-
-		if len(dalleResp.Data) == 0 {
-			fmt.Println("No images returned")
-			return
-		}
-
-		imageURL := dalleResp.Data[0].Url
-
-		// Download the image
-		imageResp, err := http.Get(imageURL)
-		if err != nil {
-			panic(err)
-		}
-		defer imageResp.Body.Close()
-
-		txtFn := strings.Replace(strings.Replace(fn, ".png", ".txt", -1), "generated", "txt-generated", -1)
-		file.StringToAsciiFile(txtFn, prompt)
-		// utils.System("open " + txtFn)
-
-		os.Remove(fn)
-		file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-		if err != nil {
-			logger.Error("Failed to open output file: ", fn)
-			panic(err)
-		}
-		defer file.Close()
-
-		_, err = io.Copy(file, imageResp.Body)
-		if err != nil {
-			panic(err)
-		}
-
-		path, err := annotate(fn, "bottom", 0.2)
-		if err != nil {
-			fmt.Println("Error annotating image:", err)
-			return
-		}
-		logger.Info(colors.Cyan, addr, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
-		utils.System("open " + path)
+		fM.Unlock()
+		cnt++
+	}
+	// msg := fmt.Sprintf("%s,%s,%s,image\n", utils.FormattedDate(time.Now().Unix()), addr, strings.ToLower(ensOrAddr))
+	// file.AppendToAsciiFile("dalledress.csv", msg)
+	if file.FileExists(fn) {
+		utils.System("open " + fn)
+		return
 	}
 
+	logger.Info(colors.Cyan, addr, colors.Yellow, "- improving the prompt...", colors.Off)
+
+	prompt := a.GetImprovedPrompt(ensOrAddr)
+	size := "1024x1024"
+	if strings.Contains(prompt, "horizontal") {
+		size = "1792x1024"
+	} else if strings.Contains(prompt, "vertical") {
+		size = "1024x1792"
+	}
+
+	quality := "standard"
+	if os.Getenv("DALLE_QUALITY") != "" {
+		quality = os.Getenv("DALLE_QUALITY")
+	}
+
+	url := "https://api.openai.com/v1/images/generations"
+	payload := DalleRequest{
+		Prompt:  prompt,
+		N:       1,
+		Quality: quality,
+		Style:   "vivid",
+		Model:   "dall-e-3",
+		Size:    size,
+	}
+
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		panic(err)
+	}
+
+	apiKey := os.Getenv("OPENAI_API_KEY")
+	if apiKey == "" {
+		log.Fatal("No OPENAI_API_KEY key found")
+	}
+
+	logger.Info(colors.Cyan, addr, colors.Yellow, "- generating the image...", colors.Off)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	// logger.Info("DalleResponse: ", string(body))
+	var dalleResp DalleResponse
+	err = json.Unmarshal(body, &dalleResp)
+	if err != nil {
+		panic(err)
+	}
+
+	if resp.StatusCode != 200 {
+		fmt.Println("Error:", resp.Status, resp.StatusCode, string(body))
+		return
+	}
+
+	if len(dalleResp.Data) == 0 {
+		fmt.Println("No images returned")
+		return
+	}
+
+	imageURL := dalleResp.Data[0].Url
+
+	// Download the image
+	imageResp, err := http.Get(imageURL)
+	if err != nil {
+		panic(err)
+	}
+	defer imageResp.Body.Close()
+
+	txtFn := strings.Replace(strings.Replace(fn, ".png", ".txt", -1), "generated", "txt-generated", -1)
+	file.StringToAsciiFile(txtFn, prompt)
+	// utils.System("open " + txtFn)
+
+	os.Remove(fn)
+	file, err := os.OpenFile(fn, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		logger.Error("Failed to open output file: ", fn)
+		panic(err)
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, imageResp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	path, err := annotate(fn, "bottom", 0.2)
+	if err != nil {
+		fmt.Println("Error annotating image:", err)
+		return
+	}
+	logger.Info(colors.Cyan, addr, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
+	utils.System("open " + path)
+	// }
 }
 
 func (a *App) GetModeration(ensOrAddr string) string {

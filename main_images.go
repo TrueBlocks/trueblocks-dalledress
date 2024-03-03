@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 )
 
 func main_images() {
@@ -20,13 +22,24 @@ func main_images() {
 	lines := file.AsciiFileToLines("addresses.txt")
 	if len(lines) > 0 {
 		wg := sync.WaitGroup{}
+		fn := "/Users/jrush/Development/trueblocks-dalledress/last.txt"
+		v := strings.Trim(file.AsciiFileToString(fn), "\n\r")
+		last := utils.MustParseInt(v)
+		logger.Info("Starting at address ", last, " of ", len(lines), file.FileExists(fn), v)
 		for i := 0; i < len(lines); i++ {
-			wg.Add(1)
-			go doOne(&wg, app, lines[i])
-			if (i+1)%5 == 0 {
-				wg.Wait()
-				logger.Info("Sleeping for 60 seconds")
-				time.Sleep(time.Second * 60)
+			if i > int(last) {
+				if address, ok := app.validateInput(lines[i]); !ok {
+					return
+				} else {
+					wg.Add(1)
+					go doOne(&wg, app, address.Hex())
+					file.StringToAsciiFile(fn, fmt.Sprintf("%d\n", i))
+					if (i+1)%5 == 0 {
+						wg.Wait()
+						logger.Info("Sleeping for 60 seconds")
+						time.Sleep(time.Second * 60)
+					}
+				}
 			}
 		}
 		wg.Wait()

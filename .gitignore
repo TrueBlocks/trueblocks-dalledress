@@ -1,3 +1,9 @@
+annotated*
+generated*
+stitched*
+txt-*
+viewing*
+
 main
 last.txt
 y
@@ -17,10 +23,7 @@ two
 shit*
 dalledress.csv
 settings.json
-*generated*
 saved*
-annotated*
-stitched*
 
 build/bin
 node_modules

@@ -11,8 +11,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"text/template"
+	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
@@ -42,6 +42,7 @@ type Dalledress struct {
 	Adjective    Attribute `json:"adjective"`
 	EmotionShort Attribute `json:"emotionShort"`
 	Emotion      Attribute `json:"emotion"`
+	Gerunds      Attribute `json:"gerunds"`
 	Literary     Attribute `json:"literary"`
 	Noun         Attribute `json:"noun"`
 	Style        Attribute `json:"style"`
@@ -60,23 +61,25 @@ type Dalledress struct {
 	Terse        Value     `json:"terse"`
 }
 
-var promptTemplate = `Draw a human-like and {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} feeling {{.EmotionShort.Val}}{{.Ens}}.
-Noun: human-like {{.Noun.Val}}.
+var promptTemplate = `Draw a {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} and feeling {{.EmotionShort.Val}}{{.Ens}}.
+Noun: {{.Noun.Val}}.
 Emotion: {{.Emotion.Val}}.
+Gerunds: {{.Gerunds.Val}}.
 Primary style: {{.Style.Val}}.
 Use only the colors {{.Color1.Val}} and {{.Color2.Val}}.
 {{.Orientation.Val}}.
 {{.Background.Val}}.
 Expand upon the most relevant connotative meanings of {{.Noun.Val}}, {{.Emotion.Val}}, {{.Adjective.Val}}, and {{.Adverb.Val}}.
 Find the representation that most closely matches the description.
-Focus on the Noun, the Emotion, and Primary style.{{.Literary.Val}}
+Focus on the Noun, the Gerunds, the Emotion, and Primary style.{{.Literary.Val}}
 DO NOT PUT ANY TEXT IN THE IMAGE.`
 
 var dataTemplate = `
 Address:     {{.Addr}} Ens: {{.Ens}}.
 Seed:        {{.Seed}}.
-Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective.Val}} Noun: human-like {{.Noun.Val}}.
+Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective.Val}} Noun: {{.Noun.Val}}.
 Emotion:     {{.EmotionShort.Val}}.
+Gerunds:	 {{.Gerunds.Val}}.
 Literary:    {{.Literary.Val}}.
 Style:       {{.Style.Val}}.
 Color1:      {{.Color1.Val}} Color2: {{.Color2.Val}} Color3: {{.Color3.Val}}.
@@ -84,7 +87,7 @@ Variant1:    {{.Variant1.Val}} Variant2: {{.Variant2.Val}} Variant3: {{.Variant3
 Background:  {{.Background.Val}}.
 Orientation: {{.Orientation.Val}}.`
 
-var terseTemplate = `Human-like {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} feeling {{.Emotion.Val}} in the style of {{.ShortStyle}}`
+var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} and feeling {{.Emotion.Val}} in the style of {{.ShortStyle}}`
 
 func (d *Dalledress) generatePrompt(t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
@@ -198,7 +201,8 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		Adverb:       Attribute{Seed: seed[0:12]},
 		Adjective:    Attribute{Seed: seed[12:24]},
 		EmotionShort: Attribute{Seed: seed[24:36]},
-		Emotion:      Attribute{Seed: seed[36:48]},
+		Emotion:      Attribute{Seed: seed[24:36]},
+		Gerunds:      Attribute{Seed: seed[36:48]},
 		Literary:     Attribute{Seed: seed[48:60]},
 		Noun:         Attribute{Seed: seed[60:72]},
 		Style:        Attribute{Seed: seed[72:84]},
@@ -222,12 +226,14 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		len(a.styles),        // 5
 		len(a.colors),        // 6
 		8,                    // 7
+		len(a.gerunds),       // 8
 	}
 
 	dd.Adverb.Num = hexStringToBigIntModulo(dd.Adverb.Seed, SeedBump, lengths[0])
 	dd.Adjective.Num = hexStringToBigIntModulo(dd.Adjective.Seed, SeedBump, lengths[1])
 	dd.EmotionShort.Num = hexStringToBigIntModulo(dd.EmotionShort.Seed, 0, lengths[2])
 	dd.Emotion.Num = hexStringToBigIntModulo(dd.Emotion.Seed, 0, lengths[2])
+	dd.Gerunds.Num = hexStringToBigIntModulo(dd.Gerunds.Seed, 0, lengths[8])
 	dd.Literary.Num = hexStringToBigIntModulo(dd.Literary.Seed, 0, lengths[3])
 	dd.Noun.Num = hexStringToBigIntModulo(dd.Noun.Seed, 0, lengths[4])
 	dd.Style.Num = hexStringToBigIntModulo(dd.Style.Seed, 0, lengths[5])
@@ -241,14 +247,45 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	dd.Background.Num = hexStringToBigIntModulo(dd.Background.Seed, 0, lengths[7])
 	dd.Orientation.Num = hexStringToBigIntModulo(dd.Orientation.Seed, 0, lengths[7])
 
+	series := strings.Trim(file.AsciiFileToString("series.txt"), "\n\r")
+
 	dd.Adverb.Val = a.adverbs[dd.Adverb.Num]
 	dd.Adjective.Val = a.adjectives[dd.Adjective.Num]
 	dd.EmotionShort.Val = a.emotionsShort[dd.EmotionShort.Num]
 	dd.Emotion.Val = a.emotions[dd.Emotion.Num]
+	if series == "postal" {
+		dd.EmotionShort.Val = "postal going"
+		dd.Emotion.Val = "postal going (becoming extremely and uncontrollably angry often to the point of violence)"
+	} else if series == "happiness" {
+		dd.EmotionShort.Val = "happiness"
+		dd.Emotion.Val = "happiness (state of well-being characterized by emotions ranging from contentment to intense joy)"
+	} else if series == "fury" || series == "steam" {
+		dd.EmotionShort.Val = "fury and postal going"
+		dd.Emotion.Val = "fury (wild or violent anger) and postal going (becoming extremely and uncontrollably angry often to the point of violence)"
+	} else if series == "love" || series == "solar" {
+		dd.EmotionShort.Val = "love and compassion"
+		dd.Emotion.Val = "love (a strong positive emotion of regard and affection) and compassion (sympathetic pity and concern for the sufferings or misfortunes of others)"
+	}
+	dd.Gerunds.Val = a.gerunds[dd.Gerunds.Num] + " and " + a.gerunds[lengths[8]-dd.Gerunds.Num]
 	dd.Literary.Val = " Write in the literary style {{.Literary.Val}}."
-	dd.Noun.Val = a.nouns[dd.Noun.Num]
+	if series == "human" || series == "human2" {
+		dd.Noun.Val = "human"
+	} else if strings.Contains(series, "human-with") || series == "postal" || series == "happiness" {
+		dd.Noun.Val = "human with " + a.nouns[dd.Noun.Num] + " characteristics"
+	} else if strings.Contains(series, "human-like") || series == "fury" || series == "love" || series == "steam" || series == "solar" {
+		dd.Noun.Val = a.nouns[dd.Noun.Num] + " with human-like characteristics"
+	} else {
+		dd.Noun.Val = a.nouns[dd.Noun.Num]
+	}
 	dd.Style.Val = a.styles[dd.Style.Num]
 	dd.ShortStyle = a.shortStyles[dd.Style.Num]
+	if series == "steam" {
+		dd.Style.Val = "steam punk,modern western art movements"
+		dd.ShortStyle = "steam punk"
+	} else if series == "solar" {
+		dd.Style.Val = "solar punk,modern western art movements"
+		dd.ShortStyle = "solar punk"
+	}
 	dd.Style2.Val = a.styles[dd.Style2.Num]
 	dd.Color1.Val = a.colors[dd.Color1.Num]
 	dd.Color2.Val = a.colors[dd.Color2.Num]
@@ -317,7 +354,7 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 	default:
 		logger.Fatal("Invalid orientation number: ", dd.Orientation.Num)
 	}
-	dd.Orientation.Val = "Orient the scene {Ori} and {Sym} and make sure the human-like {{.Noun.Val}} is facing {Gaze}"
+	dd.Orientation.Val = "Orient the scene {Ori} and {Sym} and make sure the {{.Noun.Val}} is facing {Gaze}"
 	e = os.Getenv("DALLE_ORIENTATION")
 	if e != "" {
 		dd.Orientation.Val = e
@@ -354,10 +391,7 @@ type DalleResponse struct {
 
 var SeedBump = int(0)
 
-var fM sync.Mutex
-var reserved = make(map[string]bool)
-
-func (a *App) GetImage(ensOrAddr string) {
+func (a *App) GetImage(which int, ensOrAddr string) {
 	// logger.Info("Generating image for", ensOrAddr)
 	addr := ensOrAddr
 	// if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
@@ -366,32 +400,26 @@ func (a *App) GetImage(ensOrAddr string) {
 	// } else {
 	folder := "./generated/"
 	file.EstablishFolder(folder)
+	file.EstablishFolder(strings.Replace(folder, "/generated", "/txt-prompt", -1))
 	file.EstablishFolder(strings.Replace(folder, "/generated", "/txt-generated", -1))
 	file.EstablishFolder(strings.Replace(folder, "/generated", "/annotated", -1))
 	file.EstablishFolder(strings.Replace(folder, "/generated", "/stitched", -1))
-	cnt := 0
-	fn := ""
-	for {
-		fn = filepath.Join(folder, fmt.Sprintf("%s-%05d.png", addr, cnt))
-		fM.Lock()
-		if !file.FileExists(fn) && !reserved[fn] {
-			reserved[fn] = true
-			fM.Unlock()
-			break
-		}
-		fM.Unlock()
-		cnt++
-	}
-	// msg := fmt.Sprintf("%s,%s,%s,image\n", utils.FormattedDate(time.Now().Unix()), addr, strings.ToLower(ensOrAddr))
-	// file.AppendToAsciiFile("dalledress.csv", msg)
-	if file.FileExists(fn) {
-		utils.System("open " + fn)
+
+	series := strings.Trim(file.AsciiFileToString("series.txt"), "\n\r")
+
+	fn := filepath.Join(folder, fmt.Sprintf("%s-%s.png", addr, series)) // cnt))
+	annoName := strings.Replace(fn, "/generated", "/annotated", -1)
+	if file.FileExists(annoName) {
+		logger.Info(colors.Yellow+"Image already exists: ", fn, colors.Off)
+		time.Sleep(250 * time.Millisecond)
+		utils.System("open " + annoName)
 		return
 	}
+	a.nMade++
 
 	logger.Info(colors.Cyan, addr, colors.Yellow, "- improving the prompt...", colors.Off)
 
-	prompt := a.GetImprovedPrompt(ensOrAddr)
+	prompt, orig := a.GetImprovedPrompt(ensOrAddr)
 	size := "1024x1024"
 	if strings.Contains(prompt, "horizontal") {
 		size = "1792x1024"
@@ -473,6 +501,8 @@ func (a *App) GetImage(ensOrAddr string) {
 
 	txtFn := strings.Replace(strings.Replace(fn, ".png", ".txt", -1), "generated", "txt-generated", -1)
 	file.StringToAsciiFile(txtFn, prompt)
+	promptFn := strings.Replace(strings.Replace(fn, ".png", ".txt", -1), "generated", "txt-prompt", -1)
+	file.StringToAsciiFile(promptFn, orig)
 	// utils.System("open " + txtFn)
 
 	os.Remove(fn)
@@ -493,7 +523,7 @@ func (a *App) GetImage(ensOrAddr string) {
 		fmt.Println("Error annotating image:", err)
 		return
 	}
-	logger.Info(colors.Cyan, addr, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
+	logger.Info(colors.Cyan, addr, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), fmt.Sprintf("%d", which), colors.Off)
 	utils.System("open " + path)
 	// }
 }
@@ -539,7 +569,7 @@ func (a *App) GetModeration(ensOrAddr string) string {
 	return string(body)
 }
 
-func (a *App) GetImprovedPrompt(ensOrAddr string) string {
+func (a *App) GetImprovedPrompt(ensOrAddr string) (string, string) {
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	if apiKey == "" {
 		log.Fatal("No OPENAI_API_KEY key found")
@@ -557,12 +587,12 @@ func (a *App) GetImprovedPrompt(ensOrAddr string) string {
 
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
-		return fmt.Sprintf("Error: %s", err)
+		return fmt.Sprintf("Error: %s", err), ""
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
 	if err != nil {
-		return fmt.Sprintf("Error: %s", err)
+		return fmt.Sprintf("Error: %s", err), ""
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+apiKey)
@@ -570,16 +600,16 @@ func (a *App) GetImprovedPrompt(ensOrAddr string) string {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Sprintf("Error: %s", err)
+		return fmt.Sprintf("Error: %s", err), ""
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Sprintf("Error: %s", err)
+		return fmt.Sprintf("Error: %s", err), ""
 	}
 
-	return string(body)
+	return string(body), prompt
 }
 
 func toLines(filename string) ([]string, error) {

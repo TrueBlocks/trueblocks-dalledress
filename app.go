@@ -27,6 +27,7 @@ type App struct {
 	adjectives    []string
 	emotionsShort []string
 	emotions      []string
+	gerunds       []string
 	literary      []string
 	nouns         []string
 	styles        []string
@@ -36,11 +37,12 @@ type App struct {
 	dTemplate     *template.Template
 	tTemplate     *template.Template
 	apiKey        string
+	nMade         int
 }
 
-func doOne(wg *sync.WaitGroup, app *App, arg string) {
+func doOne(which int, wg *sync.WaitGroup, app *App, arg string) {
 	defer wg.Done()
-	app.GetImage(arg)
+	app.GetImage(which, arg)
 }
 
 func NewApp() *App {
@@ -82,6 +84,9 @@ func (a *App) startup(ctx context.Context) {
 			a.emotions[i] = parts[0] + " (" + strings.Replace(parts[2], ".", "", -1) + ")"
 			a.emotionsShort = append(a.emotionsShort, parts[0])
 		}
+	}
+	if a.gerunds, err = toLines(filepath.Join(dbFolder, "gerunds.csv")); err != nil {
+		logger.Fatal(err)
 	}
 	if lines, err := toLines(filepath.Join(dbFolder, "literarystyles.csv")); err != nil {
 		logger.Fatal(err)

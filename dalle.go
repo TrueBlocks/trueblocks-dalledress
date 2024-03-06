@@ -61,18 +61,23 @@ type Dalledress struct {
 	Terse        Value     `json:"terse"`
 }
 
-var promptTemplate = `Draw a {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} and feeling {{.EmotionShort.Val}}{{.Ens}}.
-Noun: {{.Noun.Val}}.
-Emotion: {{.Emotion.Val}}.
-Gerunds: {{.Gerunds.Val}}.
-Primary style: {{.Style.Val}}.
-Use only the colors {{.Color1.Val}} and {{.Color2.Val}}.
+// var promptTemplateOld = `Draw a {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} and feeling {{.EmotionShort.Val}}{{.Ens}}.
+// Noun: {{.Noun.Val}}.
+// Emotion: {{.Emotion.Val}}.
+// Gerunds: {{.Gerunds.Val}}.
+// Primary style: {{.Style.Val}}.
+// Use only the colors {{.Color1.Val}} and {{.Color2.Val}}.
+// {{.Orientation.Val}}.
+// {{.Background.Val}}.
+// Expand upon the most relevant connotative meanings of {{.Noun.Val}}, {{.Emotion.Val}}, {{.Adjective.Val}}, and {{.Adverb.Val}}.
+// Find the representation that most closely matches the description.
+// Focus on the Noun, the Gerunds, the Emotion, and Primary style.{{.Literary.Val}}
+// DO NOT PUT ANY TEXT IN THE IMAGE.`
+
+var promptTemplate = `Draw a {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} in the style of {{.Style.Val}}.
 {{.Orientation.Val}}.
-{{.Background.Val}}.
-Expand upon the most relevant connotative meanings of {{.Noun.Val}}, {{.Emotion.Val}}, {{.Adjective.Val}}, and {{.Adverb.Val}}.
-Find the representation that most closely matches the description.
-Focus on the Noun, the Gerunds, the Emotion, and Primary style.{{.Literary.Val}}
-DO NOT PUT ANY TEXT IN THE IMAGE.`
+Include the two most obvious connotations of "{{.Noun.Val}}", "{{.Adjective.Val}}", and "{{.Adverb.Val}}" in your work.
+{{.Literary.Val}}`
 
 var dataTemplate = `
 Address:     {{.Addr}} Ens: {{.Ens}}.
@@ -87,7 +92,9 @@ Variant1:    {{.Variant1.Val}} Variant2: {{.Variant2.Val}} Variant3: {{.Variant3
 Background:  {{.Background.Val}}.
 Orientation: {{.Orientation.Val}}.`
 
-var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} and feeling {{.Emotion.Val}} in the style of {{.ShortStyle}}`
+// var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} and feeling {{.Emotion.Val}} in the style of {{.ShortStyle}}`
+
+var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} in the style of {{.ShortStyle}}`
 
 func (d *Dalledress) generatePrompt(t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer

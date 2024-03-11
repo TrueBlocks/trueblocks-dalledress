@@ -1,18 +1,14 @@
 #!/usr/bin/env bash
 
-rm -f viewing/*
-#cp -p annotated/$1*human-with.png viewing/
-#cp -p annotated/$1*human-like.png viewing/
-#cp -p annotated/$1*happiness.png viewing/
-#cp -p annotated/$1*postal.png viewing/
-cp -p annotated/$1*fury.png viewing/
-#cp -p annotated/$1*love.png viewing/
-#cp -p annotated/$1*human.png viewing/
-#cp -p annotated/$1*human2.png viewing/
-#cp -p annotated/$1*steam.png viewing/
-#cp -p annotated/$1*solar.png viewing/
-#cp -p annotated/$1*00000.png viewing/
-#cp -p annotated/$1*00001.png viewing/
-cp -p annotated/*00002.png viewing/
-open viewing
-read -p "Press Enter to continue"
+if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+    echo "Usage: $0 <option1> <option2> [option3]"
+    exit 1
+fi
+
+if [ -e annotated/$1*$2*.png ]; then
+    open annotated/$1*$2*.png
+fi
+
+if [ "$#" -eq 3 ] && [ -e annotated/$1*$3*.png ]; then
+    open annotated/$1*$3*.png
+fi

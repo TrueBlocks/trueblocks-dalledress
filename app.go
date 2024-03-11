@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync"
 	"text/template"
@@ -20,24 +22,29 @@ import (
 
 // App struct
 type App struct {
-	ctx           context.Context
-	conn          *rpc.Connection
-	addresses     []string
-	adverbs       []string
-	adjectives    []string
-	emotionsShort []string
-	emotions      []string
-	gerunds       []string
-	literary      []string
-	nouns         []string
-	styles        []string
-	shortStyles   []string
-	colors        []string
-	pTemplate     *template.Template
-	dTemplate     *template.Template
-	tTemplate     *template.Template
-	apiKey        string
-	nMade         int
+	ctx         context.Context    `json:"-"`
+	conn        *rpc.Connection    `json:"-"`
+	addresses   []string           `json:"-"`
+	Adverbs     []string           `json:"adverbs"`
+	Adjectives  []string           `json:"adjectives"`
+	Nouns       []string           `json:"nouns"`
+	Emotions    []string           `json:"emotions"`
+	Occupations []string           `json:"occupations"`
+	Gerunds     []string           `json:"gerunds"`
+	Litstyles   []string           `json:"litstyles"`
+	Artstyles   []string           `json:"artstyles"`
+	Colors      []string           `json:"colors"`
+	pTemplate   *template.Template `json:"-"`
+	dTemplate   *template.Template `json:"-"`
+	tTemplate   *template.Template `json:"-"`
+	apiKey      string             `json:"-"`
+	nMade       int                `json:"-"`
+	Series      Series             `json:"series"`
+}
+
+func (a App) String() string {
+	bytes, _ := json.MarshalIndent(a, "", "  ")
+	return string(bytes)
 }
 
 func doOne(which int, wg *sync.WaitGroup, app *App, arg string) {
@@ -65,58 +72,14 @@ func (a *App) startup(ctx context.Context) {
 		logger.Error("Could not find rpc server.")
 	}
 
-	dbFolder, _ := paths.GetConfigDir("TrueBlocks/dalledress/databases")
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	} else if a.apiKey = os.Getenv("OPENAI_API_KEY"); a.apiKey == "" {
+		log.Fatal("No OPENAI_API_KEY key found")
+	}
 
 	var err error
-	if a.adverbs, err = toLines(filepath.Join(dbFolder, "adverbs.csv")); err != nil {
-		logger.Fatal(err)
-	}
-	if a.adjectives, err = toLines(filepath.Join(dbFolder, "adjectives.csv")); err != nil {
-		logger.Fatal(err)
-	}
-	if a.emotions, err = toLines(filepath.Join(dbFolder, "emotions.csv")); err != nil {
-		logger.Fatal(err)
-	}
-	for i := 0; i < len(a.emotions); i++ {
-		e2 := a.emotions[i]
-		parts := strings.Split(e2, ",")
-		if len(parts) > 2 {
-			a.emotions[i] = parts[0] + " (" + strings.Replace(parts[2], ".", "", -1) + ")"
-			a.emotionsShort = append(a.emotionsShort, parts[0])
-		}
-	}
-	if a.gerunds, err = toLines(filepath.Join(dbFolder, "gerunds.csv")); err != nil {
-		logger.Fatal(err)
-	}
-	if lines, err := toLines(filepath.Join(dbFolder, "literarystyles.csv")); err != nil {
-		logger.Fatal(err)
-	} else {
-		for _, line := range lines {
-			parts := strings.Split(line, ",")
-			if len(parts) > 1 {
-				a.literary = append(a.literary, parts[0]+" ("+strings.Replace(parts[1], ".", "", -1)+")")
-			}
-		}
-	}
-	if a.nouns, err = toLines(filepath.Join(dbFolder, "nouns.csv")); err != nil {
-		logger.Fatal(err)
-	}
-	if a.styles, err = toLines(filepath.Join(dbFolder, "styles.csv")); err != nil {
-		logger.Fatal(err)
-	}
-	for i := 0; i < len(a.styles); i++ {
-		parts := strings.Split(a.styles[i], ",")
-		a.shortStyles = append(a.shortStyles, parts[0])
-		a.styles[i] = strings.Replace(a.styles[i], ",", " from the ", -1)
-	}
-	if a.colors, err = toLines(filepath.Join(dbFolder, "colors.csv")); err != nil {
-		logger.Fatal(err)
-	}
-	for i := 0; i < len(a.colors); i++ {
-		a.colors[i] = strings.Replace(a.colors[i], ",", " (", -1) + ")"
-		// fmt.Println(a.colors[i])
-	}
-
+	// Make the templates
 	if a.pTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}
@@ -127,11 +90,158 @@ func (a *App) startup(ctx context.Context) {
 		logger.Fatal("could not create terse template:", err)
 	}
 
-	if err = godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	} else if a.apiKey = os.Getenv("OPENAI_API_KEY"); a.apiKey == "" {
-		log.Fatal("No OPENAI_API_KEY key found")
+	if a.Series, err = GetSeries(); err != nil {
+		logger.Fatal(err)
 	}
+
+	// Read (and possibly filter) the databases
+	if a.Adverbs, err = a.toLines("adverbs", Filtered); err != nil {
+		logger.Fatal(err)
+	}
+
+	if a.Adjectives, err = a.toLines("adjectives", Filtered); err != nil {
+		logger.Fatal(err)
+	}
+
+	if a.Nouns, err = a.toLines("nouns", Filtered); err != nil {
+		logger.Fatal(err)
+	}
+
+	if a.Emotions, err = a.toLines("emotions", CommaToParens|Filtered); err != nil {
+		logger.Fatal(err)
+	}
+
+	if a.Occupations, err = a.toLines("occupations", CommaToParens|Filtered|Noneable); err != nil {
+		logger.Fatal(err)
+	}
+
+	if a.Gerunds, err = a.toLines("gerunds", Filtered); err != nil {
+		logger.Fatal(err)
+	}
+
+	if a.Artstyles, err = a.toLines("artstyles", Filtered); err != nil {
+		logger.Fatal(err)
+	}
+
+	if a.Litstyles, err = a.toLines("litstyles", CommaToParens|Filtered); err != nil {
+		logger.Fatal(err)
+	}
+
+	if a.Colors, err = a.toLines("colors", Filtered|Noneable); err != nil {
+		logger.Fatal(err)
+	}
+}
+
+type Adjustment int
+
+const (
+	NoAdjustment  Adjustment = 0
+	CommaToParens            = 1 << iota
+	Filtered
+	Noneable
+)
+
+type Series struct {
+	Last        int      `json:"last"`
+	Suffix      string   `json:"suffix"`
+	Artstyles   []string `json:"artstyles"`
+	Emotions    []string `json:"emotions"`
+	Occupations []string `json:"occupations"`
+	Nouns       []string `json:"nouns"`
+	Litstyles   []string `json:"litstyles"`
+	Adverbs     []string `json:"adverbs"`
+	Adjectives  []string `json:"adjectives"`
+	Gerunds     []string `json:"gerunds"`
+	Colors      []string `json:"colors"`
+}
+
+func (s *Series) String() string {
+	bytes, _ := json.MarshalIndent(s, "", "  ")
+	return string(bytes)
+}
+
+func (s *Series) Save() {
+	file.StringToAsciiFile("series.json", s.String())
+}
+
+func GetSeries() (Series, error) {
+	if str := file.AsciiFileToString("series.json"); len(str) == 0 {
+		return Series{}, fmt.Errorf("could not load series.json")
+	} else {
+		bytes := []byte(str)
+		var s Series
+		if err := json.Unmarshal(bytes, &s); err != nil {
+			logger.Error("could not unmarshal series:", err)
+			return Series{}, err
+		}
+		return s, nil
+	}
+}
+
+func (s *Series) GetFilter(fieldName string) ([]string, error) {
+	reflectedT := reflect.ValueOf(s)
+	field := reflect.Indirect(reflectedT).FieldByName(fieldName)
+	if !field.IsValid() {
+		return nil, fmt.Errorf("field %s not valid", fieldName)
+	}
+	if field.Kind() != reflect.Slice {
+		return nil, fmt.Errorf("field %s not a slice", fieldName)
+	}
+	if field.Type().Elem().Kind() != reflect.String {
+		return nil, fmt.Errorf("field %s not a string slice", fieldName)
+	}
+	return field.Interface().([]string), nil
+}
+
+func (a *App) toLines(db string, adjust Adjustment) ([]string, error) {
+	dbFolder, _ := paths.GetConfigDir("TrueBlocks/dalledress/databases")
+	filename := filepath.Join(dbFolder, db+".csv")
+
+	lines := file.AsciiFileToLines(filename)
+	var err error
+	if len(lines) == 0 {
+		err = fmt.Errorf("could not load %s", filename)
+	} else {
+		if adjust&CommaToParens != 0 {
+			for i, line := range lines {
+				lines[i] = strings.Replace(line, ",", " (", 1) + ")"
+			}
+		}
+		if adjust&Filtered != 0 {
+			fn := strings.ToUpper(db[:1]) + db[1:]
+			if filter, err := a.Series.GetFilter(fn); err != nil {
+				return lines, err
+
+			} else {
+				if len(filter) == 0 {
+					// logger.Info("says filtered, but no filter for", db)
+					return lines, nil
+				}
+				// logger.Info("found filter for", db, filter)
+
+				filtered := make([]string, 0, len(lines))
+				for _, line := range lines {
+					for _, f := range filter {
+						// logger.Info(line, f, strings.Contains(line, f))
+						if strings.Contains(line, f) {
+							filtered = append(filtered, line)
+						}
+					}
+				}
+				lines = filtered
+			}
+		}
+	}
+
+	if len(lines) == 0 {
+		if adjust&Noneable != 0 {
+			lines = append(lines, "none")
+		} else {
+			return lines, fmt.Errorf("no lines match query in %s", filename)
+		}
+	}
+
+	return lines, err
 }
 
 func (a *App) GetTypes() []interface{} {

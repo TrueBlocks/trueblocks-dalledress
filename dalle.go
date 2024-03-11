@@ -35,66 +35,59 @@ type Value struct {
 }
 
 type Dalledress struct {
-	Ens          string    `json:"ens"`
-	Addr         string    `json:"addr"`
-	Seed         string    `json:"seed"`
-	Adverb       Attribute `json:"adverb"`
-	Adjective    Attribute `json:"adjective"`
-	EmotionShort Attribute `json:"emotionShort"`
-	Emotion      Attribute `json:"emotion"`
-	Gerunds      Attribute `json:"gerunds"`
-	Literary     Attribute `json:"literary"`
-	Noun         Attribute `json:"noun"`
-	Style        Attribute `json:"style"`
-	ShortStyle   string    `json:"shortStyle"`
-	Style2       Attribute `json:"style2"`
-	Color1       Attribute `json:"color1"`
-	Color2       Attribute `json:"color2"`
-	Color3       Attribute `json:"color3"`
-	Variant1     Attribute `json:"variant1"`
-	Variant2     Attribute `json:"variant2"`
-	Variant3     Attribute `json:"variant3"`
-	Background   Attribute `json:"background"`
-	Orientation  Attribute `json:"orientation"`
-	Prompt       Value     `json:"prompt"`
-	Data         Value     `json:"data"`
-	Terse        Value     `json:"terse"`
+	HexIn           string    `json:"hexIn"`
+	Seed            string    `json:"seed"`
+	Adverb          Attribute `json:"adverb"`
+	Adjective       Attribute `json:"adjective"`
+	Noun            Attribute `json:"noun"`
+	Emotion         Attribute `json:"emotion"`
+	EmotionShort    Attribute `json:"emotionShort"`
+	Occupation      Attribute `json:"occupation"`
+	OccupationShort Attribute `json:"occupationShort"`
+	Gerunds         Attribute `json:"gerunds"`
+	ArtStyle        Attribute `json:"artstyle"`
+	ArtStyleShort   string    `json:"artStyleShort"`
+	ArtStyle2       Attribute `json:"artstyle2"`
+	LitStyle        Attribute `json:"litstyle"`
+	Color1          Attribute `json:"color1"`
+	Color2          Attribute `json:"color2"`
+	Color3          Attribute `json:"color3"`
+	Background      Attribute `json:"background"`
+	Orientation     Attribute `json:"orientation"`
+	Prompt          Value     `json:"prompt"`
+	Data            Value     `json:"data"`
+	Terse           Value     `json:"terse"`
 }
 
-// var promptTemplateOld = `Draw a {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} and feeling {{.EmotionShort.Val}}{{.Ens}}.
-// Noun: {{.Noun.Val}}.
-// Emotion: {{.Emotion.Val}}.
-// Gerunds: {{.Gerunds.Val}}.
-// Primary style: {{.Style.Val}}.
-// Use only the colors {{.Color1.Val}} and {{.Color2.Val}}.
-// {{.Orientation.Val}}.
-// {{.Background.Val}}.
-// Expand upon the most relevant connotative meanings of {{.Noun.Val}}, {{.Emotion.Val}}, {{.Adjective.Val}}, and {{.Adverb.Val}}.
-// Find the representation that most closely matches the description.
-// Focus on the Noun, the Gerunds, the Emotion, and Primary style.{{.Literary.Val}}
-// DO NOT PUT ANY TEXT IN THE IMAGE.`
-
-var promptTemplate = `Draw a {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} in the style of {{.Style.Val}}.
+var promptTemplate = `
+Draw a {{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} who works as a 
+{{.Occupation.Val}} and is {{.Gerunds.Val}} and feeling {{.Emotion.Val}}.
+Noun: {{.Noun.Val}}.
+Emotion: {{.Emotion.Val}}.
+Occupation: {{.Occupation.Val}}.
+Gerunds: {{.Gerunds.Val}}.
+Artistic style: {{.ArtStyle.Val}}.
+Use only the colors {{.Color1.Val}} and {{.Color2.Val}}.
 {{.Orientation.Val}}.
-Include the two most obvious connotations of "{{.Noun.Val}}", "{{.Adjective.Val}}", and "{{.Adverb.Val}}" in your work.
-{{.Literary.Val}}`
+{{.Background.Val}}.
+Expand upon the most relevant connotative meanings of {{.Noun.Val}}, {{.Emotion.Val}}, {{.Adjective.Val}}, and {{.Adverb.Val}}.
+Find the representation that most closely matches the description.
+Focus on the noun, the occupation, the emotion, and literary style.{{.LitStyle.Val}}`
 
 var dataTemplate = `
-Address:     {{.Addr}} Ens: {{.Ens}}.
+HexIn:       {{.HexIn}}.
 Seed:        {{.Seed}}.
 Adverb:      {{.Adverb.Val}} Adjective: {{.Adjective.Val}} Noun: {{.Noun.Val}}.
 Emotion:     {{.EmotionShort.Val}}.
+Occupation:  {{.OccupationShort.Val}}.
 Gerunds:	 {{.Gerunds.Val}}.
-Literary:    {{.Literary.Val}}.
-Style:       {{.Style.Val}}.
+LitStyle:    {{.LitStyle.Val}}.
+ArtStyle:    {{.ArtStyle.Val}}.
 Color1:      {{.Color1.Val}} Color2: {{.Color2.Val}} Color3: {{.Color3.Val}}.
-Variant1:    {{.Variant1.Val}} Variant2: {{.Variant2.Val}} Variant3: {{.Variant3.Val}}.
 Background:  {{.Background.Val}}.
 Orientation: {{.Orientation.Val}}.`
 
-// var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.Gerunds.Val}} and feeling {{.Emotion.Val}} in the style of {{.ShortStyle}}`
-
-var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} in the style of {{.ShortStyle}}`
+var terseTemplate = `{{.Adverb.Val}} {{.Adjective.Val}} {{.Noun.Val}} {{.OccupationShort.Val}} {{.Gerunds.Val}} and feeling {{.EmotionShort.Val}} in the style of {{.ArtStyleShort}}`
 
 func (d *Dalledress) generatePrompt(t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
@@ -180,138 +173,123 @@ func clip(s string) string {
 	return parts[0]
 }
 
-func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
-	if len(a.adverbs) == 0 {
+func (a *App) GetDalledress(hexIn string) (Dalledress, error) {
+	if len(a.Adverbs) == 0 {
 		return Dalledress{}, fmt.Errorf("adverbs not loaded")
 	}
 
-	// addr, _ := a.conn.GetEnsAddress(ensOrAddr)
-	addr := ensOrAddr
-	// if base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
-	// 	return Dalledress{}, fmt.Errorf("ENS not registered: %s", ensOrAddr)
-	// }
-	hash := hexutil.Encode(crypto.Keccak256([]byte(addr)))
-	seed := hash[2:] + addr[2:]
-	if len(seed) < 104 {
-		return Dalledress{}, fmt.Errorf("invalid seed: %s", seed)
-	}
-	if ensOrAddr == addr {
-		ensOrAddr = ""
-	} else {
-		ensOrAddr = strings.Replace(" named "+ensOrAddr, ".eth", "", -1)
+	hash1 := hexutil.Encode(crypto.Keccak256([]byte(hexIn)))
+	hash2 := reverseString(hash1)
+	hexIn2 := reverseString(hexIn)
+	seed := hash1[2:] + hash2[2:] + hexIn[2:] + hexIn2[2:] // 64 + 64 + 32 + 32 = 192
+	if len(seed) < 165 {
+		return Dalledress{}, fmt.Errorf("invalid seed (too short): %s", seed)
 	}
 
 	dd := Dalledress{
-		Ens:          ensOrAddr,
-		Addr:         addr,
-		Seed:         seed,
-		Adverb:       Attribute{Seed: seed[0:12]},
-		Adjective:    Attribute{Seed: seed[12:24]},
-		EmotionShort: Attribute{Seed: seed[24:36]},
-		Emotion:      Attribute{Seed: seed[24:36]},
-		Gerunds:      Attribute{Seed: seed[36:48]},
-		Literary:     Attribute{Seed: seed[48:60]},
-		Noun:         Attribute{Seed: seed[60:72]},
-		Style:        Attribute{Seed: seed[72:84]},
-		Style2:       Attribute{Seed: seed[84:96]},
-		Color1:       Attribute{Seed: seed[92:104]},
-		Color2:       Attribute{Seed: seed[80:92]},
-		Color3:       Attribute{Seed: seed[68:80]},
-		Variant1:     Attribute{Seed: seed[56:68]},
-		Variant2:     Attribute{Seed: seed[44:56]},
-		Variant3:     Attribute{Seed: seed[32:44]},
-		Background:   Attribute{Seed: seed[20:32]},
-		Orientation:  Attribute{Seed: seed[8:20]},
+		HexIn:           hexIn,
+		Seed:            seed,
+		Adverb:          Attribute{Seed: seed[0:12]},    // 12-0 = 12
+		Adjective:       Attribute{Seed: seed[12:24]},   // 24-12 = 12
+		Noun:            Attribute{Seed: seed[24:36]},   // 36-24 = 12
+		Emotion:         Attribute{Seed: seed[36:48]},   // 48-36 = 12
+		EmotionShort:    Attribute{Seed: seed[48:60]},   // 60-48 = 12
+		Occupation:      Attribute{Seed: seed[60:72]},   // 72-60 = 12
+		OccupationShort: Attribute{Seed: seed[72:84]},   // 84-72 = 12
+		Gerunds:         Attribute{Seed: seed[84:96]},   // 96-84 = 12
+		ArtStyle:        Attribute{Seed: seed[96:108]},  // 108-96 = 12
+		ArtStyle2:       Attribute{Seed: seed[108:120]}, // 120-108 = 12
+		LitStyle:        Attribute{Seed: seed[120:132]}, // 132-120 = 12
+		Color1:          Attribute{Seed: seed[132:144]}, // 144-132 = 12
+		Color2:          Attribute{Seed: seed[144:156]}, // 156-144 = 12
+		Color3:          Attribute{Seed: seed[156:168]}, // 168-156 = 12
+		Background:      Attribute{Seed: seed[168:180]}, // 180-168 = 12
+		Orientation:     Attribute{Seed: seed[180:192]}, // 192-180 = 12
 	}
 
-	lengths := []int{
-		len(a.adverbs),       // 0
-		len(a.adjectives),    // 1
-		len(a.emotionsShort), // 2
-		len(a.literary),      // 3
-		len(a.nouns),         // 4
-		len(a.styles),        // 5
-		len(a.colors),        // 6
-		8,                    // 7
-		len(a.gerunds),       // 8
+	lengths := map[string]int{
+		"adverbs":     len(a.Adverbs),
+		"adjectives":  len(a.Adjectives),
+		"nouns":       len(a.Nouns),
+		"emotions":    len(a.Emotions),
+		"occupations": len(a.Occupations),
+		"gerunds":     len(a.Gerunds),
+		"artstyles":   len(a.Artstyles),
+		"litstyles":   len(a.Litstyles),
+		"colors":      len(a.Colors),
+		"other":       8,
 	}
 
-	dd.Adverb.Num = hexStringToBigIntModulo(dd.Adverb.Seed, SeedBump, lengths[0])
-	dd.Adjective.Num = hexStringToBigIntModulo(dd.Adjective.Seed, SeedBump, lengths[1])
-	dd.EmotionShort.Num = hexStringToBigIntModulo(dd.EmotionShort.Seed, 0, lengths[2])
-	dd.Emotion.Num = hexStringToBigIntModulo(dd.Emotion.Seed, 0, lengths[2])
-	dd.Gerunds.Num = hexStringToBigIntModulo(dd.Gerunds.Seed, 0, lengths[8])
-	dd.Literary.Num = hexStringToBigIntModulo(dd.Literary.Seed, 0, lengths[3])
-	dd.Noun.Num = hexStringToBigIntModulo(dd.Noun.Seed, 0, lengths[4])
-	dd.Style.Num = hexStringToBigIntModulo(dd.Style.Seed, 0, lengths[5])
-	dd.Style2.Num = hexStringToBigIntModulo(dd.Style2.Seed, 0, lengths[5])
-	dd.Variant1.Num = hexStringToBigIntModulo(dd.Variant1.Seed, 0, lengths[5])
-	dd.Variant2.Num = hexStringToBigIntModulo(dd.Variant2.Seed, 0, lengths[5])
-	dd.Variant3.Num = hexStringToBigIntModulo(dd.Variant3.Seed, 0, lengths[5])
-	dd.Color1.Num = hexStringToBigIntModulo(dd.Color1.Seed, 0, lengths[6])
-	dd.Color2.Num = hexStringToBigIntModulo(dd.Color2.Seed, 0, lengths[6])
-	dd.Color3.Num = hexStringToBigIntModulo(dd.Color3.Seed, 0, lengths[6])
-	dd.Background.Num = hexStringToBigIntModulo(dd.Background.Seed, 0, lengths[7])
-	dd.Orientation.Num = hexStringToBigIntModulo(dd.Orientation.Seed, 0, lengths[7])
+	dd.Adverb.Num = hexStringToBigIntModulo(dd.Adverb.Seed, SeedBump, lengths["adverbs"])
+	dd.Adjective.Num = hexStringToBigIntModulo(dd.Adjective.Seed, SeedBump, lengths["adjectives"])
+	dd.Noun.Num = hexStringToBigIntModulo(dd.Noun.Seed, 0, lengths["nouns"])
+	dd.Emotion.Num = hexStringToBigIntModulo(dd.Emotion.Seed, 0, lengths["emotions"])
+	dd.EmotionShort.Num = hexStringToBigIntModulo(dd.EmotionShort.Seed, 0, lengths["emotions"])
+	dd.Occupation.Num = hexStringToBigIntModulo(dd.Occupation.Seed, 0, lengths["occupations"])
+	dd.OccupationShort.Num = hexStringToBigIntModulo(dd.OccupationShort.Seed, 0, lengths["occupations"])
+	dd.Gerunds.Num = hexStringToBigIntModulo(dd.Gerunds.Seed, 0, lengths["gerunds"])
+	dd.ArtStyle.Num = hexStringToBigIntModulo(dd.ArtStyle.Seed, 0, lengths["artstyles"])
+	dd.ArtStyle2.Num = hexStringToBigIntModulo(dd.ArtStyle2.Seed, 0, lengths["artstyles"])
+	dd.LitStyle.Num = hexStringToBigIntModulo(dd.LitStyle.Seed, 0, lengths["litstyles"])
+	dd.Color1.Num = hexStringToBigIntModulo(dd.Color1.Seed, 0, lengths["colors"])
+	dd.Color2.Num = hexStringToBigIntModulo(dd.Color2.Seed, 0, lengths["colors"])
+	dd.Color3.Num = hexStringToBigIntModulo(dd.Color3.Seed, 0, lengths["colors"])
+	dd.Background.Num = hexStringToBigIntModulo(dd.Background.Seed, 0, lengths["other"])
+	dd.Orientation.Num = hexStringToBigIntModulo(dd.Orientation.Seed, 0, lengths["other"])
 
-	series := strings.Trim(file.AsciiFileToString("series.txt"), "\n\r")
-
-	dd.Adverb.Val = a.adverbs[dd.Adverb.Num]
-	dd.Adjective.Val = a.adjectives[dd.Adjective.Num]
-	dd.EmotionShort.Val = a.emotionsShort[dd.EmotionShort.Num]
-	dd.Emotion.Val = a.emotions[dd.Emotion.Num]
-	if series == "postal" {
-		dd.EmotionShort.Val = "postal going"
-		dd.Emotion.Val = "postal going (becoming extremely and uncontrollably angry often to the point of violence)"
-	} else if series == "happiness" {
-		dd.EmotionShort.Val = "happiness"
-		dd.Emotion.Val = "happiness (state of well-being characterized by emotions ranging from contentment to intense joy)"
-	} else if series == "fury" || series == "steam" {
-		dd.EmotionShort.Val = "fury and postal going"
-		dd.Emotion.Val = "fury (wild or violent anger) and postal going (becoming extremely and uncontrollably angry often to the point of violence)"
-	} else if series == "love" || series == "solar" {
-		dd.EmotionShort.Val = "love and compassion"
-		dd.Emotion.Val = "love (a strong positive emotion of regard and affection) and compassion (sympathetic pity and concern for the sufferings or misfortunes of others)"
-	}
-	dd.Gerunds.Val = a.gerunds[dd.Gerunds.Num] + " and " + a.gerunds[lengths[8]-dd.Gerunds.Num]
-	dd.Literary.Val = " Write in the literary style {{.Literary.Val}}."
-	if series == "human" || series == "human2" {
-		dd.Noun.Val = "human"
-	} else if strings.Contains(series, "human-with") || series == "postal" || series == "happiness" {
-		dd.Noun.Val = "human with " + a.nouns[dd.Noun.Num] + " characteristics"
-	} else if strings.Contains(series, "human-like") || series == "fury" || series == "love" || series == "steam" || series == "solar" {
-		dd.Noun.Val = a.nouns[dd.Noun.Num] + " with human-like characteristics"
-	} else {
-		dd.Noun.Val = a.nouns[dd.Noun.Num]
-	}
-	dd.Style.Val = a.styles[dd.Style.Num]
-	dd.ShortStyle = a.shortStyles[dd.Style.Num]
-	if series == "steam" {
-		dd.Style.Val = "steam punk,modern western art movements"
-		dd.ShortStyle = "steam punk"
-	} else if series == "solar" {
-		dd.Style.Val = "solar punk,modern western art movements"
-		dd.ShortStyle = "solar punk"
-	}
-	dd.Style2.Val = a.styles[dd.Style2.Num]
-	dd.Color1.Val = a.colors[dd.Color1.Num]
-	dd.Color2.Val = a.colors[dd.Color2.Num]
+	dd.Adverb.Val = a.Adverbs[dd.Adverb.Num]
+	dd.Adjective.Val = a.Adjectives[dd.Adjective.Num]
+	dd.Noun.Val = a.Nouns[dd.Noun.Num] + " with human-like characteristics"
+	dd.Emotion.Val = a.Emotions[dd.Emotion.Num]
+	dd.Occupation.Val = a.Occupations[dd.Occupation.Num]
+	dd.Gerunds.Val = a.Gerunds[dd.Gerunds.Num] + " and " + a.Gerunds[lengths["gerunds"]-dd.Gerunds.Num]
+	dd.ArtStyle.Val = a.Artstyles[dd.ArtStyle.Num]
+	dd.ArtStyle2.Val = a.Artstyles[dd.ArtStyle2.Num]
+	dd.LitStyle.Val = " Write in the literary style " + a.Litstyles[dd.LitStyle.Num]
+	dd.Color1.Val = strings.Replace(a.Colors[dd.Color1.Num], ",", " (", -1) + ")"
+	dd.Color2.Val = strings.Replace(a.Colors[dd.Color2.Num], ",", " (", -1) + ")"
 	dd.Color3.Val = "#" + muteColor(dd.Color3.Seed[:8], dd.Color3.Seed[4:4])
-	dd.Variant1.Val = clip(a.styles[dd.Variant1.Num])
-	dd.Variant2.Val = clip(a.styles[dd.Variant2.Num])
-	dd.Variant3.Val = clip(a.styles[dd.Variant3.Num])
 
-	e := os.Getenv("DALLE_NO_LITERARY")
-	if e != "" {
-		dd.Literary.Val = ""
+	// Noneable
+	if dd.Occupation.Val == "none" {
+		dd.Occupation.Val = ""
 	}
-	dd.Literary.Val = strings.Replace(dd.Literary.Val, "{{.Literary.Val}}", a.literary[dd.Literary.Num], -1)
+	if dd.Color1.Val == "none" {
+		dd.Color1.Val = ""
+	}
+	if dd.Color2.Val == "none" {
+		dd.Color2.Val = ""
+	}
+	if dd.Color3.Val == "none" {
+		dd.Color3.Val = ""
+	}
+
+	parts := strings.Split(dd.Emotion.Val, " (")
+	if len(parts) > 0 {
+		dd.EmotionShort.Val = parts[0]
+	} else {
+		dd.EmotionShort.Val = dd.Emotion.Val
+	}
+
+	parts = strings.Split(dd.ArtStyle.Val, ",")
+	if len(parts) > 0 {
+		dd.ArtStyleShort = parts[0]
+	} else {
+		dd.ArtStyleShort = dd.ArtStyle.Val
+	}
+
+	parts = strings.Split(dd.Occupation.Val, " (")
+	if len(parts) > 0 {
+		dd.OccupationShort.Val = parts[0]
+	} else {
+		dd.OccupationShort.Val = dd.Occupation.Val
+	}
 
 	switch dd.Background.Num {
 	case 0:
 		dd.Background.Val = "The background should be transparent"
 	case 1:
-		dd.Background.Val = "The background should be this color {{.Color3.Val}} and pay homage to this style {{.Style2.Val}}"
+		dd.Background.Val = "The background should be this color {{.Color3.Val}} and pay homage to this style {{.ArtStyle2.Val}}"
 	case 2:
 		dd.Background.Val = " The background should be this color {{.Color3.Val}} and subtly patterned"
 	case 3:
@@ -328,7 +306,7 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		logger.Fatal("Invalid background number: ", dd.Background.Num)
 	}
 
-	e = os.Getenv("DALLE_BACKGROUND")
+	e := os.Getenv("DALLE_BACKGROUND")
 	if e != "" {
 		switch e {
 		case "solid":
@@ -338,7 +316,7 @@ func (a *App) GetDalledress(ensOrAddr string) (Dalledress, error) {
 		}
 	}
 	dd.Background.Val = strings.Replace(dd.Background.Val, "{{.Color3.Val}}", dd.Color3.Val, -1)
-	dd.Background.Val = strings.Replace(dd.Background.Val, "{{.Style2.Val}}", dd.Style2.Val, -1)
+	dd.Background.Val = strings.Replace(dd.Background.Val, "{{.ArtStyle2.Val}}", dd.ArtStyle2.Val, -1)
 
 	ori, gaze, sym := "", "", ""
 	switch dd.Orientation.Num {
@@ -399,12 +377,6 @@ type DalleResponse struct {
 var SeedBump = int(0)
 
 func (a *App) GetImage(which int, ensOrAddr string) {
-	// logger.Info("Generating image for", ensOrAddr)
-	addr := ensOrAddr
-	// if addr, _ := a.conn.GetEnsAddress(ensOrAddr); len(addr) < 42 { // base.HexToAddress(addr) == base.ZeroAddr || !base.IsValidAddress(addr) {
-	// 	logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
-	// 	return
-	// } else {
 	folder := "./generated/"
 	file.EstablishFolder(folder)
 	file.EstablishFolder(strings.Replace(folder, "/generated", "/txt-prompt", -1))
@@ -412,9 +384,8 @@ func (a *App) GetImage(which int, ensOrAddr string) {
 	file.EstablishFolder(strings.Replace(folder, "/generated", "/annotated", -1))
 	file.EstablishFolder(strings.Replace(folder, "/generated", "/stitched", -1))
 
-	series := strings.Trim(file.AsciiFileToString("series.txt"), "\n\r")
-
-	fn := filepath.Join(folder, fmt.Sprintf("%s-%s.png", addr, series)) // cnt))
+	addr := ensOrAddr
+	fn := filepath.Join(folder, fmt.Sprintf("%s-%s.png", addr, a.Series.Suffix))
 	annoName := strings.Replace(fn, "/generated", "/annotated", -1)
 	if file.FileExists(annoName) {
 		logger.Info(colors.Yellow+"Image already exists: ", fn, colors.Off)
@@ -479,6 +450,10 @@ func (a *App) GetImage(which int, ensOrAddr string) {
 	if err != nil {
 		panic(err)
 	}
+	bodyStr := string(body)
+	bodyStr = strings.Replace(bodyStr, "\"revised_prompt\": \"", "\"revised_prompt\": \"NO TEXT. ", -1)
+	bodyStr = strings.Replace(bodyStr, ".\",", ". NO TEXT.\",", 1)
+	body = []byte(bodyStr)
 
 	// logger.Info("DalleResponse: ", string(body))
 	var dalleResp DalleResponse
@@ -619,16 +594,6 @@ func (a *App) GetImprovedPrompt(ensOrAddr string) (string, string) {
 	return string(body), prompt
 }
 
-func toLines(filename string) ([]string, error) {
-	lines := file.AsciiFileToLines(filename)
-	// logger.Info("Reading", filename, len(lines), "lines")
-	var err error
-	if len(lines) == 0 {
-		err = fmt.Errorf("could not load %s", filename)
-	}
-	return lines, err
-}
-
 func muteColor(hex, test string) string {
 	if test < "b" {
 		return hex
@@ -638,4 +603,12 @@ func muteColor(hex, test string) string {
 	h, s, l := c.Hsl()
 	s *= 0.5
 	return colorful.Hsl(h, s, l).Hex() + hex[6:8]
+}
+
+func reverseString(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
 }

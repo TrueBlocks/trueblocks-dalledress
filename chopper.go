@@ -13,7 +13,21 @@ func (a *App) Chopper(input string) (string, map[string]string, error) {
 		return "", map[string]string{}, err
 	}
 
-	keys := []string{"adverb", "adjective", "emotionshort", "emotion", "literary", "noun", "style", "style2", "color1", "color2", "color3", "variant1", "variant2", "variant3", "background", "orientation"}
+	keys := []string{
+		"adverb",
+		"adjective",
+		"noun",
+		"emotion",
+		"emotionshort",
+		"artstyle",
+		"artstyle2",
+		"litstyle",
+		"color1",
+		"color2",
+		"color3",
+		"background",
+		"orientation",
+	}
 	starts := []int{0, 12, 24, 36, 48, 60, 72, 84, 92, 80, 68, 56, 44, 32, 20, 8}
 	ends := []int{12, 24, 36, 48, 60, 72, 84, 96, 104, 92, 80, 68, 56, 44, 32, 20}
 

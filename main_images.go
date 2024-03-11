@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 )
 
 func main_images() {
@@ -24,26 +22,28 @@ func main_images() {
 	lines := file.AsciiFileToLines(sourceFile)
 	if len(lines) > 0 {
 		wg := sync.WaitGroup{}
-		fn := "last.txt"
-		v := strings.Trim(file.AsciiFileToString(fn), "\n\r")
-		last := utils.MustParseInt(v)
-		logger.Info("Starting at address ", last, " of ", len(lines), file.FileExists(fn), v)
+		logger.Info("Starting at address ", app.Series.Last, " of ", len(lines))
+		app.nMade = 0
 		for i := 0; i < len(lines); i++ {
 			if lines[i][0] == '#' || len(lines[i]) < 42 {
 				continue
 			}
-			if i > int(last) {
+			if i > int(app.Series.Last) {
 				if address, ok := app.validateInput(lines[i]); !ok {
 					fmt.Println("Invalid address", lines[i])
 					return
 				} else {
 					wg.Add(1)
 					go doOne(i, &wg, app, address.Hex())
-					file.StringToAsciiFile(fn, fmt.Sprintf("%d\n", i))
+					app.Series.Last = i
+					app.Series.Save()
 					if (i+1)%5 == 0 {
 						wg.Wait()
-						logger.Info("Sleeping for 60 seconds")
-						time.Sleep(time.Second * 60)
+						if app.nMade > 4 {
+							logger.Info("Sleeping for 60 seconds")
+							time.Sleep(time.Second * 60)
+							app.nMade = 0
+						}
 					}
 				}
 			}

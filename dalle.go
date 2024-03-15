@@ -242,7 +242,7 @@ func (a *App) GetDalledress(hexIn string) (Dalledress, error) {
 	dd.Noun.Val = a.Nouns[dd.Noun.Num] + " with human-like characteristics"
 	dd.Emotion.Val = a.Emotions[dd.Emotion.Num]
 	dd.Occupation.Val = a.Occupations[dd.Occupation.Num]
-	dd.Gerunds.Val = a.Gerunds[dd.Gerunds.Num] + " and " + a.Gerunds[lengths["gerunds"]-dd.Gerunds.Num]
+	dd.Gerunds.Val = a.Gerunds[dd.Gerunds.Num] + " and " + a.Gerunds[lengths["gerunds"]-dd.Gerunds.Num-1]
 	dd.ArtStyle.Val = a.Artstyles[dd.ArtStyle.Num]
 	dd.ArtStyle2.Val = a.Artstyles[dd.ArtStyle2.Num]
 	dd.LitStyle.Val = " Write in the literary style " + a.Litstyles[dd.LitStyle.Num]
@@ -388,14 +388,14 @@ func (a *App) GetImage(which int, ensOrAddr string) {
 	fn := filepath.Join(folder, fmt.Sprintf("%s-%s.png", addr, a.Series.Suffix))
 	annoName := strings.Replace(fn, "/generated", "/annotated", -1)
 	if file.FileExists(annoName) {
-		logger.Info(colors.Yellow+"Image already exists: ", fn, colors.Off)
+		logger.Info(colors.Yellow+"Image already exists: ", fn, which, colors.Off)
 		time.Sleep(250 * time.Millisecond)
 		utils.System("open " + annoName)
 		return
 	}
 	a.nMade++
 
-	logger.Info(colors.Cyan, addr, colors.Yellow, "- improving the prompt...", colors.Off)
+	logger.Info(colors.Cyan, addr, colors.Yellow, "- improving the prompt...", which, colors.Off)
 
 	prompt, orig := a.GetImprovedPrompt(ensOrAddr)
 	size := "1024x1024"
@@ -430,7 +430,7 @@ func (a *App) GetImage(which int, ensOrAddr string) {
 		log.Fatal("No OPENAI_API_KEY key found")
 	}
 
-	logger.Info(colors.Cyan, addr, colors.Yellow, "- generating the image...", colors.Off)
+	logger.Info(colors.Cyan, addr, colors.Yellow, "- generating the image...", which, colors.Off)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
 	if err != nil {

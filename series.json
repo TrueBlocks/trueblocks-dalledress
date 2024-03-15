@@ -1,13 +1,16 @@
 {
-  "last": 59,
-  "suffix": "-five-tone-virus",
+  "last": 49,
+  "suffix": "-five-tone-postal-protozoa",
   "artstyles": [
     "five-tone"
   ],
-  "emotions": [],
+  "emotions": [
+    "fury",
+    "postal"
+  ],
   "occupations": [],
   "nouns": [
-    "virus"
+    "protozoa"
   ],
   "litstyles": [],
   "adverbs": [],
@@ -17,6 +20,7 @@
     "black",
     "white",
     "grey",
-    "gray"
+    "gray",
+    "indego"
   ]
 }

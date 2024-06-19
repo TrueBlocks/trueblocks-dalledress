@@ -11,7 +11,7 @@ require (
 	github.com/fogleman/gg v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lucasb-eyer/go-colorful v1.2.0
-	github.com/wailsapp/wails/v2 v2.7.1
+	github.com/wailsapp/wails/v2 v2.8.2
 )
 
 require (
@@ -89,14 +89,14 @@ require (
 	github.com/wealdtech/go-ens/v3 v3.6.0 // indirect
 	github.com/wealdtech/go-multicodec v1.4.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb // indirect
 	golang.org/x/image v0.15.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/term v0.15.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/term v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.56.3 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect

@@ -16,8 +16,8 @@ import {
   GetPrompt,
   GetData,
   GetJson,
-  GetImage,
-  GetImageData
+  GetImage
+  // GetImageData
   // GetImprovedPrompt,
   // GetModeration
 } from "../wailsjs/go/main/App";
@@ -58,7 +58,7 @@ export default function App() {
   }, [email]);
 
   const openImage = (email: string) => {
-    GetImage(email);
+    GetImage(1, email);
   };
 
   return (

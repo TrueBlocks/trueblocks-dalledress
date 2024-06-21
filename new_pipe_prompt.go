@@ -18,6 +18,7 @@ func (app *App2) pipe2_handlePrompt() {
 		if dd.TersePrompt, err = dd.generatePrompt(app.tTemplate, nil); err != nil {
 			logger.Fatal(err.Error())
 		}
+		app.ReportOn("TersePrompt", dd.Orig, dd.TersePrompt)
 		app.pipe6Chan <- dd
 	}
 	close(app.pipe6Chan)

@@ -14,10 +14,10 @@ func main() {
 		main_new()
 	case Images:
 		main_images()
-	case Annotate:
-		main_annotate()
-	case Stitch:
-		main_stitch()
+	// case Annotate:
+	// 	main_annotate()
+	// case Stitch:
+	// 	main_stitch()
 	case Wails:
 		main_wails()
 	default:

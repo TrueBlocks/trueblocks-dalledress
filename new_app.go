@@ -55,3 +55,7 @@ func (app *App2) ReportOn(loc, address, value string) {
 	file.EstablishFolder(path)
 	file.StringToAsciiFile(filepath.Join(path, address+".json"), value)
 }
+
+func (app *App2) ReportDone(address string) {
+	logger.Info("Done", address)
+}

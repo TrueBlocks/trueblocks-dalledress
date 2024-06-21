@@ -7,13 +7,13 @@ Emotion: {{.Emotion false}}.
 Occupation: {{.Occupation false}}.
 Action: {{.Action false}}.
 Artistic style: {{.ArtStyle false 1}}.
+Literary Style: {{.LitStyle false}}.
 Use only the colors {{.Color true 1}} and {{.Color true 2}}.
 {{.Orientation false}}.
 {{.BackStyle false}}.
 Expand upon the most relevant connotative meanings of {{.Noun true}}, {{.Emotion true}}, {{.Adjective true}}, and {{.Adverb true}}.
 Find the representation that most closely matches the description.
-Focus on the noun, the occupation, the emotion, and literary style.
-Rewrite the prompt using the literary style: {{.LitStyle false}}`
+Focus on the noun, the occupation, the emotion, and the literary style.`
 
 var dataTemplate = `Orig:             {{.Orig}}
 Seed:             {{.Seed}}

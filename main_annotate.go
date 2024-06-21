@@ -5,17 +5,10 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/draw"
-	"image/png"
-	"log"
-	"math"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
-	"github.com/fogleman/gg"
 	"github.com/lucasb-eyer/go-colorful"
 )
 
@@ -125,90 +118,90 @@ func getText() string { // path string) string {
 }
 
 // annotate reads an image and adds a text annotation to it.
-func annotate(fileName, location string, annoPct float64) (ret string, err error) {
-	file, err := os.Open(fileName)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-	img, _, err := image.Decode(file)
-	if err != nil {
-		return "", err
-	}
+// func annotate(fileName, location string, annoPct float64) (ret string, err error) {
+// 	file, err := os.Open(fileName)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	defer file.Close()
+// 	img, _, err := image.Decode(file)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	bounds := img.Bounds()
-	width := bounds.Dx()
-	height := bounds.Dy()
+// 	bounds := img.Bounds()
+// 	width := bounds.Dx()
+// 	height := bounds.Dy()
 
-	text := getText() // fileName)
-	estimatedFontSize := 20. * (float64(width) / float64(len(text)*7.))
+// 	text := getText() // fileName)
+// 	estimatedFontSize := 20. * (float64(width) / float64(len(text)*7.))
 
-	textWidth := float64(width) * 0.95
-	lines := math.Ceil(float64(len(text)) / (textWidth / estimatedFontSize))
-	marginHeight := float64(height) * 0.025
-	annoHeight := lines * estimatedFontSize * 1.5
-	newHeight := height + int(annoHeight+marginHeight*2)
+// 	textWidth := float64(width) * 0.95
+// 	lines := math.Ceil(float64(len(text)) / (textWidth / estimatedFontSize))
+// 	marginHeight := float64(height) * 0.025
+// 	annoHeight := lines * estimatedFontSize * 1.5
+// 	newHeight := height + int(annoHeight+marginHeight*2)
 
-	newImg := image.NewRGBA(image.Rect(0, 0, width, newHeight))
-	draw.Draw(newImg, newImg.Bounds(), img, bounds.Min, draw.Src)
+// 	newImg := image.NewRGBA(image.Rect(0, 0, width, newHeight))
+// 	draw.Draw(newImg, newImg.Bounds(), img, bounds.Min, draw.Src)
 
-	bgColor, _ := findAverageDominantColor(img)
-	col, err := parseHexColor(bgColor)
-	if err != nil {
-		return "", err
-	}
+// 	bgColor, _ := findAverageDominantColor(img)
+// 	col, err := parseHexColor(bgColor)
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	bgRect := image.Rect(0, height, width, newHeight)
-	if location == "top" {
-		bgRect = image.Rect(0, 0, width, int(annoHeight+marginHeight*2))
-		draw.Draw(newImg, bgRect, &image.Uniform{col}, image.Point{}, draw.Src)
-	} else {
-		draw.Draw(newImg, bgRect, &image.Uniform{col}, image.Point{}, draw.Src)
-	}
+// 	bgRect := image.Rect(0, height, width, newHeight)
+// 	if location == "top" {
+// 		bgRect = image.Rect(0, 0, width, int(annoHeight+marginHeight*2))
+// 		draw.Draw(newImg, bgRect, &image.Uniform{col}, image.Point{}, draw.Src)
+// 	} else {
+// 		draw.Draw(newImg, bgRect, &image.Uniform{col}, image.Point{}, draw.Src)
+// 	}
 
-	gc := gg.NewContextForImage(newImg)
-	if err := gc.LoadFontFace("/System/Library/Fonts/Monaco.ttf", estimatedFontSize); err != nil {
-		log.Fatalf("Error loading font: %v", err) // Handle the error appropriately
-	}
-	borderCol := darkenColor(col)
-	gc.SetColor(borderCol)
-	gc.SetLineWidth(2)
-	if location == "top" {
-		gc.DrawLine(0, float64(height)*annoPct, float64(width), float64(height)*annoPct)
-	} else {
-		gc.DrawLine(0, float64(height), float64(width), float64(height))
-	}
-	gc.Stroke()
+// 	gc := gg.NewContextForImage(newImg)
+// 	if err := gc.LoadFontFace("/System/Library/Fonts/Monaco.ttf", estimatedFontSize); err != nil {
+// 		log.Fatalf("Error loading font: %v", err) // Handle the error appropriately
+// 	}
+// 	borderCol := darkenColor(col)
+// 	gc.SetColor(borderCol)
+// 	gc.SetLineWidth(2)
+// 	if location == "top" {
+// 		gc.DrawLine(0, float64(height)*annoPct, float64(width), float64(height)*annoPct)
+// 	} else {
+// 		gc.DrawLine(0, float64(height), float64(width), float64(height))
+// 	}
+// 	gc.Stroke()
 
-	// Draw the text with adjusted margins.
-	textColor, _ := contrastColor(col)
-	// fmt.Println(l, textColor, col)
+// 	// Draw the text with adjusted margins.
+// 	textColor, _ := contrastColor(col)
+// 	// fmt.Println(l, textColor, col)
 
-	gc.SetColor(textColor) // use the contrasting color for the text
-	gc.DrawStringWrapped(text, float64(width)/2, float64(height)+marginHeight*2, 0.5, 0.35, textWidth, 1.5, gg.AlignLeft)
+// 	gc.SetColor(textColor) // use the contrasting color for the text
+// 	gc.DrawStringWrapped(text, float64(width)/2, float64(height)+marginHeight*2, 0.5, 0.35, textWidth, 1.5, gg.AlignLeft)
 
-	// Save the new image.
-	outputPath := strings.Replace(fileName, "generated/", "annotated/", -1)
-	out, err := os.Create(outputPath)
-	if err != nil {
-		return "", err
-	}
-	defer out.Close()
+// 	// Save the new image.
+// 	outputPath := strings.Replace(fileName, "generated/", "annotated/", -1)
+// 	out, err := os.Create(outputPath)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	defer out.Close()
 
-	err = png.Encode(out, gc.Image())
-	if err != nil {
-		return "", err
-	}
+// 	err = png.Encode(out, gc.Image())
+// 	if err != nil {
+// 		return "", err
+// 	}
 
-	return outputPath, nil
-}
+// 	return outputPath, nil
+// }
 
-func main_annotate() {
-	path, err := annotate(os.Args[1], "bottom", 0.2)
-	if err != nil {
-		fmt.Println("Error annotating image:", err)
-		return
-	}
-	fmt.Println("Annotated image saved to:", path)
-	utils.System("open " + path)
-}
+// func main_annotate() {
+// 	path, err := annotate(os.Args[1], "bottom", 0.2)
+// 	if err != nil {
+// 		fmt.Println("Error annotating image:", err)
+// 		return
+// 	}
+// 	fmt.Println("Annotated image saved to:", path)
+// 	utils.System("open " + path)
+// }

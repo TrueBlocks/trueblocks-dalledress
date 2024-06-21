@@ -9,37 +9,35 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
-	"sync"
-	"text/template"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/rpc"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/paths"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/walk"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // App struct
 type App struct {
-	ctx         context.Context    `json:"-"`
-	conn        *rpc.Connection    `json:"-"`
-	addresses   []string           `json:"-"`
-	Adverbs     []string           `json:"adverbs"`
-	Adjectives  []string           `json:"adjectives"`
-	Nouns       []string           `json:"nouns"`
-	Emotions    []string           `json:"emotions"`
-	Occupations []string           `json:"occupations"`
-	Gerunds     []string           `json:"gerunds"`
-	Litstyles   []string           `json:"litstyles"`
-	Artstyles   []string           `json:"artstyles"`
-	Colors      []string           `json:"colors"`
-	pTemplate   *template.Template `json:"-"`
-	dTemplate   *template.Template `json:"-"`
-	tTemplate   *template.Template `json:"-"`
-	apiKey      string             `json:"-"`
-	nMade       int                `json:"-"`
-	Series      Series             `json:"series"`
+	ctx  context.Context `json:"-"`
+	conn *rpc.Connection `json:"-"`
+	// addresses   []string           `json:"-"`
+	Adverbs     []string `json:"adverbs"`
+	Adjectives  []string `json:"adjectives"`
+	Nouns       []string `json:"nouns"`
+	Emotions    []string `json:"emotions"`
+	Occupations []string `json:"occupations"`
+	Gerunds     []string `json:"gerunds"`
+	Litstyles   []string `json:"litstyles"`
+	Artstyles   []string `json:"artstyles"`
+	Colors      []string `json:"colors"`
+	// p Template   *template.Template `json:"-"`
+	// d Template   *template.Template `json:"-"`
+	// t Template *template.Template `json:"-"`
+	apiKey string `json:"-"`
+	// nMade       int                `json:"-"`
+	Series Series `json:"series"`
 }
 
 func (a App) String() string {
@@ -47,10 +45,10 @@ func (a App) String() string {
 	return string(bytes)
 }
 
-func doOne(which int, wg *sync.WaitGroup, app *App, arg string) {
-	defer wg.Done()
-	app.GetImage(which, arg)
-}
+// func doOne(which int, wg *sync.WaitGroup, app *App, arg string) {
+// 	defer wg.Done()
+// 	app.GetImage(which, arg)
+// }
 
 func NewApp() *App {
 	return &App{}
@@ -58,16 +56,16 @@ func NewApp() *App {
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	if a.conn = rpc.NewConnection("mainnet", true, map[string]bool{
-		"blocks":       true,
-		"receipts":     true,
-		"transactions": true,
-		"traces":       true,
-		"logs":         true,
-		"statements":   true,
-		"state":        true,
-		"tokens":       true,
-		"results":      true,
+	if a.conn = rpc.NewConnection("mainnet", true, map[walk.CacheType]bool{
+		walk.Cache_Blocks:       true,
+		walk.Cache_Receipts:     true,
+		walk.Cache_Transactions: true,
+		walk.Cache_Traces:       true,
+		walk.Cache_Logs:         true,
+		walk.Cache_Statements:   true,
+		walk.Cache_State:        true,
+		walk.Cache_Tokens:       true,
+		walk.Cache_Results:      true,
 	}); a.conn == nil {
 		logger.Error("Could not find rpc server.")
 	}
@@ -80,15 +78,15 @@ func (a *App) startup(ctx context.Context) {
 
 	var err error
 	// Make the templates
-	if a.pTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
-		logger.Fatal("could not create prompt template:", err)
-	}
-	if a.dTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
-		logger.Fatal("could not create data template:", err)
-	}
-	if a.tTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
-		logger.Fatal("could not create terse template:", err)
-	}
+	// if a.p Template, err = template.New("prompt").Parse(prompt Template); err != nil {
+	// 	logger.Fatal("could not create prompt template:", err)
+	// }
+	// if a.d Template, err = template.New("data").Parse(dataTemplate); err != nil {
+	// 	logger.Fatal("could not create data template:", err)
+	// }
+	// if a.t Template, err = template.New("terse").Parse(terseTemplate); err != nil {
+	// 	logger.Fatal("could not create terse template:", err)
+	// }
 
 	if a.Series, err = GetSeries(); err != nil {
 		logger.Fatal(err)
@@ -194,7 +192,7 @@ func (s *Series) GetFilter(fieldName string) ([]string, error) {
 }
 
 func (a *App) toLines(db string, adjust Adjustment) ([]string, error) {
-	dbFolder, _ := paths.GetConfigDir("TrueBlocks/dalledress/databases")
+	dbFolder, _ := GetConfigDir("TrueBlocks/dalledress/databases")
 	filename := filepath.Join(dbFolder, db+".csv")
 
 	lines := file.AsciiFileToLines(filename)
@@ -242,6 +240,18 @@ func (a *App) toLines(db string, adjust Adjustment) ([]string, error) {
 	}
 
 	return lines, err
+}
+
+// GetConfigDir returns the operating system's configuration folder for the current user.
+// If the folder does not exist, it is created.
+func GetConfigDir(appDir string) (string, error) {
+	if configPath, err := os.UserConfigDir(); err != nil {
+		return "", err
+	} else {
+		path := filepath.Join(configPath, appDir)
+		file.EstablishFolder(path)
+		return path, nil
+	}
 }
 
 func (a *App) GetTypes() []interface{} {

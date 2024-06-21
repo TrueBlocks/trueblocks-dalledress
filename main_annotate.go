@@ -111,17 +111,17 @@ func contrastColor(cIn color.Color) (color.Color, float64) {
 	return color.RGBA{R: r, G: g, B: b, A: 255}, l // Return as color.RGBA with full opacity
 }
 
-func getText(path string) string {
-	addr := strings.Replace(strings.Replace(strings.Replace(path, "generated/", "", -1), ".png", "", -1), "/", "", -1)
+func getText() string { // path string) string {
+	// addr := strings.Replace(strings.Replace(strings.Replace(path, "generated/", "", -1), ".png", "", -1), "/", "", -1)
 	// fmt.Println(path, addr)
 	// os.Exit(0)
-	parts := strings.Split(addr, "-")
-	addr = parts[0]
+	// parts := strings.Split(addr, "-")
+	// addr = parts[0]
 	app := NewApp()
 	ctx := context.Background()
 	app.startup(ctx)
 	app.domReady(ctx)
-	return app.GetTerse(addr)
+	return "" // app.GetTerse(addr)
 }
 
 // annotate reads an image and adds a text annotation to it.
@@ -140,7 +140,7 @@ func annotate(fileName, location string, annoPct float64) (ret string, err error
 	width := bounds.Dx()
 	height := bounds.Dy()
 
-	text := getText(fileName)
+	text := getText() // fileName)
 	estimatedFontSize := 20. * (float64(width) / float64(len(text)*7.))
 
 	textWidth := float64(width) * 0.95

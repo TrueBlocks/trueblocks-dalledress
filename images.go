@@ -33,7 +33,7 @@ func (a *App) GetImageData(ensOrAddr string) string {
 	// 	logger.Error(fmt.Errorf("ENS not registered: %s", ensOrAddr))
 	// 	return ""
 	// } else {
-	folder := "./generated/"
+	folder := "./output/generated/"
 	fn := filepath.Join(folder, fmt.Sprintf("%s.png", addr))
 	if file.FileExists(fn) {
 		base64Image, err := loadImageAsBase64("path/to/your/image.png")

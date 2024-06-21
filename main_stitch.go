@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	"github.com/disintegration/imaging"
@@ -16,8 +17,8 @@ import (
 func main_stitch() {
 	parts := strings.Split(os.Args[1], "-")
 	imagePaths := make([]string, 0, 3)
-	start := utils.MustParseInt(os.Getenv("STITCH_START"))
-	cnt := utils.MustParseInt(os.Getenv("STITCH_CNT"))
+	start := base.MustParseInt64(os.Getenv("STITCH_START"))
+	cnt := base.MustParseInt64(os.Getenv("STITCH_CNT"))
 	if cnt == 0 {
 		cnt = 3
 	}

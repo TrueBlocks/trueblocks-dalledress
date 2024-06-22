@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+grep $1 output/data/* | cut -f2 -d, >output/counts/$1.txt
+cat output/counts/$1.txt | sort -n | uniq -c | sort -n | sed 's/^ *//' >output/summary/$1.txt
+cat output/summary/$1.txt | cut -f1 -d' ' | sort -n | uniq -c >output/histograms/$1.txt

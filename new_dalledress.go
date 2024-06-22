@@ -9,14 +9,16 @@ import (
 )
 
 type DalleDress struct {
-	Num         int                  `json:"num"`
-	Orig        string               `json:"orig"`
-	Seed        string               `json:"seed"`
-	Prompt      string               `json:"prompt,omitempty"`
-	DataPrompt  string               `json:"dataPrompt,omitempty"`
-	TersePrompt string               `json:"tersePrompt,omitempty"`
-	Attribs     []Attribute          `json:"attributes"`
-	AttribMap   map[string]Attribute `json:"-"`
+	Num            int                  `json:"num"`
+	Orig           string               `json:"orig"`
+	Seed           string               `json:"seed"`
+	Error          string               `json:"error,omitempty"`
+	Prompt         string               `json:"prompt,omitempty"`
+	DataPrompt     string               `json:"dataPrompt,omitempty"`
+	TersePrompt    string               `json:"tersePrompt,omitempty"`
+	EnhancedPrompt string               `json:"enhancedPrompt,omitempty"`
+	Attribs        []Attribute          `json:"attributes"`
+	AttribMap      map[string]Attribute `json:"-"`
 }
 
 func NewDalleDress(i int, address string) *DalleDress {

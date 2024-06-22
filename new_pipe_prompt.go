@@ -19,6 +19,11 @@ func (app *App2) pipe2_handlePrompt() {
 			logger.Fatal(err.Error())
 		}
 		app.ReportOn("TersePrompt", dd.Orig, dd.TersePrompt)
+		if dd.EnhancedPrompt, err = dd.enhancePrompt(); err != nil {
+			logger.Fatal(err.Error())
+		}
+		dd.EnhancedPrompt += " DO NOT PUT ANY TEXT IN THE IMAGE. NONE. ZERO. NADA."
+		app.ReportOn("EnhancedPrompt", dd.Orig, dd.EnhancedPrompt)
 		app.pipe6Chan <- dd
 	}
 	close(app.pipe6Chan)

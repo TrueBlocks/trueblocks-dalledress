@@ -1,22 +1,26 @@
 package main
 
 import (
+	"log"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/joho/godotenv"
 )
 
 type App2 struct {
+	apiKey    string
+	databases map[string][]string
 	pipe1Chan chan *DalleDress
 	pipe2Chan chan *DalleDress
 	pipe6Chan chan *DalleDress
-	databases map[string][]string
-	pTemplate *template.Template `json:"-"`
-	dTemplate *template.Template `json:"-"`
-	tTemplate *template.Template `json:"-"`
+	pTemplate *template.Template
+	dTemplate *template.Template
+	tTemplate *template.Template
 }
 
 func NewApp2() *App2 {
@@ -45,6 +49,12 @@ func NewApp2() *App2 {
 	}
 	if app.tTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
 		logger.Fatal("could not create terse template:", err)
+	}
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	} else if app.apiKey = os.Getenv("OPENAI_API_KEY"); app.apiKey == "" {
+		log.Fatal("No OPENAI_API_KEY key found")
 	}
 
 	return &app

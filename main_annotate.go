@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"image"
 	"image/color"
@@ -104,98 +103,6 @@ func contrastColor(cIn color.Color) (color.Color, float64) {
 	return color.RGBA{R: r, G: g, B: b, A: 255}, l // Return as color.RGBA with full opacity
 }
 
-func getText() string { // path string) string {
-	// addr := strings.Replace(strings.Replace(strings.Replace(path, "generated/", "", -1), ".png", "", -1), "/", "", -1)
-	// fmt.Println(path, addr)
-	// os.Exit(0)
-	// parts := strings.Split(addr, "-")
-	// addr = parts[0]
-	app := NewApp()
-	ctx := context.Background()
-	app.startup(ctx)
-	app.domReady(ctx)
-	return "" // app.GetTerse(addr)
-}
-
-// annotate reads an image and adds a text annotation to it.
-// func annotate(fileName, location string, annoPct float64) (ret string, err error) {
-// 	file, err := os.Open(fileName)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	defer file.Close()
-// 	img, _, err := image.Decode(file)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	bounds := img.Bounds()
-// 	width := bounds.Dx()
-// 	height := bounds.Dy()
-
-// 	text := getText() // fileName)
-// 	estimatedFontSize := 20. * (float64(width) / float64(len(text)*7.))
-
-// 	textWidth := float64(width) * 0.95
-// 	lines := math.Ceil(float64(len(text)) / (textWidth / estimatedFontSize))
-// 	marginHeight := float64(height) * 0.025
-// 	annoHeight := lines * estimatedFontSize * 1.5
-// 	newHeight := height + int(annoHeight+marginHeight*2)
-
-// 	newImg := image.NewRGBA(image.Rect(0, 0, width, newHeight))
-// 	draw.Draw(newImg, newImg.Bounds(), img, bounds.Min, draw.Src)
-
-// 	bgColor, _ := findAverageDominantColor(img)
-// 	col, err := parseHexColor(bgColor)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	bgRect := image.Rect(0, height, width, newHeight)
-// 	if location == "top" {
-// 		bgRect = image.Rect(0, 0, width, int(annoHeight+marginHeight*2))
-// 		draw.Draw(newImg, bgRect, &image.Uniform{col}, image.Point{}, draw.Src)
-// 	} else {
-// 		draw.Draw(newImg, bgRect, &image.Uniform{col}, image.Point{}, draw.Src)
-// 	}
-
-// 	gc := gg.NewContextForImage(newImg)
-// 	if err := gc.LoadFontFace("/System/Library/Fonts/Monaco.ttf", estimatedFontSize); err != nil {
-// 		log.Fatalf("Error loading font: %v", err) // Handle the error appropriately
-// 	}
-// 	borderCol := darkenColor(col)
-// 	gc.SetColor(borderCol)
-// 	gc.SetLineWidth(2)
-// 	if location == "top" {
-// 		gc.DrawLine(0, float64(height)*annoPct, float64(width), float64(height)*annoPct)
-// 	} else {
-// 		gc.DrawLine(0, float64(height), float64(width), float64(height))
-// 	}
-// 	gc.Stroke()
-
-// 	// Draw the text with adjusted margins.
-// 	textColor, _ := contrastColor(col)
-// 	// fmt.Println(l, textColor, col)
-
-// 	gc.SetColor(textColor) // use the contrasting color for the text
-// 	gc.DrawStringWrapped(text, float64(width)/2, float64(height)+marginHeight*2, 0.5, 0.35, textWidth, 1.5, gg.AlignLeft)
-
-// 	// Save the new image.
-// 	outputPath := strings.Replace(fileName, "generated/", "annotated/", -1)
-// 	out, err := os.Create(outputPath)
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	defer out.Close()
-
-// 	err = png.Encode(out, gc.Image())
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	return outputPath, nil
-// }
-
 // func main_annotate() {
 // 	path, err := annotate(os.Args[1], "bottom", 0.2)
 // 	if err != nil {
@@ -204,4 +111,47 @@ func getText() string { // path string) string {
 // 	}
 // 	fmt.Println("Annotated image saved to:", path)
 // 	utils.System("open " + path)
+// }
+
+// func (a *App) GetImprovedPrompt(ensOrAddr string) (string, string) {
+// 	apiKey := os.Getenv("OPENAI_API_KEY")
+// 	if apiKey == "" {
+// 		log.Fatal("No OPENAI_API_KEY key found")
+// 	}
+// 	// fmt.Println("API key found", apiKey)
+
+// 	prompt := dd.Prompt // a.GetPrompt(ensOrAddr)
+// 	prompt = "Please give me a detailed, but terse, rewriting of this description of an image. Be imaginative. " + prompt + " Mute the colors."
+// 	url := "https://api.openai.com/v1/chat/completions"
+// 	payload := DalleRequest{
+// 		Model: "gpt-3.5-turbo",
+// 		Seed:  1337,
+// 	}
+// 	payload.Messages = append(payload.Messages, Message{Role: "system", Content: prompt})
+
+// 	payloadBytes, err := json.Marshal(payload)
+// 	if err != nil {
+// 		return fmt.Sprintf("Error: %s", err), ""
+// 	}
+
+// 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+// 	if err != nil {
+// 		return fmt.Sprintf("Error: %s", err), ""
+// 	}
+// 	req.Header.Set("Content-Type", "application/json")
+// 	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+// 	client := &http.Client{}
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		return fmt.Sprintf("Error: %s", err), ""
+// 	}
+// 	defer resp.Body.Close()
+
+// 	body, err := io.ReadAll(resp.Body)
+// 	if err != nil {
+// 		return fmt.Sprintf("Error: %s", err), ""
+// 	}
+
+// 	return string(body), prompt
 // }

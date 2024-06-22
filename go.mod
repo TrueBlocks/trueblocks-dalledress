@@ -10,9 +10,8 @@ replace (
 )
 
 require (
+	git.sr.ht/~sbinet/gg v0.5.0
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20240606085217-aac29013bb53
-	github.com/disintegration/imaging v1.6.2
-	github.com/fogleman/gg v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/wailsapp/wails/v2 v2.8.2
@@ -26,6 +25,7 @@ require (
 	github.com/bits-and-blooms/bitset v1.10.0 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
 	github.com/bykof/gostradamus v1.0.4 // indirect
+	github.com/campoy/embedmd v1.0.0 // indirect
 	github.com/consensys/bavard v0.1.13 // indirect
 	github.com/consensys/gnark-crypto v0.12.1 // indirect
 	github.com/crackcomm/go-gitignore v0.0.0-20170627025303-887ab5e44cc3 // indirect
@@ -78,6 +78,7 @@ require (
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect

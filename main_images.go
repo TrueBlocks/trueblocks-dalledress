@@ -48,7 +48,6 @@ func main_images() {
 	// 			logger.Info("Round", i, "run", j)
 	// 			wg.Add(1)
 	// 			go doOne(i, &wg, app, fmt.Sprintf("0x%040x", 10010010+(i*10)+j)) // os.Args[1])
-	// 			// SeedBump++
 	// 		}
 	// 		wg.Wait()
 	// 		logger.Info("Sleeping for 60 seconds")

@@ -7,7 +7,7 @@ import (
 
 func (app *App2) pipe0_handleAddrs(addresses []string) {
 	for i, address := range addresses {
-		if !base.IsValidAddress(address) {
+		if len(address) != 66 && !base.IsValidAddress(address) {
 			continue
 		}
 		dalleDress := NewDalleDress(i, address)

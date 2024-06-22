@@ -1,8 +1,19 @@
 package main
 
-var promptTemplate = `Draw a {{.Adverb true}} {{.Adjective true}} {{.Noun true}} who works as a
-{{.Occupation true}} and is {{.Action false}} and feeling {{.Emotion false}}.
-Noun: {{.Noun false}}.
+/*	prompt = `Please give me a detailed rewriting of this description
+of an image in the literary style ` + dd.LitStyle(false) + `. Be imaginative, creative,
+and complete. Here's the prompt: ` + prompt
+*/
+
+var promptTemplate = `Please give me a detailed rewrite of the following prompt
+in the literary style {{.LitStyle false}}. Be imaginative, creative, and complete.
+
+Here's the prompt:
+
+Draw a {{.Adverb false}} {{.Adjective false}} {{.Noun true}} with human-like characteristics who works as a
+{{.Occupation false}} feeling {{.Emotion false}}.
+
+Noun: {{.Noun false}} with human-like characteristics.
 Emotion: {{.Emotion false}}.
 Occupation: {{.Occupation false}}.
 Action: {{.Action false}}.
@@ -11,8 +22,11 @@ Literary Style: {{.LitStyle false}}.
 Use only the colors {{.Color true 1}} and {{.Color true 2}}.
 {{.Orientation false}}.
 {{.BackStyle false}}.
-Expand upon the most relevant connotative meanings of {{.Noun true}}, {{.Emotion true}}, {{.Adjective true}}, and {{.Adverb true}}.
-Find the representation that most closely matches the description.
+
+Emphasize the emotional aspect of the image. Look deeply into and expand upon the
+many connotative meanings of "{{.Noun true}}," "{{.Emotion true}}," "{{.Adjective true}},"
+and "{{.Adverb true}}." Find the representation that most closely matches all the data.
+
 Focus on the noun, the occupation, the emotion, and the literary style.`
 
 var dataTemplate = `Orig:             {{.Orig}}
@@ -45,4 +59,4 @@ GazeShort:        {{.Gaze true}}
 BackStyle:        {{.BackStyle false}}
 BackStyleShort:   {{.BackStyle true}}`
 
-var terseTemplate = `{{.Adverb false}} {{.Adjective false}} {{.Noun true}} {{.Occupation true}} {{.Action false}} and feeling {{.Emotion true}} in the style of {{.ArtStyle true 1}}`
+var terseTemplate = `{{.Adverb false}} {{.Adjective false}} {{.Noun true}} with human-like characteristics who works as a {{.Occupation false}} feeling {{.Emotion false}} in the style of {{.ArtStyle true 1}}`

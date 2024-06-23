@@ -12,8 +12,8 @@ func main() {
 	switch i {
 	case New:
 		main_new()
-	case Images:
-		main_images()
+	// case Images:
+	// 	main_images()
 	// case Annotate:
 	// 	main_annotate()
 	// case Stitch:

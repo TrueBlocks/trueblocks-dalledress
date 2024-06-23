@@ -14,7 +14,7 @@ func (app *App2) pipe1_handleSelect() {
 				dd.AttribMap[attr.Name] = attr
 			}
 		}
-		app.ReportOn("PostSelect", dd.Orig, dd.String())
+		app.ReportOn("PostSelect", dd.Orig, "json", dd.String())
 		app.pipe2Chan <- dd
 	}
 	close(app.pipe2Chan)

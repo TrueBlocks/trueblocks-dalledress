@@ -60,10 +60,10 @@ func NewApp2() *App2 {
 	return &app
 }
 
-func (app *App2) ReportOn(loc, address, value string) {
+func (app *App2) ReportOn(loc, address, ft, value string) {
 	path := filepath.Join("./output/", strings.ToLower(loc))
 	file.EstablishFolder(path)
-	file.StringToAsciiFile(filepath.Join(path, address+".json"), value)
+	file.StringToAsciiFile(filepath.Join(path, address+"."+ft), value)
 }
 
 func (app *App2) ReportDone(address string) {

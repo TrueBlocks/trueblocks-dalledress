@@ -10,20 +10,20 @@ func (app *App2) pipe2_handlePrompt() {
 		if dd.Prompt, err = dd.generatePrompt(app.pTemplate, nil); err != nil {
 			logger.Fatal(err.Error())
 		}
-		app.ReportOn("Prompt", dd.Orig, dd.Prompt)
+		app.ReportOn("Prompt", dd.Orig, "txt", dd.Prompt)
 		if dd.DataPrompt, err = dd.generatePrompt(app.dTemplate, nil); err != nil {
 			logger.Fatal(err.Error())
 		}
-		app.ReportOn("DataPrompt", dd.Orig, dd.DataPrompt)
+		app.ReportOn("DataPrompt", dd.Orig, "txt", dd.DataPrompt)
 		if dd.TersePrompt, err = dd.generatePrompt(app.tTemplate, nil); err != nil {
 			logger.Fatal(err.Error())
 		}
-		app.ReportOn("TersePrompt", dd.Orig, dd.TersePrompt)
+		app.ReportOn("TersePrompt", dd.Orig, "txt", dd.TersePrompt)
 		if dd.EnhancedPrompt, err = dd.enhancePrompt(); err != nil {
 			logger.Fatal(err.Error())
 		}
 		dd.EnhancedPrompt += " DO NOT PUT ANY TEXT IN THE IMAGE. NONE. ZERO. NADA."
-		app.ReportOn("EnhancedPrompt", dd.Orig, dd.EnhancedPrompt)
+		app.ReportOn("EnhancedPrompt", dd.Orig, "txt", dd.EnhancedPrompt)
 		app.pipe6Chan <- dd
 	}
 	close(app.pipe6Chan)

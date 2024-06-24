@@ -1,4 +1,4 @@
-package main
+package openai
 
 import (
 	"bytes"
@@ -17,22 +17,29 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 )
 
-func getAiImage(prompt, tersePrompt, hash string) error {
-	folder := "./output/generated/"
+type ImageData struct {
+	EnhancedPrompt string `json:"enhancedPrompt"`
+	TersePrompt    string `json:"tersePrompt"`
+	Hash           string `json:"hash"`
+	SeriesName     string `json:"seriesName"`
+}
+
+func GetImage(imageData *ImageData) error {
+	folder := filepath.Join("./output", imageData.SeriesName, "generated")
 	file.EstablishFolder(folder)
 	file.EstablishFolder(strings.Replace(folder, "/generated", "/annotated", -1))
 	file.EstablishFolder(strings.Replace(folder, "/generated", "/stitched", -1))
 
 	t := time.Now()
 	s := t.Format("20060102150405")
-	fn := filepath.Join(folder, fmt.Sprintf("%s-%s.png", hash, s)) //a.Series.Suffix))
+	fn := filepath.Join(folder, fmt.Sprintf("%s-%s.png", imageData.Hash, s)) //a.Series.Suffix))
 
-	logger.Info(colors.Cyan, hash, colors.Yellow, "- improving the prompt...", colors.Off)
+	logger.Info(colors.Cyan, imageData.Hash, colors.Yellow, "- improving the prompt...", colors.Off)
 
 	size := "1024x1024"
-	if strings.Contains(prompt, "horizontal") {
+	if strings.Contains(imageData.EnhancedPrompt, "horizontal") {
 		size = "1792x1024"
-	} else if strings.Contains(prompt, "vertical") {
+	} else if strings.Contains(imageData.EnhancedPrompt, "vertical") {
 		size = "1024x1792"
 	}
 
@@ -42,8 +49,8 @@ func getAiImage(prompt, tersePrompt, hash string) error {
 	}
 
 	url := "https://api.openai.com/v1/images/generations"
-	payload := DalleRequest{
-		Prompt:  prompt,
+	payload := dalleRequest{
+		Prompt:  imageData.EnhancedPrompt,
 		N:       1,
 		Quality: quality,
 		Style:   "vivid",
@@ -61,7 +68,7 @@ func getAiImage(prompt, tersePrompt, hash string) error {
 		logger.Fatal("No OPENAI_API_KEY key found")
 	}
 
-	logger.Info(colors.Cyan, hash, colors.Yellow, "- generating the image...", colors.Off)
+	logger.Info(colors.Cyan, imageData.Hash, colors.Yellow, "- generating the image...", colors.Off)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
 	if err != nil {
@@ -86,7 +93,7 @@ func getAiImage(prompt, tersePrompt, hash string) error {
 	bodyStr = strings.Replace(bodyStr, ".\",", ". NO TEXT.\",", 1)
 	body = []byte(bodyStr)
 
-	var dalleResp DalleResponse
+	var dalleResp dalleResponse
 	err = json.Unmarshal(body, &dalleResp)
 	if err != nil {
 		return err
@@ -120,11 +127,11 @@ func getAiImage(prompt, tersePrompt, hash string) error {
 		return err
 	}
 
-	path, err := annotate(tersePrompt, fn, "bottom", 0.2)
+	path, err := annotate(imageData.TersePrompt, fn, "bottom", 0.2)
 	if err != nil {
 		return fmt.Errorf("error annotating image: %v", err)
 	}
-	logger.Info(colors.Cyan, hash, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
+	logger.Info(colors.Cyan, imageData.Hash, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
 	utils.System("open " + path)
 	return nil
 }

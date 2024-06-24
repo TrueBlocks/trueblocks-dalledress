@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/openai"
 )
 
 func (app *App2) pipe2_handlePrompt() {
@@ -19,7 +20,7 @@ func (app *App2) pipe2_handlePrompt() {
 			logger.Fatal(err.Error())
 		}
 		app.ReportOn("TersePrompt", dd.Orig, "txt", dd.TersePrompt)
-		if dd.EnhancedPrompt, err = dd.enhancePrompt(); err != nil {
+		if dd.EnhancedPrompt, err = openai.EnhancePrompt(dd.Prompt); err != nil {
 			logger.Fatal(err.Error())
 		}
 		dd.EnhancedPrompt += " DO NOT PUT ANY TEXT IN THE IMAGE. NONE. ZERO. NADA."

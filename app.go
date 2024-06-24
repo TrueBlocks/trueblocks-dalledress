@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
@@ -105,11 +104,11 @@ func (a *App) startup(ctx context.Context) {
 		logger.Fatal(err)
 	}
 
-	if a.Emotions, err = a.toLines("emotions", CommaToParens|Filtered); err != nil {
+	if a.Emotions, err = a.toLines("emotions", Filtered); err != nil {
 		logger.Fatal(err)
 	}
 
-	if a.Occupations, err = a.toLines("occupations", CommaToParens|Filtered|Noneable); err != nil {
+	if a.Occupations, err = a.toLines("occupations", Filtered|Noneable); err != nil {
 		logger.Fatal(err)
 	}
 
@@ -121,7 +120,7 @@ func (a *App) startup(ctx context.Context) {
 		logger.Fatal(err)
 	}
 
-	if a.Litstyles, err = a.toLines("litstyles", CommaToParens|Filtered); err != nil {
+	if a.Litstyles, err = a.toLines("litstyles", Filtered); err != nil {
 		logger.Fatal(err)
 	}
 
@@ -133,63 +132,10 @@ func (a *App) startup(ctx context.Context) {
 type Adjustment int
 
 const (
-	NoAdjustment  Adjustment = 0
-	CommaToParens            = 1 << iota
-	Filtered
+	NoAdjustment Adjustment = 0
+	Filtered                = 1 << iota
 	Noneable
 )
-
-type Series struct {
-	Last        int      `json:"last"`
-	Suffix      string   `json:"suffix"`
-	Artstyles   []string `json:"artstyles"`
-	Emotions    []string `json:"emotions"`
-	Occupations []string `json:"occupations"`
-	Nouns       []string `json:"nouns"`
-	Litstyles   []string `json:"litstyles"`
-	Adverbs     []string `json:"adverbs"`
-	Adjectives  []string `json:"adjectives"`
-	Gerunds     []string `json:"gerunds"`
-	Colors      []string `json:"colors"`
-}
-
-func (s *Series) String() string {
-	bytes, _ := json.MarshalIndent(s, "", "  ")
-	return string(bytes)
-}
-
-func (s *Series) Save() {
-	file.StringToAsciiFile("series.json", s.String())
-}
-
-func GetSeries() (Series, error) {
-	if str := file.AsciiFileToString("series.json"); len(str) == 0 {
-		return Series{}, fmt.Errorf("could not load series.json")
-	} else {
-		bytes := []byte(str)
-		var s Series
-		if err := json.Unmarshal(bytes, &s); err != nil {
-			logger.Error("could not unmarshal series:", err)
-			return Series{}, err
-		}
-		return s, nil
-	}
-}
-
-func (s *Series) GetFilter(fieldName string) ([]string, error) {
-	reflectedT := reflect.ValueOf(s)
-	field := reflect.Indirect(reflectedT).FieldByName(fieldName)
-	if !field.IsValid() {
-		return nil, fmt.Errorf("field %s not valid", fieldName)
-	}
-	if field.Kind() != reflect.Slice {
-		return nil, fmt.Errorf("field %s not a slice", fieldName)
-	}
-	if field.Type().Elem().Kind() != reflect.String {
-		return nil, fmt.Errorf("field %s not a string slice", fieldName)
-	}
-	return field.Interface().([]string), nil
-}
 
 func (a *App) toLines(db string, adjust Adjustment) ([]string, error) {
 	dbFolder, _ := GetConfigDir("TrueBlocks/dalledress/databases")
@@ -200,11 +146,6 @@ func (a *App) toLines(db string, adjust Adjustment) ([]string, error) {
 	if len(lines) == 0 {
 		err = fmt.Errorf("could not load %s", filename)
 	} else {
-		if adjust&CommaToParens != 0 {
-			for i, line := range lines {
-				lines[i] = strings.Replace(line, ",", " (", 1) + ")"
-			}
-		}
 		if adjust&Filtered != 0 {
 			fn := strings.ToUpper(db[:1]) + db[1:]
 			if filter, err := a.Series.GetFilter(fn); err != nil {

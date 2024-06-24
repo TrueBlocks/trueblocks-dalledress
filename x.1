@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-grep $1 output/data/* | cut -f2 -d, >output/selectors/$1.txt
-cat output/selectors/$1.txt | sort -n | uniq -c | sort -n | sed 's/^ *//' | tr ' ' '\t' >output/summary/$1.txt
-cat output/summary/$1.txt | cut -f1 | sort -n | uniq -c | sed 's/^ *//'  | tr ' ' '\t' >output/histograms/$1.txt

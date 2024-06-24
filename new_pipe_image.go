@@ -1,11 +1,20 @@
 package main
 
-import "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+import (
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/openai"
+)
 
 func (app *App2) pipe6_handleImage() {
 	for dd := range app.pipe6Chan {
 		app.ReportDone(dd.Orig)
-		if err := getAiImage(dd.EnhancedPrompt, dd.TersePrompt, dd.Orig); err != nil {
+		imageData := openai.ImageData{
+			EnhancedPrompt: dd.EnhancedPrompt,
+			TersePrompt:    dd.TersePrompt,
+			Hash:           dd.Orig,
+			SeriesName:     app.Series.Suffix,
+		}
+		if err := openai.GetImage(&imageData); err != nil {
 			logger.Error(err.Error())
 		}
 	}

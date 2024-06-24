@@ -6,7 +6,6 @@ import (
 
 func main_new() {
 	app := NewApp2()
-
 	addresses := file.AsciiFileToLines("./addresses.txt")
 	go app.pipe0_handleAddrs(addresses)
 	go app.pipe1_handleSelect()

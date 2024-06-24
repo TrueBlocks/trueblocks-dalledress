@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -21,6 +22,7 @@ type App2 struct {
 	pTemplate *template.Template
 	dTemplate *template.Template
 	tTemplate *template.Template
+	Series    Series `json:"series"`
 }
 
 func NewApp2() *App2 {
@@ -31,16 +33,24 @@ func NewApp2() *App2 {
 		databases: make(map[string][]string),
 	}
 
+	var err error
+	if app.Series, err = GetSeries(); err != nil {
+		logger.Fatal(err)
+	}
+
 	for _, db := range databaseNames {
 		if app.databases[db] == nil {
-			app.databases[db] = file.AsciiFileToLines("./databases/" + db + ".csv")[1:]
-			for i := 0; i < len(app.databases[db]); i++ {
-				app.databases[db][i] = strings.Replace(app.databases[db][i], "v0.1.0,", "", -1)
+			if lines, err := app.toLines(db, Filtered); err != nil {
+				logger.Fatal(err)
+			} else {
+				app.databases[db] = lines
+				for i := 0; i < len(app.databases[db]); i++ {
+					app.databases[db][i] = strings.Replace(app.databases[db][i], "v0.1.0,", "", -1)
+				}
 			}
 		}
 	}
 
-	var err error
 	if app.pTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}
@@ -61,11 +71,55 @@ func NewApp2() *App2 {
 }
 
 func (app *App2) ReportOn(loc, address, ft, value string) {
-	path := filepath.Join("./output/", strings.ToLower(loc))
+	path := filepath.Join("./output/", app.Series.Suffix, strings.ToLower(loc))
 	file.EstablishFolder(path)
 	file.StringToAsciiFile(filepath.Join(path, address+"."+ft), value)
 }
 
 func (app *App2) ReportDone(address string) {
 	logger.Info("Done", address)
+}
+
+func (a *App2) toLines(db string, adjust Adjustment) ([]string, error) {
+	filename := "./databases/" + db + ".csv"
+	lines := file.AsciiFileToLines(filename)
+	var err error
+	if len(lines) == 0 {
+		err = fmt.Errorf("could not load %s", filename)
+	} else {
+		if adjust&Filtered != 0 {
+			fn := strings.ToUpper(db[:1]) + db[1:]
+			if filter, err := a.Series.GetFilter(fn); err != nil {
+				return lines, err
+
+			} else {
+				if len(filter) == 0 {
+					// logger.Info("says filtered, but no filter for", db)
+					return lines, nil
+				}
+				// logger.Info("found filter for", db, filter)
+
+				filtered := make([]string, 0, len(lines))
+				for _, line := range lines {
+					for _, f := range filter {
+						// logger.Info(line, f, strings.Contains(line, f))
+						if strings.Contains(line, f) {
+							filtered = append(filtered, line)
+						}
+					}
+				}
+				lines = filtered
+			}
+		}
+	}
+
+	if len(lines) == 0 {
+		if adjust&Noneable != 0 {
+			lines = append(lines, "none")
+		} else {
+			return lines, fmt.Errorf("no lines match query in %s", filename)
+		}
+	}
+
+	return lines, err
 }

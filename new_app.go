@@ -40,7 +40,11 @@ func NewApp2() *App2 {
 
 	for _, db := range databaseNames {
 		if app.databases[db] == nil {
-			if lines, err := app.toLines(db, Filtered); err != nil {
+			aspect := Adjustment(Filtered)
+			if db == "litstyles" || db == "occupations" || db == "colors" {
+				aspect |= Noneable
+			}
+			if lines, err := app.toLines(db, aspect); err != nil {
 				logger.Fatal(err)
 			} else {
 				app.databases[db] = lines

@@ -120,7 +120,7 @@ func (a *App) startup(ctx context.Context) {
 		logger.Fatal(err)
 	}
 
-	if a.Litstyles, err = a.toLines("litstyles", Filtered); err != nil {
+	if a.Litstyles, err = a.toLines("litstyles", Filtered|Noneable); err != nil {
 		logger.Fatal(err)
 	}
 

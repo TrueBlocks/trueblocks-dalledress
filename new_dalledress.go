@@ -128,11 +128,14 @@ func (dalleDress *DalleDress) Emotion(short bool) string {
 
 func (dalleDress *DalleDress) Occupation(short bool) string {
 	val := dalleDress.AttribMap["occupation"].Value
+	if val == "none" {
+		return ""
+	}
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[0]
 	}
-	return parts[0] + " (" + parts[1] + ")"
+	return " who works as a " + parts[0] + " (" + parts[1] + ")"
 }
 
 func (dalleDress *DalleDress) Action(short bool) string {
@@ -156,8 +159,23 @@ func (dalleDress *DalleDress) ArtStyle(short bool, which int) string {
 	return parts[0] + " (" + parts[2] + ")"
 }
 
+func (dalleDress *DalleDress) LitPrompt(short bool) string {
+	val := dalleDress.AttribMap["litStyle"].Value
+	if val == "none" {
+		return ""
+	}
+	text := `Please give me a detailed rewrite of the following
+	prompt in the literary style ` + dalleDress.LitStyle(short) + `. 
+	Be imaginative, creative, and complete.
+`
+	return text
+}
+
 func (dalleDress *DalleDress) LitStyle(short bool) string {
 	val := dalleDress.AttribMap["litStyle"].Value
+	if val == "none" {
+		return ""
+	}
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[0]

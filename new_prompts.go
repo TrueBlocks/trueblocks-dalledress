@@ -1,17 +1,9 @@
 package main
 
-/*	prompt = `Please give me a detailed rewriting of this description
-of an image in the literary style ` + dd.LitStyle(false) + `. Be imaginative, creative,
-and complete. Here's the prompt: ` + prompt
-*/
+var promptTemplate = `{{.LitPrompt false}}Here's the prompt:
 
-var promptTemplate = `Please give me a detailed rewrite of the following prompt
-in the literary style {{.LitStyle false}}. Be imaginative, creative, and complete.
-
-Here's the prompt:
-
-Draw a {{.Adverb false}} {{.Adjective false}} {{.Noun true}} with human-like characteristics who works as a
-{{.Occupation false}} feeling {{.Emotion false}}.
+Draw a {{.Adverb false}} {{.Adjective false}} {{.Noun true}} with human-like
+characteristics feeling {{.Emotion false}}{{.Occupation false}}.
 
 Noun: {{.Noun false}} with human-like characteristics.
 Emotion: {{.Emotion false}}.
@@ -27,7 +19,7 @@ Emphasize the emotional aspect of the image. Look deeply into and expand upon th
 many connotative meanings of "{{.Noun true}}," "{{.Emotion true}}," "{{.Adjective true}},"
 and "{{.Adverb true}}." Find the representation that most closely matches all the data.
 
-Focus on the noun, the occupation, the emotion, and the literary style.`
+Focus on the emotion, the noun, and the styles.`
 
 var dataTemplate = `Orig:             {{.Orig}}
 Seed:             {{.Seed}}
@@ -59,4 +51,4 @@ GazeShort:        {{.Gaze true}}
 BackStyle:        {{.BackStyle false}}
 BackStyleShort:   {{.BackStyle true}}`
 
-var terseTemplate = `{{.Adverb false}} {{.Adjective false}} {{.Noun true}} with human-like characteristics who works as a {{.Occupation false}} feeling {{.Emotion false}} in the style of {{.ArtStyle true 1}}`
+var terseTemplate = `{{.Adverb false}} {{.Adjective false}} {{.Noun true}} with human-like characteristics feeling {{.Emotion false}}{{.Occupation false}} in the style of {{.ArtStyle true 1}}`

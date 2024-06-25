@@ -14,6 +14,8 @@ import { useForm } from "@mantine/form";
 import { IconCopy, IconCheck } from "@tabler/icons-react";
 import {
   GetPrompt,
+  GetEnhanced,
+  GetTerse,
   GetData,
   GetJson,
   GetImage
@@ -25,8 +27,12 @@ import "./App.css";
 import "@mantine/core/styles.css";
 
 export default function App() {
-  const [email, setEmail] = useState<string>("trueblocks.eth");
+  const [email, setEmail] = useState<string>(
+    "0xf503017d7baf7fbc0fff7492b751025c6a78179b"
+  );
   const [prompt, setPrompt] = useState<string>("");
+  const [enhanced, setEnhanced] = useState<string>("");
+  const [terse, setTerse] = useState<string>("");
   const [data, setData] = useState<string>("");
   const [json, setJson] = useState<string>("");
   // const [moderation, setModeration] = useState<string>("");
@@ -34,7 +40,7 @@ export default function App() {
 
   const form = useForm({
     initialValues: {
-      email: "trueblocks.eth",
+      email: "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
       termsOfService: false
     }
   });
@@ -42,6 +48,12 @@ export default function App() {
   useEffect(() => {
     GetPrompt(form.values["email"]).then((value: string) => {
       setPrompt(value);
+    });
+    GetEnhanced(form.values["email"]).then((value: string) => {
+      setEnhanced(value);
+    });
+    GetTerse(form.values["email"]).then((value: string) => {
+      setTerse(value);
     });
     GetData(form.values["email"]).then((value: string) => {
       setData(value);
@@ -58,7 +70,7 @@ export default function App() {
   }, [email]);
 
   const openImage = (email: string) => {
-    GetImage(1, email);
+    GetImage(email);
   };
 
   return (
@@ -91,8 +103,15 @@ export default function App() {
         }}
       >
         <Text>{email ? email : "Working..."}</Text>
+        <div>Prompt:</div>
         <CopyText prompt={prompt ? prompt : "Working..."} />
+        <div>Enhanced:</div>
+        <CopyText prompt={enhanced ? enhanced : "Working..."} />
+        <div>Terse:</div>
+        <CopyText prompt={terse ? terse : "Working..."} />
+        <div>Data:</div>
         <CopyText prompt={data ? data : "Working..."} />
+        <div>Json:</div>
         <CopyText prompt={json ? json : "Working..."} />
       </Paper>
     </div>

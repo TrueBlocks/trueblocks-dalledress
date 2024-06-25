@@ -57,6 +57,7 @@ func GetImage(imageData *ImageData) error {
 		Model:   "dall-e-3",
 		Size:    size,
 	}
+	// fmt.Println(payload.String())
 
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -93,7 +94,7 @@ func GetImage(imageData *ImageData) error {
 	bodyStr = strings.Replace(bodyStr, ".\",", ". NO TEXT.\",", 1)
 	body = []byte(bodyStr)
 
-	var dalleResp dalleResponse
+	var dalleResp dalleResponse1
 	err = json.Unmarshal(body, &dalleResp)
 	if err != nil {
 		return err

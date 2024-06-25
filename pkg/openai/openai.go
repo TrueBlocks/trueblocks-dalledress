@@ -1,5 +1,7 @@
 package openai
 
+import "encoding/json"
+
 type message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
@@ -17,7 +19,12 @@ type dalleRequest struct {
 	Messages []message `json:"messages,omitempty"`
 }
 
-type dalleResponse struct {
+func (req *dalleRequest) String() string {
+	bytes, _ := json.MarshalIndent(req, "", "  ")
+	return string(bytes)
+}
+
+type dalleResponse1 struct {
 	Data []struct {
 		Url string `json:"url"`
 	} `json:"data"`

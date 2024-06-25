@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -13,10 +15,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type App2 struct {
+type App struct {
+	ctx       context.Context
 	apiKey    string
 	databases map[string][]string
-	pipe1Chan chan *DalleDress
 	pipe2Chan chan *DalleDress
 	pipe6Chan chan *DalleDress
 	pTemplate *template.Template
@@ -25,9 +27,16 @@ type App2 struct {
 	Series    Series `json:"series"`
 }
 
-func NewApp2() *App2 {
-	app := App2{
-		pipe1Chan: make(chan *DalleDress),
+type Adjustment int
+
+const (
+	NoAdjustment Adjustment = 0
+	Filtered                = 1 << iota
+	Noneable
+)
+
+func NewApp() *App {
+	app := App{
 		pipe2Chan: make(chan *DalleDress),
 		pipe6Chan: make(chan *DalleDress),
 		databases: make(map[string][]string),
@@ -74,17 +83,22 @@ func NewApp2() *App2 {
 	return &app
 }
 
-func (app *App2) ReportOn(loc, address, ft, value string) {
+func (a App) String() string {
+	bytes, _ := json.MarshalIndent(a, "", "  ")
+	return string(bytes)
+}
+
+func (app *App) ReportOn(loc, address, ft, value string) {
 	path := filepath.Join("./output/", app.Series.Suffix, strings.ToLower(loc))
 	file.EstablishFolder(path)
 	file.StringToAsciiFile(filepath.Join(path, address+"."+ft), value)
 }
 
-func (app *App2) ReportDone(address string) {
+func (app *App) ReportDone(address string) {
 	logger.Info("Done", address)
 }
 
-func (a *App2) toLines(db string, adjust Adjustment) ([]string, error) {
+func (a *App) toLines(db string, adjust Adjustment) ([]string, error) {
 	filename := "./databases/" + db + ".csv"
 	lines := file.AsciiFileToLines(filename)
 	var err error

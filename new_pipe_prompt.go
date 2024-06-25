@@ -5,7 +5,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/openai"
 )
 
-func (app *App2) pipe2_handlePrompt() {
+func (app *App) pipe2_handlePrompt() {
 	var err error
 	for dd := range app.pipe2Chan {
 		if dd.Prompt, err = dd.generatePrompt(app.pTemplate, nil); err != nil {
@@ -23,7 +23,8 @@ func (app *App2) pipe2_handlePrompt() {
 		if dd.EnhancedPrompt, err = openai.EnhancePrompt(dd.Prompt); err != nil {
 			logger.Fatal(err.Error())
 		}
-		dd.EnhancedPrompt += " DO NOT PUT ANY TEXT IN THE IMAGE. NONE. ZERO. NADA."
+		msg := " DO NOT PUT TEXT IN THE IMAGE. "
+		dd.EnhancedPrompt = msg + dd.EnhancedPrompt + msg
 		app.ReportOn("EnhancedPrompt", dd.Orig, "txt", dd.EnhancedPrompt)
 		app.pipe6Chan <- dd
 	}

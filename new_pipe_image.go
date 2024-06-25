@@ -5,7 +5,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/openai"
 )
 
-func (app *App2) pipe6_handleImage() {
+func (app *App) pipe6_handleImage() {
 	for dd := range app.pipe6Chan {
 		app.ReportDone(dd.Orig)
 		imageData := openai.ImageData{

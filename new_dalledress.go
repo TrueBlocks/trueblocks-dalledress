@@ -6,13 +6,9 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
-
-	"github.com/TrueBlocks/trueblocks-core/sdk"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 )
 
 type DalleDress struct {
-	Num            int                  `json:"num"`
 	Orig           string               `json:"orig"`
 	Seed           string               `json:"seed"`
 	Error          string               `json:"error,omitempty"`
@@ -24,7 +20,7 @@ type DalleDress struct {
 	AttribMap      map[string]Attribute `json:"-"`
 }
 
-func NewDalleDress(i int, address string) *DalleDress {
+func NewDalleDress(databases map[string][]string, address string) (*DalleDress, error) {
 	reverse := func(s string) string {
 		runes := []rune(s)
 		n := len(runes)
@@ -33,23 +29,42 @@ func NewDalleDress(i int, address string) *DalleDress {
 		}
 		return string(runes)
 	}
-	if strings.HasSuffix(address, ".eth") {
-		opts := sdk.NamesOptions{
-			Terms: []string{address},
-		}
-		if names, _, err := opts.Names(); err != nil {
-			logger.Error(err)
-			// will fail later
-		} else {
-			address = names[0].Address.Hex()
-		}
+	// if strings.HasSuffix(address, ".eth") {
+	// 	opts := sdk.NamesOptions{
+	// 		Terms: []string{address},
+	// 	}
+	// 	if names, _, err := opts.Names(); err != nil {
+	// 		return nil, fmt.Errorf("Error getting names for %s", address)
+	// 	} else {
+	// 		address = names[0].Address.Hex()
+	// 	}
+	// }
+	seed := address + reverse(address)
+	if len(seed) < 66 {
+		return nil, fmt.Errorf("seed length is less than 66")
 	}
-	return &DalleDress{
-		Num:       i,
+	seed = seed[2:66]
+
+	dd := DalleDress{
 		Orig:      address,
-		Seed:      address + reverse(address),
+		Seed:      seed,
 		AttribMap: make(map[string]Attribute),
 	}
+
+	for i := 0; i < len(dd.Seed); i = i + 8 {
+		index := len(dd.Attribs)
+		attr := NewAttribute(databases, index, dd.Seed[i:i+6])
+		dd.Attribs = append(dd.Attribs, attr)
+		dd.AttribMap[attr.Name] = attr
+		if i+4+6 < len(dd.Seed) {
+			index = len(dd.Attribs)
+			attr = NewAttribute(databases, index, dd.Seed[i+4:i+4+6])
+			dd.Attribs = append(dd.Attribs, attr)
+			dd.AttribMap[attr.Name] = attr
+		}
+	}
+
+	return &dd, nil
 }
 
 func (d *DalleDress) String() string {
@@ -57,9 +72,9 @@ func (d *DalleDress) String() string {
 	return string(jsonData)
 }
 
-func (dalleDress *DalleDress) generatePrompt(t *template.Template, f func(s string) string) (string, error) {
+func (dd *DalleDress) generatePrompt(t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
-	if err := t.Execute(&buffer, dalleDress); err != nil {
+	if err := t.Execute(&buffer, dd); err != nil {
 		return "", err
 	}
 	if f == nil {
@@ -104,8 +119,8 @@ var attributeNames = []string{
 	"backStyle",
 }
 
-func (dalleDress *DalleDress) Adverb(short bool) string {
-	val := dalleDress.AttribMap["adverb"].Value
+func (dd *DalleDress) Adverb(short bool) string {
+	val := dd.AttribMap["adverb"].Value
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[0]
@@ -113,8 +128,8 @@ func (dalleDress *DalleDress) Adverb(short bool) string {
 	return parts[0] + " (" + parts[1] + ")"
 }
 
-func (dalleDress *DalleDress) Adjective(short bool) string {
-	val := dalleDress.AttribMap["adjective"].Value
+func (dd *DalleDress) Adjective(short bool) string {
+	val := dd.AttribMap["adjective"].Value
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[0]
@@ -122,8 +137,8 @@ func (dalleDress *DalleDress) Adjective(short bool) string {
 	return parts[0] + " (" + parts[1] + ")"
 }
 
-func (dalleDress *DalleDress) Noun(short bool) string {
-	val := dalleDress.AttribMap["noun"].Value
+func (dd *DalleDress) Noun(short bool) string {
+	val := dd.AttribMap["noun"].Value
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[0]
@@ -131,8 +146,8 @@ func (dalleDress *DalleDress) Noun(short bool) string {
 	return parts[0] + " (" + parts[1] + ", " + parts[2] + ")"
 }
 
-func (dalleDress *DalleDress) Emotion(short bool) string {
-	val := dalleDress.AttribMap["emotion"].Value
+func (dd *DalleDress) Emotion(short bool) string {
+	val := dd.AttribMap["emotion"].Value
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[0]
@@ -140,8 +155,8 @@ func (dalleDress *DalleDress) Emotion(short bool) string {
 	return parts[0] + " (" + parts[1] + ", " + parts[4] + ")"
 }
 
-func (dalleDress *DalleDress) Occupation(short bool) string {
-	val := dalleDress.AttribMap["occupation"].Value
+func (dd *DalleDress) Occupation(short bool) string {
+	val := dd.AttribMap["occupation"].Value
 	if val == "none" {
 		return ""
 	}
@@ -152,8 +167,8 @@ func (dalleDress *DalleDress) Occupation(short bool) string {
 	return " who works as a " + parts[0] + " (" + parts[1] + ")"
 }
 
-func (dalleDress *DalleDress) Action(short bool) string {
-	val := dalleDress.AttribMap["action"].Value
+func (dd *DalleDress) Action(short bool) string {
+	val := dd.AttribMap["action"].Value
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[0]
@@ -161,8 +176,8 @@ func (dalleDress *DalleDress) Action(short bool) string {
 	return parts[0] + " (" + parts[1] + ")"
 }
 
-func (dalleDress *DalleDress) ArtStyle(short bool, which int) string {
-	val := dalleDress.AttribMap["artStyle"+fmt.Sprintf("%d", which)].Value
+func (dd *DalleDress) ArtStyle(short bool, which int) string {
+	val := dd.AttribMap["artStyle"+fmt.Sprintf("%d", which)].Value
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[0]
@@ -173,20 +188,20 @@ func (dalleDress *DalleDress) ArtStyle(short bool, which int) string {
 	return parts[0] + " (" + parts[2] + ")"
 }
 
-func (dalleDress *DalleDress) LitPrompt(short bool) string {
-	val := dalleDress.AttribMap["litStyle"].Value
+func (dd *DalleDress) LitPrompt(short bool) string {
+	val := dd.AttribMap["litStyle"].Value
 	if val == "none" {
 		return ""
 	}
 	text := `Please give me a detailed rewrite of the following
-	prompt in the literary style ` + dalleDress.LitStyle(short) + `. 
+	prompt in the literary style ` + dd.LitStyle(short) + `. 
 	Be imaginative, creative, and complete.
 `
 	return text
 }
 
-func (dalleDress *DalleDress) LitStyle(short bool) string {
-	val := dalleDress.AttribMap["litStyle"].Value
+func (dd *DalleDress) LitStyle(short bool) string {
+	val := dd.AttribMap["litStyle"].Value
 	if val == "none" {
 		return ""
 	}
@@ -200,8 +215,8 @@ func (dalleDress *DalleDress) LitStyle(short bool) string {
 	return parts[0] + " (" + parts[1] + ")"
 }
 
-func (dalleDress *DalleDress) Color(short bool, which int) string {
-	val := dalleDress.AttribMap["color"+fmt.Sprintf("%d", which)].Value
+func (dd *DalleDress) Color(short bool, which int) string {
+	val := dd.AttribMap["color"+fmt.Sprintf("%d", which)].Value
 	parts := strings.Split(val, ",")
 	if short {
 		return parts[1]
@@ -209,21 +224,21 @@ func (dalleDress *DalleDress) Color(short bool, which int) string {
 	return parts[1] + " (" + parts[0] + ")"
 }
 
-func (dalleDress *DalleDress) Orientation(short bool) string {
-	val := dalleDress.AttribMap["orientation"].Value
+func (dd *DalleDress) Orientation(short bool) string {
+	val := dd.AttribMap["orientation"].Value
 	if short {
 		parts := strings.Split(val, ",")
 		return parts[0]
 	}
 	ret := `Orient the scene [{ORI}] and make sure the [{NOUN}] is facing [{GAZE}]`
 	ret = strings.ReplaceAll(ret, "[{ORI}]", strings.ReplaceAll(val, ",", " and "))
-	ret = strings.ReplaceAll(ret, "[{NOUN}]", dalleDress.Noun(true))
-	ret = strings.ReplaceAll(ret, "[{GAZE}]", dalleDress.Gaze(true))
+	ret = strings.ReplaceAll(ret, "[{NOUN}]", dd.Noun(true))
+	ret = strings.ReplaceAll(ret, "[{GAZE}]", dd.Gaze(true))
 	return ret
 }
 
-func (dalleDress *DalleDress) Gaze(short bool) string {
-	val := dalleDress.AttribMap["gaze"].Value
+func (dd *DalleDress) Gaze(short bool) string {
+	val := dd.AttribMap["gaze"].Value
 	if short {
 		parts := strings.Split(val, ",")
 		return parts[0]
@@ -231,9 +246,9 @@ func (dalleDress *DalleDress) Gaze(short bool) string {
 	return strings.ReplaceAll(val, ",", ", ")
 }
 
-func (dalleDress *DalleDress) BackStyle(short bool) string {
-	val := dalleDress.AttribMap["backStyle"].Value
-	val = strings.ReplaceAll(val, "[{Color3}]", dalleDress.Color(true, 3))
-	val = strings.ReplaceAll(val, "[{ArtStyle2}]", dalleDress.ArtStyle(false, 2))
+func (dd *DalleDress) BackStyle(short bool) string {
+	val := dd.AttribMap["backStyle"].Value
+	val = strings.ReplaceAll(val, "[{Color3}]", dd.Color(true, 3))
+	val = strings.ReplaceAll(val, "[{ArtStyle2}]", dd.ArtStyle(false, 2))
 	return val
 }

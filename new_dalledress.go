@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+
+	"github.com/TrueBlocks/trueblocks-core/sdk"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 )
 
 type DalleDress struct {
@@ -29,6 +32,17 @@ func NewDalleDress(i int, address string) *DalleDress {
 			runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
 		}
 		return string(runes)
+	}
+	if strings.HasSuffix(address, ".eth") {
+		opts := sdk.NamesOptions{
+			Terms: []string{address},
+		}
+		if names, _, err := opts.Names(); err != nil {
+			logger.Error(err)
+			// will fail later
+		} else {
+			address = names[0].Address.Hex()
+		}
 	}
 	return &DalleDress{
 		Num:       i,

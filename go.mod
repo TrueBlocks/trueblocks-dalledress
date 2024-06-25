@@ -20,6 +20,8 @@ require (
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
+	github.com/TrueBlocks/trueblocks-core/sdk v0.0.0-20240605222744-1cbeec2938e0 // indirect
+	github.com/alecthomas/participle/v2 v2.0.0 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/bits-and-blooms/bitset v1.10.0 // indirect
@@ -40,6 +42,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/holiman/uint256 v1.2.4 // indirect
@@ -110,6 +113,7 @@ require (
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/term v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
+	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.17.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

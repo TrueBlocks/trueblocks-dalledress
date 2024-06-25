@@ -38,20 +38,21 @@ func (s *Series) Save() {
 }
 
 func GetSeries() (Series, error) {
-	if str := file.AsciiFileToString("series.json"); len(str) == 0 {
-		return Series{}, fmt.Errorf("could not load series.json")
-	} else {
-		bytes := []byte(str)
-		var s Series
-		if err := json.Unmarshal(bytes, &s); err != nil {
-			logger.Error("could not unmarshal series:", err)
-			return Series{}, err
-		}
-		s.Suffix = strings.ReplaceAll(s.Suffix, " ", "-")
-		file.EstablishFolder("./series/")
-		file.StringToAsciiFile(filepath.Join("./series", s.Suffix+".json"), s.String())
-		return s, nil
+	str := strings.TrimSpace(file.AsciiFileToString("series.json"))
+	if len(str) == 0 {
+		return Series{}, nil
 	}
+
+	bytes := []byte(str)
+	var s Series
+	if err := json.Unmarshal(bytes, &s); err != nil {
+		logger.Error("could not unmarshal series:", err)
+		return Series{}, err
+	}
+	s.Suffix = strings.ReplaceAll(s.Suffix, " ", "-")
+	file.EstablishFolder("./series/")
+	file.StringToAsciiFile(filepath.Join("./series", s.Suffix+".json"), s.String())
+	return s, nil
 }
 
 func (s *Series) GetFilter(fieldName string) ([]string, error) {

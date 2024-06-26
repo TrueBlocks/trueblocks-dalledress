@@ -1,5 +1,5 @@
 {
-  "suffix": "happy-punk-cats",
+  "suffix": "punky-cats-doing-shit-optimism-blocks-10",
   "adverbs": [
     "ly,"
   ],
@@ -15,7 +15,14 @@
   "occupations": [],
   "actions": [],
   "artstyles": [
-    "punk"
+    "clockpunk",
+    "cyberpunk",
+    "decopunk",
+    "dieselpunk",
+    "nanopunk",
+    "solarpunk",
+    "steampunk",
+    "teslapunk"
   ],
   "litstyles": [],
   "colors": [

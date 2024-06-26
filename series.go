@@ -12,7 +12,7 @@ import (
 )
 
 type Series struct {
-	Last         int      `json:"last"`
+	Last         int      `json:"last,omitempty"`
 	Suffix       string   `json:"suffix"`
 	Adverbs      []string `json:"adverbs"`
 	Adjectives   []string `json:"adjectives"`
@@ -33,8 +33,11 @@ func (s *Series) String() string {
 	return string(bytes)
 }
 
-func (s *Series) Save() {
-	file.StringToAsciiFile("series.json", s.String())
+func (s *Series) Save(fn string) {
+	ss := *s
+	ss.Last = 0
+	file.EstablishFolder(fn)
+	file.StringToAsciiFile(fn, ss.String())
 }
 
 func GetSeries() (Series, error) {

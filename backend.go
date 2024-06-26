@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/openai"
 )
@@ -55,9 +53,9 @@ func (app *App) GetJson(addr string) string {
 	}
 }
 
-func (app *App) GetImage(addr string) {
+func (app *App) GetImage(addr string) error {
 	if dd, err := NewDalleDress(app.databases, addr); err != nil {
-		logger.Error(err.Error())
+		return err
 	} else {
 		imageData := openai.ImageData{
 			EnhancedPrompt: app.GetEnhanced(addr),
@@ -65,9 +63,6 @@ func (app *App) GetImage(addr string) {
 			Hash:           dd.Orig,
 			SeriesName:     app.Series.Suffix,
 		}
-		if err := openai.GetImage(&imageData); err != nil {
-			logger.Error(err.Error())
-		}
-		fmt.Println("Open address: ", addr)
+		return openai.GetImage(&imageData)
 	}
 }

@@ -124,58 +124,59 @@ func isContentPolicyViolation(err error) bool {
 }
 
 func (app *App) handleLines() {
-// sourceFile := "addresses.txt"
-// lines := file.AsciiFileToLines(sourceFile)
-// if len(lines) > 0 {
-// 	wg := sync.WaitGroup{}
-// 	logger.Info("Starting at address ", app.Series.Last, " of ", len(lines))
-// 	app.nMade = 0
-// 	for i := 0; i < len(lines); i++ {
-// 		if lines[i][0] == '#' || len(lines[i]) < 42 {
-// 			continue
-// 		}
-// 		if i > int(app.Series.Last) {
-// 			if address, ok := app.validateInput(lines[i]); !ok {
-// 				fmt.Println("Invalid address", lines[i])
-// 				return
-// 			} else {
-// 				wg.Add(1)
-// 				go doOne(i, &wg, app, address.Hex())
-// 				app.Series.Last = i
-// 				app.Series.Save()
-// 				if (i+1)%5 == 0 {
-// 					wg.Wait()
-// 					if app.nMade > 4 {
-// 						logger.Info("Sleeping for 60 seconds")
-// 						time.Sleep(time.Second * 60)
-// 						app.nMade = 0
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// 	wg.Wait()
-// 	return
-// }
-// if len(os.Args) == 2 {
-// 	for i := 0; i < 10; i++ {
-// 		wg := sync.WaitGroup{}
-// 		for j := 0; j < 5; j++ {
-// 			logger.Info("Round", i, "run", j)
-// 			wg.Add(1)
-// 			go doOne(i, &wg, app, fmt.Sprintf("0x%040x", 10010010+(i*10)+j)) // os.Args[1])
-// 		}
-// 		wg.Wait()
-// 		logger.Info("Sleeping for 60 seconds")
-// 		time.Sleep(time.Second * 60)
-// 	}
-// } else {
-// 	wg := sync.WaitGroup{}
-// 	for i, arg := range os.Args[1:] {
-// 		wg.Add(1)
-// 		go doOne(i, &wg, app, arg)
-// 	}
-// 	wg.Wait()
-// }
-// }
+	batchSize := 5
+	rateLimit := time.Second / 5
+	sem := make(chan struct{}, batchSize)
+	lines := func() []string {
+		if len(os.Args) < 2 {
+			return file.AsciiFileToLines("addresses.txt")
+		}
+		return os.Args[1:]
+	}()
+
+	// logger.Info("Starting at address ", app.Series.Last, " of ", len(lines))
+
+	var wg sync.WaitGroup
+	ticker := time.NewTicker(rateLimit)
+	defer ticker.Stop()
+
+	for i, addr := range lines {
+		if app.Series.Last > 0 && i <= int(app.Series.Last) {
+			continue
+		}
+
+		sem <- struct{}{}
+		wg.Add(1)
+		go func(index int, address string) {
+			defer wg.Done()
+			defer func() { <-sem }()
+			backoff := time.Second
+			maxRetries := 5
+			for attempt := 0; attempt < maxRetries; attempt++ {
+				<-ticker.C
+				err := app.GetImage(address)
+				if err == nil {
+					return
+				}
+				if isContentPolicyViolation(err) {
+					msg := fmt.Sprintf("Content policy violation, skipping retry for address: %s Error: %s", address, err)
+					logger.Error(msg)
+					return
+				}
+				msg := fmt.Sprintf("Error fetching image: %s Retry attempt: %d Sleeping: %d", err, attempt+1, backoff)
+				logger.Error(msg)
+				time.Sleep(backoff)
+				backoff = time.Duration(float64(backoff) * (1 + rand.Float64()))
+			}
+			logger.Error("Failed to fetch image after max retries:", address)
+		}(i, addr)
+
+		app.Series.Last = i
+		app.Series.Save("series.json")
+
+		if (i+1)%batchSize == 0 {
+			wg.Wait()
+		}
+	}
+	wg.Wait()
 }

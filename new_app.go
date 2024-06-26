@@ -27,14 +27,6 @@ type App struct {
 	Series    Series `json:"series"`
 }
 
-type Adjustment int
-
-const (
-	NoAdjustment Adjustment = 0
-	Filtered                = 1 << iota
-	Noneable
-)
-
 func NewApp() *App {
 	app := App{
 		pipe2Chan: make(chan *DalleDress),
@@ -49,11 +41,7 @@ func NewApp() *App {
 
 	for _, db := range databaseNames {
 		if app.databases[db] == nil {
-			aspect := Adjustment(Filtered)
-			if db == "litstyles" || db == "occupations" || db == "colors" {
-				aspect |= Noneable
-			}
-			if lines, err := app.toLines(db, aspect); err != nil {
+			if lines, err := app.toLines(db); err != nil {
 				logger.Fatal(err)
 			} else {
 				app.databases[db] = lines
@@ -98,45 +86,36 @@ func (app *App) ReportDone(address string) {
 	logger.Info("Done", address)
 }
 
-func (a *App) toLines(db string, adjust Adjustment) ([]string, error) {
+func (a *App) toLines(db string) ([]string, error) {
 	filename := "./databases/" + db + ".csv"
 	lines := file.AsciiFileToLines(filename)
 	var err error
 	if len(lines) == 0 {
 		err = fmt.Errorf("could not load %s", filename)
 	} else {
-		if adjust&Filtered != 0 {
-			fn := strings.ToUpper(db[:1]) + db[1:]
-			if filter, err := a.Series.GetFilter(fn); err != nil {
-				return lines, err
+		fn := strings.ToUpper(db[:1]) + db[1:]
+		if filter, err := a.Series.GetFilter(fn); err != nil {
+			return lines, err
 
-			} else {
-				if len(filter) == 0 {
-					// logger.Info("says filtered, but no filter for", db)
-					return lines, nil
-				}
-				// logger.Info("found filter for", db, filter)
+		} else {
+			if len(filter) == 0 {
+				return lines, nil
+			}
 
-				filtered := make([]string, 0, len(lines))
-				for _, line := range lines {
-					for _, f := range filter {
-						// logger.Info(line, f, strings.Contains(line, f))
-						if strings.Contains(line, f) {
-							filtered = append(filtered, line)
-						}
+			filtered := make([]string, 0, len(lines))
+			for _, line := range lines {
+				for _, f := range filter {
+					if strings.Contains(line, f) {
+						filtered = append(filtered, line)
 					}
 				}
-				lines = filtered
 			}
+			lines = filtered
 		}
 	}
 
 	if len(lines) == 0 {
-		if adjust&Noneable != 0 {
-			lines = append(lines, "none")
-		} else {
-			return lines, fmt.Errorf("no lines match query in %s", filename)
-		}
+		lines = append(lines, "none")
 	}
 
 	return lines, err

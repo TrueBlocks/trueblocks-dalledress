@@ -76,8 +76,8 @@ func (a App) String() string {
 	return string(bytes)
 }
 
-func (app *App) ReportOn(loc, address, ft, value string) {
-	path := filepath.Join("./output/", app.Series.Suffix, strings.ToLower(loc))
+func ReportOn(loc, address, ft, value string) {
+	path := filepath.Join("./output/", strings.ToLower(loc))
 	file.EstablishFolder(path)
 	file.StringToAsciiFile(filepath.Join(path, address+"."+ft), value)
 }

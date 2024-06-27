@@ -12,7 +12,7 @@ import (
 func EnhancePrompt(prompt, authorType string) (string, error) {
 	url := "https://api.openai.com/v1/chat/completions"
 	payload := dalleRequest{
-		Model:     "gpt-3.5-turbo",
+		Model:     "gpt-4",
 		Seed:      1337,
 		Tempature: 0.2,
 	}

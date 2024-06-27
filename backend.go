@@ -62,15 +62,15 @@ func (app *App) GetImage(addr string) error {
 		return err
 	} else {
 		suff := app.Series.Suffix
-		app.ReportOn(filepath.Join(suff, "selector"), dd.Orig, "json", dd.String())
+		ReportOn(filepath.Join(suff, "selector"), dd.Orig, "json", dd.String())
 		data := app.GetData(addr)
-		app.ReportOn(filepath.Join(suff, "data"), dd.Orig, "txt", data)
+		ReportOn(filepath.Join(suff, "data"), dd.Orig, "txt", data)
 		terse := app.GetTerse(addr)
-		app.ReportOn(filepath.Join(suff, "terse"), dd.Orig, "txt", terse)
+		ReportOn(filepath.Join(suff, "terse"), dd.Orig, "txt", terse)
 		prompt := app.GetPrompt(addr)
-		app.ReportOn(filepath.Join(suff, "prompt"), dd.Orig, "txt", prompt)
+		ReportOn(filepath.Join(suff, "prompt"), dd.Orig, "txt", prompt)
 		enhanced := app.GetEnhanced(addr)
-		app.ReportOn(filepath.Join(suff, "enhanced"), dd.Orig, "txt", strings.ReplaceAll(enhanced, ".", ".\n"))
+		ReportOn(filepath.Join(suff, "enhanced"), dd.Orig, "txt", strings.ReplaceAll(enhanced, ".", ".\n"))
 		imageData := openai.ImageData{
 			TersePrompt:    terse,
 			EnhancedPrompt: enhanced,

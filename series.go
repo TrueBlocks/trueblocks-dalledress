@@ -33,10 +33,10 @@ func (s *Series) String() string {
 	return string(bytes)
 }
 
-func (s *Series) Save(fn string) {
-	ss := *s
-	ss.Last = 0
-	file.EstablishFolder(fn)
+func (s *Series) SaveSeries(fn string, last int) {
+	ss := s
+	ss.Last = last
+	file.EstablishFolder("series")
 	file.StringToAsciiFile(fn, ss.String())
 }
 
@@ -53,8 +53,7 @@ func GetSeries() (Series, error) {
 		return Series{}, err
 	}
 	s.Suffix = strings.ReplaceAll(s.Suffix, " ", "-")
-	file.EstablishFolder("./series/")
-	file.StringToAsciiFile(filepath.Join("./series", s.Suffix+".json"), s.String())
+	s.SaveSeries(filepath.Join("./series", s.Suffix+".json"), 0)
 	return s, nil
 }
 

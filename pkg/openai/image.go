@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
@@ -20,21 +19,18 @@ import (
 type ImageData struct {
 	EnhancedPrompt string `json:"enhancedPrompt"`
 	TersePrompt    string `json:"tersePrompt"`
-	Hash           string `json:"hash"`
 	SeriesName     string `json:"seriesName"`
+	Filename       string `json:"filename"`
 }
 
 func GetImage(imageData *ImageData) error {
-	folder := filepath.Join("./output", imageData.SeriesName, "generated")
-	file.EstablishFolder(folder)
-	file.EstablishFolder(strings.Replace(folder, "/generated", "/annotated", -1))
-	file.EstablishFolder(strings.Replace(folder, "/generated", "/stitched", -1))
+	generated := filepath.Join("./output", imageData.SeriesName, "generated")
+	file.EstablishFolder(generated)
+	annotated := strings.Replace(generated, "/generated", "/annotated", -1)
+	file.EstablishFolder(annotated)
 
-	t := time.Now()
-	s := t.Format("20060102150405")
-	fn := filepath.Join(folder, fmt.Sprintf("%s-%s.png", imageData.Hash, s)) //a.Series.Suffix))
-
-	logger.Info(colors.Cyan, imageData.Hash, colors.Yellow, "- improving the prompt...", colors.Off)
+	fn := filepath.Join(generated, fmt.Sprintf("%s.png", imageData.Filename))
+	logger.Info(colors.Cyan, imageData.Filename, colors.Yellow, "- improving the prompt...", colors.Off)
 
 	size := "1024x1024"
 	if strings.Contains(imageData.EnhancedPrompt, "horizontal") {
@@ -57,7 +53,6 @@ func GetImage(imageData *ImageData) error {
 		Model:   "dall-e-3",
 		Size:    size,
 	}
-	// fmt.Println(payload.String())
 
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
@@ -69,7 +64,7 @@ func GetImage(imageData *ImageData) error {
 		logger.Fatal("No OPENAI_API_KEY key found")
 	}
 
-	logger.Info(colors.Cyan, imageData.Hash, colors.Yellow, "- generating the image...", colors.Off)
+	logger.Info(colors.Cyan, imageData.Filename, colors.Yellow, "- generating the image...", colors.Off)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
 	if err != nil {
@@ -90,8 +85,6 @@ func GetImage(imageData *ImageData) error {
 		return err
 	}
 	bodyStr := string(body)
-	bodyStr = strings.Replace(bodyStr, "\"revised_prompt\": \"", "\"revised_prompt\": \"NO TEXT. ", -1)
-	bodyStr = strings.Replace(bodyStr, ".\",", ". NO TEXT.\",", 1)
 	body = []byte(bodyStr)
 
 	var dalleResp dalleResponse1
@@ -132,7 +125,7 @@ func GetImage(imageData *ImageData) error {
 	if err != nil {
 		return fmt.Errorf("error annotating image: %v", err)
 	}
-	logger.Info(colors.Cyan, imageData.Hash, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
+	logger.Info(colors.Cyan, imageData.Filename, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
 	utils.System("open " + path)
 	return nil
 }

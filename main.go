@@ -172,7 +172,7 @@ func (app *App) handleLines() {
 		}(i, addr)
 
 		app.Series.Last = i
-		app.Series.Save("series.json")
+		app.Series.SaveSeries("series.json", app.Series.Last)
 
 		if (i+1)%batchSize == 0 {
 			wg.Wait()

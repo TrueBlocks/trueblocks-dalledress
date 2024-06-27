@@ -22,6 +22,7 @@ type App struct {
 	pTemplate *template.Template
 	dTemplate *template.Template
 	tTemplate *template.Template
+	aTemplate *template.Template
 	Series    Series `json:"series"`
 }
 
@@ -56,6 +57,9 @@ func NewApp() *App {
 	}
 	if app.tTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
 		logger.Fatal("could not create terse template:", err)
+	}
+	if app.aTemplate, err = template.New("author").Parse(authorTemplate); err != nil {
+		logger.Fatal("could not create prompt template:", err)
 	}
 
 	if err := godotenv.Load(); err != nil {

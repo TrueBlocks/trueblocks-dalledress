@@ -39,7 +39,8 @@ func NewDalleDress(databases map[string][]string, address string) (*DalleDress, 
 	// 		address = names[0].Address.Hex()
 	// 	}
 	// }
-	seed := address + reverse(address)
+	parts := strings.Split(address, ",")
+	seed := parts[0] + reverse(parts[0])
 	if len(seed) < 66 {
 		return nil, fmt.Errorf("seed length is less than 66")
 	}
@@ -188,16 +189,9 @@ func (dd *DalleDress) ArtStyle(short bool, which int) string {
 	return parts[0] + " (" + parts[2] + ")"
 }
 
-func (dd *DalleDress) LitPrompt(short bool) string {
-	val := dd.AttribMap["litStyle"].Value
-	if val == "none" {
-		return ""
-	}
-	text := `Please give me a detailed rewrite of the following
-	prompt in the literary style ` + dd.LitStyle(short) + `. 
-	Be imaginative, creative, and complete.
-`
-	return text
+func (dd *DalleDress) HasLitStyle() bool {
+	ret := dd.AttribMap["litStyle"].Value
+	return ret != "none" && ret != ""
 }
 
 func (dd *DalleDress) LitStyle(short bool) string {
@@ -213,6 +207,18 @@ func (dd *DalleDress) LitStyle(short bool) string {
 		parts[1] = strings.Replace(parts[1], (parts[0] + " "), "", 1)
 	}
 	return parts[0] + " (" + parts[1] + ")"
+}
+
+func (dd *DalleDress) LitStyleDescr() string {
+	val := dd.AttribMap["litStyle"].Value
+	if val == "none" {
+		return ""
+	}
+	parts := strings.Split(val, ",")
+	if strings.HasPrefix(parts[1], parts[0]+" ") {
+		parts[1] = strings.Replace(parts[1], (parts[0] + " "), "", 1)
+	}
+	return parts[1]
 }
 
 func (dd *DalleDress) Color(short bool, which int) string {
@@ -251,4 +257,16 @@ func (dd *DalleDress) BackStyle(short bool) string {
 	val = strings.ReplaceAll(val, "[{Color3}]", dd.Color(true, 3))
 	val = strings.ReplaceAll(val, "[{ArtStyle2}]", dd.ArtStyle(false, 2))
 	return val
+}
+
+func (dd *DalleDress) LitPrompt(short bool) string {
+	val := dd.AttribMap["litStyle"].Value
+	if val == "none" {
+		return ""
+	}
+	text := `Please give me a detailed rewrite of the following
+	prompt in the literary style ` + dd.LitStyle(short) + `. 
+	Be imaginative, creative, and complete.
+`
+	return text
 }

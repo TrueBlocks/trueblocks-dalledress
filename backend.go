@@ -1,6 +1,9 @@
 package main
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/openai"
 )
@@ -18,7 +21,8 @@ func (app *App) GetEnhanced(addr string) string {
 	if dd, err := NewDalleDress(app.databases, addr); err != nil {
 		return err.Error()
 	} else {
-		if dd.EnhancedPrompt, err = openai.EnhancePrompt(app.GetPrompt(addr)); err != nil {
+		authorType, _ := dd.generatePrompt(app.aTemplate, nil)
+		if dd.EnhancedPrompt, err = openai.EnhancePrompt(app.GetPrompt(addr), authorType); err != nil {
 			logger.Fatal(err.Error())
 		}
 		msg := " DO NOT PUT TEXT IN THE IMAGE. "
@@ -57,11 +61,21 @@ func (app *App) GetImage(addr string) error {
 	if dd, err := NewDalleDress(app.databases, addr); err != nil {
 		return err
 	} else {
+		suff := app.Series.Suffix
+		app.ReportOn(filepath.Join(suff, "selector"), dd.Orig, "json", dd.String())
+		data := app.GetData(addr)
+		app.ReportOn(filepath.Join(suff, "data"), dd.Orig, "txt", data)
+		terse := app.GetTerse(addr)
+		app.ReportOn(filepath.Join(suff, "terse"), dd.Orig, "txt", terse)
+		prompt := app.GetPrompt(addr)
+		app.ReportOn(filepath.Join(suff, "prompt"), dd.Orig, "txt", prompt)
+		enhanced := app.GetEnhanced(addr)
+		app.ReportOn(filepath.Join(suff, "enhanced"), dd.Orig, "txt", strings.ReplaceAll(enhanced, ".", ".\n"))
 		imageData := openai.ImageData{
-			EnhancedPrompt: app.GetEnhanced(addr),
-			TersePrompt:    app.GetTerse(addr),
-			Hash:           dd.Orig,
+			TersePrompt:    terse,
+			EnhancedPrompt: enhanced,
 			SeriesName:     app.Series.Suffix,
+			Filename:       strings.ReplaceAll(dd.Orig, ",", "-"),
 		}
 		return openai.GetImage(&imageData)
 	}

@@ -9,14 +9,14 @@ import (
 	"strings"
 )
 
-func EnhancePrompt(prompt string) (string, error) {
+func EnhancePrompt(prompt, authorType string) (string, error) {
 	url := "https://api.openai.com/v1/chat/completions"
 	payload := dalleRequest{
-		Model: "gpt-3.5-turbo",
-		Seed:  1337,
+		Model:     "gpt-3.5-turbo",
+		Seed:      1337,
+		Tempature: 0.2,
 	}
 	payload.Messages = append(payload.Messages, message{Role: "system", Content: prompt})
-
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		return "", err

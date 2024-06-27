@@ -8,15 +8,16 @@ type message struct {
 }
 
 type dalleRequest struct {
-	Input    string    `json:"input,omitempty"`
-	Prompt   string    `json:"prompt,omitempty"`
-	N        int       `json:"n,omitempty"`
-	Quality  string    `json:"quality,omitempty"`
-	Model    string    `json:"model,omitempty"`
-	Style    string    `json:"style,omitempty"`
-	Size     string    `json:"size,omitempty"`
-	Seed     int       `json:"seed,omitempty"`
-	Messages []message `json:"messages,omitempty"`
+	Input     string    `json:"input,omitempty"`
+	Prompt    string    `json:"prompt,omitempty"`
+	N         int       `json:"n,omitempty"`
+	Quality   string    `json:"quality,omitempty"`
+	Model     string    `json:"model,omitempty"`
+	Style     string    `json:"style,omitempty"`
+	Size      string    `json:"size,omitempty"`
+	Seed      int       `json:"seed,omitempty"`
+	Tempature float64   `json:"temperature,omitempty"`
+	Messages  []message `json:"messages,omitempty"`
 }
 
 func (req *dalleRequest) String() string {

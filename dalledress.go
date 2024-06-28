@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+
+	"github.com/TrueBlocks/trueblocks-core/sdk"
 )
 
 type DalleDress struct {
@@ -29,16 +31,18 @@ func NewDalleDress(databases map[string][]string, address string) (*DalleDress, 
 		}
 		return string(runes)
 	}
-	// if strings.HasSuffix(address, ".eth") {
-	// 	opts := sdk.NamesOptions{
-	// 		Terms: []string{address},
-	// 	}
-	// 	if names, _, err := opts.Names(); err != nil {
-	// 		return nil, fmt.Errorf("Error getting names for %s", address)
-	// 	} else {
-	// 		address = names[0].Address.Hex()
-	// 	}
-	// }
+	if strings.HasSuffix(address, ".eth") {
+		opts := sdk.NamesOptions{
+			Terms: []string{address},
+		}
+		if names, _, err := opts.Names(); err != nil {
+			return nil, fmt.Errorf("error getting names for %s", address)
+		} else {
+			if len(names) > 0 {
+				address = names[0].Address.Hex()
+			}
+		}
+	}
 	parts := strings.Split(address, ",")
 	seed := parts[0] + reverse(parts[0])
 	if len(seed) < 66 {

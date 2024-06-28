@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -127,55 +128,62 @@ func (app *App) handleLines() {
 	batchSize := 5
 	rateLimit := time.Second / 5
 	sem := make(chan struct{}, batchSize)
-	lines := func() []string {
-		if len(os.Args) < 2 {
-			return file.AsciiFileToLines("addresses.txt")
-		}
-		return os.Args[1:]
-	}()
 
-	// logger.Info("Starting at address ", app.Series.Last, " of ", len(lines))
+	lines, series := func() ([]string, []Series) {
+		series := []Series{app.Series}
+		if len(os.Args) < 2 {
+			return file.AsciiFileToLines("addresses.txt"), series
+		}
+		return os.Args[1:], series
+	}()
 
 	var wg sync.WaitGroup
 	ticker := time.NewTicker(rateLimit)
 	defer ticker.Stop()
 
-	for i, addr := range lines {
-		if app.Series.Last > 0 && i <= int(app.Series.Last) {
-			continue
-		}
-
-		sem <- struct{}{}
-		wg.Add(1)
-		go func(index int, address string) {
-			defer wg.Done()
-			defer func() { <-sem }()
-			backoff := time.Second
-			maxRetries := 5
-			for attempt := 0; attempt < maxRetries; attempt++ {
-				<-ticker.C
-				err := app.GetImage(address)
-				if err == nil {
-					return
-				}
-				if isContentPolicyViolation(err) {
-					msg := fmt.Sprintf("Content policy violation, skipping retry for address: %s Error: %s", address, err)
-					logger.Error(msg)
-					return
-				}
-				msg := fmt.Sprintf("Error fetching image: %s Retry attempt: %d Sleeping: %d", err, attempt+1, backoff)
-				logger.Error(msg)
-				time.Sleep(backoff)
-				backoff = time.Duration(float64(backoff) * (1 + rand.Float64()))
+	for _, ser := range series {
+		app.Series = ser
+		for i, addr := range lines {
+			if app.Series.Last > 0 && i <= int(app.Series.Last) {
+				continue
 			}
-			logger.Error("Failed to fetch image after max retries:", address)
-		}(i, addr)
 
-		app.Series.Last = i
-		app.Series.SaveSeries("series.json", app.Series.Last)
+			sem <- struct{}{}
+			wg.Add(1)
+			go func(index int, address string) {
+				defer wg.Done()
+				defer func() { <-sem }()
+				backoff := time.Second
+				maxRetries := 5
+				for attempt := 0; attempt < maxRetries; attempt++ {
+					<-ticker.C
+					err := app.GetImage(address)
+					if err == nil {
+						return
+					}
+					if isContentPolicyViolation(err) {
+						msg := fmt.Sprintf("Content policy violation, skipping retry for address: %s Error: %s", address, err)
+						logger.Error(msg)
+						return
+					} else if strings.Contains(err.Error(), "seed length is less than 66") {
+						msg := fmt.Sprintf("Invalid address, skipping retry for address: %s Error: %s", address, err)
+						logger.Error(msg)
+						return
+					}
+					msg := fmt.Sprintf("Error fetching image: %s Retry attempt: %d Sleeping: %d", err, attempt+1, backoff)
+					logger.Error(msg)
+					time.Sleep(backoff)
+					backoff = time.Duration(float64(backoff) * (1 + rand.Float64()))
+				}
+				logger.Error("Failed to fetch image after max retries:", address)
+			}(i, addr)
 
-		if (i+1)%batchSize == 0 {
-			wg.Wait()
+			app.Series.Last = i
+			app.Series.SaveSeries("series.json", app.Series.Last)
+
+			if (i+1)%batchSize == 0 {
+				wg.Wait()
+			}
 		}
 	}
 	wg.Wait()

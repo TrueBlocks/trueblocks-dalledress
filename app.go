@@ -12,6 +12,7 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/names"
 	"github.com/joho/godotenv"
 )
 
@@ -27,6 +28,9 @@ type App struct {
 }
 
 func NewApp() *App {
+	// preload the names map
+	_, _ = names.LoadNamesMap("mainnet", names.Regular|names.Custom|names.Prefund, []string{})
+
 	app := App{
 		databases: make(map[string][]string),
 	}

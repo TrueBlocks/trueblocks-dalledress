@@ -1,3 +1,46 @@
+import React, { useState } from "react";
+import { Container, TextInput, Button, Group, Text } from "@mantine/core";
+import classes from "../View.module.css";
+import View from "@/components/view/View";
+
+function DalleView() {
+  const [address, setAddress] = useState("");
+  const [firstHash, setFirstHash] = useState("");
+  const [appendedString, setAppendedString] = useState("");
+
+  const handleGenerate = () => {
+    crypto.subtle
+      .digest("SHA-256", new TextEncoder().encode(address))
+      .then((hashBuffer) => {
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+        setFirstHash(hashHex);
+        const appended = `${address.slice(0, 16)} | ${address.slice(16, 32)} | ${hashHex.slice(0, 16)} | ${hashHex.slice(16, 32)} | ${hashHex.slice(32, 48)}`;
+        setAppendedString(appended);
+      });
+  };
+
+  return (
+    <View title="Dalle View">
+      <TextInput
+        value={address}
+        onChange={(event) => setAddress(event.currentTarget.value)}
+        placeholder="Enter address"
+        label="Address"
+      />
+      <Group mt="md" style={{ justifyContent: "center" }}>
+        <Button onClick={handleGenerate}>Generate</Button>
+      </Group>
+      <Text mt="md">First Hash: {firstHash}</Text>
+      <Text mt="md">Appended String: {appendedString}</Text>
+    </View>
+  );
+}
+
+export default DalleView;
+
 /*
 import React, { useState, useEffect } from "react";
 import { ActionIcon } from "@mantine/core";

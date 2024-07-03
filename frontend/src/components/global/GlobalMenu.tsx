@@ -1,6 +1,12 @@
 import React, { ReactNode } from "react";
 import { NavLink } from "@mantine/core";
-import { IconHome, IconSettings, IconTag, IconList } from "@tabler/icons-react";
+import {
+  IconHome,
+  IconSettings,
+  IconTag,
+  IconList,
+  IconSpider
+} from "@tabler/icons-react";
 import { Link, useRoute } from "wouter";
 
 // StyledNavLink is a helper component that renders navigation link
@@ -11,6 +17,7 @@ type StyledNavLinkParams = {
   icon?: ReactNode;
   children?: ReactNode;
 };
+
 function StyledNavLink(params: StyledNavLinkParams) {
   const [isActive] = useRoute(params.href);
 
@@ -27,8 +34,7 @@ function GlobalMenu() {
   return (
     <>
       <StyledNavLink label="Home" icon={<IconHome />} href="/" />
-      <StyledNavLink label="Dalle" icon={<IconList />} href="/dalle" />
-      <StyledNavLink label="Blocks" icon={<IconList />} href="/blocks" />
+      <StyledNavLink label="Dalle" icon={<IconSpider />} href="/dalle" />
       <StyledNavLink label="Names" icon={<IconTag />} href="/names" />
       <StyledNavLink
         label="Settings"

@@ -1,7 +1,7 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "TrueBlocks Dapplet",
-  "outputfilename": "trueblocks-browse",
+  "name": "TrueBlocks DalleDress",
+  "outputfilename": "trueblocks-dalledress",
   "frontend:install": "yarn install",
   "frontend:build": "yarn run build",
   "frontend:dev:watcher": "yarn run dev",

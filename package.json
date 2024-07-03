@@ -1,8 +1,8 @@
 {
     "scripts": {
-        "dev": "wails dev --debounce 500 2>&1 | grep -v AssetHandler"
+        "dev": "TB_WAILS=true wails dev --debounce 500 2>&1 | grep -v AssetHandler"
     },
-    "name": "trueblocks-dapplet",
+    "name": "trueblocks-dalledress",
     "version": "1.0.0",
     "license": "GPL-3.0"
 }

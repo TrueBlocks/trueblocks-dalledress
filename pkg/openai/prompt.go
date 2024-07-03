@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 )
 
 func EnhancePrompt(prompt, authorType string) (string, error) {
@@ -42,20 +41,15 @@ func EnhancePrompt(prompt, authorType string) (string, error) {
 		return "", err
 	}
 
+	type dalleResponse struct {
+		Choices []struct {
+			Message message `json:"message"`
+		} `json:"choices"`
+	}
 	var response dalleResponse
-	json.Unmarshal(body, &response)
-	ret := strings.ReplaceAll(response.Choices[0].Message.Content, "\n", " ")
-	ret = strings.ReplaceAll(ret, "  ", " ")
-	return ret, nil
-}
-
-type Message struct {
-	Content string `json:"content"`
-}
-type dalleChoice struct {
-	Message Message `json:"message"`
-}
-
-type dalleResponse struct {
-	Choices []dalleChoice `json:"choices"`
+	if err := json.Unmarshal(body, &response); err != nil {
+		return "", err
+	} else {
+		return response.Choices[0].Message.Content, nil
+	}
 }

@@ -16,6 +16,7 @@ type DalleDress struct {
 	Error          string               `json:"error,omitempty"`
 	Prompt         string               `json:"prompt,omitempty"`
 	DataPrompt     string               `json:"dataPrompt,omitempty"`
+	TitlePrompt    string               `json:"titlePrompt,omitempty"`
 	TersePrompt    string               `json:"tersePrompt,omitempty"`
 	EnhancedPrompt string               `json:"enhancedPrompt,omitempty"`
 	Attribs        []Attribute          `json:"attributes"`
@@ -48,7 +49,9 @@ func NewDalleDress(databases map[string][]string, address string) (*DalleDress, 
 	if len(seed) < 66 {
 		return nil, fmt.Errorf("seed length is less than 66")
 	}
-	seed = seed[2:66]
+	if strings.HasPrefix(seed, "0x") {
+		seed = seed[2:66]
+	}
 
 	dd := DalleDress{
 		Orig:      address,

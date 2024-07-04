@@ -34,6 +34,10 @@ export function GetTerse(arg1) {
   return window['go']['app']['App']['GetTerse'](arg1);
 }
 
+export function GetTitle(arg1) {
+  return window['go']['app']['App']['GetTitle'](arg1);
+}
+
 export function HandleLines() {
   return window['go']['app']['App']['HandleLines']();
 }

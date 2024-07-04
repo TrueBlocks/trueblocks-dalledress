@@ -1,40 +1,126 @@
-import React, { useState } from "react";
-import { Container, TextInput, Button, Group, Text } from "@mantine/core";
-import classes from "../View.module.css";
-import View from "@/components/view/View";
+import React, { useState, useEffect } from 'react';
+import { Paper, Grid, Tabs, TextInput, Button, Group, Text, ScrollArea } from '@mantine/core';
+import classes from '../View.module.css';
+import View from '@/components/view/View';
+import { GetJson, GetData, GetTitle, GetTerse, GetPrompt, GetEnhanced, GetImage } from '@gocode/app/App';
 
 function DalleView() {
-  const [address, setAddress] = useState("");
-  const [firstHash, setFirstHash] = useState("");
-  const [appendedString, setAppendedString] = useState("");
+  const [address, setAddress] = useState<string>('0xf503017d7baf7fbc0fff7492b751025c6a78179b');
+  const [json, setJson] = useState<string>('');
+  const [data, setData] = useState<string>('');
+  const [prompt, setPrompt] = useState<string>('');
+  const [enhanced, setEnhanced] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
+  const [terse, setTerse] = useState<string>('');
+  const [imagePath, setImagePath] = useState<string>('');
+  const [isGenerateDisabled, setIsGenerateDisabled] = useState<boolean>(false);
 
   const handleGenerate = () => {
-    crypto.subtle
-      .digest("SHA-256", new TextEncoder().encode(address))
-      .then((hashBuffer) => {
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join("");
-        setFirstHash(hashHex);
-        const appended = `${address.slice(0, 16)} | ${address.slice(16, 32)} | ${hashHex.slice(0, 16)} | ${hashHex.slice(16, 32)} | ${hashHex.slice(32, 48)}`;
-        setAppendedString(appended);
+    setIsGenerateDisabled(true);
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(address)).then((hashBuffer) => {
+      setImagePath('x');
+      GetEnhanced(address).then((value: string) => {
+        setEnhanced(value);
+        setIsGenerateDisabled(false);
       });
+    });
   };
+
+  useEffect(() => {
+    GetJson(address).then((value: string) => {
+      setJson(value);
+    });
+    GetData(address).then((value: string) => {
+      setData(value);
+    });
+    GetTitle(address).then((value: string) => {
+      setTitle(value);
+    });
+    GetTerse(address).then((value: string) => {
+      setTerse(value);
+    });
+    GetPrompt(address).then((value: string) => {
+      setPrompt(value);
+    });
+  }, [address]);
+
+  useEffect(() => {
+    setIsGenerateDisabled(false);
+  }, [address]);
 
   return (
     <View title="Dalle View">
-      <TextInput
-        value={address}
-        onChange={(event) => setAddress(event.currentTarget.value)}
-        placeholder="Enter address"
-        label="Address"
-      />
-      <Group mt="md" style={{ justifyContent: "center" }}>
-        <Button onClick={handleGenerate}>Generate</Button>
-      </Group>
-      <Text mt="md">First Hash: {firstHash}</Text>
-      <Text mt="md">Appended String: {appendedString}</Text>
+      <Grid>
+        <Grid.Col span={8} className={classes.gridColumn}>
+          <Group mt="md" style={{ justifyContent: 'flex-start' }}>
+            <TextInput
+              value={address}
+              onChange={(event) => setAddress(event.currentTarget.value)}
+              placeholder="Enter address"
+              label="Address"
+              style={{ width: '600px' }}
+            />
+            <Button onClick={handleGenerate} style={{ marginTop: '22px' }} disabled={isGenerateDisabled}>
+              Generate
+            </Button>
+          </Group>
+          <Paper
+            shadow="xs"
+            p="md"
+            style={{
+              maxWidth: '100vw',
+              marginLeft: 0,
+              border: '1px solid green',
+            }}
+          >
+            <Text mt="md">Image: {imagePath}</Text>
+            <div style={{ height: '500px' }}></div> {/* Blank space below */}
+          </Paper>
+        </Grid.Col>
+        <Grid.Col span={4} className={classes.gridColumn}>
+          <Tabs defaultValue="json">
+            <ScrollArea style={{ whiteSpace: 'nowrap' }}>
+              <Tabs.List>
+                <Tabs.Tab value="json">JSON</Tabs.Tab>
+                <Tabs.Tab value="data">Data</Tabs.Tab>
+                <Tabs.Tab value="title">Title</Tabs.Tab>
+                <Tabs.Tab value="terse">Terse</Tabs.Tab>
+                <Tabs.Tab value="prompt">Prompt</Tabs.Tab>
+                <Tabs.Tab value="enhanced">Enhanced</Tabs.Tab>
+              </Tabs.List>
+            </ScrollArea>
+
+            <Tabs.Panel value="json">
+              <Text mt="md">
+                <pre>{json}</pre>
+              </Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="data">
+              <Text mt="md">
+                <pre>{data}</pre>
+              </Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="title">
+              <Text mt="md">{title}</Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="terse">
+              <Text mt="md" style={{ textAlign: 'justify' }}>
+                {terse}
+              </Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="prompt">
+              <Text mt="md" style={{ textAlign: 'justify' }}>
+                {prompt}
+              </Text>
+            </Tabs.Panel>
+            <Tabs.Panel value="enhanced">
+              <Text mt="md" style={{ textAlign: 'justify' }}>
+                {enhanced}
+              </Text>
+            </Tabs.Panel>
+          </Tabs>
+        </Grid.Col>
+      </Grid>
     </View>
   );
 }
@@ -42,109 +128,35 @@ function DalleView() {
 export default DalleView;
 
 /*
-import React, { useState, useEffect } from "react";
-import { ActionIcon } from "@mantine/core";
-import {
-  Paper,
-  Button,
-  Group,
-  Box,
-  TextInput,
-  Text,
-  CopyButton,
-  Tooltip
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { IconCopy, IconCheck } from "@tabler/icons-react";
-import {
-  GetPrompt,
-  GetEnhanced,
-  GetTerse,
-  GetData,
-  GetJson,
-  GetImage
-  // GetImageData
-  // GetImprovedPrompt,
-  // GetModeration
-} from "../wailsjs/go/app/App";
-import "./App.css";
-import "@mantine/core/styles.css";
-
-export default function App() {
-  const [email, setEmail] = useState<string>(
-    "0xf503017d7baf7fbc0fff7492b751025c6a78179b"
-  );
-  const [prompt, setPrompt] = useState<string>("");
-  const [enhanced, setEnhanced] = useState<string>("");
-  const [terse, setTerse] = useState<string>("");
-  const [data, setData] = useState<string>("");
-  const [json, setJson] = useState<string>("");
-  // const [moderation, setModeration] = useState<string>("");
-  // const [improvedPrompt, setImprovedPrompt] = useState<string>("");
-
   const form = useForm({
     initialValues: {
-      email: "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
-      termsOfService: false
+      address: "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
     }
   });
 
-  useEffect(() => {
-    GetPrompt(form.values["email"]).then((value: string) => {
-      setPrompt(value);
-    });
-    GetEnhanced(form.values["email"]).then((value: string) => {
-      setEnhanced(value);
-    });
-    GetTerse(form.values["email"]).then((value: string) => {
-      setTerse(value);
-    });
-    GetData(form.values["email"]).then((value: string) => {
-      setData(value);
-    });
-    GetJson(form.values["email"]).then((value: string) => {
-      setJson(value);
-    });
-    // GetModeration(form.values["email"]).then((value: string) => {
-    //   setModeration(value);
-    // });
-    // GetImprovedPrompt(form.values["email"]).then((value: string) => {
-    //   setImprovedPrompt(value);
-    // });
-  }, [email]);
-
-  const openImage = (email: string) => {
-    GetImage(email);
+  const openImage = (address: string) => {
+    GetImage(address);
   };
 
   return (
     <div id="App" style={{ width: "98vw", margin: "auto" }}>
       <Box mx="auto">
         <form
-          onSubmit={form.onSubmit((values) => setEmail(values["email"]))}
-          onBlur={form.onSubmit((values) => setEmail(values["email"]))}
+          onSubmit={form.onSubmit((values) => setEmail(values["address"]))}
+          onBlur={form.onSubmit((values) => setEmail(values["address"]))}
         >
           <TextInput
             label="Email"
-            placeholder="your@email.com"
-            {...form.getInputProps("email")}
+            placeholder="your@address.com"
+            {...form.getInputProps("address")}
           />
           <Group mt="md">
             <Button type="submit">Submit</Button>
           </Group>
         </form>
       </Box>
-      <Button onClick={() => openImage(email)}>Generate</Button>{" "}
-      <Paper
-        shadow="xs"
-        p="md"
-        style={{
-          maxWidth: "100vw",
-          marginLeft: 0,
-          border: "1px solid green"
-        }}
-      >
-        <Text>{email ? email : "Working..."}</Text>
+      <Button onClick={() => openImage(address)}>Generate</Button>{" "}
+        <Text>{address ? address : "Working..."}</Text>
         <div>Prompt:</div>
         <CopyText prompt={prompt ? prompt : "Working..."} />
         <div>Enhanced:</div>
@@ -159,37 +171,6 @@ export default function App() {
     </div>
   );
 }
-
-export const CopyText = ({ prompt }: { prompt?: string }) => {
-  const promptText = prompt ? prompt : "Book Now";
-
-  return (
-    <div className="shit-container">
-      <div className="shit">{promptText}</div>
-      <CopyButton value={promptText} timeout={2000}>
-        {({ copied, copy }) => (
-          <Tooltip
-            label={copied ? "Copied" : "Copy"}
-            withArrow
-            position="right"
-          >
-            <ActionIcon
-              color={copied ? "teal" : "gray"}
-              variant="subtle"
-              onClick={copy}
-            >
-              {copied ? (
-                <IconCheck style={{ width: "1rem" }} />
-              ) : (
-                <IconCopy style={{ width: "1rem" }} />
-              )}
-            </ActionIcon>
-          </Tooltip>
-        )}
-      </CopyButton>
-    </div>
-  );
-};
 
 function ImageDisplay() {
   const [imageSrc, setImageSrc] = useState("");

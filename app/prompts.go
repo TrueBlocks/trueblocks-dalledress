@@ -53,6 +53,8 @@ BackStyleShort:   {{.BackStyle true}}`
 
 var terseTemplate = `{{.Adverb false}} {{.Adjective false}} {{.Noun true}} with human-like characteristics feeling {{.Emotion false}}{{.Occupation false}} in the style of {{.ArtStyle true 1}}`
 
+var titleTemplate = `{{.Emotion true}} {{.Adverb true}} {{.Adjective true}} {{.Occupation true}} {{.Noun true}}`
+
 var authorTemplate = `{{if .HasLitStyle}}You are an award winning author who writes in the literary
 style called {{.LitStyle true}}. Take on the persona of such an author.
 {{.LitStyle true}} is a genre or literary style that {{.LitStyleDescr}}.{{end}}`

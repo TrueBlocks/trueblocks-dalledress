@@ -18,6 +18,8 @@ export function GetSession():Promise<config.Session>;
 
 export function GetTerse(arg1:string):Promise<string>;
 
+export function GetTitle(arg1:string):Promise<string>;
+
 export function HandleLines():Promise<void>;
 
 export function MaxNames():Promise<number>;

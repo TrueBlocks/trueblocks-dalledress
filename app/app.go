@@ -23,16 +23,17 @@ import (
 )
 
 type App struct {
-	ctx       context.Context
-	session   config.Session
-	apiKey    string
-	databases map[string][]string
-	aTemplate *template.Template
-	pTemplate *template.Template
-	dTemplate *template.Template
-	tTemplate *template.Template
-	Series    dalle.Series `json:"series"`
-	names     []types.Name
+	ctx            context.Context
+	session        config.Session
+	apiKey         string
+	databases      map[string][]string
+	authorTemplate *template.Template
+	promptTemplate *template.Template
+	dataTemplate   *template.Template
+	terseTemplate  *template.Template
+	titleTemplate  *template.Template
+	Series         dalle.Series `json:"series"`
+	names          []types.Name
 }
 
 func NewApp() *App {
@@ -58,16 +59,19 @@ func NewApp() *App {
 		}
 	}
 
-	if a.pTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
+	if a.promptTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}
-	if a.dTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
+	if a.dataTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
 		logger.Fatal("could not create data template:", err)
 	}
-	if a.tTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
+	if a.titleTemplate, err = template.New("terse").Parse(titleTemplate); err != nil {
+		logger.Fatal("could not create title template:", err)
+	}
+	if a.terseTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
 		logger.Fatal("could not create terse template:", err)
 	}
-	if a.aTemplate, err = template.New("author").Parse(authorTemplate); err != nil {
+	if a.authorTemplate, err = template.New("author").Parse(authorTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}
 

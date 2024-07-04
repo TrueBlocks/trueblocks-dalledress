@@ -19,6 +19,7 @@ import (
 type ImageData struct {
 	EnhancedPrompt string `json:"enhancedPrompt"`
 	TersePrompt    string `json:"tersePrompt"`
+	TitlePrompt    string `json:"titlePrompt"`
 	SeriesName     string `json:"seriesName"`
 	Filename       string `json:"filename"`
 }

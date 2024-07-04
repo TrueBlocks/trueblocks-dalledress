@@ -24,3 +24,8 @@
     background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
     color: #333333;
 }
+
+.gridColumn {
+  border: 1px solid #ccc;
+  padding: 8px; /* Optional: Add some padding for better spacing */
+}

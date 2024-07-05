@@ -13,8 +13,8 @@ import (
 )
 
 type DalleDress struct {
-	Source         string               `json:"source"`
-	FileName       string               `json:"fileName"`
+	Original       string               `json:"original"`
+	Filename       string               `json:"fileName"`
 	Seed           string               `json:"seed"`
 	Prompt         string               `json:"prompt,omitempty"`
 	DataPrompt     string               `json:"dataPrompt,omitempty"`
@@ -25,16 +25,7 @@ type DalleDress struct {
 	AttribMap      map[string]Attribute `json:"-"`
 }
 
-func NewDalleDress(databases map[string][]string, origAddr string) (*DalleDress, error) {
-	reverse := func(s string) string {
-		runes := []rune(s)
-		n := len(runes)
-		for i := 0; i < n/2; i++ {
-			runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
-		}
-		return string(runes)
-	}
-	address := origAddr
+func NewDalleDress(databases map[string][]string, address string) (*DalleDress, error) {
 	if strings.HasSuffix(address, ".eth") {
 		opts := sdk.NamesOptions{
 			Terms: []string{address},
@@ -47,7 +38,7 @@ func NewDalleDress(databases map[string][]string, origAddr string) (*DalleDress,
 			}
 		}
 	}
-	address = strings.TrimSpace(address)
+
 	parts := strings.Split(address, ",")
 	seed := parts[0] + reverse(parts[0])
 	if len(seed) < 66 {
@@ -58,12 +49,11 @@ func NewDalleDress(databases map[string][]string, origAddr string) (*DalleDress,
 	}
 
 	dd := DalleDress{
-		Source:    origAddr,
-		Filename:  address,
+		Original:  address,
+		Filename:  validFilename(address),
 		Seed:      seed,
 		AttribMap: make(map[string]Attribute),
 	}
-	// logger.Info("Orig: [" + dd.Orig + "]")
 
 	for i := 0; i < len(dd.Seed); i = i + 8 {
 		index := len(dd.Attribs)
@@ -287,5 +277,26 @@ func (dd *DalleDress) LitPrompt(short bool) string {
 func (dd *DalleDress) ReportOn(loc, ft, value string) {
 	path := filepath.Join("./output/", strings.ToLower(loc))
 	file.EstablishFolder(path)
-	file.StringToAsciiFile(filepath.Join(path, dd.Original+"."+ft), value)
+	file.StringToAsciiFile(filepath.Join(path, dd.Filename+"."+ft), value)
+}
+
+// validFilename returns a valid filename from the input string
+func validFilename(in string) string {
+	invalidChars := []string{"/", "\\", ":", "*", "?", "\"", "<", ">", "|"}
+	for _, char := range invalidChars {
+		in = strings.ReplaceAll(in, char, "_")
+	}
+	in = strings.TrimSpace(in)
+	in = strings.ReplaceAll(in, "__", "_")
+	return in
+}
+
+// reverse returns the reverse of the input string
+func reverse(s string) string {
+	runes := []rune(s)
+	n := len(runes)
+	for i := 0; i < n/2; i++ {
+		runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
+	}
+	return string(runes)
 }

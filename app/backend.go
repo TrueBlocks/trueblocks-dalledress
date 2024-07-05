@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
@@ -59,10 +60,13 @@ func (a *App) GetEnhanced(addr string) string {
 	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
 		return err.Error()
 	} else {
-		fn := filepath.Join("output", a.Series.Suffix, "enhanced", dd.FileName+".txt")
-		logger.Info("Loading file", fn)
+		fn := filepath.Join("output", a.Series.Suffix, "enhanced", dd.Filename+".txt")
+		ret := ""
 		if file.FileExists(fn) {
-			return file.AsciiFileToString(fn)
+			ret := file.AsciiFileToString(fn)
+			if strings.HasPrefix(ret, "No enhanced prompt found") {
+				return
+			}
 		} else {
 			return "No enhanced prompt found at " + fn + ". Press Generate."
 		}
@@ -78,7 +82,7 @@ func (a *App) GetImage(addr string) (string, error) {
 		if err != nil {
 			return err.Error(), err
 		}
-		fn := filepath.Join(cwd, "output", a.Series.Suffix, "annotated", dd.FileName+".png")
+		fn := filepath.Join(cwd, "output", a.Series.Suffix, "annotated", dd.Filename+".png")
 		logger.Info("Loading file", fn)
 		if file.FileExists(fn) {
 			logger.Info("loading image from:", fn)
@@ -109,14 +113,14 @@ func (a *App) GenerateImage(addr string) string {
 		dd.ReportOn(filepath.Join(suff, "terse"), "txt", terse)
 		prompt := a.GetPrompt(addr)
 		dd.ReportOn(filepath.Join(suff, "prompt"), "txt", prompt)
-		enhanced := a.GetEnhanced(addr)
+		enhanced := a.GenerateEnhanced(addr)
 		dd.ReportOn(filepath.Join(suff, "enhanced"), "txt", enhanced)
 		imageData := openai.ImageData{
 			TitlePrompt:    title,
 			TersePrompt:    terse,
 			EnhancedPrompt: enhanced,
 			SeriesName:     a.Series.Suffix,
-			Filename:       dd.FileName,
+			Filename:       dd.Filename,
 		}
 		if err := openai.GenerateImage(&imageData); err != nil {
 			return err.Error()

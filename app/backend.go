@@ -1,9 +1,12 @@
 package app
 
 import (
+	"encoding/base64"
+	"fmt"
+	"os"
 	"path/filepath"
-	"strings"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/openai"
@@ -57,6 +60,46 @@ func (a *App) GetEnhanced(addr string) string {
 	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
 		return err.Error()
 	} else {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err.Error()
+		}
+		fn := filepath.Join(cwd, "output", a.Series.Suffix, "enhanced", dd.Orig+".txt")
+		if file.FileExists(fn) {
+			return fn + file.AsciiFileToString(fn)
+		} else {
+			return "No enhanced prompt found. Press Generate."
+		}
+	}
+}
+
+func (a *App) GetImage(addr string) (string, error) {
+	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
+		return err.Error(), err
+	} else {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err.Error(), err
+		}
+		fn := fmt.Sprintf("%s/output/%s/annotated/%s.png", cwd, a.Series.Suffix, dd.Orig)
+		if file.FileExists(fn) {
+			logger.Info("loading image from:", fn)
+			imageBytes, err := os.ReadFile(fn)
+			if err != nil {
+				return err.Error(), err
+			}
+			base64Image := base64.StdEncoding.EncodeToString(imageBytes)
+			return base64Image, nil
+		} else {
+			return "No image file found. Press Generate.", nil
+		}
+	}
+}
+
+func (a *App) GenerateEnhanced(addr string) string {
+	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
+		return err.Error()
+	} else {
 		authorType, _ := dd.GeneratePrompt(a.authorTemplate, nil)
 		if dd.EnhancedPrompt, err = openai.EnhancePrompt(a.GetPrompt(addr), authorType); err != nil {
 			logger.Fatal(err.Error())
@@ -67,7 +110,7 @@ func (a *App) GetEnhanced(addr string) string {
 	}
 }
 
-func (a *App) GetImage(addr string) error {
+/*
 	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
 		return err
 	} else {
@@ -92,4 +135,4 @@ func (a *App) GetImage(addr string) error {
 		}
 		return openai.GetImage(&imageData)
 	}
-}
+*/

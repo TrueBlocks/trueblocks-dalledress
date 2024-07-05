@@ -11,11 +11,13 @@ import (
 
 // Session stores ephemeral things such as last window position, last view, and recent file
 type Session struct {
-	X      int    `json:"x"`
-	Y      int    `json:"y"`
-	Width  int    `json:"width"`
-	Height int    `json:"height"`
-	Title  string `json:"title"`
+	X         int    `json:"x"`
+	Y         int    `json:"y"`
+	Width     int    `json:"width"`
+	Height    int    `json:"height"`
+	Title     string `json:"title"`
+	LastRoute string `json:"lastRoute"`
+	LastTab   string `json:"lastTab"`
 }
 
 var defaultSession = Session{
@@ -46,6 +48,7 @@ func (s *Session) Load() bool {
 func (s *Session) Save() {
 	fn := getSessionFn()
 	if contents, _ := json.Marshal(s); len(contents) > 0 {
+		logger.Info("Saving session to", fn)
 		file.StringToAsciiFile(fn, string(contents))
 	}
 }

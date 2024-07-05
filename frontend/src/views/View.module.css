@@ -29,3 +29,8 @@
   border: 1px solid #ccc;
   padding: 8px; /* Optional: Add some padding for better spacing */
 }
+
+.tabPanel {
+  max-height: 95vh;
+  overflow: auto;
+}

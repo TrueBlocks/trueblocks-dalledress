@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Paper, Grid, Tabs, TextInput, Button, Group, Text, ScrollArea } from '@mantine/core';
+import { Paper, Grid, Tabs, TextInput, Button, Group, Text } from '@mantine/core';
 import classes from '../View.module.css';
 import View from '@/components/view/View';
 import { GetJson, GetData, GetTitle, GetTerse, GetPrompt, GetEnhanced, GetImage } from '@gocode/app/App';
+import { GetLastTab, SetLastTab } from '@gocode/app/App';
+import ImageDisplay from '@/components/image/ImageDisplay';
 
 function DalleView() {
   const [address, setAddress] = useState<string>('0xf503017d7baf7fbc0fff7492b751025c6a78179b');
@@ -14,11 +16,20 @@ function DalleView() {
   const [terse, setTerse] = useState<string>('');
   const [imagePath, setImagePath] = useState<string>('');
   const [isGenerateDisabled, setIsGenerateDisabled] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>('json');
+
+  useEffect(() => {
+    GetLastTab().then((lastTab: string) => {
+      setActiveTab(lastTab);
+    });
+  }, []);
 
   const handleGenerate = () => {
     setIsGenerateDisabled(true);
     crypto.subtle.digest('SHA-256', new TextEncoder().encode(address)).then((hashBuffer) => {
-      setImagePath('x');
+      GetImage(address).then((value: string) => {
+        setImagePath(value);
+      });
       GetEnhanced(address).then((value: string) => {
         setEnhanced(value);
         setIsGenerateDisabled(false);
@@ -48,6 +59,13 @@ function DalleView() {
     setIsGenerateDisabled(false);
   }, [address]);
 
+  const handleTabChange = (value: string | null) => {
+    if (value) {
+      setActiveTab(value);
+      SetLastTab(value);
+    }
+  };
+
   return (
     <View title="Dalle View">
       <Grid>
@@ -70,50 +88,47 @@ function DalleView() {
             style={{
               maxWidth: '100vw',
               marginLeft: 0,
-              border: '1px solid green',
             }}
           >
             <Text mt="md">Image: {imagePath}</Text>
-            <div style={{ height: '500px' }}></div> {/* Blank space below */}
+            <ImageDisplay address={address} />
           </Paper>
         </Grid.Col>
         <Grid.Col span={4} className={classes.gridColumn}>
-          <Tabs defaultValue="json">
-            <ScrollArea style={{ whiteSpace: 'nowrap' }}>
-              <Tabs.List>
-                <Tabs.Tab value="json">JSON</Tabs.Tab>
-                <Tabs.Tab value="data">Data</Tabs.Tab>
-                <Tabs.Tab value="title">Title</Tabs.Tab>
-                <Tabs.Tab value="terse">Terse</Tabs.Tab>
-                <Tabs.Tab value="prompt">Prompt</Tabs.Tab>
-                <Tabs.Tab value="enhanced">Enhanced</Tabs.Tab>
-              </Tabs.List>
-            </ScrollArea>
+          <Tabs value={activeTab} onChange={handleTabChange}>
+            <Tabs.List>
+              <Tabs.Tab value="json">JSON</Tabs.Tab>
+              <Tabs.Tab value="data">Data</Tabs.Tab>
+              <Tabs.Tab value="title">Title</Tabs.Tab>
+              <Tabs.Tab value="terse">Terse</Tabs.Tab>
+              <Tabs.Tab value="prompt">Prompt</Tabs.Tab>
+              <Tabs.Tab value="enhanced">Enhanced</Tabs.Tab>
+            </Tabs.List>
 
-            <Tabs.Panel value="json">
+            <Tabs.Panel value="json" className={classes.tabPanel}>
               <Text mt="md">
                 <pre>{json}</pre>
               </Text>
             </Tabs.Panel>
-            <Tabs.Panel value="data">
+            <Tabs.Panel value="data" className={classes.tabPanel}>
               <Text mt="md">
                 <pre>{data}</pre>
               </Text>
             </Tabs.Panel>
-            <Tabs.Panel value="title">
+            <Tabs.Panel value="title" className={classes.tabPanel}>
               <Text mt="md">{title}</Text>
             </Tabs.Panel>
-            <Tabs.Panel value="terse">
+            <Tabs.Panel value="terse" className={classes.tabPanel}>
               <Text mt="md" style={{ textAlign: 'justify' }}>
                 {terse}
               </Text>
             </Tabs.Panel>
-            <Tabs.Panel value="prompt">
+            <Tabs.Panel value="prompt" className={classes.tabPanel}>
               <Text mt="md" style={{ textAlign: 'justify' }}>
                 {prompt}
               </Text>
             </Tabs.Panel>
-            <Tabs.Panel value="enhanced">
+            <Tabs.Panel value="enhanced" className={classes.tabPanel}>
               <Text mt="md" style={{ textAlign: 'justify' }}>
                 {enhanced}
               </Text>
@@ -126,66 +141,3 @@ function DalleView() {
 }
 
 export default DalleView;
-
-/*
-  const form = useForm({
-    initialValues: {
-      address: "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
-    }
-  });
-
-  const openImage = (address: string) => {
-    GetImage(address);
-  };
-
-  return (
-    <div id="App" style={{ width: "98vw", margin: "auto" }}>
-      <Box mx="auto">
-        <form
-          onSubmit={form.onSubmit((values) => setEmail(values["address"]))}
-          onBlur={form.onSubmit((values) => setEmail(values["address"]))}
-        >
-          <TextInput
-            label="Email"
-            placeholder="your@address.com"
-            {...form.getInputProps("address")}
-          />
-          <Group mt="md">
-            <Button type="submit">Submit</Button>
-          </Group>
-        </form>
-      </Box>
-      <Button onClick={() => openImage(address)}>Generate</Button>{" "}
-        <Text>{address ? address : "Working..."}</Text>
-        <div>Prompt:</div>
-        <CopyText prompt={prompt ? prompt : "Working..."} />
-        <div>Enhanced:</div>
-        <CopyText prompt={enhanced ? enhanced : "Working..."} />
-        <div>Terse:</div>
-        <CopyText prompt={terse ? terse : "Working..."} />
-        <div>Data:</div>
-        <CopyText prompt={data ? data : "Working..."} />
-        <div>Json:</div>
-        <CopyText prompt={json ? json : "Working..."} />
-      </Paper>
-    </div>
-  );
-}
-
-function ImageDisplay() {
-  const [imageSrc, setImageSrc] = useState("");
-
-  const fetchImage = async () => {
-    const imageData = await GetImageData(); // Adjust based on your actual IPC call
-    setImageSrc(imageData);
-  };
-
-  return (
-    <div>
-      <button onClick={fetchImage}>Load Image</button>
-      {imageSrc && <img src={imageSrc} alt="Dynamically loaded" />}
-    </div>
-  );
-}
-
-*/

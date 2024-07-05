@@ -16,7 +16,14 @@ import (
 var assets embed.FS
 
 func main() {
-	if os.Getenv("TB_WAILS") == "true" {
+	if os.Getenv("TB_CMD_LINE") == "true" {
+		a := app.NewApp()
+		ctx := context.Background()
+		a.Startup(ctx)
+		a.DomReady(ctx)
+		logger.Info("Running in console mode")
+		a.HandleLines()
+	} else {
 		a := app.NewApp()
 		opts := options.App{
 			Title:            a.GetSession().Title,
@@ -37,12 +44,5 @@ func main() {
 		if err := wails.Run(&opts); err != nil {
 			println("Error:", err.Error())
 		}
-	} else {
-		app := app.NewApp()
-		ctx := context.Background()
-		app.Startup(ctx)
-		app.DomReady(ctx)
-		logger.Info("Running in console mode")
-		app.HandleLines()
 	}
 }

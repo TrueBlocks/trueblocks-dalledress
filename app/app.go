@@ -137,7 +137,7 @@ func (a *App) Startup(ctx context.Context) {
 }
 
 func (a *App) DomReady(ctx context.Context) {
-	if os.Getenv("TB_WAILS") != "true" {
+	if os.Getenv("TB_CMD_LINE") == "true" {
 		return
 	}
 	if a.session.Load() {
@@ -148,7 +148,7 @@ func (a *App) DomReady(ctx context.Context) {
 }
 
 func (a *App) Shutdown(ctx context.Context) {
-	if os.Getenv("TB_WAILS") != "true" {
+	if os.Getenv("TB_CMD_LINE") == "true" {
 		return
 	}
 	a.GetSession().X, a.GetSession().Y = runtime.WindowGetPosition(a.ctx)
@@ -159,6 +159,24 @@ func (a *App) Shutdown(ctx context.Context) {
 
 func (a *App) GetSession() *config.Session {
 	return &a.session
+}
+
+func (a *App) GetLastRoute() string {
+	return a.GetSession().LastRoute
+}
+
+func (a *App) SetLastRoute(route string) {
+	a.GetSession().LastRoute = route
+	a.GetSession().Save()
+}
+
+func (a *App) GetLastTab() string {
+	return a.GetSession().LastTab
+}
+
+func (a *App) SetLastTab(tab string) {
+	a.GetSession().LastTab = tab
+	a.GetSession().Save()
 }
 
 func isContentPolicyViolation(err error) bool {
@@ -207,7 +225,7 @@ func (a *App) HandleLines() {
 				maxRetries := 5
 				for attempt := 0; attempt < maxRetries; attempt++ {
 					<-ticker.C
-					err := a.GetImage(address)
+					_, err := a.GetImage(address)
 					if err == nil {
 						return
 					}

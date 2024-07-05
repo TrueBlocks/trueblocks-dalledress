@@ -15,28 +15,20 @@ function DalleView() {
   const [title, setTitle] = useState<string>('');
   const [terse, setTerse] = useState<string>('');
   const [imagePath, setImagePath] = useState<string>('');
-  const [isGenerateDisabled, setIsGenerateDisabled] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('json');
 
+  const handleGenerate = () => {
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(address)).then((hashBuffer) => {});
+  };
+
+  // On first load of the view, set the most recently viewed tab
   useEffect(() => {
     GetLastTab().then((lastTab: string) => {
       setActiveTab(lastTab);
     });
   }, []);
 
-  const handleGenerate = () => {
-    setIsGenerateDisabled(true);
-    crypto.subtle.digest('SHA-256', new TextEncoder().encode(address)).then((hashBuffer) => {
-      GetImage(address).then((value: string) => {
-        setImagePath(value);
-      });
-      GetEnhanced(address).then((value: string) => {
-        setEnhanced(value);
-        setIsGenerateDisabled(false);
-      });
-    });
-  };
-
+  // When address changes, update all the data
   useEffect(() => {
     GetJson(address).then((value: string) => {
       setJson(value);
@@ -53,10 +45,12 @@ function DalleView() {
     GetPrompt(address).then((value: string) => {
       setPrompt(value);
     });
-  }, [address]);
-
-  useEffect(() => {
-    setIsGenerateDisabled(false);
+    GetEnhanced(address).then((value: string) => {
+      setEnhanced(value);
+    });
+    GetImage(address).then((value: string) => {
+      setImagePath(value);
+    });
   }, [address]);
 
   const handleTabChange = (value: string | null) => {
@@ -78,7 +72,7 @@ function DalleView() {
               label="Address"
               style={{ width: '600px' }}
             />
-            <Button onClick={handleGenerate} style={{ marginTop: '22px' }} disabled={isGenerateDisabled}>
+            <Button onClick={handleGenerate} style={{ marginTop: '22px' }}>
               Generate
             </Button>
           </Group>

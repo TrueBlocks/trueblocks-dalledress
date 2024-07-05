@@ -11,5 +11,15 @@
   "author": {
     "name": "TrueBlocks, LLC",
     "email": "info@quickblocks.io"
+  },
+  "dev": {
+    "watch": {
+      "patterns": [
+        "frontend/**/*.{js,jsx,ts,tsx,css,scss,html}"
+      ],
+      "ignore": [
+        "frontend/dist/**"
+      ]
+    }
   }
 }

@@ -14,8 +14,10 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ address }) => {
     if (address) {
       GetImage(address)
         .then((base64Image: string) => {
-          const dataUrl = `data:image/png;base64,${base64Image}`;
-          setImageSrc(dataUrl);
+          if (base64Image !== 'No image file found. Press Generate.') {
+            const dataUrl = `data:image/png;base64,${base64Image}`;
+            setImageSrc(dataUrl);
+          }
         })
         .catch((error: any) => {
           console.error('Error fetching image path:', error);
@@ -23,14 +25,14 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({ address }) => {
     }
   }, [address]);
 
-  if (!imageSrc) {
+  if (!imageSrc || imageSrc === 'No image file found. Press Generate.') {
     return <div>Loading...</div>;
   }
 
   return (
     <div>
       <div>{address}</div>
-      <Image src={imageSrc} alt="Dynamic Image" />
+      <Image src={imageSrc} alt={address} />
       <div>{address}</div>
     </div>
   );

@@ -45,6 +45,7 @@ func NewApp() *App {
 	if a.Series, err = dalle.GetSeries(); err != nil {
 		logger.Fatal(err)
 	}
+	logger.Info("Loaded series:", a.Series.Suffix)
 
 	for _, db := range dalle.DatabaseNames {
 		if a.databases[db] == nil {
@@ -58,6 +59,7 @@ func NewApp() *App {
 			}
 		}
 	}
+	logger.Info("Loaded", len(dalle.DatabaseNames), "databases")
 
 	if a.promptTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
@@ -74,6 +76,7 @@ func NewApp() *App {
 	if a.authorTemplate, err = template.New("author").Parse(authorTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}
+	logger.Info("Compiled templates")
 
 	return &a
 }

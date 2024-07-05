@@ -17,11 +17,11 @@ var assets embed.FS
 
 func main() {
 	if os.Getenv("TB_CMD_LINE") == "true" {
+		logger.Info("Running in console mode")
 		a := app.NewApp()
 		ctx := context.Background()
 		a.Startup(ctx)
 		a.DomReady(ctx)
-		logger.Info("Running in console mode")
 		a.HandleLines()
 	} else {
 		a := app.NewApp()

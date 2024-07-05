@@ -43,7 +43,7 @@ func (s *Series) SaveSeries(fn string, last int) {
 func GetSeries() (Series, error) {
 	str := strings.TrimSpace(file.AsciiFileToString("inputs/series.json"))
 	if len(str) == 0 {
-		return Series{}, nil
+		return Series{}, fmt.Errorf("could not read series file")
 	}
 
 	bytes := []byte(str)

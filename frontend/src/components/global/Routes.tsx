@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { Route, Switch, useLocation } from 'wouter';
 import classes from './Routes.module.css';
+import StatusBar from './StatusBar';
 import DalleView from '@/views/Dalle/DalleView';
 import HomeView from '@/views/Home/HomeView';
 import NamesView from '@/views/Names/NamesView';
 import SettingsView from '@/views/Settings/SettingsView';
 import { GetLastRoute } from '@gocode/app/App';
 
-function Routes() {
+export const Routes = () => {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
@@ -32,8 +33,7 @@ function Routes() {
           <HomeView />
         </Route>
       </Switch>
+      <StatusBar />
     </div>
   );
-}
-
-export default Routes;
+};

@@ -1,6 +1,6 @@
-# trueblocks-browse
+# trueblocks-dalledress
 
-Web 3.0 Account Browser built on TrueBlocks
+AI Image Generator from Ethereum Addresses, Block Hashes, or Transaction Hashes
 
 ## Installing
 
@@ -12,7 +12,7 @@ cd frontend && yarn install && cd -
 ## Running
 
 ```[bash]
-wails dev
+wails dev   # or yarn dev for less verbose output
 ```
 
 ## Building
@@ -23,5 +23,4 @@ wails build
 
 ## Api Keys
 
-If you intend to use features that require OpenAI, rename the `.env.example` file to `.env` and add your OpenAI API key. The
-features will not work otherwise.
+If you intend to use features that require OpenAI, rename the `.env.example` file to `.env` and add your OpenAI API key. The features will not work otherwise.

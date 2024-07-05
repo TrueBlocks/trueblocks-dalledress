@@ -11,13 +11,14 @@ import (
 
 // Session stores ephemeral things such as last window position, last view, and recent file
 type Session struct {
-	X         int    `json:"x"`
-	Y         int    `json:"y"`
-	Width     int    `json:"width"`
-	Height    int    `json:"height"`
-	Title     string `json:"title"`
-	LastRoute string `json:"lastRoute"`
-	LastTab   string `json:"lastTab"`
+	X           int    `json:"x"`
+	Y           int    `json:"y"`
+	Width       int    `json:"width"`
+	Height      int    `json:"height"`
+	Title       string `json:"title"`
+	LastRoute   string `json:"lastRoute"`
+	LastTab     string `json:"lastTab"`
+	LastAddress string `json:"lastAddress"`
 }
 
 var defaultSession = Session{

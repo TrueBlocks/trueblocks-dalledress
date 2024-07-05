@@ -7,7 +7,6 @@ import (
 	"log"
 	"math/rand/v2"
 	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 	"text/template"
@@ -84,12 +83,6 @@ func NewApp() *App {
 func (a App) String() string {
 	bytes, _ := json.MarshalIndent(a, "", "  ")
 	return string(bytes)
-}
-
-func ReportOn(loc, address, ft, value string) {
-	path := filepath.Join("./output/", strings.ToLower(loc))
-	file.EstablishFolder(path)
-	file.StringToAsciiFile(filepath.Join(path, address+"."+ft), value)
 }
 
 func (a *App) toLines(db string) ([]string, error) {
@@ -179,6 +172,15 @@ func (a *App) GetLastTab() string {
 
 func (a *App) SetLastTab(tab string) {
 	a.GetSession().LastTab = tab
+	a.GetSession().Save()
+}
+
+func (a *App) GetLastAddress() string {
+	return a.GetSession().LastAddress
+}
+
+func (a *App) SetLastAddress(addr string) {
+	a.GetSession().LastAddress = addr
 	a.GetSession().Save()
 }
 

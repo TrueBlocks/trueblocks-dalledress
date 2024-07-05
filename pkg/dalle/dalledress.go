@@ -4,16 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"text/template"
 
 	"github.com/TrueBlocks/trueblocks-core/sdk"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 )
 
 type DalleDress struct {
-	Orig           string               `json:"orig"`
+	Source         string               `json:"source"`
+	FileName       string               `json:"fileName"`
 	Seed           string               `json:"seed"`
-	Error          string               `json:"error,omitempty"`
 	Prompt         string               `json:"prompt,omitempty"`
 	DataPrompt     string               `json:"dataPrompt,omitempty"`
 	TitlePrompt    string               `json:"titlePrompt,omitempty"`
@@ -23,7 +25,7 @@ type DalleDress struct {
 	AttribMap      map[string]Attribute `json:"-"`
 }
 
-func NewDalleDress(databases map[string][]string, address string) (*DalleDress, error) {
+func NewDalleDress(databases map[string][]string, origAddr string) (*DalleDress, error) {
 	reverse := func(s string) string {
 		runes := []rune(s)
 		n := len(runes)
@@ -32,6 +34,7 @@ func NewDalleDress(databases map[string][]string, address string) (*DalleDress, 
 		}
 		return string(runes)
 	}
+	address := origAddr
 	if strings.HasSuffix(address, ".eth") {
 		opts := sdk.NamesOptions{
 			Terms: []string{address},
@@ -44,6 +47,7 @@ func NewDalleDress(databases map[string][]string, address string) (*DalleDress, 
 			}
 		}
 	}
+	address = strings.TrimSpace(address)
 	parts := strings.Split(address, ",")
 	seed := parts[0] + reverse(parts[0])
 	if len(seed) < 66 {
@@ -54,10 +58,12 @@ func NewDalleDress(databases map[string][]string, address string) (*DalleDress, 
 	}
 
 	dd := DalleDress{
-		Orig:      address,
+		Source:    origAddr,
+		Filename:  address,
 		Seed:      seed,
 		AttribMap: make(map[string]Attribute),
 	}
+	// logger.Info("Orig: [" + dd.Orig + "]")
 
 	for i := 0; i < len(dd.Seed); i = i + 8 {
 		index := len(dd.Attribs)
@@ -80,7 +86,7 @@ func (d *DalleDress) String() string {
 	return string(jsonData)
 }
 
-func (dd *DalleDress) GeneratePrompt(t *template.Template, f func(s string) string) (string, error) {
+func (dd *DalleDress) ExecuteTemplate(t *template.Template, f func(s string) string) (string, error) {
 	var buffer bytes.Buffer
 	if err := t.Execute(&buffer, dd); err != nil {
 		return "", err
@@ -276,4 +282,10 @@ func (dd *DalleDress) LitPrompt(short bool) string {
 	Be imaginative, creative, and complete.
 `
 	return text
+}
+
+func (dd *DalleDress) ReportOn(loc, ft, value string) {
+	path := filepath.Join("./output/", strings.ToLower(loc))
+	file.EstablishFolder(path)
+	file.StringToAsciiFile(filepath.Join(path, dd.Original+"."+ft), value)
 }

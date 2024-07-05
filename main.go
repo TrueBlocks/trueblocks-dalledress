@@ -3,11 +3,16 @@ package main
 import (
 	"context"
 	"embed"
+	"fmt"
+	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
 	"github.com/wailsapp/wails/v2"
+	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
@@ -33,6 +38,7 @@ func main() {
 			OnDomReady:       a.DomReady,
 			OnShutdown:       a.Shutdown,
 			BackgroundColour: nil,
+			LogLevel:         wLogger.ERROR,
 			Bind: []interface{}{
 				a,
 			},
@@ -41,8 +47,34 @@ func main() {
 				Assets: assets,
 			},
 		}
+		http.HandleFunc("/files/", func(w http.ResponseWriter, r *http.Request) {
+			address := strings.TrimPrefix(r.URL.Path, "/files/")
+			if address == "" {
+				http.Error(w, "Address not provided", http.StatusBadRequest)
+				return
+			}
+			cwd, err := os.Getwd()
+			if err != nil {
+				http.Error(w, "Error getting current working directory", http.StatusInternalServerError)
+				return
+			}
+			filePath := filepath.Join(cwd, "output", a.Series.Suffix, "annotated", address+".png")
+			if _, err := os.Stat(filePath); os.IsNotExist(err) {
+				msg := fmt.Sprintf("File not found at %s", filePath)
+				http.Error(w, msg, http.StatusNotFound)
+				return
+			}
+			logger.Info("Serving file:", filePath)
+			http.ServeFile(w, r, filePath)
+		})
+		go func() {
+			logger.Info("Starting file server on :8082")
+			if err := http.ListenAndServe(":8082", nil); err != nil {
+				logger.Error("File server error:", err)
+			}
+		}()
 		if err := wails.Run(&opts); err != nil {
-			println("Error:", err.Error())
+			fmt.Println("Error:", err.Error())
 		}
 	}
 }

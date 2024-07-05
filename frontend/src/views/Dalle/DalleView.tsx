@@ -2,55 +2,75 @@ import React, { useState, useEffect } from 'react';
 import { Paper, Grid, Tabs, TextInput, Button, Group, Text } from '@mantine/core';
 import classes from '../View.module.css';
 import View from '@/components/view/View';
-import { GetJson, GetData, GetTitle, GetTerse, GetPrompt, GetEnhanced, GetImage } from '@gocode/app/App';
-import { GetLastTab, SetLastTab } from '@gocode/app/App';
-import ImageDisplay from '@/components/image/ImageDisplay';
+import {
+  GetJson,
+  GetData,
+  GetTitle,
+  GetTerse,
+  GetPrompt,
+  GetEnhanced,
+  GenerateImage,
+  GetLastTab,
+  SetLastTab,
+  GetLastAddress,
+  SetLastAddress,
+} from '@gocode/app/App';
+import { ImageDisplay } from '@/components/image/ImageDisplay';
 
 function DalleView() {
-  const [address, setAddress] = useState<string>('0xf503017d7baf7fbc0fff7492b751025c6a78179b');
+  const [address, setAddress] = useState<string>('');
   const [json, setJson] = useState<string>('');
   const [data, setData] = useState<string>('');
   const [prompt, setPrompt] = useState<string>('');
   const [enhanced, setEnhanced] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [terse, setTerse] = useState<string>('');
-  const [imagePath, setImagePath] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('json');
 
   const handleGenerate = () => {
-    crypto.subtle.digest('SHA-256', new TextEncoder().encode(address)).then((hashBuffer) => {});
+    setEnhanced('Loading...');
+    GenerateImage(address).then((value: string) => {
+      setEnhanced(value);
+    });
   };
 
-  // On first load of the view, set the most recently viewed tab
+  // On first load of the view, set the most recently viewed tab and address
   useEffect(() => {
     GetLastTab().then((lastTab: string) => {
       setActiveTab(lastTab);
+    });
+    GetLastAddress().then((lastAddress: string) => {
+      if (lastAddress && lastAddress.length > 0) {
+        setAddress(lastAddress);
+      } else {
+        setAddress('0xf503017d7baf7fbc0fff7492b751025c6a78179b');
+      }
     });
   }, []);
 
   // When address changes, update all the data
   useEffect(() => {
-    GetJson(address).then((value: string) => {
-      setJson(value);
-    });
-    GetData(address).then((value: string) => {
-      setData(value);
-    });
-    GetTitle(address).then((value: string) => {
-      setTitle(value);
-    });
-    GetTerse(address).then((value: string) => {
-      setTerse(value);
-    });
-    GetPrompt(address).then((value: string) => {
-      setPrompt(value);
-    });
-    GetEnhanced(address).then((value: string) => {
-      setEnhanced(value);
-    });
-    GetImage(address).then((value: string) => {
-      setImagePath(value);
-    });
+    if (address) {
+      SetLastAddress(address);
+      GetJson(address).then((value: string) => {
+        setJson(value);
+      });
+      GetData(address).then((value: string) => {
+        setData(value);
+      });
+      GetTitle(address).then((value: string) => {
+        setTitle(value);
+      });
+      GetTerse(address).then((value: string) => {
+        setTerse(value);
+      });
+      GetPrompt(address).then((value: string) => {
+        setPrompt(value);
+      });
+      GetEnhanced(address).then((value: string) => {
+        setEnhanced(value);
+      });
+    }
   }, [address]);
 
   const handleTabChange = (value: string | null) => {
@@ -84,7 +104,6 @@ function DalleView() {
               marginLeft: 0,
             }}
           >
-            <Text mt="md">Image: {imagePath}</Text>
             <ImageDisplay address={address} />
           </Paper>
         </Grid.Col>

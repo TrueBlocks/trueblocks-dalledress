@@ -2,6 +2,8 @@
   "$schema": "https://wails.io/schemas/config.v2.json",
   "name": "TrueBlocks DalleDress",
   "outputfilename": "trueblocks-dalledress",
+  "assetdir": "./frontend/dist",
+  "frontend:dir": "./frontend",
   "frontend:install": "yarn install",
   "frontend:build": "yarn run build",
   "frontend:dev:watcher": "yarn run dev",

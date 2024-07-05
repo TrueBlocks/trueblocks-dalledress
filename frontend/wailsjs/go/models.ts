@@ -6,6 +6,8 @@ export namespace config {
 	    width: number;
 	    height: number;
 	    title: string;
+	    lastRoute: string;
+	    lastTab: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Session(source);
@@ -18,6 +20,8 @@ export namespace config {
 	        this.width = source["width"];
 	        this.height = source["height"];
 	        this.title = source["title"];
+	        this.lastRoute = source["lastRoute"];
+	        this.lastTab = source["lastTab"];
 	    }
 	}
 

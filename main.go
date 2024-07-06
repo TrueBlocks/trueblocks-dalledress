@@ -49,6 +49,10 @@ func main() {
 		}
 		http.HandleFunc("/files/", func(w http.ResponseWriter, r *http.Request) {
 			address := strings.TrimPrefix(r.URL.Path, "/files/")
+			parts := strings.Split(address, "&")
+			if len(parts) > 1 {
+				address = parts[0]
+			}
 			if address == "" {
 				http.Error(w, "Address not provided", http.StatusBadRequest)
 				return

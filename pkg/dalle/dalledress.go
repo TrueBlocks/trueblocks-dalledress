@@ -25,7 +25,8 @@ type DalleDress struct {
 	AttribMap      map[string]Attribute `json:"-"`
 }
 
-func NewDalleDress(databases map[string][]string, address string) (*DalleDress, error) {
+func NewDalleDress(databases map[string][]string, addressIn string) (*DalleDress, error) {
+	address := addressIn
 	if strings.HasSuffix(address, ".eth") {
 		opts := sdk.NamesOptions{
 			Terms: []string{address},
@@ -49,7 +50,7 @@ func NewDalleDress(databases map[string][]string, address string) (*DalleDress, 
 	}
 
 	dd := DalleDress{
-		Original:  address,
+		Original:  addressIn,
 		Filename:  validFilename(address),
 		Seed:      seed,
 		AttribMap: make(map[string]Attribute),

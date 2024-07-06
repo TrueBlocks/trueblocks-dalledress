@@ -36,6 +36,8 @@ export function HandleLines():Promise<void>;
 
 export function MaxNames():Promise<number>;
 
+export function Refresh(arg1:string):Promise<string>;
+
 export function SetLastAddress(arg1:string):Promise<void>;
 
 export function SetLastRoute(arg1:string):Promise<void>;

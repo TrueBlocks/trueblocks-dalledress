@@ -11,8 +11,7 @@ export const ImageDisplay = ({ address, loading }: { address: string; loading: b
     });
   }, [address, loading]);
 
-  const imgSrc = `http://localhost:8082/files/${address}`;
-
+  const imgSrc = `http://localhost:8082/files/${address}&timestamp=${new Date().getTime()}`;
   if (loading) {
     return (
       <div>

@@ -70,6 +70,10 @@ export function MaxNames() {
   return window['go']['app']['App']['MaxNames']();
 }
 
+export function Refresh(arg1) {
+  return window['go']['app']['App']['Refresh'](arg1);
+}
+
 export function SetLastAddress(arg1) {
   return window['go']['app']['App']['SetLastAddress'](arg1);
 }

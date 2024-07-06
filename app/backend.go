@@ -1,3 +1,15 @@
+/*
+GetJson,
+GetData,
+GetSeries,
+GetTerse,
+GetPrompt,
+GetEnhanced,
+GetImage,
+GenerateImage,
+Refresh,
+*/
+
 package app
 
 import (
@@ -89,6 +101,24 @@ func (a *App) GenerateEnhanced(addr string) string {
 		msg := " DO NOT PUT TEXT IN THE IMAGE. "
 		dd.EnhancedPrompt = msg + dd.EnhancedPrompt + msg
 		return dd.EnhancedPrompt
+	}
+}
+
+func (a *App) Refresh(addr string) string {
+	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
+		return err.Error()
+	} else {
+		suff := a.Series.Suffix
+		dd.ReportOn(filepath.Join(suff, "selector"), "json", dd.String())
+		data := a.GetData(addr)
+		dd.ReportOn(filepath.Join(suff, "data"), "txt", data)
+		title := a.GetTitle(addr)
+		dd.ReportOn(filepath.Join(suff, "title"), "txt", title)
+		terse := a.GetTerse(addr)
+		dd.ReportOn(filepath.Join(suff, "terse"), "txt", terse)
+		prompt := a.GetPrompt(addr)
+		dd.ReportOn(filepath.Join(suff, "prompt"), "txt", prompt)
+		return ""
 	}
 }
 

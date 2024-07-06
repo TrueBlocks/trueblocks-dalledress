@@ -11,6 +11,7 @@ import {
   GetEnhanced,
   GetImage,
   GenerateImage,
+  Refresh,
   GetLastTab,
   SetLastTab,
   GetLastAddress,
@@ -31,6 +32,7 @@ function DalleView() {
   const [activeTab, setActiveTab] = useState<string>('json');
 
   const refresh = () => {
+    Refresh(address);
     var addr = address;
     setAddress('');
     setAddress(addr);

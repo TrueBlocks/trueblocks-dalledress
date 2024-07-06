@@ -21,36 +21,38 @@ and "{{.Adverb true}}." Find the representation that most closely matches all th
 
 Focus on the emotion, the noun, and the styles.`
 
-var dataTemplate = `Original:         {{.Original}}
-Filename:         {{.Filename}}
-Seed:             {{.Seed}}
-Adverb:           {{.Adverb false}}
-AdverbShort:      {{.Adverb true}}
-Adjective:        {{.Adjective false}}
-AdjectiveShort:   {{.Adjective true}}
-Noun:             {{.Noun false}}
-NounShort:        {{.Noun true}}
-Emotion:          {{.Emotion false}}
-EmotionShort:     {{.Emotion true}}
-Occupation:       {{.Occupation false}}
-OccupationShort:  {{.Occupation true}}
-Action:	          {{.Action false}}
-ActionShort:	  {{.Action true}}
-ArtStyle 1:       {{.ArtStyle false 1}}
-ArtStyleShort 1:  {{.ArtStyle true 1}}
-ArtStyle 2:       {{.ArtStyle false 2}}
-ArtStyleShort 2:  {{.ArtStyle true 2}}
-{{if .HasLitStyle}}LitStyle:         {{.LitStyle true}}
-LitStyleShort:    {{.LitStyle false}}
-{{end}}Color 1:          {{.Color false 1}}
-Color 2:          {{.Color false 2}}
-Color 3:          {{.Color false 3}}
-Orientation:      {{.Orientation false}}
-OrientationShort: {{.Orientation true}}
-Gaze:             {{.Gaze false}}
-GazeShort:        {{.Gaze true}}
-BackStyle:        {{.BackStyle false}}
-BackStyleShort:   {{.BackStyle true}}`
+var dataTemplate = `
+Adverb:             {{.Adverb true}}
+Adjective:          {{.Adjective true}}
+Noun:               {{.Noun true}}
+Emotion:            {{.Emotion true}}
+Occupation:         {{.Occupation true}}
+Action:     	    {{.Action true}}
+ArtStyle 1:         {{.ArtStyle true 1}}
+ArtStyle 2:         {{.ArtStyle true 2}}
+{{if .HasLitStyle}}LitStyle:           {{.LitStyle false}}
+{{end}}Orientation:        {{.Orientation true}}
+Gaze:               {{.Gaze true}}
+BackStyle:          {{.BackStyle true}}
+Color 1:            {{.Color false 1}}
+Color 2:            {{.Color false 2}}
+Color 3:            {{.Color false 3}}
+------------------------------------------
+Original:           {{.Original}}
+Filename:           {{.Filename}}
+Seed:               {{.Seed}}
+Adverb (full):      {{.Adverb false}}
+Adjective (full):   {{.Adjective false}}
+Noun (full):        {{.Noun false}}
+Emotion (full):     {{.Emotion false}}
+Occupation (full):  {{.Occupation false}}
+Action (full):      {{.Action false}}
+ArtStyle 1 (full):  {{.ArtStyle false 1}}
+ArtStyle 2 (full):  {{.ArtStyle false 2}}
+{{if .HasLitStyle}}LitStyle (full):    {{.LitStyle true}}
+{{end}}Orientation (full): {{.Orientation false}}
+Gaze (full):        {{.Gaze false}}
+BackStyle:          {{.BackStyle false}}`
 
 var terseTemplate = `{{.Adverb false}} {{.Adjective false}} {{.Noun true}} with human-like characteristics feeling {{.Emotion false}}{{.Occupation false}} in the style of {{.ArtStyle true 1}}`
 

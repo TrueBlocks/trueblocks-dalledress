@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand/v2"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"text/template"
@@ -41,7 +42,7 @@ func NewApp() *App {
 	}
 
 	var err error
-	if a.Series, err = dalle.GetSeries(); err != nil {
+	if a.Series, err = a.LoadSeries(); err != nil {
 		logger.Fatal(err)
 	}
 	logger.Info("Loaded series:", a.Series.Suffix)
@@ -229,4 +230,28 @@ func (a *App) HandleLines() {
 		}
 	}
 	wg.Wait()
+}
+
+func (a *App) LoadSeries() (dalle.Series, error) {
+	lastSeries := a.GetSession().LastSeries
+	fn := filepath.Join("./output/series", lastSeries+".json")
+	str := strings.TrimSpace(file.AsciiFileToString(fn))
+	if len(str) == 0 || !file.FileExists(fn) {
+		ret := dalle.Series{
+			Suffix: "simple",
+		}
+		ret.SaveSeries(fn, 0)
+		return ret, nil
+	}
+
+	bytes := []byte(str)
+	var s dalle.Series
+	if err := json.Unmarshal(bytes, &s); err != nil {
+		logger.Error("could not unmarshal series:", err)
+		return dalle.Series{}, err
+	}
+
+	s.Suffix = strings.ReplaceAll(s.Suffix, " ", "-")
+	s.SaveSeries(filepath.Join("./output/series", s.Suffix+".json"), 0)
+	return s, nil
 }

@@ -18,6 +18,10 @@ export function GetEnhanced(arg1) {
   return window['go']['app']['App']['GetEnhanced'](arg1);
 }
 
+export function GetFileList() {
+  return window['go']['app']['App']['GetFileList']();
+}
+
 export function GetImage(arg1) {
   return window['go']['app']['App']['GetImage'](arg1);
 }
@@ -68,6 +72,10 @@ export function GetTitle(arg1) {
 
 export function HandleLines() {
   return window['go']['app']['App']['HandleLines']();
+}
+
+export function LoadSeries() {
+  return window['go']['app']['App']['LoadSeries']();
 }
 
 export function MaxNames() {

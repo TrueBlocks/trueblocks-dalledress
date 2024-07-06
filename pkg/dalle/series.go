@@ -3,12 +3,9 @@ package dalle
 import (
 	"encoding/json"
 	"fmt"
-	"path/filepath"
 	"reflect"
-	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 )
 
 type Series struct {
@@ -38,23 +35,6 @@ func (s *Series) SaveSeries(fn string, last int) {
 	ss.Last = last
 	file.EstablishFolder("output/series")
 	file.StringToAsciiFile(fn, ss.String())
-}
-
-func GetSeries() (Series, error) {
-	str := strings.TrimSpace(file.AsciiFileToString("inputs/series.json"))
-	if len(str) == 0 {
-		return Series{}, fmt.Errorf("could not read series file")
-	}
-
-	bytes := []byte(str)
-	var s Series
-	if err := json.Unmarshal(bytes, &s); err != nil {
-		logger.Error("could not unmarshal series:", err)
-		return Series{}, err
-	}
-	s.Suffix = strings.ReplaceAll(s.Suffix, " ", "-")
-	s.SaveSeries(filepath.Join("./output/series", s.Suffix+".json"), 0)
-	return s, nil
 }
 
 func (s *Series) GetFilter(fieldName string) ([]string, error) {

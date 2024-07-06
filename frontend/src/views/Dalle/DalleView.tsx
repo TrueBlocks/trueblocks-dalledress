@@ -5,10 +5,11 @@ import View from '@/components/view/View';
 import {
   GetJson,
   GetData,
-  GetTitle,
+  GetSeries,
   GetTerse,
   GetPrompt,
   GetEnhanced,
+  GetImage,
   GenerateImage,
   GetLastTab,
   SetLastTab,
@@ -23,14 +24,24 @@ function DalleView() {
   const [data, setData] = useState<string>('');
   const [prompt, setPrompt] = useState<string>('');
   const [enhanced, setEnhanced] = useState<string>('');
-  const [title, setTitle] = useState<string>('');
+  const [series, setSeries] = useState<string>('');
   const [terse, setTerse] = useState<string>('');
+  const [image, setImage] = useState<string>('');
+  const [imageLoading, setImageLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('json');
 
+  const refresh = () => {
+    var addr = address;
+    setAddress('');
+    setAddress(addr);
+  };
   const handleGenerate = () => {
     setEnhanced('Loading...');
+    setImageLoading(true);
     GenerateImage(address).then((value: string) => {
+      setImageLoading(false);
       setEnhanced(value);
+      refresh();
     });
   };
 
@@ -50,7 +61,7 @@ function DalleView() {
 
   // When address changes, update all the data
   useEffect(() => {
-    if (address) {
+    if (address && !imageLoading) {
       SetLastAddress(address);
       GetJson(address).then((value: string) => {
         setJson(value);
@@ -58,8 +69,8 @@ function DalleView() {
       GetData(address).then((value: string) => {
         setData(value);
       });
-      GetTitle(address).then((value: string) => {
-        setTitle(value);
+      GetSeries(address).then((value: string) => {
+        setSeries(value);
       });
       GetTerse(address).then((value: string) => {
         setTerse(value);
@@ -70,8 +81,11 @@ function DalleView() {
       GetEnhanced(address).then((value: string) => {
         setEnhanced(value);
       });
+      GetImage(address).then((value: string) => {
+        setImage(value);
+      });
     }
-  }, [address]);
+  }, [address, imageLoading]);
 
   const handleTabChange = (value: string | null) => {
     if (value) {
@@ -95,6 +109,9 @@ function DalleView() {
             <Button onClick={handleGenerate} style={{ marginTop: '22px' }}>
               Generate
             </Button>
+            <Button onClick={refresh} style={{ marginTop: '22px' }}>
+              Refresh
+            </Button>
           </Group>
           <Paper
             shadow="xs"
@@ -104,20 +121,25 @@ function DalleView() {
               marginLeft: 0,
             }}
           >
-            <ImageDisplay address={address} />
+            <ImageDisplay address={image} loading={imageLoading} />
           </Paper>
         </Grid.Col>
         <Grid.Col span={4} className={classes.gridColumn}>
           <Tabs value={activeTab} onChange={handleTabChange}>
             <Tabs.List>
+              <Tabs.Tab value="series">Series</Tabs.Tab>
               <Tabs.Tab value="json">JSON</Tabs.Tab>
               <Tabs.Tab value="data">Data</Tabs.Tab>
-              <Tabs.Tab value="title">Title</Tabs.Tab>
               <Tabs.Tab value="terse">Terse</Tabs.Tab>
               <Tabs.Tab value="prompt">Prompt</Tabs.Tab>
               <Tabs.Tab value="enhanced">Enhanced</Tabs.Tab>
             </Tabs.List>
 
+            <Tabs.Panel value="series" className={classes.tabPanel}>
+              <Text mt="md">
+                <pre>{series}</pre>
+              </Text>
+            </Tabs.Panel>
             <Tabs.Panel value="json" className={classes.tabPanel}>
               <Text mt="md">
                 <pre>{json}</pre>
@@ -127,9 +149,6 @@ function DalleView() {
               <Text mt="md">
                 <pre>{data}</pre>
               </Text>
-            </Tabs.Panel>
-            <Tabs.Panel value="title" className={classes.tabPanel}>
-              <Text mt="md">{title}</Text>
             </Tabs.Panel>
             <Tabs.Panel value="terse" className={classes.tabPanel}>
               <Text mt="md" style={{ textAlign: 'justify' }}>

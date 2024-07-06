@@ -1,9 +1,13 @@
 {
-  "suffix": "new-shit",
+  "suffix": "negative-fish",
   "adverbs": [],
   "adjectives": [],
-  "nouns": [],
-  "emotions": [],
+  "nouns": [
+    "other fish,"
+  ],
+  "emotions": [
+    "negative"
+  ],
   "occupations": [],
   "actions": [],
   "artstyles": [],

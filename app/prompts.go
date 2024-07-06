@@ -21,7 +21,8 @@ and "{{.Adverb true}}." Find the representation that most closely matches all th
 
 Focus on the emotion, the noun, and the styles.`
 
-var dataTemplate = `Orig:             {{.Orig}}
+var dataTemplate = `Original:         {{.Original}}
+Filename:         {{.Filename}}
 Seed:             {{.Seed}}
 Adverb:           {{.Adverb false}}
 AdverbShort:      {{.Adverb true}}

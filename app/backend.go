@@ -1,16 +1,17 @@
 package app
 
 import (
-	"encoding/base64"
-	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/openai"
 )
+
+func (a *App) GetSeries(addr string) string {
+	return a.Series.String()
+}
 
 func (a *App) GetJson(addr string) string {
 	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
@@ -61,12 +62,8 @@ func (a *App) GetEnhanced(addr string) string {
 		return err.Error()
 	} else {
 		fn := filepath.Join("output", a.Series.Suffix, "enhanced", dd.Filename+".txt")
-		ret := ""
 		if file.FileExists(fn) {
-			ret := file.AsciiFileToString(fn)
-			if strings.HasPrefix(ret, "No enhanced prompt found") {
-				return
-			}
+			return file.AsciiFileToString(fn)
 		} else {
 			return "No enhanced prompt found at " + fn + ". Press Generate."
 		}
@@ -74,28 +71,24 @@ func (a *App) GetEnhanced(addr string) string {
 }
 
 func (a *App) GetImage(addr string) (string, error) {
-	logger.Info("GetImage", addr)
 	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
 		return err.Error(), err
 	} else {
-		cwd, err := os.Getwd()
-		if err != nil {
-			return err.Error(), err
+		return dd.Filename, nil
+	}
+}
+
+func (a *App) GenerateEnhanced(addr string) string {
+	if dd, err := dalle.NewDalleDress(a.databases, addr); err != nil {
+		return err.Error()
+	} else {
+		authorType, _ := dd.ExecuteTemplate(a.authorTemplate, nil)
+		if dd.EnhancedPrompt, err = openai.EnhancePrompt(a.GetPrompt(addr), authorType); err != nil {
+			logger.Fatal(err.Error())
 		}
-		fn := filepath.Join(cwd, "output", a.Series.Suffix, "annotated", dd.Filename+".png")
-		logger.Info("Loading file", fn)
-		if file.FileExists(fn) {
-			logger.Info("loading image from:", fn)
-			imageBytes, err := os.ReadFile(fn)
-			if err != nil {
-				return err.Error(), err
-			}
-			base64Image := base64.StdEncoding.EncodeToString(imageBytes)
-			return base64Image, nil
-		} else {
-			logger.Info("File not found", fn)
-			return "No image file found at" + fn + ". Press Generate.", nil
-		}
+		msg := " DO NOT PUT TEXT IN THE IMAGE. "
+		dd.EnhancedPrompt = msg + dd.EnhancedPrompt + msg
+		return dd.EnhancedPrompt
 	}
 }
 

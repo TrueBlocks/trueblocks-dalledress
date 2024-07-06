@@ -127,6 +127,8 @@ func GenerateImage(imageData *ImageData) error {
 		return fmt.Errorf("error annotating image: %v", err)
 	}
 	logger.Info(colors.Cyan, imageData.Filename, colors.Green, "- image saved as", colors.White+strings.Trim(path, " "), colors.Off)
-	utils.System("open " + path)
+	if os.Getenv("TB_CMD_LINE") == "true" {
+		utils.System("open " + path)
+	}
 	return nil
 }

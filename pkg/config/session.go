@@ -19,6 +19,7 @@ type Session struct {
 	LastRoute   string `json:"lastRoute"`
 	LastTab     string `json:"lastTab"`
 	LastAddress string `json:"lastAddress"`
+	LastSeries  string `json:"lastSeries"`
 }
 
 var defaultSession = Session{

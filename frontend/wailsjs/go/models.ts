@@ -9,6 +9,7 @@ export namespace config {
 	    lastRoute: string;
 	    lastTab: string;
 	    lastAddress: string;
+	    lastSeries: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Session(source);
@@ -24,6 +25,7 @@ export namespace config {
 	        this.lastRoute = source["lastRoute"];
 	        this.lastTab = source["lastTab"];
 	        this.lastAddress = source["lastAddress"];
+	        this.lastSeries = source["lastSeries"];
 	    }
 	}
 

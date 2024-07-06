@@ -13,9 +13,11 @@ import {
   GenerateImage,
   Refresh,
   GetLastTab,
-  SetLastTab,
   GetLastAddress,
+  GetLastSeries,
+  SetLastTab,
   SetLastAddress,
+  SetLastSeries,
 } from '@gocode/app/App';
 import { ImageDisplay } from '@/components/image/ImageDisplay';
 

@@ -153,37 +153,6 @@ func (a *App) Shutdown(ctx context.Context) {
 	a.GetSession().Save()
 }
 
-func (a *App) GetSession() *config.Session {
-	return &a.session
-}
-
-func (a *App) GetLastRoute() string {
-	return a.GetSession().LastRoute
-}
-
-func (a *App) SetLastRoute(route string) {
-	a.GetSession().LastRoute = route
-	a.GetSession().Save()
-}
-
-func (a *App) GetLastTab() string {
-	return a.GetSession().LastTab
-}
-
-func (a *App) SetLastTab(tab string) {
-	a.GetSession().LastTab = tab
-	a.GetSession().Save()
-}
-
-func (a *App) GetLastAddress() string {
-	return a.GetSession().LastAddress
-}
-
-func (a *App) SetLastAddress(addr string) {
-	a.GetSession().LastAddress = addr
-	a.GetSession().Save()
-}
-
 func isContentPolicyViolation(err error) bool {
 	var apiErr struct {
 		Code    string `json:"code"`

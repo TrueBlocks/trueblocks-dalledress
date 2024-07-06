@@ -34,6 +34,10 @@ export function GetLastRoute() {
   return window['go']['app']['App']['GetLastRoute']();
 }
 
+export function GetLastSeries() {
+  return window['go']['app']['App']['GetLastSeries']();
+}
+
 export function GetLastTab() {
   return window['go']['app']['App']['GetLastTab']();
 }
@@ -80,6 +84,10 @@ export function SetLastAddress(arg1) {
 
 export function SetLastRoute(arg1) {
   return window['go']['app']['App']['SetLastRoute'](arg1);
+}
+
+export function SetLastSeries(arg1) {
+  return window['go']['app']['App']['SetLastSeries'](arg1);
 }
 
 export function SetLastTab(arg1) {

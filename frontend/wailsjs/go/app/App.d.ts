@@ -18,6 +18,8 @@ export function GetLastAddress():Promise<string>;
 
 export function GetLastRoute():Promise<string>;
 
+export function GetLastSeries():Promise<string>;
+
 export function GetLastTab():Promise<string>;
 
 export function GetNames(arg1:number,arg2:number):Promise<Array<string>>;
@@ -41,6 +43,8 @@ export function Refresh(arg1:string):Promise<string>;
 export function SetLastAddress(arg1:string):Promise<void>;
 
 export function SetLastRoute(arg1:string):Promise<void>;
+
+export function SetLastSeries(arg1:string):Promise<void>;
 
 export function SetLastTab(arg1:string):Promise<void>;
 

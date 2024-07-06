@@ -75,8 +75,8 @@ func main() {
 			http.ServeFile(w, r, filePath)
 		})
 		go func() {
-			logger.Info("Starting file server on :8082")
-			if err := http.ListenAndServe(":8082", nil); err != nil {
+			logger.Info("Starting file server on :8889")
+			if err := http.ListenAndServe(":8889", nil); err != nil {
 				logger.Error("File server error:", err)
 			}
 		}()

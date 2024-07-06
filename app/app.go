@@ -41,6 +41,9 @@ func NewApp() *App {
 		databases: make(map[string][]string),
 	}
 
+	// it's okay if it's not found
+	_ = a.session.Load()
+
 	var err error
 	if a.Series, err = a.LoadSeries(); err != nil {
 		logger.Fatal(err)
@@ -137,10 +140,8 @@ func (a *App) DomReady(ctx context.Context) {
 	if os.Getenv("TB_CMD_LINE") == "true" {
 		return
 	}
-	if a.session.Load() {
-		runtime.WindowSetPosition(a.ctx, a.GetSession().X, a.GetSession().Y)
-		runtime.WindowSetSize(a.ctx, a.GetSession().Width, a.GetSession().Height)
-	}
+	runtime.WindowSetPosition(a.ctx, a.GetSession().X, a.GetSession().Y)
+	runtime.WindowSetSize(a.ctx, a.GetSession().Width, a.GetSession().Height)
 	runtime.WindowShow(a.ctx)
 }
 
@@ -236,7 +237,9 @@ func (a *App) LoadSeries() (dalle.Series, error) {
 	lastSeries := a.GetSession().LastSeries
 	fn := filepath.Join("./output/series", lastSeries+".json")
 	str := strings.TrimSpace(file.AsciiFileToString(fn))
+	logger.Info("lastSeries", lastSeries, fn, str)
 	if len(str) == 0 || !file.FileExists(fn) {
+		logger.Info("No series found, creating a new one", fn)
 		ret := dalle.Series{
 			Suffix: "simple",
 		}

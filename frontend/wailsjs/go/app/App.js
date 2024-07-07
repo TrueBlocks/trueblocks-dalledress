@@ -18,6 +18,10 @@ export function GetEnhanced(arg1) {
   return window['go']['app']['App']['GetEnhanced'](arg1);
 }
 
+export function GetExistingAddrs() {
+  return window['go']['app']['App']['GetExistingAddrs']();
+}
+
 export function GetFileList() {
   return window['go']['app']['App']['GetFileList']();
 }

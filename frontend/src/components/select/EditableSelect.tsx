@@ -1,40 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Select } from '@mantine/core';
-import { SetLastSeries } from '@gocode/app/App';
+import { GetExistingAddrs } from '@gocode/app/App';
 
 type SelectItem = {
   value: string;
   label: string;
 };
-
-async function GetExistingAddrs(): Promise<string[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        'gitcoin.eth',
-        'giveth.eth',
-        'chase.wright.eth',
-        'cnn.eth',
-        'dawid.eth',
-        'dragonstone.eth',
-        'eats.eth',
-        'ens.eth',
-        'gameofthrones.eth',
-        'jen.eth',
-        'makingprogress.eth',
-        'meriam.eth',
-        'nate.eth',
-        'poap.eth',
-        'revenge.eth',
-        'rotki.eth',
-        'trueblocks.eth',
-        'unchainedindex.eth',
-        'vitalik.eth',
-        'when.eth',
-      ]);
-    }, 1000);
-  });
-}
 
 interface EditableSelectProps {
   value: string;

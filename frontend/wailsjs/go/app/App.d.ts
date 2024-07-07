@@ -11,6 +11,8 @@ export function GetData(arg1:string):Promise<string>;
 
 export function GetEnhanced(arg1:string):Promise<string>;
 
+export function GetExistingAddrs():Promise<Array<string>>;
+
 export function GetFileList():Promise<Array<string>>;
 
 export function GetImage(arg1:string):Promise<string>;

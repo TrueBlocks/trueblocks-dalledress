@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Paper, Grid, Tabs, TextInput, Button, Group, Text } from '@mantine/core';
+import { Select, Paper, Grid, Tabs, TextInput, Button, Group, Text } from '@mantine/core';
 import classes from '../View.module.css';
 import View from '@/components/view/View';
+import EditableSelect from '@/components/select/EditableSelect';
 import {
   GetJson,
   GetData,
@@ -103,12 +104,11 @@ function DalleView() {
       <Grid>
         <Grid.Col span={8} className={classes.gridColumn}>
           <Group mt="md" style={{ justifyContent: 'flex-start' }}>
-            <TextInput
+            <EditableSelect
               value={address}
-              onChange={(event) => setAddress(event.currentTarget.value)}
-              placeholder="Enter address"
-              label="Address"
-              style={{ width: '600px' }}
+              onChange={(value) => setAddress(value)}
+              label="Select or enter an address or ENS name"
+              placeholder="Enter or select an address"
             />
             <Button onClick={handleGenerate} style={{ marginTop: '22px' }}>
               Generate

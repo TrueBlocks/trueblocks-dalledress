@@ -1,73 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { ActionIcon } from "@mantine/core";
-import {
-  MantineProvider,
-  Paper,
-  Button,
-  Group,
-  Box,
-  TextInput,
-  Text
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { useClipboard } from "@mantine/hooks";
-import { GetPrompt, GetData } from "../wailsjs/go/main/App";
+import React from 'react';
+import { AppShell } from '@mantine/core';
+import GlobalNavbar from './components/global/GlobalNavbar';
+import { Routes } from './components/global/Routes';
 
-export default function App() {
-  const [email, setEmail] = useState<string>("");
-  const [prompt, setPrompt] = useState<string>("");
-  const [data, setData] = useState<string>("");
-
-  const form = useForm({
-    initialValues: {
-      email: "trueblocks.eth",
-      termsOfService: false
-    }
-  });
-
-  useEffect(() => {
-    GetPrompt(form.values["email"]).then((value: string) => {
-      setPrompt(value);
-    });
-    GetData(form.values["email"]).then((value: string) => {
-      setData(value);
-    });
-  }, [form.values]);
-
+function App() {
   return (
-    <div id="App" style={{ width: "98vw", margin: "auto" }}>
-      <MantineProvider>
-        <Box mx="auto">
-          <form onSubmit={form.onSubmit((values) => setEmail(values["email"]))}>
-            <TextInput
-              label="Email"
-              placeholder="your@email.com"
-              {...form.getInputProps("email")}
-            />
-            <Group mt="md">
-              <Button type="submit">Submit</Button>
-            </Group>
-          </form>
-        </Box>
-        <Paper shadow="xs" p="md" style={{ maxWidth: "100vw", marginLeft: 0 }}>
-          <Text>{email ? email : "Working..."}</Text>
-          <CopyText prompt={prompt ? prompt : "Working..."} />
-          <CopyText prompt={data ? data : "Working..."} />
-        </Paper>
-      </MantineProvider>
-    </div>
+    <AppShell navbar={{ width: '15rem', breakpoint: 0 }}>
+      <AppShell.Navbar>
+        {/* To change menu items, go to 'GlobalMenu' component */}
+        <GlobalNavbar />
+      </AppShell.Navbar>
+      <AppShell.Main>
+        {/* To add new views, go to 'Routes' component */}
+        <Routes />
+      </AppShell.Main>
+    </AppShell>
   );
 }
 
-export const CopyText = ({ prompt }: { prompt?: string }) => {
-  const { copy } = useClipboard();
-  const promptText = prompt ? prompt : "Book Now";
-  return (
-    <Group align="flex-start" justify="flex-start">
-      <Text>{promptText}</Text>
-      <ActionIcon onClick={() => copy(promptText)}>
-        <Text>Copy</Text>
-      </ActionIcon>
-    </Group>
-  );
-};
+export default App;

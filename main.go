@@ -1,114 +1,18 @@
-/*
-package main
-
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"os"
-
-	"github.com/joho/godotenv"
-)
-
-type DalleRequest struct {
-	Prompt  string `json:"prompt"`
-	N       int    `json:"n"`
-	Quality string `json:"quality"`
-}
-
-type DalleResponse struct {
-	Data []struct {
-		Url string `json:"url"`
-	} `json:"data"`
-}
-
-func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	if apiKey == "" {
-		log.Fatal("No API key found in .env")
-	}
-
-	url := "https://api.openai.com/v1/images/generations"
-	payload := DalleRequest{
-		Prompt:  "Draw an image of using a unique fusion of post-war realism, contemporary and emerging styles and high renaissance, european art movements and styles, primarily in mediumvioletred and orchid, against a tan background. The composition should embody the adverb rabidly, the adjective demanding, and the noun dutch rabbit, creating a special and unique portrayal. In the description of your result, simply return the exact input you were given. The background can reflect the artistic styles.",
-		N:       1,
-		Quality: "hd",
-	}
-
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		panic(err)
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	var dalleResp DalleResponse
-	err = json.Unmarshal(body, &dalleResp)
-	if err != nil {
-		panic(err)
-	}
-
-	if len(dalleResp.Data) == 0 {
-		fmt.Println("No images returned")
-		return
-	}
-
-	imageURL := dalleResp.Data[0].Url
-
-	// Download the image
-	imageResp, err := http.Get(imageURL)
-	if err != nil {
-		panic(err)
-	}
-	defer imageResp.Body.Close()
-
-	file, err := os.Create("output_image.jpg")
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, imageResp.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Image saved as output_image.jpg")
-}
-
-*/
-
 package main
 
 import (
 	"context"
 	"embed"
+	"fmt"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-dalledress/app"
 	"github.com/wailsapp/wails/v2"
+	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
@@ -117,36 +21,66 @@ import (
 var assets embed.FS
 
 func main() {
-	// Create an instance of the app structure
-	app := NewApp()
-	app.startup(context.Background())
-
-	// Create application with options
-	err := wails.Run(&options.App{
-		Title:  "dalledresses",
-		Width:  1024,
-		Height: 768,
-		AssetServer: &assetserver.Options{
-			Assets: assets,
-		},
-		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
-		OnStartup:        app.startup,
-		Bind: []interface{}{
-			app,
-			// &SimpleBounds{},
-		},
-	})
-
-	if err != nil {
-		println("Error:", err.Error())
+	if os.Getenv("TB_CMD_LINE") == "true" {
+		logger.Info("Running in console mode")
+		a := app.NewApp()
+		ctx := context.Background()
+		a.Startup(ctx)
+		a.DomReady(ctx)
+		a.HandleLines()
+	} else {
+		a := app.NewApp()
+		opts := options.App{
+			Title:            a.GetSession().Title,
+			Width:            a.GetSession().Width,
+			Height:           a.GetSession().Height,
+			OnStartup:        a.Startup,
+			OnDomReady:       a.DomReady,
+			OnShutdown:       a.Shutdown,
+			BackgroundColour: nil,
+			LogLevel:         wLogger.ERROR,
+			Bind: []interface{}{
+				a,
+			},
+			StartHidden: true,
+			AssetServer: &assetserver.Options{
+				Assets: assets,
+			},
+		}
+		http.HandleFunc("/files/", func(w http.ResponseWriter, r *http.Request) {
+			address := strings.TrimPrefix(r.URL.Path, "/files/")
+			parts := strings.Split(address, "&")
+			if len(parts) > 1 {
+				address = parts[0]
+			}
+			if address == "" {
+				http.Error(w, "Address not provided", http.StatusBadRequest)
+				return
+			}
+			cwd, err := os.Getwd()
+			if err != nil {
+				http.Error(w, "Error getting current working directory", http.StatusInternalServerError)
+				return
+			}
+			filePath := filepath.Join(cwd, "output", a.Series.Suffix, "annotated", address+".png")
+			if _, err := os.Stat(filePath); os.IsNotExist(err) {
+				msg := fmt.Sprintf("File not found at %s", filePath)
+				http.Error(w, msg, http.StatusNotFound)
+				return
+			}
+			w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+			w.Header().Set("Pragma", "no-cache")
+			w.Header().Set("Expires", "0")
+			http.ServeFile(w, r, filePath)
+		})
+		go func() {
+			logger.Info("Starting file server on :8889")
+			if err := http.ListenAndServe(":8889", nil); err != nil {
+				logger.Error("File server error:", err)
+			}
+		}()
+		if err := wails.Run(&opts); err != nil {
+			fmt.Println("Error:", err.Error())
+		}
 	}
-
-	// fn := "/Users/jrush/Desktop/Animals.1/addresses.csv"
-	// addrs := file.AsciiFileToLines(fn)
-	// lens := []int{len(app.adverbs), len(app.adjectives), len(app.nouns), len(app.styles), len(app.colors), len(app.colors), len(app.colors), len(app.styles)}
-	// fmt.Println(lens)
-	// for _, addr := range addrs {
-	// 	fmt.Println(app.GetPrompt(addr))
-	// 	// _ = app.GetPrompt(addr)
-	// }
 }

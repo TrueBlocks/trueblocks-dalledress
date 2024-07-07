@@ -24,14 +24,14 @@
       "@/*": [
         "*"
       ],
+      "@assets/*": [
+        "assets/*"
+      ],
       "@components": [
         "components/index"
       ],
       "@gocode/*": [
         "../wailsjs/go/*"
-      ],
-      "@assets/*": [
-        "assets/*"
       ]
     }
   },

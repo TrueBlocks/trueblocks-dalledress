@@ -1,13 +1,25 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "TrueBlocks Account Browser",
-  "outputfilename": "trueblocks-browse",
+  "name": "TrueBlocks DalleDress",
+  "outputfilename": "trueblocks-dalledress",
+  "assetdir": "./frontend/dist",
+  "frontend:dir": "./frontend",
   "frontend:install": "yarn install",
   "frontend:build": "yarn run build",
   "frontend:dev:watcher": "yarn run dev",
   "frontend:dev:serverUrl": "auto",
   "author": {
     "name": "TrueBlocks, LLC",
-    "email": "jrush@quickblocks.io"
+    "email": "info@quickblocks.io"
+  },
+  "dev": {
+    "watch": {
+      "patterns": [
+        "frontend/**/*.{js,jsx,ts,tsx,css,scss,html}"
+      ],
+      "ignore": [
+        "frontend/dist/**"
+      ]
+    }
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GetNames, MaxNames, GetFileList } from '@gocode/app/App';
+import { GetNames, MaxNames, GetFilelist } from '@gocode/app/App';
 import { useHotkeys } from 'react-hotkeys-hook';
 import classes from '../View.module.css';
 import View from '@/components/view/View';
@@ -39,7 +39,7 @@ function NamesView() {
     console.log('useEffect', curName);
     GetNames(curName, 20).then((names: string[]) => setName(names));
     MaxNames().then((maxNames: number) => setMaxNames(maxNames));
-    GetFileList().then((fileList: string[]) => setFileList(fileList));
+    GetFilelist().then((fileList: string[]) => setFileList(fileList));
   }, [curName]);
 
   return (

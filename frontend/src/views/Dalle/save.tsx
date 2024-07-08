@@ -6,7 +6,7 @@
   });
 
   const openImage = (address: string) => {
-    GetImage(address);
+    GetFilename(address);
   };
 
   return (

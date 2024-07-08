@@ -24,7 +24,7 @@ type ImageData struct {
 	Filename       string `json:"filename"`
 }
 
-func GenerateImage(imageData *ImageData) error {
+func RequestImage(imageData *ImageData) error {
 	generated := filepath.Join("./output", imageData.SeriesName, "generated")
 	file.EstablishFolder(generated)
 	annotated := strings.Replace(generated, "/generated", "/annotated", -1)

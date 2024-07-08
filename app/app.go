@@ -34,6 +34,7 @@ type App struct {
 	titleTemplate  *template.Template
 	Series         dalle.Series `json:"series"`
 	names          []types.Name
+	dallesCache    map[string]*dalle.DalleDress
 }
 
 func NewApp() *App {
@@ -201,7 +202,7 @@ func (a *App) HandleLines() {
 				maxRetries := 5
 				for attempt := 0; attempt < maxRetries; attempt++ {
 					<-ticker.C
-					_, err := a.GetImage(address)
+					_, err := a.GenerateImage(address)
 					if err == nil {
 						return
 					}
@@ -237,7 +238,7 @@ func (a *App) LoadSeries() (dalle.Series, error) {
 	lastSeries := a.GetSession().LastSeries
 	fn := filepath.Join("./output/series", lastSeries+".json")
 	str := strings.TrimSpace(file.AsciiFileToString(fn))
-	logger.Info("lastSeries", lastSeries, fn, str)
+	logger.Info("lastSeries", lastSeries)
 	if len(str) == 0 || !file.FileExists(fn) {
 		logger.Info("No series found, creating a new one", fn)
 		ret := dalle.Series{

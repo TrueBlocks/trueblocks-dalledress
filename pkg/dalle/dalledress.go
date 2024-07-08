@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
 
-	"github.com/TrueBlocks/trueblocks-core/sdk"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 )
 
 type DalleDress struct {
@@ -23,53 +24,6 @@ type DalleDress struct {
 	EnhancedPrompt string               `json:"enhancedPrompt,omitempty"`
 	Attribs        []Attribute          `json:"attributes"`
 	AttribMap      map[string]Attribute `json:"-"`
-}
-
-func NewDalleDress(databases map[string][]string, addressIn string) (*DalleDress, error) {
-	address := addressIn
-	if strings.HasSuffix(address, ".eth") {
-		opts := sdk.NamesOptions{
-			Terms: []string{address},
-		}
-		if names, _, err := opts.Names(); err != nil {
-			return nil, fmt.Errorf("error getting names for %s", address)
-		} else {
-			if len(names) > 0 {
-				address = names[0].Address.Hex()
-			}
-		}
-	}
-
-	parts := strings.Split(address, ",")
-	seed := parts[0] + reverse(parts[0])
-	if len(seed) < 66 {
-		return nil, fmt.Errorf("seed length is less than 66")
-	}
-	if strings.HasPrefix(seed, "0x") {
-		seed = seed[2:66]
-	}
-
-	dd := DalleDress{
-		Original:  addressIn,
-		Filename:  validFilename(address),
-		Seed:      seed,
-		AttribMap: make(map[string]Attribute),
-	}
-
-	for i := 0; i < len(dd.Seed); i = i + 8 {
-		index := len(dd.Attribs)
-		attr := NewAttribute(databases, index, dd.Seed[i:i+6])
-		dd.Attribs = append(dd.Attribs, attr)
-		dd.AttribMap[attr.Name] = attr
-		if i+4+6 < len(dd.Seed) {
-			index = len(dd.Attribs)
-			attr = NewAttribute(databases, index, dd.Seed[i+4:i+4+6])
-			dd.Attribs = append(dd.Attribs, attr)
-			dd.AttribMap[attr.Name] = attr
-		}
-	}
-
-	return &dd, nil
 }
 
 func (d *DalleDress) String() string {
@@ -275,29 +229,15 @@ func (dd *DalleDress) LitPrompt(short bool) string {
 	return text
 }
 
-func (dd *DalleDress) ReportOn(loc, ft, value string) {
+var saveMutex sync.Mutex
+
+func (dd *DalleDress) ReportOn(addr, loc, ft, value string) {
+	logger.Info("Generating", loc, "for "+addr)
 	path := filepath.Join("./output/", strings.ToLower(loc))
+
+	saveMutex.Lock()
+	defer saveMutex.Unlock()
 	file.EstablishFolder(path)
 	file.StringToAsciiFile(filepath.Join(path, dd.Filename+"."+ft), value)
 }
 
-// validFilename returns a valid filename from the input string
-func validFilename(in string) string {
-	invalidChars := []string{"/", "\\", ":", "*", "?", "\"", "<", ">", "|"}
-	for _, char := range invalidChars {
-		in = strings.ReplaceAll(in, char, "_")
-	}
-	in = strings.TrimSpace(in)
-	in = strings.ReplaceAll(in, "__", "_")
-	return in
-}
-
-// reverse returns the reverse of the input string
-func reverse(s string) string {
-	runes := []rune(s)
-	n := len(runes)
-	for i := 0; i < n/2; i++ {
-		runes[i], runes[n-1-i] = runes[n-1-i], runes[i]
-	}
-	return string(runes)
-}

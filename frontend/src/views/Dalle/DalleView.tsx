@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Select, Paper, Grid, Tabs, TextInput, Button, Group, Text } from '@mantine/core';
 import classes from '../View.module.css';
 import View from '@/components/view/View';
-import EditableSelect from '@/components/select/EditableSelect';
+import EditableSelect from '@/components/EditableSelect';
+import ResultDialog from '@/components/ResultDialog';
 import {
   GetJson,
   GetData,
@@ -10,17 +11,17 @@ import {
   GetTerse,
   GetPrompt,
   GetEnhanced,
-  GetImage,
+  GetFilename,
   GenerateImage,
-  Refresh,
   GetLastTab,
   GetLastAddress,
   GetLastSeries,
   SetLastTab,
   SetLastAddress,
   SetLastSeries,
+  Save,
 } from '@gocode/app/App';
-import { ImageDisplay } from '@/components/image/ImageDisplay';
+import { ImageDisplay } from '@/components/ImageDisplay';
 
 function DalleView() {
   const [address, setAddress] = useState<string>('');
@@ -33,20 +34,26 @@ function DalleView() {
   const [image, setImage] = useState<string>('');
   const [imageLoading, setImageLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('json');
+  const [dialogOpened, setDialogOpened] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const refresh = () => {
-    Refresh(address);
-    var addr = address;
-    setAddress('');
-    setAddress(addr);
+  const handleOpenDialog = (result: boolean) => {
+    setSuccess(result);
+    setDialogOpened(true);
   };
+
   const handleGenerate = () => {
     setEnhanced('Loading...');
     setImageLoading(true);
     GenerateImage(address).then((value: string) => {
       setImageLoading(false);
       setEnhanced(value);
-      refresh();
+    });
+  };
+
+  const handleSave = () => {
+    Save(address).then((value: boolean) => {
+      handleOpenDialog(value);
     });
   };
 
@@ -86,7 +93,7 @@ function DalleView() {
       GetEnhanced(address).then((value: string) => {
         setEnhanced(value);
       });
-      GetImage(address).then((value: string) => {
+      GetFilename(address).then((value: string) => {
         setImage(value);
       });
     }
@@ -113,8 +120,8 @@ function DalleView() {
             <Button onClick={handleGenerate} style={{ marginTop: '22px' }}>
               Generate
             </Button>
-            <Button onClick={refresh} style={{ marginTop: '22px' }}>
-              Refresh
+            <Button onClick={handleSave} style={{ marginTop: '22px' }}>
+              Save
             </Button>
           </Group>
           <Paper
@@ -172,6 +179,7 @@ function DalleView() {
           </Tabs>
         </Grid.Col>
       </Grid>
+      <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />{' '}
     </View>
   );
 }

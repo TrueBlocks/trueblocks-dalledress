@@ -22,12 +22,12 @@ export function GetExistingAddrs() {
   return window['go']['app']['App']['GetExistingAddrs']();
 }
 
-export function GetFileList() {
-  return window['go']['app']['App']['GetFileList']();
+export function GetFilelist() {
+  return window['go']['app']['App']['GetFilelist']();
 }
 
-export function GetImage(arg1) {
-  return window['go']['app']['App']['GetImage'](arg1);
+export function GetFilename(arg1) {
+  return window['go']['app']['App']['GetFilename'](arg1);
 }
 
 export function GetJson(arg1) {
@@ -82,12 +82,16 @@ export function LoadSeries() {
   return window['go']['app']['App']['LoadSeries']();
 }
 
+export function MakeDalleDress(arg1) {
+  return window['go']['app']['App']['MakeDalleDress'](arg1);
+}
+
 export function MaxNames() {
   return window['go']['app']['App']['MaxNames']();
 }
 
-export function Refresh(arg1) {
-  return window['go']['app']['App']['Refresh'](arg1);
+export function Save(arg1) {
+  return window['go']['app']['App']['Save'](arg1);
 }
 
 export function SetLastAddress(arg1) {

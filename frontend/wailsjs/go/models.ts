@@ -33,6 +33,78 @@ export namespace config {
 
 export namespace dalle {
 	
+	export class Attribute {
+	    database: string;
+	    name: string;
+	    bytes: string;
+	    number: number;
+	    factor: number;
+	    count: number;
+	    selector: number;
+	    value: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Attribute(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.database = source["database"];
+	        this.name = source["name"];
+	        this.bytes = source["bytes"];
+	        this.number = source["number"];
+	        this.factor = source["factor"];
+	        this.count = source["count"];
+	        this.selector = source["selector"];
+	        this.value = source["value"];
+	    }
+	}
+	export class DalleDress {
+	    original: string;
+	    fileName: string;
+	    seed: string;
+	    prompt?: string;
+	    dataPrompt?: string;
+	    titlePrompt?: string;
+	    tersePrompt?: string;
+	    enhancedPrompt?: string;
+	    attributes: Attribute[];
+	
+	    static createFrom(source: any = {}) {
+	        return new DalleDress(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.original = source["original"];
+	        this.fileName = source["fileName"];
+	        this.seed = source["seed"];
+	        this.prompt = source["prompt"];
+	        this.dataPrompt = source["dataPrompt"];
+	        this.titlePrompt = source["titlePrompt"];
+	        this.tersePrompt = source["tersePrompt"];
+	        this.enhancedPrompt = source["enhancedPrompt"];
+	        this.attributes = this.convertValues(source["attributes"], Attribute);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class Series {
 	    last?: number;
 	    suffix: string;

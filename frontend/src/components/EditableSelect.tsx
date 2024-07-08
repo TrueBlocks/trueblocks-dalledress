@@ -25,11 +25,13 @@ const EditableSelect: React.FC<EditableSelectProps> = ({ value, onChange, label,
         setOptions(formattedOptions);
         if (!existingAddrs.includes(value)) {
           setInputValue(existingAddrs.length > 0 ? existingAddrs[0] : '');
+        } else {
+          setInputValue(value); // Ensure the inputValue is set to the prop value if it exists in the options
         }
       });
     }
     fetchAddresses();
-  }, []);
+  }, [value]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && inputValue.trim() !== '') {

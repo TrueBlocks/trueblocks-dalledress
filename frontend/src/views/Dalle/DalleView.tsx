@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Paper, Grid, Tabs, TextInput, Button, Group, Text } from '@mantine/core';
+import { Select, Paper, Grid, Button, Group } from '@mantine/core';
 import classes from '../View.module.css';
 import View from '@/components/view/View';
 import EditableSelect from '@/components/EditableSelect';
@@ -22,6 +22,7 @@ import {
   Save,
 } from '@gocode/app/App';
 import { ImageDisplay } from '@/components/ImageDisplay';
+import Tabber from './Tabber';
 
 function DalleView() {
   const [address, setAddress] = useState<string>('');
@@ -106,80 +107,44 @@ function DalleView() {
     }
   };
 
+  const tabItems = [
+    { value: 'series', label: 'Series', content: series },
+    { value: 'json', label: 'JSON', content: json },
+    { value: 'data', label: 'Data', content: data },
+    { value: 'terse', label: 'Terse', content: terse },
+    { value: 'prompt', label: 'Prompt', content: prompt },
+    { value: 'enhanced', label: 'Enhanced', content: enhanced },
+  ];
+
   return (
     <View title="Dalle View">
-      <Grid>
-        <Grid.Col span={8} className={classes.gridColumn}>
-          <Group mt="md" style={{ justifyContent: 'flex-start' }}>
-            <EditableSelect
-              value={address}
-              onChange={(value) => setAddress(value)}
-              label="Select or enter an address or ENS name"
-              placeholder="Enter or select an address"
-            />
-            <Button onClick={handleGenerate} style={{ marginTop: '22px' }}>
-              Generate
-            </Button>
-            <Button onClick={handleSave} style={{ marginTop: '22px' }}>
-              Save
-            </Button>
-          </Group>
-          <Paper
-            shadow="xs"
-            p="md"
-            style={{
-              maxWidth: '100vw',
-              marginLeft: 0,
-            }}
-          >
-            <ImageDisplay address={image} loading={imageLoading} />
-          </Paper>
-        </Grid.Col>
-        <Grid.Col span={4} className={classes.gridColumn}>
-          <Tabs value={activeTab} onChange={handleTabChange}>
-            <Tabs.List>
-              <Tabs.Tab value="series">Series</Tabs.Tab>
-              <Tabs.Tab value="json">JSON</Tabs.Tab>
-              <Tabs.Tab value="data">Data</Tabs.Tab>
-              <Tabs.Tab value="terse">Terse</Tabs.Tab>
-              <Tabs.Tab value="prompt">Prompt</Tabs.Tab>
-              <Tabs.Tab value="enhanced">Enhanced</Tabs.Tab>
-            </Tabs.List>
-
-            <Tabs.Panel value="series" className={classes.tabPanel}>
-              <Text mt="md">
-                <pre>{series}</pre>
-              </Text>
-            </Tabs.Panel>
-            <Tabs.Panel value="json" className={classes.tabPanel}>
-              <Text mt="md">
-                <pre>{json}</pre>
-              </Text>
-            </Tabs.Panel>
-            <Tabs.Panel value="data" className={classes.tabPanel}>
-              <Text mt="md">
-                <pre>{data}</pre>
-              </Text>
-            </Tabs.Panel>
-            <Tabs.Panel value="terse" className={classes.tabPanel}>
-              <Text mt="md" style={{ textAlign: 'justify' }}>
-                {terse}
-              </Text>
-            </Tabs.Panel>
-            <Tabs.Panel value="prompt" className={classes.tabPanel}>
-              <Text mt="md" style={{ textAlign: 'justify' }}>
-                {prompt}
-              </Text>
-            </Tabs.Panel>
-            <Tabs.Panel value="enhanced" className={classes.tabPanel}>
-              <Text mt="md" style={{ textAlign: 'justify' }}>
-                {enhanced}
-              </Text>
-            </Tabs.Panel>
-          </Tabs>
-        </Grid.Col>
-      </Grid>
-      <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />{' '}
+      <div className={classes.content}>
+        <Grid>
+          <Grid.Col span={8} className={classes.gridColumn}>
+            <Group mt="md" style={{ justifyContent: 'flex-start' }}>
+              <EditableSelect
+                value={address}
+                onChange={(value) => setAddress(value)}
+                label="Select or enter an address or ENS name"
+                placeholder="Enter or select an address"
+              />
+              <Button onClick={handleGenerate} style={{ marginTop: '22px' }}>
+                Generate
+              </Button>
+              <Button onClick={handleSave} style={{ marginTop: '22px' }}>
+                Save
+              </Button>
+            </Group>
+            <Paper shadow="xs" p="md" className={classes.imageDisplayContainer}>
+              <ImageDisplay address={image} loading={imageLoading} />
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={4} className={classes.gridColumn}>
+            <Tabber items={tabItems} activeTab={activeTab} onTabChange={handleTabChange} />
+          </Grid.Col>
+        </Grid>
+        <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />
+      </div>
     </View>
   );
 }

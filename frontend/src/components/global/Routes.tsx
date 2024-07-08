@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Route, Switch, useLocation } from 'wouter';
 import classes from './Routes.module.css';
-import StatusBar from './StatusBar';
 import DalleView from '@/views/Dalle/DalleView';
-import HomeView from '@/views/Home/HomeView';
 import NamesView from '@/views/Names/NamesView';
+import StatusBar from './StatusBar';
+import HomeView from '@/views/Home/HomeView';
 import SettingsView from '@/views/Settings/SettingsView';
 import { GetLastRoute } from '@gocode/app/App';
 

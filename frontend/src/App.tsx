@@ -9,8 +9,8 @@ function App() {
   return (
     <AppShell
       header={{ height: "3rem" }}
-      navbar={{ width: "15rem", breakpoint: 0 }}
-      aside={{ collapsed: { desktop: true }, width: "15rem", breakpoint: 0 }}
+      navbar={{ collapsed: { desktop: false }, width: "10rem", breakpoint: 0 }}
+      aside={{ collapsed: { desktop: false }, width: "10rem", breakpoint: 0 }}
     >
       <AppShell.Header>
         <Header />

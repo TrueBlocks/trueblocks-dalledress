@@ -1,7 +1,7 @@
 import React from "react";
 import { Center, Stack, Title } from "@mantine/core";
-import Footer from "./Footer";
 import Menu from "./Menu";
+import ServerStatus from "./ServerStatus";
 
 function Navbar() {
   return (
@@ -12,7 +12,7 @@ function Navbar() {
         </Center>
         <Menu />
       </div>
-      <Footer />
+      <ServerStatus />
     </Stack>
   );
 }

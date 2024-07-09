@@ -1,5 +1,6 @@
 import React from "react";
 import { AppShell } from "@mantine/core";
+import Aside from "./components/global/Aside";
 import Header from "./components/global/Header";
 import Navbar from "./components/global/Navbar";
 import Routes from "./components/global/Routes";
@@ -9,6 +10,7 @@ function App() {
     <AppShell
       header={{ height: "3rem" }}
       navbar={{ width: "15rem", breakpoint: 0 }}
+      aside={{ collapsed: { desktop: true }, width: "15rem", breakpoint: 0 }}
     >
       <AppShell.Header>
         <Header />
@@ -19,6 +21,9 @@ function App() {
       <AppShell.Main>
         <Routes />
       </AppShell.Main>
+      <AppShell.Aside>
+        <Aside />
+      </AppShell.Aside>
     </AppShell>
   );
 }

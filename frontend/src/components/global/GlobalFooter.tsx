@@ -4,7 +4,6 @@ import { IconCheck } from "@tabler/icons-react";
 
 function GlobalFooter() {
   return (
-    // Status indicators mock
     <Flex justify="center" align="center">
       <IconCheck />
       <Text size="xs">Node</Text>

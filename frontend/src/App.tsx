@@ -7,11 +7,9 @@ function App() {
   return (
     <AppShell navbar={{ width: "15rem", breakpoint: 0 }}>
       <AppShell.Navbar>
-        {/* To change menu items, go to 'GlobalMenu' component */}
         <GlobalNavbar />
       </AppShell.Navbar>
       <AppShell.Main>
-        {/* To add new views, go to 'Routes' component */}
         <Routes />
       </AppShell.Main>
     </AppShell>

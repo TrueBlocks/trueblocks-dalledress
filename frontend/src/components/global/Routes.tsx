@@ -8,12 +8,9 @@ function Routes() {
   return (
     <div className={classes.container}>
       <Switch>
-        {/* Settings */}
         <Route path="/settings">
           <SettingsView />
         </Route>
-
-        {/* Default route */}
         <Route>
           <HomeView />
         </Route>

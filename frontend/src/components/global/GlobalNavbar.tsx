@@ -8,13 +8,10 @@ function GlobalNavbar() {
     <Stack h={"100%"} justify="space-between">
       <div>
         <Center>
-          {/* This will be replaced by a logo */}
           <Title order={1}>Browse</Title>
         </Center>
-        {/* Main menu */}
         <GlobalMenu />
       </div>
-      {/* Navbar footer which can host status indicators */}
       <GlobalFooter />
     </Stack>
   );

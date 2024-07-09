@@ -3,7 +3,7 @@ import { NavLink } from "@mantine/core";
 import { IconHome, IconSettings } from "@tabler/icons-react";
 import { Link, useRoute } from "wouter";
 
-function GlobalMenu() {
+function Menu() {
   return (
     <>
       <StyledNavLink label="Home" icon={<IconHome />} href="/" />
@@ -16,7 +16,7 @@ function GlobalMenu() {
   );
 }
 
-export default GlobalMenu;
+export default Menu;
 
 type StyledNavLinkParams = {
   label: string;

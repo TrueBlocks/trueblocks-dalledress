@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Space, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 
-function GlobalFooter() {
+function Footer() {
   return (
     <Flex justify="center" align="center">
       <IconCheck />
@@ -14,4 +14,4 @@ function GlobalFooter() {
   );
 }
 
-export default GlobalFooter;
+export default Footer;

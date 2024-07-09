@@ -1,20 +1,20 @@
 import React from "react";
 import { Center, Stack, Title } from "@mantine/core";
-import GlobalFooter from "./GlobalFooter";
-import GlobalMenu from "./GlobalMenu";
+import Footer from "./Footer";
+import Menu from "./Menu";
 
-function GlobalNavbar() {
+function Navbar() {
   return (
     <Stack h={"100%"} justify="space-between">
       <div>
         <Center>
           <Title order={1}>Browse</Title>
         </Center>
-        <GlobalMenu />
+        <Menu />
       </div>
-      <GlobalFooter />
+      <Footer />
     </Stack>
   );
 }
 
-export default GlobalNavbar;
+export default Navbar;

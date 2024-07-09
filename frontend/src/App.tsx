@@ -1,13 +1,13 @@
 import React from "react";
 import { AppShell } from "@mantine/core";
-import GlobalNavbar from "./components/global/GlobalNavbar";
+import Navbar from "./components/global/Navbar";
 import Routes from "./components/global/Routes";
 
 function App() {
   return (
     <AppShell navbar={{ width: "15rem", breakpoint: 0 }}>
       <AppShell.Navbar>
-        <GlobalNavbar />
+        <Navbar />
       </AppShell.Navbar>
       <AppShell.Main>
         <Routes />

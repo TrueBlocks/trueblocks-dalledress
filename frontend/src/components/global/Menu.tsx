@@ -5,14 +5,14 @@ import { Link, useRoute } from "wouter";
 
 function Menu() {
   return (
-    <>
+    <div style={{ flexGrow: 1 }}>
       <StyledNavLink label="Home" icon={<IconHome />} href="/" />
       <StyledNavLink
         label="Settings"
         icon={<IconSettings />}
         href="/settings"
       />
-    </>
+    </div>
   );
 }
 

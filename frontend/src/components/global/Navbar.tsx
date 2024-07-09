@@ -6,9 +6,7 @@ import ServerStatus from "./ServerStatus";
 function Navbar() {
   return (
     <Stack h={"100%"} justify="space-between">
-      <div>
-        <Menu />
-      </div>
+      <Menu />
       <ServerStatus />
     </Stack>
   );

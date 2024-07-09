@@ -13,7 +13,7 @@ function App() {
       aside={{ collapsed: { desktop: false }, width: "10rem", breakpoint: 0 }}
     >
       <AppShell.Header>
-        <Header />
+        <Header title="ApplicationTitle" />
       </AppShell.Header>
       <AppShell.Navbar>
         <Navbar />

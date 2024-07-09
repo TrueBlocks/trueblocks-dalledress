@@ -15,7 +15,7 @@ var assets embed.FS
 func main() {
 	a := app.NewApp()
 	opts := options.App{
-		Title:      "TrueBlocks Browse",
+		Title:      "ApplicationTitle",
 		Width:      a.GetSession().Width,
 		Height:     a.GetSession().Height,
 		OnStartup:  a.Startup,

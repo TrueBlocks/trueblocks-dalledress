@@ -1,16 +1,17 @@
 import React from "react";
-import { Checkbox, InputLabel } from "@mantine/core";
-import { View, ViewHeader, ViewContent, ViewStatus } from "@/components/view";
+import { Stack, Title, Checkbox, InputLabel } from "@mantine/core";
+import classes from "@/App.module.css";
+import { View, ViewStatus } from "@/components/view";
 
 function SettingsView() {
   return (
     <View>
-      <ViewHeader>Settings View Header</ViewHeader>
-      <ViewContent>
+      <Title order={3}>Settings View Header</Title>
+      <Stack className={classes.mainContent}>
         <InputLabel>
           <Checkbox label={"A checkbox"} />
         </InputLabel>
-      </ViewContent>
+      </Stack>
       <ViewStatus>Status / Progress</ViewStatus>
     </View>
   );

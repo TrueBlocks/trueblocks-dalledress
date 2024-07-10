@@ -1,11 +1,11 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Text } from "@mantine/core";
 
-export function ViewContent({ children }: { children: React.ReactNode }) {
+export function ViewContent({ children }: { children: ReactNode }) {
   return (
     <Text
       style={{
-        flex: 1,
+        flexGrow: 1,
       }}
     >
       {children}

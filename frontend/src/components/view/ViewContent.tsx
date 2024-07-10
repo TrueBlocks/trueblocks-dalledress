@@ -5,7 +5,7 @@ export function ViewContent({ children }: { children: React.ReactNode }) {
   return (
     <Text
       style={{
-        flex: 1
+        flex: 1,
       }}
     >
       {children}

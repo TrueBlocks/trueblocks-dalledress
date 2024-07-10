@@ -1,10 +1,10 @@
 import React from "react";
 import { AppShell, Text } from "@mantine/core";
-import classes from "./App.module.css";
 import Aside from "./components/global/Aside";
 import Header from "./components/global/Header";
 import Navbar from "./components/global/Navbar";
 import Routes from "./components/global/Routes";
+import classes from "@/App.module.css";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
       <AppShell.Navbar>
         <Navbar />
       </AppShell.Navbar>
-      <AppShell.Main className={classes.appMain}>
+      <AppShell.Main className={classes.mainContent}>
         <Routes />
       </AppShell.Main>
       <AppShell.Aside>

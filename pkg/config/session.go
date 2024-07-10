@@ -11,15 +11,17 @@ import (
 
 // Session stores ephemeral things such as last window position, last view, and recent file
 type Session struct {
-	X      int `json:"x"`
-	Y      int `json:"y"`
-	Width  int `json:"width"`
-	Height int `json:"height"`
+	X      int    `json:"x"`
+	Y      int    `json:"y"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
+	Title  string `json:"title"`
 }
 
 var defaultSession = Session{
 	Width:  1024,
 	Height: 768,
+	Title:  "ApplicationTitle",
 }
 
 func NewSession() Session {

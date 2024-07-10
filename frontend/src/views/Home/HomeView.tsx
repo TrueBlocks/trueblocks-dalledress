@@ -1,9 +1,14 @@
 import React from "react";
-import View from "@/components/view/View";
+import { View, ViewHeader, ViewContent, ViewStatus } from "@/components/view";
 
-// HomeView is temporary. It will probably be removed later
 function HomeView() {
-  return <View title="Welcome">Welcome to ApplicationTitle 🔥🚀</View>;
+  return (
+    <View>
+      <ViewHeader>Home View Title</ViewHeader>
+      <ViewContent>Home View Content</ViewContent>
+      <ViewStatus>Status / Progress</ViewStatus>
+    </View>
+  );
 }
 
 export default HomeView;

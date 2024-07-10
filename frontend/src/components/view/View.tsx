@@ -1,16 +1,7 @@
 import React, { ReactNode } from "react";
+import { Stack } from "@mantine/core";
+import classes from "@/App.module.css";
 
 export function View(params: { title?: string; children: ReactNode }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        flex: 1,
-      }}
-    >
-      {params.children}
-    </div>
-  );
+  return <Stack className={classes.mainContent}>{params.children}</Stack>;
 }

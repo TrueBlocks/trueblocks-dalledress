@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Select, Paper, Grid, Button, Group } from '@mantine/core';
-import classes from '../View.module.css';
-import View from '@/components/view/View';
-import EditableSelect from '@/components/EditableSelect';
-import ResultDialog from '@/components/ResultDialog';
+import React, { useState, useEffect } from "react";
+import { Select, Paper, Grid, Button, Group } from "@mantine/core";
+import classes from "@/App.module.css";
+import { View } from "@/components/view/View";
+import EditableSelect from "@/components/EditableSelect";
+import ResultDialog from "@/components/ResultDialog";
 import {
   GetJson,
   GetData,
@@ -20,21 +20,21 @@ import {
   SetLastAddress,
   SetLastSeries,
   Save,
-} from '@gocode/app/App';
-import { ImageDisplay } from '@/components/ImageDisplay';
-import Tabber from './Tabber';
+} from "@gocode/app/App";
+import { ImageDisplay } from "@/components/ImageDisplay";
+import Tabber from "./Tabber";
 
 function DalleView() {
-  const [address, setAddress] = useState<string>('');
-  const [json, setJson] = useState<string>('');
-  const [data, setData] = useState<string>('');
-  const [prompt, setPrompt] = useState<string>('');
-  const [enhanced, setEnhanced] = useState<string>('');
-  const [series, setSeries] = useState<string>('');
-  const [terse, setTerse] = useState<string>('');
-  const [image, setImage] = useState<string>('');
+  const [address, setAddress] = useState<string>("");
+  const [json, setJson] = useState<string>("");
+  const [data, setData] = useState<string>("");
+  const [prompt, setPrompt] = useState<string>("");
+  const [enhanced, setEnhanced] = useState<string>("");
+  const [series, setSeries] = useState<string>("");
+  const [terse, setTerse] = useState<string>("");
+  const [image, setImage] = useState<string>("");
   const [imageLoading, setImageLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>('json');
+  const [activeTab, setActiveTab] = useState<string>("json");
   const [dialogOpened, setDialogOpened] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -44,7 +44,7 @@ function DalleView() {
   };
 
   const handleGenerate = () => {
-    setEnhanced('Loading...');
+    setEnhanced("Loading...");
     setImageLoading(true);
     GenerateImage(address).then((value: string) => {
       setImageLoading(false);
@@ -67,7 +67,7 @@ function DalleView() {
       if (lastAddress && lastAddress.length > 0) {
         setAddress(lastAddress);
       } else {
-        setAddress('0xf503017d7baf7fbc0fff7492b751025c6a78179b');
+        setAddress("0xf503017d7baf7fbc0fff7492b751025c6a78179b");
       }
     });
   }, []);
@@ -108,12 +108,12 @@ function DalleView() {
   };
 
   const tabItems = [
-    { value: 'series', label: 'Series', content: series },
-    { value: 'json', label: 'JSON', content: json },
-    { value: 'data', label: 'Data', content: data },
-    { value: 'terse', label: 'Terse', content: terse },
-    { value: 'prompt', label: 'Prompt', content: prompt },
-    { value: 'enhanced', label: 'Enhanced', content: enhanced },
+    { value: "series", label: "Series", content: series },
+    { value: "json", label: "JSON", content: json },
+    { value: "data", label: "Data", content: data },
+    { value: "terse", label: "Terse", content: terse },
+    { value: "prompt", label: "Prompt", content: prompt },
+    { value: "enhanced", label: "Enhanced", content: enhanced },
   ];
 
   return (
@@ -121,17 +121,17 @@ function DalleView() {
       <div className={classes.content}>
         <Grid>
           <Grid.Col span={8} className={classes.gridColumn}>
-            <Group mt="md" style={{ justifyContent: 'flex-start' }}>
+            <Group mt="md" style={{ justifyContent: "flex-start" }}>
               <EditableSelect
                 value={address}
                 onChange={(value) => setAddress(value)}
                 label="Select or enter an address or ENS name"
                 placeholder="Enter or select an address"
               />
-              <Button onClick={handleGenerate} style={{ marginTop: '22px' }}>
+              <Button onClick={handleGenerate} style={{ marginTop: "22px" }}>
                 Generate
               </Button>
-              <Button onClick={handleSave} style={{ marginTop: '22px' }}>
+              <Button onClick={handleSave} style={{ marginTop: "22px" }}>
                 Save
               </Button>
             </Group>

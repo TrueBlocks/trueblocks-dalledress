@@ -50,7 +50,6 @@ func (s *Session) Load() bool {
 func (s *Session) Save() {
 	fn := getSessionFn()
 	if contents, _ := json.Marshal(s); len(contents) > 0 {
-		// logger.Info("Saving session to", fn)
 		file.StringToAsciiFile(fn, string(contents))
 	}
 }

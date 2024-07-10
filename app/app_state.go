@@ -1,13 +1,5 @@
 package app
 
-import (
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/config"
-)
-
-func (a *App) GetSession() *config.Session {
-	return &a.session
-}
-
 func (a *App) GetLastRoute() string {
 	return a.GetSession().LastRoute
 }

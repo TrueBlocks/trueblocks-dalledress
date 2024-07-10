@@ -141,8 +141,8 @@ func (a *App) DomReady(ctx context.Context) {
 	if os.Getenv("TB_CMD_LINE") == "true" {
 		return
 	}
-	runtime.WindowSetPosition(a.ctx, a.GetSession().X, a.GetSession().Y)
-	runtime.WindowSetSize(a.ctx, a.GetSession().Width, a.GetSession().Height)
+	runtime.WindowSetPosition(a.ctx, a.session.X, a.session.Y)
+	runtime.WindowSetSize(a.ctx, a.session.Width, a.session.Height)
 	runtime.WindowShow(a.ctx)
 }
 
@@ -150,23 +150,14 @@ func (a *App) Shutdown(ctx context.Context) {
 	if os.Getenv("TB_CMD_LINE") == "true" {
 		return
 	}
-	a.GetSession().X, a.GetSession().Y = runtime.WindowGetPosition(a.ctx)
-	a.GetSession().Width, a.GetSession().Height = runtime.WindowGetSize(a.ctx)
-	a.GetSession().Y += 38 // TODO: This is a hack to account for the menu bar - not sure why it's needed
-	a.GetSession().Save()
+	a.session.X, a.session.Y = runtime.WindowGetPosition(a.ctx)
+	a.session.Width, a.session.Height = runtime.WindowGetSize(a.ctx)
+	a.session.Y += 38 // TODO: This is a hack to account for the menu bar - not sure why it's needed
+	a.session.Save()
 }
 
-func isContentPolicyViolation(err error) bool {
-	var apiErr struct {
-		Code    string `json:"code"`
-		Message string `json:"message"`
-		Param   string `json:"param"`
-		Type    string `json:"type"`
-	}
-	if jsonErr := json.Unmarshal([]byte(err.Error()), &apiErr); jsonErr == nil {
-		return apiErr.Code == "content_policy_violation"
-	}
-	return false
+func (a *App) GetSession() *config.Session {
+	return &a.session
 }
 
 func (a *App) HandleLines() {
@@ -206,11 +197,12 @@ func (a *App) HandleLines() {
 					if err == nil {
 						return
 					}
-					if isContentPolicyViolation(err) {
-						msg := fmt.Sprintf("Content policy violation, skipping retry for address: %s Error: %s", address, err)
-						logger.Error(msg)
-						return
-					} else if strings.Contains(err.Error(), "seed length is less than 66") {
+					// if isContentPolicyViolation(err) {
+					// 	msg := fmt.Sprintf("Content policy violation, skipping retry for address: %s Error: %s", address, err)
+					// 	logger.Error(msg)
+					// 	return
+					// } else 
+					if strings.Contains(err.Error(), "seed length is less than 66") {
 						msg := fmt.Sprintf("Invalid address, skipping retry for address: %s Error: %s", address, err)
 						logger.Error(msg)
 						return

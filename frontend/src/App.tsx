@@ -1,5 +1,5 @@
 import React from "react";
-import { AppShell } from "@mantine/core";
+import { AppShell, Text } from "@mantine/core";
 import Aside from "./components/global/Aside";
 import Header from "./components/global/Header";
 import Navbar from "./components/global/Navbar";
@@ -11,6 +11,7 @@ function App() {
       header={{ height: "3rem" }}
       navbar={{ collapsed: { desktop: false }, width: "10rem", breakpoint: 0 }}
       aside={{ collapsed: { desktop: false }, width: "10rem", breakpoint: 0 }}
+      footer={{ height: "2rem" }}
     >
       <AppShell.Header>
         <Header title="ApplicationTitle" />
@@ -24,6 +25,9 @@ function App() {
       <AppShell.Aside>
         <Aside />
       </AppShell.Aside>
+      <AppShell.Footer>
+        <Text size={"sm"}>time / date / currently opened file</Text>
+      </AppShell.Footer>
     </AppShell>
   );
 }

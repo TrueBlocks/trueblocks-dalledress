@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Select, Paper, Grid, Button, Group } from "@mantine/core";
+import { Stack, Title, Text, Select, Paper, Grid, Button, Group } from "@mantine/core";
 import classes from "@/App.module.css";
-import { View } from "@/components/view/View";
+import { View, ViewStatus } from "@/components/view";
 import EditableSelect from "@/components/EditableSelect";
 import ResultDialog from "@/components/ResultDialog";
 import {
@@ -108,44 +108,75 @@ function DalleView() {
   };
 
   const tabItems = [
-    { value: "series", label: "Series", content: series },
-    { value: "json", label: "JSON", content: json },
-    { value: "data", label: "Data", content: data },
-    { value: "terse", label: "Terse", content: terse },
-    { value: "prompt", label: "Prompt", content: prompt },
-    { value: "enhanced", label: "Enhanced", content: enhanced },
+    { pre: true, item: { value: "series", label: "Series", content: series } },
+    { pre: true, item: { value: "json", label: "JSON", content: json } },
+    { pre: true, item: { value: "data", label: "Data", content: data } },
+    { pre: false, item: { value: "terse", label: "Terse", content: terse } },
+    { pre: false, item: { value: "prompt", label: "Prompt", content: prompt } },
+    { pre: false, item: { value: "enhanced", label: "Enhanced", content: enhanced } },
   ];
 
   return (
-    <View title="Dalle View">
-      <div className={classes.content}>
-        <Grid>
-          <Grid.Col span={8} className={classes.gridColumn}>
-            <Group mt="md" style={{ justifyContent: "flex-start" }}>
-              <EditableSelect
-                value={address}
-                onChange={(value) => setAddress(value)}
-                label="Select or enter an address or ENS name"
-                placeholder="Enter or select an address"
-              />
-              <Button onClick={handleGenerate} style={{ marginTop: "22px" }}>
-                Generate
-              </Button>
-              <Button onClick={handleSave} style={{ marginTop: "22px" }}>
-                Save
-              </Button>
-            </Group>
-            <Paper shadow="xs" p="md" className={classes.imageDisplayContainer}>
-              <ImageDisplay address={image} loading={imageLoading} />
-            </Paper>
-          </Grid.Col>
-          <Grid.Col span={4} className={classes.gridColumn}>
-            <Tabber items={tabItems} activeTab={activeTab} onTabChange={handleTabChange} />
-          </Grid.Col>
-        </Grid>
-        <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />
-      </div>
+    <View>
+      <Title order={3}>Dalle View</Title>
+      <Stack h="100%" className={classes.mainContent}>
+        <div className={classes.content}>
+          <Grid>
+            <Grid.Col span={8} className={classes.gridColumn}>
+              <Group mt="md" style={{ justifyContent: "flex-start" }}>
+                <EditableSelect
+                  value={address}
+                  onChange={(value) => setAddress(value)}
+                  label="Select or enter an address or ENS name"
+                  placeholder="Enter or select an address"
+                />
+                <Button onClick={handleGenerate} style={{ marginTop: "22px" }}>
+                  Generate
+                </Button>
+                <Button onClick={handleSave} style={{ marginTop: "22px" }}>
+                  Save
+                </Button>
+              </Group>
+              <Paper shadow="xs" p="md" className={classes.imageDisplayContainer}>
+                <ImageDisplay address={image} loading={imageLoading} />
+              </Paper>
+            </Grid.Col>
+            <Grid.Col span={4} className={classes.gridColumn}>
+              <Tabber items={tabItems} activeTab={activeTab} onTabChange={handleTabChange} />
+            </Grid.Col>
+          </Grid>
+          <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />
+        </div>
+      </Stack>
+      <ViewStatus>Status / Progress</ViewStatus>
     </View>
+    //   <div className={classes.content}>
+    //     <Grid>
+    //       <Grid.Col span={8} className={classes.gridColumn}>
+    //         <Group mt="md" style={{ justifyContent: "flex-start" }}>
+    //           <EditableSelect
+    //             value={address}
+    //             onChange={(value) => setAddress(value)}
+    //             label="Select or enter an address or ENS name"
+    //             placeholder="Enter or select an address"
+    //           />
+    //           <Button onClick={handleGenerate} style={{ marginTop: "22px" }}>
+    //             Generate
+    //           </Button>
+    //           <Button onClick={handleSave} style={{ marginTop: "22px" }}>
+    //             Save
+    //           </Button>
+    //         </Group>
+    //         <Paper shadow="xs" p="md" className={classes.imageDisplayContainer}>
+    //           <ImageDisplay address={image} loading={imageLoading} />
+    //         </Paper>
+    //       </Grid.Col>
+    //       <Grid.Col span={4} className={classes.gridColumn}>
+    //         <Tabber items={tabItems} activeTab={activeTab} onTabChange={handleTabChange} />
+    //       </Grid.Col>
+    //     </Grid>
+    //     <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />
+    //   </div>
   );
 }
 

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Text, Image } from '@mantine/core';
-import { GetTitle } from '@gocode/app/App';
+import React, { useState, useEffect } from "react";
+import { Text, Image } from "@mantine/core";
+import { GetTitle } from "@gocode/app/App";
 
 export const ImageDisplay = ({ address, loading }: { address: string; loading: boolean }) => {
-  var [title, setTitle] = useState<string>('');
+  var [title, setTitle] = useState<string>("");
 
   useEffect(() => {
     GetTitle(address).then((value: string) => {
@@ -12,7 +12,7 @@ export const ImageDisplay = ({ address, loading }: { address: string; loading: b
   }, [address, loading]);
 
   const imgSrc = `http://localhost:8889/files/${address}&timestamp=${new Date().getTime()}`;
-  if (loading || !address || address === '') {
+  if (loading || !address || address === "") {
     return (
       <div>
         <Text>{title}</Text>
@@ -24,7 +24,7 @@ export const ImageDisplay = ({ address, loading }: { address: string; loading: b
   return (
     <div>
       <Text>{title}</Text>
-      <Image src={imgSrc} alt={address} />
+      <Image style={{ height: "700px" }} fit="contain" src={imgSrc} alt={address} />
     </div>
   );
 };

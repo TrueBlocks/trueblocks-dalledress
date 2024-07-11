@@ -16,6 +16,10 @@ func (a *App) GetNames(first, pageSize int) []types.Name {
 	return a.names[first:last]
 }
 
+func (a *App) GetNamesCnt() int {
+	return len(a.names)
+}
+
 func (a *App) loadNames() error {
 	opts := sdk.NamesOptions{
 		Regular: true,

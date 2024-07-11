@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@tabler/icons-react": "^2.46.0",
+    "@tanstack/react-table": "^8.19.2",
     "dirname": "^0.1.0",
     "path": "^0.12.7",
     "react": "^18.2.0",

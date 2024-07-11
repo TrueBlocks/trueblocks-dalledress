@@ -30,6 +30,8 @@ export function GetLastTab():Promise<string>;
 
 export function GetNames(arg1:number,arg2:number):Promise<Array<types.Name>>;
 
+export function GetNamesCnt():Promise<number>;
+
 export function GetPrompt(arg1:string):Promise<string>;
 
 export function GetSeries(arg1:string):Promise<string>;

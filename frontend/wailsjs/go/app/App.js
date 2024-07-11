@@ -86,10 +86,6 @@ export function MakeDalleDress(arg1) {
   return window['go']['app']['App']['MakeDalleDress'](arg1);
 }
 
-export function MaxNames() {
-  return window['go']['app']['App']['MaxNames']();
-}
-
 export function Save(arg1) {
   return window['go']['app']['App']['Save'](arg1);
 }

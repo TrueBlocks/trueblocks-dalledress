@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
@@ -41,6 +42,7 @@ func main() {
 			LogLevel:         wLogger.ERROR,
 			Bind: []interface{}{
 				a,
+				&types.Name{},
 			},
 			StartHidden: true,
 			AssetServer: &assetserver.Options{

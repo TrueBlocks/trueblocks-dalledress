@@ -18,36 +18,26 @@ function Menu() {
     setActiveRoute(route);
   };
 
+  var menuItems = [
+    { route: "/", label: "Home", icon: <IconHome /> },
+    { route: "/dalle", label: "Dalle", icon: <IconSpider /> },
+    { route: "/names", label: "Names", icon: <IconTag /> },
+    { route: "/series", label: "Series", icon: <IconList /> },
+    { route: "/settings", label: "Settings", icon: <IconSettings /> },
+  ];
+
   return (
     <div style={{ flexGrow: 1 }}>
-      <StyledNavLink
-        label="Home"
-        icon={<IconHome />}
-        href="/"
-        onClick={() => handleRouteChange("/")}
-        activeRoute={activeRoute}
-      />
-      <StyledNavLink
-        label="Dalle"
-        icon={<IconSpider />}
-        href="/dalle"
-        onClick={() => handleRouteChange("/dalle")}
-        activeRoute={activeRoute}
-      />
-      <StyledNavLink
-        label="Names"
-        icon={<IconTag />}
-        href="/names"
-        onClick={() => handleRouteChange("/names")}
-        activeRoute={activeRoute}
-      />
-      <StyledNavLink
-        label="Settings"
-        icon={<IconSettings />}
-        href="/settings"
-        onClick={() => handleRouteChange("/settings")}
-        activeRoute={activeRoute}
-      />
+      {menuItems.map((item) => (
+        <StyledNavLink
+          key={item.route}
+          label={item.label}
+          icon={item.icon}
+          href={item.route}
+          onClick={() => handleRouteChange(item.route)}
+          activeRoute={activeRoute}
+        />
+      ))}
     </div>
   );
 }

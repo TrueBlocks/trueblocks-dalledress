@@ -1,10 +1,7 @@
 import React, { useEffect } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import classes from "@/App.module.css";
-import DalleView from "@/views/Dalle/DalleView";
-import NamesView from "@/views/Names/NamesView";
-import HomeView from "@/views/Home/HomeView";
-import SettingsView from "@/views/Settings/SettingsView";
+import { DalleView, NamesView, HomeView, SeriesView, SettingsView } from "@/views";
 import { GetLastRoute } from "@gocode/app/App";
 
 export const Routes = () => {
@@ -16,24 +13,25 @@ export const Routes = () => {
     });
   }, [setLocation]);
 
+  var menuItems = [
+    { route: "/dalle", component: DalleView },
+    { route: "/names", component: NamesView },
+    { route: "/series", component: SeriesView },
+    { route: "/settings", component: SettingsView },
+    { route: "/", component: HomeView },
+  ];
+
   return (
     <div className={classes.mainContent}>
       <Switch>
-        <Route path="/dalle">
-          <DalleView />
-        </Route>
-        <Route path="/names">
-          <NamesView />
-        </Route>
-        <Route path="/settings">
-          <SettingsView />
-        </Route>
-        <Route path="/">
-          <HomeView />
-        </Route>
+        {menuItems.map((item) => (
+          <Route key={item.route} path={item.route}>
+            <item.component />
+          </Route>
+        ))}
       </Switch>
     </div>
   );
-}
+};
 
 export default Routes;

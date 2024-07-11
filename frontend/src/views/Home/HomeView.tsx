@@ -3,7 +3,7 @@ import { Stack, Text, Title } from "@mantine/core";
 import classes from "@/App.module.css";
 import { View, ViewStatus } from "@/components/view";
 
-function HomeView() {
+export function HomeView() {
   return (
     <View>
       <Title order={3}>Home View Title</Title>
@@ -14,5 +14,3 @@ function HomeView() {
     </View>
   );
 }
-
-export default HomeView;

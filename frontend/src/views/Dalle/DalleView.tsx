@@ -24,7 +24,7 @@ import {
 import { ImageDisplay } from "@/components/ImageDisplay";
 import Tabber from "./Tabber";
 
-function DalleView() {
+export function DalleView() {
   const [address, setAddress] = useState<string>("");
   const [json, setJson] = useState<string>("");
   const [data, setData] = useState<string>("");
@@ -150,34 +150,5 @@ function DalleView() {
       </Stack>
       <ViewStatus>Status / Progress</ViewStatus>
     </View>
-    //   <div className={classes.content}>
-    //     <Grid>
-    //       <Grid.Col span={8} className={classes.gridColumn}>
-    //         <Group mt="md" style={{ justifyContent: "flex-start" }}>
-    //           <EditableSelect
-    //             value={address}
-    //             onChange={(value) => setAddress(value)}
-    //             label="Select or enter an address or ENS name"
-    //             placeholder="Enter or select an address"
-    //           />
-    //           <Button onClick={handleGenerate} style={{ marginTop: "22px" }}>
-    //             Generate
-    //           </Button>
-    //           <Button onClick={handleSave} style={{ marginTop: "22px" }}>
-    //             Save
-    //           </Button>
-    //         </Group>
-    //         <Paper shadow="xs" p="md" className={classes.imageDisplayContainer}>
-    //           <ImageDisplay address={image} loading={imageLoading} />
-    //         </Paper>
-    //       </Grid.Col>
-    //       <Grid.Col span={4} className={classes.gridColumn}>
-    //         <Tabber items={tabItems} activeTab={activeTab} onTabChange={handleTabChange} />
-    //       </Grid.Col>
-    //     </Grid>
-    //     <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />
-    //   </div>
   );
 }
-
-export default DalleView;

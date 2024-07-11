@@ -49,7 +49,7 @@ func (s *Session) Load() bool {
 // Save saves the session to the configuration folder.
 func (s *Session) Save() {
 	fn := getSessionFn()
-	if contents, _ := json.Marshal(s); len(contents) > 0 {
+	if contents, _ := json.MarshalIndent(s, "", "  "); len(contents) > 0 {
 		file.StringToAsciiFile(fn, string(contents))
 	}
 }

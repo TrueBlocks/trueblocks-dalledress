@@ -1,60 +1,60 @@
 import React, { useState, useEffect } from "react";
-import { GetNames, MaxNames, GetFilelist } from "@gocode/app/App";
+import { GetNames } from "@gocode/app/App";
+import { types } from "@gocode/models";
 import { useHotkeys } from "react-hotkeys-hook";
 import classes from "@/App.module.css";
 import { View, ViewStatus } from "@/components/view";
-import { Stack, Text, Title } from "@mantine/core";
+import { Stack, Title } from "@mantine/core";
 
-function NamesView() {
-  const [names, setName] = useState<string[]>();
-  const [curName, setCurName] = useState<number>(0);
-  const [maxNames, setMaxNames] = useState<number>(0);
-  const [fileList, setFileList] = useState<string[]>();
+export function NamesView() {
+  const [names, setName] = useState<types.Name[]>();
+  const [nNames, setNamesCount] = useState<number>(0);
+  const [curName, setCurName] = useState<number>(-1);
 
   useHotkeys("left", (event) => {
-    event.preventDefault();
     setCurName(curName - 1 < 0 ? 0 : curName - 1);
+    event.preventDefault();
   });
   useHotkeys("up", (event) => {
-    event.preventDefault();
     setCurName(curName - 20 < 0 ? 0 : curName - 20);
+    event.preventDefault();
   });
   useHotkeys("right", (event) => {
+    setCurName(curName + 1 > nNames ? nNames : curName + 1);
     event.preventDefault();
-    setCurName(curName + 1 > maxNames ? maxNames : curName + 1);
   });
   useHotkeys("down", (event) => {
+    setCurName(curName + 20 > nNames ? nNames - 20 : curName + 20);
     event.preventDefault();
-    setCurName(curName + 20 > maxNames ? maxNames - 20 : curName + 20);
   });
   useHotkeys("home", (event) => {
-    event.preventDefault();
     setCurName(0);
+    event.preventDefault();
   });
   useHotkeys("end", (event) => {
+    setCurName(nNames - 20);
     event.preventDefault();
-    setCurName(maxNames - 20);
   });
 
   useEffect(() => {
-    console.log("useEffect", curName);
-    GetNames(curName, 20).then((names: string[]) => setName(names));
-    MaxNames().then((maxNames: number) => setMaxNames(maxNames));
-    GetFilelist().then((fileList: string[]) => setFileList(fileList));
+    GetNames(curName, 20).then((names) => {
+      setName(names);
+      setNamesCount(names?.length);
+    });
   }, [curName]);
+
+  useEffect(() => {
+    setCurName(0);
+  }, []);
 
   return (
     <View>
-      <Title order={3}>Home View Title</Title>
+      <Title order={3}>Names Title</Title>
       <Stack className={classes.mainContent}>
-        {fileList?.map((item, index) => <div key={index}>{item}</div>)}
-        <pre>Number of records: {maxNames}</pre>
+        <pre>Number of records: {nNames}</pre>
         <pre>{JSON.stringify(names, null, 4)}</pre>
-        {/* <Text>Home View Content</Text> */}
       </Stack>
       <ViewStatus>Status / Progress</ViewStatus>
     </View>
   );
 }
-
-export default NamesView;

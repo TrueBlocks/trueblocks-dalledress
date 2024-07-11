@@ -3,7 +3,7 @@ package utils
 import (
 	"context"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/walk"
 )
@@ -19,17 +19,10 @@ func Listing(folderPath string) ([]string, error) {
 	for result := range filenameChan {
 		switch result.Type {
 		case walk.Regular:
-			ret = append(ret, result.Path)
-			logger.Info(colors.Green, result.Path, colors.Off)
-			// ok, err := walker.visitFunc1(walker, result.Path, cnt == 0)
-			// if err != nil {
-			// 	return err
-			// }
-			// if ok {
-			cnt++
-			// } else {
-			// 	return nil
-			// }
+			if file.FileExists(result.Path) {
+				ret = append(ret, result.Path)
+				cnt++
+			}
 		case walk.Cache_NotACache:
 			nRoutines--
 			if nRoutines == 0 {

@@ -18,8 +18,8 @@
     "wouter": "^2.12.1"
   },
   "devDependencies": {
-    "@mantine/core": "^7.5.0",
-    "@mantine/hooks": "^7.5.0",
+    "@mantine/core": "^7.11.1",
+    "@mantine/hooks": "^7.11.1",
     "@types/node": "^20.11.5",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
@@ -33,6 +33,6 @@
     "eslint-plugin-react": "^7.33.2",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3",
-    "vite": ">=3.2.10"
+    "vite": "^3.2.0"
   }
 }

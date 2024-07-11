@@ -1,9 +1,18 @@
 import React from "react";
-import View from "@/components/view/View";
+import { Stack, Text, Title } from "@mantine/core";
+import classes from "@/App.module.css";
+import { View, ViewStatus } from "@/components/view";
 
-// HomeView is temporary. It will probably be removed later
 function HomeView() {
-  return <View title="Welcome">Welcome to ApplicationTitle 🔥🚀</View>;
+  return (
+    <View>
+      <Title order={3}>Home View Title</Title>
+      <Stack className={classes.mainContent}>
+        <Text>Home View Content</Text>
+      </Stack>
+      <ViewStatus>Status / Progress</ViewStatus>
+    </View>
+  );
 }
 
 export default HomeView;

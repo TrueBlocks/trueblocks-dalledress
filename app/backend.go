@@ -16,7 +16,15 @@ import (
 var dalleCacheMutex sync.Mutex
 
 func (a *App) MakeDalleDress(addressIn string) (*dalle.DalleDress, error) {
+	dalleCacheMutex.Lock()
+	defer dalleCacheMutex.Unlock()
+	if a.dalleCache[addressIn] != nil {
+		logger.Info("Returning cached dalle for", addressIn)
+		return a.dalleCache[addressIn], nil
+	}
+
 	address := addressIn
+	logger.Info("Making dalle for", addressIn)
 	if strings.HasSuffix(address, ".eth") {
 		opts := sdk.NamesOptions{
 			Terms: []string{address},
@@ -29,6 +37,7 @@ func (a *App) MakeDalleDress(addressIn string) (*dalle.DalleDress, error) {
 			}
 		}
 	}
+	logger.Info("Resolved", addressIn)
 
 	parts := strings.Split(address, ",")
 	seed := parts[0] + reverse(parts[0])
@@ -39,16 +48,10 @@ func (a *App) MakeDalleDress(addressIn string) (*dalle.DalleDress, error) {
 		seed = seed[2:66]
 	}
 
-	dalleCacheMutex.Lock()
-	defer dalleCacheMutex.Unlock()
-
-	if a.dallesCache == nil {
-		a.dallesCache = make(map[string]*dalle.DalleDress)
-	}
 	fn := validFilename(address)
-	if a.dallesCache[fn] != nil {
+	if a.dalleCache[fn] != nil {
 		logger.Info("Returning cached dalle for", addressIn)
-		return a.dallesCache[fn], nil
+		return a.dalleCache[fn], nil
 	}
 
 	dd := dalle.DalleDress{
@@ -86,7 +89,9 @@ func (a *App) MakeDalleDress(addressIn string) (*dalle.DalleDress, error) {
 		dd.EnhancedPrompt = file.AsciiFileToString(fn)
 	}
 
-	a.dallesCache[dd.Filename] = &dd
+	a.dalleCache[dd.Filename] = &dd
+	a.dalleCache[addressIn] = &dd
+
 	return &dd, nil
 }
 

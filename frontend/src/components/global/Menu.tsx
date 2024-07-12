@@ -2,19 +2,19 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { NavLink } from "@mantine/core";
 import { IconHome, IconSettings, IconTag, IconList, IconSpider } from "@tabler/icons-react";
 import { Link, useRoute } from "wouter";
-import { GetLastRoute, SetLastRoute } from "@gocode/app/App";
+import { GetLast, SetLast } from "@gocode/app/App";
 
 function Menu() {
   const [activeRoute, setActiveRoute] = useState("/");
 
   useEffect(() => {
-    const lastRoute = (GetLastRoute() || "/").then((route) => {
+    const lastRoute = (GetLast("route") || "/").then((route) => {
       setActiveRoute(route);
     });
   }, []);
 
   const handleRouteChange = (route: string) => {
-    SetLastRoute(route);
+    SetLast("route", route);
     setActiveRoute(route);
   };
 

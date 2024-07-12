@@ -32,7 +32,7 @@
       ],
       "@gocode/*": [
         "../wailsjs/go/*"
-      ]
+      ],
     }
   },
   "include": [

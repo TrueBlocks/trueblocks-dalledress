@@ -5,17 +5,16 @@ import { GetNames, GetNamesCnt } from "@gocode/app/App";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Stack, Table, Title } from "@mantine/core";
-import { type Name, defaultData, columns, createRowModel } from "./Names";
+import { namesColumns, createRowModel } from "./Names";
 import { View, ViewStatus } from "@/components/view";
-import { VAlignedTd } from "./VAlignedTd";
 
-const columnHelper = createColumnHelper<Name>();
+const columnHelper = createColumnHelper<types.Name>();
 
 export function NamesView() {
-  const [data, _setData] = React.useState(() => [...defaultData]);
-  const [names, setName] = useState<types.Name[]>();
+  const [names, _setData] = React.useState<types.Name[]>(() => []);
   const [nNames, setNamesCount] = useState<number>(0);
   const [curName, setCurName] = useState<number>(-1);
+  const [perPage, setPerPage] = useState<number>(20);
 
   useHotkeys("left", (event) => {
     setCurName(curName - 1 < 0 ? 0 : curName - 1);
@@ -43,9 +42,8 @@ export function NamesView() {
   });
 
   useEffect(() => {
-    GetNames(curName, 20).then((names: types.Name[]) => {
-      _setData(names?.map((name) => createRowModel(name)) ?? []);
-      setName(names);
+    GetNames(curName, perPage).then((names: types.Name[]) => {
+      _setData(names);
       GetNamesCnt().then((cnt) => {
         setNamesCount(cnt);
       });
@@ -57,8 +55,8 @@ export function NamesView() {
   }, []);
 
   const table = useReactTable({
-    data,
-    columns,
+    data: names,
+    columns: namesColumns,
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -82,22 +80,13 @@ export function NamesView() {
             {table.getRowModel().rows.map((row) => (
               <Table.Tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <VAlignedTd key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</VAlignedTd>
+                  <Table.Td style={{ verticalAlign: "top" }} key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Table.Td>
                 ))}
               </Table.Tr>
             ))}
           </Table.Tbody>
-          {/* <Table.Tfoot>
-        {table.getFooterGroups().map((footerGroup) => (
-          <Table.Tr key={footerGroup.id}>
-            {footerGroup.headers.map((header) => (
-              <Table.Th key={header.id}>
-                {header.isPlaceholder ? null : flexRender(header.column.columnDef.footer, header.getContext())}
-              </Table.Th>
-            ))}
-          </Table.Tr>
-        ))}
-      </Table.Tfoot> */}
         </Table>
       </Stack>
       <ViewStatus>Status / Progress</ViewStatus>

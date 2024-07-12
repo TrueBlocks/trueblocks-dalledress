@@ -6,8 +6,8 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/utils"
 )
 
-func (a *App) GetFilelist() []string {
-	folder := filepath.Join("./output/series")
+func (a *App) GetFilelist(baseFolder string) []string {
+	folder := filepath.Join(baseFolder)
 	if list, err := utils.Listing(folder); err != nil {
 		return []string{err.Error()}
 	} else {

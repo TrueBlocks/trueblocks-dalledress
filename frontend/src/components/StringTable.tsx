@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Table, Checkbox } from "@mantine/core";
+import { Link, useLocation } from "wouter";
+import { Anchor } from "@mantine/core";
+import { SetLast } from "@gocode/app/App";
 
 export interface DataItem {
   id: number;
@@ -12,6 +15,16 @@ interface StringTableProps {
 
 const StringTable: React.FC<StringTableProps> = ({ data }) => {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [location, setLocation] = useLocation();
+
+  const handleSeriesClick = async (seriesName: string) => {
+    try {
+      await SetLast("series", seriesName);
+      setLocation("/dalle");
+    } catch (error) {
+      console.error("Error updating data:", error);
+    }
+  };
 
   const handleCheckboxChange = (id: number) => {
     setSelectedIds((prevSelectedIds) =>
@@ -33,7 +46,17 @@ const StringTable: React.FC<StringTableProps> = ({ data }) => {
       <Table.Td>
         <Checkbox checked={selectedIds.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} />
       </Table.Td>
-      <Table.Td>{item.value}</Table.Td>
+      <Table.Td>
+        <Link
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            handleSeriesClick(item.value);
+          }}
+        >
+          <Anchor>{item.value}</Anchor>
+        </Link>
+      </Table.Td>
     </Table.Tr>
   ));
 

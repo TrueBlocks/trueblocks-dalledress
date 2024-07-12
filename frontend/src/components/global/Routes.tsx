@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import classes from "@/App.module.css";
 import { DalleView, NamesView, HomeView, SeriesView, SettingsView } from "@/views";
-import { GetLastRoute } from "@gocode/app/App";
+import { GetLast } from "@gocode/app/App";
 
 export const Routes = () => {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    const lastRoute = (GetLastRoute() || "/").then((route) => {
+    const lastRoute = (GetLast("route") || "/").then((route) => {
       setLocation(route);
     });
   }, [setLocation]);

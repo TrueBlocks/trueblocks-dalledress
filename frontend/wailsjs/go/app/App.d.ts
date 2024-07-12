@@ -14,19 +14,13 @@ export function GetEnhanced(arg1:string):Promise<string>;
 
 export function GetExistingAddrs():Promise<Array<string>>;
 
-export function GetFilelist():Promise<Array<string>>;
+export function GetFilelist(arg1:string):Promise<Array<string>>;
 
 export function GetFilename(arg1:string):Promise<string>;
 
 export function GetJson(arg1:string):Promise<string>;
 
-export function GetLastAddress():Promise<string>;
-
-export function GetLastRoute():Promise<string>;
-
-export function GetLastSeries():Promise<string>;
-
-export function GetLastTab():Promise<string>;
+export function GetLast(arg1:string):Promise<string>;
 
 export function GetNames(arg1:number,arg2:number):Promise<Array<types.Name>>;
 
@@ -48,14 +42,10 @@ export function LoadSeries():Promise<dalle.Series>;
 
 export function MakeDalleDress(arg1:string):Promise<dalle.DalleDress>;
 
+export function ReloadDatabases():Promise<void>;
+
 export function Save(arg1:string):Promise<boolean>;
 
-export function SetLastAddress(arg1:string):Promise<void>;
-
-export function SetLastRoute(arg1:string):Promise<void>;
-
-export function SetLastSeries(arg1:string):Promise<void>;
-
-export function SetLastTab(arg1:string):Promise<void>;
+export function SetLast(arg1:string,arg2:string):Promise<void>;
 
 export function String():Promise<string>;

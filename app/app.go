@@ -34,16 +34,49 @@ type App struct {
 	titleTemplate  *template.Template
 	Series         dalle.Series `json:"series"`
 	names          []types.Name
-	dallesCache    map[string]*dalle.DalleDress
+	dalleCache     map[string]*dalle.DalleDress
 }
 
 func NewApp() *App {
 	a := App{
-		databases: make(map[string][]string),
+		databases:  make(map[string][]string),
+		dalleCache: make(map[string]*dalle.DalleDress),
 	}
 
 	// it's okay if it's not found
 	_ = a.session.Load()
+
+	var err error
+	if a.promptTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
+		logger.Fatal("could not create prompt template:", err)
+	}
+	if a.dataTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
+		logger.Fatal("could not create data template:", err)
+	}
+	if a.titleTemplate, err = template.New("terse").Parse(titleTemplate); err != nil {
+		logger.Fatal("could not create title template:", err)
+	}
+	if a.terseTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
+		logger.Fatal("could not create terse template:", err)
+	}
+	if a.authorTemplate, err = template.New("author").Parse(authorTemplate); err != nil {
+		logger.Fatal("could not create prompt template:", err)
+	}
+	logger.Info("Compiled templates")
+
+	a.ReloadDatabases()
+
+	return &a
+}
+
+func (a App) String() string {
+	bytes, _ := json.MarshalIndent(a, "", "  ")
+	return string(bytes)
+}
+
+func (a *App) ReloadDatabases() {
+	a.Series = dalle.Series{}
+	a.databases = make(map[string][]string)
 
 	var err error
 	if a.Series, err = a.LoadSeries(); err != nil {
@@ -64,35 +97,12 @@ func NewApp() *App {
 		}
 	}
 	logger.Info("Loaded", len(dalle.DatabaseNames), "databases")
-
-	if a.promptTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
-		logger.Fatal("could not create prompt template:", err)
-	}
-	if a.dataTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
-		logger.Fatal("could not create data template:", err)
-	}
-	if a.titleTemplate, err = template.New("terse").Parse(titleTemplate); err != nil {
-		logger.Fatal("could not create title template:", err)
-	}
-	if a.terseTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
-		logger.Fatal("could not create terse template:", err)
-	}
-	if a.authorTemplate, err = template.New("author").Parse(authorTemplate); err != nil {
-		logger.Fatal("could not create prompt template:", err)
-	}
-	logger.Info("Compiled templates")
-
-	return &a
-}
-
-func (a App) String() string {
-	bytes, _ := json.MarshalIndent(a, "", "  ")
-	return string(bytes)
 }
 
 func (a *App) toLines(db string) ([]string, error) {
 	filename := "./databases/" + db + ".csv"
 	lines := file.AsciiFileToLines(filename)
+	lines = lines[1:] // skip header
 	var err error
 	if len(lines) == 0 {
 		err = fmt.Errorf("could not load %s", filename)
@@ -201,7 +211,7 @@ func (a *App) HandleLines() {
 					// 	msg := fmt.Sprintf("Content policy violation, skipping retry for address: %s Error: %s", address, err)
 					// 	logger.Error(msg)
 					// 	return
-					// } else 
+					// } else
 					if strings.Contains(err.Error(), "seed length is less than 66") {
 						msg := fmt.Sprintf("Invalid address, skipping retry for address: %s Error: %s", address, err)
 						logger.Error(msg)
@@ -247,7 +257,7 @@ func (a *App) LoadSeries() (dalle.Series, error) {
 		return dalle.Series{}, err
 	}
 
-	s.Suffix = strings.ReplaceAll(s.Suffix, " ", "-")
+	s.Suffix = strings.Trim(strings.ReplaceAll(s.Suffix, " ", "-"), "-")
 	s.SaveSeries(filepath.Join("./output/series", s.Suffix+".json"), 0)
 	return s, nil
 }

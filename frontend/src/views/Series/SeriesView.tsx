@@ -9,7 +9,12 @@ export function SeriesView() {
   const [fileList, setFileList] = useState<string[]>([]);
 
   useEffect(() => {
-    GetFilelist().then((fileList: string[]) => setFileList(fileList));
+    GetFilelist("./output/series").then((fileList: string[]) => {
+      fileList = fileList.map((file) => file.replace("output/series/", ""));
+      fileList = fileList.filter((file) => file.includes(".json") && file !== ".json");
+      fileList = fileList.map((file) => file.replace(".json", ""));
+      setFileList(fileList);
+    });
   }, []);
 
   const dataItems = fileList.map((file, index) => ({ id: index, value: file }));

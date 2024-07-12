@@ -22,8 +22,8 @@ export function GetExistingAddrs() {
   return window['go']['app']['App']['GetExistingAddrs']();
 }
 
-export function GetFilelist() {
-  return window['go']['app']['App']['GetFilelist']();
+export function GetFilelist(arg1) {
+  return window['go']['app']['App']['GetFilelist'](arg1);
 }
 
 export function GetFilename(arg1) {
@@ -34,20 +34,8 @@ export function GetJson(arg1) {
   return window['go']['app']['App']['GetJson'](arg1);
 }
 
-export function GetLastAddress() {
-  return window['go']['app']['App']['GetLastAddress']();
-}
-
-export function GetLastRoute() {
-  return window['go']['app']['App']['GetLastRoute']();
-}
-
-export function GetLastSeries() {
-  return window['go']['app']['App']['GetLastSeries']();
-}
-
-export function GetLastTab() {
-  return window['go']['app']['App']['GetLastTab']();
+export function GetLast(arg1) {
+  return window['go']['app']['App']['GetLast'](arg1);
 }
 
 export function GetNames(arg1, arg2) {
@@ -90,24 +78,16 @@ export function MakeDalleDress(arg1) {
   return window['go']['app']['App']['MakeDalleDress'](arg1);
 }
 
+export function ReloadDatabases() {
+  return window['go']['app']['App']['ReloadDatabases']();
+}
+
 export function Save(arg1) {
   return window['go']['app']['App']['Save'](arg1);
 }
 
-export function SetLastAddress(arg1) {
-  return window['go']['app']['App']['SetLastAddress'](arg1);
-}
-
-export function SetLastRoute(arg1) {
-  return window['go']['app']['App']['SetLastRoute'](arg1);
-}
-
-export function SetLastSeries(arg1) {
-  return window['go']['app']['App']['SetLastSeries'](arg1);
-}
-
-export function SetLastTab(arg1) {
-  return window['go']['app']['App']['SetLastTab'](arg1);
+export function SetLast(arg1, arg2) {
+  return window['go']['app']['App']['SetLast'](arg1, arg2);
 }
 
 export function String() {

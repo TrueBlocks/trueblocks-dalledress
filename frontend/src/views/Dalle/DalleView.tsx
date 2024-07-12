@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Stack, Title, Text, Select, Paper, Grid, Button, Group } from "@mantine/core";
+import { Stack, Title, Paper, Grid, Button, Group } from "@mantine/core";
 import classes from "@/App.module.css";
 import { View, ViewStatus } from "@/components/view";
 import EditableSelect from "@/components/EditableSelect";
@@ -13,12 +13,8 @@ import {
   GetEnhanced,
   GetFilename,
   GenerateImage,
-  GetLastTab,
-  GetLastAddress,
-  GetLastSeries,
-  SetLastTab,
-  SetLastAddress,
-  SetLastSeries,
+  GetLast,
+  SetLast,
   Save,
 } from "@gocode/app/App";
 import { ImageDisplay } from "@/components/ImageDisplay";
@@ -37,6 +33,7 @@ export function DalleView() {
   const [activeTab, setActiveTab] = useState<string>("json");
   const [dialogOpened, setDialogOpened] = useState(false);
   const [success, setSuccess] = useState(false);
+  const gridWidth = 8;
 
   const handleOpenDialog = (result: boolean) => {
     setSuccess(result);
@@ -60,10 +57,10 @@ export function DalleView() {
 
   // On first load of the view, set the most recently viewed tab and address
   useEffect(() => {
-    GetLastTab().then((lastTab: string) => {
+    GetLast("tab").then((lastTab: string) => {
       setActiveTab(lastTab);
     });
-    GetLastAddress().then((lastAddress: string) => {
+    GetLast("address").then((lastAddress: string) => {
       if (lastAddress && lastAddress.length > 0) {
         setAddress(lastAddress);
       } else {
@@ -75,7 +72,7 @@ export function DalleView() {
   // When address changes, update all the data
   useEffect(() => {
     if (address && !imageLoading) {
-      SetLastAddress(address);
+      SetLast("address", address);
       GetJson(address).then((value: string) => {
         setJson(value);
       });
@@ -103,7 +100,7 @@ export function DalleView() {
   const handleTabChange = (value: string | null) => {
     if (value) {
       setActiveTab(value);
-      SetLastTab(value);
+      SetLast("tab", value);
     }
   };
 
@@ -120,9 +117,9 @@ export function DalleView() {
     <View>
       <Title order={3}>Dalle View</Title>
       <Stack h="100%" className={classes.mainContent}>
-        <div className={classes.content}>
-          <Grid>
-            <Grid.Col span={8} className={classes.gridColumn}>
+        <Grid>
+          <Grid.Col span={gridWidth}>
+            <Stack h="100%" className={classes.mainContent}>
               <Group mt="md" style={{ justifyContent: "flex-start" }}>
                 <EditableSelect
                   value={address}
@@ -137,16 +134,16 @@ export function DalleView() {
                   Save
                 </Button>
               </Group>
-              <Paper shadow="xs" p="md" className={classes.imageDisplayContainer}>
+              <Paper shadow="xs" p="md">
                 <ImageDisplay address={image} loading={imageLoading} />
               </Paper>
-            </Grid.Col>
-            <Grid.Col span={4} className={classes.gridColumn}>
-              <Tabber items={tabItems} activeTab={activeTab} onTabChange={handleTabChange} />
-            </Grid.Col>
-          </Grid>
-          <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />
-        </div>
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span={12 - gridWidth}>
+            <Tabber items={tabItems} activeTab={activeTab} onTabChange={handleTabChange} />
+          </Grid.Col>
+        </Grid>
+        <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />
       </Stack>
       <ViewStatus>Status / Progress</ViewStatus>
     </View>

@@ -30,6 +30,14 @@ export function GetFilename(arg1) {
   return window['go']['app']['App']['GetFilename'](arg1);
 }
 
+export function GetHistory(arg1, arg2, arg3) {
+  return window['go']['app']['App']['GetHistory'](arg1, arg2, arg3);
+}
+
+export function GetHistoryCnt(arg1) {
+  return window['go']['app']['App']['GetHistoryCnt'](arg1);
+}
+
 export function GetJson(arg1) {
   return window['go']['app']['App']['GetJson'](arg1);
 }

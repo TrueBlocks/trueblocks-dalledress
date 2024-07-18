@@ -23,6 +23,7 @@ function Menu() {
     { route: "/dalle", label: "Dalle", icon: <IconSpider /> },
     { route: "/names", label: "Names", icon: <IconTag /> },
     { route: "/series", label: "Series", icon: <IconList /> },
+    { route: "/history", label: "History", icon: <IconList /> },
     { route: "/settings", label: "Settings", icon: <IconSettings /> },
   ];
 

@@ -18,6 +18,10 @@ export function GetFilelist(arg1:string):Promise<Array<string>>;
 
 export function GetFilename(arg1:string):Promise<string>;
 
+export function GetHistory(arg1:string,arg2:number,arg3:number):Promise<Array<types.Transaction>>;
+
+export function GetHistoryCnt(arg1:string):Promise<number>;
+
 export function GetJson(arg1:string):Promise<string>;
 
 export function GetLast(arg1:string):Promise<string>;

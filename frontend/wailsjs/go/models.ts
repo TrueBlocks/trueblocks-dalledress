@@ -1,3 +1,32 @@
+export namespace base {
+	
+	export class Address {
+	    address: number[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Address(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.address = source["address"];
+	    }
+	}
+	export class Hash {
+	    hash: number[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Hash(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hash = source["hash"];
+	    }
+	}
+
+}
+
 export namespace config {
 	
 	export class Session {
@@ -241,15 +270,13 @@ export namespace types {
 	export class Log {
 	    address: base.Address;
 	    articulatedLog?: Function;
-	    // Go type: base
-	    blockHash: any;
+	    blockHash: base.Hash;
 	    blockNumber: number;
 	    data?: string;
 	    logIndex: number;
 	    timestamp?: number;
 	    topics?: base.Hash[];
-	    // Go type: base
-	    transactionHash: any;
+	    transactionHash: base.Hash;
 	    transactionIndex: number;
 	
 	    static createFrom(source: any = {}) {
@@ -260,13 +287,13 @@ export namespace types {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.address = this.convertValues(source["address"], base.Address);
 	        this.articulatedLog = this.convertValues(source["articulatedLog"], Function);
-	        this.blockHash = this.convertValues(source["blockHash"], null);
+	        this.blockHash = this.convertValues(source["blockHash"], base.Hash);
 	        this.blockNumber = source["blockNumber"];
 	        this.data = source["data"];
 	        this.logIndex = source["logIndex"];
 	        this.timestamp = source["timestamp"];
 	        this.topics = this.convertValues(source["topics"], base.Hash);
-	        this.transactionHash = this.convertValues(source["transactionHash"], null);
+	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
 	        this.transactionIndex = source["transactionIndex"];
 	    }
 	
@@ -346,8 +373,7 @@ export namespace types {
 	}
 	
 	export class Receipt {
-	    // Go type: base
-	    blockHash?: any;
+	    blockHash?: base.Hash;
 	    blockNumber: number;
 	    contractAddress?: base.Address;
 	    cumulativeGasUsed?: number;
@@ -358,8 +384,7 @@ export namespace types {
 	    logs: Log[];
 	    status: number;
 	    to?: base.Address;
-	    // Go type: base
-	    transactionHash: any;
+	    transactionHash: base.Hash;
 	    transactionIndex: number;
 	
 	    static createFrom(source: any = {}) {
@@ -368,7 +393,7 @@ export namespace types {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.blockHash = this.convertValues(source["blockHash"], null);
+	        this.blockHash = this.convertValues(source["blockHash"], base.Hash);
 	        this.blockNumber = source["blockNumber"];
 	        this.contractAddress = this.convertValues(source["contractAddress"], base.Address);
 	        this.cumulativeGasUsed = source["cumulativeGasUsed"];
@@ -379,7 +404,7 @@ export namespace types {
 	        this.logs = this.convertValues(source["logs"], Log);
 	        this.status = source["status"];
 	        this.to = this.convertValues(source["to"], base.Address);
-	        this.transactionHash = this.convertValues(source["transactionHash"], null);
+	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
 	        this.transactionIndex = source["transactionIndex"];
 	    }
 	
@@ -536,16 +561,14 @@ export namespace types {
 	export class Trace {
 	    action?: TraceAction;
 	    articulatedTrace?: Function;
-	    // Go type: base
-	    blockHash: any;
+	    blockHash: base.Hash;
 	    blockNumber: number;
 	    error?: string;
 	    result?: TraceResult;
 	    subtraces: number;
 	    timestamp: number;
 	    traceAddress: number[];
-	    // Go type: base
-	    transactionHash: any;
+	    transactionHash: base.Hash;
 	    transactionIndex: number;
 	    type?: string;
 	    transactionPosition?: number;
@@ -558,14 +581,14 @@ export namespace types {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.action = this.convertValues(source["action"], TraceAction);
 	        this.articulatedTrace = this.convertValues(source["articulatedTrace"], Function);
-	        this.blockHash = this.convertValues(source["blockHash"], null);
+	        this.blockHash = this.convertValues(source["blockHash"], base.Hash);
 	        this.blockNumber = source["blockNumber"];
 	        this.error = source["error"];
 	        this.result = this.convertValues(source["result"], TraceResult);
 	        this.subtraces = source["subtraces"];
 	        this.timestamp = source["timestamp"];
 	        this.traceAddress = source["traceAddress"];
-	        this.transactionHash = this.convertValues(source["transactionHash"], null);
+	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
 	        this.transactionIndex = source["transactionIndex"];
 	        this.type = source["type"];
 	        this.transactionPosition = source["transactionPosition"];
@@ -638,8 +661,7 @@ export namespace types {
 	    sender: base.Address;
 	    spotPrice: number;
 	    timestamp: number;
-	    // Go type: base
-	    transactionHash: any;
+	    transactionHash: base.Hash;
 	    transactionIndex: number;
 	
 	    static createFrom(source: any = {}) {
@@ -677,7 +699,7 @@ export namespace types {
 	        this.sender = this.convertValues(source["sender"], base.Address);
 	        this.spotPrice = source["spotPrice"];
 	        this.timestamp = source["timestamp"];
-	        this.transactionHash = this.convertValues(source["transactionHash"], null);
+	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
 	        this.transactionIndex = source["transactionIndex"];
 	    }
 	
@@ -701,16 +723,14 @@ export namespace types {
 	}
 	export class Transaction {
 	    articulatedTx?: Function;
-	    // Go type: base
-	    blockHash: any;
+	    blockHash: base.Hash;
 	    blockNumber: number;
 	    from: base.Address;
 	    gas: number;
 	    gasPrice: number;
 	    gasUsed: number;
 	    hasToken: boolean;
-	    // Go type: base
-	    hash: any;
+	    hash: base.Hash;
 	    input: string;
 	    isError: boolean;
 	    maxFeePerGas: number;
@@ -733,14 +753,14 @@ export namespace types {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.articulatedTx = this.convertValues(source["articulatedTx"], Function);
-	        this.blockHash = this.convertValues(source["blockHash"], null);
+	        this.blockHash = this.convertValues(source["blockHash"], base.Hash);
 	        this.blockNumber = source["blockNumber"];
 	        this.from = this.convertValues(source["from"], base.Address);
 	        this.gas = source["gas"];
 	        this.gasPrice = source["gasPrice"];
 	        this.gasUsed = source["gasUsed"];
 	        this.hasToken = source["hasToken"];
-	        this.hash = this.convertValues(source["hash"], null);
+	        this.hash = this.convertValues(source["hash"], base.Hash);
 	        this.input = source["input"];
 	        this.isError = source["isError"];
 	        this.maxFeePerGas = source["maxFeePerGas"];

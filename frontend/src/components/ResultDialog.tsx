@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal, Text } from '@mantine/core';
+import React from "react";
+import { Modal, Text } from "@mantine/core";
 
 interface ResultDialogProps {
   opened: boolean;
@@ -7,12 +7,10 @@ interface ResultDialogProps {
   success: boolean;
 }
 
-const ResultDialog: React.FC<ResultDialogProps> = ({ opened, onClose, success }) => {
+export const ResultDialog: React.FC<ResultDialogProps> = ({ opened, onClose, success }) => {
   return (
     <Modal opened={opened} onClose={onClose} title="Result">
-      <Text>{success ? 'Success!' : 'Failed!'}</Text>
+      <Text>{success ? "Success!" : "Failed!"}</Text>
     </Modal>
   );
 };
-
-export default ResultDialog;

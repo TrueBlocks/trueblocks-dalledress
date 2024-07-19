@@ -1,6 +1,8 @@
 package app
 
 import (
+	"sync"
+
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
@@ -8,13 +10,16 @@ import (
 )
 
 var addrToHistoryMap = map[base.Address][]types.Transaction{}
+var m = sync.Mutex{}
 
 func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 	address := base.HexToAddress(addr)
+	m.Lock()
+	defer m.Unlock()
+
 	if len(addrToHistoryMap[address]) == 0 {
 		opts := sdk.ExportOptions{
-			Addrs:      []string{addr},
-			Articulate: true,
+			Addrs: []string{addr},
 			Globals: sdk.Globals{
 				Cache: true,
 			},

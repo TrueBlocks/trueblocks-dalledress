@@ -1,6 +1,6 @@
 import React from "react";
 import { Tabs, Text } from "@mantine/core";
-import classes from "../View.module.css";
+import classes from "../Views.module.css";
 
 interface TabItem {
   value: string;

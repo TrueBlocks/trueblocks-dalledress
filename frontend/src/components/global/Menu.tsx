@@ -2,9 +2,9 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { NavLink } from "@mantine/core";
 import { IconHome, IconSettings, IconTag, IconList, IconSpider } from "@tabler/icons-react";
 import { Link, useRoute } from "wouter";
-import { GetLast, SetLast } from "../../../wailsjs/go/app/App";
+import { GetLast, SetLast } from "@gocode/app/App";
 
-function Menu() {
+export function Menu() {
   const [activeRoute, setActiveRoute] = useState("/");
 
   useEffect(() => {
@@ -42,8 +42,6 @@ function Menu() {
     </div>
   );
 }
-
-export default Menu;
 
 type StyledNavLinkParams = {
   label: string;

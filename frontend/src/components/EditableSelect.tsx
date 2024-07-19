@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Select } from '@mantine/core';
-import { GetExistingAddrs } from '@gocode/app/App';
+import React, { useState, useEffect } from "react";
+import { Select } from "@mantine/core";
+import { GetExistingAddrs } from "@gocode/app/App";
 
 type SelectItem = {
   value: string;
@@ -14,7 +14,7 @@ interface EditableSelectProps {
   placeholder: string;
 }
 
-const EditableSelect: React.FC<EditableSelectProps> = ({ value, onChange, label, placeholder }) => {
+export const EditableSelect: React.FC<EditableSelectProps> = ({ value, onChange, label, placeholder }) => {
   const [options, setOptions] = useState<SelectItem[]>([]);
   const [inputValue, setInputValue] = useState<string>(value);
 
@@ -24,7 +24,7 @@ const EditableSelect: React.FC<EditableSelectProps> = ({ value, onChange, label,
         const formattedOptions = existingAddrs.map((addr) => ({ value: addr, label: addr }));
         setOptions(formattedOptions);
         if (!existingAddrs.includes(value)) {
-          setInputValue(existingAddrs.length > 0 ? existingAddrs[0] : '');
+          setInputValue(existingAddrs.length > 0 ? existingAddrs[0] : "");
         } else {
           setInputValue(value); // Ensure the inputValue is set to the prop value if it exists in the options
         }
@@ -34,7 +34,7 @@ const EditableSelect: React.FC<EditableSelectProps> = ({ value, onChange, label,
   }, [value]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && inputValue.trim() !== '') {
+    if (event.key === "Enter" && inputValue.trim() !== "") {
       const newOption: SelectItem = { value: inputValue, label: inputValue };
       setOptions((current) => {
         const existingIndex = current.findIndex((option) => option.value.toLowerCase() === inputValue.toLowerCase());
@@ -47,7 +47,7 @@ const EditableSelect: React.FC<EditableSelectProps> = ({ value, onChange, label,
       onChange(inputValue);
       event.preventDefault();
       setTimeout(() => {
-        const selectElement = document.querySelector('.mantine-Select-input') as HTMLElement;
+        const selectElement = document.querySelector(".mantine-Select-input") as HTMLElement;
         if (selectElement) {
           selectElement.blur();
         }
@@ -72,9 +72,7 @@ const EditableSelect: React.FC<EditableSelectProps> = ({ value, onChange, label,
       onSearchChange={setInputValue}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
-      style={{ width: '600px' }}
+      style={{ width: "600px" }}
     />
   );
 };
-
-export default EditableSelect;

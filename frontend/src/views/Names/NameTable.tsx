@@ -1,65 +1,65 @@
 import React from "react";
 import { IconCircleCheck } from "@tabler/icons-react";
-import { types } from "../../../wailsjs/go/models";
+import { types } from "@gocode/models";
 import { createColumnHelper } from "@tanstack/react-table";
 
-export function createRowModel(name: types.Name): types.Name {
-  var cV = function (a: any, classs: any, asMap: boolean = false): any {
-    return a;
-  };
-  return {
-    address: name.address,
-    decimals: name.decimals,
-    isContract: name.isContract,
-    isErc20: name.isErc20,
-    isErc721: name.isErc721,
-    name: name.name,
-    source: name.source,
-    symbol: name.symbol,
-    tags: name.tags,
-    convertValues: cV,
-  };
-}
+// export function createRowModel(name: types.Name): types.Name {
+//   var cV = function (a: any, classs: any, asMap: boolean = false): any {
+//     return a;
+//   };
+//   return {
+//     address: name.address,
+//     decimals: name.decimals,
+//     isContract: name.isContract,
+//     isErc20: name.isErc20,
+//     isErc721: name.isErc721,
+//     name: name.name,
+//     source: name.source,
+//     symbol: name.symbol,
+//     tags: name.tags,
+//     convertValues: cV,
+//   };
+// }
 
-const columnHelper = createColumnHelper<types.Name>();
+const nameColumnHelper = createColumnHelper<types.Name>();
 
-export const namesColumns = [
-  columnHelper.accessor("address", {
+export const nameColumns = [
+  nameColumnHelper.accessor("address", {
     header: () => "Address",
     cell: (info) => info.getValue(),
     size: 100,
   }),
-  columnHelper.accessor("tags", {
+  nameColumnHelper.accessor("tags", {
     header: () => "Tags",
     cell: (info) => info.renderValue(),
     size: 100,
   }),
-  columnHelper.accessor("name", {
+  nameColumnHelper.accessor("name", {
     header: () => "Name",
     cell: (info) => info.renderValue(),
     size: 100,
   }),
-  columnHelper.accessor("symbol", {
+  nameColumnHelper.accessor("symbol", {
     header: () => "Symbol",
     cell: (info) => info.renderValue(),
     size: 100,
   }),
-  columnHelper.accessor("decimals", {
+  nameColumnHelper.accessor("decimals", {
     header: () => "Decimals",
     cell: (info) => info.renderValue(),
     size: 100,
   }),
-  columnHelper.accessor("isContract", {
+  nameColumnHelper.accessor("isContract", {
     header: () => "isContract",
     cell: (info) => (info.getValue() ? <IconCircleCheck size={20} color="white" fill="green" /> : ""),
     size: 100,
   }),
-  columnHelper.accessor("isErc20", {
+  nameColumnHelper.accessor("isErc20", {
     header: () => "isErc20",
     cell: (info) => (info.getValue() ? <IconCircleCheck size={20} color="white" fill="green" /> : ""),
     size: 100,
   }),
-  columnHelper.accessor("isErc721", {
+  nameColumnHelper.accessor("isErc721", {
     header: () => "isErc721",
     cell: (info) => (info.getValue() ? <IconCircleCheck size={20} color="white" fill="green" /> : ""),
     size: 100,

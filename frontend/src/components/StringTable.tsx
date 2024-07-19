@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Table, Checkbox, Anchor } from "@mantine/core";
 import { Link, useLocation } from "wouter";
-import { SetLast } from "../../wailsjs/go/app/App";
+import { SetLast } from "@gocode/app/App";
 
 export interface DataItem {
   id: number;
@@ -12,7 +12,7 @@ interface StringTableProps {
   data: DataItem[];
 }
 
-const StringTable: React.FC<StringTableProps> = ({ data }) => {
+export const StringTable: React.FC<StringTableProps> = ({ data }) => {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [location, setLocation] = useLocation();
 
@@ -73,5 +73,3 @@ const StringTable: React.FC<StringTableProps> = ({ data }) => {
     </Table>
   );
 };
-
-export default StringTable;

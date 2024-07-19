@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
 import { AppShell, Text } from "@mantine/core";
-import Aside from "./components/global/Aside";
-import Header from "./components/global/Header";
-import Navbar from "./components/global/Navbar";
-import Routes from "./components/global/Routes";
-import classes from "/App.module.css";
-import { EventsOn, EventsOff, EventsEmit } from "../wailsjs/runtime";
+import { Aside, Header, Navbar, Routes } from "@components";
+import classes from "@/App.module.css";
+import { EventsOn, EventsOff, EventsEmit } from "@runtime";
 
 function App() {
   const [showHelp, setShowHelp] = React.useState(true);

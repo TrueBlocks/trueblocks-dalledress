@@ -1,74 +1,28 @@
 import React, { useState, useEffect } from "react";
-import classes from "/App.module.css";
-import { types } from "../../../wailsjs/go/models";
-import { GetNames, GetNamesCnt } from "../../../wailsjs/go/app/App";
-import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import classes from "@/App.module.css";
+import { GetNames, GetNamesCnt } from "@gocode/app/App";
+import { types } from "@gocode/models";
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Stack, Table, Title } from "@mantine/core";
-import { namesColumns, createRowModel } from "./Names";
-import { View, ViewStatus } from "../../components/view";
-
-const columnHelper = createColumnHelper<types.Name>();
+import { nameColumns } from "./NameTable";
+import { View, ViewStatus } from "@components";
+import { useKeyboardPaging } from "@hooks";
 
 export function NamesView() {
-  const [items, setItems] = useState<types.Name[]>([]);
-  const [nItems, setNItems] = useState<number>(0);
-  const [curItem, setCurItem] = useState<number>(0);
-  const perPage = 20;
-
-  useHotkeys("left", (event) => {
-    setCurItem((cur) => Math.max(cur - 1, 0));
-    event.preventDefault();
-  });
-  useHotkeys("up", (event) => {
-    setCurItem((cur) => Math.max(cur - perPage, 0));
-    event.preventDefault();
-  });
-  useHotkeys("home", (event) => {
-    setCurItem(0);
-    event.preventDefault();
-  });
-
-  useHotkeys("right", (event) => {
-    var max = Math.max(nItems - perPage, 0);
-    setCurItem((cur) => Math.min(max, cur + 1));
-    event.preventDefault();
-  });
-  useHotkeys("down", (event) => {
-    var max = Math.max(nItems - perPage, 0);
-    setCurItem((cur) => Math.min(max, cur + perPage));
-    event.preventDefault();
-  });
-  useHotkeys("end", (event) => {
-    var max = Math.max(nItems - perPage, 0);
-    setCurItem(max);
-    event.preventDefault();
-  });
-
-  useEffect(() => {
-    const fetchHistory = async () => {
-      const fetchedItems = await GetNames(curItem, perPage);
-      setItems(fetchedItems);
-      const cnt = await GetNamesCnt();
-      setNItems(cnt);
-    };
-    fetchHistory();
-  }, [curItem, perPage]);
-
-  useEffect(() => {
-    setCurItem(0);
-  }, []);
-
+  const { items, nItems, curItem } = useKeyboardPaging<types.Name>(GetNames, GetNamesCnt, undefined, 20);
   const table = useReactTable({
     data: items,
-    columns: namesColumns,
+    columns: nameColumns,
     getCoreRowModel: getCoreRowModel(),
   });
 
   return (
     <View>
       <Stack className={classes.mainContent}>
-        <Title order={3}>Names Title {curItem}</Title>
+        <Title order={3}>
+          Names {curItem} of {nItems}
+        </Title>
         <Table>
           <Table.Thead>
             {table.getHeaderGroups().map((headerGroup) => (

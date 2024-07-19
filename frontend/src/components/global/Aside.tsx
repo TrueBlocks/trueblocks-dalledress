@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
-import { EventsOn, EventsOff } from "../../../wailsjs/runtime";
+import { EventsOn, EventsOff } from "@runtime";
 import { Text } from "@mantine/core";
 
-function Aside() {
+export function Aside() {
   return <Text>Help file</Text>;
 }
-
-export default Aside;

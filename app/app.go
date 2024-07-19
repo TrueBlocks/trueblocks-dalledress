@@ -13,8 +13,10 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/config"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
@@ -35,6 +37,29 @@ type App struct {
 	Series         dalle.Series `json:"series"`
 	names          []types.Name
 	dalleCache     map[string]*dalle.DalleDress
+	renderCtxs     map[base.Address][]output.RenderCtx
+}
+
+func (a *App) RegisterRenderCtx(addr base.Address, ctx output.RenderCtx) {
+	if a.renderCtxs == nil {
+		a.renderCtxs = make(map[base.Address][]output.RenderCtx)
+	}
+	a.renderCtxs[addr] = append(a.renderCtxs[addr], ctx)
+}
+
+func (a *App) Cancel(addr base.Address) (int, bool) {
+	if len(a.renderCtxs) == 0 {
+		return 0, false
+	}
+	if a.renderCtxs[addr] == nil {
+		return 0, true
+	}
+	n := len(a.renderCtxs[addr])
+	for i := 0; i < len(a.renderCtxs[addr]); i++ {
+		a.renderCtxs[addr][i].Cancel()
+	}
+	a.renderCtxs[addr] = nil
+	return n, true
 }
 
 func NewApp() *App {
@@ -62,6 +87,7 @@ func NewApp() *App {
 	if a.authorTemplate, err = template.New("author").Parse(authorTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
 	}
+	logger.Info()
 	logger.Info("Compiled templates")
 
 	a.ReloadDatabases()

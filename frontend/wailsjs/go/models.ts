@@ -175,6 +175,23 @@ export namespace dalle {
 
 }
 
+export namespace output {
+	
+	export class RenderCtx {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new RenderCtx(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
+	    }
+	}
+
+}
+
 export namespace types {
 	
 	export class Parameter {

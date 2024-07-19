@@ -5,7 +5,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 )
 
-var historyMap = map[base.Address][]types.Transaction{}
+var addrToHistoryMap = map[base.Address][]types.Transaction{}
 
 func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 	address := base.HexToAddress(addr)
@@ -14,25 +14,28 @@ func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 			{
 				TransactionIndex: 1,
 				BlockNumber:      1,
+				BlockHash:        base.HexToHash("0x730724cb08a6eb17bf6b3296359d261570d343ea7944a17a9d7287d77900db01"),
 			},
 			{
 				TransactionIndex: 2,
 				BlockNumber:      2,
+				BlockHash:        base.HexToHash("0x730724cb08a6eb17bf6b3296359d261570d343ea7944a17a9d7287d77900db02"),
 			},
 			{
 				TransactionIndex: 3,
 				BlockNumber:      3,
+				BlockHash:        base.HexToHash("0x730724cb08a6eb17bf6b3296359d261570d343ea7944a17a9d7287d77900db03"),
 			},
 		}
 	}
 
 	var ret []types.Transaction
-	if len(historyMap[address]) == 0 {
+	if len(addrToHistoryMap[address]) == 0 {
 		return ret
 	}
-	first = base.Max(0, base.Min(first, len(historyMap[address])-1))
-	last := base.Min(len(historyMap[address]), first+pageSize)
-	return historyMap[address][first:last]
+	first = base.Max(0, base.Min(first, len(addrToHistoryMap[address])-1))
+	last := base.Min(len(addrToHistoryMap[address]), first+pageSize)
+	return addrToHistoryMap[address][first:last]
 }
 
 func (a *App) GetHistoryCnt(addr string) int {
@@ -40,5 +43,5 @@ func (a *App) GetHistoryCnt(addr string) int {
 	if address.IsZero() {
 		return 3
 	}
-	return len(historyMap[address])
+	return len(addrToHistoryMap[address])
 }

@@ -11,7 +11,7 @@ replace (
 
 require (
 	git.sr.ht/~sbinet/gg v0.5.0
-	github.com/TrueBlocks/trueblocks-core/sdk v0.0.0-20240605222744-1cbeec2938e0
+	github.com/TrueBlocks/trueblocks-core/sdk/v3 v3.0.0-20240718213142-3cffd1bf17f0
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20240718044519-2c9304344dd6
 	github.com/joho/godotenv v1.5.1
 	github.com/lucasb-eyer/go-colorful v1.2.0

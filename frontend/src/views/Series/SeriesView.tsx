@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { GetFilelist } from "@gocode/app/App";
-import classes from "@/App.module.css";
-import { View, ViewStatus } from "@/components/view";
-import StringTable, { DataItem } from "@/components/StringTable";
+import { GetFilelist } from "../../../wailsjs/go/app/App";
+import classes from "/App.module.css";
+import { View, ViewStatus } from "../../components/view";
+import StringTable, { DataItem } from "../../components/StringTable";
 import { Stack, Text, Title } from "@mantine/core";
 
 export function SeriesView() {

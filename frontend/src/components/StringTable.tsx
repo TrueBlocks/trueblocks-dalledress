@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Table, Checkbox } from "@mantine/core";
+import { Table, Checkbox, Anchor } from "@mantine/core";
 import { Link, useLocation } from "wouter";
-import { Anchor } from "@mantine/core";
-import { SetLast } from "@gocode/app/App";
+import { SetLast } from "../../wailsjs/go/app/App";
 
 export interface DataItem {
   id: number;

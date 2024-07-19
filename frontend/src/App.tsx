@@ -4,7 +4,7 @@ import Aside from "./components/global/Aside";
 import Header from "./components/global/Header";
 import Navbar from "./components/global/Navbar";
 import Routes from "./components/global/Routes";
-import classes from "@/App.module.css";
+import classes from "/App.module.css";
 import { EventsOn, EventsOff, EventsEmit } from "../wailsjs/runtime";
 
 function App() {

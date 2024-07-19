@@ -1,7 +1,7 @@
 import React from "react";
 import { Stack, Title, Checkbox, InputLabel } from "@mantine/core";
-import classes from "@/App.module.css";
-import { View, ViewStatus } from "@/components/view";
+import classes from "/App.module.css";
+import { View, ViewStatus } from "../../components/view";
 
 export function SettingsView() {
   return (

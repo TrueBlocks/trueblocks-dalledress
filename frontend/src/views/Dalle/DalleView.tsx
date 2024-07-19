@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Stack, Title, Paper, Grid, Button, Group } from "@mantine/core";
-import classes from "@/App.module.css";
-import { View, ViewStatus } from "@/components/view";
-import EditableSelect from "@/components/EditableSelect";
-import ResultDialog from "@/components/ResultDialog";
+import classes from "/App.module.css";
+import { View, ViewStatus } from "../../components/view";
+import EditableSelect from "../../components/EditableSelect";
+import ResultDialog from "../../components/ResultDialog";
 import {
   GetJson,
   GetData,
@@ -16,8 +16,8 @@ import {
   GetLast,
   SetLast,
   Save,
-} from "@gocode/app/App";
-import { ImageDisplay } from "@/components/ImageDisplay";
+} from "../../../wailsjs/go/app/App";
+import { ImageDisplay } from "../../components/ImageDisplay";
 import Tabber from "./Tabber";
 
 export function DalleView() {

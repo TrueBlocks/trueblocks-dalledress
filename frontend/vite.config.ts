@@ -8,7 +8,8 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@assets': path.resolve(__dirname, './src/assets'),
-      '@components': path.resolve(__dirname, './src/components/index'),
+      '@components': path.resolve(__dirname, './components/index'),
+      '@hooks': path.resolve(__dirname, './hooks/index'),
       '@gocode': path.resolve(__dirname, './wailsjs/go')
     }
   },

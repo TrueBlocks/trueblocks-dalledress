@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import classes from "@/App.module.css";
-import { types } from "@gocode/models";
-import { GetNames, GetNamesCnt } from "@gocode/app/App";
+import classes from "/App.module.css";
+import { types } from "../../../wailsjs/go/models";
+import { GetNames, GetNamesCnt } from "../../../wailsjs/go/app/App";
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Stack, Table, Title } from "@mantine/core";
 import { namesColumns, createRowModel } from "./Names";
-import { View, ViewStatus } from "@/components/view";
+import { View, ViewStatus } from "../../components/view";
 
 const columnHelper = createColumnHelper<types.Name>();
 

@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { NavLink } from "@mantine/core";
 import { IconHome, IconSettings, IconTag, IconList, IconSpider } from "@tabler/icons-react";
 import { Link, useRoute } from "wouter";
-import { GetLast, SetLast } from "@gocode/app/App";
+import { GetLast, SetLast } from "../../../wailsjs/go/app/App";
 
 function Menu() {
   const [activeRoute, setActiveRoute] = useState("/");

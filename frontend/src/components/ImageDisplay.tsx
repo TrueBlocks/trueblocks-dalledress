@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Text, Image } from "@mantine/core";
-import { GetTitle } from "@gocode/app/App";
+import { GetTitle } from "../../wailsjs/go/app/App";
 
 export const ImageDisplay = ({ address, loading }: { address: string; loading: boolean }) => {
   var [title, setTitle] = useState<string>("");

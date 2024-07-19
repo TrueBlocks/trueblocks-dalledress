@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { GetHistory, GetHistoryCnt } from "@gocode/app/App";
-import classes from "@/App.module.css";
-import { View, ViewStatus } from "@/components/view";
+import { GetHistory, GetHistoryCnt } from "../../../wailsjs/go/app/App";
+import classes from "/App.module.css";
+import { View, ViewStatus } from "../../components/view";
 import { Group, Stack, Title, Text } from "@mantine/core";
-import { types } from "@gocode/models";
+import { types } from "../../../wailsjs/go/models";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function HistoryView() {

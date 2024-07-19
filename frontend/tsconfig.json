@@ -28,7 +28,10 @@
         "assets/*"
       ],
       "@components": [
-        "components/index"
+        "./components/index"
+      ],
+      "@hooks": [
+        "./hooks/index"
       ],
       "@gocode/*": [
         "../wailsjs/go/*"

@@ -1,7 +1,6 @@
 import React from "react";
-import { Text } from "@mantine/core";
 import { IconCircleCheck } from "@tabler/icons-react";
-import { types } from "@gocode/models";
+import { types } from "../../../wailsjs/go/models";
 import { createColumnHelper } from "@tanstack/react-table";
 
 export function createRowModel(name: types.Name): types.Name {

@@ -11,51 +11,56 @@ import { View, ViewStatus } from "@/components/view";
 const columnHelper = createColumnHelper<types.Name>();
 
 export function NamesView() {
-  const [names, _setData] = React.useState<types.Name[]>(() => []);
-  const [nNames, setNamesCount] = useState<number>(0);
-  const [curName, setCurName] = useState<number>(-1);
-  const [perPage, setPerPage] = useState<number>(20);
+  const [items, setItems] = useState<types.Name[]>([]);
+  const [nItems, setNItems] = useState<number>(0);
+  const [curItem, setCurItem] = useState<number>(0);
+  const perPage = 20;
 
   useHotkeys("left", (event) => {
-    setCurName(curName - 1 < 0 ? 0 : curName - 1);
+    setCurItem((cur) => Math.max(cur - 1, 0));
     event.preventDefault();
   });
   useHotkeys("up", (event) => {
-    setCurName(curName - 20 < 0 ? 0 : curName - 20);
-    event.preventDefault();
-  });
-  useHotkeys("right", (event) => {
-    setCurName(curName + 1 >= nNames ? nNames : curName + 1);
-    event.preventDefault();
-  });
-  useHotkeys("down", (event) => {
-    setCurName(curName + 20 >= nNames ? nNames - 20 : curName + 20);
+    setCurItem((cur) => Math.max(cur - perPage, 0));
     event.preventDefault();
   });
   useHotkeys("home", (event) => {
-    setCurName(0);
+    setCurItem(0);
+    event.preventDefault();
+  });
+
+  useHotkeys("right", (event) => {
+    var max = Math.max(nItems - perPage, 0);
+    setCurItem((cur) => Math.min(max, cur + 1));
+    event.preventDefault();
+  });
+  useHotkeys("down", (event) => {
+    var max = Math.max(nItems - perPage, 0);
+    setCurItem((cur) => Math.min(max, cur + perPage));
     event.preventDefault();
   });
   useHotkeys("end", (event) => {
-    setCurName(nNames <= 20 ? 20 : nNames - 20);
+    var max = Math.max(nItems - perPage, 0);
+    setCurItem(max);
     event.preventDefault();
   });
 
   useEffect(() => {
-    GetNames(curName, perPage).then((names: types.Name[]) => {
-      _setData(names);
-      GetNamesCnt().then((cnt) => {
-        setNamesCount(cnt);
-      });
-    });
-  }, [curName]);
+    const fetchHistory = async () => {
+      const fetchedItems = await GetNames(curItem, perPage);
+      setItems(fetchedItems);
+      const cnt = await GetNamesCnt();
+      setNItems(cnt);
+    };
+    fetchHistory();
+  }, [curItem, perPage]);
 
   useEffect(() => {
-    setCurName(0);
+    setCurItem(0);
   }, []);
 
   const table = useReactTable({
-    data: names,
+    data: items,
     columns: namesColumns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -63,7 +68,7 @@ export function NamesView() {
   return (
     <View>
       <Stack className={classes.mainContent}>
-        <Title order={3}>Names Title {curName}</Title>
+        <Title order={3}>Names Title {curItem}</Title>
         <Table>
           <Table.Thead>
             {table.getHeaderGroups().map((headerGroup) => (

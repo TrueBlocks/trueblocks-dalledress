@@ -44,6 +44,7 @@ func main() {
 				a,
 				&types.Name{},
 				&types.Transaction{},
+				&types.Appearance{},
 			},
 			StartHidden: true,
 			AssetServer: &assetserver.Options{

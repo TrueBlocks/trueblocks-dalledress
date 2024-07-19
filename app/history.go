@@ -1,7 +1,9 @@
 package app
 
 import (
+	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 )
 
@@ -9,39 +11,42 @@ var addrToHistoryMap = map[base.Address][]types.Transaction{}
 
 func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 	address := base.HexToAddress(addr)
-	if address.IsZero() {
-		return []types.Transaction{
-			{
-				TransactionIndex: 1,
-				BlockNumber:      1,
-				BlockHash:        base.HexToHash("0x730724cb08a6eb17bf6b3296359d261570d343ea7944a17a9d7287d77900db01"),
-			},
-			{
-				TransactionIndex: 2,
-				BlockNumber:      2,
-				BlockHash:        base.HexToHash("0x730724cb08a6eb17bf6b3296359d261570d343ea7944a17a9d7287d77900db02"),
-			},
-			{
-				TransactionIndex: 3,
-				BlockNumber:      3,
-				BlockHash:        base.HexToHash("0x730724cb08a6eb17bf6b3296359d261570d343ea7944a17a9d7287d77900db03"),
+	if len(addrToHistoryMap[address]) == 0 {
+		opts := sdk.ExportOptions{
+			Addrs:      []string{addr},
+			Articulate: true,
+			Globals: sdk.Globals{
+				Cache: true,
 			},
 		}
-	}
-
-	var ret []types.Transaction
-	if len(addrToHistoryMap[address]) == 0 {
-		return ret
+		monitors, _, err := opts.Export()
+		if err != nil {
+			// EventEmitter.Emit("error", err)
+			logger.Info(err)
+			return []types.Transaction{}
+		} else if len(monitors) == 0 {
+			logger.Info("none")
+			return []types.Transaction{}
+		} else {
+			logger.Info("got em", len(monitors))
+			addrToHistoryMap[address] = monitors
+		}
 	}
 	first = base.Max(0, base.Min(first, len(addrToHistoryMap[address])-1))
 	last := base.Min(len(addrToHistoryMap[address]), first+pageSize)
 	return addrToHistoryMap[address][first:last]
 }
 
-func (a *App) GetHistoryCnt(addr string) int {
-	address := base.HexToAddress(addr)
-	if address.IsZero() {
-		return 3
+func (a *App) GetHistoryCnt(addr string) int64 {
+	opts := sdk.ListOptions{
+		Addrs: []string{addr},
 	}
-	return len(addrToHistoryMap[address])
+	monitors, _, err := opts.ListCount()
+	if err != nil {
+		// EventEmitter.Emit("error", err)
+		return 0
+	} else if len(monitors) == 0 {
+		return 0
+	}
+	return monitors[0].NRecords
 }

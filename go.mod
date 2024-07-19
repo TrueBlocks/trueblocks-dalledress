@@ -5,7 +5,7 @@ go 1.22
 toolchain go1.22.0
 
 replace (
-	github.com/TrueBlocks/trueblocks-core/sdk => ../trueblocks-core/sdk
+	github.com/TrueBlocks/trueblocks-core/sdk/v3 => ../trueblocks-core/sdk
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra => ../trueblocks-core/src/apps/chifra
 )
 

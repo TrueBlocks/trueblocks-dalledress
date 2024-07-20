@@ -5,8 +5,9 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 var addrToHistoryMap = map[base.Address][]types.Transaction{}
@@ -19,24 +20,42 @@ func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 
 	if len(addrToHistoryMap[address]) == 0 {
 		opts := sdk.ExportOptions{
-			Addrs: []string{addr},
+			Addrs:     []string{addr},
+			RenderCtx: output.NewStreamingContext(),
 			Globals: sdk.Globals{
 				Cache: true,
 			},
 		}
-		monitors, _, err := opts.Export()
+
+		go func() {
+			for {
+				select {
+				case model := <-opts.RenderCtx.ModelChan:
+					tx, ok := model.(*types.Transaction)
+					if !ok {
+						continue
+					}
+					addrToHistoryMap[address] = append(addrToHistoryMap[address], *tx)
+					if len(addrToHistoryMap[address])%pageSize == 0 {
+						runtime.EventsEmit(a.ctx, "History", len(addrToHistoryMap[address]), 10000)
+					}
+				case err := <-opts.RenderCtx.ErrorChan:
+					runtime.EventsEmit(a.ctx, "Error", err.Error())
+				default:
+					if opts.RenderCtx.WasCanceled() {
+						return
+					}
+				}
+			}
+		}()
+
+		_, _, err := opts.Export()
 		if err != nil {
-			// EventEmitter.Emit("error", err)
-			logger.Info(err)
+			runtime.EventsEmit(a.ctx, "Error", err.Error())
 			return []types.Transaction{}
-		} else if len(monitors) == 0 {
-			logger.Info("none")
-			return []types.Transaction{}
-		} else {
-			logger.Info("got em", len(monitors))
-			addrToHistoryMap[address] = monitors
 		}
 	}
+
 	first = base.Max(0, base.Min(first, len(addrToHistoryMap[address])-1))
 	last := base.Min(len(addrToHistoryMap[address]), first+pageSize)
 	return addrToHistoryMap[address][first:last]

@@ -12,7 +12,7 @@ export function SettingsView() {
           <Checkbox label={"A checkbox"} />
         </InputLabel>
       </Stack>
-      <ViewStatus>Status / Progress</ViewStatus>
+      <ViewStatus />
     </View>
   );
 }

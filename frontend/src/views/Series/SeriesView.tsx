@@ -23,7 +23,7 @@ export function SeriesView() {
       <Stack className={classes.mainContent}>
         <StringTable data={dataItems} />
       </Stack>
-      <ViewStatus>Status / Progress</ViewStatus>
+      <ViewStatus />
     </View>
   );
 }

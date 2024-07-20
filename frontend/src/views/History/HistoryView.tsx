@@ -10,7 +10,8 @@ import { View, ViewStatus } from "@components";
 import { useKeyboardPaging } from "@hooks";
 
 export function HistoryView() {
-  const [address, setAddress] = useState<string>("0xf503017d7baf7fbc0fff7492b751025c6a78179b");
+  const [address, setAddress] = useState<string>("0x9531c059098e3d194ff87febb587ab07b30b1306");
+  // const [address, setAddress] = useState<string>("0xf503017d7baf7fbc0fff7492b751025c6a78179b");
   const { items, nItems, curItem } = useKeyboardPaging<types.Transaction>(
     (curItem, perPage) => GetHistory(address, curItem, perPage),
     () => GetHistoryCnt(address),
@@ -55,7 +56,7 @@ export function HistoryView() {
           </Table.Tbody>
         </Table>
       </Stack>
-      <ViewStatus>Status / Progress</ViewStatus>
+      <ViewStatus />
     </View>
   );
 }

@@ -10,7 +10,7 @@ export function HomeView() {
       <Stack className={classes.mainContent}>
         <Text>Home View Content</Text>
       </Stack>
-      <ViewStatus>Status / Progress</ViewStatus>
+      <ViewStatus />
     </View>
   );
 }

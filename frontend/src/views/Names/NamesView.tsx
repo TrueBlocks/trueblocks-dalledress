@@ -48,7 +48,7 @@ export function NamesView() {
           </Table.Tbody>
         </Table>
       </Stack>
-      <ViewStatus>Status / Progress</ViewStatus>
+      <ViewStatus />
     </View>
   );
 }

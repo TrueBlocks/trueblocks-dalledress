@@ -142,7 +142,7 @@ export function DalleView() {
         </Grid>
         <ResultDialog opened={dialogOpened} onClose={() => setDialogOpened(false)} success={success} />
       </Stack>
-      <ViewStatus>Status / Progress</ViewStatus>
+      <ViewStatus />
     </View>
   );
 }

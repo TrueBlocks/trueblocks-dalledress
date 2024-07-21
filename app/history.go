@@ -89,7 +89,6 @@ func (a *App) GetHistory(addr string, first, pageSize int) []TransactionEx {
 						continue
 					}
 					txEx := NewTransactionEx(a, tx)
-					// if strings.HasPrefix(txEx.ToName, "0x") {
 					addrToHistoryMap[address] = append(addrToHistoryMap[address], *txEx)
 					if len(addrToHistoryMap[address])%pageSize == 0 {
 						a.SendMessage(address, Progress, &ProgressMsg{
@@ -97,7 +96,6 @@ func (a *App) GetHistory(addr string, first, pageSize int) []TransactionEx {
 							Want: nItems,
 						})
 					}
-					// }
 				case err := <-opts.RenderCtx.ErrorChan:
 					a.SendMessage(address, Error, err.Error())
 				default:

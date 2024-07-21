@@ -2,6 +2,12 @@ import React, { ReactNode, useState, useEffect } from "react";
 import classes from "./ViewStatus.module.css";
 import { EventsOn, EventsOff } from "@runtime";
 import { Text } from "@mantine/core";
+import { MessageType } from "@gocode/app/App";
+
+type Progress = {
+  have: number;
+  want: number;
+};
 
 export function ViewStatus() {
   const [statusMessage, setStatusMessage] = useState<string>("");
@@ -13,8 +19,8 @@ export function ViewStatus() {
       setColor(classes.green);
     };
 
-    const handleProgress = (x: number, y: number) => {
-      setStatusMessage(`Progress: ${x}/${y}`);
+    const handleProgress = (p: Progress) => {
+      setStatusMessage(`Progress: ${p.have}/${p.want}`);
       setColor(classes.green);
     };
 
@@ -23,7 +29,7 @@ export function ViewStatus() {
       setColor(classes.red);
     };
 
-    EventsOn("Done", handleDone);
+    EventsOn("Completed", handleDone);
     EventsOn("Progress", handleProgress);
     EventsOn("Error", handleError);
 

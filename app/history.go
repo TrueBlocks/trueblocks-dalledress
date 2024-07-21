@@ -7,13 +7,64 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-var addrToHistoryMap = map[base.Address][]types.Transaction{}
+type TransactionEx struct {
+	BlockNumber      base.Blknum    `json:"blockNumber"`
+	TransactionIndex base.Txnum     `json:"transactionIndex"`
+	Timestamp        base.Timestamp `json:"timestamp"`
+	Date             string         `json:"date"`
+	From             base.Address   `json:"from"`
+	FromName         string         `json:"fromName"`
+	To               base.Address   `json:"to"`
+	ToName           string         `json:"toName"`
+	Wei              base.Wei       `json:"wei"`
+	Ether            string         `json:"ether"`
+	Function         string         `json:"function"`
+	HasToken         bool           `json:"hasToken"`
+	IsError          bool           `json:"isError"`
+}
+
+func NewTransactionEx(a *App, tx *types.Transaction) *TransactionEx {
+	fromName := a.namesMap[tx.From].Name
+	if len(fromName) == 0 {
+		fromName = tx.From.String()
+	} else if len(fromName) > 39 {
+		fromName = fromName[:39] + "..."
+	}
+	toName := a.namesMap[tx.To].Name
+	if len(toName) == 0 {
+		toName = tx.To.String()
+	} else if len(toName) > 39 {
+		toName = toName[:39] + "..."
+	}
+	ether := tx.Value.ToEtherStr(18)
+	if tx.Value.IsZero() {
+		ether = "-"
+	} else if len(ether) > 5 {
+		ether = ether[:5]
+	}
+	return &TransactionEx{
+		BlockNumber:      tx.BlockNumber,
+		TransactionIndex: tx.TransactionIndex,
+		Timestamp:        tx.Timestamp,
+		Date:             tx.Date(),
+		From:             tx.From,
+		FromName:         fromName,
+		To:               tx.To,
+		ToName:           toName,
+		Wei:              tx.Value,
+		Ether:            ether,
+		HasToken:         tx.HasToken,
+		IsError:          tx.IsError,
+		// Function:         tx.Function(),
+	}
+}
+
+var addrToHistoryMap = map[base.Address][]TransactionEx{}
 var m = sync.Mutex{}
 
-func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
+func (a *App) GetHistory(addr string, first, pageSize int) []TransactionEx {
 	address := base.HexToAddress(addr)
 	m.Lock()
 	defer m.Unlock()
@@ -37,12 +88,18 @@ func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 					if !ok {
 						continue
 					}
-					addrToHistoryMap[address] = append(addrToHistoryMap[address], *tx)
+					txEx := NewTransactionEx(a, tx)
+					// if strings.HasPrefix(txEx.ToName, "0x") {
+					addrToHistoryMap[address] = append(addrToHistoryMap[address], *txEx)
 					if len(addrToHistoryMap[address])%pageSize == 0 {
-						runtime.EventsEmit(a.ctx, "Progress", len(addrToHistoryMap[address]), nItems)
+						a.SendMessage(address, Progress, &ProgressMsg{
+							Have: int64(len(addrToHistoryMap[address])),
+							Want: nItems,
+						})
 					}
+					// }
 				case err := <-opts.RenderCtx.ErrorChan:
-					runtime.EventsEmit(a.ctx, "Error", err.Error())
+					a.SendMessage(address, Error, err.Error())
 				default:
 					if opts.RenderCtx.WasCanceled() {
 						return
@@ -53,11 +110,11 @@ func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 
 		_, _, err := opts.Export()
 		if err != nil {
-			runtime.EventsEmit(a.ctx, "Error", err.Error())
-			return []types.Transaction{}
+			a.SendMessage(address, Error, err.Error())
+			return []TransactionEx{}
 		}
 
-		runtime.EventsEmit(a.ctx, "Done")
+		a.SendMessage(address, Completed, "")
 	}
 
 	first = base.Max(0, base.Min(first, len(addrToHistoryMap[address])-1))

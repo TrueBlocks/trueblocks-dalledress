@@ -90,6 +90,10 @@ export function MakeDalleDress(arg1) {
   return window['go']['app']['App']['MakeDalleDress'](arg1);
 }
 
+export function MessageType(arg1) {
+  return window['go']['app']['App']['MessageType'](arg1);
+}
+
 export function RegisterRenderCtx(arg1, arg2) {
   return window['go']['app']['App']['RegisterRenderCtx'](arg1, arg2);
 }
@@ -100,6 +104,10 @@ export function ReloadDatabases() {
 
 export function Save(arg1) {
   return window['go']['app']['App']['Save'](arg1);
+}
+
+export function SendMessage(arg1, arg2, arg3) {
+  return window['go']['app']['App']['SendMessage'](arg1, arg2, arg3);
 }
 
 export function SetLast(arg1, arg2) {

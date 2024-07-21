@@ -1,9 +1,9 @@
 import React from "react";
 import { IconCircleCheck } from "@tabler/icons-react";
-import { types } from "@gocode/models";
+import { app } from "@gocode/models";
 import { createColumnHelper } from "@tanstack/react-table";
 
-const txColumnHelper = createColumnHelper<types.Transaction>();
+const txColumnHelper = createColumnHelper<app.TransactionEx>();
 
 export const txColumns = [
   txColumnHelper.accessor("blockNumber", {
@@ -16,23 +16,23 @@ export const txColumns = [
     cell: (info) => info.renderValue(),
     size: 100,
   }),
-  txColumnHelper.accessor("timestamp", {
-    header: () => "Timestamp",
+  txColumnHelper.accessor("date", {
+    header: () => "Date",
     cell: (info) => info.renderValue(),
     size: 100,
   }),
-  txColumnHelper.accessor("from", {
+  txColumnHelper.accessor("fromName", {
     header: () => "From",
     cell: (info) => info.renderValue(),
     size: 100,
   }),
-  txColumnHelper.accessor("to", {
+  txColumnHelper.accessor("toName", {
     header: () => "To",
     cell: (info) => info.renderValue(),
     size: 100,
   }),
-  txColumnHelper.accessor("value", {
-    header: () => "Value",
+  txColumnHelper.accessor("ether", {
+    header: () => "Ether",
     cell: (info) => info.renderValue(),
     size: 100,
   }),

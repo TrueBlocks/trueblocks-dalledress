@@ -44,6 +44,8 @@ func main() {
 				a,
 				&types.Name{},
 				&types.Transaction{},
+				&app.TransactionEx{},
+				&app.ProgressMsg{},
 			},
 			StartHidden: true,
 			AssetServer: &assetserver.Options{

@@ -36,6 +36,7 @@ type App struct {
 	titleTemplate  *template.Template
 	Series         dalle.Series `json:"series"`
 	names          []types.Name
+	namesMap       map[base.Address]types.Name
 	dalleCache     map[string]*dalle.DalleDress
 	renderCtxs     map[base.Address][]output.RenderCtx
 }

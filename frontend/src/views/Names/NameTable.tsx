@@ -3,24 +3,6 @@ import { IconCircleCheck } from "@tabler/icons-react";
 import { types } from "@gocode/models";
 import { createColumnHelper } from "@tanstack/react-table";
 
-// export function createRowModel(name: types.Name): types.Name {
-//   var cV = function (a: any, classs: any, asMap: boolean = false): any {
-//     return a;
-//   };
-//   return {
-//     address: name.address,
-//     decimals: name.decimals,
-//     isContract: name.isContract,
-//     isErc20: name.isErc20,
-//     isErc721: name.isErc721,
-//     name: name.name,
-//     source: name.source,
-//     symbol: name.symbol,
-//     tags: name.tags,
-//     convertValues: cV,
-//   };
-// }
-
 const nameColumnHelper = createColumnHelper<types.Name>();
 
 export const nameColumns = [

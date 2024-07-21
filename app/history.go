@@ -24,10 +24,12 @@ func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 			RenderCtx: output.NewStreamingContext(),
 			Globals: sdk.Globals{
 				Cache: true,
+				Ether: true,
 			},
 		}
 
 		go func() {
+			nItems := a.GetHistoryCnt(addr)
 			for {
 				select {
 				case model := <-opts.RenderCtx.ModelChan:
@@ -37,7 +39,7 @@ func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 					}
 					addrToHistoryMap[address] = append(addrToHistoryMap[address], *tx)
 					if len(addrToHistoryMap[address])%pageSize == 0 {
-						runtime.EventsEmit(a.ctx, "History", len(addrToHistoryMap[address]), 10000)
+						runtime.EventsEmit(a.ctx, "Progress", len(addrToHistoryMap[address]), nItems)
 					}
 				case err := <-opts.RenderCtx.ErrorChan:
 					runtime.EventsEmit(a.ctx, "Error", err.Error())
@@ -54,6 +56,8 @@ func (a *App) GetHistory(addr string, first, pageSize int) []types.Transaction {
 			runtime.EventsEmit(a.ctx, "Error", err.Error())
 			return []types.Transaction{}
 		}
+
+		runtime.EventsEmit(a.ctx, "Done")
 	}
 
 	first = base.Max(0, base.Min(first, len(addrToHistoryMap[address])-1))

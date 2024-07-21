@@ -8,6 +8,11 @@ export function ViewStatus() {
   const [color, setColor] = useState<string>(classes.green);
 
   useEffect(() => {
+    const handleDone = () => {
+      setStatusMessage("done");
+      setColor(classes.green);
+    };
+
     const handleProgress = (x: number, y: number) => {
       setStatusMessage(`Progress: ${x}/${y}`);
       setColor(classes.green);
@@ -18,10 +23,12 @@ export function ViewStatus() {
       setColor(classes.red);
     };
 
+    EventsOn("Done", handleDone);
     EventsOn("Progress", handleProgress);
     EventsOn("Error", handleError);
 
     return () => {
+      EventsOff("Done");
       EventsOff("Progress");
       EventsOff("Error");
     };

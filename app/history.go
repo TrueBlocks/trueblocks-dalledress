@@ -15,7 +15,11 @@ var addrToHistoryMap = map[base.Address][]TransactionEx{}
 var m = sync.Mutex{}
 
 func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
-	address := base.HexToAddress(addr)
+	address, ok := a.ConvertToAddress(addr)
+	if !ok {
+		a.SendMessage(base.ZeroAddr, Error, "Invalid address")
+		return []TransactionEx{}
+	}
 
 	m.Lock()
 	_, exists := addrToHistoryMap[address]
@@ -78,7 +82,11 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 }
 
 func (a *App) GetHistoryCnt(addr string) int64 {
-	address := base.HexToAddress(addr)
+	address, ok := a.ConvertToAddress(addr)
+	if !ok {
+		a.SendMessage(base.ZeroAddr, Error, "Invalid address")
+		return 0
+	}
 
 	opts := sdk.ListOptions{
 		Addrs: []string{addr},
@@ -93,14 +101,16 @@ func (a *App) GetHistoryCnt(addr string) int64 {
 	return monitors[0].NRecords
 }
 
+var e sync.Mutex
+
 func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 	if !strings.HasSuffix(addr, ".eth") {
 		ret := base.HexToAddress(addr)
 		return ret, ret != base.ZeroAddr
 	}
 
-	m.Lock()
-	defer m.Unlock()
+	e.Lock()
+	defer e.Unlock()
 	if ensAddr, exists := a.ensMap[addr]; exists {
 		return ensAddr, true
 	}

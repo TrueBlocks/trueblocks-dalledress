@@ -1,7 +1,7 @@
 .small {
-  width: 10px;
-  max-width: 10px;
-  min-width: 10px;
+  width: 30px;
+  max-width: 30px;
+  min-width: 30px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -9,9 +9,9 @@
 }
 
 .small-centered {
-  width: 10px;
-  max-width: 10px;
-  min-width: 10px;
+  width: 30px;
+  max-width: 30px;
+  min-width: 30px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

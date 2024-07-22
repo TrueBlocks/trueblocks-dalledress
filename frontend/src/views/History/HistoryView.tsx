@@ -7,7 +7,7 @@ import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-tabl
 import { useHotkeys } from "react-hotkeys-hook";
 import { Stack, Table, Title } from "@mantine/core";
 import { txColumns, CustomMeta } from "./HistoryTable";
-import { View, ViewStatus } from "@components";
+import { EditableSelect, View, ViewStatus } from "@components";
 import { useKeyboardPaging2 } from "@hooks";
 
 export function HistoryView() {
@@ -71,6 +71,12 @@ export function HistoryView() {
         <Title order={3}>
           History of {address}: showing record {curItem + 1}-{curItem + 1 + perPage - 1} of {count}
         </Title>
+        <EditableSelect
+          value={address}
+          onChange={(value) => setAddress(value)}
+          label="Select or enter an address or ENS name"
+          placeholder="Enter or select an address"
+        />
         <Table>
           <Table.Thead>
             {table.getHeaderGroups().map((headerGroup) => (

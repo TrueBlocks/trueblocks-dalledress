@@ -37,14 +37,12 @@ type App struct {
 	Series         dalle.Series `json:"series"`
 	names          []types.Name
 	namesMap       map[base.Address]types.Name
+	ensMap         map[string]base.Address
 	dalleCache     map[string]*dalle.DalleDress
 	renderCtxs     map[base.Address][]output.RenderCtx
 }
 
 func (a *App) RegisterRenderCtx(addr base.Address, ctx output.RenderCtx) {
-	if a.renderCtxs == nil {
-		a.renderCtxs = make(map[base.Address][]output.RenderCtx)
-	}
 	a.renderCtxs[addr] = append(a.renderCtxs[addr], ctx)
 }
 
@@ -67,6 +65,8 @@ func NewApp() *App {
 	a := App{
 		databases:  make(map[string][]string),
 		dalleCache: make(map[string]*dalle.DalleDress),
+		renderCtxs: make(map[base.Address][]output.RenderCtx),
+		ensMap:     make(map[string]base.Address),
 	}
 
 	// it's okay if it's not found

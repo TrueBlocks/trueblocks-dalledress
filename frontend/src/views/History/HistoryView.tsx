@@ -5,7 +5,8 @@ import { GetHistoryPage, GetHistoryCnt } from "@gocode/app/App";
 import { app } from "@gocode/models";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Stack, Table, Title } from "@mantine/core";
-import { txColumns, CustomMeta } from "./HistoryTable";
+import { txColumns } from "./HistoryTable";
+import { CustomMeta } from "../CustomMeta";
 import { EditableSelect, View, ViewStatus } from "@components";
 import { useKeyboardPaging2 } from "@hooks";
 

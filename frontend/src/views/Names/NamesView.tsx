@@ -3,7 +3,6 @@ import classes from "@/App.module.css";
 import { GetNames, GetNamesCnt } from "@gocode/app/App";
 import { types } from "@gocode/models";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { useHotkeys } from "react-hotkeys-hook";
 import { Stack, Table, Title } from "@mantine/core";
 import { nameColumns } from "./NameTable";
 import { View, ViewStatus } from "@components";

@@ -50,8 +50,9 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 					addrToHistoryMap[address] = append(addrToHistoryMap[address], *txEx)
 					if len(addrToHistoryMap[address])%pageSize == 0 {
 						a.SendMessage(address, Progress, &ProgressMsg{
-							Have: int64(len(addrToHistoryMap[address])),
-							Want: nItems,
+							Address: address,
+							Have:    int64(len(addrToHistoryMap[address])),
+							Want:    nItems,
 						})
 					}
 					m.Unlock()

@@ -2,11 +2,7 @@ import React from "react";
 import { IconCircleCheck } from "@tabler/icons-react";
 import { app } from "@gocode/models";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
-import classes from "./HistoryTable.module.scss";
-
-export interface CustomMeta {
-  className?: string;
-}
+import { CustomMeta } from "../CustomMeta";
 
 type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
   meta?: CustomMeta;

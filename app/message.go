@@ -15,8 +15,9 @@ const (
 )
 
 type ProgressMsg struct {
-	Have int64 `json:"have"`
-	Want int64 `json:"want"`
+	Address base.Address `json:"address"`
+	Have    int64        `json:"have"`
+	Want    int64        `json:"want"`
 }
 
 func (a *App) MessageType(msg Message) string {

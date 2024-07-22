@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import classes from "@/App.module.css";
-import lClasses from "./HistoryView.module.css";
+import lClasses from "../Columns.module.css";
 import { GetHistoryPage, GetHistoryCnt } from "@gocode/app/App";
 import { app } from "@gocode/models";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { useHotkeys } from "react-hotkeys-hook";
 import { Stack, Table, Title } from "@mantine/core";
-import { txColumns, CustomMeta } from "./HistoryTable";
+import { txColumns } from "./HistoryTable";
+import { CustomMeta } from "../CustomMeta";
 import { EditableSelect, View, ViewStatus } from "@components";
-import { useKeyboardPaging2 } from "@hooks";
+import { useKeyboardPaging } from "@hooks";
 
 export function HistoryView() {
   const [address, setAddress] = useState<string>("trueblocks.eth");
@@ -16,7 +16,7 @@ export function HistoryView() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [items, setItems] = useState<app.TransactionEx[]>([]);
-  const { curItem, perPage } = useKeyboardPaging2<app.TransactionEx>(items, count, [address]);
+  const { curItem, perPage } = useKeyboardPaging<app.TransactionEx>(items, count, [address]);
 
   useEffect(() => {
     if (loaded && !loading) {
@@ -31,11 +31,11 @@ export function HistoryView() {
   useEffect(() => {
     setLoading(true);
     try {
-      const fetch = async (addr: string, currentItem: number, itemsPerPage: number) => {
+      const fetch = async (addr: string) => {
         const cnt = await GetHistoryCnt(addr);
         setCount(cnt);
       };
-      fetch(address, curItem, perPage);
+      fetch(address);
       setLoaded(true);
     } finally {
       setLoading(false);

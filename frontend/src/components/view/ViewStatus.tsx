@@ -5,6 +5,7 @@ import { Text } from "@mantine/core";
 import { MessageType } from "@gocode/app/App";
 
 type Progress = {
+  address: string;
   have: number;
   want: number;
 };
@@ -20,7 +21,7 @@ export function ViewStatus() {
     };
 
     const handleProgress = (p: Progress) => {
-      setStatusMessage(`Progress: ${p.have}/${p.want}`);
+      setStatusMessage(`Progress (${p.address}): ${p.have}/${p.want}`);
       setColor(classes.green);
     };
 

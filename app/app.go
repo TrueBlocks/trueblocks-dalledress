@@ -39,11 +39,18 @@ type App struct {
 	namesMap       map[base.Address]types.Name
 	ensMap         map[string]base.Address
 	dalleCache     map[string]*dalle.DalleDress
-	renderCtxs     map[base.Address][]output.RenderCtx
+	renderCtxs     map[base.Address][]*output.RenderCtx
 }
 
-func (a *App) RegisterRenderCtx(addr base.Address, ctx output.RenderCtx) {
-	a.renderCtxs[addr] = append(a.renderCtxs[addr], ctx)
+var r sync.Mutex
+
+func (a *App) RegisterCtx(addr base.Address) *output.RenderCtx {
+	r.Lock()
+	defer r.Unlock()
+
+	rCtx := output.NewStreamingContext()
+	a.renderCtxs[addr] = append(a.renderCtxs[addr], rCtx)
+	return rCtx
 }
 
 func (a *App) Cancel(addr base.Address) (int, bool) {
@@ -65,7 +72,7 @@ func NewApp() *App {
 	a := App{
 		databases:  make(map[string][]string),
 		dalleCache: make(map[string]*dalle.DalleDress),
-		renderCtxs: make(map[base.Address][]output.RenderCtx),
+		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 	}
 

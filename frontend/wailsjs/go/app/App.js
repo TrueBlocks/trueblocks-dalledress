@@ -98,8 +98,8 @@ export function MessageType(arg1) {
   return window['go']['app']['App']['MessageType'](arg1);
 }
 
-export function RegisterRenderCtx(arg1, arg2) {
-  return window['go']['app']['App']['RegisterRenderCtx'](arg1, arg2);
+export function RegisterCtx(arg1) {
+  return window['go']['app']['App']['RegisterCtx'](arg1);
 }
 
 export function ReloadDatabases() {

@@ -6,20 +6,23 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 )
 
+// TODO: This should be on the App and it should be a sync.Map because it
+// TODO: has the attributes described in the library's comments.
 var addrToHistoryMap = map[base.Address][]TransactionEx{}
 var m = sync.Mutex{}
 
 func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 	address := base.HexToAddress(addr)
-	m.Lock()
-	defer m.Unlock()
 
-	if len(addrToHistoryMap[address]) == 0 {
-		rCtx := output.NewStreamingContext()
+	m.Lock()
+	_, exists := addrToHistoryMap[address]
+	m.Unlock()
+
+	if !exists {
+		rCtx := a.RegisterCtx(address)
 		opts := sdk.ExportOptions{
 			Addrs:     []string{addr},
 			RenderCtx: rCtx,
@@ -39,6 +42,7 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 						continue
 					}
 					txEx := NewTransactionEx(a, tx)
+					m.Lock()
 					addrToHistoryMap[address] = append(addrToHistoryMap[address], *txEx)
 					if len(addrToHistoryMap[address])%pageSize == 0 {
 						a.SendMessage(address, Progress, &ProgressMsg{
@@ -46,6 +50,7 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 							Want: nItems,
 						})
 					}
+					m.Unlock()
 				case err := <-opts.RenderCtx.ErrorChan:
 					a.SendMessage(address, Error, err.Error())
 				default:
@@ -65,6 +70,8 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 		a.SendMessage(address, Completed, "")
 	}
 
+	m.Lock()
+	defer m.Unlock()
 	first = base.Max(0, base.Min(first, len(addrToHistoryMap[address])-1))
 	last := base.Min(len(addrToHistoryMap[address]), first+pageSize)
 	return addrToHistoryMap[address][first:last]

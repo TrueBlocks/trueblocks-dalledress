@@ -55,7 +55,7 @@ export function MakeDalleDress(arg1:string):Promise<dalle.DalleDress>;
 
 export function MessageType(arg1:app.Message):Promise<string>;
 
-export function RegisterRenderCtx(arg1:base.Address,arg2:output.RenderCtx):Promise<void>;
+export function RegisterCtx(arg1:base.Address):Promise<output.RenderCtx>;
 
 export function ReloadDatabases():Promise<void>;
 

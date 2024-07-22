@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import classes from "@/App.module.css";
-import lClasses from "./HistoryView.module.css";
+import lClasses from "../Columns.module.css";
 import { GetHistoryPage, GetHistoryCnt } from "@gocode/app/App";
 import { app } from "@gocode/models";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { useHotkeys } from "react-hotkeys-hook";
 import { Stack, Table, Title } from "@mantine/core";
 import { txColumns, CustomMeta } from "./HistoryTable";
 import { EditableSelect, View, ViewStatus } from "@components";
@@ -31,11 +30,11 @@ export function HistoryView() {
   useEffect(() => {
     setLoading(true);
     try {
-      const fetch = async (addr: string, currentItem: number, itemsPerPage: number) => {
+      const fetch = async (addr: string) => {
         const cnt = await GetHistoryCnt(addr);
         setCount(cnt);
       };
-      fetch(address, curItem, perPage);
+      fetch(address);
       setLoaded(true);
     } finally {
       setLoading(false);

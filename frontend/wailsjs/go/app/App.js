@@ -6,6 +6,10 @@ export function Cancel(arg1) {
   return window['go']['app']['App']['Cancel'](arg1);
 }
 
+export function ConvertToAddress(arg1) {
+  return window['go']['app']['App']['ConvertToAddress'](arg1);
+}
+
 export function GenerateEnhanced(arg1) {
   return window['go']['app']['App']['GenerateEnhanced'](arg1);
 }
@@ -34,12 +38,12 @@ export function GetFilename(arg1) {
   return window['go']['app']['App']['GetFilename'](arg1);
 }
 
-export function GetHistory(arg1, arg2, arg3) {
-  return window['go']['app']['App']['GetHistory'](arg1, arg2, arg3);
-}
-
 export function GetHistoryCnt(arg1) {
   return window['go']['app']['App']['GetHistoryCnt'](arg1);
+}
+
+export function GetHistoryPage(arg1, arg2, arg3) {
+  return window['go']['app']['App']['GetHistoryPage'](arg1, arg2, arg3);
 }
 
 export function GetJson(arg1) {

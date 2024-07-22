@@ -9,6 +9,8 @@ import {output} from '../models';
 
 export function Cancel(arg1:base.Address):Promise<number|boolean>;
 
+export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
+
 export function GenerateEnhanced(arg1:string):Promise<string>;
 
 export function GenerateImage(arg1:string):Promise<string>;
@@ -23,9 +25,9 @@ export function GetFilelist(arg1:string):Promise<Array<string>>;
 
 export function GetFilename(arg1:string):Promise<string>;
 
-export function GetHistory(arg1:string,arg2:number,arg3:number):Promise<Array<app.TransactionEx>>;
-
 export function GetHistoryCnt(arg1:string):Promise<number>;
+
+export function GetHistoryPage(arg1:string,arg2:number,arg3:number):Promise<Array<app.TransactionEx>>;
 
 export function GetJson(arg1:string):Promise<string>;
 

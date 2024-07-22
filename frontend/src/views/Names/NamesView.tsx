@@ -11,18 +11,30 @@ import { View, ViewStatus } from "@components";
 import { useKeyboardPaging } from "@hooks";
 
 export function NamesView() {
-  const { items, nItems, curItem } = useKeyboardPaging<types.Name>(GetNames, GetNamesCnt, undefined, 20);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const { items, count, curItem } = useKeyboardPaging<types.Name>(GetNames, GetNamesCnt);
   const table = useReactTable({
     data: items,
     columns: nameColumns,
     getCoreRowModel: getCoreRowModel(),
   });
 
+  if (loading) {
+    return (
+      <View>
+        <Stack className={classes.mainContent}>
+          <Title order={3}>Loading...</Title>
+        </Stack>
+      </View>
+    );
+  }
+
   return (
     <View>
       <Stack className={classes.mainContent}>
         <Title order={3}>
-          Names {curItem} of {nItems}
+          Names: showing record {curItem + 1}-{curItem + 1 + perPage - 1} of {count}
         </Title>
         <Table>
           <Table.Thead>

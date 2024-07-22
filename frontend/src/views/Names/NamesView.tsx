@@ -11,9 +11,36 @@ import { View, ViewStatus } from "@components";
 import { useKeyboardPaging } from "@hooks";
 
 export function NamesView() {
+  const [count, setCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
-  const { items, count, curItem } = useKeyboardPaging<types.Name>(GetNames, GetNamesCnt);
+  const [items, setItems] = useState<types.Name[]>([]);
+  const { curItem, perPage } = useKeyboardPaging<types.Name>(items, count);
+
+  useEffect(() => {
+    if (loaded && !loading) {
+      const fetch = async (currentItem: number, itemsPerPage: number) => {
+        const newItems = await GetNames(currentItem, itemsPerPage);
+        setItems(newItems);
+      };
+      fetch(curItem, perPage);
+    }
+  }, [count, curItem, perPage]);
+
+  useEffect(() => {
+    setLoading(true);
+    try {
+      const fetch = async () => {
+        const cnt = await GetNamesCnt();
+        setCount(cnt);
+      };
+      fetch();
+      setLoaded(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const table = useReactTable({
     data: items,
     columns: nameColumns,

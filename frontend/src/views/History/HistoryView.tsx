@@ -8,7 +8,7 @@ import { Stack, Table, Title } from "@mantine/core";
 import { txColumns } from "./HistoryTable";
 import { CustomMeta } from "../CustomMeta";
 import { EditableSelect, View, ViewStatus } from "@components";
-import { useKeyboardPaging2 } from "@hooks";
+import { useKeyboardPaging } from "@hooks";
 
 export function HistoryView() {
   const [address, setAddress] = useState<string>("trueblocks.eth");
@@ -16,7 +16,7 @@ export function HistoryView() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [items, setItems] = useState<app.TransactionEx[]>([]);
-  const { curItem, perPage } = useKeyboardPaging2<app.TransactionEx>(items, count, [address]);
+  const { curItem, perPage } = useKeyboardPaging<app.TransactionEx>(items, count, [address]);
 
   useEffect(() => {
     if (loaded && !loading) {

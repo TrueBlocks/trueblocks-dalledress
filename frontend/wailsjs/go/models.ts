@@ -15,6 +15,7 @@ export namespace app {
 	    function: string;
 	    hasToken: boolean;
 	    isError: boolean;
+	    logCount: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new TransactionEx(source);
@@ -35,6 +36,7 @@ export namespace app {
 	        this.function = source["function"];
 	        this.hasToken = source["hasToken"];
 	        this.isError = source["isError"];
+	        this.logCount = source["logCount"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

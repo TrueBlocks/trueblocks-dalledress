@@ -19,6 +19,7 @@ type TransactionEx struct {
 	Function         string         `json:"function"`
 	HasToken         bool           `json:"hasToken"`
 	IsError          bool           `json:"isError"`
+	LogCount         uint64         `json:"logCount"`
 }
 
 func NewTransactionEx(a *App, tx *types.Transaction) *TransactionEx {
@@ -40,6 +41,11 @@ func NewTransactionEx(a *App, tx *types.Transaction) *TransactionEx {
 	} else if len(ether) > 5 {
 		ether = ether[:5]
 	}
+	logCount := 0
+	if tx.Receipt != nil {
+		logCount = len(tx.Receipt.Logs)
+	}
+
 	return &TransactionEx{
 		BlockNumber:      tx.BlockNumber,
 		TransactionIndex: tx.TransactionIndex,
@@ -53,6 +59,7 @@ func NewTransactionEx(a *App, tx *types.Transaction) *TransactionEx {
 		Ether:            ether,
 		HasToken:         tx.HasToken,
 		IsError:          tx.IsError,
+		LogCount:         uint64(logCount),
 		// Function:         tx.Function(),
 	}
 }

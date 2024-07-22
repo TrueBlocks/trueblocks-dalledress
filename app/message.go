@@ -10,6 +10,7 @@ type Message int
 const (
 	Completed Message = iota
 	Error
+	Warn
 	Progress
 )
 
@@ -22,6 +23,7 @@ func (a *App) MessageType(msg Message) string {
 	m := map[Message]string{
 		Completed: "Completed",
 		Error:     "Error",
+		Warn:      "Warn",
 		Progress:  "Progress",
 	}
 	return m[msg]

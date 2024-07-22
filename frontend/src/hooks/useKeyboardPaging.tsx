@@ -1,15 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, DependencyList } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
-type FetchItemsFn<T> = (curItem: number, perPage: number) => Promise<T[]>;
-
-export function useKeyboardPaging2<T>(
-  fetchItems: FetchItemsFn<T>,
-  nItems: number,
-  dependency?: any,
-  perPage: number = 20
-) {
-  const [items, setItems] = useState<T[]>([]);
+export function useKeyboardPaging2<T>(items: T[], nItems: number, deps: DependencyList = [], perPage: number = 20) {
   const [curItem, setCurItem] = useState<number>(0);
 
   useHotkeys("left", (event) => {
@@ -42,21 +34,15 @@ export function useKeyboardPaging2<T>(
   });
 
   useEffect(() => {
-    const fetch = async () => {
-      const fetchedItems = await fetchItems(curItem, perPage);
-      setItems(fetchedItems);
-    };
-    fetch();
-  }, [curItem, perPage, dependency]);
-
-  useEffect(() => {
     setCurItem(0);
-  }, [dependency]);
+  }, deps);
 
-  return { items, nItems, curItem };
+  return { items, nItems, perPage, curItem };
 }
 
+type FetchItemsFn<T> = (curItem: number, perPage: number) => Promise<T[]>;
 type FetchCountFn = () => Promise<number>;
+
 export function useKeyboardPaging<T>(
   fetchItems: FetchItemsFn<T>,
   fetchCount: FetchCountFn,

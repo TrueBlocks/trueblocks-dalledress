@@ -19,6 +19,16 @@
   text-align: center;
 }
 
+.medium-small {
+  width: 90px;
+  max-width: 90px;
+  min-width: 90px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
 .medium {
   width: 120px;
   max-width: 120px;

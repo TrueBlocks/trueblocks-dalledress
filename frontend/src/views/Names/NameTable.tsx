@@ -12,15 +12,20 @@ type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
 const nameColumnHelper = createColumnHelper<app.NameEx>();
 
 export const nameColumns: CustomColumnDef<app.NameEx, any>[] = [
-  nameColumnHelper.accessor("address", {
-    header: () => "Address",
-    cell: (info) => info.renderValue(),
-    meta: { className: "wide" },
-  }),
   nameColumnHelper.accessor("type", {
     header: () => "Type",
     cell: (row) => <NameTags name={row.row.original} />,
     meta: { className: "small" },
+  }),
+  nameColumnHelper.accessor("tags", {
+    header: () => "Tags",
+    cell: (info) => info.renderValue(),
+    meta: { className: "medium-small" },
+  }),
+  nameColumnHelper.accessor("address", {
+    header: () => "Address",
+    cell: (info) => info.renderValue(),
+    meta: { className: "wide" },
   }),
   nameColumnHelper.accessor("name", {
     header: () => "Name",
@@ -36,11 +41,6 @@ export const nameColumns: CustomColumnDef<app.NameEx, any>[] = [
     header: () => "Decimals",
     cell: (info) => info.renderValue(),
     meta: { className: "small" },
-  }),
-  nameColumnHelper.accessor("tags", {
-    header: () => "Tags",
-    cell: (info) => info.renderValue(),
-    meta: { className: "medium" },
   }),
   nameColumnHelper.accessor("isContract", {
     header: () => "isContract",

@@ -6,6 +6,7 @@ x
 .env
 package.json.md5
 
+build/bin
 node_modules
 frontend/dist
 

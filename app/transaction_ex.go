@@ -5,6 +5,8 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 )
 
+// TODO: Eventually, this will get put back into core
+
 type TransactionEx struct {
 	BlockNumber      base.Blknum    `json:"blockNumber"`
 	TransactionIndex base.Txnum     `json:"transactionIndex"`
@@ -23,13 +25,13 @@ type TransactionEx struct {
 }
 
 func NewTransactionEx(a *App, tx *types.Transaction) *TransactionEx {
-	fromName := a.namesMap[tx.From].Name
+	fromName := a.namesMap[tx.From].Name.Name
 	if len(fromName) == 0 {
 		fromName = tx.From.String()
 	} else if len(fromName) > 39 {
 		fromName = fromName[:39] + "..."
 	}
-	toName := a.namesMap[tx.To].Name
+	toName := a.namesMap[tx.To].Name.Name
 	if len(toName) == 0 {
 		toName = tx.To.String()
 	} else if len(toName) > 39 {

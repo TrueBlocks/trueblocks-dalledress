@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { NavLink } from "@mantine/core";
-import { IconHome, IconSettings, IconTag, IconList, IconSpider } from "@tabler/icons-react";
+import { IconHome, IconTag, IconSettings, IconList, IconSpider } from "@tabler/icons-react";
 import { Link, useRoute } from "wouter";
 import { GetLast, SetLast } from "@gocode/app/App";
 
@@ -21,9 +21,9 @@ export function Menu() {
   var menuItems = [
     { route: "/", label: "Home", icon: <IconHome /> },
     { route: "/dalle", label: "Dalle", icon: <IconSpider /> },
-    { route: "/names", label: "Names", icon: <IconTag /> },
     { route: "/series", label: "Series", icon: <IconList /> },
     { route: "/history", label: "History", icon: <IconList /> },
+    { route: "/names", label: "Names", icon: <IconTag /> },
     { route: "/settings", label: "Settings", icon: <IconSettings /> },
   ];
 

@@ -2,27 +2,13 @@ import React, { useEffect } from "react";
 import { AppShell, Text } from "@mantine/core";
 import { Aside, Header, Navbar, Routes } from "@components";
 import classes from "@/App.module.css";
-import { EventsOn, EventsOff, EventsEmit } from "@runtime";
 
 function App() {
   const [showHelp, setShowHelp] = React.useState(true);
 
-  const sendMessage = () => {
-    EventsEmit("toggleHelp", "Hello from SenderComponent");
+  const toggleHelp = () => {
     setShowHelp(!showHelp);
   };
-
-  useEffect(() => {
-    const messageListener = (message: string) => {
-      console.log("Received in help component:", message);
-    };
-
-    EventsOn("toggleHelp", messageListener);
-
-    return () => {
-      EventsOff("toggleHelp");
-    };
-  }, [showHelp]);
 
   return (
     <AppShell
@@ -33,6 +19,7 @@ function App() {
     >
       <AppShell.Header>
         <Header title="ApplicationTitle" />
+        <button onClick={toggleHelp}>Toggle Help</button>{" "}
       </AppShell.Header>
       <AppShell.Navbar>
         <Navbar />
@@ -45,7 +32,6 @@ function App() {
       </AppShell.Aside>
       <AppShell.Footer>
         <Text size={"sm"}>time / date / currently opened file</Text>
-        <button onClick={sendMessage}>Send Message</button>{" "}
       </AppShell.Footer>
     </AppShell>
   );

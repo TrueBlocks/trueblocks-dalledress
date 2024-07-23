@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import classes from "@/App.module.css";
 import lClasses from "../Columns.module.css";
-import { GetNames, GetNamesCnt } from "@gocode/app/App";
-import { types } from "@gocode/models";
+import { GetNamesPage, GetNamesCnt } from "@gocode/app/App";
+import { app } from "@gocode/models";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { Stack, Table, Title } from "@mantine/core";
 import { nameColumns } from "./NameTable";
@@ -10,17 +10,19 @@ import { CustomMeta } from "../CustomMeta";
 import { View, ViewStatus } from "@components";
 import { useKeyboardPaging } from "@hooks";
 
+// TODO: This should use tabs per type (Regular, Custom, Prefund, Baddress, etc.)
+// TODO: Or, at least have tags for each type.
 export function NamesView() {
   const [count, setCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
-  const [items, setItems] = useState<types.Name[]>([]);
-  const { curItem, perPage } = useKeyboardPaging<types.Name>(items, count);
+  const [items, setItems] = useState<app.NameEx[]>([]);
+  const { curItem, perPage } = useKeyboardPaging<app.NameEx>(items, count);
 
   useEffect(() => {
     if (loaded && !loading) {
       const fetch = async (currentItem: number, itemsPerPage: number) => {
-        const newItems = await GetNames(currentItem, itemsPerPage);
+        const newItems = await GetNamesPage(currentItem, itemsPerPage);
         setItems(newItems);
       };
       fetch(curItem, perPage);

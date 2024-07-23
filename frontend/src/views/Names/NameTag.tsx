@@ -1,23 +1,23 @@
 import React, { ReactNode, useEffect } from "react";
 import { Badge } from "@mantine/core";
-import { app } from "@gocode/models";
+import { app, names } from "@gocode/models";
 
 export const NameTags = ({ name }: { name: app.NameEx }) => {
   const [tags, setTags] = React.useState<ReactNode>([]);
 
   useEffect(() => {
     var types: ReactNode[] = [];
-    if (name.type & 2) {
-      types.push(<Badge color="blue">Reg</Badge>);
+    if (name.type & names.Parts.REGULAR) {
+      types.push(<Badge color="blue">R</Badge>);
     }
-    if (name.type & 4) {
-      types.push(<Badge color="yellow">Cus</Badge>);
+    if (name.type & names.Parts.CUSTOM) {
+      types.push(<Badge color="yellow">C</Badge>);
     }
-    if (name.type & 8) {
-      types.push(<Badge color="green">Pre</Badge>);
+    if (name.type & names.Parts.PREFUND) {
+      types.push(<Badge color="green">P</Badge>);
     }
-    if (name.type & 16) {
-      types.push(<Badge color="pink">Bad</Badge>);
+    if (name.type & names.Parts.BADDRESS) {
+      types.push(<Badge color="pink">B</Badge>);
     }
     setTags(<div>{types.map((tag) => tag)}</div>);
   }, [name]);

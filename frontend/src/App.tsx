@@ -18,8 +18,10 @@ function App() {
       footer={{ height: "2rem" }}
     >
       <AppShell.Header>
-        <Header title="ApplicationTitle" />
-        <button onClick={toggleHelp}>Toggle Help</button>{" "}
+        <div style={{ display: "inline" }}>
+          <Header title="ApplicationTitle" />
+          <button onClick={toggleHelp}>Toggle Help</button>
+        </div>
       </AppShell.Header>
       <AppShell.Navbar>
         <Navbar />

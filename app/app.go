@@ -3,8 +3,14 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"os"
 
 	"github.com/TrueBlocks/trueblocks-browse/pkg/config"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
+	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -33,8 +39,8 @@ func NewApp() *App {
 
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
-	// } else if a.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); a.apiKeys["openAi"] == "" {
-	// 	log.Fatal("No OPENAI_API_KEY key found")
+		// } else if a.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); a.apiKeys["openAi"] == "" {
+		// 	log.Fatal("No OPENAI_API_KEY key found")
 	}
 
 	// Initialize your data here

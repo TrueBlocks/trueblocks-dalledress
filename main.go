@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"fmt"
+	"os"
 
 	"github.com/TrueBlocks/trueblocks-browse/app"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -21,7 +24,7 @@ func main() {
 		ctx := context.Background()
 		a.Startup(ctx)
 		a.DomReady(ctx)
-		a.HandleLines()
+		// a.HandleLines()
 	} else {
 		a := app.NewApp()
 		opts := options.App{

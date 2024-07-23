@@ -42,7 +42,18 @@ func (a *App) loadNames() error {
 		a.names = append(a.names, name)
 	}
 	sort.Slice(a.names, func(i, j int) bool {
-		return a.names[i].Address.Hex() < a.names[j].Address.Hex()
+		ti := a.names[i].Type
+		tj := a.names[j].Type
+		if a.names[i].Type == a.names[j].Type {
+			return a.names[i].Address.Hex() < a.names[j].Address.Hex()
+		}
+		if ti == 4 || ti == 18 {
+			return true
+		}
+		if tj == 4 || tj == 18 {
+			return false
+		}
+		return ti < tj
 	})
 	return nil
 }

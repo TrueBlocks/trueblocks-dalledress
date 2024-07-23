@@ -43,18 +43,18 @@ func (a *App) loadNames() error {
 	}
 	sort.Slice(a.names, func(i, j int) bool {
 		ti := a.names[i].Type
+		if ti == names.Regular {
+			ti = 7
+		}
 		tj := a.names[j].Type
+		if tj == names.Regular {
+			tj = 7
+		}
 		if ti == tj {
 			if a.names[i].Tags == a.names[j].Tags {
 				return a.names[i].Address.Hex() < a.names[j].Address.Hex()
 			}
 			return a.names[i].Tags < a.names[j].Tags
-		}
-		if ti == 4 || ti == 18 {
-			return true
-		}
-		if tj == 4 || tj == 18 {
-			return false
 		}
 		return ti < tj
 	})

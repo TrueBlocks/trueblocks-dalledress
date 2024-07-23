@@ -11,3 +11,10 @@
   font-size: 14pt;
   font-family: monospace;
 }
+
+.yellow {
+  background-color: black;
+  color: yellow;
+  font-size: 14pt;
+  font-family: monospace;
+}

@@ -4,7 +4,7 @@ import { EventsOn, EventsOff } from "@runtime";
 import { Text } from "@mantine/core";
 import { MessageType } from "@gocode/app/App";
 
-// TODO: Why is this no availabe in the Wails folders?
+// TODO: Why is this not availabe in the Wails folders?
 type Progress = {
   address: string;
   have: number;
@@ -26,6 +26,11 @@ export function ViewStatus() {
       setColor(classes.green);
     };
 
+    const handleWarning = (warnStr: string) => {
+      setStatusMessage(`Warning: ${warnStr}`);
+      setColor(classes.yellow);
+    };
+
     const handleError = (errorStr: string) => {
       setStatusMessage(`Error: ${errorStr}`);
       setColor(classes.red);
@@ -33,11 +38,13 @@ export function ViewStatus() {
 
     EventsOn("Completed", handleDone);
     EventsOn("Progress", handleProgress);
+    EventsOn("Warning", handleWarning);
     EventsOn("Error", handleError);
 
     return () => {
-      EventsOff("Done");
+      EventsOff("Completed");
       EventsOff("Progress");
+      EventsOff("Warning");
       EventsOff("Error");
     };
   }, []);

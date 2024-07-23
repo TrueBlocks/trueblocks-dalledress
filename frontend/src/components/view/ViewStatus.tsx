@@ -4,6 +4,7 @@ import { EventsOn, EventsOff } from "@runtime";
 import { Text } from "@mantine/core";
 import { MessageType } from "@gocode/app/App";
 
+// TODO: Why is this no availabe in the Wails folders?
 type Progress = {
   address: string;
   have: number;

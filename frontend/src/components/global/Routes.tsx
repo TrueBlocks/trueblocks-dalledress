@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import classes from "@/App.module.css";
-import { DalleView, NamesView, HomeView, SeriesView, HistoryView, SettingsView } from "@views";
+import { HomeView, NamesView, HistoryView, DalleView, SeriesView, SettingsView } from "@views";
 import { GetLast } from "@gocode/app/App";
 
 export const Routes = () => {
@@ -15,9 +15,9 @@ export const Routes = () => {
 
   var menuItems = [
     { route: "/dalle", component: DalleView },
-    { route: "/names", component: NamesView },
     { route: "/series", component: SeriesView },
     { route: "/history", component: HistoryView },
+    { route: "/names", component: NamesView },
     { route: "/settings", component: SettingsView },
     { route: "/", component: HomeView },
   ];
@@ -34,3 +34,4 @@ export const Routes = () => {
     </div>
   );
 };
+

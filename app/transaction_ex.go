@@ -5,6 +5,8 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 )
 
+// TODO: Eventually, this will get put back into core
+
 type TransactionEx struct {
 	BlockNumber      base.Blknum    `json:"blockNumber"`
 	TransactionIndex base.Txnum     `json:"transactionIndex"`
@@ -19,16 +21,17 @@ type TransactionEx struct {
 	Function         string         `json:"function"`
 	HasToken         bool           `json:"hasToken"`
 	IsError          bool           `json:"isError"`
+	LogCount         uint64         `json:"logCount"`
 }
 
 func NewTransactionEx(a *App, tx *types.Transaction) *TransactionEx {
-	fromName := a.namesMap[tx.From].Name
+	fromName := a.namesMap[tx.From].Name.Name
 	if len(fromName) == 0 {
 		fromName = tx.From.String()
 	} else if len(fromName) > 39 {
 		fromName = fromName[:39] + "..."
 	}
-	toName := a.namesMap[tx.To].Name
+	toName := a.namesMap[tx.To].Name.Name
 	if len(toName) == 0 {
 		toName = tx.To.String()
 	} else if len(toName) > 39 {
@@ -40,6 +43,11 @@ func NewTransactionEx(a *App, tx *types.Transaction) *TransactionEx {
 	} else if len(ether) > 5 {
 		ether = ether[:5]
 	}
+	logCount := 0
+	if tx.Receipt != nil {
+		logCount = len(tx.Receipt.Logs)
+	}
+
 	return &TransactionEx{
 		BlockNumber:      tx.BlockNumber,
 		TransactionIndex: tx.TransactionIndex,
@@ -53,6 +61,7 @@ func NewTransactionEx(a *App, tx *types.Transaction) *TransactionEx {
 		Ether:            ether,
 		HasToken:         tx.HasToken,
 		IsError:          tx.IsError,
+		LogCount:         uint64(logCount),
 		// Function:         tx.Function(),
 	}
 }

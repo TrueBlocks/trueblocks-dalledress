@@ -17,7 +17,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/config"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
 	"github.com/joho/godotenv"
@@ -25,9 +24,14 @@ import (
 )
 
 type App struct {
-	ctx            context.Context
-	session        config.Session
-	apiKey         string
+	ctx        context.Context
+	session    config.Session
+	apiKeys    map[string]string
+	namesMap   map[base.Address]NameEx
+	names      []NameEx // We keep both for performance reasons
+	ensMap     map[string]base.Address
+	renderCtxs map[base.Address][]*output.RenderCtx
+	// Add your application's data here
 	databases      map[string][]string
 	authorTemplate *template.Template
 	promptTemplate *template.Template
@@ -35,50 +39,30 @@ type App struct {
 	terseTemplate  *template.Template
 	titleTemplate  *template.Template
 	Series         dalle.Series `json:"series"`
-	names          []types.Name
-	namesMap       map[base.Address]types.Name
-	ensMap         map[string]base.Address
 	dalleCache     map[string]*dalle.DalleDress
-	renderCtxs     map[base.Address][]*output.RenderCtx
-}
-
-var r sync.Mutex
-
-func (a *App) RegisterCtx(addr base.Address) *output.RenderCtx {
-	r.Lock()
-	defer r.Unlock()
-
-	rCtx := output.NewStreamingContext()
-	a.renderCtxs[addr] = append(a.renderCtxs[addr], rCtx)
-	return rCtx
-}
-
-func (a *App) Cancel(addr base.Address) (int, bool) {
-	if len(a.renderCtxs) == 0 {
-		return 0, false
-	}
-	if a.renderCtxs[addr] == nil {
-		return 0, true
-	}
-	n := len(a.renderCtxs[addr])
-	for i := 0; i < len(a.renderCtxs[addr]); i++ {
-		a.renderCtxs[addr][i].Cancel()
-	}
-	a.renderCtxs[addr] = nil
-	return n, true
 }
 
 func NewApp() *App {
 	a := App{
-		databases:  make(map[string][]string),
-		dalleCache: make(map[string]*dalle.DalleDress),
+		apiKeys:    make(map[string]string),
+		namesMap:   make(map[base.Address]NameEx),
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
+		// Initialize maps here
+		databases:  make(map[string][]string),
+		dalleCache: make(map[string]*dalle.DalleDress),
 	}
 
 	// it's okay if it's not found
 	_ = a.session.Load()
 
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	} else if a.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); a.apiKeys["openAi"] == "" {
+		log.Fatal("No OPENAI_API_KEY key found")
+	}
+
+	// Initialize your data here
 	var err error
 	if a.promptTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
 		logger.Fatal("could not create prompt template:", err)
@@ -108,6 +92,38 @@ func (a App) String() string {
 	return string(bytes)
 }
 
+func (a *App) Startup(ctx context.Context) {
+	a.ctx = ctx
+	if err := a.loadNames(); err != nil {
+		logger.Panic(err)
+	}
+}
+
+func (a *App) DomReady(ctx context.Context) {
+	// Sometimes useful for debugging
+	if os.Getenv("TB_CMD_LINE") == "true" {
+		return
+	}
+	runtime.WindowSetPosition(a.ctx, a.session.X, a.session.Y)
+	runtime.WindowSetSize(a.ctx, a.session.Width, a.session.Height)
+	runtime.WindowShow(a.ctx)
+}
+
+func (a *App) Shutdown(ctx context.Context) {
+	// Sometimes useful for debugging
+	if os.Getenv("TB_CMD_LINE") == "true" {
+		return
+	}
+	a.session.X, a.session.Y = runtime.WindowGetPosition(a.ctx)
+	a.session.Width, a.session.Height = runtime.WindowGetSize(a.ctx)
+	a.session.Y += 38 // TODO: This is a hack to account for the menu bar - not sure why it's needed
+	a.session.Save()
+}
+
+func (a *App) GetSession() *config.Session {
+	return &a.session
+}
+
 func (a *App) ReloadDatabases() {
 	a.Series = dalle.Series{}
 	a.databases = make(map[string][]string)
@@ -131,6 +147,32 @@ func (a *App) ReloadDatabases() {
 		}
 	}
 	logger.Info("Loaded", len(dalle.DatabaseNames), "databases")
+}
+
+func (a *App) LoadSeries() (dalle.Series, error) {
+	lastSeries := a.GetSession().LastSeries
+	fn := filepath.Join("./output/series", lastSeries+".json")
+	str := strings.TrimSpace(file.AsciiFileToString(fn))
+	logger.Info("lastSeries", lastSeries)
+	if len(str) == 0 || !file.FileExists(fn) {
+		logger.Info("No series found, creating a new one", fn)
+		ret := dalle.Series{
+			Suffix: "simple",
+		}
+		ret.SaveSeries(fn, 0)
+		return ret, nil
+	}
+
+	bytes := []byte(str)
+	var s dalle.Series
+	if err := json.Unmarshal(bytes, &s); err != nil {
+		logger.Error("could not unmarshal series:", err)
+		return dalle.Series{}, err
+	}
+
+	s.Suffix = strings.Trim(strings.ReplaceAll(s.Suffix, " ", "-"), "-")
+	s.SaveSeries(filepath.Join("./output/series", s.Suffix+".json"), 0)
+	return s, nil
 }
 
 func (a *App) toLines(db string) ([]string, error) {
@@ -167,41 +209,6 @@ func (a *App) toLines(db string) ([]string, error) {
 	}
 
 	return lines, err
-}
-
-func (a *App) Startup(ctx context.Context) {
-	a.ctx = ctx
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	} else if a.apiKey = os.Getenv("OPENAI_API_KEY"); a.apiKey == "" {
-		log.Fatal("No OPENAI_API_KEY key found")
-	}
-	if err := a.loadNames(); err != nil {
-		logger.Panic(err)
-	}
-}
-
-func (a *App) DomReady(ctx context.Context) {
-	if os.Getenv("TB_CMD_LINE") == "true" {
-		return
-	}
-	runtime.WindowSetPosition(a.ctx, a.session.X, a.session.Y)
-	runtime.WindowSetSize(a.ctx, a.session.Width, a.session.Height)
-	runtime.WindowShow(a.ctx)
-}
-
-func (a *App) Shutdown(ctx context.Context) {
-	if os.Getenv("TB_CMD_LINE") == "true" {
-		return
-	}
-	a.session.X, a.session.Y = runtime.WindowGetPosition(a.ctx)
-	a.session.Width, a.session.Height = runtime.WindowGetSize(a.ctx)
-	a.session.Y += 38 // TODO: This is a hack to account for the menu bar - not sure why it's needed
-	a.session.Save()
-}
-
-func (a *App) GetSession() *config.Session {
-	return &a.session
 }
 
 func (a *App) HandleLines() {
@@ -268,30 +275,4 @@ func (a *App) HandleLines() {
 		}
 	}
 	wg.Wait()
-}
-
-func (a *App) LoadSeries() (dalle.Series, error) {
-	lastSeries := a.GetSession().LastSeries
-	fn := filepath.Join("./output/series", lastSeries+".json")
-	str := strings.TrimSpace(file.AsciiFileToString(fn))
-	logger.Info("lastSeries", lastSeries)
-	if len(str) == 0 || !file.FileExists(fn) {
-		logger.Info("No series found, creating a new one", fn)
-		ret := dalle.Series{
-			Suffix: "simple",
-		}
-		ret.SaveSeries(fn, 0)
-		return ret, nil
-	}
-
-	bytes := []byte(str)
-	var s dalle.Series
-	if err := json.Unmarshal(bytes, &s); err != nil {
-		logger.Error("could not unmarshal series:", err)
-		return dalle.Series{}, err
-	}
-
-	s.Suffix = strings.Trim(strings.ReplaceAll(s.Suffix, " ", "-"), "-")
-	s.SaveSeries(filepath.Join("./output/series", s.Suffix+".json"), 0)
-	return s, nil
 }

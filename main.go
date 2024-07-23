@@ -42,16 +42,17 @@ func main() {
 			LogLevel:         wLogger.ERROR,
 			Bind: []interface{}{
 				a,
-				&types.Name{},
-				&types.Transaction{},
-				&app.TransactionEx{},
 				&app.ProgressMsg{},
+				&types.Transaction{},
+				&app.NameEx{},
+				&app.TransactionEx{},
 			},
 			StartHidden: true,
 			AssetServer: &assetserver.Options{
 				Assets: assets,
 			},
 		}
+
 		http.HandleFunc("/files/", func(w http.ResponseWriter, r *http.Request) {
 			address := strings.TrimPrefix(r.URL.Path, "/files/")
 			parts := strings.Split(address, "&")
@@ -78,12 +79,14 @@ func main() {
 			w.Header().Set("Expires", "0")
 			http.ServeFile(w, r, filePath)
 		})
+
 		go func() {
 			logger.Info("Starting file server on :8889")
 			if err := http.ListenAndServe(":8889", nil); err != nil {
 				logger.Error("File server error:", err)
 			}
 		}()
+
 		if err := wails.Run(&opts); err != nil {
 			fmt.Println("Error:", err.Error())
 		}

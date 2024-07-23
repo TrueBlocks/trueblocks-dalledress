@@ -12,7 +12,7 @@ cd frontend && yarn install && cd -
 ## Running
 
 ```[bash]
-wails dev   # or yarn dev for less verbose output
+wails dev
 ```
 
 ## Building

@@ -54,12 +54,16 @@ export function GetLast(arg1) {
   return window['go']['app']['App']['GetLast'](arg1);
 }
 
-export function GetNames(arg1, arg2) {
-  return window['go']['app']['App']['GetNames'](arg1, arg2);
+export function GetNameTypes() {
+  return window['go']['app']['App']['GetNameTypes']();
 }
 
 export function GetNamesCnt() {
   return window['go']['app']['App']['GetNamesCnt']();
+}
+
+export function GetNamesPage(arg1, arg2) {
+  return window['go']['app']['App']['GetNamesPage'](arg1, arg2);
 }
 
 export function GetPrompt(arg1) {

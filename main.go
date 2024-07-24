@@ -24,7 +24,6 @@ func main() {
 		ctx := context.Background()
 		a.Startup(ctx)
 		a.DomReady(ctx)
-		// a.HandleLines()
 	} else {
 		a := app.NewApp()
 		opts := options.App{
@@ -40,6 +39,9 @@ func main() {
 				a,
 				&app.ProgressMsg{},
 				&app.NameEx{},
+			},
+			EnumBind: []interface{}{
+				app.NameDbParts,
 			},
 			StartHidden: true,
 			AssetServer: &assetserver.Options{

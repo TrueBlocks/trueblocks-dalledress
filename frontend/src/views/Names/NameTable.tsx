@@ -2,7 +2,7 @@ import React from "react";
 import { IconCircleCheck } from "@tabler/icons-react";
 import { app } from "@gocode/models";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
-import { CustomMeta } from "../CustomMeta";
+import { CustomMeta } from "@components";
 import { NameTags } from "./NameTag";
 
 type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
@@ -39,7 +39,7 @@ export const nameColumns: CustomColumnDef<app.NameEx, any>[] = [
   }),
   nameColumnHelper.accessor("decimals", {
     header: () => "Decimals",
-    cell: (info) => info.renderValue(),
+    cell: (info) => (info.getValue() === 0 ? "-" : info.getValue()),
     meta: { className: "small" },
   }),
   nameColumnHelper.accessor("isContract", {

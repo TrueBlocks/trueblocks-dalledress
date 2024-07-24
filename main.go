@@ -47,6 +47,9 @@ func main() {
 				&app.NameEx{},
 				&app.TransactionEx{},
 			},
+			EnumBind: []interface{}{
+				app.NameDbParts,
+			},
 			StartHidden: true,
 			AssetServer: &assetserver.Options{
 				Assets: assets,

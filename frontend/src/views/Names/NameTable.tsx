@@ -15,46 +15,46 @@ export const nameColumns: CustomColumnDef<app.NameEx, any>[] = [
   nameColumnHelper.accessor("type", {
     header: () => "Type",
     cell: (row) => <NameTags name={row.row.original} />,
-    meta: { className: "small" },
+    meta: { className: "small cell" },
   }),
   nameColumnHelper.accessor("tags", {
     header: () => "Tags",
     cell: (info) => info.renderValue(),
-    meta: { className: "medium-small" },
+    meta: { className: "medium cell" },
   }),
   nameColumnHelper.accessor("address", {
     header: () => "Address",
     cell: (info) => info.renderValue(),
-    meta: { className: "wide" },
+    meta: { className: "wide cell" },
   }),
   nameColumnHelper.accessor("name", {
     header: () => "Name",
     cell: (info) => info.renderValue(),
-    meta: { className: "wide" },
+    meta: { className: "wide cell" },
   }),
   nameColumnHelper.accessor("symbol", {
     header: () => "Symbol",
     cell: (info) => info.renderValue(),
-    meta: { className: "small" },
+    meta: { className: "small cell" },
   }),
   nameColumnHelper.accessor("decimals", {
     header: () => "Decimals",
     cell: (info) => (info.getValue() === 0 ? "-" : info.getValue()),
-    meta: { className: "small" },
+    meta: { className: "small center cell" },
   }),
   nameColumnHelper.accessor("isContract", {
     header: () => "isContract",
     cell: (info) => (info.getValue() ? <IconCircleCheck size={20} color="white" fill="green" /> : ""),
-    meta: { className: "small-centered" },
+    meta: { className: "small center cell" },
   }),
   nameColumnHelper.accessor("isErc20", {
     header: () => "isErc20",
     cell: (info) => (info.getValue() ? <IconCircleCheck size={20} color="white" fill="green" /> : ""),
-    meta: { className: "small-centered" },
+    meta: { className: "small center cell" },
   }),
   nameColumnHelper.accessor("isErc721", {
     header: () => "isErc721",
     cell: (info) => (info.getValue() ? <IconCircleCheck size={20} color="white" fill="green" /> : ""),
-    meta: { className: "small-centered" },
+    meta: { className: "small center cell" },
   }),
 ];

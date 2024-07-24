@@ -1,5 +1,5 @@
 import React from "react";
-import lClasses from "./DataTable.module.css";
+import "./DataTable.css";
 import { flexRender, Table as ReactTable } from "@tanstack/react-table";
 import { Table, Title } from "@mantine/core";
 import { CustomMeta } from "./";
@@ -14,7 +14,7 @@ export function DataTable<T>({ table, loading }: { table: ReactTable<T>; loading
           {table.getHeaderGroups().map((headerGroup) => (
             <Table.Tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <Table.Th key={header.id} className={lClasses.centered}>
+                <Table.Th key={header.id} className={"centered"}>
                   {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                 </Table.Th>
               ))}
@@ -27,7 +27,7 @@ export function DataTable<T>({ table, loading }: { table: ReactTable<T>; loading
               {row.getVisibleCells().map((cell) => {
                 const meta = cell.column.columnDef.meta as CustomMeta;
                 return (
-                  <Table.Td key={cell.id} className={lClasses[meta?.className || ""]}>
+                  <Table.Td key={cell.id} className={meta?.className}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Table.Td>
                 );

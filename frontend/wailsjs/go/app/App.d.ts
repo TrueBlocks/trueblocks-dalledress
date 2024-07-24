@@ -7,6 +7,8 @@ import {output} from '../models';
 
 export function Cancel(arg1:base.Address):Promise<number|boolean>;
 
+export function Fatal(arg1:string):Promise<void>;
+
 export function GetLast(arg1:string):Promise<string>;
 
 export function GetNameTypes():Promise<Array<string>>;

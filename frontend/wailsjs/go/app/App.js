@@ -6,6 +6,10 @@ export function Cancel(arg1) {
   return window['go']['app']['App']['Cancel'](arg1);
 }
 
+export function Fatal(arg1) {
+  return window['go']['app']['App']['Fatal'](arg1);
+}
+
 export function GetLast(arg1) {
   return window['go']['app']['App']['GetLast'](arg1);
 }

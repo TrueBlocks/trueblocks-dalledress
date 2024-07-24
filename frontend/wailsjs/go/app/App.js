@@ -10,6 +10,10 @@ export function ConvertToAddress(arg1) {
   return window['go']['app']['App']['ConvertToAddress'](arg1);
 }
 
+export function Fatal(arg1) {
+  return window['go']['app']['App']['Fatal'](arg1);
+}
+
 export function GenerateEnhanced(arg1) {
   return window['go']['app']['App']['GenerateEnhanced'](arg1);
 }

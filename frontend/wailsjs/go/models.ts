@@ -15,7 +15,7 @@ export namespace app {
 	    tags: string;
 	    // Go type: base
 	    prefund?: any;
-	    type: number;
+	    type: names.Parts;
 	
 	    static createFrom(source: any = {}) {
 	        return new NameEx(source);
@@ -278,6 +278,17 @@ export namespace dalle {
 	        this.gazes = source["gazes"];
 	        this.backstyles = source["backstyles"];
 	    }
+	}
+
+}
+
+export namespace names {
+	
+	export enum Parts {
+	    REGULAR = 2,
+	    CUSTOM = 4,
+	    PREFUND = 8,
+	    BADDRESS = 16,
 	}
 
 }

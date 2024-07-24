@@ -2,7 +2,7 @@ import React from "react";
 import { IconCircleCheck } from "@tabler/icons-react";
 import { app } from "@gocode/models";
 import { createColumnHelper, ColumnDef } from "@tanstack/react-table";
-import { CustomMeta } from "../CustomMeta";
+import { CustomMeta } from "@components";
 
 type CustomColumnDef<TData, TValue> = ColumnDef<TData, TValue> & {
   meta?: CustomMeta;
@@ -15,7 +15,7 @@ export const txColumns: CustomColumnDef<app.TransactionEx, any>[] = [
     id: "blockTx",
     header: () => "Id",
     cell: (info) => info.getValue(),
-    meta: { className: "small" },
+    meta: { className: "medium-small" },
   }),
   txColumnHelper.accessor("date", {
     header: () => "Date",

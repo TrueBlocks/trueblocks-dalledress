@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math/rand/v2"
@@ -22,6 +23,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
+
+// Since we need App.ctx to display a dialog and we can only get it when Startup method
+// is executed, we keep track of the first fatal error that has happened before Startup
+var startupError error
 
 type App struct {
 	ctx        context.Context
@@ -57,7 +62,7 @@ func NewApp() *App {
 	_ = a.session.Load()
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+		a.Fatal("Error loading .env file")
 	} else if a.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); a.apiKeys["openAi"] == "" {
 		log.Fatal("No OPENAI_API_KEY key found")
 	}
@@ -94,6 +99,9 @@ func (a App) String() string {
 
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+	if startupError != nil {
+		a.Fatal(startupError.Error())
+	}
 	if err := a.loadNames(); err != nil {
 		logger.Panic(err)
 	}
@@ -275,4 +283,28 @@ func (a *App) HandleLines() {
 		}
 	}
 	wg.Wait()
+}
+
+func (a *App) Fatal(message string) {
+	if message == "" {
+		message = "Fatal error occured. The application cannot continue to run."
+	}
+	log.Println(message)
+
+	// If a.ctx has not been set yet (i.e. we are before calling Startup), we can't display the
+	// dialog. Instead, we keep the error and let Startup call this function again when a.ctx is set.
+	if a.ctx == nil {
+		// We will only display the first error, since it makes more sense
+		if startupError == nil {
+			startupError = errors.New(message)
+		}
+		// Return to allow the application to continue starting up, until we get the context
+		return
+	}
+	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+		Type:    runtime.ErrorDialog,
+		Title:   "Fatal Error",
+		Message: message,
+	})
+	os.Exit(1)
 }

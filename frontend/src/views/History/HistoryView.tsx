@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import classes from "@/App.module.css";
-import lClasses from "../Columns.module.css";
 import { GetHistoryPage, GetHistoryCnt } from "@gocode/app/App";
 import { app } from "@gocode/models";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { Stack, Table, Title } from "@mantine/core";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { Stack, Title } from "@mantine/core";
 import { txColumns } from "./HistoryTable";
-import { CustomMeta } from "../CustomMeta";
 import { EditableSelect, View, ViewStatus } from "@components";
 import { useKeyboardPaging } from "@hooks";
+import { DataTable } from "@components";
 
 export function HistoryView() {
   const [address, setAddress] = useState<string>("trueblocks.eth");
@@ -48,16 +47,6 @@ export function HistoryView() {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (loading) {
-    return (
-      <View>
-        <Stack className={classes.mainContent}>
-          <Title order={3}>Loading...</Title>
-        </Stack>
-      </View>
-    );
-  }
-
   return (
     <View>
       <Stack className={classes.mainContent}>
@@ -70,33 +59,7 @@ export function HistoryView() {
           label="Select or enter an address or ENS name"
           placeholder="Enter or select an address"
         />
-        <Table>
-          <Table.Thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Table.Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Table.Th key={header.id} className={lClasses.centered}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </Table.Th>
-                ))}
-              </Table.Tr>
-            ))}
-          </Table.Thead>
-          <Table.Tbody>
-            {table.getRowModel().rows.map((row) => (
-              <Table.Tr key={row.id}>
-                {row.getVisibleCells().map((cell) => {
-                  var meta = cell.column.columnDef.meta as CustomMeta;
-                  return (
-                    <Table.Td key={cell.id} className={lClasses[meta?.className || ""]}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </Table.Td>
-                  );
-                })}
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
+        <DataTable<app.TransactionEx> table={table} loading={loading} />
       </Stack>
       <ViewStatus />
     </View>

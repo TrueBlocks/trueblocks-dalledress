@@ -1,6 +1,8 @@
-package app
+package messages
 
 import (
+	"context"
+
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -12,6 +14,7 @@ const (
 	Error
 	Warn
 	Progress
+	Server
 )
 
 type ProgressMsg struct {
@@ -20,16 +23,21 @@ type ProgressMsg struct {
 	Want    int64        `json:"want"`
 }
 
-func (a *App) MessageType(msg Message) string {
+type ServerMsg struct {
+	Name string `json:"name"`
+}
+
+func MessageType(msg Message) string {
 	m := map[Message]string{
 		Completed: "Completed",
 		Error:     "Error",
 		Warn:      "Warn",
 		Progress:  "Progress",
+		Server:    "Server",
 	}
 	return m[msg]
 }
 
-func (a *App) SendMessage(addr base.Address, msg Message, data interface{}) {
-	runtime.EventsEmit(a.ctx, a.MessageType(msg), data)
+func SendMessage(ctx context.Context, addr base.Address, msg Message, data interface{}) {
+	runtime.EventsEmit(ctx, MessageType(msg), data)
 }

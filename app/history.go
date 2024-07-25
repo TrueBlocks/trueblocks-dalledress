@@ -7,6 +7,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
 )
 
 // TODO: This should be on the App and it should be a sync.Map because it
@@ -17,7 +18,7 @@ var m = sync.Mutex{}
 func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 	address, ok := a.ConvertToAddress(addr)
 	if !ok {
-		a.SendMessage(base.ZeroAddr, Error, "Invalid address")
+		messages.SendMessage(a.ctx, base.ZeroAddr, messages.Error, "Invalid address")
 		return []TransactionEx{}
 	}
 
@@ -49,7 +50,7 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 					m.Lock()
 					addrToHistoryMap[address] = append(addrToHistoryMap[address], *txEx)
 					if len(addrToHistoryMap[address])%pageSize == 0 {
-						a.SendMessage(address, Progress, &ProgressMsg{
+						messages.SendMessage(a.ctx, address, messages.Progress, &messages.ProgressMsg{
 							Address: address,
 							Have:    int64(len(addrToHistoryMap[address])),
 							Want:    nItems,
@@ -57,7 +58,7 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 					}
 					m.Unlock()
 				case err := <-opts.RenderCtx.ErrorChan:
-					a.SendMessage(address, Error, err.Error())
+					messages.SendMessage(a.ctx, address, messages.Error, err.Error())
 				default:
 					if opts.RenderCtx.WasCanceled() {
 						return
@@ -68,11 +69,11 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 
 		_, _, err := opts.Export()
 		if err != nil {
-			a.SendMessage(address, Error, err.Error())
+			messages.SendMessage(a.ctx, address, messages.Error, err.Error())
 			return []TransactionEx{}
 		}
 
-		a.SendMessage(address, Completed, "")
+		messages.SendMessage(a.ctx, address, messages.Completed, "")
 	}
 
 	m.Lock()
@@ -85,7 +86,7 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []TransactionEx {
 func (a *App) GetHistoryCnt(addr string) int64 {
 	address, ok := a.ConvertToAddress(addr)
 	if !ok {
-		a.SendMessage(base.ZeroAddr, Error, "Invalid address")
+		messages.SendMessage(a.ctx, base.ZeroAddr, messages.Error, "Invalid address")
 		return 0
 	}
 
@@ -94,7 +95,7 @@ func (a *App) GetHistoryCnt(addr string) int64 {
 	}
 	monitors, _, err := opts.ListCount()
 	if err != nil {
-		a.SendMessage(address, Error, err.Error())
+		messages.SendMessage(a.ctx, address, messages.Error, err.Error())
 		return 0
 	} else if len(monitors) == 0 {
 		return 0
@@ -121,7 +122,7 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 		Terms: []string{addr},
 	}
 	if names, _, err := opts.Names(); err != nil {
-		a.SendMessage(base.ZeroAddr, Error, err.Error())
+		messages.SendMessage(a.ctx, base.ZeroAddr, messages.Error, err.Error())
 		return base.ZeroAddr, false
 	} else {
 		if len(names) > 0 {

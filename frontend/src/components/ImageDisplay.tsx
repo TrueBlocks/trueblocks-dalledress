@@ -23,7 +23,8 @@ export const ImageDisplay = ({ address, loading }: { address: string; loading: b
 
   return (
     <div>
-      <Text color="white">{title}</Text>
+      <Text c="white">{imgSrc}</Text>
+      <Text c="white">{title}</Text>
       <Image fit="contain" src={imgSrc} alt={address} />
     </div>
   );

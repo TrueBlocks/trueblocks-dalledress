@@ -12,6 +12,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -42,7 +43,7 @@ func main() {
 			LogLevel:         wLogger.ERROR,
 			Bind: []interface{}{
 				a,
-				&app.ProgressMsg{},
+				&messages.ProgressMsg{},
 				&types.Transaction{},
 				&app.NameEx{},
 				&app.TransactionEx{},

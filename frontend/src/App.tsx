@@ -19,7 +19,7 @@ function App() {
     >
       <AppShell.Header>
         <Header title="ApplicationTitle" />
-        <button onClick={toggleHelp}>Toggle Help</button>{" "}
+        <button onClick={toggleHelp}>Toggle Help</button>
       </AppShell.Header>
       <AppShell.Navbar>
         <Navbar />

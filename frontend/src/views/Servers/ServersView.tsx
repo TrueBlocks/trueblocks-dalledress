@@ -53,7 +53,7 @@ export function ServersView() {
     }
     setLogMessages((prev) => {
       const newLogs = [...prev, p];
-      return newLogs.length > 4 ? newLogs.slice(-4) : newLogs;
+      return newLogs.length > 8 ? newLogs.slice(-8) : newLogs;
     });
   };
 
@@ -73,10 +73,10 @@ export function ServersView() {
       <Title order={3}>Servers View</Title>
       <Stack className={classes.mainContent}>
         <SimpleGrid cols={2} spacing="lg" style={{ padding: "lg" }}>
-          <ServerCard s={scraper} toggle={toggleServer} />
-          <ServerCard s={monitor} toggle={toggleServer} />
-          <ServerCard s={ipfs} toggle={toggleServer} />
-          <ServerCard s={fileServer} toggle={toggleServer} />
+          <ServerCard server={scraper} toggle={toggleServer} />
+          <ServerCard server={monitor} toggle={toggleServer} />
+          <ServerCard server={ipfs} toggle={toggleServer} />
+          <ServerCard server={fileServer} toggle={toggleServer} />
         </SimpleGrid>
         <ServerLog logMessages={logMessages} />
       </Stack>

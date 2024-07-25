@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Text } from "@mantine/core";
+import { Card, Text, Title } from "@mantine/core";
 
 // TODO: This should be a type from GoLang
 type Progress = {
@@ -10,12 +10,15 @@ type Progress = {
 
 export const ServerLog = ({ logMessages }: { logMessages: Progress[] }) => {
   return (
-    <Card shadow="xl" style={{ maxHeight: "200px", overflowY: "auto" }}>
-      {logMessages.map((log, index) => (
-        <Text c={log.color} key={index}>
-          {log.message}
-        </Text>
-      ))}
-    </Card>
+    <>
+      <Title order={4} >Logs:</Title>
+      <Card shadow="xl" style={{ maxHeight: "16rem", overflowY: "auto" }}>
+        {logMessages.map((log, index) => (
+          <Text c={log.color} key={index}>
+            {log.message}
+          </Text>
+        ))}
+      </Card>
+    </>
   );
 };

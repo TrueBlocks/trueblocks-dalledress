@@ -34,16 +34,8 @@ export function Greet(arg1) {
   return window['go']['app']['App']['Greet'](arg1);
 }
 
-export function MessageType(arg1) {
-  return window['go']['app']['App']['MessageType'](arg1);
-}
-
 export function RegisterCtx(arg1) {
   return window['go']['app']['App']['RegisterCtx'](arg1);
-}
-
-export function SendMessage(arg1, arg2, arg3) {
-  return window['go']['app']['App']['SendMessage'](arg1, arg2, arg3);
 }
 
 export function SetLast(arg1, arg2) {

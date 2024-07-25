@@ -2,7 +2,6 @@ import React, { ReactNode, useState, useEffect } from "react";
 import classes from "./ViewStatus.module.css";
 import { EventsOn, EventsOff } from "@runtime";
 import { Text } from "@mantine/core";
-import { MessageType } from "@gocode/app/App";
 
 // TODO: Why is this not availabe in the Wails folders?
 type Progress = {

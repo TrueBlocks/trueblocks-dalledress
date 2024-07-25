@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/TrueBlocks/trueblocks-browse/app"
+	"github.com/TrueBlocks/trueblocks-browse/pkg/messages"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
@@ -37,7 +38,7 @@ func main() {
 			LogLevel:         wLogger.ERROR,
 			Bind: []interface{}{
 				a,
-				&app.ProgressMsg{},
+				&messages.ProgressMsg{},
 				&app.NameEx{},
 			},
 			EnumBind: []interface{}{

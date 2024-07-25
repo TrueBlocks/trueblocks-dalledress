@@ -1,19 +1,29 @@
 package app
 
 import (
-	"time"
+	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-browse/servers"
 )
 
-var ss = servers.Server{
-	Name:    "Testing Server",
-	State:   servers.Running,
-	Sleep:   1,
-	Started: time.Now(),
-	Runs:    12,
+func (a *App) GetServer(name string) *servers.Server {
+	switch name {
+	case "scraper":
+		return &a.Scraper.Server
+	default:
+		return nil
+	}
 }
 
-func (a *App) GetServer(name string) *servers.Server {
-	return &ss
+func (a *App) ToggleServer(name string) error {
+	switch name {
+	case "scraper":
+		return a.Scraper.Server.Toggle()
+	default:
+		return fmt.Errorf("server %s not found in ToggleServer", name)
+	}
+}
+
+func (a *App) StartServers() {
+	go a.Scraper.Run()
 }

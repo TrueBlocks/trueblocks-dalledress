@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/TrueBlocks/trueblocks-browse/pkg/config"
+	"github.com/TrueBlocks/trueblocks-browse/servers"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
@@ -28,6 +29,7 @@ type App struct {
 	ensMap     map[string]base.Address
 	renderCtxs map[base.Address][]*output.RenderCtx
 	// Add your application's data here
+	Scraper        *servers.Scraper
 }
 
 func NewApp() *App {
@@ -37,6 +39,7 @@ func NewApp() *App {
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 		// Initialize maps here
+		Scraper:    servers.NewScraper("scraper", 14000),
 	}
 
 	// it's okay if it's not found
@@ -66,6 +69,7 @@ func (a *App) Startup(ctx context.Context) {
 	if err := a.loadNames(); err != nil {
 		logger.Panic(err)
 	}
+	a.Scraper.MsgCtx = ctx
 }
 
 func (a *App) DomReady(ctx context.Context) {

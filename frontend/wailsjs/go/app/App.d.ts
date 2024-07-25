@@ -26,4 +26,8 @@ export function RegisterCtx(arg1:base.Address):Promise<output.RenderCtx>;
 
 export function SetLast(arg1:string,arg2:string):Promise<void>;
 
+export function StartServers():Promise<void>;
+
 export function String():Promise<string>;
+
+export function ToggleServer(arg1:string):Promise<void>;

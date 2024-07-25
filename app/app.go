@@ -29,7 +29,7 @@ type App struct {
 	ensMap     map[string]base.Address
 	renderCtxs map[base.Address][]*output.RenderCtx
 	// Add your application's data here
-	Scraper        *servers.Scraper
+	Scraper *servers.Scraper
 }
 
 func NewApp() *App {
@@ -39,7 +39,7 @@ func NewApp() *App {
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 		// Initialize maps here
-		Scraper:    servers.NewScraper("scraper", 14000),
+		Scraper: servers.NewScraper("scraper", 1000),
 	}
 
 	// it's okay if it's not found

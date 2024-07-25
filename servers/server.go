@@ -55,10 +55,11 @@ func (s *Server) getColor() string {
 }
 
 func (s *Server) Notify(msg ...string) {
+	s.Tick()
 	fmt.Printf("Notify %s%-10.10s (% 5d-% 5.2f): %s%s\n",
 		s.getColor(),
 		s.Name,
-		s.Tick(),
+		s.Runs,
 		float64(time.Since(s.Started))/float64(time.Second),
 		msg,
 		colors.Off,

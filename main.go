@@ -54,6 +54,8 @@ func main() {
 			},
 		}
 
+		go a.StartServers()
+
 		if err := wails.Run(&opts); err != nil {
 			fmt.Println("Error:", err.Error())
 		}

@@ -26,6 +26,10 @@ export function GetNamesPage(arg1, arg2) {
   return window['go']['app']['App']['GetNamesPage'](arg1, arg2);
 }
 
+export function GetServer(arg1) {
+  return window['go']['app']['App']['GetServer'](arg1);
+}
+
 export function GetSession() {
   return window['go']['app']['App']['GetSession']();
 }

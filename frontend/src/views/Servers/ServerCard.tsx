@@ -1,34 +1,31 @@
-import React from "react";
-import { Card, Text, Group, Badge, Title, Button } from "@mantine/core";
+import React, { useState, useEffect } from "react";
+import { Card, Text, Group, Badge, Title } from "@mantine/core";
+import { StateToString } from "@gocode/app/App";
 import { servers } from "@gocode/models";
 
 export const ServerCard = ({ s, toggle }: { s: servers.Server; toggle: (name: string) => void }) => {
-  const { name, sleep, started, runs, state } = s;
-  const status = state === servers.State.RUNNING ? "green" : "red";
-  var stateStr = "";
-  switch (state) {
-    case servers.State.STOPPED:
-      stateStr = "Stopped";
-      break;
-    case servers.State.PAUSED:
-      stateStr = "Paused";
-      break;
-    case servers.State.RUNNING:
-      stateStr = "Running";
-      break;
-  }
+  const [stateStr, setStateStr] = useState<string>("");
+  const { name, sleep, started, color, runs, state } = s;
+
+  useEffect(() => {
+    StateToString(name).then((s) => {
+      setStateStr(s);
+    });
+  }, [state]);
 
   const handleToggle = () => {
     toggle(name);
   };
 
   return (
-    <Card shadow="xl" style={{ margin: "1rem" }}>
+    <Card shadow="xl">
       <Group style={{ justifyContent: "space-between", marginBottom: 5 }}>
-        <Title order={4}>{name}</Title>
-        <Badge color={status}>
-          <button onClick={handleToggle}>{stateStr}</button>
-        </Badge>
+        <Title order={4} c={color}>
+          {name}
+        </Title>
+        <div onClick={handleToggle} style={{ cursor: "pointer" }}>
+          <Badge bg={state === servers.State.RUNNING ? "green" : "red"}>{stateStr}</Badge>
+        </div>
       </Group>
       <Text size="sm" style={{ lineHeight: 1.5 }}>
         Sleep Duration: {sleep}
@@ -39,7 +36,6 @@ export const ServerCard = ({ s, toggle }: { s: servers.Server; toggle: (name: st
       <Text size="sm" style={{ lineHeight: 1.5 }}>
         Runs: {runs}
       </Text>
-      <pre>{JSON.stringify(s, null, 2)}</pre>
     </Card>
   );
 };

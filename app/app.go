@@ -61,10 +61,10 @@ func NewApp() *App {
 		// Initialize maps here
 		databases:  make(map[string][]string),
 		dalleCache: make(map[string]*dalle.DalleDress),
-		Scraper:    servers.NewScraper("scraper", 1000),
-		FileServer: servers.NewFileServer("fileServer", 8080, 3000),
+		Scraper:    servers.NewScraper("scraper", 1000), // TODO: Should be seven seconds
+		FileServer: servers.NewFileServer("fileserver", 8080, 1000),
 		Monitor:    servers.NewMonitor("monitor", 1000),
-		Ipfs:       servers.NewIpfs("ipfs", 4000),
+		Ipfs:       servers.NewIpfs("ipfs", 1000),
 	}
 
 	// it's okay if it's not found

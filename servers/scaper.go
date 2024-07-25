@@ -16,6 +16,7 @@ func NewScraper(name string, sleep time.Duration) *Scraper {
 		Server: Server{
 			Name:    name,
 			Sleep:   sleep,
+			Color:   "yellow",
 			State:   Paused,
 			Started: time.Now(),
 		},

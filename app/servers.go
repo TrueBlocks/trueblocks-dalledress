@@ -6,6 +6,13 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/servers"
 )
 
+func (a *App) StartServers() {
+	go a.Scraper.Run()
+	go a.FileServer.Run()
+	go a.Monitor.Run()
+	go a.Ipfs.Run()
+}
+
 func (a *App) GetServer(name string) *servers.Server {
 	switch name {
 	case "scraper":
@@ -36,9 +43,10 @@ func (a *App) ToggleServer(name string) error {
 	}
 }
 
-func (a *App) StartServers() {
-	go a.Scraper.Run()
-	// go a.FileServer.Run()
-	go a.Monitor.Run()
-	go a.Ipfs.Run()
+func (a *App) StateToString(name string) string {
+	s := a.GetServer(name)
+	if s == nil {
+		return "Server not found"
+	}
+	return s.State.String()
 }

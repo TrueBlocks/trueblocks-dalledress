@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { View, ViewStatus } from "@components";
-import { ServerCard } from "./ServerCard";
+import { ServerCard, ServerLog } from "./";
 import { servers } from "@gocode/models";
 import { GetServer, ToggleServer } from "@gocode/app/App";
 import { Stack, Title, SimpleGrid } from "@mantine/core";
@@ -10,6 +10,8 @@ import classes from "@/App.module.css";
 // TODO: This should be a type from GoLang
 type Progress = {
   name: string;
+  message: string;
+  color: string;
 };
 
 export function ServersView() {
@@ -17,10 +19,11 @@ export function ServersView() {
   const [fileServer, setFileServer] = useState<servers.Server>({} as servers.Server);
   const [monitor, setMonitor] = useState<servers.Server>({} as servers.Server);
   const [ipfs, setIpfs] = useState<servers.Server>({} as servers.Server);
+  const [logMessages, setLogMessages] = useState<Progress[]>([]);
 
-  const updateServer = (server: string, update: React.Dispatch<React.SetStateAction<servers.Server>>) => {
+  const updateServer = (server: string, setStateFn: Dispatch<SetStateAction<servers.Server>>) => {
     GetServer(server).then((s) => {
-      update(s);
+      setStateFn(s);
     });
   };
 
@@ -48,6 +51,10 @@ export function ServersView() {
       default:
         break;
     }
+    setLogMessages((prev) => {
+      const newLogs = [...prev, p];
+      return newLogs.length > 4 ? newLogs.slice(-4) : newLogs;
+    });
   };
 
   useEffect(() => {
@@ -71,6 +78,7 @@ export function ServersView() {
           <ServerCard s={ipfs} toggle={toggleServer} />
           <ServerCard s={fileServer} toggle={toggleServer} />
         </SimpleGrid>
+        <ServerLog logMessages={logMessages} />
       </Stack>
       <ViewStatus />
     </View>

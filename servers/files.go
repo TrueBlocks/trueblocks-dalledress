@@ -22,6 +22,7 @@ func NewFileServer(name string, port int, sleep time.Duration) *FileServer {
 		Server: Server{
 			Name:    name,
 			Sleep:   sleep,
+			Color:   "green",
 			State:   Paused,
 			Started: time.Now(),
 		},

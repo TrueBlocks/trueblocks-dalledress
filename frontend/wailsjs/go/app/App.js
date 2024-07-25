@@ -26,12 +26,12 @@ export function GetNamesPage(arg1, arg2) {
   return window['go']['app']['App']['GetNamesPage'](arg1, arg2);
 }
 
-export function GetSession() {
-  return window['go']['app']['App']['GetSession']();
+export function GetServer(arg1) {
+  return window['go']['app']['App']['GetServer'](arg1);
 }
 
-export function Greet(arg1) {
-  return window['go']['app']['App']['Greet'](arg1);
+export function GetSession() {
+  return window['go']['app']['App']['GetSession']();
 }
 
 export function RegisterCtx(arg1) {
@@ -42,6 +42,18 @@ export function SetLast(arg1, arg2) {
   return window['go']['app']['App']['SetLast'](arg1, arg2);
 }
 
+export function StartServers() {
+  return window['go']['app']['App']['StartServers']();
+}
+
+export function StateToString(arg1) {
+  return window['go']['app']['App']['StateToString'](arg1);
+}
+
 export function String() {
   return window['go']['app']['App']['String']();
+}
+
+export function ToggleServer(arg1) {
+  return window['go']['app']['App']['ToggleServer'](arg1);
 }

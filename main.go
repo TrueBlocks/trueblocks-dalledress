@@ -48,6 +48,7 @@ func main() {
 				&types.Transaction{},
 				&app.NameEx{},
 				&app.TransactionEx{},
+				&servers.Server{},
 			},
 			EnumBind: []interface{}{
 				app.NameDbParts,
@@ -93,6 +94,8 @@ func main() {
 				logger.Error("File server error:", err)
 			}
 		}()
+
+		go a.StartServers()
 
 		if err := wails.Run(&opts); err != nil {
 			fmt.Println("Error:", err.Error())

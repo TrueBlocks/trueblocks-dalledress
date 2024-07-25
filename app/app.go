@@ -20,6 +20,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/config"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
+	"github.com/TrueBlocks/trueblocks-dalledress/servers"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -45,6 +46,10 @@ type App struct {
 	titleTemplate  *template.Template
 	Series         dalle.Series `json:"series"`
 	dalleCache     map[string]*dalle.DalleDress
+	Scraper        *servers.Scraper
+	FileServer     *servers.FileServer
+	Monitor        *servers.Monitor
+	Ipfs           *servers.Ipfs
 }
 
 func NewApp() *App {
@@ -56,6 +61,10 @@ func NewApp() *App {
 		// Initialize maps here
 		databases:  make(map[string][]string),
 		dalleCache: make(map[string]*dalle.DalleDress),
+		Scraper:    servers.NewScraper("scraper", 1000),
+		FileServer: servers.NewFileServer("fileServer", 8080, 3000),
+		Monitor:    servers.NewMonitor("monitor", 1000),
+		Ipfs:       servers.NewIpfs("ipfs", 4000),
 	}
 
 	// it's okay if it's not found
@@ -105,6 +114,10 @@ func (a *App) Startup(ctx context.Context) {
 	if err := a.loadNames(); err != nil {
 		logger.Panic(err)
 	}
+	a.Scraper.MsgCtx = ctx
+	a.FileServer.MsgCtx = ctx
+	a.Monitor.MsgCtx = ctx
+	a.Ipfs.MsgCtx = ctx
 }
 
 func (a *App) DomReady(ctx context.Context) {

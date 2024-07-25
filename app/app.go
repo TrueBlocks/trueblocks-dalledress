@@ -29,7 +29,10 @@ type App struct {
 	ensMap     map[string]base.Address
 	renderCtxs map[base.Address][]*output.RenderCtx
 	// Add your application's data here
-	Scraper *servers.Scraper
+	Scraper    *servers.Scraper
+	FileServer *servers.FileServer
+	Monitor    *servers.Monitor
+	Ipfs       *servers.Ipfs
 }
 
 func NewApp() *App {
@@ -39,7 +42,10 @@ func NewApp() *App {
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 		// Initialize maps here
-		Scraper: servers.NewScraper("scraper", 1000),
+		Scraper:    servers.NewScraper("scraper", 1000), // TODO: Should be seven seconds
+		FileServer: servers.NewFileServer("fileserver", 8080, 1000),
+		Monitor:    servers.NewMonitor("monitor", 1000),
+		Ipfs:       servers.NewIpfs("ipfs", 1000),
 	}
 
 	// it's okay if it's not found
@@ -70,6 +76,9 @@ func (a *App) Startup(ctx context.Context) {
 		logger.Panic(err)
 	}
 	a.Scraper.MsgCtx = ctx
+	a.FileServer.MsgCtx = ctx
+	a.Monitor.MsgCtx = ctx
+	a.Ipfs.MsgCtx = ctx
 }
 
 func (a *App) DomReady(ctx context.Context) {

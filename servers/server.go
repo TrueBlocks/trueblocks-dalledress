@@ -14,6 +14,7 @@ import (
 type Server struct {
 	Name    string          `json:"name"`
 	Sleep   time.Duration   `json:"sleep"`
+	Color   string          `json:"color"`
 	Started time.Time       `json:"started"`
 	Runs    int             `json:"runs"`
 	State   State           `json:"state"`
@@ -50,22 +51,24 @@ func (s *Server) Tick() int {
 	return s.Runs
 }
 
-func (s *Server) getColor() string {
-	return colors.Yellow
-}
-
 func (s *Server) Notify(msg ...string) {
+	color := colors.ColorMap[s.Color]
+	if color == "" {
+		color = colors.White
+	}
+
 	s.Tick()
-	fmt.Printf("Notify %s%-10.10s (% 5d-% 5.2f): %s%s\n",
-		s.getColor(),
+	msgOut := fmt.Sprintf("%-10.10s (% 5d-% 5.2f): %s",
 		s.Name,
 		s.Runs,
 		float64(time.Since(s.Started))/float64(time.Second),
 		msg,
-		colors.Off,
 	)
+	// fmt.Printf("%sNotify: %s%s\n", color, msgOut, colors.Off)
 	messages.SendMessage(s.MsgCtx, base.ZeroAddr, messages.Server, messages.ServerMsg{
-		Name: strings.ToLower(s.Name),
+		Name:    strings.ToLower(s.Name),
+		Message: msgOut,
+		Color:   s.Color,
 	})
 }
 

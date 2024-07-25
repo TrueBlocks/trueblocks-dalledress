@@ -46,6 +46,10 @@ export function StartServers() {
   return window['go']['app']['App']['StartServers']();
 }
 
+export function StateToString(arg1) {
+  return window['go']['app']['App']['StateToString'](arg1);
+}
+
 export function String() {
   return window['go']['app']['App']['String']();
 }

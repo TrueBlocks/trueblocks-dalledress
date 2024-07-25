@@ -153,6 +153,7 @@ export namespace servers {
 	export class Server {
 	    name: string;
 	    sleep: number;
+	    color: string;
 	    // Go type: time
 	    started: any;
 	    runs: number;
@@ -166,6 +167,7 @@ export namespace servers {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.sleep = source["sleep"];
+	        this.color = source["color"];
 	        this.started = this.convertValues(source["started"], null);
 	        this.runs = source["runs"];
 	        this.state = source["state"];

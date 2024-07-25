@@ -28,6 +28,8 @@ export function SetLast(arg1:string,arg2:string):Promise<void>;
 
 export function StartServers():Promise<void>;
 
+export function StateToString(arg1:string):Promise<string>;
+
 export function String():Promise<string>;
 
 export function ToggleServer(arg1:string):Promise<void>;

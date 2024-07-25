@@ -14,8 +14,32 @@ export function Fatal(arg1) {
   return window['go']['app']['App']['Fatal'](arg1);
 }
 
+export function GenerateEnhanced(arg1) {
+  return window['go']['app']['App']['GenerateEnhanced'](arg1);
+}
+
+export function GenerateImage(arg1) {
+  return window['go']['app']['App']['GenerateImage'](arg1);
+}
+
+export function GetData(arg1) {
+  return window['go']['app']['App']['GetData'](arg1);
+}
+
+export function GetEnhanced(arg1) {
+  return window['go']['app']['App']['GetEnhanced'](arg1);
+}
+
 export function GetExistingAddrs() {
   return window['go']['app']['App']['GetExistingAddrs']();
+}
+
+export function GetFilelist(arg1) {
+  return window['go']['app']['App']['GetFilelist'](arg1);
+}
+
+export function GetFilename(arg1) {
+  return window['go']['app']['App']['GetFilename'](arg1);
 }
 
 export function GetHistoryCnt(arg1) {
@@ -24,6 +48,10 @@ export function GetHistoryCnt(arg1) {
 
 export function GetHistoryPage(arg1, arg2, arg3) {
   return window['go']['app']['App']['GetHistoryPage'](arg1, arg2, arg3);
+}
+
+export function GetJson(arg1) {
+  return window['go']['app']['App']['GetJson'](arg1);
 }
 
 export function GetLast(arg1) {
@@ -42,6 +70,14 @@ export function GetNamesPage(arg1, arg2) {
   return window['go']['app']['App']['GetNamesPage'](arg1, arg2);
 }
 
+export function GetPrompt(arg1) {
+  return window['go']['app']['App']['GetPrompt'](arg1);
+}
+
+export function GetSeries(arg1) {
+  return window['go']['app']['App']['GetSeries'](arg1);
+}
+
 export function GetServer(arg1) {
   return window['go']['app']['App']['GetServer'](arg1);
 }
@@ -50,8 +86,36 @@ export function GetSession() {
   return window['go']['app']['App']['GetSession']();
 }
 
+export function GetTerse(arg1) {
+  return window['go']['app']['App']['GetTerse'](arg1);
+}
+
+export function GetTitle(arg1) {
+  return window['go']['app']['App']['GetTitle'](arg1);
+}
+
+export function HandleLines() {
+  return window['go']['app']['App']['HandleLines']();
+}
+
+export function LoadSeries() {
+  return window['go']['app']['App']['LoadSeries']();
+}
+
+export function MakeDalleDress(arg1) {
+  return window['go']['app']['App']['MakeDalleDress'](arg1);
+}
+
 export function RegisterCtx(arg1) {
   return window['go']['app']['App']['RegisterCtx'](arg1);
+}
+
+export function ReloadDatabases() {
+  return window['go']['app']['App']['ReloadDatabases']();
+}
+
+export function Save(arg1) {
+  return window['go']['app']['App']['Save'](arg1);
 }
 
 export function SetLast(arg1, arg2) {

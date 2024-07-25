@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"path/filepath"
 
-	"github.com/TrueBlocks/trueblocks-browse/pkg/utils"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/utils"
 )
 
 // Session stores ephemeral things such as last window position, last view, and recent file
@@ -19,12 +19,13 @@ type Session struct {
 	LastRoute   string `json:"lastRoute"`
 	LastTab     string `json:"lastTab"`
 	LastAddress string `json:"lastAddress"`
+	LastSeries  string `json:"lastSeries"`
 }
 
 var defaultSession = Session{
 	Width:  1024,
 	Height: 768,
-	Title:  "Browse by TrueBlocks",
+	Title:  "DalleDress by TrueBlocks",
 }
 
 func NewSession() Session {

@@ -1,6 +1,6 @@
-# trueblocks-browse
+# trueblocks-dalledress
 
-Web 3.0 Account Browser built on TrueBlocks
+AI Image Generator from Ethereum Addresses, Block Hashes, or Transaction Hashes
 
 ## Installing
 

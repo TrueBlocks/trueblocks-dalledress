@@ -1,7 +1,7 @@
 import React from "react";
 
 // Find: Routes
-import { IconHome, IconTag, IconSettings, IconList, IconSpider, IconServer } from "@tabler/icons-react";
+import { IconHome, IconSpider, IconList, IconTag, IconServer, IconSettings } from "@tabler/icons-react";
 import { HomeView, DalleView, SeriesView, HistoryView, NamesView, ServersView, SettingsView } from "@views";
 
 // Note:

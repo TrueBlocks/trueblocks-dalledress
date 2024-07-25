@@ -21,11 +21,7 @@ export function GetSession():Promise<config.Session>;
 
 export function Greet(arg1:string):Promise<string>;
 
-export function MessageType(arg1:app.Message):Promise<string>;
-
 export function RegisterCtx(arg1:base.Address):Promise<output.RenderCtx>;
-
-export function SendMessage(arg1:base.Address,arg2:app.Message,arg3:any):Promise<void>;
 
 export function SetLast(arg1:string,arg2:string):Promise<void>;
 

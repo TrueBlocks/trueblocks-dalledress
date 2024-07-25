@@ -1,8 +1,9 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { NavLink } from "@mantine/core";
-import { IconHome, IconTag, IconSettings } from "@tabler/icons-react";
 import { Link, useRoute } from "wouter";
 import { GetLast, SetLast } from "@gocode/app/App";
+// TODO: This alias is wrong, can it not be @Routes See also @/App.module.css
+import { routeItems } from "@/Routes";
 
 export function Menu() {
   const [activeRoute, setActiveRoute] = useState("/");
@@ -18,24 +19,20 @@ export function Menu() {
     setActiveRoute(route);
   };
 
-  var menuItems = [
-    { route: "/", label: "Home", icon: <IconHome /> },
-    { route: "/names", label: "Names", icon: <IconTag /> },
-    { route: "/settings", label: "Settings", icon: <IconSettings /> },
-  ];
-
   return (
     <div style={{ flexGrow: 1 }}>
-      {menuItems.map((item) => (
-        <StyledNavLink
-          key={item.route}
-          label={item.label}
-          icon={item.icon}
-          href={item.route}
-          onClick={() => handleRouteChange(item.route)}
-          activeRoute={activeRoute}
-        />
-      ))}
+      {routeItems
+        .sort((a, b) => a.order - b.order)
+        .map((item) => (
+          <StyledNavLink
+            key={item.route}
+            label={item.label}
+            icon={item.icon}
+            href={item.route}
+            onClick={() => handleRouteChange(item.route)}
+            activeRoute={activeRoute}
+          />
+        ))}
     </div>
   );
 }

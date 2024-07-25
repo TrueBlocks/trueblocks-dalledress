@@ -13,6 +13,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
+	"github.com/TrueBlocks/trueblocks-dalledress/servers"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -50,6 +51,8 @@ func main() {
 			},
 			EnumBind: []interface{}{
 				app.NameDbParts,
+				servers.Types,
+				servers.States,
 			},
 			StartHidden: true,
 			AssetServer: &assetserver.Options{

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import classes from "@/App.module.css";
-import { HomeView, NamesView, SettingsView } from "@views";
 import { GetLast } from "@gocode/app/App";
+import { routeItems } from "@/Routes";
 
 export const Routes = () => {
   const [, setLocation] = useLocation();
@@ -13,16 +13,10 @@ export const Routes = () => {
     });
   }, [setLocation]);
 
-  var menuItems = [
-    { route: "/names", component: NamesView },
-    { route: "/settings", component: SettingsView },
-    { route: "/", component: HomeView },
-  ];
-
   return (
     <div className={classes.mainContent}>
       <Switch>
-        {menuItems.map((item) => (
+        {routeItems.map((item) => (
           <Route key={item.route} path={item.route}>
             <item.component />
           </Route>
@@ -31,4 +25,3 @@ export const Routes = () => {
     </div>
   );
 };
-

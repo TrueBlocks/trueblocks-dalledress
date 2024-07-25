@@ -15,6 +15,7 @@ func NewMonitor(name string, sleep time.Duration) *Monitor {
 		Server: Server{
 			Name:    name,
 			Sleep:   sleep,
+			Color:   "blue",
 			State:   Paused,
 			Started: time.Now(),
 		},

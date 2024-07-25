@@ -15,6 +15,7 @@ func NewIpfs(name string, sleep time.Duration) *Ipfs {
 		Server: Server{
 			Name:    name,
 			Sleep:   sleep,
+			Color:   "red",
 			State:   Paused,
 			Started: time.Now(),
 		},

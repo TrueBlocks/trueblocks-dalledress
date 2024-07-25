@@ -24,7 +24,9 @@ type ProgressMsg struct {
 }
 
 type ServerMsg struct {
-	Name string `json:"name"`
+	Name    string `json:"name"`
+	Message string `json:"message"`
+	Color   string `json:"color"`
 }
 
 func MessageType(msg Message) string {

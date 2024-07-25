@@ -19,8 +19,6 @@ export function GetNamesPage(arg1:number,arg2:number):Promise<Array<app.NameEx>>
 
 export function GetSession():Promise<config.Session>;
 
-export function Greet(arg1:string):Promise<string>;
-
 export function RegisterCtx(arg1:base.Address):Promise<output.RenderCtx>;
 
 export function SetLast(arg1:string,arg2:string):Promise<void>;

@@ -30,10 +30,6 @@ export function GetSession() {
   return window['go']['app']['App']['GetSession']();
 }
 
-export function Greet(arg1) {
-  return window['go']['app']['App']['Greet'](arg1);
-}
-
 export function RegisterCtx(arg1) {
   return window['go']['app']['App']['RegisterCtx'](arg1);
 }

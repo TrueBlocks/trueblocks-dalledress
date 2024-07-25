@@ -57,6 +57,63 @@ export namespace app {
 		    return a;
 		}
 	}
+	export class TransactionEx {
+	    blockNumber: number;
+	    transactionIndex: number;
+	    timestamp: number;
+	    date: string;
+	    from: base.Address;
+	    fromName: string;
+	    to: base.Address;
+	    toName: string;
+	    // Go type: base
+	    wei: any;
+	    ether: string;
+	    function: string;
+	    hasToken: boolean;
+	    isError: boolean;
+	    logCount: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TransactionEx(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.blockNumber = source["blockNumber"];
+	        this.transactionIndex = source["transactionIndex"];
+	        this.timestamp = source["timestamp"];
+	        this.date = source["date"];
+	        this.from = this.convertValues(source["from"], base.Address);
+	        this.fromName = source["fromName"];
+	        this.to = this.convertValues(source["to"], base.Address);
+	        this.toName = source["toName"];
+	        this.wei = this.convertValues(source["wei"], null);
+	        this.ether = source["ether"];
+	        this.function = source["function"];
+	        this.hasToken = source["hasToken"];
+	        this.isError = source["isError"];
+	        this.logCount = source["logCount"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 
 }
 

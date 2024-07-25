@@ -8,7 +8,15 @@ import {output} from '../models';
 
 export function Cancel(arg1:base.Address):Promise<number|boolean>;
 
+export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
+
 export function Fatal(arg1:string):Promise<void>;
+
+export function GetExistingAddrs():Promise<Array<string>>;
+
+export function GetHistoryCnt(arg1:string):Promise<number>;
+
+export function GetHistoryPage(arg1:string,arg2:number,arg3:number):Promise<Array<app.TransactionEx>>;
 
 export function GetLast(arg1:string):Promise<string>;
 

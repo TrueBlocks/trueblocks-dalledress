@@ -1,0 +1,8 @@
+{
+    "scripts": {
+        "dev": "wails dev --debounce 2000"
+    },
+    "name": "trueblocks-dalledress",
+    "version": "1.0.0",
+    "license": "GPL-3.0"
+}

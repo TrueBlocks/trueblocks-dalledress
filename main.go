@@ -10,10 +10,11 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
 	"github.com/TrueBlocks/trueblocks-dalledress/servers"
+	"github.com/TrueBlocks/trueblocks-dalledress/types"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -45,13 +46,13 @@ func main() {
 			Bind: []interface{}{
 				a,
 				&messages.ProgressMsg{},
-				&types.Transaction{},
-				&app.NameEx{},
-				&app.TransactionEx{},
+				&coreTypes.Transaction{},
+				&types.NameEx{},
+				&types.TransactionEx{},
 				&servers.Server{},
 			},
 			EnumBind: []interface{}{
-				app.NameDbParts,
+				types.NameDbParts,
 				servers.Types,
 				servers.States,
 			},

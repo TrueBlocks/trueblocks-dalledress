@@ -21,6 +21,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/config"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
 	"github.com/TrueBlocks/trueblocks-dalledress/servers"
+	"github.com/TrueBlocks/trueblocks-dalledress/types"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -33,8 +34,8 @@ type App struct {
 	ctx        context.Context
 	session    config.Session
 	apiKeys    map[string]string
-	namesMap   map[base.Address]NameEx
-	names      []NameEx // We keep both for performance reasons
+	namesMap   map[base.Address]types.NameEx
+	names      []types.NameEx // We keep both for performance reasons
 	ensMap     map[string]base.Address
 	renderCtxs map[base.Address][]*output.RenderCtx
 	// Add your application's data here
@@ -55,7 +56,7 @@ type App struct {
 func NewApp() *App {
 	a := App{
 		apiKeys:    make(map[string]string),
-		namesMap:   make(map[base.Address]NameEx),
+		namesMap:   make(map[base.Address]types.NameEx),
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 		// Initialize maps here

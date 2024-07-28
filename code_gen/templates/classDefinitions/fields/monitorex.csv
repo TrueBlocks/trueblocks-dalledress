@@ -1,0 +1,6 @@
+name         ,type     ,strDefault ,attributes ,upgrades ,docOrder ,description
+address      ,address  ,           ,           ,         ,         ,the address to monitor
+ensName      ,string   ,           ,           ,         ,         ,the ENS name of the address
+label        ,string   ,           ,           ,         ,         ,a label for the address
+transactions ,[]string ,           ,           ,         ,         ,a list of transactions to monitor
+stats        ,*Stats   ,           ,           ,         ,         ,the stats for this address

@@ -1,0 +1,3 @@
+name      ,type        ,strDefault ,attributes ,upgrades ,docOrder ,description
+filename  ,string      ,           ,           ,         ,       1 ,the name of this file
+monitors  ,[]MonitorEx ,           ,           ,         ,       2 ,the addresses being monitored by this file

@@ -43,6 +43,7 @@ func main() {
 			OnShutdown:       a.Shutdown,
 			BackgroundColour: nil,
 			LogLevel:         wLogger.ERROR,
+			Menu:             a.GetMenus(),
 			Bind: []interface{}{
 				a,
 				&messages.ProgressMsg{},

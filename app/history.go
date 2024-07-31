@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
-	"github.com/TrueBlocks/trueblocks-dalledress/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 // TODO: This should be on the App and it should be a sync.Map because it
@@ -19,7 +20,7 @@ var m = sync.Mutex{}
 func (a *App) GetHistoryPage(addr string, first, pageSize int) []types.TransactionEx {
 	address, ok := a.ConvertToAddress(addr)
 	if !ok {
-		messages.SendMessage(a.ctx, base.ZeroAddr, messages.Error, "Invalid address")
+		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(fmt.Errorf("Invalid address: "+addr)))
 		return []types.TransactionEx{}
 	}
 
@@ -51,15 +52,14 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []types.Transacti
 					m.Lock()
 					addrToHistoryMap[address] = append(addrToHistoryMap[address], *txEx)
 					if len(addrToHistoryMap[address])%pageSize == 0 {
-						messages.SendMessage(a.ctx, address, messages.Progress, &messages.ProgressMsg{
-							Address: address,
-							Have:    int64(len(addrToHistoryMap[address])),
-							Want:    nItems,
-						})
+						messages.Send(a.ctx,
+							messages.Progress,
+							messages.NewProgressMsg(int64(len(addrToHistoryMap[address])), nItems, address),
+						)
 					}
 					m.Unlock()
 				case err := <-opts.RenderCtx.ErrorChan:
-					messages.SendMessage(a.ctx, address, messages.Error, err.Error())
+					messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err, address))
 				default:
 					if opts.RenderCtx.WasCanceled() {
 						return
@@ -70,11 +70,14 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []types.Transacti
 
 		_, _, err := opts.Export()
 		if err != nil {
-			messages.SendMessage(a.ctx, address, messages.Error, err.Error())
+			messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err, address))
 			return []types.TransactionEx{}
 		}
 
-		messages.SendMessage(a.ctx, address, messages.Completed, "")
+		messages.Send(a.ctx,
+			messages.Completed,
+			messages.NewProgressMsg(int64(len(addrToHistoryMap[address])), int64(len(addrToHistoryMap[address])), address),
+		)
 	}
 
 	m.Lock()
@@ -87,7 +90,7 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []types.Transacti
 func (a *App) GetHistoryCnt(addr string) int64 {
 	address, ok := a.ConvertToAddress(addr)
 	if !ok {
-		messages.SendMessage(a.ctx, base.ZeroAddr, messages.Error, "Invalid address")
+		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(fmt.Errorf("Invalid address: "+addr)))
 		return 0
 	}
 
@@ -96,7 +99,7 @@ func (a *App) GetHistoryCnt(addr string) int64 {
 	}
 	monitors, _, err := opts.ListCount()
 	if err != nil {
-		messages.SendMessage(a.ctx, address, messages.Error, err.Error())
+		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err, address))
 		return 0
 	} else if len(monitors) == 0 {
 		return 0
@@ -123,7 +126,7 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 		Terms: []string{addr},
 	}
 	if names, _, err := opts.Names(); err != nil {
-		messages.SendMessage(a.ctx, base.ZeroAddr, messages.Error, err.Error())
+		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err))
 		return base.ZeroAddr, false
 	} else {
 		if len(names) > 0 {

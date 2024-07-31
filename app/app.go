@@ -20,8 +20,8 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/config"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/servers"
-	"github.com/TrueBlocks/trueblocks-dalledress/types"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -30,14 +30,17 @@ import (
 // is executed, we keep track of the first fatal error that has happened before Startup
 var startupError error
 
+// Find: NewViews
 type App struct {
-	ctx        context.Context
-	session    config.Session
-	apiKeys    map[string]string
-	namesMap   map[base.Address]types.NameEx
-	names      []types.NameEx // We keep both for performance reasons
-	ensMap     map[string]base.Address
-	renderCtxs map[base.Address][]*output.RenderCtx
+	ctx         context.Context
+	session     config.Session
+	apiKeys     map[string]string
+	namesMap    map[base.Address]types.NameEx
+	names       []types.NameEx // We keep both for performance reasons
+	monitorsMap map[base.Address]types.MonitorEx
+	monitors    []types.MonitorEx // We keep both for performance reasons
+	ensMap      map[string]base.Address
+	renderCtxs  map[base.Address][]*output.RenderCtx
 	// Add your application's data here
 	databases      map[string][]string
 	authorTemplate *template.Template
@@ -51,14 +54,18 @@ type App struct {
 	FileServer     *servers.FileServer
 	Monitor        *servers.Monitor
 	Ipfs           *servers.Ipfs
+	Documents      []types.Document
+	CurrentDoc     *types.Document
 }
 
+// Find: NewViews
 func NewApp() *App {
 	a := App{
-		apiKeys:    make(map[string]string),
-		namesMap:   make(map[base.Address]types.NameEx),
-		renderCtxs: make(map[base.Address][]*output.RenderCtx),
-		ensMap:     make(map[string]base.Address),
+		apiKeys:     make(map[string]string),
+		namesMap:    make(map[base.Address]types.NameEx),
+		monitorsMap: make(map[base.Address]types.MonitorEx),
+		renderCtxs:  make(map[base.Address][]*output.RenderCtx),
+		ensMap:      make(map[string]base.Address),
 		// Initialize maps here
 		databases:  make(map[string][]string),
 		dalleCache: make(map[string]*dalle.DalleDress),
@@ -66,7 +73,10 @@ func NewApp() *App {
 		FileServer: servers.NewFileServer("fileserver", 8080, 1000),
 		Monitor:    servers.NewMonitor("monitor", 1000),
 		Ipfs:       servers.NewIpfs("ipfs", 1000),
+		Documents:  make([]types.Document, 10),
 	}
+	a.CurrentDoc = &a.Documents[0]
+	a.CurrentDoc.Filename = "Untitled"
 
 	// it's okay if it's not found
 	_ = a.session.Load()
@@ -112,7 +122,11 @@ func (a *App) Startup(ctx context.Context) {
 	if startupError != nil {
 		a.Fatal(startupError.Error())
 	}
+	// Find: NewViews
 	if err := a.loadNames(); err != nil {
+		logger.Panic(err)
+	}
+	if err := a.loadMonitors(); err != nil {
 		logger.Panic(err)
 	}
 	a.Scraper.MsgCtx = ctx

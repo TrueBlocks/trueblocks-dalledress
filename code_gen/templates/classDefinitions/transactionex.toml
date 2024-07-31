@@ -6,5 +6,4 @@
     attributes = ""
     produced_by = "monitorex"
     contains = ""
-    cache_type = "cacheable"
-    cache_by = "string"
+    cache_type = "marshal_only"

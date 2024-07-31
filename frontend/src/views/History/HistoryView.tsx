@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "wouter";
 import classes from "@/App.module.css";
 import { GetHistoryPage, GetHistoryCnt } from "@gocode/app/App";
 import { types } from "@gocode/models";
@@ -17,6 +18,9 @@ export function HistoryView() {
   const [items, setItems] = useState<types.TransactionEx[]>([]);
   const { curItem, perPage } = useKeyboardPaging<types.TransactionEx>(items, count, [address]);
 
+  const params = useParams();
+  const addr = params.address;
+
   useEffect(() => {
     if (loaded && !loading) {
       const fetch = async (addr: string, currentItem: number, itemsPerPage: number) => {
@@ -25,7 +29,7 @@ export function HistoryView() {
       };
       fetch(address, curItem, perPage);
     }
-  }, [count, curItem, perPage]);
+  }, [count, curItem, perPage, address, loaded, loading]);
 
   useEffect(() => {
     setLoading(true);
@@ -40,6 +44,14 @@ export function HistoryView() {
       setLoading(false);
     }
   }, [address]);
+
+  useEffect(() => {
+    if (addr && addr !== "" && addr !== ":address") {
+      setAddress(addr);
+    } else {
+      setAddress("trueblocks.eth");
+    }
+  }, [addr]);
 
   const table = useReactTable({
     data: items,

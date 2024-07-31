@@ -7,4 +7,4 @@
     produced_by = "document"
     contains = ""
     cache_type = "cacheable"
-    cache_by = "string"
+    cache_by = "filename"

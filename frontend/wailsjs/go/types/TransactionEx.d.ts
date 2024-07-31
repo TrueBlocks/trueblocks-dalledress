@@ -3,21 +3,11 @@
 import {io} from '../models';
 import {types} from '../models';
 
-export function CacheId():Promise<string>;
-
-export function CacheLocation():Promise<string|string>;
-
-export function CacheName():Promise<string>;
-
 export function FinishUnmarshal():Promise<void>;
-
-export function GetCacheName():Promise<string>;
 
 export function MarshalCache(arg1:io.Writer):Promise<void>;
 
 export function Model(arg1:string,arg2:string,arg3:boolean,arg4:{[key: string]: any}):Promise<types.Model>;
-
-export function SetDocument(arg1:types.Document):Promise<void>;
 
 export function String():Promise<string>;
 

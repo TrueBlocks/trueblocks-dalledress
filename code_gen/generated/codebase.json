@@ -7,22 +7,37 @@
             "doc_route": "100-document",
             "doc_descr": "a document containing a list of addresses and some summary statistics",
             "produced_by": "document",
-            "cache_by": "string",
+            "cache_by": "filename",
             "cache_type": "cacheable",
             "members": [
                 {
                     "name": "filename",
                     "type": "string",
+                    "strDefault": "Unknown",
                     "docOrder": 1,
                     "description": "the name of this file",
                     "num": 1
                 },
                 {
+                    "name": "dirty",
+                    "type": "bool",
+                    "docOrder": 2,
+                    "description": "whether this file has been modified",
+                    "num": 2
+                },
+                {
+                    "name": "lastUpdate",
+                    "type": "blknum",
+                    "docOrder": 3,
+                    "description": "the block number of the last update",
+                    "num": 3
+                },
+                {
                     "name": "monitors",
                     "type": "MonitorEx",
-                    "docOrder": 2,
+                    "docOrder": 4,
                     "description": "the addresses being monitored by this file",
-                    "num": 2,
+                    "num": 4,
                     "isArray": true
                 }
             ]
@@ -33,40 +48,79 @@
             "doc_route": "101-monitorex",
             "doc_descr": "a single monitored address",
             "produced_by": "document",
-            "cache_by": "string",
-            "cache_type": "cacheable",
+            "cache_type": "marshal_only",
             "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "the name of the file",
+                    "num": 1
+                },
                 {
                     "name": "address",
                     "type": "address",
+                    "docOrder": 2,
                     "description": "the address to monitor",
-                    "num": 1
+                    "num": 2
                 },
                 {
                     "name": "ensName",
                     "type": "string",
+                    "docOrder": 3,
                     "description": "the ENS name of the address",
-                    "num": 2
+                    "num": 3
                 },
                 {
                     "name": "label",
                     "type": "string",
+                    "docOrder": 4,
                     "description": "a label for the address",
-                    "num": 3
+                    "num": 4
                 },
                 {
                     "name": "transactions",
                     "type": "string",
+                    "docOrder": 5,
                     "description": "a list of transactions to monitor",
-                    "num": 4,
+                    "num": 5,
                     "isArray": true
                 },
                 {
                     "name": "stats",
                     "type": "Stats",
+                    "docOrder": 6,
                     "description": "the stats for this address",
-                    "num": 5,
+                    "num": 6,
                     "isPointer": true
+                },
+                {
+                    "name": "deleted",
+                    "type": "bool",
+                    "docOrder": 7,
+                    "description": "true if the file has been deleted",
+                    "num": 7
+                },
+                {
+                    "name": "fileSize",
+                    "type": "int64",
+                    "docOrder": 8,
+                    "description": "the size of the file",
+                    "num": 8
+                },
+                {
+                    "name": "lastScanned",
+                    "type": "uint32",
+                    "docOrder": 9,
+                    "description": "the last time the file was scanned",
+                    "num": 9
+                },
+                {
+                    "name": "nRecords",
+                    "type": "int64",
+                    "docOrder": 10,
+                    "description": "the number of records in the file",
+                    "num": 10
                 }
             ]
         },
@@ -76,8 +130,7 @@
             "doc_route": "102-stats",
             "doc_descr": "statistics about the document and its addresses",
             "produced_by": "stats",
-            "cache_by": "string",
-            "cache_type": "cacheable",
+            "cache_type": "marshal_only",
             "members": [
                 {
                     "name": "nAddresses",
@@ -143,8 +196,7 @@
             "doc_route": "104-transactionex",
             "doc_descr": "a transaction with some expansions for the app",
             "produced_by": "monitorex",
-            "cache_by": "string",
-            "cache_type": "cacheable",
+            "cache_type": "marshal_only",
             "members": [
                 {
                     "name": "blockNumber",

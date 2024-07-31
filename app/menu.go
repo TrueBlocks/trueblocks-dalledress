@@ -23,9 +23,10 @@ func (a *App) GetMenus() *menu.Menu {
 	viewMenu.AddText("Dalle", keys.CmdOrCtrl("2"), a.ViewDalle)
 	viewMenu.AddText("Series", keys.CmdOrCtrl("3"), a.ViewSeries)
 	viewMenu.AddText("History", keys.CmdOrCtrl("4"), a.ViewHistory)
-	viewMenu.AddText("Names", keys.CmdOrCtrl("5"), a.ViewNames)
-	viewMenu.AddText("Servers", keys.CmdOrCtrl("6"), a.ViewServers)
-	viewMenu.AddText("Settings", keys.CmdOrCtrl("7"), a.ViewSettings)
+	viewMenu.AddText("Monitors", keys.CmdOrCtrl("5"), a.ViewMonitors)
+	viewMenu.AddText("Names", keys.CmdOrCtrl("6"), a.ViewNames)
+	viewMenu.AddText("Servers", keys.CmdOrCtrl("7"), a.ViewServers)
+	viewMenu.AddText("Settings", keys.CmdOrCtrl("8"), a.ViewSettings)
 
 	return appMenu
 }

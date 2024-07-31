@@ -10,11 +10,10 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/servers"
-	"github.com/TrueBlocks/trueblocks-dalledress/types"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -44,18 +43,23 @@ func main() {
 			BackgroundColour: nil,
 			LogLevel:         wLogger.ERROR,
 			Menu:             a.GetMenus(),
+			// Find: NewViews
 			Bind: []interface{}{
 				a,
+				&messages.DocumentMsg{},
+				&messages.ServerMsg{},
 				&messages.ProgressMsg{},
-				&coreTypes.Transaction{},
+				&messages.ErrorMsg{},
 				&types.NameEx{},
 				&types.TransactionEx{},
 				&servers.Server{},
+				&types.MonitorEx{},
 			},
 			EnumBind: []interface{}{
-				types.NameDbParts,
+				types.NameParts,
 				servers.Types,
 				servers.States,
+				messages.Messages,
 			},
 			StartHidden: true,
 			AssetServer: &assetserver.Options{

@@ -1,6 +1,11 @@
 name         ,type     ,strDefault ,attributes ,upgrades ,docOrder ,description
-address      ,address  ,           ,           ,         ,         ,the address to monitor
-ensName      ,string   ,           ,           ,         ,         ,the ENS name of the address
-label        ,string   ,           ,           ,         ,         ,a label for the address
-transactions ,[]string ,           ,           ,         ,         ,a list of transactions to monitor
-stats        ,*Stats   ,           ,           ,         ,         ,the stats for this address
+name         ,string   ,           ,           ,         ,       1 ,the name of the file
+address      ,address  ,           ,           ,         ,       2 ,the address to monitor
+ensName      ,string   ,           ,           ,         ,       3 ,the ENS name of the address
+label        ,string   ,           ,           ,         ,       4 ,a label for the address
+transactions ,[]string ,           ,           ,         ,       5 ,a list of transactions to monitor
+stats        ,*Stats   ,           ,           ,         ,       6 ,the stats for this address
+deleted      ,bool     ,           ,           ,         ,       7 ,true if the file has been deleted
+fileSize     ,int64    ,           ,           ,         ,       8 ,the size of the file
+lastScanned  ,uint32   ,           ,           ,         ,       9 ,the last time the file was scanned
+nRecords     ,int64    ,           ,           ,         ,      10 ,the number of records in the file

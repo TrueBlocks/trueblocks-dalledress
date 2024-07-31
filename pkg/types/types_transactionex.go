@@ -11,17 +11,12 @@ package types
 // EXISTING_CODE
 import (
 	"encoding/json"
-	"fmt"
 	"io"
-	"path/filepath"
-	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/cache"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 )
-
-// TODO: Eventually, this will get put back into core
 
 // EXISTING_CODE
 
@@ -40,7 +35,6 @@ type TransactionEx struct {
 	TransactionIndex base.Txnum   `json:"transactionIndex"`
 	Wei              base.Wei     `json:"wei"`
 	// EXISTING_CODE
-	pDocument *Document
 	// EXISTING_CODE
 }
 
@@ -60,28 +54,6 @@ func (s *TransactionEx) Model(chain, format string, verbose bool, extraOpts map[
 		Data:  model,
 		Order: order,
 	}
-}
-
-func (s *TransactionEx) CacheName() string {
-	return "TransactionEx"
-}
-
-func (s *TransactionEx) CacheId() string {
-	return fmt.Sprintf("%0s", s.GetCacheName())
-}
-
-func (s *TransactionEx) CacheLocation() (directory string, extension string) {
-	paddedId := s.CacheId()
-	parts := make([]string, 3)
-	parts[0] = paddedId[:2]
-	parts[1] = paddedId[2:4]
-	parts[2] = paddedId[4:6]
-
-	subFolder := strings.ToLower(s.CacheName()) + "s"
-	directory = filepath.Join(subFolder, filepath.Join(parts...))
-	extension = "bin"
-
-	return
 }
 
 func (s *TransactionEx) MarshalCache(writer io.Writer) (err error) {
@@ -235,14 +207,6 @@ func (s *TransactionEx) FinishUnmarshal() {
 }
 
 // EXISTING_CODE
-func (s *TransactionEx) GetCacheName() string {
-	return s.pDocument.GetCacheName() + "_Stats"
-}
-
-func (s *TransactionEx) SetDocument(doc *Document) {
-	s.pDocument = doc
-}
-
 func NewTransactionEx(namesMap map[base.Address]NameEx, tx *coreTypes.Transaction) *TransactionEx {
 	fromName := namesMap[tx.From].Name.Name
 	if len(fromName) == 0 {
@@ -256,13 +220,15 @@ func NewTransactionEx(namesMap map[base.Address]NameEx, tx *coreTypes.Transactio
 	} else if len(toName) > 39 {
 		toName = toName[:39] + "..."
 	}
-	logCount := 0
-	if tx.Receipt != nil {
-		logCount = len(tx.Receipt.Logs)
-	}
 	ether := tx.Value.ToEtherStr(18)
 	if tx.Value.IsZero() {
 		ether = "-"
+	} else if len(ether) > 5 {
+		ether = ether[:5]
+	}
+	logCount := 0
+	if tx.Receipt != nil {
+		logCount = len(tx.Receipt.Logs)
 	}
 
 	return &TransactionEx{

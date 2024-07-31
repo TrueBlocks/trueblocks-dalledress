@@ -78,6 +78,14 @@ export function GetMenus() {
   return window['go']['app']['App']['GetMenus']();
 }
 
+export function GetMonitorsCnt() {
+  return window['go']['app']['App']['GetMonitorsCnt']();
+}
+
+export function GetMonitorsPage(arg1, arg2) {
+  return window['go']['app']['App']['GetMonitorsPage'](arg1, arg2);
+}
+
 export function GetNameTypes() {
   return window['go']['app']['App']['GetNameTypes']();
 }
@@ -176,6 +184,10 @@ export function ViewHistory(arg1) {
 
 export function ViewHome(arg1) {
   return window['go']['app']['App']['ViewHome'](arg1);
+}
+
+export function ViewMonitors(arg1) {
+  return window['go']['app']['App']['ViewMonitors'](arg1);
 }
 
 export function ViewNames(arg1) {

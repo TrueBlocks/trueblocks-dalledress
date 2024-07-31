@@ -5,7 +5,7 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/names"
-	"github.com/TrueBlocks/trueblocks-dalledress/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 func (a *App) GetNamesPage(first, pageSize int) []types.NameEx {
@@ -23,12 +23,12 @@ func (a *App) GetNamesCnt() int {
 }
 
 func (a *App) loadNames() error {
-	nameTypes := []names.Parts{names.Regular, names.Custom, names.Prefund, names.Baddress}
+	nameTypes := []names.Parts{names.Regular | names.Baddress, names.Custom, names.Prefund}
 	for _, t := range nameTypes {
-		if m, err := names.LoadNamesMap("mainnet", t, nil); err != nil {
+		if namesMap, err := names.LoadNamesMap("mainnet", t, nil); err != nil {
 			return err
 		} else {
-			for addr, name := range m {
+			for addr, name := range namesMap {
 				namex := types.NewNameEx(name, t)
 				vv := a.namesMap[addr]
 				namex.Type |= vv.Type

@@ -1,3 +1,5 @@
-name      ,type        ,strDefault ,attributes ,upgrades ,docOrder ,description
-filename  ,string      ,           ,           ,         ,       1 ,the name of this file
-monitors  ,[]MonitorEx ,           ,           ,         ,       2 ,the addresses being monitored by this file
+name       ,type        ,strDefault ,attributes ,upgrades ,docOrder ,description
+filename   ,string      ,Unknown    ,           ,         ,       1 ,the name of this file
+dirty      ,bool        ,           ,           ,         ,       2 ,whether this file has been modified
+lastUpdate ,blknum      ,           ,           ,         ,       3 ,the block number of the last update
+monitors   ,[]MonitorEx ,           ,           ,         ,       4 ,the addresses being monitored by this file

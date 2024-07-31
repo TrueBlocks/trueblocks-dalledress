@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -28,8 +30,8 @@ func (a *App) FileOpen(cd *menu.CallbackData) {
 	messages.Send(a.ctx, messages.Document, messages.NewDocumentMsg(a.CurrentDoc.Filename, "Opened"))
 }
 
-func (a *App) FileSave(cd *menu.CallbackData) {
-	a.CurrentDoc.Filename, _ = runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+func (a *App) getFilename() error {
+	filename, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
 		DefaultDirectory:           "/Users/jrush/Documents/",
 		DefaultFilename:            a.CurrentDoc.Filename,
 		Title:                      "Save File",
@@ -40,10 +42,32 @@ func (a *App) FileSave(cd *menu.CallbackData) {
 			{DisplayName: "Monitor Groups", Pattern: "*.tbx"},
 		},
 	})
+	if err != nil {
+		return err
+	}
+	if filename == "" {
+		return fmt.Errorf("user hit escape")
+	}
+	a.CurrentDoc.Filename = filename
+	return nil
+}
+
+func (a *App) FileSave(cd *menu.CallbackData) {
+	if a.CurrentDoc.Filename == "Untitled" {
+		if err := a.getFilename(); err != nil {
+			messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err))
+			return
+		}
+	}
 	a.CurrentDoc.Save()
 	messages.Send(a.ctx, messages.Document, messages.NewDocumentMsg(a.CurrentDoc.Filename, "Saved"))
 }
 
 func (a *App) FileSaveAs(cd *menu.CallbackData) {
-	logger.Info("File SaveAs")
+	if err := a.getFilename(); err != nil {
+		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err))
+		return
+	}
+	a.CurrentDoc.Save()
+	messages.Send(a.ctx, messages.Document, messages.NewDocumentMsg(a.CurrentDoc.Filename, "Saved"))
 }

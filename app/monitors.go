@@ -7,17 +7,17 @@ import (
 )
 
 func (a *App) GetMonitorsPage(first, pageSize int) []types.MonitorEx {
-	if len(a.monitors) == 0 {
-		return a.monitors
+	if len(a.CurrentDoc.Monitors) == 0 {
+		return a.CurrentDoc.Monitors
 	}
 
-	first = base.Max(0, base.Min(first, len(a.monitors)-1))
-	last := base.Min(len(a.monitors), first+pageSize)
-	return a.monitors[first:last]
+	first = base.Max(0, base.Min(first, len(a.CurrentDoc.Monitors)-1))
+	last := base.Min(len(a.CurrentDoc.Monitors), first+pageSize)
+	return a.CurrentDoc.Monitors[first:last]
 }
 
 func (a *App) GetMonitorsCnt() int {
-	return len(a.monitors)
+	return len(a.CurrentDoc.Monitors)
 }
 
 func (a *App) loadMonitors() error {
@@ -27,8 +27,9 @@ func (a *App) loadMonitors() error {
 	} else {
 		for _, monitor := range monitors {
 			monitorEx := types.NewMonitorEx(a.namesMap, &monitor)
-			a.monitors = append(a.monitors, monitorEx)
-			a.monitorsMap[monitorEx.Address] = monitorEx
+			a.CurrentDoc.Monitors = append(a.CurrentDoc.Monitors, monitorEx)
+			a.CurrentDoc.MonitorsMap[monitorEx.Address] = monitorEx
+			a.CurrentDoc.Dirty = true
 		}
 	}
 	return nil

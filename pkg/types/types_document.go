@@ -26,6 +26,7 @@ type Document struct {
 	LastUpdate base.Blknum `json:"lastUpdate"`
 	Monitors   []MonitorEx `json:"monitors"`
 	// EXISTING_CODE
+	MonitorsMap map[base.Address]MonitorEx `json:"monitorsMap"`
 	// EXISTING_CODE
 }
 
@@ -124,7 +125,13 @@ func (s *Document) Save() error {
 	}); err != nil {
 		return err
 	} else {
-		return store.Write(s, nil)
+		if err = store.Write(s, nil); err != nil {
+			return err
+		}
+		s.Dirty = false
+		bytes, _ := json.MarshalIndent(s, "", "  ")
+		file.StringToAsciiFile(s.Filename+".json", string(bytes))
+		return nil
 	}
 }
 

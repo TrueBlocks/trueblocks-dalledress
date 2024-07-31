@@ -32,15 +32,13 @@ var startupError error
 
 // Find: NewViews
 type App struct {
-	ctx         context.Context
-	session     config.Session
-	apiKeys     map[string]string
-	namesMap    map[base.Address]types.NameEx
-	names       []types.NameEx // We keep both for performance reasons
-	monitorsMap map[base.Address]types.MonitorEx
-	monitors    []types.MonitorEx // We keep both for performance reasons
-	ensMap      map[string]base.Address
-	renderCtxs  map[base.Address][]*output.RenderCtx
+	ctx        context.Context
+	session    config.Session
+	apiKeys    map[string]string
+	namesMap   map[base.Address]types.NameEx
+	names      []types.NameEx // We keep both for performance reasons
+	ensMap     map[string]base.Address
+	renderCtxs map[base.Address][]*output.RenderCtx
 	// Add your application's data here
 	databases      map[string][]string
 	authorTemplate *template.Template
@@ -61,11 +59,10 @@ type App struct {
 // Find: NewViews
 func NewApp() *App {
 	a := App{
-		apiKeys:     make(map[string]string),
-		namesMap:    make(map[base.Address]types.NameEx),
-		monitorsMap: make(map[base.Address]types.MonitorEx),
-		renderCtxs:  make(map[base.Address][]*output.RenderCtx),
-		ensMap:      make(map[string]base.Address),
+		apiKeys:    make(map[string]string),
+		namesMap:   make(map[base.Address]types.NameEx),
+		renderCtxs: make(map[base.Address][]*output.RenderCtx),
+		ensMap:     make(map[string]base.Address),
 		// Initialize maps here
 		databases:  make(map[string][]string),
 		dalleCache: make(map[string]*dalle.DalleDress),
@@ -77,6 +74,7 @@ func NewApp() *App {
 	}
 	a.CurrentDoc = &a.Documents[0]
 	a.CurrentDoc.Filename = "Untitled"
+	a.CurrentDoc.MonitorsMap = make(map[base.Address]types.MonitorEx)
 
 	// it's okay if it's not found
 	_ = a.session.Load()

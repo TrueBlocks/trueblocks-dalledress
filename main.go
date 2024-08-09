@@ -10,10 +10,11 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/daemons"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/servers"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -47,18 +48,22 @@ func main() {
 			Bind: []interface{}{
 				a,
 				&messages.DocumentMsg{},
-				&messages.ServerMsg{},
-				&messages.ProgressMsg{},
 				&messages.ErrorMsg{},
-				&types.NameEx{},
-				&types.TransactionEx{},
-				&servers.Server{},
-				&types.MonitorEx{},
+				&messages.ProgressMsg{},
+				&messages.DaemonMsg{},
+				&daemons.Daemon{},
+				&coreTypes.Transaction{},
+				&types.SummaryAbis{},
+				&types.SummaryIndex{},
+				&types.SummaryManifest{},
+				&types.SummaryMonitor{},
+				&types.SummaryName{},
+				&types.SummaryStatus{},
 			},
 			EnumBind: []interface{}{
 				types.NameParts,
-				servers.Types,
-				servers.States,
+				daemons.Types,
+				daemons.States,
 				messages.Messages,
 			},
 			StartHidden: true,
@@ -100,8 +105,6 @@ func main() {
 				logger.Error("File server error:", err)
 			}
 		}()
-
-		go a.StartServers()
 
 		if err := wails.Run(&opts); err != nil {
 			fmt.Println("Error:", err.Error())

@@ -8,8 +8,10 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/walk"
 )
 
-func Listing(folderPath string) ([]string, error) {
-	ret := []string{}
+type Series string
+
+func Listing(folderPath string) ([]Series, error) {
+	ret := []Series{}
 	filenameChan := make(chan walk.CacheFileInfo)
 
 	var nRoutines int = 1
@@ -20,7 +22,7 @@ func Listing(folderPath string) ([]string, error) {
 		switch result.Type {
 		case walk.Regular:
 			if file.FileExists(result.Path) {
-				ret = append(ret, result.Path)
+				ret = append(ret, Series(result.Path))
 				cnt++
 			}
 		case walk.Cache_NotACache:

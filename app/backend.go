@@ -95,7 +95,7 @@ func (a *App) MakeDalleDress(addressIn string) (*dalle.DalleDress, error) {
 	return &dd, nil
 }
 
-func (a *App) GetSeries(addr string) string {
+func (a *App) GetAppSeries(addr string) string {
 	return a.Series.String()
 }
 

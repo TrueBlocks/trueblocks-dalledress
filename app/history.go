@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-	"strings"
+	"sort"
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
@@ -12,21 +12,18 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-// TODO: This should be on the App and it should be a sync.Map because it
-// TODO: has the attributes described in the library's comments.
-var addrToHistoryMap = map[base.Address][]types.TransactionEx{}
-var m = sync.Mutex{}
+var historyMutex sync.Mutex
 
-func (a *App) GetHistoryPage(addr string, first, pageSize int) []types.TransactionEx {
+func (a *App) GetHistory(addr string, first, pageSize int) types.SummaryTransaction {
 	address, ok := a.ConvertToAddress(addr)
 	if !ok {
 		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(fmt.Errorf("Invalid address: "+addr)))
-		return []types.TransactionEx{}
+		return types.SummaryTransaction{}
 	}
 
-	m.Lock()
-	_, exists := addrToHistoryMap[address]
-	m.Unlock()
+	historyMutex.Lock()
+	_, exists := a.historyMap[address]
+	historyMutex.Unlock()
 
 	if !exists {
 		rCtx := a.RegisterCtx(address)
@@ -48,16 +45,26 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []types.Transacti
 					if !ok {
 						continue
 					}
-					txEx := types.NewTransactionEx(a.namesMap, tx)
-					m.Lock()
-					addrToHistoryMap[address] = append(addrToHistoryMap[address], *txEx)
-					if len(addrToHistoryMap[address])%pageSize == 0 {
+					txEx := tx //types.NewTransactionEx(tx)
+					// if name, ok := a.names.NamesMap[tx.From]; ok {
+					// 	txEx.FromName = name.Name
+					// }
+					// if name, ok := a.names.NamesMap[tx.To]; ok {
+					// 	txEx.ToName = name.Name
+					// }
+					historyMutex.Lock()
+					summary := a.historyMap[address]
+					summary.Address = address
+					summary.Name = a.names.NamesMap[address].Name
+					summary.Transactions = append(summary.Transactions, *txEx)
+					a.historyMap[address] = summary
+					if len(a.historyMap[address].Transactions)%pageSize == 0 {
 						messages.Send(a.ctx,
 							messages.Progress,
-							messages.NewProgressMsg(int64(len(addrToHistoryMap[address])), nItems, address),
+							messages.NewProgressMsg(int64(len(a.historyMap[address].Transactions)), nItems, address),
 						)
 					}
-					m.Unlock()
+					historyMutex.Unlock()
 				case err := <-opts.RenderCtx.ErrorChan:
 					messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err, address))
 				default:
@@ -71,20 +78,34 @@ func (a *App) GetHistoryPage(addr string, first, pageSize int) []types.Transacti
 		_, _, err := opts.Export()
 		if err != nil {
 			messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err, address))
-			return []types.TransactionEx{}
+			return types.SummaryTransaction{}
 		}
+		historyMutex.Lock()
+		sort.Slice(a.historyMap[address].Transactions, func(i, j int) bool {
+			if a.historyMap[address].Transactions[i].BlockNumber == a.historyMap[address].Transactions[j].BlockNumber {
+				return a.historyMap[address].Transactions[i].TransactionIndex > a.historyMap[address].Transactions[j].TransactionIndex
+			}
+			return a.historyMap[address].Transactions[i].BlockNumber > a.historyMap[address].Transactions[j].BlockNumber
+		})
+		historyMutex.Unlock()
 
 		messages.Send(a.ctx,
 			messages.Completed,
-			messages.NewProgressMsg(int64(len(addrToHistoryMap[address])), int64(len(addrToHistoryMap[address])), address),
+			messages.NewProgressMsg(int64(len(a.historyMap[address].Transactions)), int64(len(a.historyMap[address].Transactions)), address),
 		)
 	}
 
-	m.Lock()
-	defer m.Unlock()
-	first = base.Max(0, base.Min(first, len(addrToHistoryMap[address])-1))
-	last := base.Min(len(addrToHistoryMap[address]), first+pageSize)
-	return addrToHistoryMap[address][first:last]
+	historyMutex.Lock()
+	defer historyMutex.Unlock()
+
+	first = base.Max(0, base.Min(first, len(a.historyMap[address].Transactions)-1))
+	last := base.Min(len(a.historyMap[address].Transactions), first+pageSize)
+	sum := a.historyMap[address]
+	sum.Summarize()
+	copy := sum.ShallowCopy()
+	copy.Balance = a.getBalance(address)
+	copy.Transactions = a.historyMap[address].Transactions[first:last]
+	return copy
 }
 
 func (a *App) GetHistoryCnt(addr string) int64 {
@@ -97,44 +118,42 @@ func (a *App) GetHistoryCnt(addr string) int64 {
 	opts := sdk.ListOptions{
 		Addrs: []string{addr},
 	}
-	monitors, _, err := opts.ListCount()
+	appearances, _, err := opts.ListCount()
 	if err != nil {
 		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err, address))
 		return 0
-	} else if len(monitors) == 0 {
+	} else if len(appearances) == 0 {
 		return 0
 	}
-	return monitors[0].NRecords
+	return appearances[0].NRecords
 }
 
-var e sync.Mutex
+var bMutex sync.Mutex
 
-func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
-	if !strings.HasSuffix(addr, ".eth") {
-		ret := base.HexToAddress(addr)
-		return ret, ret != base.ZeroAddr
+func (a *App) getBalance(address base.Address) string {
+	bMutex.Lock()
+	_, exists := a.balanceMap[address]
+	bMutex.Unlock()
+
+	if exists {
+		bMutex.Lock()
+		defer bMutex.Unlock()
+		return a.balanceMap[address]
 	}
 
-	e.Lock()
-	defer e.Unlock()
-	if ensAddr, exists := a.ensMap[addr]; exists {
-		return ensAddr, true
+	opts := sdk.StateOptions{
+		Addrs: []string{address.Hex()},
+		Globals: sdk.Globals{
+			Ether: true,
+			Cache: true,
+		},
 	}
-
-	// Try to get an ENS or return the same input
-	opts := sdk.NamesOptions{
-		Terms: []string{addr},
-	}
-	if names, _, err := opts.Names(); err != nil {
-		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err))
-		return base.ZeroAddr, false
+	if balances, _, err := opts.State(); err != nil {
+		return "0"
 	} else {
-		if len(names) > 0 {
-			a.ensMap[addr] = names[0].Address
-			return names[0].Address, true
-		} else {
-			ret := base.HexToAddress(addr)
-			return ret, ret != base.ZeroAddr
-		}
+		bMutex.Lock()
+		defer bMutex.Unlock()
+		a.balanceMap[address] = balances[0].Balance.ToEtherStr(18)
+		return a.balanceMap[address]
 	}
 }

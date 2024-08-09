@@ -10,7 +10,7 @@ replace (
 require (
 	git.sr.ht/~sbinet/gg v0.5.0
 	github.com/TrueBlocks/trueblocks-core/sdk/v3 v3.0.0-20240728020742-8b2832e69983
-	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20240728020742-8b2832e69983
+	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20240808100829-648e5249703a
 	github.com/joho/godotenv v1.5.1
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/wailsapp/wails/v2 v2.8.2

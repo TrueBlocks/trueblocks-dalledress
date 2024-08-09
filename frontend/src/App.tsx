@@ -1,16 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { AppShell, Text } from "@mantine/core";
 import { Aside, Header, Navbar, Routes } from "@components";
 import { EventsOn, EventsOff } from "@runtime";
 import { useLocation } from "wouter";
 import classes from "@/App.module.css";
+import { GetLast, SetLast } from "@gocode/app/App";
 
 function App() {
-  const [showHelp, setShowHelp] = React.useState(true);
+  const [showHelp, setShowHelp] = useState<boolean>(false);
   const [, setLocation] = useLocation();
 
   const toggleHelp = () => {
-    setShowHelp(!showHelp);
+    setShowHelp((prevShowHelp) => {
+      const newShowHelp = !prevShowHelp;
+      SetLast("help", `${newShowHelp ? "true" : "false"}`);
+      return newShowHelp;
+    });
   };
 
   useEffect(() => {
@@ -20,22 +25,29 @@ function App() {
     };
 
     EventsOn("navigate", handleNavigation);
+    EventsOn("helpToggle", toggleHelp);
 
     return () => {
       EventsOff("navigate");
+      EventsOff("helpToggle");
     };
   }, [setLocation]);
+
+  useEffect(() => {
+    GetLast("help").then((value) => {
+      setShowHelp(value === "true");
+    });
+  }, []);
 
   return (
     <AppShell
       header={{ height: "3rem" }}
       navbar={{ collapsed: { desktop: false }, width: "10rem", breakpoint: 0 }}
-      aside={{ collapsed: { desktop: showHelp }, width: "10rem", breakpoint: 0 }}
+      aside={{ collapsed: { desktop: !showHelp }, width: "20rem", breakpoint: 0 }}
       footer={{ height: "2rem" }}
     >
       <AppShell.Header>
-        <Header title="ApplicationTitle" />
-        <button onClick={toggleHelp}>Toggle Help</button>
+        <Header title="TrueBlocks DalleDress" />
       </AppShell.Header>
       <AppShell.Navbar>
         <Navbar />

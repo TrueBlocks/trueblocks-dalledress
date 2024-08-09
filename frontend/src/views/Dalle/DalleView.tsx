@@ -5,7 +5,7 @@ import { View, ViewStatus, EditableSelect, ResultDialog, ImageDisplay } from "@c
 import {
   GetJson,
   GetData,
-  GetSeries,
+  GetAppSeries,
   GetTerse,
   GetPrompt,
   GetEnhanced,
@@ -76,7 +76,7 @@ export function DalleView() {
       GetData(address).then((value: string) => {
         setData(value);
       });
-      GetSeries(address).then((value: string) => {
+      GetAppSeries(address).then((value: string) => {
         setSeries(value);
       });
       GetTerse(address).then((value: string) => {

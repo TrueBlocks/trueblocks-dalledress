@@ -1,64 +1,93 @@
 package app
 
 import (
+	"fmt"
+	"path/filepath"
 	"sort"
+	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/names"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 )
 
-func (a *App) GetNamesPage(first, pageSize int) []types.NameEx {
-	if len(a.names) == 0 {
-		return a.names
-	}
-
-	first = base.Max(0, base.Min(first, len(a.names)-1))
-	last := base.Min(len(a.names), first+pageSize)
-	return a.names[first:last]
+func (a *App) GetNames(first, pageSize int) types.SummaryName {
+	first = base.Max(0, base.Min(first, len(a.names.Names)-1))
+	last := base.Min(len(a.names.Names), first+pageSize)
+	copy := a.names.ShallowCopy()
+	copy.Names = a.names.Names[first:last]
+	return copy
 }
 
 func (a *App) GetNamesCnt() int {
-	return len(a.names)
+	return len(a.names.Names)
 }
 
-func (a *App) loadNames() error {
-	nameTypes := []names.Parts{names.Regular | names.Baddress, names.Custom, names.Prefund}
-	for _, t := range nameTypes {
-		if namesMap, err := names.LoadNamesMap("mainnet", t, nil); err != nil {
-			return err
+func (a *App) loadNames(wg *sync.WaitGroup) error {
+	defer func() {
+		if wg != nil {
+			wg.Done()
+		}
+	}()
+
+	chain := "mainnet"
+	filePath := filepath.Join(config.MustGetPathToChainConfig(chain), string(names.DatabaseCustom))
+	lineCount, _ := file.WordCount(filePath, true)
+	customCount := 0
+	for _, name := range a.names.Names {
+		if name.Parts&coreTypes.Custom != 0 {
+			customCount++
 		} else {
-			for addr, name := range namesMap {
-				namex := types.NewNameEx(name, t)
-				vv := a.namesMap[addr]
-				namex.Type |= vv.Type
-				a.namesMap[addr] = namex
-			}
+			break
 		}
 	}
-	for _, name := range a.namesMap {
-		a.names = append(a.names, name)
+	if lineCount == customCount {
+		return nil
 	}
-	sort.Slice(a.names, func(i, j int) bool {
-		ti := a.names[i].Type
-		if ti == names.Regular {
-			ti = 7
+	names.ClearCustomNames()
+
+	parts := coreTypes.Regular | coreTypes.Custom | coreTypes.Prefund | coreTypes.Baddress
+	if namesMap, err := names.LoadNamesMap(chain, parts, nil); err != nil {
+		return err
+	} else if (namesMap == nil) || (len(namesMap) == 0) {
+		return fmt.Errorf("no names found")
+	} else {
+		if len(a.names.Names) == len(namesMap) {
+			return nil
 		}
-		tj := a.names[j].Type
-		if tj == names.Regular {
-			tj = 7
+
+		a.names = types.SummaryName{
+			NamesMap: namesMap,
+			Names:    []coreTypes.Name{},
 		}
-		if ti == tj {
-			if a.names[i].Tags == a.names[j].Tags {
-				return a.names[i].Address.Hex() < a.names[j].Address.Hex()
-			}
-			return a.names[i].Tags < a.names[j].Tags
+		for _, name := range a.names.NamesMap {
+			a.names.Names = append(a.names.Names, name)
 		}
-		return ti < tj
-	})
-	return nil
+		sort.Slice(a.names.Names, func(i, j int) bool {
+			return compare(a.names.Names[i], a.names.Names[j])
+		})
+		a.names.Summarize()
+		return nil
+	}
 }
 
-func (a *App) GetNameTypes() []string {
-	return []string{"Regular", "Custom", "Prefund", "Baddress"}
+func compare(nameI, nameJ coreTypes.Name) bool {
+	ti := nameI.Parts
+	if ti == coreTypes.Regular {
+		ti = 7
+	}
+	tj := nameJ.Parts
+	if tj == coreTypes.Regular {
+		tj = 7
+	}
+	if ti == tj {
+		if nameI.Tags == nameJ.Tags {
+			return nameI.Address.Hex() < nameJ.Address.Hex()
+		}
+		return nameI.Tags < nameJ.Tags
+	}
+	return ti < tj
 }

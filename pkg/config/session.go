@@ -9,23 +9,32 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/utils"
 )
 
+type Daemons struct {
+	Freshen bool `json:"freshen"`
+	Scraper bool `json:"scraper"`
+	Ipfs    bool `json:"ipfs"`
+}
+
 // Session stores ephemeral things such as last window position, last view, and recent file
 type Session struct {
-	X           int    `json:"x"`
-	Y           int    `json:"y"`
-	Width       int    `json:"width"`
-	Height      int    `json:"height"`
-	Title       string `json:"title"`
-	LastRoute   string `json:"lastRoute"`
-	LastTab     string `json:"lastTab"`
-	LastAddress string `json:"lastAddress"`
-	LastSeries  string `json:"lastSeries"`
+	X           int     `json:"x"`
+	Y           int     `json:"y"`
+	Width       int     `json:"width"`
+	Height      int     `json:"height"`
+	Title       string  `json:"title"`
+	LastRoute   string  `json:"lastRoute"`
+	LastTab     string  `json:"lastTab"`
+	LastAddress string  `json:"lastAddress"`
+	LastSeries  string  `json:"lastSeries"`
+	LastHelp    string  `json:"lastHelp"`
+	Daemons     Daemons `json:"daemons"`
 }
 
 var defaultSession = Session{
 	Width:  1024,
 	Height: 768,
 	Title:  "DalleDress by TrueBlocks",
+	Daemons: Daemons{},
 }
 
 func NewSession() Session {

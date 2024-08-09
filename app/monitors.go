@@ -1,36 +1,52 @@
 package app
 
 import (
+	"sort"
+	"sync"
+
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-func (a *App) GetMonitorsPage(first, pageSize int) []types.MonitorEx {
-	if len(a.CurrentDoc.Monitors) == 0 {
-		return a.CurrentDoc.Monitors
-	}
-
-	first = base.Max(0, base.Min(first, len(a.CurrentDoc.Monitors)-1))
-	last := base.Min(len(a.CurrentDoc.Monitors), first+pageSize)
-	return a.CurrentDoc.Monitors[first:last]
+func (a *App) GetMonitors(first, pageSize int) types.SummaryMonitor {
+	first = base.Max(0, base.Min(first, len(a.monitors.Monitors)-1))
+	last := base.Min(len(a.monitors.Monitors), first+pageSize)
+	copy := a.monitors.ShallowCopy()
+	copy.Monitors = a.monitors.Monitors[first:last]
+	return copy
 }
 
 func (a *App) GetMonitorsCnt() int {
-	return len(a.CurrentDoc.Monitors)
+	return len(a.monitors.Monitors)
 }
 
-func (a *App) loadMonitors() error {
+func (a *App) loadMonitors(wg *sync.WaitGroup) error {
+	defer func() {
+		if wg != nil {
+			wg.Done()
+		}
+	}()
+
 	opts := sdk.MonitorsOptions{}
 	if monitors, _, err := opts.MonitorsList(); err != nil {
 		return err
 	} else {
-		for _, monitor := range monitors {
-			monitorEx := types.NewMonitorEx(a.namesMap, &monitor)
-			a.CurrentDoc.Monitors = append(a.CurrentDoc.Monitors, monitorEx)
-			a.CurrentDoc.MonitorsMap[monitorEx.Address] = monitorEx
-			a.CurrentDoc.Dirty = true
+		if len(a.monitors.Monitors) == len(monitors) {
+			return nil
 		}
+		a.monitors = types.SummaryMonitor{}
+		a.monitors.MonitorMap = make(map[base.Address]coreTypes.Monitor)
+		for _, mon := range monitors {
+			mon.Name = a.names.NamesMap[mon.Address].Name
+			a.monitors.Monitors = append(a.monitors.Monitors, mon)
+			a.monitors.MonitorMap[mon.Address] = mon
+		}
+		sort.Slice(a.monitors.Monitors, func(i, j int) bool {
+			return a.monitors.Monitors[i].NRecords > a.monitors.Monitors[j].NRecords
+		})
+		a.monitors.Summarize()
 	}
 	return nil
 }

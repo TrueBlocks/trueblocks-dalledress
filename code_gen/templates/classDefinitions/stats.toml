@@ -1,9 +1,0 @@
-[settings]
-    class = "Stats"
-    doc_group = "01-Stats"
-    doc_descr = "statistics about the document and its addresses"
-    doc_route = "102-stats"
-    attributes = ""
-    produced_by = "stats"
-    contains = ""
-    cache_type = "marshal_only"

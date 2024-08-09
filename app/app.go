@@ -11,17 +11,21 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"text/template"
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/config"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/daemons"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/servers"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -33,12 +37,28 @@ var startupError error
 // Find: NewViews
 type App struct {
 	ctx        context.Context
+	Documents  []types.Document
+	CurrentDoc *types.Document
+
 	session    config.Session
 	apiKeys    map[string]string
-	namesMap   map[base.Address]types.NameEx
-	names      []types.NameEx // We keep both for performance reasons
 	ensMap     map[string]base.Address
 	renderCtxs map[base.Address][]*output.RenderCtx
+	historyMap map[base.Address]types.SummaryTransaction
+	balanceMap map[base.Address]string
+
+	// Summaries
+	abis     types.SummaryAbis
+	index    types.SummaryIndex
+	manifest types.SummaryManifest
+	monitors types.SummaryMonitor
+	names    types.SummaryName
+	status   types.SummaryStatus
+
+	ScraperController *daemons.DaemonScraper
+	FreshenController *daemons.DaemonFreshen
+	IpfsController    *daemons.DaemonIpfs
+
 	// Add your application's data here
 	databases      map[string][]string
 	authorTemplate *template.Template
@@ -48,33 +68,25 @@ type App struct {
 	titleTemplate  *template.Template
 	Series         dalle.Series `json:"series"`
 	dalleCache     map[string]*dalle.DalleDress
-	Scraper        *servers.Scraper
-	FileServer     *servers.FileServer
-	Monitor        *servers.Monitor
-	Ipfs           *servers.Ipfs
-	Documents      []types.Document
-	CurrentDoc     *types.Document
 }
 
 // Find: NewViews
 func NewApp() *App {
 	a := App{
 		apiKeys:    make(map[string]string),
-		namesMap:   make(map[base.Address]types.NameEx),
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 		// Initialize maps here
+		historyMap: make(map[base.Address]types.SummaryTransaction),
+		balanceMap: make(map[base.Address]string),
+		Documents:  make([]types.Document, 10),
 		databases:  make(map[string][]string),
 		dalleCache: make(map[string]*dalle.DalleDress),
-		Scraper:    servers.NewScraper("scraper", 1000), // TODO: Should be seven seconds
-		FileServer: servers.NewFileServer("fileserver", 8080, 1000),
-		Monitor:    servers.NewMonitor("monitor", 1000),
-		Ipfs:       servers.NewIpfs("ipfs", 1000),
-		Documents:  make([]types.Document, 10),
 	}
+	a.names.NamesMap = make(map[base.Address]coreTypes.Name)
+	a.monitors.MonitorMap = make(map[base.Address]coreTypes.Monitor)
 	a.CurrentDoc = &a.Documents[0]
 	a.CurrentDoc.Filename = "Untitled"
-	a.CurrentDoc.MonitorsMap = make(map[base.Address]types.MonitorEx)
 
 	// it's okay if it's not found
 	_ = a.session.Load()
@@ -115,22 +127,91 @@ func (a App) String() string {
 	return string(bytes)
 }
 
+func (a *App) GetContext() context.Context {
+	return a.ctx
+}
+
+var freshenLock atomic.Uint32
+
+// Freshen gets called by the daemons to instruct first the backend, then the frontend to update.
+// Protect against updating too fast... Note that this routine is called as a goroutine.
+func (a *App) Freshen(which ...string) {
+	// Skip this update we're actively upgrading
+	if !freshenLock.CompareAndSwap(0, 1) {
+		// logger.Info(colors.Red, "Skipping update", colors.Off)
+		return
+	}
+	logger.Info(colors.Green, "Freshening...", colors.Off)
+	defer freshenLock.CompareAndSwap(1, 0)
+
+	notify :=
+		func() {
+			// Let the front end know it needs to update
+			messages.Send(a.ctx, messages.Daemon, messages.NewDaemonMsg(
+				a.FreshenController.Color,
+				"Freshening...",
+				a.FreshenController.Color,
+			))
+		}
+
+	// First, we want to update the current route if we're told to
+	route := ""
+	if len(which) > 0 {
+		route = which[0]
+	}
+	switch route {
+	case "/abis":
+		a.loadAbis(nil)
+		notify()
+	case "/manifest":
+		a.loadManifest(nil)
+		notify()
+	case "/monitors":
+		a.loadMonitors(nil)
+		notify()
+	case "/names":
+		a.loadNames(nil)
+		notify()
+	case "/index":
+		a.loadIndex(nil)
+		notify()
+	}
+
+	// Now update everything in the fullness of time
+	wg := sync.WaitGroup{}
+	wg.Add(5)
+	go a.loadAbis(&wg)
+	go a.loadManifest(&wg)
+	go a.loadMonitors(&wg)
+	go a.loadNames(&wg)
+	go a.loadIndex(&wg)
+	wg.Wait()
+	notify()
+}
+
+// Find: NewViews
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+
+	a.FreshenController = daemons.NewFreshen(a, "freshen", 2000, a.GetLastDaemon("daemon-freshen"))
+	a.ScraperController = daemons.NewScraper(a, "scraper", 7000, a.GetLastDaemon("daemon-scraper"))
+	a.IpfsController = daemons.NewIpfs(a, "ipfs", 10000, a.GetLastDaemon("daemon-ipfs"))
+	go a.startDaemons()
+
 	if startupError != nil {
 		a.Fatal(startupError.Error())
 	}
-	// Find: NewViews
-	if err := a.loadNames(); err != nil {
+
+	logger.Info("Starting freshen process...")
+	a.Freshen(a.GetSession().LastRoute)
+
+	if err := a.loadStatus(); err != nil {
 		logger.Panic(err)
 	}
-	if err := a.loadMonitors(); err != nil {
+
+	if err := a.loadConfig(); err != nil {
 		logger.Panic(err)
 	}
-	a.Scraper.MsgCtx = ctx
-	a.FileServer.MsgCtx = ctx
-	a.Monitor.MsgCtx = ctx
-	a.Ipfs.MsgCtx = ctx
 }
 
 func (a *App) DomReady(ctx context.Context) {

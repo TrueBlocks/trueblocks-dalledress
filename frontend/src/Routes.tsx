@@ -1,8 +1,34 @@
 import React from "react";
 
 // Find: NewViews
-import { IconHome, IconSpider, IconList, IconArticle, IconTag, IconDeviceDesktop, IconServer, IconSettings } from "@tabler/icons-react";
-import { HomeView, DalleView, SeriesView, HistoryView, NamesView, MonitorsView, ServersView, SettingsView } from "@views";
+import {
+  // Icons
+  HomeIcon,
+  HistoryIcon,
+  MonitorIcon,
+  NamesIcon,
+  IndexesIcon,
+  ManifestIcon,
+  AbisIcon,
+  StatusIcon,
+  DaemonsIcon,
+  SettingsIcon,
+  SeriesIcon,
+  DalleIcon,
+  // Views
+  HomeView,
+  HistoryView,
+  NamesView,
+  MonitorsView,
+  IndexesView,
+  ManifestView,
+  AbisView,
+  DaemonsView,
+  StatusView,
+  SettingsView,
+  SeriesView,
+  DalleView,
+} from "@views";
 
 // Note:
 //  Change with care. The order of the items in this list matters (the last one is the default).
@@ -12,56 +38,84 @@ export const routeItems = [
     order: 2,
     route: "/dalle",
     label: "Dalle",
-    icon: <IconSpider />,
+    icon: DalleIcon,
     component: DalleView,
   },
   {
     order: 3,
     route: "/series",
     label: "Series",
-    icon: <IconList />,
+    icon: SeriesIcon,
     component: SeriesView,
   },
   {
     order: 10,
     route: "/history/:address",
     label: "History",
-    icon: <IconArticle />,
+    icon: HistoryIcon,
     component: HistoryView,
   },
   {
     order: 20,
     route: "/monitors",
     label: "Monitors",
-    icon: <IconDeviceDesktop />,
+    icon: MonitorIcon,
     component: MonitorsView,
   },
   {
     order: 30,
     route: "/names",
     label: "Names",
-    icon: <IconTag />,
+    icon: NamesIcon,
     component: NamesView,
   },
   {
     order: 40,
-    route: "/servers",
-    label: "Servers",
-    icon: <IconServer />,
-    component: ServersView,
+    route: "/indexes",
+    label: "Indexes",
+    icon: IndexesIcon,
+    component: IndexesView,
   },
   {
     order: 50,
+    route: "/manifest",
+    label: "Manifest",
+    icon: ManifestIcon,
+    component: ManifestView,
+  },
+  {
+    order: 60,
+    route: "/abis",
+    label: "Abis",
+    icon: AbisIcon,
+    component: AbisView,
+  },
+  {
+    order: 70,
+    route: "/status",
+    label: "Status",
+    icon: StatusIcon,
+    component: StatusView,
+  },
+  {
+    order: 80,
+    route: "/daemons",
+    label: "Daemons",
+    icon: DaemonsIcon,
+    component: DaemonsView,
+  },
+  {
+    order: 90,
     route: "/settings",
     label: "Settings",
-    icon: <IconSettings />,
+    icon: SettingsIcon,
     component: SettingsView,
   },
   {
     order: 0,
     route: "/",
     label: "Home",
-    icon: <IconHome />,
+    icon: HomeIcon,
     component: HomeView,
   },
 ];

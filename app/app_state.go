@@ -1,5 +1,7 @@
 package app
 
+import "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+
 func (a *App) GetLast(which string) string {
 	switch which {
 	case "route":
@@ -10,12 +12,13 @@ func (a *App) GetLast(which string) string {
 		return a.GetSession().LastAddress
 	case "series":
 		return a.GetSession().LastSeries
+	case "help":
+		return a.GetSession().LastHelp
 	}
 	return "Unknown"
 }
 
 func (a *App) SetLast(which, value string) {
-	reload := false
 	switch which {
 	case "route":
 		a.GetSession().LastRoute = value
@@ -25,10 +28,34 @@ func (a *App) SetLast(which, value string) {
 		a.GetSession().LastAddress = value
 	case "series":
 		a.GetSession().LastSeries = value
-		reload = true
+	case "help":
+		a.GetSession().LastHelp = value
 	}
 	a.GetSession().Save()
-	if reload {
-		a.ReloadDatabases()
+	a.ReloadDatabases()
+}
+
+func (a *App) GetLastDaemon(which string) bool {
+	switch which {
+	case "daemon-freshen":
+		return a.GetSession().Daemons.Freshen
+	case "daemon-scraper":
+		return a.GetSession().Daemons.Scraper
+	case "daemon-ipfs":
+		return a.GetSession().Daemons.Ipfs
 	}
+	logger.Error("Should not happen in GetLastDaemon")
+	return false
+}
+
+func (a *App) SetLastDaemon(which string, value bool) {
+	switch which {
+	case "daemon-freshen":
+		a.GetSession().Daemons.Freshen = value
+	case "daemon-scraper":
+		a.GetSession().Daemons.Scraper = value
+	case "daemon-ipfs":
+		a.GetSession().Daemons.Ipfs = value
+	}
+	a.GetSession().Save()
 }

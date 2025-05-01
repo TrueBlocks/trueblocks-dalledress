@@ -11,8 +11,8 @@ import (
 )
 
 func (a *App) GetMonitors(first, pageSize int) types.SummaryMonitor {
-	first = base.Max(0, base.Min(first, len(a.monitors.Monitors)-1))
-	last := base.Min(len(a.monitors.Monitors), first+pageSize)
+	first = max(0, min(first, len(a.monitors.Monitors)-1))
+	last := min(len(a.monitors.Monitors), first+pageSize)
 	copy := a.monitors.ShallowCopy()
 	copy.Monitors = a.monitors.Monitors[first:last]
 	return copy

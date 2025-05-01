@@ -6,14 +6,13 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 // Find: NewViews
 func (a *App) GetIndex(first, pageSize int) types.SummaryIndex {
-	first = base.Max(0, base.Min(first, len(a.index.Chunks)-1))
-	last := base.Min(len(a.index.Chunks), first+pageSize)
+	first = max(0, min(first, len(a.index.Chunks)-1))
+	last := min(len(a.index.Chunks), first+pageSize)
 	copy := a.index.ShallowCopy()
 	copy.Chunks = a.index.Chunks[first:last]
 	return copy

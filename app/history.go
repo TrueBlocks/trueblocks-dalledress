@@ -98,8 +98,8 @@ func (a *App) GetHistory(addr string, first, pageSize int) types.SummaryTransact
 	historyMutex.Lock()
 	defer historyMutex.Unlock()
 
-	first = base.Max(0, base.Min(first, len(a.historyMap[address].Transactions)-1))
-	last := base.Min(len(a.historyMap[address].Transactions), first+pageSize)
+	first = max(0, min(first, len(a.historyMap[address].Transactions)-1))
+	last := min(len(a.historyMap[address].Transactions), first+pageSize)
 	sum := a.historyMap[address]
 	sum.Summarize()
 	copy := sum.ShallowCopy()
@@ -153,7 +153,7 @@ func (a *App) getBalance(address base.Address) string {
 	} else {
 		bMutex.Lock()
 		defer bMutex.Unlock()
-		a.balanceMap[address] = balances[0].Balance.ToEtherStr(18)
+		a.balanceMap[address] = balances[0].Balance.ToFloatString(18)
 		return a.balanceMap[address]
 	}
 }

@@ -5,14 +5,13 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 // Find: NewViews
 func (a *App) GetAbis(first, pageSize int) types.SummaryAbis {
-	first = base.Max(0, base.Min(first, len(a.abis.Files)-1))
-	last := base.Min(len(a.abis.Files), first+pageSize)
+	first = max(0, min(first, len(a.abis.Files)-1))
+	last := min(len(a.abis.Files), first+pageSize)
 	copy := a.abis.ShallowCopy()
 	copy.Files = a.abis.Files[first:last]
 	return copy

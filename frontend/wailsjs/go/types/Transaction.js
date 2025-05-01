@@ -10,8 +10,8 @@ export function Date() {
   return window['go']['types']['Transaction']['Date']();
 }
 
-export function FinishUnmarshal() {
-  return window['go']['types']['Transaction']['FinishUnmarshal']();
+export function FinishUnmarshal(arg1) {
+  return window['go']['types']['Transaction']['FinishUnmarshal'](arg1);
 }
 
 export function GasCost() {
@@ -28,6 +28,14 @@ export function Model(arg1, arg2, arg3, arg4) {
 
 export function String() {
   return window['go']['types']['Transaction']['String']();
+}
+
+export function ToTransfer(arg1) {
+  return window['go']['types']['Transaction']['ToTransfer'](arg1);
+}
+
+export function TracesToTransfer(arg1, arg2) {
+  return window['go']['types']['Transaction']['TracesToTransfer'](arg1, arg2);
 }
 
 export function UnmarshalCache(arg1, arg2) {

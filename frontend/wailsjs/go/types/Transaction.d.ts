@@ -8,14 +8,18 @@ export function CacheLocations():Promise<string>;
 
 export function Date():Promise<string>;
 
-export function FinishUnmarshal():Promise<void>;
+export function FinishUnmarshal(arg1:number):Promise<void>;
 
 export function GasCost():Promise<base.Value>;
 
 export function MarshalCache(arg1:io.Writer):Promise<void>;
 
-export function Model(arg1:string,arg2:string,arg3:boolean,arg4:{[key: string]: any}):Promise<types.Model>;
+export function Model(arg1:string,arg2:string,arg3:boolean,arg4:Record<string, any>):Promise<types.Model>;
 
 export function String():Promise<string>;
+
+export function ToTransfer(arg1:base.Address):Promise<types.Transfer>;
+
+export function TracesToTransfer(arg1:Array<types.Trace>,arg2:base.Address):Promise<types.Transfer>;
 
 export function UnmarshalCache(arg1:number,arg2:io.Reader):Promise<void>;

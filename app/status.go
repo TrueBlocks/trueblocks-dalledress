@@ -5,14 +5,13 @@ import (
 	"sort"
 
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/version"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 func (a *App) GetStatus(first, pageSize int) types.SummaryStatus {
-	first = base.Max(0, base.Min(first, len(a.status.Caches)-1))
-	last := base.Min(len(a.status.Caches), first+pageSize)
+	first = max(0, min(first, len(a.status.Caches)-1))
+	last := min(len(a.status.Caches), first+pageSize)
 	copy := a.status.ShallowCopy()
 	copy.Caches = a.status.Caches[first:last]
 	return copy

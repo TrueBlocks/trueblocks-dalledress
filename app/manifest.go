@@ -6,13 +6,12 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 func (a *App) GetManifest(first, pageSize int) types.SummaryManifest {
-	first = base.Max(0, base.Min(first, len(a.manifest.Chunks)-1))
-	last := base.Min(len(a.manifest.Chunks), first+pageSize)
+	first = max(0, min(first, len(a.manifest.Chunks)-1))
+	last := min(len(a.manifest.Chunks), first+pageSize)
 	copy := a.manifest.ShallowCopy()
 	copy.Chunks = a.manifest.Chunks[first:last]
 	return copy

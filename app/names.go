@@ -6,17 +6,16 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/names"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 func (a *App) GetNames(first, pageSize int) types.SummaryName {
-	first = base.Max(0, base.Min(first, len(a.names.Names)-1))
-	last := base.Min(len(a.names.Names), first+pageSize)
+	first = max(0, min(first, len(a.names.Names)-1))
+	last := min(len(a.names.Names), first+pageSize)
 	copy := a.names.ShallowCopy()
 	copy.Names = a.names.Names[first:last]
 	return copy

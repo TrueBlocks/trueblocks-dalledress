@@ -54,17 +54,17 @@ func (s *Document) CacheLocations() (string, string, string) {
 
 func (s *Document) MarshalCache(writer io.Writer) (err error) {
 	// Dirty
-	if err = cache.WriteValue(writer, s.Dirty); err != nil {
+	if err = base.WriteValue(writer, s.Dirty); err != nil {
 		return err
 	}
 
 	// Filename
-	if err = cache.WriteValue(writer, s.Filename); err != nil {
+	if err = base.WriteValue(writer, s.Filename); err != nil {
 		return err
 	}
 
 	// LastUpdate
-	if err = cache.WriteValue(writer, s.LastUpdate); err != nil {
+	if err = base.WriteValue(writer, s.LastUpdate); err != nil {
 		return err
 	}
 
@@ -73,7 +73,7 @@ func (s *Document) MarshalCache(writer io.Writer) (err error) {
 	for _, monitor := range s.Monitors {
 		monitors = append(monitors, &monitor)
 	}
-	if err = cache.WriteValue(writer, monitors); err != nil {
+	if err = base.WriteValue(writer, monitors); err != nil {
 		return err
 	}
 
@@ -86,23 +86,23 @@ func (s *Document) UnmarshalCache(vers uint64, reader io.Reader) (err error) {
 	// EXISTING_CODE
 
 	// Dirty
-	if err = cache.ReadValue(reader, &s.Dirty, vers); err != nil {
+	if err = base.ReadValue(reader, &s.Dirty, vers); err != nil {
 		return err
 	}
 
 	// Filename
-	if err = cache.ReadValue(reader, &s.Filename, vers); err != nil {
+	if err = base.ReadValue(reader, &s.Filename, vers); err != nil {
 		return err
 	}
 
 	// LastUpdate
-	if err = cache.ReadValue(reader, &s.LastUpdate, vers); err != nil {
+	if err = base.ReadValue(reader, &s.LastUpdate, vers); err != nil {
 		return err
 	}
 
 	// Monitors
 	s.Monitors = make([]coreTypes.Monitor, 0)
-	if err = cache.ReadValue(reader, &s.Monitors, vers); err != nil {
+	if err = base.ReadValue(reader, &s.Monitors, vers); err != nil {
 		return err
 	}
 
@@ -121,11 +121,11 @@ func (s *Document) FinishUnmarshal() {
 func (s *Document) Save() error {
 	if store, err := cache.NewStore(&cache.StoreOptions{
 		Location: cache.FsCache,
-		ReadOnly: false,
+		// ReadOnly: false,
 	}); err != nil {
 		return err
 	} else {
-		if err = store.Write(s, nil); err != nil {
+		if err = store.Write(s); err != nil {
 			return err
 		}
 		s.Dirty = false

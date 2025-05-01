@@ -1,12 +1,13 @@
 {
-    "scripts": {
-        "dev": "wails dev --debounce 2000"
-    },
-    "name": "trueblocks-miniDapp",
-    "version": "1.0.0",
-    "license": "GPL-3.0",
-    "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^8.0.1",
-        "@typescript-eslint/parser": "^8.0.1"
-    }
+  "scripts": {
+    "build": "wails build",
+    "clean": "make clean",
+    "dev": "wails dev -debounce 1000 | grep -v 'AssetHandler'",
+    "install": "cd frontend && yarn install && cd - && rm -fR node_modules",
+    "lint": "cd frontend && yarn eslint . && cd .. && golangci-lint run && echo '✅ No issues found.'",
+    "start": "yarn dev",
+    "test-go": "go test ./...",
+    "test-tsx": "cd frontend && yarn vitest run && cd ..",
+    "test": "yarn test-go && yarn test-tsx"
+  }
 }

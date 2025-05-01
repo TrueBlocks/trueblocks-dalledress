@@ -26,9 +26,9 @@ type ImageData struct {
 
 func RequestImage(imageData *ImageData) error {
 	generated := filepath.Join("./output", imageData.SeriesName, "generated")
-	file.EstablishFolder(generated)
+	_ = file.EstablishFolder(generated)
 	annotated := strings.Replace(generated, "/generated", "/annotated", -1)
-	file.EstablishFolder(annotated)
+	_ = file.EstablishFolder(annotated)
 
 	fn := filepath.Join(generated, fmt.Sprintf("%s.png", imageData.Filename))
 	logger.Info(colors.Cyan, imageData.Filename, colors.Yellow, "- improving the prompt...", colors.Off)

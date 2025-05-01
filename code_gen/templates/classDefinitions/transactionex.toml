@@ -1,9 +1,0 @@
-[settings]
-    class = "TransactionEx"
-    doc_group = "01-Document"
-    doc_descr = "a transaction with some expansions for the app"
-    doc_route = "104-transactionex"
-    attributes = ""
-    produced_by = "monitorex"
-    contains = ""
-    cache_type = "marshal_only"

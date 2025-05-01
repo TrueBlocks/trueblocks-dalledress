@@ -2,124 +2,80 @@ package app
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"html/template"
 	"log"
-	"math/rand/v2"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"sync/atomic"
-	"text/template"
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/config"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/daemons"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/joho/godotenv"
+	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// Since we need App.ctx to display a dialog and we can only get it when Startup method
-// is executed, we keep track of the first fatal error that has happened before Startup
-var startupError error
-
-// Find: NewViews
 type App struct {
-	ctx        context.Context
-	Documents  []types.Document
-	CurrentDoc *types.Document
-
-	session    config.Session
-	apiKeys    map[string]string
-	ensMap     map[string]base.Address
-	renderCtxs map[base.Address][]*output.RenderCtx
-	historyMap map[base.Address]types.SummaryTransaction
-	balanceMap map[base.Address]string
-
-	// Summaries
-	abis     types.SummaryAbis
-	index    types.SummaryIndex
-	manifest types.SummaryManifest
-	monitors types.SummaryMonitor
-	names    types.SummaryName
-	status   types.SummaryStatus
-
-	ScraperController *daemons.DaemonScraper
-	FreshenController *daemons.DaemonFreshen
-	IpfsController    *daemons.DaemonIpfs
-
-	// Add your application's data here
-	databases      map[string][]string
+	Assets         embed.FS
+	Preferences    *preferences.Preferences
+	Projects       *project.Manager
+	ChainList      *utils.ChainList
+	Names          map[base.Address]types.Name
+	locked         int32
+	ctx            context.Context
+	apiKeys        map[string]string
+	ensMap         map[string]base.Address
+	renderCtxs     map[base.Address][]*output.RenderCtx
 	authorTemplate *template.Template
 	promptTemplate *template.Template
 	dataTemplate   *template.Template
 	terseTemplate  *template.Template
 	titleTemplate  *template.Template
 	Series         dalle.Series `json:"series"`
+	databases      map[string][]string
 	dalleCache     map[string]*dalle.DalleDress
 }
 
-// Find: NewViews
-func NewApp() *App {
-	a := App{
+func NewApp(assets embed.FS) (*App, *menu.Menu) {
+	app := &App{
+		Names:    make(map[base.Address]types.Name),
+		Projects: project.NewManager(),
+		Preferences: &preferences.Preferences{
+			Org:  preferences.OrgPreferences{},
+			User: preferences.UserPreferences{},
+			App:  preferences.AppPreferences{},
+		},
+		Assets:     assets,
 		apiKeys:    make(map[string]string),
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
-		// Initialize maps here
-		historyMap: make(map[base.Address]types.SummaryTransaction),
-		balanceMap: make(map[base.Address]string),
-		Documents:  make([]types.Document, 10),
 		databases:  make(map[string][]string),
 		dalleCache: make(map[string]*dalle.DalleDress),
 	}
-	a.names.NamesMap = make(map[base.Address]coreTypes.Name)
-	a.monitors.MonitorMap = make(map[base.Address]coreTypes.Monitor)
-	a.CurrentDoc = &a.Documents[0]
-	a.CurrentDoc.Filename = "Untitled"
 
-	// it's okay if it's not found
-	_ = a.session.Load()
+	app.ChainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
 	if err := godotenv.Load(); err != nil {
-		a.Fatal("Error loading .env file")
-	} else if a.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); a.apiKeys["openAi"] == "" {
+		log.Fatal("Error loading .env file")
+	} else if app.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); app.apiKeys["openAi"] == "" {
 		log.Fatal("No OPENAI_API_KEY key found")
 	}
 
-	// Initialize your data here
-	var err error
-	if a.promptTemplate, err = template.New("prompt").Parse(promptTemplate); err != nil {
-		logger.Fatal("could not create prompt template:", err)
-	}
-	if a.dataTemplate, err = template.New("data").Parse(dataTemplate); err != nil {
-		logger.Fatal("could not create data template:", err)
-	}
-	if a.titleTemplate, err = template.New("terse").Parse(titleTemplate); err != nil {
-		logger.Fatal("could not create title template:", err)
-	}
-	if a.terseTemplate, err = template.New("terse").Parse(terseTemplate); err != nil {
-		logger.Fatal("could not create terse template:", err)
-	}
-	if a.authorTemplate, err = template.New("author").Parse(authorTemplate); err != nil {
-		logger.Fatal("could not create prompt template:", err)
-	}
-	logger.Info()
-	logger.Info("Compiled templates")
-
-	a.ReloadDatabases()
-
-	return &a
+	appMenu := app.buildAppMenu()
+	return app, appMenu
 }
 
 func (a App) String() string {
@@ -131,287 +87,245 @@ func (a *App) GetContext() context.Context {
 	return a.ctx
 }
 
-var freshenLock atomic.Uint32
-
-// Freshen gets called by the daemons to instruct first the backend, then the frontend to update.
-// Protect against updating too fast... Note that this routine is called as a goroutine.
-func (a *App) Freshen(which ...string) {
-	// Skip this update we're actively upgrading
-	if !freshenLock.CompareAndSwap(0, 1) {
-		// logger.Info(colors.Red, "Skipping update", colors.Off)
-		return
-	}
-	logger.Info(colors.Green, "Freshening...", colors.Off)
-	defer freshenLock.CompareAndSwap(1, 0)
-
-	notify :=
-		func() {
-			// Let the front end know it needs to update
-			messages.Send(a.ctx, messages.Daemon, messages.NewDaemonMsg(
-				a.FreshenController.Color,
-				"Freshening...",
-				a.FreshenController.Color,
-			))
-		}
-
-	// First, we want to update the current route if we're told to
-	route := ""
-	if len(which) > 0 {
-		route = which[0]
-	}
-	switch route {
-	case "/abis":
-		a.loadAbis(nil)
-		notify()
-	case "/manifest":
-		a.loadManifest(nil)
-		notify()
-	case "/monitors":
-		a.loadMonitors(nil)
-		notify()
-	case "/names":
-		a.loadNames(nil)
-		notify()
-	case "/index":
-		a.loadIndex(nil)
-		notify()
-	}
-
-	// Now update everything in the fullness of time
-	wg := sync.WaitGroup{}
-	wg.Add(5)
-	go a.loadAbis(&wg)
-	go a.loadManifest(&wg)
-	go a.loadMonitors(&wg)
-	go a.loadNames(&wg)
-	go a.loadIndex(&wg)
-	wg.Wait()
-	notify()
-}
-
-// Find: NewViews
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 
-	a.FreshenController = daemons.NewFreshen(a, "freshen", 2000, a.GetLastDaemon("daemon-freshen"))
-	a.ScraperController = daemons.NewScraper(a, "scraper", 7000, a.GetLastDaemon("daemon-scraper"))
-	a.IpfsController = daemons.NewIpfs(a, "ipfs", 10000, a.GetLastDaemon("daemon-ipfs"))
-	go a.startDaemons()
+	msgs.InitializeContext(ctx)
 
-	if startupError != nil {
-		a.Fatal(startupError.Error())
+	org, err := preferences.GetOrgPreferences()
+	if err != nil {
+		msgs.EmitError("Loading org preferences failed", err)
+		return
 	}
 
-	logger.Info("Starting freshen process...")
-	a.Freshen(a.GetSession().LastRoute)
-
-	if err := a.loadStatus(); err != nil {
-		logger.Panic(err)
+	user, err := preferences.GetUserPreferences()
+	if err != nil {
+		msgs.EmitError("Loading user preferences failed", err)
+		return
 	}
 
-	if err := a.loadConfig(); err != nil {
-		logger.Panic(err)
+	appPrefs, err := preferences.GetAppPreferences()
+	if err != nil {
+		msgs.EmitError("Loading app preferences failed", err)
+		return
+	}
+
+	a.Preferences.Org = org
+	a.Preferences.User = user
+	a.Preferences.App = appPrefs
+
+	if len(a.Preferences.App.RecentProjects) > 0 {
+		mostRecentPath := a.Preferences.App.RecentProjects[0]
+		if file.FileExists(mostRecentPath) {
+			_, err := a.Projects.Open(mostRecentPath)
+			if err != nil {
+				msgs.EmitError("Failed to open recent project", err)
+			}
+		}
 	}
 }
 
 func (a *App) DomReady(ctx context.Context) {
-	// Sometimes useful for debugging
-	if os.Getenv("TB_CMD_LINE") == "true" {
-		return
+	a.ctx = ctx
+	if a.IsReady() {
+		runtime.WindowSetSize(ctx, a.Preferences.App.Bounds.Width, a.Preferences.App.Bounds.Height)
+		runtime.WindowSetPosition(ctx, a.Preferences.App.Bounds.X, a.Preferences.App.Bounds.Y)
+		runtime.WindowShow(ctx)
+		go a.watchWindowBounds() // if the window moves or resizes, we want to know
 	}
-	runtime.WindowSetPosition(a.ctx, a.session.X, a.session.Y)
-	runtime.WindowSetSize(a.ctx, a.session.Width, a.session.Height)
-	runtime.WindowShow(a.ctx)
 }
 
-func (a *App) Shutdown(ctx context.Context) {
-	// Sometimes useful for debugging
-	if os.Getenv("TB_CMD_LINE") == "true" {
-		return
-	}
-	a.session.X, a.session.Y = runtime.WindowGetPosition(a.ctx)
-	a.session.Width, a.session.Height = runtime.WindowGetSize(a.ctx)
-	a.session.Y += 38 // TODO: This is a hack to account for the menu bar - not sure why it's needed
-	a.session.Save()
+func (a *App) BeforeClose(ctx context.Context) bool {
+	x, y := runtime.WindowGetPosition(ctx)
+	w, h := runtime.WindowGetSize(ctx)
+	a.SaveBounds(x, y, w, h)
+	return false // allow window to close
 }
 
-func (a *App) GetSession() *config.Session {
-	return &a.session
-}
-
-func (a *App) ReloadDatabases() {
-	a.Series = dalle.Series{}
-	a.databases = make(map[string][]string)
-
-	var err error
-	if a.Series, err = a.LoadSeries(); err != nil {
-		logger.Fatal(err)
-	}
-	logger.Info("Loaded series:", a.Series.Suffix)
-
-	for _, db := range dalle.DatabaseNames {
-		if a.databases[db] == nil {
-			if lines, err := a.toLines(db); err != nil {
-				logger.Fatal(err)
-			} else {
-				a.databases[db] = lines
-				for i := 0; i < len(a.databases[db]); i++ {
-					a.databases[db][i] = strings.Replace(a.databases[db][i], "v0.1.0,", "", -1)
-				}
-			}
-		}
-	}
-	logger.Info("Loaded", len(dalle.DatabaseNames), "databases")
-}
-
-func (a *App) LoadSeries() (dalle.Series, error) {
-	lastSeries := a.GetSession().LastSeries
-	fn := filepath.Join("./output/series", lastSeries+".json")
-	str := strings.TrimSpace(file.AsciiFileToString(fn))
-	logger.Info("lastSeries", lastSeries)
-	if len(str) == 0 || !file.FileExists(fn) {
-		logger.Info("No series found, creating a new one", fn)
-		ret := dalle.Series{
-			Suffix: "simple",
-		}
-		ret.SaveSeries(fn, 0)
-		return ret, nil
-	}
-
-	bytes := []byte(str)
-	var s dalle.Series
-	if err := json.Unmarshal(bytes, &s); err != nil {
-		logger.Error("could not unmarshal series:", err)
-		return dalle.Series{}, err
-	}
-
-	s.Suffix = strings.Trim(strings.ReplaceAll(s.Suffix, " ", "-"), "-")
-	s.SaveSeries(filepath.Join("./output/series", s.Suffix+".json"), 0)
-	return s, nil
-}
-
-func (a *App) toLines(db string) ([]string, error) {
-	filename := "./databases/" + db + ".csv"
-	lines := file.AsciiFileToLines(filename)
-	lines = lines[1:] // skip header
-	var err error
-	if len(lines) == 0 {
-		err = fmt.Errorf("could not load %s", filename)
-	} else {
-		fn := strings.ToUpper(db[:1]) + db[1:]
-		if filter, err := a.Series.GetFilter(fn); err != nil {
-			return lines, err
-
-		} else {
-			if len(filter) == 0 {
-				return lines, nil
-			}
-
-			filtered := make([]string, 0, len(lines))
-			for _, line := range lines {
-				for _, f := range filter {
-					if strings.Contains(line, f) {
-						filtered = append(filtered, line)
-					}
-				}
-			}
-			lines = filtered
-		}
-	}
-
-	if len(lines) == 0 {
-		lines = append(lines, "none")
-	}
-
-	return lines, err
-}
-
-func (a *App) HandleLines() {
-	batchSize := 5
-	rateLimit := time.Second / 5
-	sem := make(chan struct{}, batchSize)
-
-	lines, series := func() ([]string, []dalle.Series) {
-		series := []dalle.Series{a.Series}
-		if len(os.Args) < 2 {
-			return file.AsciiFileToLines("inputs/addresses.txt"), series
-		}
-		return os.Args[1:], series
-	}()
-
-	var wg sync.WaitGroup
-	ticker := time.NewTicker(rateLimit)
+func (a *App) watchWindowBounds() {
+	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
 
-	for _, ser := range series {
-		a.Series = ser
-		for i, addr := range lines {
-			if a.Series.Last > 0 && i <= int(a.Series.Last) {
-				continue
-			}
-
-			sem <- struct{}{}
-			wg.Add(1)
-			go func(index int, address string) {
-				defer wg.Done()
-				defer func() { <-sem }()
-				backoff := time.Second
-				maxRetries := 5
-				for attempt := 0; attempt < maxRetries; attempt++ {
-					<-ticker.C
-					_, err := a.GenerateImage(address)
-					if err == nil {
-						return
-					}
-					// if isContentPolicyViolation(err) {
-					// 	msg := fmt.Sprintf("Content policy violation, skipping retry for address: %s Error: %s", address, err)
-					// 	logger.Error(msg)
-					// 	return
-					// } else
-					if strings.Contains(err.Error(), "seed length is less than 66") {
-						msg := fmt.Sprintf("Invalid address, skipping retry for address: %s Error: %s", address, err)
-						logger.Error(msg)
-						return
-					}
-					msg := fmt.Sprintf("Error fetching image: %s Retry attempt: %d Sleeping: %d", err, attempt+1, backoff)
-					logger.Error(msg)
-					time.Sleep(backoff)
-					backoff = time.Duration(float64(backoff) * (1 + rand.Float64()))
-				}
-				logger.Error("Failed to fetch image after max retries:", address)
-			}(i, addr)
-
-			a.Series.Last = i
-			a.Series.SaveSeries("inputs/series.json", a.Series.Last)
-
-			if (i+1)%batchSize == 0 {
-				wg.Wait()
-			}
+	var lastX, lastY, lastW, lastH int
+	for range ticker.C {
+		if !a.IsReady() {
+			continue
+		}
+		x, y := runtime.WindowGetPosition(a.ctx)
+		w, h := runtime.WindowGetSize(a.ctx)
+		if x != lastX || y != lastY || w != lastW || h != lastH {
+			a.SaveBounds(x, y, w, h)
+			lastX, lastY, lastW, lastH = x, y, w, h
 		}
 	}
-	wg.Wait()
 }
 
-func (a *App) Fatal(message string) {
-	if message == "" {
-		message = "Fatal error occured. The application cannot continue to run."
-	}
-	log.Println(message)
-
-	// If a.ctx has not been set yet (i.e. we are before calling Startup), we can't display the
-	// dialog. Instead, we keep the error and let Startup call this function again when a.ctx is set.
-	if a.ctx == nil {
-		// We will only display the first error, since it makes more sense
-		if startupError == nil {
-			startupError = errors.New(message)
-		}
-		// Return to allow the application to continue starting up, until we get the context
+func (a *App) SaveBounds(x, y, w, h int) {
+	if !a.IsReady() {
 		return
 	}
-	_, _ = runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-		Type:    runtime.ErrorDialog,
-		Title:   "Fatal Error",
-		Message: message,
-	})
-	os.Exit(1)
+
+	a.Preferences.App.Bounds = preferences.Bounds{
+		X:      x,
+		Y:      y,
+		Width:  w,
+		Height: h,
+	}
+
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) IsReady() bool {
+	return a.ctx != nil
+}
+
+func (a *App) IsInitialized() bool {
+	_, appFolder := preferences.GetConfigFolders()
+	fn := filepath.Join(appFolder, ".initialized")
+	return file.FileExists(fn)
+}
+
+func (a *App) SetInitialized(isInit bool) error {
+	_, appFolder := preferences.GetConfigFolders()
+	fn := filepath.Join(appFolder, ".initialized")
+	if isInit {
+		if !file.Touch(fn) {
+			return fmt.Errorf("failed to create " + fn + " file")
+		} else {
+			return nil
+		}
+	} else {
+		_ = os.Remove(fn)
+		return nil // do not fail even if not found
+	}
+}
+
+func (a *App) SetAppPreferences(appPrefs *preferences.AppPreferences) error {
+	a.Preferences.App = *appPrefs
+	return preferences.SetAppPreferences(appPrefs)
+}
+
+func (a *App) GetAppPreferences() *preferences.AppPreferences {
+	return &a.Preferences.App
+}
+
+func (a *App) SetMenuCollapsed(collapse bool) {
+	a.Preferences.App.MenuCollapsed = collapse
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) SetHelpCollapsed(collapse bool) {
+	a.Preferences.App.HelpCollapsed = collapse
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) SetLastView(view string) {
+	a.Preferences.App.LastView = view
+	if view != "/wizard" {
+		a.Preferences.App.LastViewNoWizard = view
+	}
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) GetWizardReturn() string {
+	if a.Preferences.App.LastViewNoWizard == "" {
+		return "/"
+	}
+	return a.Preferences.App.LastViewNoWizard
+}
+
+func (a *App) GetAppId() preferences.Id {
+	return preferences.GetAppId()
+}
+
+func (a *App) SetLastTab(route string, tab string) {
+	if !atomic.CompareAndSwapInt32(&a.locked, 0, 1) {
+		return
+	}
+	defer atomic.StoreInt32(&a.locked, 0)
+
+	a.Preferences.App.LastTab[route] = tab
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) GetLastTab(route string) string {
+	return a.Preferences.App.LastTab[route]
+}
+
+func (a *App) GetOpenProjects() []map[string]interface{} {
+	projectIDs := a.Projects.GetOpenProjectIDs()
+	result := make([]map[string]interface{}, 0, len(projectIDs))
+
+	for _, id := range projectIDs {
+		project := a.Projects.GetProjectByID(id)
+		if project == nil {
+			continue
+		}
+
+		projectInfo := map[string]interface{}{
+			"id":         id,
+			"name":       project.GetName(),
+			"path":       project.GetPath(),
+			"isActive":   id == a.Projects.ActiveID,
+			"isDirty":    project.IsDirty(),
+			"lastOpened": project.LastOpened,
+			// "createdAt":  project.CreatedAt,
+		}
+
+		result = append(result, projectInfo)
+	}
+
+	return result
+}
+
+func (a *App) Logger(msg string) {
+	fmt.Println(msg)
+}
+
+func (a *App) GetUserPreferences() *preferences.UserPreferences {
+	return &a.Preferences.User
+}
+
+func (a *App) SetUserPreferences(userPrefs *preferences.UserPreferences) error {
+	a.Preferences.User = *userPrefs
+	return preferences.SetUserPreferences(userPrefs)
+}
+
+func (a *App) GetOrgPreferences() *preferences.OrgPreferences {
+	return &a.Preferences.Org
+}
+
+func (a *App) SetOrgPreferences(orgPrefs *preferences.OrgPreferences) error {
+	a.Preferences.Org = *orgPrefs
+	return preferences.SetOrgPreferences(orgPrefs)
+}
+
+func (app *App) GetChainList() *utils.ChainList {
+	return app.ChainList
+}
+
+var r sync.Mutex
+
+func (a *App) RegisterCtx(addr base.Address) *output.RenderCtx {
+	r.Lock()
+	defer r.Unlock()
+
+	rCtx := output.NewStreamingContext()
+	a.renderCtxs[addr] = append(a.renderCtxs[addr], rCtx)
+	return rCtx
+}
+
+func (a *App) Cancel(addr base.Address) (int, bool) {
+	if len(a.renderCtxs) == 0 {
+		return 0, false
+	}
+	if a.renderCtxs[addr] == nil {
+		return 0, true
+	}
+	n := len(a.renderCtxs[addr])
+	for i := 0; i < len(a.renderCtxs[addr]); i++ {
+		a.renderCtxs[addr][i].Cancel()
+	}
+	a.renderCtxs[addr] = nil
+	return n, true
 }

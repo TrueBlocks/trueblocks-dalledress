@@ -237,7 +237,6 @@ func (dd *DalleDress) ReportOn(addr, loc, ft, value string) {
 
 	saveMutex.Lock()
 	defer saveMutex.Unlock()
-	file.EstablishFolder(path)
-	file.StringToAsciiFile(filepath.Join(path, dd.Filename+"."+ft), value)
+	_ = file.EstablishFolder(path)
+	_ = file.StringToAsciiFile(filepath.Join(path, dd.Filename+"."+ft), value)
 }
-

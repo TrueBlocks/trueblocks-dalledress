@@ -1,25 +1,18 @@
-import react from "@vitejs/plugin-react";
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { defineConfig } from "vite";
-import mdPlugin from 'vite-plugin-md';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tsconfigPaths(),
-    mdPlugin({
-      mode: 'html', // 'html' mode will handle Markdown as raw HTML/text content
-    }),
-  ],
-  server: {
-    host: 'localhost',
-    port: 5173,
-    watch: {
-      usePolling: true,
+  plugins: [react(), tsconfigPaths()],
+  resolve: {
+    alias: {
+      '@app': 'wailsjs/go/app/App',
+      '@hooks': 'src/hooks',
+      '@utils': 'src/utils',
+      '@contexts': 'src/contexts',
     },
-    hmr: {
-      host: 'localhost',
-      port: 5173,
-    },
+  },
+  esbuild: {
+    logOverride: { 'ignored-use-directive': 'silent' },
   },
 });

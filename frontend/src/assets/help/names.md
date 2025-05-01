@@ -1,5 +1,9 @@
-The Names view allows you to manage the names of the devices and the monitors. The view is divided into the following sections:
+Welcome to the **Names** view! This section provides information about managing names in your application.
 
-#### Sharing
+## Tabs Overview
 
-Abis are a naturally shareable item. Everyone in teh community needs Abis. You may choose to share by pressing the share button.
+1. **Custom**: Displays custom information about names.
+2. **Named**: Allows you to manage named entities using a form.
+3. **Prefund**: Provides details about prefunding options.
+
+For further assistance, please contact support.

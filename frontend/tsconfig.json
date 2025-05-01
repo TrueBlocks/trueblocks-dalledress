@@ -19,33 +19,50 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": "./src",
+    "noUncheckedIndexedAccess": true,
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom",
+      "@testing-library/dom"
+    ],
+    "baseUrl": ".",
     "paths": {
-      "@assets/*": [
-        "./assets/*"
-      ],
       "@components": [
-        "./components/index"
+        "src/components"
       ],
-      "@views": [
-        "./views/index"
+      "@contexts": [
+        "src/contexts"
       ],
       "@hooks": [
-        "./hooks/index"
+        "src/hooks"
       ],
-      "@gocode/*": [
-        "../wailsjs/go/*"
+      "@layout": [
+        "src/layout"
+      ],
+      "@views": [
+        "src/views"
+      ],
+      "@wizards": [
+        "src/wizards"
+      ],
+      "@utils": [
+        "src/utils"
       ],
       "@runtime": [
-        "../wailsjs/runtime/runtime"
+        "wailsjs/runtime"
       ],
-      "@/*": [
-        "./*"
+      "@app": [
+        "wailsjs/go/app/App"
+      ],
+      "@models": [
+        "wailsjs/go/models"
       ]
     }
   },
   "include": [
-    "src"
+    "src",
+    "wailsjs",
+    "tests"
   ],
   "references": [
     {

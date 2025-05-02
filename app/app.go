@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -20,9 +21,11 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/dalle"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
+	"github.com/fsnotify/fsnotify"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -47,6 +50,7 @@ type App struct {
 	Series         dalle.Series `json:"series"`
 	databases      map[string][]string
 	dalleCache     map[string]*dalle.DalleDress
+	fileServer     *fileserver.FileServer
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -114,6 +118,12 @@ func (a *App) Startup(ctx context.Context) {
 	a.Preferences.User = user
 	a.Preferences.App = appPrefs
 
+	a.fileServer = fileserver.NewFileServer(a.Preferences)
+	if err := a.fileServer.Start(); err != nil {
+		msgs.EmitError("Failed to start file server", err)
+	}
+	go a.watchImagesDir()
+
 	if len(a.Preferences.App.RecentProjects) > 0 {
 		mostRecentPath := a.Preferences.App.RecentProjects[0]
 		if file.FileExists(mostRecentPath) {
@@ -139,6 +149,13 @@ func (a *App) BeforeClose(ctx context.Context) bool {
 	x, y := runtime.WindowGetPosition(ctx)
 	w, h := runtime.WindowGetSize(ctx)
 	a.SaveBounds(x, y, w, h)
+
+	if a.fileServer != nil {
+		if err := a.fileServer.Stop(); err != nil {
+			log.Printf("Error shutting down file server: %v", err)
+		}
+	}
+
 	return false // allow window to close
 }
 
@@ -328,4 +345,112 @@ func (a *App) Cancel(addr base.Address) (int, bool) {
 	}
 	a.renderCtxs[addr] = nil
 	return n, true
+}
+
+// GetImageURL returns a URL that can be used to access an image
+func (a *App) GetImageURL(relativePath string) string {
+	if a.fileServer == nil {
+		log.Printf("GetImageURL: fileServer is nil")
+		return ""
+	}
+
+	basePath := ""
+	if path, err := filepath.Abs(a.fileServer.GetBasePath()); err == nil {
+		basePath = path
+	}
+
+	if basePath == "" {
+		log.Printf("GetImageURL: Unable to determine base path")
+		return ""
+	}
+
+	cleanPath := filepath.Clean(relativePath)
+	cleanPath = strings.TrimPrefix(cleanPath, "/")
+
+	pathWithoutQuery := cleanPath
+	if idx := strings.Index(cleanPath, "?"); idx > 0 {
+		pathWithoutQuery = cleanPath[:idx]
+	}
+
+	fullPath := filepath.Join(basePath, pathWithoutQuery)
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		log.Printf("GetImageURL: File does not exist: %s", fullPath)
+		if strings.HasPrefix(pathWithoutQuery, "samples/") {
+			log.Printf("GetImageURL: Attempting to recreate sample files")
+			sampleDir := filepath.Join(basePath, "samples")
+			if err := os.MkdirAll(sampleDir, 0755); err != nil {
+				log.Printf("GetImageURL: Failed to create samples directory: %v", err)
+			}
+			if err := fileserver.CreateSampleFiles(basePath); err != nil {
+				log.Printf("GetImageURL: Failed to recreate sample files: %v", err)
+			} else {
+				log.Printf("GetImageURL: Sample files created in %s", sampleDir)
+			}
+			// Wait up to 200ms for the file to appear
+			for i := 0; i < 4; i++ {
+				if _, err := os.Stat(fullPath); err == nil {
+					url := a.fileServer.GetURL(cleanPath)
+					log.Printf("GetImageURL: (after create) %s -> %s (file exists at %s)", relativePath, url, fullPath)
+					return url
+				}
+				time.Sleep(50 * time.Millisecond)
+			}
+		}
+		return ""
+	}
+
+	url := a.fileServer.GetURL(cleanPath)
+	log.Printf("GetImageURL: %s -> %s (file exists at %s)", relativePath, url, fullPath)
+	return url
+}
+
+// ChangeImageStorageLocation changes the directory where images are stored
+func (a *App) ChangeImageStorageLocation(newPath string) error {
+	if a.fileServer == nil {
+		return fmt.Errorf("file server not initialized")
+	}
+	return a.fileServer.UpdateBasePath(newPath)
+}
+
+// Watch the images directory for changes and notify frontend
+func (a *App) watchImagesDir() {
+	basePath := a.fileServer.GetBasePath()
+	imagesDir := filepath.Join(basePath, "samples")
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Printf("Failed to create fsnotify watcher: %v", err)
+		return
+	}
+	defer watcher.Close()
+
+	_ = watcher.Add(imagesDir)
+
+	debounce := make(chan struct{}, 1)
+	go func() {
+		for range debounce {
+			time.Sleep(300 * time.Millisecond)
+			runtime.EventsEmit(a.ctx, "images:changed")
+		}
+	}()
+
+	for {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+			// Only care about create/remove/rename
+			if event.Op&(fsnotify.Create|fsnotify.Remove|fsnotify.Rename) != 0 {
+				select {
+				case debounce <- struct{}{}:
+				default:
+				}
+			}
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			log.Printf("fsnotify error: %v", err)
+		}
+	}
 }

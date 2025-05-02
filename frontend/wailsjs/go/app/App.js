@@ -10,6 +10,10 @@ export function Cancel(arg1) {
   return window['go']['app']['App']['Cancel'](arg1);
 }
 
+export function ChangeImageStorageLocation(arg1) {
+  return window['go']['app']['App']['ChangeImageStorageLocation'](arg1);
+}
+
 export function CheckRPCStatus() {
   return window['go']['app']['App']['CheckRPCStatus']();
 }
@@ -60,6 +64,10 @@ export function GetContext() {
 
 export function GetFilename() {
   return window['go']['app']['App']['GetFilename']();
+}
+
+export function GetImageURL(arg1) {
+  return window['go']['app']['App']['GetImageURL'](arg1);
 }
 
 export function GetLastTab(arg1) {

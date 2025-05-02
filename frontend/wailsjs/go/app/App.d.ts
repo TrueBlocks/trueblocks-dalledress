@@ -13,6 +13,8 @@ export function AddrToName(arg1:base.Address):Promise<string>;
 
 export function Cancel(arg1:base.Address):Promise<number|boolean>;
 
+export function ChangeImageStorageLocation(arg1:string):Promise<void>;
+
 export function CheckRPCStatus():Promise<string>;
 
 export function CloseProject(arg1:string):Promise<void>;
@@ -38,6 +40,8 @@ export function GetChainList():Promise<utils.ChainList>;
 export function GetContext():Promise<context.Context>;
 
 export function GetFilename():Promise<project.Project>;
+
+export function GetImageURL(arg1:string):Promise<string>;
 
 export function GetLastTab(arg1:string):Promise<string>;
 

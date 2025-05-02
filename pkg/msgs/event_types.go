@@ -16,6 +16,8 @@ const (
 	EventViewChange EventType = "app:view-changed"
 
 	EventTabCycle EventType = "hotkey:tab-cycle"
+
+	EventImagesChanged EventType = "images:changed"
 )
 
 var AllMessages = []struct {
@@ -31,4 +33,5 @@ var AllMessages = []struct {
 	{EventViewChange, "VIEW_CHANGE"},
 	{EventVersion, "VERSION"},
 	{EventTabCycle, "TAB_CYCLE"},
+	{EventImagesChanged, "IMAGES_CHANGED"},
 }

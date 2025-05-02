@@ -175,6 +175,7 @@ export namespace msgs {
 	    VIEW_CHANGE = "app:view-changed",
 	    VERSION = "1.0",
 	    TAB_CYCLE = "hotkey:tab-cycle",
+	    IMAGES_CHANGED = "images:changed",
 	}
 
 }

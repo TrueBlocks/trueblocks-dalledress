@@ -6,6 +6,7 @@ require (
 	git.sr.ht/~sbinet/gg v0.6.0
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250422130252-4a2fc83a6800
 	github.com/TrueBlocks/trueblocks-sdk/v5 v5.2.0
+	github.com/fsnotify/fsnotify v1.8.0
 	github.com/google/go-cmp v0.7.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kbinani/screenshot v0.0.0-20250118074034-a3924b7bbc8c
@@ -33,7 +34,6 @@ require (
 	github.com/ethereum/c-kzg-4844 v1.0.0 // indirect
 	github.com/ethereum/go-ethereum v1.15.9 // indirect
 	github.com/ethereum/go-verkle v0.2.2 // indirect
-	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/gen2brain/shm v0.1.1 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/gocarina/gocsv v0.0.0-20230123225133-763e25b40669 // indirect

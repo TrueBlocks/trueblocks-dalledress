@@ -34,7 +34,7 @@ export function Home() {
       .then((url) => {
         setSampleImageUrl(url || '');
       })
-      .catch((err) => {
+      .catch(() => {
         setSampleImageUrl('');
       });
 

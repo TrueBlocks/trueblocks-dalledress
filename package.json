@@ -4,7 +4,7 @@
     "clean": "make clean",
     "dev": "wails dev -debounce 1000 | grep -v 'AssetHandler'",
     "install": "cd frontend && yarn install && cd - && rm -fR node_modules",
-    "lint": "cd frontend && yarn eslint . && cd .. && golangci-lint run && echo '✅ No issues found.'",
+    "lint": "cd frontend && yarn eslint .  --max-warnings=0 && cd .. && golangci-lint run",
     "start": "yarn dev",
     "test-go": "go test ./...",
     "test-tsx": "cd frontend && yarn vitest run && cd ..",

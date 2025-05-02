@@ -24,17 +24,15 @@ type FileServer struct {
 	running   bool
 	urlPrefix string
 	mutex     sync.Mutex
-	prefs     *preferences.Preferences
 }
 
 // NewFileServer creates a new file server instance
-func NewFileServer(prefs *preferences.Preferences) *FileServer {
+func NewFileServer() *FileServer {
 	return &FileServer{
 		basePath:  "", // Will be set in Start() method
 		port:      0,  // Will be determined dynamically
 		running:   false,
 		urlPrefix: "/images/",
-		prefs:     prefs,
 	}
 }
 
@@ -63,8 +61,6 @@ func (fs *FileServer) Start() error {
 	if err := CreateSampleFiles(fs.basePath); err != nil {
 		log.Printf("Warning: failed to create sample files: %v", err)
 		// Continue even if sample creation fails - this is non-critical
-	} else {
-		log.Printf("Sample files created successfully in %s", filepath.Join(fs.basePath, "samples"))
 	}
 
 	// Find available port
@@ -191,27 +187,17 @@ func findAvailablePort(basePort int) (int, error) {
 	return 0, fmt.Errorf("no available ports found in range %d-%d", basePort, basePort+100)
 }
 
-// getStorageLocation determines where images should be stored
+// getStorageLocation returns the directory path where images should be stored.
+// It always uses a subdirectory named "images" inside the application's folder
+// within the user's Documents directory. If the user's home directory cannot be
+// determined, it returns an error.
 func (fs *FileServer) getStorageLocation() (string, error) {
-	// Check if there are recent projects
-	if len(fs.prefs.App.RecentProjects) > 0 {
-		// Take the directory of the most recent project
-		recentPath := fs.prefs.App.RecentProjects[0]
-		// Extract directory from file path
-		dir := filepath.Dir(recentPath)
-		if _, err := os.Stat(dir); err == nil {
-			return filepath.Join(dir, "images"), nil
-		}
-	}
-
-	// Fall back to default location
-	userDir, err := os.UserHomeDir()
-	if err != nil {
+	if userDir, err := os.UserHomeDir(); err != nil {
 		return "", fmt.Errorf("failed to get user home directory: %w", err)
+	} else {
+		appId := preferences.GetAppId()
+		return filepath.Join(userDir, "Documents", appId.AppName, "images"), nil
 	}
-
-	appId := preferences.GetAppId()
-	return filepath.Join(userDir, "Documents", appId.AppName, "images"), nil
 }
 
 // GetURL returns the URL for accessing a specific image

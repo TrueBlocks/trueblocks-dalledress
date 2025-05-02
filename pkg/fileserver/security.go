@@ -8,13 +8,13 @@ import (
 
 func init() {
 	// Register common image MIME types
-	mime.AddExtensionType(".png", "image/png")
-	mime.AddExtensionType(".jpg", "image/jpeg")
-	mime.AddExtensionType(".jpeg", "image/jpeg")
-	mime.AddExtensionType(".gif", "image/gif")
-	mime.AddExtensionType(".webp", "image/webp")
-	mime.AddExtensionType(".svg", "image/svg+xml")
-	mime.AddExtensionType(".avif", "image/avif")
+	_ = mime.AddExtensionType(".png", "image/png")
+	_ = mime.AddExtensionType(".jpg", "image/jpeg")
+	_ = mime.AddExtensionType(".jpeg", "image/jpeg")
+	_ = mime.AddExtensionType(".gif", "image/gif")
+	_ = mime.AddExtensionType(".webp", "image/webp")
+	_ = mime.AddExtensionType(".svg", "image/svg+xml")
+	_ = mime.AddExtensionType(".avif", "image/avif")
 }
 
 // SecurityMiddleware adds security headers to responses

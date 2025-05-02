@@ -5,11 +5,9 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -25,7 +23,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/fsnotify/fsnotify"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -72,10 +69,12 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 
 	app.ChainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	} else if app.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); app.apiKeys["openAi"] == "" {
-		log.Fatal("No OPENAI_API_KEY key found")
+	if file.FileExists(".env") {
+		if err := godotenv.Load(); err != nil {
+			log.Fatal("Error loading .env file")
+		} else if app.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); app.apiKeys["openAi"] == "" {
+			log.Fatal("No OPENAI_API_KEY key found")
+		}
 	}
 
 	appMenu := app.buildAppMenu()
@@ -118,7 +117,7 @@ func (a *App) Startup(ctx context.Context) {
 	a.Preferences.User = user
 	a.Preferences.App = appPrefs
 
-	a.fileServer = fileserver.NewFileServer(a.Preferences)
+	a.fileServer = fileserver.NewFileServer()
 	if err := a.fileServer.Start(); err != nil {
 		msgs.EmitError("Failed to start file server", err)
 	}
@@ -345,112 +344,4 @@ func (a *App) Cancel(addr base.Address) (int, bool) {
 	}
 	a.renderCtxs[addr] = nil
 	return n, true
-}
-
-// GetImageURL returns a URL that can be used to access an image
-func (a *App) GetImageURL(relativePath string) string {
-	if a.fileServer == nil {
-		log.Printf("GetImageURL: fileServer is nil")
-		return ""
-	}
-
-	basePath := ""
-	if path, err := filepath.Abs(a.fileServer.GetBasePath()); err == nil {
-		basePath = path
-	}
-
-	if basePath == "" {
-		log.Printf("GetImageURL: Unable to determine base path")
-		return ""
-	}
-
-	cleanPath := filepath.Clean(relativePath)
-	cleanPath = strings.TrimPrefix(cleanPath, "/")
-
-	pathWithoutQuery := cleanPath
-	if idx := strings.Index(cleanPath, "?"); idx > 0 {
-		pathWithoutQuery = cleanPath[:idx]
-	}
-
-	fullPath := filepath.Join(basePath, pathWithoutQuery)
-	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
-		log.Printf("GetImageURL: File does not exist: %s", fullPath)
-		if strings.HasPrefix(pathWithoutQuery, "samples/") {
-			log.Printf("GetImageURL: Attempting to recreate sample files")
-			sampleDir := filepath.Join(basePath, "samples")
-			if err := os.MkdirAll(sampleDir, 0755); err != nil {
-				log.Printf("GetImageURL: Failed to create samples directory: %v", err)
-			}
-			if err := fileserver.CreateSampleFiles(basePath); err != nil {
-				log.Printf("GetImageURL: Failed to recreate sample files: %v", err)
-			} else {
-				log.Printf("GetImageURL: Sample files created in %s", sampleDir)
-			}
-			// Wait up to 200ms for the file to appear
-			for i := 0; i < 4; i++ {
-				if _, err := os.Stat(fullPath); err == nil {
-					url := a.fileServer.GetURL(cleanPath)
-					log.Printf("GetImageURL: (after create) %s -> %s (file exists at %s)", relativePath, url, fullPath)
-					return url
-				}
-				time.Sleep(50 * time.Millisecond)
-			}
-		}
-		return ""
-	}
-
-	url := a.fileServer.GetURL(cleanPath)
-	log.Printf("GetImageURL: %s -> %s (file exists at %s)", relativePath, url, fullPath)
-	return url
-}
-
-// ChangeImageStorageLocation changes the directory where images are stored
-func (a *App) ChangeImageStorageLocation(newPath string) error {
-	if a.fileServer == nil {
-		return fmt.Errorf("file server not initialized")
-	}
-	return a.fileServer.UpdateBasePath(newPath)
-}
-
-// Watch the images directory for changes and notify frontend
-func (a *App) watchImagesDir() {
-	basePath := a.fileServer.GetBasePath()
-	imagesDir := filepath.Join(basePath, "samples")
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Printf("Failed to create fsnotify watcher: %v", err)
-		return
-	}
-	defer watcher.Close()
-
-	_ = watcher.Add(imagesDir)
-
-	debounce := make(chan struct{}, 1)
-	go func() {
-		for range debounce {
-			time.Sleep(300 * time.Millisecond)
-			runtime.EventsEmit(a.ctx, "images:changed")
-		}
-	}()
-
-	for {
-		select {
-		case event, ok := <-watcher.Events:
-			if !ok {
-				return
-			}
-			// Only care about create/remove/rename
-			if event.Op&(fsnotify.Create|fsnotify.Remove|fsnotify.Rename) != 0 {
-				select {
-				case debounce <- struct{}{}:
-				default:
-				}
-			}
-		case err, ok := <-watcher.Errors:
-			if !ok {
-				return
-			}
-			log.Printf("fsnotify error: %v", err)
-		}
-	}
 }

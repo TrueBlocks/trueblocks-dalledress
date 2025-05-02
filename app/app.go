@@ -29,25 +29,25 @@ import (
 )
 
 type App struct {
-	Assets         embed.FS
-	Preferences    *preferences.Preferences
-	Projects       *project.Manager
-	ChainList      *utils.ChainList
-	Names          map[base.Address]types.Name
-	fileServer     *fileserver.FileServer
-	locked         int32
-	ctx            context.Context
-	apiKeys        map[string]string
-	ensMap         map[string]base.Address
-	renderCtxs     map[base.Address][]*output.RenderCtx
-	authorTemplate *template.Template
-	promptTemplate *template.Template
-	dataTemplate   *template.Template
-	terseTemplate  *template.Template
-	titleTemplate  *template.Template
-	Series         dalle.Series `json:"series"`
-	databases      map[string][]string
-	dalleCache     map[string]*dalle.DalleDress
+	Assets      embed.FS
+	Preferences *preferences.Preferences
+	Projects    *project.Manager
+	ChainList   *utils.ChainList
+	Names       map[base.Address]types.Name
+	fileServer  *fileserver.FileServer
+	locked      int32
+	ctx         context.Context
+	apiKeys     map[string]string
+	ensMap      map[string]base.Address
+	renderCtxs  map[base.Address][]*output.RenderCtx
+	// authorTemplate *template.Template
+	// promptTemplate *template.Template
+	// dataTemplate   *template.Template
+	// terseTemplate  *template.Template
+	// titleTemplate  *template.Template
+	Series     dalle.Series `json:"series"`
+	databases  map[string][]string
+	dalleCache map[string]*dalle.DalleDress
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {

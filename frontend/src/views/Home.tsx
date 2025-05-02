@@ -38,7 +38,6 @@ export function Home() {
         setSampleImageUrl('');
       });
 
-    // Listen for backend events about image changes
     const off = EventsOn(msgs.EventType.IMAGES_CHANGED, () => {
       setRefreshKey((prev) => prev + 1);
     });

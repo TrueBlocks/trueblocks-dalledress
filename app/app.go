@@ -37,6 +37,7 @@ type App struct {
 	Projects       *project.Manager
 	ChainList      *utils.ChainList
 	Names          map[base.Address]types.Name
+	fileServer     *fileserver.FileServer
 	locked         int32
 	ctx            context.Context
 	apiKeys        map[string]string
@@ -50,7 +51,6 @@ type App struct {
 	Series         dalle.Series `json:"series"`
 	databases      map[string][]string
 	dalleCache     map[string]*dalle.DalleDress
-	fileServer     *fileserver.FileServer
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {

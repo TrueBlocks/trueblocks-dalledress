@@ -7,17 +7,7 @@
   "frontend:dev:watcher": "yarn dev",
   "frontend:dev:serverUrl": "http://localhost:5173",
   "author": {
-    "name": "TrueBlocks, LLC",
-    "email": "info@quickblocks.io"
-  },
-  "dev": {
-    "watch": {
-      "patterns": [
-        "frontend/**/*.{js,jsx,ts,tsx,css,scss,html}"
-      ],
-      "ignore": [
-        "frontend/dist/**"
-      ]
-    }
+    "name": "TrueBlocks",
+    "email": "info@trueblocks.io"
   }
 }

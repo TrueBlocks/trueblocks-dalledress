@@ -1,26 +1,89 @@
-# trueblocks-dalledress
+# TrueBlocks Dalledress
 
-AI Image Generator from Ethereum Addresses, Block Hashes, or Transaction Hashes
+An opinionated version of a desktop-based Wails app with Golang backend and React frontend using TrueBlocks's SDK and Unchained Index.
 
-## Installing
+## Features
 
-```[bash]
-go mod tidy
-cd frontend && yarn install && cd -
+- Desktop app built with Wails, React, TypeScript, Mantine, and TrueBlocks
+- Golang backend - fast, concurrent, type safe
+- ESLint & Prettier configured for frontend
+- GolangCI-lint configured for backend
+- VSCode automatic formatting on save (Go, TS, JS, YAML, TOML)
+
+## Getting Started
+
+### Prerequisites
+
+- Golang >= 1.23.1
+- Wails >= 2.10.1 and < 3.x
+- Yarn (no npm)
+- Node.js >= 18.x
+
+### Installation
+
+```bash
+git clone https://github.com/TrueBlocks/trueblocks-dalledress.git
+cd trueblocks-dalledress
+yarn install
+yarn test
 ```
 
-## Running
+### Running in Development
 
-```[bash]
-wails dev
+```bash
+yarn dev
 ```
 
-## Building
+### Building for Production
 
-```[bash]
-wails build
+```bash
+yarn build
 ```
 
-## Api Keys
+### Linting
 
-If you intend to use features that require OpenAI, rename the `.env.example` file to `.env` and add your OpenAI API key. The features will not work otherwise.
+```bash
+yarn lint
+```
+
+## Project Structure
+
+```[text]
+.
+├── app
+├── frontend
+│   ├── dist
+│   │   └── assets
+│   └── src
+│       ├── components
+│       ├── context
+│       ├── contexts
+│       ├── hooks
+│       ├── layout
+│       ├── utils
+│       ├── views
+│       └── wizards
+│           └── hooks
+└── pkg
+    ├── markdown
+    ├── msgs
+    ├── preferences
+    ├── project
+    └── validation
+```
+
+## Contributing
+
+We love contributors. Please see information about our workflow before proceeding.
+
+- Fork this repository into your own repo.
+- Create a branch: `git checkout -b <branch_name>`.
+- Make changes to your local branch and commit them to your forked repo:  
+  `git commit -m '<commit_message>'`
+- Push back to the original branch:  
+  `git push origin TrueBlocks/trueblocks-dalledress`
+- Create the pull request.
+
+## License
+
+[LICENSE](./LICENSE)

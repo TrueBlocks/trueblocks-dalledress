@@ -145,7 +145,7 @@ export const DalleDress = () => {
         setError('Invalid address or ENS name');
       }
     } catch (e) {
-      setError('Failed to resolve address');
+      setError('Failed to resolve address ' + e);
     }
     setLoading(false);
   };

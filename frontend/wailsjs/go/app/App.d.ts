@@ -6,10 +6,13 @@ import {preferences} from '../models';
 import {utils} from '../models';
 import {context} from '../models';
 import {project} from '../models';
+import {types} from '../models';
 import {app} from '../models';
 import {output} from '../models';
 
 export function AddrToName(arg1:base.Address):Promise<string>;
+
+export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
 export function Cancel(arg1:base.Address):Promise<number|boolean>;
 
@@ -47,9 +50,15 @@ export function GetLastTab(arg1:string):Promise<string>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
+export function GetNames(arg1:number,arg2:number):Promise<Record<base.Address, types.Name>>;
+
+export function GetNamesCnt():Promise<number>;
+
 export function GetOpenProjects():Promise<Array<Record<string, any>>>;
 
 export function GetOrgPreferences():Promise<preferences.OrgPreferences>;
+
+export function GetProjectAddress():Promise<base.Address>;
 
 export function GetUserInfoStatus():Promise<app.UserInfoStatus>;
 
@@ -82,6 +91,8 @@ export function SetLastView(arg1:string):Promise<void>;
 export function SetMenuCollapsed(arg1:boolean):Promise<void>;
 
 export function SetOrgPreferences(arg1:preferences.OrgPreferences):Promise<void>;
+
+export function SetProjectAddress(arg1:base.Address):Promise<void>;
 
 export function SetUserInfo(arg1:string,arg2:string):Promise<void>;
 

@@ -1,11 +1,12 @@
 import { SetInitialized } from '@app';
-import { About, Data, Home, Names, Settings } from '@views';
+import { About, DalleDress, Data, Home, Names, Settings } from '@views';
 import { Wizard } from '@wizards';
 import {
   FaCog,
   FaDatabase,
   FaHome,
   FaInfoCircle,
+  FaPalette,
   FaUser,
 } from 'react-icons/fa';
 
@@ -63,13 +64,23 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
+    icon: FaPalette,
+    label: 'DalleDress',
+    path: '/dalledress',
+    position: 'top',
+    component: DalleDress,
+    hotkey: 'mod+5',
+    altHotkey: 'alt+5',
+    type: 'navigation',
+  },
+  {
     icon: FaCog,
     label: 'Settings',
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+5',
-    altHotkey: 'alt+5',
+    hotkey: 'mod+6',
+    altHotkey: 'alt+6',
     type: 'navigation',
   },
   {

@@ -1,8 +1,9 @@
 export { About } from './About';
+export { DalleDress } from './DalleDress';
 export { Data } from './Data';
 export { Home } from './Home';
 export { Names } from './Names';
 export { Settings } from './Settings';
+export { SettingsApp } from './SettingsApp';
 export { SettingsOrg } from './SettingsOrg';
 export { SettingsUser } from './SettingsUser';
-export { SettingsApp } from './SettingsApp';

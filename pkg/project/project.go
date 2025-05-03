@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 )
 
 // Project represents a single project with its metadata and data.
@@ -18,6 +20,7 @@ type Project struct {
 	Preferences map[string]string      `json:"preferences"`
 	Dirty       bool                   `json:"dirty"`
 	Data        map[string]interface{} `json:"data"`
+	Address     base.Address           `json:"address"`
 	Path        string                 `json:"-"` // Not serialized, in-memory only
 }
 
@@ -30,6 +33,7 @@ func New(name string) *Project {
 		Preferences: make(map[string]string),
 		Dirty:       true,
 		Data:        make(map[string]interface{}),
+		Address:     base.ZeroAddr,
 	}
 }
 
@@ -170,4 +174,17 @@ func (p *Project) GetData() map[string]interface{} {
 func (p *Project) SetData(data map[string]interface{}) {
 	p.Data = data
 	p.Dirty = true
+}
+
+// GetAddress returns the project's main address
+func (p *Project) GetAddress() base.Address {
+	return p.Address
+}
+
+// SetAddress sets the project's main address and marks as dirty
+func (p *Project) SetAddress(addr base.Address) {
+	if p.Address != addr {
+		p.Address = addr
+		p.Dirty = true
+	}
 }

@@ -40,14 +40,7 @@ type App struct {
 	apiKeys     map[string]string
 	ensMap      map[string]base.Address
 	renderCtxs  map[base.Address][]*output.RenderCtx
-	// authorTemplate *template.Template
-	// promptTemplate *template.Template
-	// dataTemplate   *template.Template
-	// terseTemplate  *template.Template
-	// titleTemplate  *template.Template
-	Series     dalle.Series `json:"series"`
-	databases  map[string][]string
-	dalleCache map[string]*dalle.DalleDress
+	Dalle       *dalle.Context
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -63,8 +56,6 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		apiKeys:    make(map[string]string),
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
-		databases:  make(map[string][]string),
-		dalleCache: make(map[string]*dalle.DalleDress),
 	}
 
 	app.ChainList, _ = utils.UpdateChainList(config.PathToRootConfig())
@@ -76,6 +67,21 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 			log.Fatal("No OPENAI_API_KEY key found")
 		}
 	}
+
+	// --- Dalle Context Initialization ---
+	// Use parsed templates from pkg/dalle/prompts.go
+	app.Dalle = &dalle.Context{
+		PromptTemplate: dalle.PromptTemplate,
+		DataTemplate:   dalle.DataTemplate,
+		TitleTemplate:  dalle.TitleTemplate,
+		TerseTemplate:  dalle.TerseTemplate,
+		AuthorTemplate: dalle.AuthorTemplate,
+		Series:         dalle.Series{},            // TODO: load from file or config
+		Databases:      make(map[string][]string), // TODO: load from CSVs
+		DalleCache:     make(map[string]*dalle.DalleDress),
+	}
+	app.Dalle.ReloadDatabases()
+	// --- End Dalle Context Initialization ---
 
 	appMenu := app.buildAppMenu()
 	return app, appMenu
@@ -344,4 +350,54 @@ func (a *App) Cancel(addr base.Address) (int, bool) {
 	}
 	a.renderCtxs[addr] = nil
 	return n, true
+}
+
+// GetProjectAddress returns the address of the active project
+func (a *App) GetProjectAddress() base.Address {
+	active := a.Projects.Active()
+	if active == nil {
+		return base.ZeroAddr
+	}
+	return active.GetAddress()
+}
+
+// SetProjectAddress sets the address of the active project
+func (a *App) SetProjectAddress(addr base.Address) {
+	active := a.Projects.Active()
+	if active != nil {
+		active.SetAddress(addr)
+	}
+}
+
+func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
+	active := a.Projects.Active()
+	if active == nil {
+		return nil, fmt.Errorf("no active project")
+	}
+	addr := active.GetAddress()
+	if addr == base.ZeroAddr {
+		return nil, fmt.Errorf("project address is not set")
+	}
+
+	// Always resolve ENS/address using ConvertToAddress
+	resolved, ok := a.ConvertToAddress(addr.Hex())
+	if !ok || resolved == base.ZeroAddr {
+		return nil, fmt.Errorf("invalid address or ENS name")
+	}
+
+	dress, err := a.Dalle.MakeDalleDress(resolved.Hex())
+	if err != nil {
+		return nil, err
+	}
+
+	imagePath := filepath.Join("generated", dress.Filename+".png")
+	imageURL := ""
+	if a.fileServer != nil {
+		imageURL = a.fileServer.GetURL(imagePath)
+	}
+
+	return map[string]interface{}{
+		"imageUrl": imageURL,
+		"parts":    dress,
+	}, nil
 }

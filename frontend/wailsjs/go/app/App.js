@@ -6,6 +6,10 @@ export function AddrToName(arg1) {
   return window['go']['app']['App']['AddrToName'](arg1);
 }
 
+export function BuildDalleDressForProject() {
+  return window['go']['app']['App']['BuildDalleDressForProject']();
+}
+
 export function Cancel(arg1) {
   return window['go']['app']['App']['Cancel'](arg1);
 }
@@ -78,12 +82,24 @@ export function GetMarkdown(arg1, arg2, arg3) {
   return window['go']['app']['App']['GetMarkdown'](arg1, arg2, arg3);
 }
 
+export function GetNames(arg1, arg2) {
+  return window['go']['app']['App']['GetNames'](arg1, arg2);
+}
+
+export function GetNamesCnt() {
+  return window['go']['app']['App']['GetNamesCnt']();
+}
+
 export function GetOpenProjects() {
   return window['go']['app']['App']['GetOpenProjects']();
 }
 
 export function GetOrgPreferences() {
   return window['go']['app']['App']['GetOrgPreferences']();
+}
+
+export function GetProjectAddress() {
+  return window['go']['app']['App']['GetProjectAddress']();
 }
 
 export function GetUserInfoStatus() {
@@ -148,6 +164,10 @@ export function SetMenuCollapsed(arg1) {
 
 export function SetOrgPreferences(arg1) {
   return window['go']['app']['App']['SetOrgPreferences'](arg1);
+}
+
+export function SetProjectAddress(arg1) {
+  return window['go']['app']['App']['SetProjectAddress'](arg1);
 }
 
 export function SetUserInfo(arg1, arg2) {

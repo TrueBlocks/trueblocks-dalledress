@@ -117,7 +117,7 @@ export const DalleDress = () => {
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('Template1');
+  // const [activeTab, setActiveTab] = useState('Template1');
 
   // On mount, fetch the current project address
   useEffect(() => {

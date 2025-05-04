@@ -10,6 +10,8 @@ github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250422130252-4a2f
 github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250422130252-4a2fc83a6800/go.mod h1:kmws7c1+p44+2DlGPBHUtYw4z1LeuCPu2LvX9KzmiOs=
 github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250503130226-41a6e34513e4 h1:BI/JJJWkfZ2oI9fmbfVASch9ARvcM9GjE4YS/cS8US8=
 github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250503130226-41a6e34513e4/go.mod h1:F67OUkjuWHkFduyLHrMhBosd2Di68t1tDhKH/0SZ/zM=
+github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250503171732-e94b79c8d326 h1:s1sWJnoKUGuytQi/E+YKWypaHE+k+hFSipbv47Z5Uas=
+github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250503171732-e94b79c8d326/go.mod h1:F46H7Ky9ezBUTXhzH3jy0JBM7kIe8nR6Y6m+NStdg38=
 github.com/TrueBlocks/trueblocks-sdk/v5 v5.2.0 h1:ln00w0GEXaASqs5ivaFR0/SBw7KuL/OBPIlbfzuX9cw=
 github.com/TrueBlocks/trueblocks-sdk/v5 v5.2.0/go.mod h1:RPU/qGXAhTpbsNez1db2ik0IQW8SJZOig79r6cATPx8=
 github.com/VictoriaMetrics/fastcache v1.12.2 h1:N0y9ASrJ0F6h0QaC3o6uJb3NIZ9VKLjCM7NQbSmF7WI=

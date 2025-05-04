@@ -10,7 +10,7 @@ lint:
 	@yarn lint
 
 test:
-	@yarn test
+	@@export $(grep -v '^#' ../.env | xargs) >/dev/null && yarn test
 
 app:
 	@rm -fR build/bin

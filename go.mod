@@ -4,7 +4,7 @@ go 1.23.1
 
 require (
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250422130252-4a2fc83a6800
-	github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250503124524-70135a6e7f2f
+	github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250503130226-41a6e34513e4
 	github.com/TrueBlocks/trueblocks-sdk/v5 v5.2.0
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/google/go-cmp v0.7.0

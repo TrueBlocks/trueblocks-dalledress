@@ -2,6 +2,8 @@ module github.com/TrueBlocks/trueblocks-dalledress
 
 go 1.23.1
 
+replace github.com/TrueBlocks/trueblocks-dalle/v2 => ./pkg/dalle
+
 require (
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250422130252-4a2fc83a6800
 	github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250503171732-e94b79c8d326

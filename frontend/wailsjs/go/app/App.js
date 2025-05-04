@@ -6,16 +6,28 @@ export function AddrToName(arg1) {
   return window['go']['app']['App']['AddrToName'](arg1);
 }
 
+export function BuildDalleDressForProject() {
+  return window['go']['app']['App']['BuildDalleDressForProject']();
+}
+
 export function Cancel(arg1) {
   return window['go']['app']['App']['Cancel'](arg1);
 }
 
-export function ConvertToAddress(arg1) {
-  return window['go']['app']['App']['ConvertToAddress'](arg1);
+export function ChangeImageStorageLocation(arg1) {
+  return window['go']['app']['App']['ChangeImageStorageLocation'](arg1);
 }
 
-export function Fatal(arg1) {
-  return window['go']['app']['App']['Fatal'](arg1);
+export function CheckRPCStatus() {
+  return window['go']['app']['App']['CheckRPCStatus']();
+}
+
+export function CloseProject(arg1) {
+  return window['go']['app']['App']['CloseProject'](arg1);
+}
+
+export function ConvertToAddress(arg1) {
+  return window['go']['app']['App']['ConvertToAddress'](arg1);
 }
 
 export function FileNew(arg1) {
@@ -26,6 +38,10 @@ export function FileOpen(arg1) {
   return window['go']['app']['App']['FileOpen'](arg1);
 }
 
+export function FileQuit(arg1) {
+  return window['go']['app']['App']['FileQuit'](arg1);
+}
+
 export function FileSave(arg1) {
   return window['go']['app']['App']['FileSave'](arg1);
 }
@@ -34,100 +50,36 @@ export function FileSaveAs(arg1) {
   return window['go']['app']['App']['FileSaveAs'](arg1);
 }
 
-export function Freshen(arg1) {
-  return window['go']['app']['App']['Freshen'](arg1);
+export function GetAppId() {
+  return window['go']['app']['App']['GetAppId']();
 }
 
-export function GenerateEnhanced(arg1) {
-  return window['go']['app']['App']['GenerateEnhanced'](arg1);
+export function GetAppPreferences() {
+  return window['go']['app']['App']['GetAppPreferences']();
 }
 
-export function GenerateImage(arg1) {
-  return window['go']['app']['App']['GenerateImage'](arg1);
-}
-
-export function GetAbis(arg1, arg2) {
-  return window['go']['app']['App']['GetAbis'](arg1, arg2);
-}
-
-export function GetAbisCnt() {
-  return window['go']['app']['App']['GetAbisCnt']();
-}
-
-export function GetAppSeries(arg1) {
-  return window['go']['app']['App']['GetAppSeries'](arg1);
+export function GetChainList() {
+  return window['go']['app']['App']['GetChainList']();
 }
 
 export function GetContext() {
   return window['go']['app']['App']['GetContext']();
 }
 
-export function GetDaemon(arg1) {
-  return window['go']['app']['App']['GetDaemon'](arg1);
+export function GetFilename() {
+  return window['go']['app']['App']['GetFilename']();
 }
 
-export function GetData(arg1) {
-  return window['go']['app']['App']['GetData'](arg1);
+export function GetImageURL(arg1) {
+  return window['go']['app']['App']['GetImageURL'](arg1);
 }
 
-export function GetEnhanced(arg1) {
-  return window['go']['app']['App']['GetEnhanced'](arg1);
+export function GetLastTab(arg1) {
+  return window['go']['app']['App']['GetLastTab'](arg1);
 }
 
-export function GetExistingAddrs() {
-  return window['go']['app']['App']['GetExistingAddrs']();
-}
-
-export function GetFilename(arg1) {
-  return window['go']['app']['App']['GetFilename'](arg1);
-}
-
-export function GetHistory(arg1, arg2, arg3) {
-  return window['go']['app']['App']['GetHistory'](arg1, arg2, arg3);
-}
-
-export function GetHistoryCnt(arg1) {
-  return window['go']['app']['App']['GetHistoryCnt'](arg1);
-}
-
-export function GetIndex(arg1, arg2) {
-  return window['go']['app']['App']['GetIndex'](arg1, arg2);
-}
-
-export function GetIndexCnt() {
-  return window['go']['app']['App']['GetIndexCnt']();
-}
-
-export function GetJson(arg1) {
-  return window['go']['app']['App']['GetJson'](arg1);
-}
-
-export function GetLast(arg1) {
-  return window['go']['app']['App']['GetLast'](arg1);
-}
-
-export function GetLastDaemon(arg1) {
-  return window['go']['app']['App']['GetLastDaemon'](arg1);
-}
-
-export function GetManifest(arg1, arg2) {
-  return window['go']['app']['App']['GetManifest'](arg1, arg2);
-}
-
-export function GetManifestCnt() {
-  return window['go']['app']['App']['GetManifestCnt']();
-}
-
-export function GetMenus() {
-  return window['go']['app']['App']['GetMenus']();
-}
-
-export function GetMonitors(arg1, arg2) {
-  return window['go']['app']['App']['GetMonitors'](arg1, arg2);
-}
-
-export function GetMonitorsCnt() {
-  return window['go']['app']['App']['GetMonitorsCnt']();
+export function GetMarkdown(arg1, arg2, arg3) {
+  return window['go']['app']['App']['GetMarkdown'](arg1, arg2, arg3);
 }
 
 export function GetNames(arg1, arg2) {
@@ -138,134 +90,98 @@ export function GetNamesCnt() {
   return window['go']['app']['App']['GetNamesCnt']();
 }
 
-export function GetPrompt(arg1) {
-  return window['go']['app']['App']['GetPrompt'](arg1);
+export function GetOpenProjects() {
+  return window['go']['app']['App']['GetOpenProjects']();
 }
 
-export function GetSeries(arg1) {
-  return window['go']['app']['App']['GetSeries'](arg1);
+export function GetOrgPreferences() {
+  return window['go']['app']['App']['GetOrgPreferences']();
 }
 
-export function GetSession() {
-  return window['go']['app']['App']['GetSession']();
+export function GetProjectAddress() {
+  return window['go']['app']['App']['GetProjectAddress']();
 }
 
-export function GetStatus(arg1, arg2) {
-  return window['go']['app']['App']['GetStatus'](arg1, arg2);
+export function GetUserInfoStatus() {
+  return window['go']['app']['App']['GetUserInfoStatus']();
 }
 
-export function GetStatusCnt() {
-  return window['go']['app']['App']['GetStatusCnt']();
+export function GetUserPreferences() {
+  return window['go']['app']['App']['GetUserPreferences']();
 }
 
-export function GetTerse(arg1) {
-  return window['go']['app']['App']['GetTerse'](arg1);
+export function GetWizardReturn() {
+  return window['go']['app']['App']['GetWizardReturn']();
 }
 
-export function GetTitle(arg1) {
-  return window['go']['app']['App']['GetTitle'](arg1);
+export function IsInitialized() {
+  return window['go']['app']['App']['IsInitialized']();
 }
 
-export function HandleLines() {
-  return window['go']['app']['App']['HandleLines']();
+export function IsReady() {
+  return window['go']['app']['App']['IsReady']();
 }
 
-export function HelpToggle(arg1) {
-  return window['go']['app']['App']['HelpToggle'](arg1);
-}
-
-export function LoadSeries() {
-  return window['go']['app']['App']['LoadSeries']();
-}
-
-export function MakeDalleDress(arg1) {
-  return window['go']['app']['App']['MakeDalleDress'](arg1);
+export function Logger(arg1) {
+  return window['go']['app']['App']['Logger'](arg1);
 }
 
 export function RegisterCtx(arg1) {
   return window['go']['app']['App']['RegisterCtx'](arg1);
 }
 
-export function ReloadDatabases() {
-  return window['go']['app']['App']['ReloadDatabases']();
+export function SaveBounds(arg1, arg2, arg3, arg4) {
+  return window['go']['app']['App']['SaveBounds'](arg1, arg2, arg3, arg4);
 }
 
-export function Save(arg1) {
-  return window['go']['app']['App']['Save'](arg1);
+export function SetAppPreferences(arg1) {
+  return window['go']['app']['App']['SetAppPreferences'](arg1);
 }
 
-export function SetLast(arg1, arg2) {
-  return window['go']['app']['App']['SetLast'](arg1, arg2);
+export function SetChain(arg1) {
+  return window['go']['app']['App']['SetChain'](arg1);
 }
 
-export function SetLastDaemon(arg1, arg2) {
-  return window['go']['app']['App']['SetLastDaemon'](arg1, arg2);
+export function SetHelpCollapsed(arg1) {
+  return window['go']['app']['App']['SetHelpCollapsed'](arg1);
 }
 
-export function StateToString(arg1) {
-  return window['go']['app']['App']['StateToString'](arg1);
+export function SetInitialized(arg1) {
+  return window['go']['app']['App']['SetInitialized'](arg1);
+}
+
+export function SetLastTab(arg1, arg2) {
+  return window['go']['app']['App']['SetLastTab'](arg1, arg2);
+}
+
+export function SetLastView(arg1) {
+  return window['go']['app']['App']['SetLastView'](arg1);
+}
+
+export function SetMenuCollapsed(arg1) {
+  return window['go']['app']['App']['SetMenuCollapsed'](arg1);
+}
+
+export function SetOrgPreferences(arg1) {
+  return window['go']['app']['App']['SetOrgPreferences'](arg1);
+}
+
+export function SetProjectAddress(arg1) {
+  return window['go']['app']['App']['SetProjectAddress'](arg1);
+}
+
+export function SetUserInfo(arg1, arg2) {
+  return window['go']['app']['App']['SetUserInfo'](arg1, arg2);
+}
+
+export function SetUserPreferences(arg1) {
+  return window['go']['app']['App']['SetUserPreferences'](arg1);
 }
 
 export function String() {
   return window['go']['app']['App']['String']();
 }
 
-export function SystemAbout(arg1) {
-  return window['go']['app']['App']['SystemAbout'](arg1);
-}
-
-export function SystemQuit(arg1) {
-  return window['go']['app']['App']['SystemQuit'](arg1);
-}
-
-export function ToggleDaemon(arg1) {
-  return window['go']['app']['App']['ToggleDaemon'](arg1);
-}
-
-export function ViewAbis(arg1) {
-  return window['go']['app']['App']['ViewAbis'](arg1);
-}
-
-export function ViewDaemons(arg1) {
-  return window['go']['app']['App']['ViewDaemons'](arg1);
-}
-
-export function ViewDalle(arg1) {
-  return window['go']['app']['App']['ViewDalle'](arg1);
-}
-
-export function ViewHistory(arg1) {
-  return window['go']['app']['App']['ViewHistory'](arg1);
-}
-
-export function ViewHome(arg1) {
-  return window['go']['app']['App']['ViewHome'](arg1);
-}
-
-export function ViewIndexes(arg1) {
-  return window['go']['app']['App']['ViewIndexes'](arg1);
-}
-
-export function ViewManifest(arg1) {
-  return window['go']['app']['App']['ViewManifest'](arg1);
-}
-
-export function ViewMonitors(arg1) {
-  return window['go']['app']['App']['ViewMonitors'](arg1);
-}
-
-export function ViewNames(arg1) {
-  return window['go']['app']['App']['ViewNames'](arg1);
-}
-
-export function ViewSeries(arg1) {
-  return window['go']['app']['App']['ViewSeries'](arg1);
-}
-
-export function ViewSettings(arg1) {
-  return window['go']['app']['App']['ViewSettings'](arg1);
-}
-
-export function ViewStatus(arg1) {
-  return window['go']['app']['App']['ViewStatus'](arg1);
+export function SwitchToProject(arg1) {
+  return window['go']['app']['App']['SwitchToProject'](arg1);
 }

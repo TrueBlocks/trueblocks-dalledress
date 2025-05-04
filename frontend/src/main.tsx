@@ -1,16 +1,24 @@
-import React from "react";
-import { MantineProvider } from "@mantine/core";
-import { createRoot } from "react-dom/client";
-import "./style.css";
-import App from "./App";
-import "@mantine/core/styles.css";
+import { StrictMode } from 'react';
 
-const container = document.getElementById("root");
-const root = createRoot(container!);
-root.render(
-  <React.StrictMode>
-    <MantineProvider defaultColorScheme="dark">
-      <App />
-    </MantineProvider>
-  </React.StrictMode>
+import { AppContextProvider } from '@contexts';
+import { MantineProvider, createTheme } from '@mantine/core';
+import '@mantine/core/styles.css';
+import { createRoot } from 'react-dom/client';
+
+import { App } from './App';
+
+const theme = createTheme({
+  primaryColor: 'green',
+  fontFamily: 'Roman',
+});
+
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <AppContextProvider>
+      <MantineProvider theme={theme} defaultColorScheme="dark">
+        <App />
+      </MantineProvider>
+    </AppContextProvider>
+  </StrictMode>,
 );

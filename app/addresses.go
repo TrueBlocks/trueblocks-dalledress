@@ -4,9 +4,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/TrueBlocks/trueblocks-core/sdk/v3"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/messages"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 var ensLock sync.Mutex
@@ -30,7 +29,7 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 		Terms: []string{addr},
 	}
 	if names, _, err := opts.Names(); err != nil {
-		messages.Send(a.ctx, messages.Error, messages.NewErrorMsg(err))
+		// msgs.Send(a.ctx, msgs.Error, msgs.NewErrorMsg(err))
 		return base.ZeroAddr, false
 	} else {
 		if len(names) > 0 {
@@ -46,7 +45,7 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 }
 
 func (a *App) AddrToName(addr base.Address) string {
-	if name, exists := a.names.NamesMap[addr]; exists {
+	if name, exists := a.Names[addr]; exists {
 		return name.Name
 	}
 	return addr.Hex()

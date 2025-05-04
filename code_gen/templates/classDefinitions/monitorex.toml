@@ -1,9 +1,0 @@
-[settings]
-    class = "MonitorEx"
-    doc_group = "01-Document"
-    doc_descr = "a single monitored address"
-    doc_route = "101-monitorex"
-    attributes = ""
-    produced_by = "document"
-    contains = ""
-    cache_type = "marshal_only"

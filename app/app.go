@@ -68,20 +68,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		}
 	}
 
-	// --- Dalle Context Initialization ---
-	// Use parsed templates from pkg/dalle/prompts.go
-	app.Dalle = &dalle.Context{
-		PromptTemplate: dalle.PromptTemplate,
-		DataTemplate:   dalle.DataTemplate,
-		TitleTemplate:  dalle.TitleTemplate,
-		TerseTemplate:  dalle.TerseTemplate,
-		AuthorTemplate: dalle.AuthorTemplate,
-		Series:         dalle.Series{},            // TODO: load from file or config
-		Databases:      make(map[string][]string), // TODO: load from CSVs
-		DalleCache:     make(map[string]*dalle.DalleDress),
-	}
-	app.Dalle.ReloadDatabases()
-	// --- End Dalle Context Initialization ---
+	app.Dalle = dalle.NewContext("./output")
 
 	appMenu := app.buildAppMenu()
 	return app, appMenu

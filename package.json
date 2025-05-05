@@ -6,8 +6,9 @@
     "install": "cd frontend && yarn install && cd - && rm -fR node_modules",
     "lint": "cd frontend && yarn eslint .  --max-warnings=0 && cd .. && golangci-lint run",
     "start": "yarn dev",
+    "test-dalle": "cd dalle && go test ./... && cd -",
     "test-go": "go test ./...",
     "test-tsx": "cd frontend && yarn vitest run && cd ..",
-    "test": "yarn test-go && yarn test-tsx"
+    "test": "export $(grep -v '^#' ../.env | xargs) >/dev/null && yarn test-go && yarn test-tsx && yarn test-dalle"
   }
 }

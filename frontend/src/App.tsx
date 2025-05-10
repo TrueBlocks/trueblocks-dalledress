@@ -39,16 +39,7 @@ export const App = () => {
     };
   }, []);
 
-  return (
-    <Router>
-      <RoutedApp />
-    </Router>
-  );
-};
-
-const RoutedApp = () => {
-  const { ready, isWizard } = useAppContext();
-  const { menuCollapsed, helpCollapsed } = useAppContext();
+  const { ready, isWizard, menuCollapsed, helpCollapsed } = useAppContext();
 
   useAppHotkeys();
   useAppHealth();
@@ -69,38 +60,40 @@ const RoutedApp = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-      }}
-    >
-      <AppShell
-        layout="default"
-        header={header}
-        footer={footer}
-        navbar={navbar}
-        aside={aside}
+    <Router>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100vh',
+        }}
       >
-        <Header />
-        <MenuBar disabled={isWizard} />
-        <ViewContextProvider>
-          <MainView />
-        </ViewContextProvider>
-        <HelpBar />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '40px',
-            right: `${getBarWidth(helpCollapsed, 2)}px`,
-            zIndex: 1000,
-          }}
+        <AppShell
+          layout="default"
+          header={header}
+          footer={footer}
+          navbar={navbar}
+          aside={aside}
         >
-          <NodeStatus />
-        </div>
-        <Footer />
-      </AppShell>
-    </div>
+          <Header />
+          <MenuBar disabled={isWizard} />
+          <ViewContextProvider>
+            <MainView />
+          </ViewContextProvider>
+          <HelpBar />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '40px',
+              right: `${getBarWidth(helpCollapsed, 2)}px`,
+              zIndex: 1000,
+            }}
+          >
+            <NodeStatus />
+          </div>
+          <Footer />
+        </AppShell>
+      </div>
+    </Router>
   );
 };

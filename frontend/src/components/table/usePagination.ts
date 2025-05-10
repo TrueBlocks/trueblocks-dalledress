@@ -29,9 +29,6 @@ export const usePagination = (viewName: string, tabName: string) => {
   );
   return {
     pagination,
-    currentPage: pagination.currentPage,
-    pageSize: pagination.pageSize,
-    totalItems: pagination.totalItems,
     goToPage,
     changePageSize,
     setTotalItems,

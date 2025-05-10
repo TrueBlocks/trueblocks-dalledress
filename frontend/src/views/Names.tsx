@@ -20,14 +20,10 @@ export const Names = () => {
     getListTypeFromLabel(lastTab['/names'] || ''),
   );
 
-  const {
-    pagination,
-    currentPage,
-    pageSize,
-    goToPage,
-    changePageSize,
-    setTotalItems,
-  } = usePagination('/names', listType);
+  const { pagination, goToPage, changePageSize, setTotalItems } = usePagination(
+    '/names',
+    listType,
+  );
 
   useEffect(() => {
     const loadNames = async () => {
@@ -37,8 +33,8 @@ export const Names = () => {
       try {
         const result = await GetNamesPage(
           listType,
-          currentPage * pageSize,
-          pageSize,
+          pagination.currentPage * pagination.pageSize,
+          pagination.pageSize,
           sort as sorting.SortDef,
           filter ?? '',
         );
@@ -59,7 +55,14 @@ export const Names = () => {
       loadNames();
     });
     return unsubscribe;
-  }, [listType, currentPage, pageSize, sort, filter, setTotalItems]);
+  }, [
+    listType,
+    pagination.currentPage,
+    pagination.pageSize,
+    sort,
+    filter,
+    setTotalItems,
+  ]);
 
   useEffect(() => {
     const currentTabLabel = lastTab['/names'] || '';

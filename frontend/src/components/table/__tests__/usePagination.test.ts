@@ -30,9 +30,9 @@ describe('usePagination', () => {
       pageSize: 25,
       totalItems: 100,
     });
-    expect(result.current.currentPage).toBe(2);
-    expect(result.current.pageSize).toBe(25);
-    expect(result.current.totalItems).toBe(100);
+    expect(result.current.pagination.currentPage).toBe(2);
+    expect(result.current.pagination.pageSize).toBe(25);
+    expect(result.current.pagination.totalItems).toBe(100);
   });
 
   it('goToPage calls updateViewPagination', () => {

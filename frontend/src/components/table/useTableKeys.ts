@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { Logger } from '@app';
 import { useTableContext } from '@components';
 
 // UseTableKeysProps defines the props for the useTableKeys hook.
@@ -67,6 +68,10 @@ export const useTableKeys = ({
           e.preventDefault();
           onPageChange(totalPages - 1);
           setSelectedRowIndex(itemCount - 1);
+          break;
+        case 'Enter':
+          e.preventDefault();
+          Logger('Table: Enter key pressed');
           break;
       }
     },

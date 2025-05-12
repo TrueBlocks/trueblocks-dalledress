@@ -75,10 +75,10 @@ export const useTableKeys = ({
           setSelectedRowIndex(itemCount - 1);
           break;
         case 'Enter':
-          e.preventDefault();
-          console.log(
-            `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`,
-          );
+          // e.preventDefault();
+          // console.log(
+          //   `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`,
+          // );
           break;
       }
     },
@@ -90,7 +90,7 @@ export const useTableKeys = ({
       totalPages,
       setSelectedRowIndex,
       goToPage,
-      tableKey,
+      // tableKey,
     ],
   );
 

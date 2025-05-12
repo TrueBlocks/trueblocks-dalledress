@@ -22,9 +22,6 @@ vi.mock('../usePagination', () => ({
       pageSize: 10,
       totalItems: 3,
     },
-    goToPage: vi.fn(),
-    changePageSize: vi.fn(),
-    setTotalItems: vi.fn(),
   }),
 }));
 
@@ -180,9 +177,6 @@ describe('Table', () => {
             pageSize: 10,
             totalItems: 100,
           },
-          goToPage: vi.fn(),
-          changePageSize: vi.fn(),
-          setTotalItems: vi.fn(),
         }),
       }));
 

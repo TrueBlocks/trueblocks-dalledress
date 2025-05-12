@@ -3,18 +3,14 @@ import { TableKey } from '@contexts';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Create mock functions
+// Create mock function
 const mockChangePageSize = vi.fn();
-const mockGoToPage = vi.fn();
-const mockSetTotalItems = vi.fn();
 
 // Mock the usePagination hook
 vi.mock('../usePagination', () => ({
   usePagination: () => ({
     pagination: { currentPage: 0, pageSize: 25, totalItems: 100 },
-    goToPage: mockGoToPage,
     changePageSize: mockChangePageSize,
-    setTotalItems: mockSetTotalItems,
   }),
 }));
 

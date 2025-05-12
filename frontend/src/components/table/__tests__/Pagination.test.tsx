@@ -9,8 +9,6 @@ vi.mock('../usePagination', () => ({
   usePagination: () => ({
     pagination: { currentPage: 0, pageSize: 10, totalItems: 100 },
     goToPage: mockGoToPage,
-    changePageSize: vi.fn(),
-    setTotalItems: vi.fn(),
   }),
 }));
 

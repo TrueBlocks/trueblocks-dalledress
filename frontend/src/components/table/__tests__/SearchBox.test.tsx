@@ -3,7 +3,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SearchBox } from './SearchBox';
+import { SearchBox } from '../SearchBox';
 
 // Use a variable for the focusControls mock
 let focusControlsMock = vi.fn();

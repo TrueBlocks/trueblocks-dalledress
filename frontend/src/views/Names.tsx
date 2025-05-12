@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Logger } from '@app';
 import { Column, Table, TableProvider, usePagination } from '@components';
-import { useAppContext } from '@contexts';
+import { TableKey, useAppContext } from '@contexts';
 import { TabView } from '@layout';
 import { msgs, sorting, types } from '@models';
 import { GetNamesPage } from '@names';
@@ -20,10 +20,15 @@ export const Names = () => {
     getListTypeFromLabel(lastTab['/names'] || ''),
   );
 
-  const { pagination, goToPage, changePageSize, setTotalItems } = usePagination(
-    '/names',
-    listType,
+  const tableKey = useMemo<TableKey>(
+    () => ({
+      viewName: '/names',
+      tabName: listType,
+    }),
+    [listType],
   );
+
+  const { pagination, setTotalItems } = usePagination(tableKey);
 
   useEffect(() => {
     const loadNames = async () => {
@@ -77,13 +82,11 @@ export const Names = () => {
         data={names}
         loading={loading}
         error={error}
-        pagination={pagination}
-        onPageChange={goToPage}
-        onPageSizeChange={changePageSize}
         sort={sort}
         onSortChange={setSort}
         filter={filter}
         onFilterChange={setFilter}
+        tableKey={tableKey}
       />
     </TableProvider>
   );

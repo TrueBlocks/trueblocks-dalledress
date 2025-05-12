@@ -1,14 +1,16 @@
 import { useCallback } from 'react';
 
-import { Logger } from '@app';
 import { useTableContext } from '@components';
+import { TableKey } from '@contexts';
+
+import { usePagination } from './usePagination';
 
 // UseTableKeysProps defines the props for the useTableKeys hook.
 interface UseTableKeysProps {
   itemCount: number;
   currentPage: number;
   totalPages: number;
-  onPageChange: (page: number) => void;
+  tableKey: TableKey;
 }
 
 // useTableKeys is a custom hook that provides keyboard navigation logic for the table, handling arrow keys, page navigation, and selection.
@@ -16,12 +18,11 @@ export const useTableKeys = ({
   itemCount,
   currentPage,
   totalPages,
-  onPageChange,
+  tableKey,
 }: UseTableKeysProps) => {
   const { focusState, selectedRowIndex, setSelectedRowIndex, focusTable } =
     useTableContext();
-
-  // Debounce ref for page navigation
+  const { goToPage } = usePagination(tableKey);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -32,7 +33,7 @@ export const useTableKeys = ({
           if (selectedRowIndex < itemCount - 1) {
             setSelectedRowIndex(selectedRowIndex + 1);
           } else if (currentPage < totalPages - 1) {
-            onPageChange(currentPage + 1);
+            goToPage(currentPage + 1);
             setSelectedRowIndex(0);
           }
           break;
@@ -41,7 +42,7 @@ export const useTableKeys = ({
           if (selectedRowIndex > 0) {
             setSelectedRowIndex(selectedRowIndex - 1);
           } else if (currentPage > 0) {
-            onPageChange(currentPage - 1);
+            goToPage(currentPage - 1);
             setSelectedRowIndex(-1);
           }
           break;
@@ -49,29 +50,35 @@ export const useTableKeys = ({
         case 'PageUp':
           e.preventDefault();
           if (currentPage > 0) {
-            onPageChange(currentPage - 1);
+            goToPage(currentPage - 1);
           }
           break;
         case 'ArrowRight':
         case 'PageDown':
           e.preventDefault();
           if (currentPage < totalPages - 1) {
-            onPageChange(currentPage + 1);
+            goToPage(currentPage + 1);
           }
           break;
         case 'Home':
           e.preventDefault();
-          onPageChange(0);
+          if (currentPage !== 0) {
+            goToPage(0);
+          }
           setSelectedRowIndex(0);
           break;
         case 'End':
           e.preventDefault();
-          onPageChange(totalPages - 1);
+          if (currentPage !== totalPages - 1) {
+            goToPage(totalPages - 1);
+          }
           setSelectedRowIndex(itemCount - 1);
           break;
         case 'Enter':
           e.preventDefault();
-          Logger('Table: Enter key pressed');
+          console.log(
+            `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`,
+          );
           break;
       }
     },
@@ -82,7 +89,8 @@ export const useTableKeys = ({
       currentPage,
       totalPages,
       setSelectedRowIndex,
-      onPageChange,
+      goToPage,
+      tableKey,
     ],
   );
 

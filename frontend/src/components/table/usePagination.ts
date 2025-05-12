@@ -1,32 +1,36 @@
 import { useCallback } from 'react';
 
-import { useViewContext } from '@contexts';
+import { TableKey, useViewContext } from '@contexts';
 
 // usePagination is a custom hook that manages pagination state and handlers for a table view/tab.
-export const usePagination = (viewName: string, tabName: string) => {
-  const { getViewPagination, updateViewPagination } = useViewContext();
-  const pagination = getViewPagination(viewName, tabName);
+export const usePagination = (tableKey: TableKey) => {
+  const { getPagination, updatePagination } = useViewContext();
+  const pagination = getPagination(tableKey);
+
   const goToPage = useCallback(
     (page: number) => {
-      updateViewPagination(viewName, tabName, { currentPage: page });
+      updatePagination(tableKey, { currentPage: page });
     },
-    [viewName, tabName, updateViewPagination],
+    [tableKey, updatePagination],
   );
+
   const changePageSize = useCallback(
     (size: number) => {
-      updateViewPagination(viewName, tabName, {
+      updatePagination(tableKey, {
         currentPage: 0,
         pageSize: size,
       });
     },
-    [viewName, tabName, updateViewPagination],
+    [tableKey, updatePagination],
   );
+
   const setTotalItems = useCallback(
     (total: number) => {
-      updateViewPagination(viewName, tabName, { totalItems: total });
+      updatePagination(tableKey, { totalItems: total });
     },
-    [viewName, tabName, updateViewPagination],
+    [tableKey, updatePagination],
   );
+
   return {
     pagination,
     goToPage,

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useTableContext } from '@components';
+import { TableKey } from '@contexts';
 import { sorting } from '@models';
 
 import {
@@ -10,29 +11,22 @@ import {
   Pagination,
   PerPage,
   Stats,
+  usePagination,
   useTableKeys,
 } from '.';
 import { SearchBox } from './SearchBox';
 import './Table.css';
-
-interface PaginationState {
-  currentPage: number;
-  pageSize: number;
-  totalItems: number;
-}
 
 export interface TableProps<T> {
   columns: Column<T>[];
   data: T[];
   loading: boolean;
   error: string | null;
-  pagination: PaginationState;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
   sort?: sorting.SortDef | null;
   onSortChange?: (sort: sorting.SortDef | null) => void;
   filter?: string;
   onFilterChange?: (filter: string) => void;
+  tableKey: TableKey;
 }
 
 export function Table<T>({
@@ -40,14 +34,13 @@ export function Table<T>({
   data,
   loading,
   error,
-  pagination,
-  onPageChange,
-  onPageSizeChange,
   sort: controlledSort,
   onSortChange,
   filter: controlledFilter,
   onFilterChange,
+  tableKey,
 }: TableProps<T>) {
+  const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
   const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -63,11 +56,7 @@ export function Table<T>({
     itemCount: data.length,
     currentPage,
     totalPages,
-    onPageChange: (page) => {
-      if (page >= 0 && page < totalPages) {
-        onPageChange(page);
-      }
-    },
+    tableKey,
   });
 
   useEffect(() => {
@@ -94,12 +83,6 @@ export function Table<T>({
       setSelectedRowIndex(Math.max(0, data.length - 1));
     }
   }, [data, selectedRowIndex, setSelectedRowIndex]);
-
-  const handlePageChange = (page: number) => {
-    if (page >= 0 && page < totalPages) {
-      onPageChange(page);
-    }
-  };
 
   // Sorting state (uncontrolled if not provided)
   const [internalSort, setInternalSort] = useState<sorting.SortDef | null>(
@@ -159,15 +142,15 @@ export function Table<T>({
       >
         <SearchBox value={filter} onChange={handleFilterChange} />
         <PerPage
+          tableKey={tableKey}
           pageSize={pageSize}
-          onPageSizeChange={onPageSizeChange}
           focusTable={focusTable}
           focusControls={focusControls}
         />
         <Pagination
           totalPages={totalPages}
           currentPage={currentPage}
-          handlePageChange={handlePageChange}
+          tableKey={tableKey}
           focusControls={focusControls}
         />
       </div>
@@ -196,12 +179,7 @@ export function Table<T>({
       </div>
 
       <div className="table-footer">
-        <Stats
-          currentPage={currentPage}
-          pageSize={pageSize}
-          namesLength={data.length}
-          totalItems={totalItems}
-        />
+        <Stats namesLength={data.length} tableKey={tableKey} />
       </div>
     </>
   );

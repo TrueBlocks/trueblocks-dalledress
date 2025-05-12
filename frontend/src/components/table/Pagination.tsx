@@ -1,10 +1,13 @@
+import { TableKey } from '@contexts';
+
 import './Pagination.css';
+import { usePagination } from './usePagination';
 
 // PaginationProps defines the props for the Pagination component.
 interface PaginationProps {
   totalPages: number;
   currentPage: number;
-  handlePageChange: (page: number) => void;
+  tableKey: TableKey;
   focusControls: () => void;
 }
 
@@ -12,9 +15,17 @@ interface PaginationProps {
 export const Pagination = ({
   totalPages,
   currentPage,
-  handlePageChange,
+  tableKey,
   focusControls,
 }: PaginationProps) => {
+  const { goToPage } = usePagination(tableKey);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 0 && page < totalPages) {
+      goToPage(page);
+    }
+  };
+
   const maxButtons = 5;
   let pageButtons = [];
   let start = 0;

@@ -6,6 +6,8 @@ import {
   useState,
 } from 'react';
 
+import { TableKey, tableKeyToString } from '.';
+
 // Pagination interfaces
 export interface PaginationState {
   currentPage: number;
@@ -20,19 +22,16 @@ export const initialPaginationState: PaginationState = {
 };
 
 export interface ViewPaginationState {
-  [viewName: string]: {
-    [tabName: string]: PaginationState;
-  };
+  [key: string]: PaginationState;
 }
 
 interface ViewContextType {
   currentView: string;
   setCurrentView: (view: string) => void;
   viewPagination: ViewPaginationState;
-  getViewPagination: (viewName: string, tabName: string) => PaginationState;
-  updateViewPagination: (
-    viewName: string,
-    tabName: string,
+  getPagination: (tableKey: TableKey) => PaginationState;
+  updatePagination: (
+    tableKey: TableKey,
     changes: Partial<PaginationState>,
   ) => void;
 }
@@ -41,37 +40,32 @@ export const ViewContext = createContext<ViewContextType>({
   currentView: '',
   setCurrentView: () => {},
   viewPagination: {},
-  getViewPagination: () => ({ ...initialPaginationState }),
-  updateViewPagination: () => {},
+  getPagination: () => ({ ...initialPaginationState }),
+  updatePagination: () => {},
 });
 
 export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   const [currentView, setCurrentView] = useState('');
   const [viewPagination, setViewPagination] = useState<ViewPaginationState>({});
 
-  const getViewPagination = useCallback(
-    (viewName: string, tabName: string) => {
-      return (
-        viewPagination[viewName]?.[tabName] || { ...initialPaginationState }
-      );
+  const getPagination = useCallback(
+    (tableKey: TableKey) => {
+      const key = tableKeyToString(tableKey);
+      return viewPagination[key] || { ...initialPaginationState };
     },
     [viewPagination],
   );
 
-  const updateViewPagination = useCallback(
-    (viewName: string, tabName: string, changes: Partial<PaginationState>) => {
+  const updatePagination = useCallback(
+    (tableKey: TableKey, changes: Partial<PaginationState>) => {
       setViewPagination((prev) => {
-        const currentPagination = prev[viewName]?.[tabName] || {
-          ...initialPaginationState,
-        };
+        const key = tableKeyToString(tableKey);
+        const currentPagination = prev[key] || { ...initialPaginationState };
         return {
           ...prev,
-          [viewName]: {
-            ...(prev[viewName] || {}),
-            [tabName]: {
-              ...currentPagination,
-              ...changes,
-            },
+          [key]: {
+            ...currentPagination,
+            ...changes,
           },
         };
       });
@@ -85,8 +79,8 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
         currentView,
         setCurrentView,
         viewPagination,
-        getViewPagination,
-        updateViewPagination,
+        getPagination,
+        updatePagination,
       }}
     >
       {children}

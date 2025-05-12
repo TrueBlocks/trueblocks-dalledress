@@ -12,19 +12,20 @@ const baseMockContext = {
 
 describe('usePagination', () => {
   it('returns pagination state and handlers', () => {
-    const getViewPagination = vi.fn().mockReturnValue({
+    const getPagination = vi.fn().mockReturnValue({
       currentPage: 2,
       pageSize: 25,
       totalItems: 100,
     });
-    const updateViewPagination = vi.fn();
+    const updatePagination = vi.fn();
     vi.spyOn(Contexts, 'useViewContext').mockReturnValue({
       ...baseMockContext,
-      getViewPagination,
-      updateViewPagination,
+      getPagination,
+      updatePagination,
     });
 
-    const { result } = renderHook(() => usePagination('view', 'tab'));
+    const tableKey = { viewName: 'view', tabName: 'tab' };
+    const { result } = renderHook(() => usePagination(tableKey));
     expect(result.current.pagination).toEqual({
       currentPage: 2,
       pageSize: 25,
@@ -35,61 +36,93 @@ describe('usePagination', () => {
     expect(result.current.pagination.totalItems).toBe(100);
   });
 
-  it('goToPage calls updateViewPagination', () => {
-    const getViewPagination = vi
+  it('goToPage calls updatePagination', () => {
+    const getPagination = vi
       .fn()
       .mockReturnValue({ currentPage: 0, pageSize: 10, totalItems: 10 });
-    const updateViewPagination = vi.fn();
+    const updatePagination = vi.fn();
     vi.spyOn(Contexts, 'useViewContext').mockReturnValue({
       ...baseMockContext,
-      getViewPagination,
-      updateViewPagination,
+      getPagination,
+      updatePagination,
     });
-    const { result } = renderHook(() => usePagination('view', 'tab'));
+
+    const tableKey = { viewName: 'view', tabName: 'tab' };
+    const { result } = renderHook(() => usePagination(tableKey));
     act(() => {
       result.current.goToPage(3);
     });
-    expect(updateViewPagination).toHaveBeenCalledWith('view', 'tab', {
+    expect(updatePagination).toHaveBeenCalledWith(tableKey, {
       currentPage: 3,
     });
   });
 
-  it('changePageSize calls updateViewPagination with currentPage 0', () => {
-    const getViewPagination = vi
+  it('changePageSize calls updatePagination with currentPage 0', () => {
+    const getPagination = vi
       .fn()
       .mockReturnValue({ currentPage: 0, pageSize: 10, totalItems: 10 });
-    const updateViewPagination = vi.fn();
+    const updatePagination = vi.fn();
     vi.spyOn(Contexts, 'useViewContext').mockReturnValue({
       ...baseMockContext,
-      getViewPagination,
-      updateViewPagination,
+      getPagination,
+      updatePagination,
     });
-    const { result } = renderHook(() => usePagination('view', 'tab'));
+
+    const tableKey = { viewName: 'view', tabName: 'tab' };
+    const { result } = renderHook(() => usePagination(tableKey));
     act(() => {
       result.current.changePageSize(50);
     });
-    expect(updateViewPagination).toHaveBeenCalledWith('view', 'tab', {
-      currentPage: 0,
-      pageSize: 50,
-    });
+    expect(updatePagination).toHaveBeenCalledWith(
+      { viewName: 'view', tabName: 'tab' },
+      { currentPage: 0, pageSize: 50 },
+    );
   });
 
-  it('setTotalItems calls updateViewPagination', () => {
-    const getViewPagination = vi
+  it('setTotalItems calls updatePagination', () => {
+    const getPagination = vi
       .fn()
       .mockReturnValue({ currentPage: 0, pageSize: 10, totalItems: 10 });
-    const updateViewPagination = vi.fn();
+    const updatePagination = vi.fn();
     vi.spyOn(Contexts, 'useViewContext').mockReturnValue({
       ...baseMockContext,
-      getViewPagination,
-      updateViewPagination,
+      getPagination,
+      updatePagination,
     });
-    const { result } = renderHook(() => usePagination('view', 'tab'));
+
+    const tableKey = { viewName: 'view', tabName: 'tab' };
+    const { result } = renderHook(() => usePagination(tableKey));
     act(() => {
       result.current.setTotalItems(123);
     });
-    expect(updateViewPagination).toHaveBeenCalledWith('view', 'tab', {
-      totalItems: 123,
+    expect(updatePagination).toHaveBeenCalledWith(
+      { viewName: 'view', tabName: 'tab' },
+      { totalItems: 123 },
+    );
+  });
+
+  it('uses memoized callbacks', () => {
+    const getPagination = vi
+      .fn()
+      .mockReturnValue({ currentPage: 0, pageSize: 10, totalItems: 10 });
+    const updatePagination = vi.fn();
+    vi.spyOn(Contexts, 'useViewContext').mockReturnValue({
+      ...baseMockContext,
+      getPagination,
+      updatePagination,
     });
+
+    const tableKey = { viewName: 'view', tabName: 'tab' };
+    const { result, rerender } = renderHook(() => usePagination(tableKey));
+
+    const initialGoToPage = result.current.goToPage;
+    const initialChangePageSize = result.current.changePageSize;
+    const initialSetTotalItems = result.current.setTotalItems;
+
+    rerender();
+
+    expect(result.current.goToPage).toBe(initialGoToPage);
+    expect(result.current.changePageSize).toBe(initialChangePageSize);
+    expect(result.current.setTotalItems).toBe(initialSetTotalItems);
   });
 });

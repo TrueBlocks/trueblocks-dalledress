@@ -1,9 +1,9 @@
 export interface TableKey {
   viewName: string;
   tabName: string;
-  tableId?: number;
+  tableId?: string;
 }
 
 export const tableKeyToString = (key: TableKey): string => {
-  return `${key.viewName}/${key.tabName}/${key.tableId ?? 0}`;
+  return `${key.viewName}/${key.tabName}/${key.tableId ?? ''}`;
 };

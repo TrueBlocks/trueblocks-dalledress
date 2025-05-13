@@ -60,6 +60,9 @@ export const useTableKeys = ({
           e.preventDefault();
           if (currentPage > 0) {
             goToPage(currentPage - 1);
+          } else {
+            // If on first page, select the first row
+            setSelectedRowIndex(0);
           }
           break;
         case 'ArrowRight':
@@ -67,6 +70,9 @@ export const useTableKeys = ({
           e.preventDefault();
           if (currentPage < totalPages - 1) {
             goToPage(currentPage + 1);
+          } else {
+            // If on last page, select the last row
+            setSelectedRowIndex(itemCount - 1);
           }
           break;
         case 'Home':

@@ -1,3 +1,4 @@
+import { useTableContext } from '@components';
 import { TableKey } from '@contexts';
 
 import './Pagination.css';
@@ -19,6 +20,7 @@ export const Pagination = ({
   focusControls,
 }: PaginationProps) => {
   const { goToPage } = usePagination(tableKey);
+  const { setSelectedRowIndex } = useTableContext();
 
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages) {
@@ -70,7 +72,13 @@ export const Pagination = ({
   return (
     <div className="pagination">
       <button
-        onClick={!allDisabled ? () => handlePageChange(0) : undefined}
+        onClick={
+          !allDisabled && currentPage > 0
+            ? () => handlePageChange(0)
+            : currentPage === 0 && !allDisabled
+              ? () => setSelectedRowIndex(0)
+              : undefined
+        }
         disabled={currentPage === 0 || allDisabled}
         title="First Page"
         onFocus={focusControls}
@@ -79,9 +87,11 @@ export const Pagination = ({
       </button>
       <button
         onClick={
-          !allDisabled
+          !allDisabled && currentPage > 0
             ? () => handlePageChange(Math.max(0, currentPage - 10))
-            : undefined
+            : currentPage === 0 && !allDisabled
+              ? () => setSelectedRowIndex(0)
+              : undefined
         }
         disabled={currentPage === 0 || allDisabled}
         title="Previous Page"
@@ -92,9 +102,11 @@ export const Pagination = ({
       {pageButtons}
       <button
         onClick={
-          !allDisabled
+          !allDisabled && currentPage < totalPages - 1
             ? () => handlePageChange(Math.min(totalPages - 1, currentPage + 10))
-            : undefined
+            : currentPage >= totalPages - 1 && !allDisabled
+              ? () => setSelectedRowIndex(Number.MAX_SAFE_INTEGER) // This will be clamped to the last item
+              : undefined
         }
         disabled={currentPage >= totalPages - 1 || allDisabled}
         title="Next Page"
@@ -104,7 +116,11 @@ export const Pagination = ({
       </button>
       <button
         onClick={
-          !allDisabled ? () => handlePageChange(totalPages - 1) : undefined
+          !allDisabled && currentPage < totalPages - 1
+            ? () => handlePageChange(totalPages - 1)
+            : currentPage >= totalPages - 1 && !allDisabled
+              ? () => setSelectedRowIndex(Number.MAX_SAFE_INTEGER) // This will be clamped to the last item
+              : undefined
         }
         disabled={currentPage >= totalPages - 1 || allDisabled}
         title="Last Page"

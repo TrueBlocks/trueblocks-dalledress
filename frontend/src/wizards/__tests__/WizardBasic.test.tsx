@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { AppContextProvider } from '@contexts';
 import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
@@ -12,6 +13,10 @@ vi.mock('@app', () => ({
   GetWizardReturn: () => Promise.resolve('/'),
   GetUserPreferences: () => Promise.resolve({ name: '', email: '' }),
   SetUserPreferences: () => Promise.resolve({}),
+  IsReady: () => Promise.resolve(true),
+  GetAppPreferences: () =>
+    Promise.resolve({ lastView: '/', menuCollapsed: false }),
+  SetLastView: () => Promise.resolve(), // <-- Add this line
 }));
 
 vi.mock('@runtime', () => ({
@@ -22,12 +27,16 @@ const mockNavigate = vi.fn();
 const mockCompleteWizard = vi.fn().mockResolvedValue(undefined);
 
 // Simple mock for AppContext
-vi.mock('@contexts', () => ({
-  useAppContext: () => ({
-    navigate: mockNavigate,
-    isWizard: true,
-  }),
-}));
+vi.mock('@contexts', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return Object.assign({}, actual, {
+    useAppContext: () => ({
+      navigate: mockNavigate,
+      isWizard: true,
+    }),
+    AppContextProvider: actual.AppContextProvider,
+  });
+});
 
 // Minimal mock for wizardUtils
 vi.mock('@utils', () => ({
@@ -105,9 +114,11 @@ describe('Wizard', () => {
 
   test('renders first step with user info form', async () => {
     render(
-      <MantineProvider>
-        <Wizard />
-      </MantineProvider>,
+      <AppContextProvider>
+        <MantineProvider>
+          <Wizard />
+        </MantineProvider>
+      </AppContextProvider>,
     );
 
     // Wait for initial step to be visible and inputs to appear
@@ -125,9 +136,11 @@ describe('Wizard', () => {
 
   test('can navigate to next step when fields are filled', async () => {
     render(
-      <MantineProvider>
-        <Wizard />
-      </MantineProvider>,
+      <AppContextProvider>
+        <MantineProvider>
+          <Wizard />
+        </MantineProvider>
+      </AppContextProvider>,
     );
 
     // Fill in required fields using more robust selectors

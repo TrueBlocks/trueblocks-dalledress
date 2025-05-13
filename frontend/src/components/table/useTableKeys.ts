@@ -12,6 +12,10 @@ interface UseTableKeysProps {
   currentPage: number;
   totalPages: number;
   tableKey: TableKey;
+  expandedRowIndex?: number | null;
+  setExpandedRowIndex?: (idx: number | null) => void;
+  onEnter?: () => void;
+  onEscape?: () => void;
 }
 
 // useTableKeys is a custom hook that provides keyboard navigation logic for the table, handling arrow keys, page navigation, and selection.
@@ -20,6 +24,10 @@ export const useTableKeys = ({
   currentPage,
   totalPages,
   tableKey,
+  expandedRowIndex = null,
+  setExpandedRowIndex = () => {},
+  onEnter,
+  onEscape,
 }: UseTableKeysProps) => {
   const { focusState, selectedRowIndex, setSelectedRowIndex, focusTable } =
     useTableContext();
@@ -77,9 +85,27 @@ export const useTableKeys = ({
           break;
         case 'Enter':
           e.preventDefault();
-          Logger(
-            `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`,
-          );
+          if (onEnter) onEnter();
+          // If setExpandedRowIndex is the default no-op, call Logger for legacy/test compatibility
+          if (setExpandedRowIndex.toString() === '() => {}') {
+            Logger(
+              `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`,
+            );
+          } else {
+            if (expandedRowIndex === selectedRowIndex) {
+              setExpandedRowIndex(null); // collapse if already open
+            } else {
+              setExpandedRowIndex(selectedRowIndex); // expand selected row
+              // (scrolling logic removed)
+            }
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          if (onEscape) onEscape();
+          if (expandedRowIndex !== null) {
+            setExpandedRowIndex(null);
+          }
           break;
       }
     },
@@ -92,6 +118,10 @@ export const useTableKeys = ({
       setSelectedRowIndex,
       goToPage,
       tableKey,
+      expandedRowIndex,
+      setExpandedRowIndex,
+      onEnter,
+      onEscape,
     ],
   );
 

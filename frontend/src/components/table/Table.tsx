@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTableContext } from '@components';
 import { TableKey } from '@contexts';
@@ -17,7 +17,7 @@ import {
 import { SearchBox } from './SearchBox';
 import './Table.css';
 
-export interface TableProps<T> {
+export interface TableProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
   data: T[];
   loading: boolean;
@@ -29,7 +29,7 @@ export interface TableProps<T> {
   tableKey: TableKey;
 }
 
-export function Table<T>({
+export function Table<T extends Record<string, unknown>>({
   columns,
   data,
   loading,
@@ -52,11 +52,35 @@ export function Table<T>({
     focusControls,
   } = useTableContext();
 
+  const [expandedRowIndex, setExpandedRowIndex] = useState<number | null>(null);
+  const [detailClosed, setDetailClosed] = useState(false);
+
+  // Ref to track if the next Enter key should re-open the detail view
+  const shouldOpenDetailOnEnter = useRef(false);
+
   const { handleKeyDown } = useTableKeys({
     itemCount: data.length,
     currentPage,
     totalPages,
     tableKey,
+    expandedRowIndex,
+    setExpandedRowIndex: (idx) => {
+      // If opening detail view via Enter, reset detailClosed
+      if (idx !== null && shouldOpenDetailOnEnter.current) {
+        setDetailClosed(false);
+        shouldOpenDetailOnEnter.current = false;
+      }
+      // If closing detail view, set detailClosed
+      if (idx === null) setDetailClosed(true);
+      setExpandedRowIndex(idx);
+    },
+    onEnter: () => {
+      shouldOpenDetailOnEnter.current = true;
+    },
+    onEscape: () => {
+      setDetailClosed(true);
+      setExpandedRowIndex(null);
+    },
   });
 
   useEffect(() => {
@@ -71,7 +95,28 @@ export function Table<T>({
 
   useEffect(() => {
     focusTable();
-  }, [currentPage, focusTable]);
+    // If the selected row is still present on the new page, keep it expanded
+    if (
+      !detailClosed &&
+      selectedRowIndex >= 0 &&
+      selectedRowIndex < data.length
+    ) {
+      setExpandedRowIndex(selectedRowIndex);
+    } else {
+      setExpandedRowIndex(null);
+    }
+  }, [currentPage, focusTable, selectedRowIndex, data.length, detailClosed]);
+
+  // Only open the expanded row dialog when the selected row changes and detailClosed is false
+  useEffect(() => {
+    if (
+      !detailClosed &&
+      selectedRowIndex >= 0 &&
+      selectedRowIndex < data.length
+    ) {
+      setExpandedRowIndex(selectedRowIndex);
+    }
+  }, [selectedRowIndex, data.length, detailClosed]);
 
   const handleRowClick = (index: number) => {
     setSelectedRowIndex(index);
@@ -135,10 +180,28 @@ export function Table<T>({
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <>
+    <div
+      className="table-outer-container"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        minHeight: 0,
+        position: 'relative',
+      }}
+    >
+      {/* Top: Pagination and Search */}
       <div
         className="top-pagination-container"
-        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          flex: '0 0 auto',
+          zIndex: 2,
+          background: '#23272f',
+          borderBottom: '1px solid #333',
+        }}
       >
         <SearchBox value={filter} onChange={handleFilterChange} />
         <PerPage
@@ -155,32 +218,85 @@ export function Table<T>({
         />
       </div>
 
-      <div className="table-container" onClick={focusTable}>
+      {/* Table header (sticky) */}
+      <div
+        className="table-header-container"
+        style={{
+          flex: '0 0 auto',
+          zIndex: 2,
+          background: '#23272f',
+          borderBottom: '1px solid #333',
+        }}
+      >
         <table
           className="data-table"
-          ref={tableRef}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          aria-label="Table with keyboard navigation"
+          style={{ width: '100%', tableLayout: 'fixed' }}
         >
           <Header
             columns={columns}
             sort={sort}
             onSortChange={handleSortChange}
           />
-          <Body
-            columns={columns}
-            data={sortedData}
-            selectedRowIndex={selectedRowIndex}
-            handleRowClick={handleRowClick}
-            noDataMessage="No data found."
-          />
         </table>
       </div>
 
-      <div className="table-footer">
+      {/* Scrollable body */}
+      <div
+        className="table-body-scroll"
+        style={{
+          flex: '1 1 auto',
+          overflowY: 'auto',
+          minHeight: 0,
+          background: '#181818',
+        }}
+        onClick={focusTable}
+      >
+        <table
+          className="data-table"
+          ref={tableRef}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          aria-label="Table with keyboard navigation"
+          style={{ width: '100%', tableLayout: 'fixed' }}
+        >
+          {/* Empty header row for column widths */}
+          <colgroup>
+            {columns.map((col) => (
+              <col key={col.key} style={{ width: col.width || 'auto' }} />
+            ))}
+          </colgroup>
+          <tbody>
+            {/* The Body component renders <tbody>, so render its content directly here */}
+            <Body
+              columns={columns}
+              data={sortedData}
+              selectedRowIndex={selectedRowIndex}
+              handleRowClick={handleRowClick}
+              noDataMessage="No data found."
+              expandedRowIndex={expandedRowIndex}
+              setExpandedRowIndex={(idx) => {
+                if (idx === null) setDetailClosed(true);
+                setExpandedRowIndex(idx);
+              }}
+              onSaveRow={() => setDetailClosed(true)}
+              onCancelRow={() => setDetailClosed(true)}
+            />
+          </tbody>
+        </table>
+      </div>
+
+      {/* Bottom: Stats */}
+      <div
+        className="table-footer"
+        style={{
+          flex: '0 0 auto',
+          zIndex: 2,
+          background: '#23272f',
+          borderTop: '1px solid #333',
+        }}
+      >
         <Stats namesLength={data.length} tableKey={tableKey} />
       </div>
-    </>
+    </div>
   );
 }

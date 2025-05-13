@@ -1,4 +1,4 @@
-import { Logger } from '@app';
+// Now import modules
 import { useTableContext } from '@components';
 import { TableKey } from '@contexts';
 import { act, renderHook } from '@testing-library/react';
@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { usePagination } from '../usePagination';
 import { useTableKeys } from '../useTableKeys';
 
-// Mock dependencies after imports
+// Mock dependencies before imports
 vi.mock('@components', () => ({
   useTableContext: vi.fn(),
 }));
@@ -477,26 +477,23 @@ describe('useTableKeys', () => {
     });
 
     it('should handle Enter key correctly', () => {
-      // Clear any existing calls
-      vi.clearAllMocks();
-
-      const { result } = renderHook(() =>
-        useTableKeys({
-          itemCount: 5,
-          currentPage: 0,
-          totalPages: 2,
-          tableKey,
-        }),
-      );
-
+      const setExpandedRowIndex = vi.fn();
+      const props = {
+        itemCount: 5,
+        currentPage: 0,
+        totalPages: 2,
+        tableKey,
+        expandedRowIndex: null,
+        setExpandedRowIndex,
+      };
+      const { result } = renderHook(() => useTableKeys(props));
       act(() => {
-        result.current.handleKeyDown(mockEvent('Enter'));
+        result.current.handleKeyDown({
+          key: 'Enter',
+          preventDefault: vi.fn(),
+        } as any);
       });
-
-      // Verify the logger was called with the expected message
-      expect(Logger).toHaveBeenCalledWith(
-        `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`,
-      );
+      expect(setExpandedRowIndex).toHaveBeenCalledWith(0);
     });
   });
 });

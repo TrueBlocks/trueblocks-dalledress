@@ -55,12 +55,16 @@ describe('Body', () => {
   it('renders all rows and columns', () => {
     render(
       <table>
-        <Body
-          columns={columns}
-          data={names}
-          selectedRowIndex={1}
-          handleRowClick={handleRowClick}
-        />
+        <tbody>
+          <Body
+            columns={columns}
+            data={names}
+            selectedRowIndex={1}
+            handleRowClick={handleRowClick}
+            expandedRowIndex={null}
+            setExpandedRowIndex={() => {}}
+          />
+        </tbody>
       </table>,
     );
     expect(screen.getByText('Alice')).toBeInTheDocument();
@@ -73,12 +77,16 @@ describe('Body', () => {
   it('calls handleRowClick when a row is clicked', () => {
     render(
       <table>
-        <Body
-          columns={columns}
-          data={names}
-          selectedRowIndex={0}
-          handleRowClick={handleRowClick}
-        />
+        <tbody>
+          <Body
+            columns={columns}
+            data={names}
+            selectedRowIndex={0}
+            handleRowClick={handleRowClick}
+            expandedRowIndex={null}
+            setExpandedRowIndex={() => {}}
+          />
+        </tbody>
       </table>,
     );
     fireEvent.click(screen.getByText('Bob'));
@@ -88,12 +96,16 @@ describe('Body', () => {
   it('applies selected class to the selected row', () => {
     render(
       <table>
-        <Body
-          columns={columns}
-          data={names}
-          selectedRowIndex={2}
-          handleRowClick={handleRowClick}
-        />
+        <tbody>
+          <Body
+            columns={columns}
+            data={names}
+            selectedRowIndex={2}
+            handleRowClick={handleRowClick}
+            expandedRowIndex={null}
+            setExpandedRowIndex={() => {}}
+          />
+        </tbody>
       </table>,
     );
     const rows = screen.getAllByRole('row');
@@ -103,12 +115,16 @@ describe('Body', () => {
   it('shows status text for deleted, custom, and prefund', () => {
     render(
       <table>
-        <Body
-          columns={columns}
-          data={names}
-          selectedRowIndex={0}
-          handleRowClick={handleRowClick}
-        />
+        <tbody>
+          <Body
+            columns={columns}
+            data={names}
+            selectedRowIndex={0}
+            handleRowClick={handleRowClick}
+            expandedRowIndex={null}
+            setExpandedRowIndex={() => {}}
+          />
+        </tbody>
       </table>,
     );
     expect(screen.getByText(/Deleted/)).toBeInTheDocument();

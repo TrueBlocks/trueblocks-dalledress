@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-  Column,
   Table,
   TableProvider,
   TagsTable,
@@ -36,6 +35,13 @@ export const Names = () => {
   const [listType, setListType] = useState<ListType>(
     getListTypeFromLabel(lastTab['/names'] || ''),
   );
+  const [showTagsView, setShowTagsView] = useState<Record<string, boolean>>({
+    All: false,
+    Custom: false,
+    Prefund: false,
+    Regular: false,
+    Baddress: false,
+  });
 
   // References for each tab's TagsTable to support targeting specific instances
   const tagsTableRefs = useRef<Record<string, TagsTableHandle | null>>({});
@@ -127,6 +133,81 @@ export const Names = () => {
     fetchSelectedTag();
   }, [lastTab]);
 
+  // Handle cmd+shift+e to open/focus tags table
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd+Shift+E (Mac) or Ctrl+Shift+E (Win/Linux)
+      const isCmdShiftE =
+        (e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'e';
+      if (isCmdShiftE) {
+        e.preventDefault();
+        const currentTabLabel = lastTab['/names'] || 'Custom';
+        if (!showTagsView[currentTabLabel]) {
+          setShowTagsView((prev) => ({
+            ...prev,
+            [currentTabLabel]: true,
+          }));
+        } else {
+          // Focus the tags table for the current tab
+          if (tagsTableRefs.current[currentTabLabel]) {
+            tagsTableRefs.current[currentTabLabel].focus();
+          } else if (tagsTableRef.current) {
+            tagsTableRef.current.focus();
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lastTab, showTagsView]);
+
+  // Handle Escape to close tags table if focused
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        const currentTabLabel = lastTab['/names'] || 'Custom';
+        if (showTagsView[currentTabLabel]) {
+          // Check if the tags table for this tab is focused using DOM API
+          const ref =
+            tagsTableRefs.current[currentTabLabel] || tagsTableRef.current;
+          // Try to get the root element of the tags table
+          let tagsTableEl: HTMLElement | null = null;
+          // Use a safer check for 'root' property without using 'any'
+          const maybeRoot =
+            ref && typeof ref === 'object' && ref !== null && 'root' in ref
+              ? (ref as { root?: unknown }).root
+              : undefined;
+          if (
+            maybeRoot &&
+            typeof maybeRoot === 'object' &&
+            maybeRoot !== null &&
+            'contains' in maybeRoot
+          ) {
+            tagsTableEl = maybeRoot as HTMLElement;
+          } else if (ref && 'focus' in ref && typeof ref.focus === 'function') {
+            // fallback: try to find by class
+            tagsTableEl = document.querySelector(
+              '.tags-table',
+            ) as HTMLElement | null;
+          }
+          if (
+            tagsTableEl &&
+            document.activeElement &&
+            tagsTableEl.contains(document.activeElement)
+          ) {
+            setShowTagsView((prev) => ({
+              ...prev,
+              [currentTabLabel]: false,
+            }));
+            e.preventDefault();
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [lastTab, showTagsView]);
+
   // Setup event listener for focusing the tags table
   useEffect(() => {
     const focusTagsTable = (_data: { activeTab?: string } = {}) => {
@@ -202,67 +283,67 @@ export const Names = () => {
   };
 
   // Each tab gets its own TableProvider instance to ensure state isolation
-  const createTableContent = (
-    tabLabel: string,
-    showTagsTable: boolean = false,
-  ) => (
-    <TableProvider key={`table-provider-${tabLabel}`}>
-      {showTagsTable ? (
-        <div className="dual-table-layout">
-          <TagsTable
-            key={`tags-table-${tabLabel}`}
-            tags={tags}
-            onTagSelect={handleTagSelect}
-            selectedTag={selectedTag}
-            visible={true}
-            ref={(ref) => {
-              // Store the ref by tab name for targeted focusing
-              if (ref) {
-                tagsTableRefs.current[tabLabel] = ref;
-              }
-              if (tabLabel === 'Custom' && ref) {
-                tagsTableRef.current = ref;
-              }
-            }}
-          />
-          <div className="table-wrapper" ref={mainTableRef}>
-            <Table<types.Name>
-              key={`data-table-${tabLabel}`}
-              columns={nameColumns}
-              data={names}
-              loading={loading}
-              error={error}
-              sort={sort}
-              onSortChange={setSort}
-              filter={filter}
-              onFilterChange={setFilter}
-              tableKey={tableKey}
+  const createTableContent = (tabLabel: string) => {
+    const tagsVisible = !!showTagsView[tabLabel];
+    return (
+      <TableProvider key={`table-provider-${tabLabel}`}>
+        {tagsVisible ? (
+          <div className="dual-table-layout">
+            <TagsTable
+              key={`tags-table-${tabLabel}`}
+              tags={tags}
+              onTagSelect={handleTagSelect}
+              selectedTag={selectedTag}
+              visible={true}
+              ref={(ref) => {
+                // Store the ref by tab name for targeted focusing
+                if (ref) {
+                  tagsTableRefs.current[tabLabel] = ref;
+                }
+                if (tabLabel === 'Custom' && ref) {
+                  tagsTableRef.current = ref;
+                }
+              }}
             />
+            <div className="table-wrapper" ref={mainTableRef}>
+              <Table
+                key={`data-table-${tabLabel}`}
+                columns={nameColumns}
+                data={names as unknown as Record<string, unknown>[]}
+                loading={loading}
+                error={error}
+                sort={sort}
+                onSortChange={setSort}
+                filter={filter}
+                onFilterChange={setFilter}
+                tableKey={tableKey}
+              />
+            </div>
           </div>
-        </div>
-      ) : (
-        <Table<types.Name>
-          key={`data-table-${tabLabel}`}
-          columns={nameColumns}
-          data={names}
-          loading={loading}
-          error={error}
-          sort={sort}
-          onSortChange={setSort}
-          filter={filter}
-          onFilterChange={setFilter}
-          tableKey={tableKey}
-        />
-      )}
-    </TableProvider>
-  );
+        ) : (
+          <Table
+            key={`data-table-${tabLabel}`}
+            columns={nameColumns}
+            data={names as unknown as Record<string, unknown>[]}
+            loading={loading}
+            error={error}
+            sort={sort}
+            onSortChange={setSort}
+            filter={filter}
+            onFilterChange={setFilter}
+            tableKey={tableKey}
+          />
+        )}
+      </TableProvider>
+    );
+  };
 
   const tabs = [
-    { label: 'All', content: createTableContent('All', false) },
-    { label: 'Custom', content: createTableContent('Custom', false) },
-    { label: 'Prefund', content: createTableContent('Prefund', false) },
-    { label: 'Regular', content: createTableContent('Regular', false) },
-    { label: 'Baddress', content: createTableContent('Baddress', false) },
+    { label: 'All', content: createTableContent('All') },
+    { label: 'Custom', content: createTableContent('Custom') },
+    { label: 'Prefund', content: createTableContent('Prefund') },
+    { label: 'Regular', content: createTableContent('Regular') },
+    { label: 'Baddress', content: createTableContent('Baddress') },
   ];
 
   return (
@@ -272,7 +353,7 @@ export const Names = () => {
   );
 };
 
-const nameColumns: Column<types.Name>[] = [
+const nameColumns = [
   { key: 'name', header: 'Name', sortable: true },
   { key: 'address', header: 'Address', sortable: true },
   { key: 'tags', header: 'Tags', sortable: true },
@@ -280,8 +361,10 @@ const nameColumns: Column<types.Name>[] = [
   {
     key: 'actions',
     header: 'Actions',
-    render: (row: types.Name) => `${row.deleted ? 'Deleted ' : ''}`,
+    render: (row: Record<string, unknown>) =>
+      `${(row as { deleted?: boolean }).deleted ? 'Deleted ' : ''}`,
     sortable: false,
+    editable: false,
   },
 ];
 

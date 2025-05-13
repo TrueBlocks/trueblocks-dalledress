@@ -32,6 +32,7 @@ export interface FormField {
   disabled?: boolean;
   sameLine?: boolean;
   flex?: number;
+  editable?: boolean;
 }
 
 export const usePreprocessedFields = (
@@ -73,6 +74,13 @@ export const usePreprocessedFields = (
       let currentGroup: FormField[] = [];
 
       fieldsToProcess.forEach((field, index) => {
+        if (typeof field.editable === 'undefined') {
+          field.editable = true;
+        }
+        if (field.editable === false) {
+          return;
+        }
+
         const isVisible =
           typeof field.visible === 'function'
             ? field.visible(formData)

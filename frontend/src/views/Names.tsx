@@ -258,11 +258,11 @@ export const Names = () => {
   );
 
   const tabs = [
-    { label: 'All', content: createTableContent('All', true) },
-    { label: 'Custom', content: createTableContent('Custom', true) },
-    { label: 'Prefund', content: createTableContent('Prefund', true) },
-    { label: 'Regular', content: createTableContent('Regular', true) },
-    { label: 'Baddress', content: createTableContent('Baddress', true) },
+    { label: 'All', content: createTableContent('All', false) },
+    { label: 'Custom', content: createTableContent('Custom', false) },
+    { label: 'Prefund', content: createTableContent('Prefund', false) },
+    { label: 'Regular', content: createTableContent('Regular', false) },
+    { label: 'Baddress', content: createTableContent('Baddress', false) },
   ];
 
   return (

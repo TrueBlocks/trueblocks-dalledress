@@ -156,36 +156,38 @@ const EditableRowForm = <T extends Record<string, unknown>>({
       }}
     >
       <form onSubmit={handleSubmit}>
-        {columns.map((col) => (
-          <div
-            key={col.key}
-            style={{
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-            }}
-          >
-            <label
-              htmlFor={col.key}
+        {columns
+          .filter((col) => col.editable !== false) // Filter out non-editable columns
+          .map((col) => (
+            <div
+              key={col.key}
               style={{
-                minWidth: 120,
-                fontWeight: 500,
-                color: '#e0e0e0',
-                marginRight: 8,
+                marginBottom: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
               }}
             >
-              {col.header}
-            </label>
-            <TextInput
-              id={col.key}
-              value={String(formData[col.key as keyof T] ?? '')}
-              onChange={(e) => handleChange(col.key, e.target.value)}
-              name={col.key}
-              style={{ flex: 1, marginBottom: 0 }}
-            />
-          </div>
-        ))}
+              <label
+                htmlFor={col.key}
+                style={{
+                  minWidth: 120,
+                  fontWeight: 500,
+                  color: '#e0e0e0',
+                  marginRight: 8,
+                }}
+              >
+                {col.header}
+              </label>
+              <TextInput
+                id={col.key}
+                value={String(formData[col.key as keyof T] ?? '')}
+                onChange={(e) => handleChange(col.key, e.target.value)}
+                name={col.key}
+                style={{ flex: 1, marginBottom: 0 }}
+              />
+            </div>
+          ))}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
           <button
             type="button"

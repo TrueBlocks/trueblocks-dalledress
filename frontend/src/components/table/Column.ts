@@ -6,4 +6,5 @@ export interface Column<T> {
   width?: string | number;
   className?: string;
   sortable?: boolean;
+  editable?: boolean;
 }

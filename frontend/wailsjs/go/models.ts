@@ -579,6 +579,7 @@ export namespace types {
 	export class NamesPage {
 	    names: Name[];
 	    total: number;
+	    tags: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new NamesPage(source);
@@ -588,6 +589,7 @@ export namespace types {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.names = this.convertValues(source["names"], Name);
 	        this.total = source["total"];
+	        this.tags = source["tags"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

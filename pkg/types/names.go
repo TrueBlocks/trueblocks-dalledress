@@ -16,25 +16,62 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
 )
 
+type namesMap map[base.Address]types.Name
 type Names struct {
-	Map      map[base.Address]types.Name `json:"map"`
-	List     []*types.Name               `json:"list"`
-	Custom   []*types.Name               `json:"custom"`
-	Prefund  []*types.Name               `json:"prefund"`
-	Regular  []*types.Name               `json:"regular"`
-	Baddress []*types.Name               `json:"baddress"`
+	Map          namesMap      `json:"map"`
+	List         []*types.Name `json:"list"`
+	Custom       []*types.Name `json:"custom"`
+	Prefund      []*types.Name `json:"prefund"`
+	Regular      []*types.Name `json:"regular"`
+	Baddress     []*types.Name `json:"baddress"`
+	ListTags     []string      `json:"listTags"`
+	CustomTags   []string      `json:"customTags"`
+	PrefundTags  []string      `json:"prefundTags"`
+	RegularTags  []string      `json:"regularTags"`
+	BaddressTags []string      `json:"baddressTags"`
+	selectedTags map[string]string
 }
 
 type NamesPage struct {
 	Names []*types.Name `json:"names"`
 	Total int           `json:"total"`
+	Tags  []string      `json:"tags"`
+}
+
+// GetSelectedTag returns the currently selected tag for a list type
+func (n *Names) GetSelectedTag(listType string) string {
+	if n.selectedTags == nil {
+		n.selectedTags = make(map[string]string)
+	}
+
+	return n.selectedTags[listType]
+}
+
+// SetSelectedTag sets the selected tag for a specific list type
+func (n *Names) SetSelectedTag(listType string, tag string) {
+	if n.selectedTags == nil {
+		n.selectedTags = make(map[string]string)
+	}
+
+	if tag == "" {
+		delete(n.selectedTags, listType)
+	} else {
+		n.selectedTags[listType] = tag
+	}
+}
+
+// ClearSelectedTag clears the selected tag for a specific list type
+func (n *Names) ClearSelectedTag(listType string) {
+	if n.selectedTags != nil {
+		delete(n.selectedTags, listType)
+	}
 }
 
 // GetNamesPage returns a page of names for the given list type and the total count.
 func (n *Names) GetNamesPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
 	if len(n.List) == 0 {
 		if err := n.LoadNames(nil); err != nil {
-			return NamesPage{Names: nil, Total: 0}
+			return NamesPage{Names: nil, Total: 0, Tags: []string{}}
 		}
 	}
 
@@ -55,27 +92,47 @@ func (n *Names) GetNamesPage(listType string, first, pageSize int, sortKey sorti
 		list = n.List
 	}
 
+	var filters []string
 	if filter != "" {
+		filters = append(filters, filter)
+	}
+
+	if selectedTag := n.GetSelectedTag(listType); selectedTag != "" {
+		filters = append(filters, selectedTag)
+	}
+
+	if len(filters) > 0 {
 		filtered := make([]*types.Name, 0, len(list))
-		f := strings.ToLower(filter)
 		for _, name := range list {
 			addrHex := strings.ToLower(name.Address.Hex())
 			addrNoPrefix := strings.TrimPrefix(addrHex, "0x")
 			addrNoLeadingZeros := strings.TrimLeft(addrNoPrefix, "0")
-			match := strings.Contains(strings.ToLower(name.Name), f) ||
-				strings.Contains(addrHex, f) ||
-				strings.Contains(addrNoPrefix, f) ||
-				strings.Contains(addrNoLeadingZeros, f) ||
-				strings.Contains(strings.ToLower(name.Tags), f) ||
-				strings.Contains(strings.ToLower(name.Source), f)
-			// Extra: if filter starts with 0x, try matching without 0x and leading zeros
-			if !match && strings.HasPrefix(f, "0x") {
-				fNoPrefix := strings.TrimPrefix(f, "0x")
-				if strings.Contains(addrNoPrefix, fNoPrefix) || strings.Contains(addrNoLeadingZeros, fNoPrefix) {
-					match = true
+
+			matchesAllFilters := true
+			for _, filter := range filters {
+				f := strings.ToLower(filter)
+				match := strings.Contains(strings.ToLower(name.Name), f) ||
+					strings.Contains(addrHex, f) ||
+					strings.Contains(addrNoPrefix, f) ||
+					strings.Contains(addrNoLeadingZeros, f) ||
+					strings.Contains(strings.ToLower(name.Tags), f) ||
+					strings.Contains(strings.ToLower(name.Source), f)
+
+				// Extra: if filter starts with 0x, try matching without 0x and leading zeros
+				if !match && strings.HasPrefix(f, "0x") {
+					fNoPrefix := strings.TrimPrefix(f, "0x")
+					if strings.Contains(addrNoPrefix, fNoPrefix) || strings.Contains(addrNoLeadingZeros, fNoPrefix) {
+						match = true
+					}
+				}
+
+				if !match {
+					matchesAllFilters = false
+					break
 				}
 			}
-			if match {
+
+			if matchesAllFilters {
 				filtered = append(filtered, name)
 			}
 		}
@@ -84,7 +141,20 @@ func (n *Names) GetNamesPage(listType string, first, pageSize int, sortKey sorti
 
 	total := len(list)
 	if total == 0 || first >= total {
-		return NamesPage{Names: nil, Total: total}
+		var tags []string
+		switch listType {
+		case "custom":
+			tags = n.CustomTags
+		case "prefund":
+			tags = n.PrefundTags
+		case "regular":
+			tags = n.RegularTags
+		case "baddress":
+			tags = n.BaddressTags
+		default:
+			tags = n.ListTags
+		}
+		return NamesPage{Names: nil, Total: total, Tags: tags}
 	}
 
 	// Sorting
@@ -110,8 +180,26 @@ func (n *Names) GetNamesPage(listType string, first, pageSize int, sortKey sorti
 		})
 	}
 
+	var tags []string
+	switch listType {
+	case "custom":
+		tags = n.CustomTags
+	case "prefund":
+		tags = n.PrefundTags
+	case "regular":
+		tags = n.RegularTags
+	case "baddress":
+		tags = n.BaddressTags
+	default:
+		tags = n.ListTags
+	}
+
 	last := min(total, first+pageSize)
-	return NamesPage{Names: list[first:last], Total: total}
+	return NamesPage{
+		Names: list[first:last],
+		Total: total,
+		Tags:  tags,
+	}
 }
 
 var namesMutex sync.Mutex
@@ -176,6 +264,13 @@ func (n *Names) LoadNames(wg *sync.WaitGroup) error {
 				n.Regular = append(n.Regular, name)
 			}
 		}
+
+		n.ListTags = extractTagsFromNames(n.List)
+		n.CustomTags = extractTagsFromNames(n.Custom)
+		n.PrefundTags = extractTagsFromNames(n.Prefund)
+		n.RegularTags = extractTagsFromNames(n.Regular)
+		n.BaddressTags = extractTagsFromNames(n.Baddress)
+
 		return nil
 	}
 }
@@ -199,6 +294,31 @@ func compare(nameI, nameJ types.Name) bool {
 }
 
 func (n *Names) ReloadNames() {
-	*n = Names{}
+	*n = Names{selectedTags: n.selectedTags}
 	_ = n.LoadNames(nil)
+}
+
+// extractTagsFromNames extracts unique tags from a list of names
+func extractTagsFromNames(namesList []*types.Name) []string {
+	tagsMap := make(map[string]bool)
+	for _, name := range namesList {
+		if name.Tags != "" {
+			// Split the tags string by commas and extract individual tags
+			tagsList := strings.Split(name.Tags, ",")
+			for _, tag := range tagsList {
+				tag = strings.TrimSpace(tag)
+				if tag != "" {
+					tagsMap[tag] = true
+				}
+			}
+		}
+	}
+
+	uniqueTags := make([]string, 0, len(tagsMap))
+	for tag := range tagsMap {
+		uniqueTags = append(uniqueTags, tag)
+	}
+	sort.Strings(uniqueTags)
+
+	return uniqueTags
 }

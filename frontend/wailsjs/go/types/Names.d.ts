@@ -4,8 +4,14 @@ import {sorting} from '../models';
 import {types} from '../models';
 import {sync} from '../models';
 
+export function ClearSelectedTag(arg1:string):Promise<void>;
+
 export function GetNamesPage(arg1:string,arg2:number,arg3:number,arg4:sorting.SortDef,arg5:string):Promise<types.NamesPage>;
+
+export function GetSelectedTag(arg1:string):Promise<string>;
 
 export function LoadNames(arg1:sync.WaitGroup):Promise<void>;
 
 export function ReloadNames():Promise<void>;
+
+export function SetSelectedTag(arg1:string,arg2:string):Promise<void>;

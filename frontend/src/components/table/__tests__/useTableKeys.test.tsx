@@ -1,4 +1,13 @@
-// Mock dependencies before imports
+import { Logger } from '@app';
+import { useTableContext } from '@components';
+import { TableKey } from '@contexts';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { usePagination } from '../usePagination';
+import { useTableKeys } from '../useTableKeys';
+
+// Mock dependencies after imports
 vi.mock('@components', () => ({
   useTableContext: vi.fn(),
 }));
@@ -11,16 +20,6 @@ vi.mock('../usePagination', () => ({
 vi.mock('@app', () => ({
   Logger: vi.fn(),
 }));
-
-// Now import modules
-import { useTableContext } from '@components';
-import { Logger } from '@app';
-import { TableKey } from '@contexts';
-import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { usePagination } from '../usePagination';
-import { useTableKeys } from '../useTableKeys';
 
 // Helper function to create mock keyboard events
 function mockEvent(
@@ -480,7 +479,7 @@ describe('useTableKeys', () => {
     it('should handle Enter key correctly', () => {
       // Clear any existing calls
       vi.clearAllMocks();
-      
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -496,7 +495,7 @@ describe('useTableKeys', () => {
 
       // Verify the logger was called with the expected message
       expect(Logger).toHaveBeenCalledWith(
-        `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`
+        `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`,
       );
     });
   });

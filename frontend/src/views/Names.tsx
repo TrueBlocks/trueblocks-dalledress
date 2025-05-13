@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Logger } from '@app';
 import {
   Column,
   Table,
@@ -38,9 +37,12 @@ export const Names = () => {
     getListTypeFromLabel(lastTab['/names'] || ''),
   );
 
-  // Reference to the tags table for focusing
-  const tagsTableRef = useRef<TagsTableHandle>(null);
+  // References for each tab's TagsTable to support targeting specific instances
+  const tagsTableRefs = useRef<Record<string, TagsTableHandle | null>>({});
   const mainTableRef = useRef<HTMLDivElement>(null);
+
+  // Single ref for backward compatibility
+  const tagsTableRef = useRef<TagsTableHandle>(null);
 
   const tableKey = useMemo<TableKey>(
     () => ({
@@ -94,7 +96,6 @@ export const Names = () => {
     loadNames();
 
     var unsubscribe = EventsOn(msgs.EventType.REFRESH, () => {
-      Logger('Refreshing names in the frontend');
       loadNames();
     });
     return unsubscribe;
@@ -128,7 +129,29 @@ export const Names = () => {
 
   // Setup event listener for focusing the tags table
   useEffect(() => {
-    const focusTagsTable = () => {
+    const focusTagsTable = (_data: { activeTab?: string } = {}) => {
+      // First try to derive tab from current location
+      const currentTabLabel = lastTab['/names'] || 'Custom';
+
+      // Try to focus the TagsTable for the current tab first
+      if (currentTabLabel && tagsTableRefs.current[currentTabLabel]) {
+        tagsTableRefs.current[currentTabLabel].focus();
+        return;
+      }
+
+      // If we couldn't focus the current tab's TagsTable, iterate through all available refs
+      const availableTabs = Object.keys(tagsTableRefs.current);
+      if (availableTabs.length > 0) {
+        // Try to find any tab that has a valid ref
+        for (const tabName of availableTabs) {
+          if (tagsTableRefs.current[tabName]) {
+            tagsTableRefs.current[tabName].focus();
+            return;
+          }
+        }
+      }
+
+      // Fall back to legacy ref as a last resort
       if (tagsTableRef.current) {
         tagsTableRef.current.focus();
       }
@@ -136,7 +159,7 @@ export const Names = () => {
 
     const unsubscribe = EventsOn(FocusSider, focusTagsTable);
     return unsubscribe;
-  }, []);
+  }, [lastTab]);
 
   // Handle tag selection
   const handleTagSelect = async (
@@ -144,38 +167,31 @@ export const Names = () => {
     focusMainTable: boolean = false,
   ) => {
     try {
-      Logger(`handleTagSelect called with tag: ${tag}, listType: ${listType}`);
       if (tag) {
-        Logger(`Calling SetSelectedTag(${listType}, ${tag})`);
         try {
-          const result = await SetSelectedTag(listType, tag);
-          Logger(`SetSelectedTag result: ${JSON.stringify(result)}`);
+          await SetSelectedTag(listType, tag);
         } catch (e) {
-          Logger(`Error in SetSelectedTag: ${e}`);
+          console.error(`Error in SetSelectedTag: ${e}`);
         }
       } else {
-        Logger(`Calling ClearSelectedTag(${listType})`);
         try {
-          const result = await ClearSelectedTag(listType);
-          Logger(`ClearSelectedTag result: ${JSON.stringify(result)}`);
+          await ClearSelectedTag(listType);
         } catch (e) {
-          Logger(`Error in ClearSelectedTag: ${e}`);
+          console.error(`Error in ClearSelectedTag: ${e}`);
         }
       }
       setSelectedTag(tag);
     } catch (err) {
-      Logger(`Error setting selected tag: ${err}`);
+      console.error(`Error setting selected tag: ${err}`);
     }
 
     // Reset to first page when selecting a tag
     if (pagination.currentPage !== 0) {
-      Logger(`Resetting to first page`);
       goToPage(0);
     }
 
     // Focus the main table only if explicitly requested (via Enter key)
     if (focusMainTable && mainTableRef.current) {
-      Logger(`Focusing main table`);
       setTimeout(() => {
         const tableElement = mainTableRef.current?.querySelector('.data-table');
         if (tableElement) {
@@ -186,19 +202,32 @@ export const Names = () => {
   };
 
   // Each tab gets its own TableProvider instance to ensure state isolation
-  const createTableContent = (showTagsTable: boolean = false) => (
-    <TableProvider>
+  const createTableContent = (
+    tabLabel: string,
+    showTagsTable: boolean = false,
+  ) => (
+    <TableProvider key={`table-provider-${tabLabel}`}>
       {showTagsTable ? (
         <div className="dual-table-layout">
           <TagsTable
+            key={`tags-table-${tabLabel}`}
             tags={tags}
             onTagSelect={handleTagSelect}
             selectedTag={selectedTag}
             visible={true}
-            ref={tagsTableRef}
+            ref={(ref) => {
+              // Store the ref by tab name for targeted focusing
+              if (ref) {
+                tagsTableRefs.current[tabLabel] = ref;
+              }
+              if (tabLabel === 'Custom' && ref) {
+                tagsTableRef.current = ref;
+              }
+            }}
           />
           <div className="table-wrapper" ref={mainTableRef}>
             <Table<types.Name>
+              key={`data-table-${tabLabel}`}
               columns={nameColumns}
               data={names}
               loading={loading}
@@ -213,6 +242,7 @@ export const Names = () => {
         </div>
       ) : (
         <Table<types.Name>
+          key={`data-table-${tabLabel}`}
           columns={nameColumns}
           data={names}
           loading={loading}
@@ -228,11 +258,11 @@ export const Names = () => {
   );
 
   const tabs = [
-    { label: 'All', content: createTableContent(false) },
-    { label: 'Custom', content: createTableContent(true) },
-    { label: 'Prefund', content: createTableContent(false) },
-    { label: 'Regular', content: createTableContent(false) },
-    { label: 'Baddress', content: createTableContent(false) },
+    { label: 'All', content: createTableContent('All', true) },
+    { label: 'Custom', content: createTableContent('Custom', true) },
+    { label: 'Prefund', content: createTableContent('Prefund', true) },
+    { label: 'Regular', content: createTableContent('Regular', true) },
+    { label: 'Baddress', content: createTableContent('Baddress', true) },
   ];
 
   return (

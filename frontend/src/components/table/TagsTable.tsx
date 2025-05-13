@@ -27,6 +27,15 @@ export const TagsTable = forwardRef(function TagsTable(
 ) {
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const tagTableRef = useRef<HTMLDivElement | null>(null);
+  const tagItemsRef = useRef<(HTMLLIElement | null)[]>([]);
+
+  // Initialize or resize the refs array when tags change
+  useEffect(() => {
+    tagItemsRef.current = tagItemsRef.current.slice(0, tags.length);
+    while (tagItemsRef.current.length < tags.length) {
+      tagItemsRef.current.push(null);
+    }
+  }, [tags]);
 
   // Expose focus method via ref
   useImperativeHandle(ref, () => ({
@@ -44,6 +53,28 @@ export const TagsTable = forwardRef(function TagsTable(
       onTagSelect(tag, shouldFocus);
     }
   };
+
+  // Scroll the focused item into view
+  useEffect(() => {
+    if (focusedIndex >= 0 && focusedIndex < tags.length) {
+      const focusedElement = tagItemsRef.current[focusedIndex];
+      if (
+        focusedElement &&
+        typeof focusedElement.scrollIntoView === 'function'
+      ) {
+        // Use scrollIntoView with options to ensure smooth scrolling and proper positioning
+        try {
+          focusedElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        } catch (e) {
+          // Handle potential issues in test environments
+          console.error(`Error scrolling: ${e}`);
+        }
+      }
+    }
+  }, [focusedIndex, tags.length]);
 
   // Handle keyboard navigation within the tags table
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -88,7 +119,11 @@ export const TagsTable = forwardRef(function TagsTable(
   useEffect(() => {
     if (selectedTag) {
       const index = tags.findIndex((tag) => tag === selectedTag);
-      setFocusedIndex(index !== -1 ? index : -1);
+      if (index !== -1) {
+        setFocusedIndex(index);
+      } else {
+        setFocusedIndex(-1);
+      }
     } else {
       setFocusedIndex(-1);
     }
@@ -115,6 +150,10 @@ export const TagsTable = forwardRef(function TagsTable(
             {tags.map((tag, index) => (
               <li
                 key={tag}
+                ref={(el) => {
+                  tagItemsRef.current[index] = el;
+                  return undefined;
+                }}
                 className={`tag-item ${selectedTag === tag ? 'selected' : ''} ${
                   focusedIndex === index ? 'focused' : ''
                 }`}

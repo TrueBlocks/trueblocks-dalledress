@@ -145,7 +145,8 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+shift+e',
             label: 'Focus tags sider',
             action: () => {
-              emitEvent(FocusSider, {});
+              // Pass the current active tab information to better target the right TagsTable
+              emitEvent(FocusSider, { activeTab: currentLocation });
             },
           },
           e,

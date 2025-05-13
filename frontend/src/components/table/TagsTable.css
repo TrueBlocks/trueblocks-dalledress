@@ -1,0 +1,89 @@
+.tags-table-container {
+  width: 175px;
+  flex-shrink: 0;
+  height: auto;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: var(--mantine-radius-sm);
+  overflow: hidden;
+  margin-top: 0.75rem;
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+}
+
+.tags-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: var(--mantine-color-dark-6);
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+.tags-table-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mantine-color-white);
+}
+
+.tags-table {
+  flex: 1;
+  overflow-y: auto;
+  outline: none;
+  max-height: 500px; /* Set max height to show ~15 items */
+}
+
+.tags-table ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tag-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tag-item:hover {
+  background-color: var(--mantine-color-dark-5);
+}
+
+.tag-item.selected {
+  background-color: var(--mantine-color-green-9);
+  color: var(--mantine-color-white);
+}
+
+.tag-item.focused {
+  outline: 2px solid var(--mantine-color-green-5);
+  outline-offset: -2px;
+}
+
+.no-tags {
+  padding: 12px;
+  text-align: center;
+  color: var(--mantine-color-gray-6);
+}
+
+.clear-tag-button {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: var(--mantine-radius-sm);
+  cursor: pointer;
+  color: var(--mantine-color-gray-6);
+}
+
+.clear-tag-button:hover {
+  background: var(--mantine-color-dark-5);
+}

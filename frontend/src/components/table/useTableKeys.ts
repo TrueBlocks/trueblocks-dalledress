@@ -79,6 +79,7 @@ export const useTableKeys = ({
           e.preventDefault();
           if (currentPage !== 0) {
             goToPage(0);
+            setSelectedRowIndex(0);
           } else {
             setSelectedRowIndex(0);
           }
@@ -87,6 +88,7 @@ export const useTableKeys = ({
           e.preventDefault();
           if (currentPage !== totalPages - 1) {
             goToPage(totalPages - 1);
+            setSelectedRowIndex(itemCount - 1);
           } else {
             setSelectedRowIndex(itemCount - 1);
           }

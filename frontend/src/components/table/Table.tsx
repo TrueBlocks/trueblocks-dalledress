@@ -53,7 +53,7 @@ export function Table<T extends Record<string, unknown>>({
   } = useTableContext();
 
   const [expandedRowIndex, setExpandedRowIndex] = useState<number | null>(null);
-  const [detailClosed, setDetailClosed] = useState(false);
+  const [detailClosed, setDetailClosed] = useState(true);
 
   // Ref to track if the next Enter key should re-open the detail view
   const shouldOpenDetailOnEnter = useRef(false);

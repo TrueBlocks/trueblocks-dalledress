@@ -282,6 +282,14 @@ export const Names = () => {
     }
   };
 
+  const handleSaveRow = (
+    row: Record<string, unknown>,
+    updated: Partial<Record<string, unknown>>,
+  ) => {
+    console.log('Saving row:', row, 'with updates:', updated);
+    // TODO: Implement actual save to backend later
+  };
+
   // Each tab gets its own TableProvider instance to ensure state isolation
   const createTableContent = (tabLabel: string) => {
     const tagsVisible = !!showTagsView[tabLabel];
@@ -317,6 +325,7 @@ export const Names = () => {
                 filter={filter}
                 onFilterChange={setFilter}
                 tableKey={tableKey}
+                onSaveRow={handleSaveRow}
               />
             </div>
           </div>
@@ -332,6 +341,10 @@ export const Names = () => {
             filter={filter}
             onFilterChange={setFilter}
             tableKey={tableKey}
+            onSaveRow={(row, updated) => {
+              console.log('Saving row:', row, 'with updates:', updated);
+              // TODO: Will handle actual saving to backend later
+            }}
           />
         )}
       </TableProvider>
@@ -355,7 +368,7 @@ export const Names = () => {
 
 const nameColumns = [
   { key: 'name', header: 'Name', sortable: true },
-  { key: 'address', header: 'Address', sortable: true },
+  { key: 'address', header: 'Address', sortable: true, readOnly: true },
   { key: 'tags', header: 'Tags', sortable: true },
   { key: 'source', header: 'Source', sortable: true },
   {

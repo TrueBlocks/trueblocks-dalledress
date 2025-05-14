@@ -1,4 +1,5 @@
 import { Body, Column } from '@components';
+import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -130,5 +131,36 @@ describe('Body', () => {
     expect(screen.getByText(/Deleted/)).toBeInTheDocument();
     expect(screen.getByText(/Custom/)).toBeInTheDocument();
     expect(screen.getByText(/Prefund/)).toBeInTheDocument();
+  });
+
+  it('renders editable form with Save and Cancel buttons when expanded', () => {
+    const onSaveRow = vi.fn();
+    const onCancelRow = vi.fn();
+    const setExpandedRowIndex = vi.fn();
+
+    render(
+      <MantineProvider>
+        <table>
+          <tbody>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={0}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={0}
+              setExpandedRowIndex={setExpandedRowIndex}
+              onSaveRow={onSaveRow}
+              onCancelRow={onCancelRow}
+            />
+          </tbody>
+        </table>
+      </MantineProvider>,
+    );
+    expect(screen.getByText('Save')).toBeInTheDocument();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toBeInTheDocument();
+    expect(screen.getByLabelText('Address')).toBeInTheDocument();
+    expect(screen.getByLabelText('Tags')).toBeInTheDocument();
+    expect(screen.getByLabelText('Source')).toBeInTheDocument();
   });
 });

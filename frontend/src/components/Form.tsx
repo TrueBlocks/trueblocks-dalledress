@@ -15,6 +15,7 @@ export interface FormProps<T = Record<string, unknown>> {
   submitText?: string;
   submitButtonRef?: React.RefObject<HTMLButtonElement | null>;
   initMode?: 'display' | 'edit';
+  compact?: boolean;
 }
 
 export function Form<T = Record<string, unknown>>({
@@ -26,6 +27,7 @@ export function Form<T = Record<string, unknown>>({
   onChange,
   submitButtonRef,
   initMode = 'display',
+  compact = false,
 }: FormProps<T>) {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'display' | 'edit'>(initMode);
@@ -71,13 +73,13 @@ export function Form<T = Record<string, unknown>>({
   );
 
   return (
-    <Stack>
+    <Stack gap={compact ? 'xs' : 'md'}>
       {title && <Title order={3}>{title}</Title>}
       {description && <Text>{description}</Text>}
       <form role="form" onSubmit={handleSave}>
-        <Stack>
+        <Stack gap={compact ? 'xs' : 'md'}>
           {processedFields.map((field, index) => renderField(field, index))}
-          <Group justify="flex-end" mt="md">
+          <Group justify="flex-end" mt={compact ? 'xs' : 'md'}>
             {mode === 'display' && (
               <Button tabIndex={0} variant="outline" onClick={handleEdit}>
                 Edit

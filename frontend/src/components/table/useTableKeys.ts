@@ -79,19 +79,21 @@ export const useTableKeys = ({
           e.preventDefault();
           if (currentPage !== 0) {
             goToPage(0);
+          } else {
+            setSelectedRowIndex(0);
           }
-          setSelectedRowIndex(0);
           break;
         case 'End':
           e.preventDefault();
           if (currentPage !== totalPages - 1) {
             goToPage(totalPages - 1);
+          } else {
+            setSelectedRowIndex(itemCount - 1);
           }
-          setSelectedRowIndex(itemCount - 1);
           break;
         case 'Enter':
           e.preventDefault();
-          if (onEnter) onEnter();
+          onEnter?.();
           // If setExpandedRowIndex is the default no-op, call Logger for legacy/test compatibility
           if (setExpandedRowIndex.toString() === '() => {}') {
             Logger(
@@ -101,8 +103,7 @@ export const useTableKeys = ({
             if (expandedRowIndex === selectedRowIndex) {
               setExpandedRowIndex(null); // collapse if already open
             } else {
-              setExpandedRowIndex(selectedRowIndex); // expand selected row
-              // (scrolling logic removed)
+              setExpandedRowIndex(selectedRowIndex);
             }
           }
           break;

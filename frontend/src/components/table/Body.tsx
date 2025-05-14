@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-import { Column } from '@components';
-import { TextInput } from '@mantine/core';
+import { Column, Form, FormField } from '@components';
 
 interface BodyProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
@@ -86,7 +85,6 @@ export function Body<T extends Record<string, unknown>>({
   );
 }
 
-// Editable form for a row
 const EditableRowForm = <T extends Record<string, unknown>>({
   row,
   columns,
@@ -132,8 +130,9 @@ const EditableRowForm = <T extends Record<string, unknown>>({
     setFormData(initial);
   }, [row, columns]);
 
-  const handleChange = (key: string, value: unknown) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -142,88 +141,38 @@ const EditableRowForm = <T extends Record<string, unknown>>({
     onClose();
   };
 
+  const formFields: FormField<T>[] = columns
+    .filter((col) => col.editable !== false)
+    .map((col) => ({
+      name: col.key,
+      label: col.header,
+      value: String(formData[col.key as keyof T] ?? ''),
+      type: 'text',
+      readOnly: col.readOnly,
+    }));
+
   return (
     <div
       style={{
         maxWidth: 700,
-        margin: '2rem auto',
+        margin: '1rem auto',
         backgroundColor: '#23272f',
         border: '1px solid #333',
         borderRadius: 12,
         boxShadow: '0 2px 16px rgba(0,0,0,0.25)',
-        padding: '2.5rem 2rem',
+        padding: '1rem 2rem',
         color: '#e0e0e0',
       }}
     >
-      <form onSubmit={handleSubmit}>
-        {columns
-          .filter((col) => col.editable !== false) // Filter out non-editable columns
-          .map((col) => (
-            <div
-              key={col.key}
-              style={{
-                marginBottom: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-              }}
-            >
-              <label
-                htmlFor={col.key}
-                style={{
-                  minWidth: 120,
-                  fontWeight: 500,
-                  color: '#e0e0e0',
-                  marginRight: 8,
-                }}
-              >
-                {col.header}
-              </label>
-              <TextInput
-                id={col.key}
-                value={String(formData[col.key as keyof T] ?? '')}
-                onChange={(e) => handleChange(col.key, e.target.value)}
-                name={col.key}
-                style={{ flex: 1, marginBottom: 0 }}
-              />
-            </div>
-          ))}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              minWidth: 100,
-              background: 'transparent',
-              color: '#7fffa9',
-              border: '1px solid #7fffa9',
-              borderRadius: 6,
-              padding: '0.5rem 1.5rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'background 0.2s, color 0.2s',
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            style={{
-              minWidth: 100,
-              background: '#7fffa9',
-              color: '#23272f',
-              border: 'none',
-              borderRadius: 6,
-              padding: '0.5rem 1.5rem',
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'background 0.2s, color 0.2s',
-            }}
-          >
-            Save
-          </button>
-        </div>
-      </form>
+      <Form<T>
+        fields={formFields}
+        initMode="edit"
+        onSubmit={handleSubmit}
+        onCancel={onClose}
+        onChange={handleChange}
+        submitText="Save"
+        compact={true}
+      />
     </div>
   );
 };

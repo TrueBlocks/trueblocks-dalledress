@@ -27,6 +27,8 @@ export interface TableProps<T extends Record<string, unknown>> {
   filter?: string;
   onFilterChange?: (filter: string) => void;
   tableKey: TableKey;
+  onSaveRow?: (row: T, updated: Partial<T>) => void;
+  onCancelRow?: () => void;
 }
 
 export function Table<T extends Record<string, unknown>>({
@@ -39,6 +41,8 @@ export function Table<T extends Record<string, unknown>>({
   filter: controlledFilter,
   onFilterChange,
   tableKey,
+  onSaveRow,
+  onCancelRow,
 }: TableProps<T>) {
   const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
@@ -65,12 +69,10 @@ export function Table<T extends Record<string, unknown>>({
     tableKey,
     expandedRowIndex,
     setExpandedRowIndex: (idx) => {
-      // If opening detail view via Enter, reset detailClosed
       if (idx !== null && shouldOpenDetailOnEnter.current) {
         setDetailClosed(false);
         shouldOpenDetailOnEnter.current = false;
       }
-      // If closing detail view, set detailClosed
       if (idx === null) setDetailClosed(true);
       setExpandedRowIndex(idx);
     },
@@ -278,8 +280,8 @@ export function Table<T extends Record<string, unknown>>({
                 if (idx === null) setDetailClosed(true);
                 setExpandedRowIndex(idx);
               }}
-              onSaveRow={() => setDetailClosed(true)}
-              onCancelRow={() => setDetailClosed(true)}
+              onSaveRow={onSaveRow || (() => setDetailClosed(true))}
+              onCancelRow={onCancelRow || (() => setDetailClosed(true))}
             />
           </tbody>
         </table>

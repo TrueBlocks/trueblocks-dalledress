@@ -5,6 +5,8 @@ import { useEvent } from '@hooks';
 import { Tabs } from '@mantine/core';
 import { msgs } from '@models';
 
+import './TabView.css';
+
 interface Tab {
   label: string;
   content: React.ReactNode;
@@ -44,7 +46,7 @@ export const TabView = ({ tabs, route }: TabViewProps) => {
   );
 
   return (
-    <div>
+    <div className="tab-view-container">
       <Tabs
         value={activeTab}
         onChange={(value) => {

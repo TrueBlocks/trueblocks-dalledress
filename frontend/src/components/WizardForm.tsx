@@ -1,13 +1,14 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, ReactNode, useEffect, useState } from 'react';
 
 import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
 import { useFormHotkeys } from '@hooks';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
 
-export interface WizardFormProps {
+export interface WizardFormProps<T = Record<string, unknown>> {
+  children?: ReactNode;
   title?: string;
   description?: string;
-  fields: FormField[];
+  fields: FormField<T>[];
   onSubmit: (e: FormEvent) => void;
   onBack?: () => void;
   onCancel?: () => void;
@@ -16,7 +17,8 @@ export interface WizardFormProps {
   submitButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-export const WizardForm = ({
+export const WizardForm = <T = Record<string, unknown>,>({
+  children,
   title,
   description,
   fields,
@@ -26,24 +28,21 @@ export const WizardForm = ({
   onChange,
   submitText = 'Next',
   submitButtonRef,
-}: WizardFormProps) => {
+}: WizardFormProps<T>) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(false);
   }, []);
 
-  useFormHotkeys({
-    onCancel,
-    submitButtonRef,
-  });
+  useFormHotkeys({ onCancel, submitButtonRef });
 
-  const processedFields = usePreprocessedFields(fields, onChange);
+  const processedFields = usePreprocessedFields<T>(fields, onChange);
 
-  const renderField = (field: FormField, index: number) => (
+  const renderField = (field: FormField<T>, index: number) => (
     <FieldRenderer
       key={field.name || index}
-      field={field}
+      field={field as FormField<Record<string, unknown>>}
       onChange={onChange}
       loading={loading}
       keyProp={field.name || index}
@@ -55,25 +54,29 @@ export const WizardForm = ({
     <Stack>
       {title && <Title order={3}>{title}</Title>}
       {description && <Text>{description}</Text>}
-      <form role="form" onSubmit={onSubmit}>
-        <Stack>
-          {processedFields.map((field, index) => renderField(field, index))}
-          <Group justify="flex-end" mt="md">
-            {onBack && (
-              <Button tabIndex={0} variant="outline" onClick={onBack}>
-                Back
+      {children ? (
+        children
+      ) : (
+        <form role="form" onSubmit={onSubmit}>
+          <Stack>
+            {processedFields.map((field, index) => renderField(field, index))}
+            <Group justify="flex-end" mt="md">
+              {onBack && (
+                <Button tabIndex={0} variant="outline" onClick={onBack}>
+                  Back
+                </Button>
+              )}
+              <Button
+                type="submit"
+                tabIndex={0}
+                ref={submitButtonRef as React.RefObject<HTMLButtonElement>}
+              >
+                {submitText}
               </Button>
-            )}
-            <Button
-              type="submit"
-              tabIndex={0}
-              ref={submitButtonRef as React.RefObject<HTMLButtonElement>}
-            >
-              {submitText}
-            </Button>
-          </Group>
-        </Stack>
-      </form>
+            </Group>
+          </Stack>
+        </form>
+      )}
     </Stack>
   );
 };

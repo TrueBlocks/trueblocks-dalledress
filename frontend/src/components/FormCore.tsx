@@ -2,8 +2,10 @@ import { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 
 import { TextInput } from '@mantine/core';
 
-export interface FormField {
+export interface FormField<T = Record<string, unknown>> {
   name?: string;
+  key?: string;
+  header?: string;
   value?: string | number | boolean;
   label?: string;
   placeholder?: string;
@@ -13,7 +15,7 @@ export interface FormField {
   onBlur?: () => void;
   rightSection?: ReactNode;
   hint?: string;
-  visible?: boolean | ((formData: Record<string, unknown>) => boolean);
+  visible?: boolean | ((formData: T) => boolean);
   objType?: string;
   type?:
     | 'text'
@@ -24,7 +26,7 @@ export interface FormField {
     | 'button'
     | 'textarea'
     | 'select';
-  fields?: FormField[];
+  fields?: FormField<T>[];
   isButtonGroup?: boolean;
   buttonAlignment?: 'left' | 'center' | 'right';
   customRender?: ReactNode;
@@ -33,15 +35,20 @@ export interface FormField {
   sameLine?: boolean;
   flex?: number;
   editable?: boolean;
+  width?: string | number;
+  className?: string;
+  sortable?: boolean;
+  accessor?: (row: T) => ReactNode;
+  render?: (row: T, rowIndex: number) => ReactNode;
 }
 
-export const usePreprocessedFields = (
-  fields: FormField[],
+export const usePreprocessedFields = <T,>(
+  fields: FormField<T>[],
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
-  formData: Record<string, unknown> = {},
-): FormField[] => {
+  formData: T = {} as T,
+): FormField<T>[] => {
   const combineOnOneLine = useCallback(
-    (fields: (FormField & { flex?: number })[]): FormField => ({
+    (fields: (FormField<T> & { flex?: number })[]): FormField<T> => ({
       customRender: (
         <div style={{ display: 'flex', gap: '1rem' }}>
           {fields.map((field) => (
@@ -69,9 +76,9 @@ export const usePreprocessedFields = (
   );
 
   const preprocessFields = useCallback(
-    (fieldsToProcess: FormField[]): FormField[] => {
-      const acceptedFields: FormField[] = [];
-      let currentGroup: FormField[] = [];
+    (fieldsToProcess: FormField<T>[]): FormField<T>[] => {
+      const acceptedFields: FormField<T>[] = [];
+      let currentGroup: FormField<T>[] = [];
 
       fieldsToProcess.forEach((field, index) => {
         if (typeof field.editable === 'undefined') {
@@ -117,16 +124,4 @@ export const usePreprocessedFields = (
   );
 
   return useMemo(() => preprocessFields(fields), [preprocessFields, fields]);
-};
-
-export const createFieldRenderer = (
-  field: FormField,
-  index: number,
-  renderComponent: (
-    field: FormField,
-    keyProp: string | number,
-    autoFocus?: boolean,
-  ) => ReactNode,
-) => {
-  return renderComponent(field, field.name || index, index === 0);
 };

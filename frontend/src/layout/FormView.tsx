@@ -1,21 +1,23 @@
 import { Form, FormField, FormProps } from '@components';
 import { Container } from '@mantine/core';
 
-export const FormView = ({
+export interface FormViewProps<T> {
+  formFields: FormField<T>[];
+  title?: string;
+  description?: string;
+  onSubmit: FormProps<T>['onSubmit'];
+  onChange?: FormProps<T>['onChange'];
+  onCancel?: FormProps<T>['onCancel'];
+}
+
+export const FormView = <T,>({
   formFields,
   title,
   description,
   onSubmit,
   onChange,
   onCancel,
-}: {
-  formFields: FormField[];
-  title?: string;
-  description?: string;
-  onSubmit: FormProps['onSubmit'];
-  onChange?: FormProps['onChange'];
-  onCancel?: FormProps['onCancel'];
-}) => {
+}: FormViewProps<T>) => {
   return (
     <Container
       size="md"
@@ -26,7 +28,7 @@ export const FormView = ({
         borderRadius: '8px',
       }}
     >
-      <Form
+      <Form<T>
         title={title}
         description={description}
         fields={formFields}

@@ -1,6 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
 import { GetOrgPreferences, Logger, SetOrgPreferences } from '@app';
+import { FormField } from '@components';
 import { FormView } from '@layout';
 import { msgs, preferences } from '@models';
 import { emitEvent } from '@utils';
@@ -39,7 +40,7 @@ export const SettingsOrg = () => {
     Logger(`${name} = ${JSON.stringify(value)}`);
   };
 
-  const formFields = [
+  const formFields: FormField<preferences.OrgPreferences>[] = [
     {
       name: 'developerName',
       value: formData['developerName'] || '',
@@ -107,7 +108,7 @@ export const SettingsOrg = () => {
   ];
 
   return (
-    <FormView
+    <FormView<preferences.OrgPreferences>
       title="Edit / Manage Your Settings"
       formFields={formFields}
       onSubmit={handleSubmit}

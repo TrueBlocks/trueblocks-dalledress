@@ -4,7 +4,7 @@ import { FormField } from '@components';
 import { Fieldset, Stack, Text, TextInput } from '@mantine/core';
 
 export interface FieldRendererProps {
-  field: FormField;
+  field: FormField<Record<string, unknown>>;
   mode?: 'display' | 'edit';
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   loading?: boolean;

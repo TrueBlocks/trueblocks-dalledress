@@ -6,6 +6,7 @@ import { msgs } from '@models';
 import { emitEvent } from '@utils';
 
 import { WizardStepProps } from '.';
+import { WizardStateData } from './WizardTypes';
 
 export const StepUserInfo = ({
   state,
@@ -55,7 +56,7 @@ export const StepUserInfo = ({
     }
   };
 
-  const formFields: FormField[] = [
+  const formFields: FormField<WizardStateData>[] = [
     {
       name: 'name',
       value: name,
@@ -79,7 +80,7 @@ export const StepUserInfo = ({
   ];
 
   return (
-    <WizardForm
+    <WizardForm<WizardStateData>
       title="User Information"
       description="Please provide your name and email address."
       fields={formFields}

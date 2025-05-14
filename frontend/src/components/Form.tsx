@@ -4,10 +4,10 @@ import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
 import { useFormHotkeys } from '@hooks';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
 
-export interface FormProps {
+export interface FormProps<T = Record<string, unknown>> {
   title?: string;
   description?: string;
-  fields: FormField[];
+  fields: FormField<T>[];
   onSubmit: (e: FormEvent) => void;
   onBack?: () => void;
   onCancel?: () => void;
@@ -17,7 +17,7 @@ export interface FormProps {
   initMode?: 'display' | 'edit';
 }
 
-export const Form = ({
+export function Form<T = Record<string, unknown>>({
   title,
   description,
   fields,
@@ -26,7 +26,7 @@ export const Form = ({
   onChange,
   submitButtonRef,
   initMode = 'display',
-}: FormProps) => {
+}: FormProps<T>) {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'display' | 'edit'>(initMode);
 
@@ -56,12 +56,12 @@ export const Form = ({
     submitButtonRef,
   });
 
-  const processedFields = usePreprocessedFields(fields, onChange);
+  const processedFields = usePreprocessedFields<T>(fields, onChange);
 
-  const renderField = (field: FormField, index: number) => (
+  const renderField = (field: FormField<T>, index: number) => (
     <FieldRenderer
       key={field.name || index}
-      field={field}
+      field={field as FormField<Record<string, unknown>>}
       mode={mode}
       onChange={onChange}
       loading={loading}
@@ -102,4 +102,4 @@ export const Form = ({
       </form>
     </Stack>
   );
-};
+}

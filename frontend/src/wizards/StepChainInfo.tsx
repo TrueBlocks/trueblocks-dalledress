@@ -8,6 +8,7 @@ import { emitEvent } from '@utils';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 
 import { WizardStepProps } from '.';
+import { WizardStateData } from './WizardTypes';
 
 export const StepChainInfo = ({
   state,
@@ -210,7 +211,7 @@ export const StepChainInfo = ({
     }
   };
 
-  const formFields: FormField[] = [
+  const formFields: FormField<WizardStateData>[] = [
     {
       name: 'rpcUrl',
       value: rpcUrl || '',
@@ -257,7 +258,14 @@ export const StepChainInfo = ({
   ];
 
   return (
-    <>
+    <WizardForm<WizardStateData>
+      title="Chain Configuration"
+      description="Configure the blockchain network details."
+      fields={formFields}
+      onSubmit={onSubmit}
+      onBack={onBack}
+      onCancel={onCancel}
+    >
       <Group justify="space-between" mb="md">
         <Text size="xl" fw={700}>
           Chain Configuration
@@ -292,9 +300,7 @@ export const StepChainInfo = ({
           </Tabs.List>
 
           <Tabs.Panel value={activeTab || 'new'} pt="xs">
-            <WizardForm
-              title=""
-              description=""
+            <WizardForm<WizardStateData>
               fields={formFields}
               onBack={onBack}
               onSubmit={handleFormSubmit}
@@ -304,6 +310,6 @@ export const StepChainInfo = ({
           </Tabs.Panel>
         </Tabs>
       </Card>
-    </>
+    </WizardForm>
   );
 };

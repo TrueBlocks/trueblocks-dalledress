@@ -488,10 +488,8 @@ describe('useTableKeys', () => {
       };
       const { result } = renderHook(() => useTableKeys(props));
       act(() => {
-        result.current.handleKeyDown({
-          key: 'Enter',
-          preventDefault: vi.fn(),
-        } as any);
+        // use mockEvent helper instead of casting to any
+        result.current.handleKeyDown(mockEvent('Enter'));
       });
       expect(setExpandedRowIndex).toHaveBeenCalledWith(0);
     });

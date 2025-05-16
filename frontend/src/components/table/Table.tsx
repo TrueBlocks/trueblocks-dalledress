@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useTableContext } from '@components';
+import { useTableContext, useTableKeys } from '@components';
+import { Form } from '@components';
 import { TableKey } from '@contexts';
+import { Modal } from '@mantine/core';
 import { sorting } from '@models';
 
 import {
@@ -12,7 +14,6 @@ import {
   PerPage,
   Stats,
   usePagination,
-  useTableKeys,
 } from '.';
 import { SearchBox } from './SearchBox';
 import './Table.css';
@@ -29,6 +30,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   tableKey: TableKey;
   onSaveRow?: (row: T, updated: Partial<T>) => void;
   onCancelRow?: () => void;
+  onSubmit?: (data: Record<string, unknown>) => void;
 }
 
 export function Table<T extends Record<string, unknown>>({
@@ -43,6 +45,7 @@ export function Table<T extends Record<string, unknown>>({
   tableKey,
   onSaveRow,
   onCancelRow,
+  onSubmit,
 }: TableProps<T>) {
   const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
@@ -56,39 +59,91 @@ export function Table<T extends Record<string, unknown>>({
     focusControls,
   } = useTableContext();
 
-  const [expandedRowIndex, setExpandedRowIndex] = useState<number | null>(null);
-  const [detailClosed, setDetailClosed] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentRowData, setCurrentRowData] = useState<T | null>(null);
 
-  // Ref to track if the next Enter key should re-open the detail view
-  const shouldOpenDetailOnEnter = useRef(false);
+  const isModalOpenRef = useRef(false);
+
+  useEffect(() => {
+    isModalOpenRef.current = isModalOpen;
+  }, [isModalOpen]);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    focusTable();
+    if (onCancelRow) {
+      onCancelRow();
+    }
+  };
+
+  const handleFormSubmit = (data: { [key: string]: FormDataEntryValue }) => {
+    if (onSubmit) {
+      const transformedData = Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [key, String(value)]),
+      );
+      onSubmit(transformedData);
+    }
+    if (currentRowData && onSaveRow) {
+      const transformedData = Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [key, String(value)]),
+      ) as Partial<T>;
+      onSaveRow(currentRowData as T, transformedData);
+    }
+    setIsModalOpen(false);
+  };
 
   const { handleKeyDown } = useTableKeys({
     itemCount: data.length,
     currentPage,
     totalPages,
     tableKey,
-    expandedRowIndex,
-    setExpandedRowIndex: (idx) => {
-      if (idx !== null && shouldOpenDetailOnEnter.current) {
-        setDetailClosed(false);
-        shouldOpenDetailOnEnter.current = false;
-      }
-      if (idx === null) setDetailClosed(true);
-      setExpandedRowIndex(idx);
-    },
     onEnter: () => {
-      shouldOpenDetailOnEnter.current = true;
+      if (selectedRowIndex >= 0 && selectedRowIndex < data.length) {
+        setCurrentRowData(data[selectedRowIndex] || null);
+        setIsModalOpen(true);
+      }
     },
     onEscape: () => {
-      setDetailClosed(true);
-      setExpandedRowIndex(null);
+      setIsModalOpen(false);
     },
   });
 
   useEffect(() => {
+    const tableElement = tableRef.current;
+    if (tableElement) {
+      const nativeKeyDownHandler = (e: KeyboardEvent) => {
+        handleKeyDown({
+          key: e.key,
+          preventDefault: () => e.preventDefault(),
+          stopPropagation: () => e.stopPropagation(),
+        } as React.KeyboardEvent);
+      };
+
+      tableElement.addEventListener('keydown', nativeKeyDownHandler);
+      return () => {
+        tableElement.removeEventListener('keydown', nativeKeyDownHandler);
+      };
+    }
+  }, [handleKeyDown, tableRef]);
+
+  const handleFieldChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCurrentRowData((prev) => {
+      if (!prev) return null;
+      return { ...prev, [name]: value };
+    });
+  };
+
+  useEffect(() => {
     if (data.length > 0 && !loading) {
+      const safeFocusTable = () => {
+        if (!isModalOpenRef.current) {
+          focusTable();
+        }
+      };
+
       const timer = setTimeout(() => {
-        focusTable();
+        safeFocusTable();
       }, 100);
 
       return () => clearTimeout(timer);
@@ -96,34 +151,33 @@ export function Table<T extends Record<string, unknown>>({
   }, [data, loading, focusTable]);
 
   useEffect(() => {
-    focusTable();
-    // If the selected row is still present on the new page, keep it expanded
-    if (
-      !detailClosed &&
-      selectedRowIndex >= 0 &&
-      selectedRowIndex < data.length
-    ) {
-      setExpandedRowIndex(selectedRowIndex);
-    } else {
-      setExpandedRowIndex(null);
+    if (isModalOpen) {
+      const firstInput = document.querySelector(
+        '.mantine-Modal input',
+      ) as HTMLInputElement | null;
+      firstInput?.focus();
     }
-  }, [currentPage, focusTable, selectedRowIndex, data.length, detailClosed]);
+  }, [isModalOpen]);
 
-  // Only open the expanded row dialog when the selected row changes and detailClosed is false
-  useEffect(() => {
-    if (
-      !detailClosed &&
-      selectedRowIndex >= 0 &&
-      selectedRowIndex < data.length
-    ) {
-      setExpandedRowIndex(selectedRowIndex);
+  const handleFormKeyDown = (e: React.KeyboardEvent) => {
+    const navigationKeys = [
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'PageUp',
+      'PageDown',
+      'Home',
+      'End',
+    ];
+    if (navigationKeys.includes(e.key)) {
+      e.stopPropagation();
     }
-  }, [selectedRowIndex, data.length, detailClosed]);
-
-  const handleRowClick = (index: number) => {
-    setSelectedRowIndex(index);
-    focusTable();
   };
+
+  useEffect(() => {
+    focusTable();
+  }, [currentPage, focusTable]);
 
   useEffect(() => {
     if (selectedRowIndex === -1 || selectedRowIndex >= data.length) {
@@ -131,7 +185,6 @@ export function Table<T extends Record<string, unknown>>({
     }
   }, [data, selectedRowIndex, setSelectedRowIndex]);
 
-  // Sorting state (uncontrolled if not provided)
   const [internalSort, setInternalSort] = useState<sorting.SortDef | null>(
     null,
   );
@@ -141,7 +194,6 @@ export function Table<T extends Record<string, unknown>>({
     else setInternalSort(nextSort);
   };
 
-  // Filter state (uncontrolled if not provided)
   const [internalFilter, setInternalFilter] = useState('');
   const filter =
     controlledFilter !== undefined ? controlledFilter : internalFilter;
@@ -150,16 +202,13 @@ export function Table<T extends Record<string, unknown>>({
     else setInternalFilter(v);
   };
 
-  // Memoized sorted data (client-side for now)
   const sortedData = useMemo(() => {
     if (!sort || !sort.key) return data;
     const col = columns.find((c) => c.key === sort.key);
     if (!col) return data;
-    // Avoid non-null assertion and explicit any
     const getValue = col.accessor
       ? (row: T) => (col.accessor ? col.accessor(row) : undefined)
       : (row: T) => {
-          // Try to get the property by key, fallback to undefined
           return Object.prototype.hasOwnProperty.call(row, col.key)
             ? (row as Record<string, unknown>)[col.key]
             : undefined;
@@ -178,8 +227,17 @@ export function Table<T extends Record<string, unknown>>({
     });
   }, [data, sort, columns]);
 
+  const handleRowClick = (index: number) => {
+    setSelectedRowIndex(index);
+    setCurrentRowData(data[index] || null);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
+
+  if (onCancelRow) {
+    console.log('onCancelRow is available but not yet implemented.');
+  }
 
   return (
     <div
@@ -192,7 +250,6 @@ export function Table<T extends Record<string, unknown>>({
         position: 'relative',
       }}
     >
-      {/* Top: Pagination and Search */}
       <div
         className="top-pagination-container"
         style={{
@@ -220,7 +277,6 @@ export function Table<T extends Record<string, unknown>>({
         />
       </div>
 
-      {/* Table header (sticky) */}
       <div
         className="table-header-container"
         style={{
@@ -242,7 +298,6 @@ export function Table<T extends Record<string, unknown>>({
         </table>
       </div>
 
-      {/* Scrollable body */}
       <div
         className="table-body-scroll"
         style={{
@@ -257,37 +312,28 @@ export function Table<T extends Record<string, unknown>>({
           className="data-table"
           ref={tableRef}
           tabIndex={0}
-          onKeyDown={handleKeyDown}
           aria-label="Table with keyboard navigation"
           style={{ width: '100%', tableLayout: 'fixed' }}
         >
-          {/* Empty header row for column widths */}
           <colgroup>
             {columns.map((col) => (
               <col key={col.key} style={{ width: col.width || 'auto' }} />
             ))}
           </colgroup>
           <tbody>
-            {/* The Body component renders <tbody>, so render its content directly here */}
             <Body
               columns={columns}
               data={sortedData}
               selectedRowIndex={selectedRowIndex}
               handleRowClick={handleRowClick}
               noDataMessage="No data found."
-              expandedRowIndex={expandedRowIndex}
-              setExpandedRowIndex={(idx) => {
-                if (idx === null) setDetailClosed(true);
-                setExpandedRowIndex(idx);
-              }}
-              onSaveRow={onSaveRow || (() => setDetailClosed(true))}
-              onCancelRow={onCancelRow || (() => setDetailClosed(true))}
+              expandedRowIndex={null}
+              setExpandedRowIndex={(_: number | null) => {}}
             />
           </tbody>
         </table>
       </div>
 
-      {/* Bottom: Stats */}
       <div
         className="table-footer"
         style={{
@@ -299,6 +345,42 @@ export function Table<T extends Record<string, unknown>>({
       >
         <Stats namesLength={data.length} tableKey={tableKey} />
       </div>
+
+      <Modal
+        opened={isModalOpen}
+        onClose={closeModal}
+        centered
+        size="lg"
+        closeOnClickOutside={true}
+        closeOnEscape={true}
+        styles={{ header: { display: 'none' } }}
+      >
+        <div onKeyDown={handleFormKeyDown}>
+          <Form
+            title={`Edit ${tableKey.tabName.replace(/\b\w/g, (char) =>
+              char.toUpperCase(),
+            )} ${tableKey.viewName
+              .replace(/^\//, '')
+              .replace(/\b\w/g, (char) => char.toUpperCase())}`}
+            fields={columns.map((col) => ({
+              name: col.key,
+              label: col.header || col.key,
+              placeholder: `Enter ${col.header || col.key}`,
+              value: currentRowData ? String(currentRowData[col.key]) : '',
+            }))}
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target as HTMLFormElement);
+              const updatedData = Object.fromEntries(formData.entries());
+              handleFormSubmit(updatedData);
+            }}
+            onCancel={closeModal}
+            onChange={handleFieldChange}
+            initMode="edit"
+            compact
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

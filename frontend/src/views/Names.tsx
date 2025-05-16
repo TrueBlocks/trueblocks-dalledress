@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Logger, SaveName } from '@app';
 import {
   Table,
   TableProvider,
@@ -290,6 +291,12 @@ export const Names = () => {
     // TODO: Implement actual save to backend later
   };
 
+  const handleSubmit = (data: Record<string, unknown>) => {
+    SaveName(data as unknown as types.Name).then(() => {
+      Logger('Front end got returned from SaveName');
+    });
+  };
+
   // Each tab gets its own TableProvider instance to ensure state isolation
   const createTableContent = (tabLabel: string) => {
     const tagsVisible = !!showTagsView[tabLabel];
@@ -326,6 +333,7 @@ export const Names = () => {
                 onFilterChange={setFilter}
                 tableKey={tableKey}
                 onSaveRow={handleSaveRow}
+                onSubmit={handleSubmit}
               />
             </div>
           </div>
@@ -341,10 +349,8 @@ export const Names = () => {
             filter={filter}
             onFilterChange={setFilter}
             tableKey={tableKey}
-            onSaveRow={(row, updated) => {
-              console.log('Saving row:', row, 'with updates:', updated);
-              // TODO: Will handle actual saving to backend later
-            }}
+            onSaveRow={handleSaveRow}
+            onSubmit={handleSubmit}
           />
         )}
       </TableProvider>

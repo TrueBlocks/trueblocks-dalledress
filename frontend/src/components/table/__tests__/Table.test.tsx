@@ -1,9 +1,8 @@
+import { Column, Table, TableProps } from '@components';
 import { TableKey } from '@contexts';
+import { MantineProvider } from '@mantine/core';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { MantineProvider } from '@mantine/core';
-
-import { Column, Table, TableProps, TableProvider } from '@components';
 
 // Mock the useTableKeys hook (must be before any imports that use it)
 vi.mock('../useTableKeys', () => ({
@@ -26,7 +25,7 @@ vi.mock('../usePagination', () => ({
 
 // Mock the useTableContext hook (must be before any imports that use it)
 vi.mock('@components', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   return {
     ...actual, // Preserve other exports from @components if any
     useTableContext: () => ({
@@ -74,7 +73,8 @@ describe('Table', () => {
 
   const tableKey: TableKey = { viewName: 'test-view', tabName: 'test-tab' };
 
-  const defaultProps: TableProps<TestRow> = { // Explicitly type defaultProps
+  const defaultProps: TableProps<TestRow> = {
+    // Explicitly type defaultProps
     columns: mockColumns,
     data: mockData,
     loading: false,
@@ -88,7 +88,7 @@ describe('Table', () => {
     return render(
       <MantineProvider>
         <Table {...testProps} />
-      </MantineProvider>
+      </MantineProvider>,
     );
   };
 
@@ -169,7 +169,11 @@ describe('Table', () => {
         ...col,
         sortable: false,
       }));
-      render(<MantineProvider><Table {...defaultProps} columns={nonSortableColumns} /></MantineProvider>);
+      render(
+        <MantineProvider>
+          <Table {...defaultProps} columns={nonSortableColumns} />
+        </MantineProvider>,
+      );
       expect(screen.getByText('ID')).toBeInTheDocument();
     });
 
@@ -198,7 +202,7 @@ describe('Table', () => {
             data={largeDataset.slice(0, 10)}
             tableKey={tableKey}
           />
-        </MantineProvider>
+        </MantineProvider>,
       );
 
       // Count rows using getByRole instead of container.querySelectorAll
@@ -216,7 +220,11 @@ describe('Table', () => {
         },
       ];
 
-      render(<MantineProvider><Table {...defaultProps} columns={columnsWithCustomRenderer} /></MantineProvider>);
+      render(
+        <MantineProvider>
+          <Table {...defaultProps} columns={columnsWithCustomRenderer} />
+        </MantineProvider>,
+      );
 
       expect(screen.getByText('Custom Column')).toBeInTheDocument();
       expect(screen.getAllByText('Static content').length).toBe(3);

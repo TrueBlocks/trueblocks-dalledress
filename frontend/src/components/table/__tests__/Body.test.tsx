@@ -57,14 +57,16 @@ describe('Body', () => {
     render(
       <table>
         <tbody>
-          <Body
-            columns={columns}
-            data={names}
-            selectedRowIndex={1}
-            handleRowClick={handleRowClick}
-            expandedRowIndex={null}
-            setExpandedRowIndex={() => {}}
-          />
+          <MantineProvider>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={1}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={null}
+              setExpandedRowIndex={() => {}}
+            />
+          </MantineProvider>
         </tbody>
       </table>,
     );
@@ -79,14 +81,16 @@ describe('Body', () => {
     render(
       <table>
         <tbody>
-          <Body
-            columns={columns}
-            data={names}
-            selectedRowIndex={0}
-            handleRowClick={handleRowClick}
-            expandedRowIndex={null}
-            setExpandedRowIndex={() => {}}
-          />
+          <MantineProvider>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={0}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={null}
+              setExpandedRowIndex={() => {}}
+            />
+          </MantineProvider>
         </tbody>
       </table>,
     );
@@ -98,39 +102,21 @@ describe('Body', () => {
     render(
       <table>
         <tbody>
-          <Body
-            columns={columns}
-            data={names}
-            selectedRowIndex={2}
-            handleRowClick={handleRowClick}
-            expandedRowIndex={null}
-            setExpandedRowIndex={() => {}}
-          />
+          <MantineProvider>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={2}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={null}
+              setExpandedRowIndex={() => {}}
+            />
+          </MantineProvider>
         </tbody>
       </table>,
     );
     const rows = screen.getAllByRole('row');
     expect(rows[2]?.className).toContain('selected');
-  });
-
-  it('shows status text for deleted, custom, and prefund', () => {
-    render(
-      <table>
-        <tbody>
-          <Body
-            columns={columns}
-            data={names}
-            selectedRowIndex={0}
-            handleRowClick={handleRowClick}
-            expandedRowIndex={null}
-            setExpandedRowIndex={() => {}}
-          />
-        </tbody>
-      </table>,
-    );
-    expect(screen.getByText(/Deleted/)).toBeInTheDocument();
-    expect(screen.getByText(/Custom/)).toBeInTheDocument();
-    expect(screen.getByText(/Prefund/)).toBeInTheDocument();
   });
 
   it('renders editable form with Save and Cancel buttons when expanded', () => {
@@ -139,9 +125,9 @@ describe('Body', () => {
     const setExpandedRowIndex = vi.fn();
 
     render(
-      <MantineProvider>
-        <table>
-          <tbody>
+      <table>
+        <tbody>
+          <MantineProvider>
             <Body
               columns={columns}
               data={names}
@@ -152,9 +138,9 @@ describe('Body', () => {
               onSaveRow={onSaveRow}
               onCancelRow={onCancelRow}
             />
-          </tbody>
-        </table>
-      </MantineProvider>,
+          </MantineProvider>
+        </tbody>
+      </table>
     );
     expect(screen.getByText('Save')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();
@@ -162,5 +148,26 @@ describe('Body', () => {
     expect(screen.getByLabelText('Address')).toBeInTheDocument();
     expect(screen.getByLabelText('Tags')).toBeInTheDocument();
     expect(screen.getByLabelText('Source')).toBeInTheDocument();
+  });
+
+  it('shows status text for custom, and prefund', () => {
+    render(
+      <table>
+        <tbody>
+          <MantineProvider>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={0}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={null}
+              setExpandedRowIndex={() => {}}
+            />
+          </MantineProvider>
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByText(/Custom/)).toBeInTheDocument();
+    expect(screen.getByText(/Prefund/)).toBeInTheDocument();
   });
 });

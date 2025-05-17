@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Column, Form, FormField } from '@components';
+import { Badge } from '@mantine/core';
 
 interface BodyProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
@@ -39,7 +40,9 @@ export function Body<T extends Record<string, unknown>>({
       {data.map((row, rowIndex) => (
         <React.Fragment key={rowIndex}>
           <tr
-            className={selectedRowIndex === rowIndex ? 'selected' : ''}
+            className={`${selectedRowIndex === rowIndex ? 'selected' : ''} ${
+              row.deleted === true ? 'deleted-row' : ''
+            }`}
             onClick={() => handleRowClick(rowIndex)}
             aria-selected={selectedRowIndex === rowIndex}
           >
@@ -52,6 +55,16 @@ export function Body<T extends Record<string, unknown>>({
                     : ((row as Record<string, unknown>)[
                         col.key
                       ] as React.ReactNode)}
+                {col.key === 'address' && row.deleted === true && (
+                  <Badge
+                    color="red"
+                    variant="light"
+                    size="xs"
+                    style={{ marginLeft: '8px' }}
+                  >
+                    Deleted
+                  </Badge>
+                )}
               </td>
             ))}
           </tr>

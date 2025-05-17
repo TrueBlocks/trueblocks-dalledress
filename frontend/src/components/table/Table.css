@@ -162,3 +162,25 @@
   background-color: var(--mantine-primary-color-filled);
   color: var(--mantine-primary-color-contrast);
 }
+
+/* Style for deleted rows */
+.data-table tr.deleted-row {
+  text-decoration: line-through;
+  opacity: 0.7;
+  background-color: rgba(255, 100, 100, 0.1);
+}
+
+.data-table tr.deleted-row td {
+  color: var(--mantine-color-gray-5);
+}
+
+/* Style for deleted label in the actions column */
+.deleted-label {
+  font-size: 0.7rem;
+  color: var(--mantine-color-red-6);
+  background-color: rgba(255, 100, 100, 0.1);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  font-weight: bold;
+}

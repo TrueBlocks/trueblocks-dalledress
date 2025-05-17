@@ -1,4 +1,11 @@
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useTableContext, useTableKeys } from '@components';
 import { Form } from '@components';
@@ -31,6 +38,8 @@ export interface TableProps<T extends Record<string, unknown>> {
   onSaveRow?: (row: T, updated: Partial<T>) => void;
   onCancelRow?: () => void;
   onSubmit?: (data: Record<string, unknown>) => void;
+  editRow?: T; // Row to be directly opened for editing
+  onAddRow?: () => void; // Callback to inform parent when add row is requested
 }
 
 export function Table<T extends Record<string, unknown>>({
@@ -46,6 +55,8 @@ export function Table<T extends Record<string, unknown>>({
   onSaveRow,
   onCancelRow,
   onSubmit,
+  editRow,
+  onAddRow,
 }: TableProps<T>) {
   const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
@@ -67,6 +78,72 @@ export function Table<T extends Record<string, unknown>>({
   useEffect(() => {
     isModalOpenRef.current = isModalOpen;
   }, [isModalOpen]);
+
+  // Shared function to open the modal for a specific row
+  const openModalForRow = useCallback(
+    (row: T | null | undefined) => {
+      if (!row) return;
+
+      const rowIndex = data.findIndex((item) => {
+        // Try to match by comparing serialized objects or by a key property if available
+        if (item.address && row.address) {
+          return String(item.address) === String(row.address);
+        }
+
+        // Fallback to JSON string comparison as a last resort
+        return JSON.stringify(item) === JSON.stringify(row);
+      });
+
+      if (rowIndex >= 0) {
+        setSelectedRowIndex(rowIndex);
+        setCurrentRowData(row);
+        setIsModalOpen(true);
+      } else {
+        // This might be a new row that doesn't exist in data yet
+        setSelectedRowIndex(-1);
+        setCurrentRowData(row);
+        setIsModalOpen(true);
+      }
+    },
+    [data, setSelectedRowIndex, setIsModalOpen],
+  );
+
+  // Function to handle opening the modal for a new row
+  const handleAddNewRow = useCallback(() => {
+    // Create an empty row as a template
+    const emptyRow = {} as T;
+
+    // Initialize with empty values for all columns
+    columns.forEach((col) => {
+      if (col.key !== 'actions') {
+        // Skip action columns
+        emptyRow[col.key as keyof T] = '' as unknown as T[keyof T];
+      }
+    });
+
+    setSelectedRowIndex(-1); // No existing row is selected
+    setCurrentRowData(emptyRow);
+    setIsModalOpen(true);
+
+    // Notify parent component
+    if (onAddRow) {
+      onAddRow();
+    }
+  }, [
+    columns,
+    setSelectedRowIndex,
+    setCurrentRowData,
+    setIsModalOpen,
+    onAddRow,
+  ]);
+
+  // Create an enhanced object reference for row that forces
+  // Effect to open the edit modal for a specific row when the editRow prop changes
+  useEffect(() => {
+    if (editRow && data.length > 0) {
+      openModalForRow(editRow as T);
+    }
+  }, [editRow, data, openModalForRow]);
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -99,8 +176,8 @@ export function Table<T extends Record<string, unknown>>({
     tableKey,
     onEnter: () => {
       if (selectedRowIndex >= 0 && selectedRowIndex < data.length) {
-        setCurrentRowData(data[selectedRowIndex] || null);
-        setIsModalOpen(true);
+        // Use the shared function to open the modal
+        openModalForRow(data[selectedRowIndex]);
       }
     },
     onEscape: () => {
@@ -235,10 +312,6 @@ export function Table<T extends Record<string, unknown>>({
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  if (onCancelRow) {
-    console.log('onCancelRow is available but not yet implemented.');
-  }
-
   return (
     <div
       className="table-outer-container"
@@ -275,6 +348,29 @@ export function Table<T extends Record<string, unknown>>({
           tableKey={tableKey}
           focusControls={focusControls}
         />
+        {onAddRow && (
+          <button
+            className="add-button"
+            onClick={handleAddNewRow}
+            style={{
+              marginLeft: 'auto',
+              padding: '4px 10px',
+              background: '#2E3846',
+              border: '1px solid #566B8C',
+              borderRadius: '4px',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '13px',
+            }}
+            title="Add a new entry"
+          >
+            <span style={{ fontSize: '14px', fontWeight: 'bold' }}>+</span>
+            Add
+          </button>
+        )}
       </div>
 
       <div
@@ -353,12 +449,22 @@ export function Table<T extends Record<string, unknown>>({
         size="lg"
         closeOnClickOutside={true}
         closeOnEscape={true}
-        styles={{ header: { display: 'none' } }}
+        styles={{
+          header: { display: 'none' },
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent gray overlay
+            backdropFilter: 'blur(1px)', // Optional slight blur effect
+          },
+          inner: {
+            padding: '20px',
+          },
+        }}
       >
         <div onKeyDown={handleFormKeyDown}>
           <Form
-            title={`Edit ${tableKey.tabName.replace(/\b\w/g, (char) =>
-              char.toUpperCase(),
+            title={`${selectedRowIndex >= 0 ? 'Edit' : 'Add'} ${tableKey.tabName.replace(
+              /\b\w/g,
+              (char) => char.toUpperCase(),
             )} ${tableKey.viewName
               .replace(/^\//, '')
               .replace(/\b\w/g, (char) => char.toUpperCase())}`}

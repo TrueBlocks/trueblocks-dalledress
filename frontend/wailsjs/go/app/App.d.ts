@@ -12,6 +12,8 @@ import {output} from '../models';
 
 export function AddrToName(arg1:base.Address):Promise<string>;
 
+export function AutonameName(arg1:string):Promise<void>;
+
 export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
 export function Cancel(arg1:base.Address):Promise<number|boolean>;
@@ -20,9 +22,13 @@ export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 
 export function CheckRPCStatus():Promise<string>;
 
+export function CleanNames(arg1:string):Promise<void>;
+
 export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
+
+export function DeleteName(arg1:string):Promise<void>;
 
 export function FileNew(arg1:menu.CallbackData):Promise<void>;
 
@@ -72,9 +78,13 @@ export function Logger(arg1:string):Promise<void>;
 
 export function ModifyName(arg1:app.ModifyData):Promise<void>;
 
+export function PublishNames(arg1:string):Promise<void>;
+
 export function RegisterCtx(arg1:base.Address):Promise<output.RenderCtx>;
 
 export function Reload():Promise<void>;
+
+export function RemoveName(arg1:string):Promise<void>;
 
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 
@@ -105,3 +115,5 @@ export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<voi
 export function String():Promise<string>;
 
 export function SwitchToProject(arg1:string):Promise<void>;
+
+export function UndeleteName(arg1:string):Promise<void>;

@@ -6,6 +6,10 @@ export function AddrToName(arg1) {
   return window['go']['app']['App']['AddrToName'](arg1);
 }
 
+export function AutonameName(arg1) {
+  return window['go']['app']['App']['AutonameName'](arg1);
+}
+
 export function BuildDalleDressForProject() {
   return window['go']['app']['App']['BuildDalleDressForProject']();
 }
@@ -22,12 +26,20 @@ export function CheckRPCStatus() {
   return window['go']['app']['App']['CheckRPCStatus']();
 }
 
+export function CleanNames(arg1) {
+  return window['go']['app']['App']['CleanNames'](arg1);
+}
+
 export function CloseProject(arg1) {
   return window['go']['app']['App']['CloseProject'](arg1);
 }
 
 export function ConvertToAddress(arg1) {
   return window['go']['app']['App']['ConvertToAddress'](arg1);
+}
+
+export function DeleteName(arg1) {
+  return window['go']['app']['App']['DeleteName'](arg1);
 }
 
 export function FileNew(arg1) {
@@ -126,12 +138,20 @@ export function ModifyName(arg1) {
   return window['go']['app']['App']['ModifyName'](arg1);
 }
 
+export function PublishNames(arg1) {
+  return window['go']['app']['App']['PublishNames'](arg1);
+}
+
 export function RegisterCtx(arg1) {
   return window['go']['app']['App']['RegisterCtx'](arg1);
 }
 
 export function Reload() {
   return window['go']['app']['App']['Reload']();
+}
+
+export function RemoveName(arg1) {
+  return window['go']['app']['App']['RemoveName'](arg1);
 }
 
 export function SaveBounds(arg1, arg2, arg3, arg4) {
@@ -192,4 +212,8 @@ export function String() {
 
 export function SwitchToProject(arg1) {
   return window['go']['app']['App']['SwitchToProject'](arg1);
+}
+
+export function UndeleteName(arg1) {
+  return window['go']['app']['App']['UndeleteName'](arg1);
 }

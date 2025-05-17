@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 
+import { Logger } from '@app';
 import { useTableContext, useTableKeys } from '@components';
 import { Form } from '@components';
 import { TableKey } from '@contexts';
@@ -17,7 +18,6 @@ import {
 } from '.';
 import { SearchBox } from './SearchBox';
 import './Table.css';
-import { Logger } from '@app';
 
 export interface TableProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
@@ -80,7 +80,7 @@ export function Table<T extends Record<string, unknown>>({
       const transformedData = Object.fromEntries(
         Object.entries(data).map(([key, value]) => [key, String(value)]),
       );
-      Logger("DEBUGGING: onSubmit in table" + JSON.stringify(transformedData));
+      Logger('DEBUGGING: onSubmit in table' + JSON.stringify(transformedData));
       onSubmit(transformedData);
     }
     setIsModalOpen(false);

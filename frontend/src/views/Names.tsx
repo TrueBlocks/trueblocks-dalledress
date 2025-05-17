@@ -284,7 +284,7 @@ export const Names = () => {
   };
 
   const handleSubmit = (data: Record<string, unknown>) => {
-      Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(data));
+    Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(data));
   };
 
   // Each tab gets its own TableProvider instance to ensure state isolation

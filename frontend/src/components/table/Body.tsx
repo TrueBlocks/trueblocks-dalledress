@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { Column, Form, FormField } from '@components';
 import { Logger } from '@app';
+import { Column, Form, FormField } from '@components';
 
 interface BodyProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
@@ -72,7 +72,10 @@ export function Body<T extends Record<string, unknown>>({
                       if (onCancelRow) onCancelRow();
                     }}
                     onSave={(updatedData) => {
-                      Logger("DEBUGGING: onSubmit in body" + JSON.stringify(updatedData));
+                      Logger(
+                        'DEBUGGING: onSubmit in body' +
+                          JSON.stringify(updatedData),
+                      );
                       if (onSubmit) onSubmit(updatedData);
                       setExpandedRowIndex(null);
                     }}

@@ -1,10 +1,9 @@
 import { TableKey } from '@contexts';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MantineProvider } from '@mantine/core';
 
-import { Column } from '../Column';
-// Import after mocks are defined
-import { Table } from '../Table';
+import { Column, Table, TableProps, TableProvider } from '@components';
 
 // Mock the useTableKeys hook (must be before any imports that use it)
 vi.mock('../useTableKeys', () => ({
@@ -26,16 +25,25 @@ vi.mock('../usePagination', () => ({
 }));
 
 // Mock the useTableContext hook (must be before any imports that use it)
-vi.mock('@components', () => ({
-  useTableContext: () => ({
-    focusState: 'table',
-    selectedRowIndex: -1,
-    setSelectedRowIndex: vi.fn(),
-    focusTable: vi.fn(),
-    focusControls: vi.fn(),
-    tableRef: { current: null },
-  }),
-}));
+vi.mock('@components', async (importOriginal) => {
+  const actual = await importOriginal() as any;
+  return {
+    ...actual, // Preserve other exports from @components if any
+    useTableContext: () => ({
+      focusState: 'table',
+      selectedRowIndex: -1,
+      setSelectedRowIndex: vi.fn(),
+      focusTable: vi.fn(),
+      focusControls: vi.fn(),
+      tableRef: { current: null },
+    }),
+    // Add the missing useTableKeys mock here
+    useTableKeys: () => ({
+      handleKeyDown: vi.fn(),
+      requestFocus: vi.fn(),
+    }),
+  };
+});
 
 describe('Table', () => {
   type TestRow = {
@@ -66,12 +74,22 @@ describe('Table', () => {
 
   const tableKey: TableKey = { viewName: 'test-view', tabName: 'test-tab' };
 
-  const defaultProps = {
+  const defaultProps: TableProps<TestRow> = { // Explicitly type defaultProps
     columns: mockColumns,
     data: mockData,
     loading: false,
     error: null,
     tableKey,
+  };
+
+  // Helper function to setup the test environment
+  const setupTest = (props: Partial<TableProps<TestRow>> = {}) => {
+    const testProps = { ...defaultProps, ...props };
+    return render(
+      <MantineProvider>
+        <Table {...testProps} />
+      </MantineProvider>
+    );
   };
 
   beforeEach(() => {
@@ -81,8 +99,7 @@ describe('Table', () => {
   // Group 1: Basic rendering tests
   describe('Rendering', () => {
     it('renders column headers', () => {
-      render(<Table {...defaultProps} />);
-
+      setupTest();
       expect(screen.getByText('ID')).toBeInTheDocument();
       expect(screen.getByText('Name')).toBeInTheDocument();
       expect(screen.getByText('Description')).toBeInTheDocument();
@@ -90,8 +107,7 @@ describe('Table', () => {
     });
 
     it('renders data rows', () => {
-      render(<Table {...defaultProps} />);
-
+      setupTest();
       expect(screen.getByText('Item 1')).toBeInTheDocument();
       expect(screen.getByText('Item 2')).toBeInTheDocument();
       expect(screen.getByText('Item 3')).toBeInTheDocument();
@@ -101,8 +117,7 @@ describe('Table', () => {
     });
 
     it('renders custom cell content using render function', () => {
-      render(<Table {...defaultProps} />);
-
+      setupTest();
       const activeElements = screen.getAllByText('Active');
       const deletedElements = screen.getAllByText('Deleted');
 
@@ -114,51 +129,47 @@ describe('Table', () => {
   // Group 2: State handling tests
   describe('State handling', () => {
     it('shows loading state', () => {
-      render(<Table {...defaultProps} loading={true} />);
-
+      setupTest({ loading: true });
       expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
 
     it('shows error state', () => {
       const errorMessage = 'Failed to load data';
-      render(<Table {...defaultProps} error={errorMessage} />);
-
+      setupTest({ error: errorMessage });
       expect(screen.getByText(`Error: ${errorMessage}`)).toBeInTheDocument();
     });
 
     it('shows no data message when data is empty', () => {
-      render(<Table {...defaultProps} data={[]} />);
-
+      setupTest({ data: [] });
       expect(screen.getByText('No data found.')).toBeInTheDocument();
     });
 
     it('applies sorting when provided', () => {
       const sort = { key: 'id', direction: 'desc' as const };
-      render(<Table {...defaultProps} sort={sort} />);
+      setupTest({ sort });
+      const rows = screen.getAllByRole('row').slice(1); // Exclude header row
 
-      const rows = screen.getAllByRole('row').slice(1);
-      expect(rows[0]).toHaveTextContent('Item 3');
-      expect(rows[1]).toHaveTextContent('Item 2');
-      expect(rows[2]).toHaveTextContent('Item 1');
+      expect(rows[0]).toHaveTextContent('3'); // ID of Item 3
+      expect(rows[1]).toHaveTextContent('2'); // ID of Item 2
+      expect(rows[2]).toHaveTextContent('1'); // ID of Item 1
     });
   });
 
   // Group 4: TableKey integration tests
   describe('TableKey integration', () => {
     it('includes tableKey prop in rendered table', () => {
-      expect(() => render(<Table {...defaultProps} />)).not.toThrow();
+      expect(() => setupTest()).not.toThrow();
     });
   });
 
-  // Group 5: Edge cases and special scenarios
+  // // Group 5: Edge cases and special scenarios
   describe('Edge cases', () => {
     it('handles no sortable columns', () => {
       const nonSortableColumns = mockColumns.map((col) => ({
         ...col,
         sortable: false,
       }));
-      render(<Table {...defaultProps} columns={nonSortableColumns} />);
-
+      render(<MantineProvider><Table {...defaultProps} columns={nonSortableColumns} /></MantineProvider>);
       expect(screen.getByText('ID')).toBeInTheDocument();
     });
 
@@ -181,11 +192,13 @@ describe('Table', () => {
       }));
 
       render(
-        <Table
-          {...defaultProps}
-          data={largeDataset.slice(0, 10)}
-          tableKey={tableKey}
-        />,
+        <MantineProvider>
+          <Table
+            {...defaultProps}
+            data={largeDataset.slice(0, 10)}
+            tableKey={tableKey}
+          />
+        </MantineProvider>
       );
 
       // Count rows using getByRole instead of container.querySelectorAll
@@ -203,7 +216,7 @@ describe('Table', () => {
         },
       ];
 
-      render(<Table {...defaultProps} columns={columnsWithCustomRenderer} />);
+      render(<MantineProvider><Table {...defaultProps} columns={columnsWithCustomRenderer} /></MantineProvider>);
 
       expect(screen.getByText('Custom Column')).toBeInTheDocument();
       expect(screen.getAllByText('Static content').length).toBe(3);

@@ -24,7 +24,7 @@ func (a *App) ModifyName(modData *ModifyData) error {
 	if !namesLock.CompareAndSwap(0, 1) {
 		return nil
 	}
-	defer namesLock.CompareAndSwap(1, 0)
+	defer namesLock.Store(0)
 
 	op := modData.Operation
 	newName := types.Name{

@@ -57,8 +57,11 @@ export const usePreprocessedFields = <T,>(
               label={field.label}
               placeholder={field.placeholder}
               withAsterisk={field.required}
-              value={field.value as string}
-              onChange={field.readOnly ? undefined : field.onChange || onChange}
+              onChange={(e) => {
+                if (!field.readOnly) {
+                  field.onChange?.(e);
+                }
+              }}
               error={field.error}
               rightSection={field.rightSection}
               onBlur={field.onBlur}
@@ -72,7 +75,7 @@ export const usePreprocessedFields = <T,>(
         </div>
       ),
     }),
-    [onChange],
+    [],
   );
 
   const preprocessFields = useCallback(

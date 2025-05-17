@@ -26,11 +26,11 @@ export const ToggleButton = ({
   const alignment =
     direction === 'left'
       ? collapsed
-        ? 'flex-start'
-        : 'flex-end'
-      : collapsed
         ? 'flex-end'
-        : 'flex-start';
+        : 'flex-start'
+      : collapsed
+        ? 'flex-start'
+        : 'flex-end';
 
   return (
     <div
@@ -46,6 +46,8 @@ export const ToggleButton = ({
         radius="md"
         style={{
           fontWeight: 'normal',
+          paddingRight: direction === 'right' ? '0.5rem' : '',
+          paddingLeft: direction !== 'right' ? '0.5rem' : '',
         }}
       >
         {icon}

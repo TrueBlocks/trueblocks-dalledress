@@ -55,7 +55,14 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
           placeholder={field.placeholder}
           withAsterisk={field.required}
           value={field.value as string}
-          onChange={field.readOnly ? undefined : field.onChange || onChange}
+          onChange={(e) => {
+            if (!field.readOnly) {
+              field.onChange?.(e);
+            }
+            if (onChange) {
+              onChange(e);
+            }
+          }}
           error={
             (!loading && field.error) ||
             (field.required && !field.value && `${field.label} is required`)

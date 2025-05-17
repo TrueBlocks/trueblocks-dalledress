@@ -19,6 +19,7 @@ import {
 import { EventsOn } from '@runtime';
 
 import './Names.css';
+import { Logger } from '@app';
 
 export const FocusSider = 'focus-tags-table';
 
@@ -290,6 +291,10 @@ export const Names = () => {
     // TODO: Implement actual save to backend later
   };
 
+  const handleSubmit = (data: Record<string, unknown>) => {
+    Logger('Front end got returned from SaveName');
+  };
+
   // Each tab gets its own TableProvider instance to ensure state isolation
   const createTableContent = (tabLabel: string) => {
     const tagsVisible = !!showTagsView[tabLabel];
@@ -326,6 +331,7 @@ export const Names = () => {
                 onFilterChange={setFilter}
                 tableKey={tableKey}
                 onSaveRow={handleSaveRow}
+                onSubmit={handleSubmit}
               />
             </div>
           </div>
@@ -341,10 +347,7 @@ export const Names = () => {
             filter={filter}
             onFilterChange={setFilter}
             tableKey={tableKey}
-            onSaveRow={(row, updated) => {
-              console.log('Saving row:', row, 'with updates:', updated);
-              // TODO: Will handle actual saving to backend later
-            }}
+            onSubmit={handleSubmit}
           />
         )}
       </TableProvider>

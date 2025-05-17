@@ -291,7 +291,7 @@ export const Names = () => {
     // TODO: Implement actual save to backend later
   };
 
-  const handleSubmit = (data: Record<string, unknown>) => {
+  const handleSubmit = (_: Record<string, unknown>) => {
     Logger('Front end got returned from SaveName');
   };
 

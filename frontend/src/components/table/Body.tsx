@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Column, Form, FormField } from '@components';
+import { Logger } from '@app';
 
 interface BodyProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
@@ -10,7 +11,7 @@ interface BodyProps<T extends Record<string, unknown>> {
   noDataMessage?: string;
   expandedRowIndex: number | null;
   setExpandedRowIndex: (index: number | null) => void;
-  onSaveRow?: (row: T, updated: Partial<T>) => void; // optional save handler
+  onSubmit?: (data: Record<string, unknown>) => void;
   onCancelRow?: () => void; // optional cancel handler
 }
 
@@ -22,7 +23,7 @@ export function Body<T extends Record<string, unknown>>({
   noDataMessage = 'No data found.',
   expandedRowIndex,
   setExpandedRowIndex,
-  onSaveRow,
+  onSubmit,
   onCancelRow,
 }: BodyProps<T>) {
   if (data.length === 0) {
@@ -70,8 +71,9 @@ export function Body<T extends Record<string, unknown>>({
                       setExpandedRowIndex(null);
                       if (onCancelRow) onCancelRow();
                     }}
-                    onSave={(row, updated) => {
-                      if (onSaveRow) onSaveRow(row, updated);
+                    onSave={(updatedData) => {
+                      Logger("DEBUGGING: onSubmit in body" + JSON.stringify(updatedData));
+                      if (onSubmit) onSubmit(updatedData);
                       setExpandedRowIndex(null);
                     }}
                   />
@@ -94,7 +96,7 @@ const EditableRowForm = <T extends Record<string, unknown>>({
   row: T;
   columns: Column<T>[];
   onClose: () => void;
-  onSave?: (row: T, updated: Partial<T>) => void;
+  onSave?: (updatedData: Record<string, unknown>) => void;
 }) => {
   // Re-initialize formData whenever the row changes
   const [formData, setFormData] = useState<Partial<T>>(() => {
@@ -137,7 +139,7 @@ const EditableRowForm = <T extends Record<string, unknown>>({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSave) onSave(row, formData);
+    if (onSave) onSave(formData);
     onClose();
   };
 

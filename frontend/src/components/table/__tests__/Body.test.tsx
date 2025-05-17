@@ -140,7 +140,7 @@ describe('Body', () => {
             />
           </MantineProvider>
         </tbody>
-      </table>
+      </table>,
     );
     expect(screen.getByText('Save')).toBeInTheDocument();
     expect(screen.getByText('Cancel')).toBeInTheDocument();

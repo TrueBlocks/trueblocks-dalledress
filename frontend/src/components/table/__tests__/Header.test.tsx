@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 
 describe('Header', () => {
   it('renders all column headers', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const columns: Column<any>[] = [
       { key: 'name', header: 'Name' },
       { key: 'address', header: 'Address' },

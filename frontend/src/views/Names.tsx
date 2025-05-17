@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Logger } from '@app';
 import {
   Table,
   TableProvider,
@@ -19,7 +20,6 @@ import {
 import { EventsOn } from '@runtime';
 
 import './Names.css';
-import { Logger } from '@app';
 
 export const FocusSider = 'focus-tags-table';
 

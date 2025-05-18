@@ -5,7 +5,7 @@ import { sorting } from '@models';
 import type { Column } from '.';
 import './Header.css';
 
-export function Header<T extends Record<string, unknown>>({
+export const Header = <T extends Record<string, unknown>>({
   columns,
   sort,
   onSortChange,
@@ -13,7 +13,7 @@ export function Header<T extends Record<string, unknown>>({
   columns: Column<T>[];
   sort?: sorting.SortDef | null;
   onSortChange?: (sort: sorting.SortDef | null) => void;
-}) {
+}) => {
   const handleClick = (col: Column<T>) => {
     if (!onSortChange) return;
     if (!col.sortable) return;
@@ -82,4 +82,4 @@ export function Header<T extends Record<string, unknown>>({
       </tr>
     </thead>
   );
-}
+};

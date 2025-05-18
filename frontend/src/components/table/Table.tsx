@@ -32,7 +32,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   onSubmit: (data: Record<string, unknown>) => void;
 }
 
-export function Table<T extends Record<string, unknown>>({
+export const Table = <T extends Record<string, unknown>>({
   columns,
   data,
   loading,
@@ -43,7 +43,7 @@ export function Table<T extends Record<string, unknown>>({
   onFilterChange,
   tableKey,
   onSubmit,
-}: TableProps<T>) {
+}: TableProps<T>) => {
   const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
   const totalPages = Math.ceil(totalItems / pageSize);
@@ -329,4 +329,4 @@ export function Table<T extends Record<string, unknown>>({
       </Modal>
     </div>
   );
-}
+};

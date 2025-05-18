@@ -8,7 +8,7 @@ interface SearchBoxProps {
   onChange: (v: string) => void;
 }
 
-export function SearchBox({ value, onChange }: SearchBoxProps) {
+export const SearchBox = ({ value, onChange }: SearchBoxProps) => {
   useFormHotkeys({ keys: ['mod+a'] });
 
   const { focusControls } = useTableContext();
@@ -50,4 +50,4 @@ export function SearchBox({ value, onChange }: SearchBoxProps) {
       aria-label="Search table"
     />
   );
-}
+};

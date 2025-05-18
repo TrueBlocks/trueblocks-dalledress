@@ -17,7 +17,7 @@ interface BodyProps<T extends Record<string, unknown>> {
   onSubmit?: (data: Record<string, unknown>) => void;
 }
 
-export function Body<T extends Record<string, unknown>>({
+export const Body = <T extends Record<string, unknown>>({
   columns,
   data,
   selectedRowIndex,
@@ -26,7 +26,7 @@ export function Body<T extends Record<string, unknown>>({
   expandedRowIndex,
   setExpandedRowIndex,
   onSubmit,
-}: BodyProps<T>) {
+}: BodyProps<T>) => {
   if (data.length === 0) {
     return (
       <tr className="selected">
@@ -80,4 +80,4 @@ export function Body<T extends Record<string, unknown>>({
       ))}
     </>
   );
-}
+};

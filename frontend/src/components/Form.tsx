@@ -18,7 +18,7 @@ export interface FormProps<T = Record<string, unknown>> {
   compact?: boolean;
 }
 
-export function Form<T = Record<string, unknown>>({
+export const Form = <T = Record<string, unknown>,>({
   title,
   description,
   fields,
@@ -28,7 +28,7 @@ export function Form<T = Record<string, unknown>>({
   submitButtonRef,
   initMode = 'display',
   compact = false,
-}: FormProps<T>) {
+}: FormProps<T>) => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'display' | 'edit'>(initMode);
 
@@ -104,4 +104,4 @@ export function Form<T = Record<string, unknown>>({
       </form>
     </Stack>
   );
-}
+};

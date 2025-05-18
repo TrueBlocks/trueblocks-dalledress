@@ -18,7 +18,7 @@ import {
 import { msgs } from '@models';
 import { EventsOn } from '@runtime';
 
-export function Home() {
+export const Home = () => {
   const [_, setAppName] = useState('Your App');
   const [sampleImageUrl, setSampleImageUrl] = useState<string>('');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -109,4 +109,4 @@ export function Home() {
       </Grid>
     </Container>
   );
-}
+};

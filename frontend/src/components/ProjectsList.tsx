@@ -25,7 +25,7 @@ interface Project {
   createdAt: string;
 }
 
-export function ProjectsList() {
+export const ProjectsList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
   const refreshProjects = async () => {
@@ -145,4 +145,4 @@ export function ProjectsList() {
       </List>
     </Paper>
   );
-}
+};

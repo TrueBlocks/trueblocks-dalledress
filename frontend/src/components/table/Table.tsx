@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 
+import { Logger } from '@app';
 import { useTableContext, useTableKeys } from '@components';
 import { Form } from '@components';
 import { TableKey } from '@contexts';
@@ -28,7 +29,6 @@ export interface TableProps<T extends Record<string, unknown>> {
   filter?: string;
   onFilterChange?: (filter: string) => void;
   tableKey: TableKey;
-  onSaveRow?: (row: T, updated: Partial<T>) => void;
   onCancelRow?: () => void;
   onSubmit?: (data: Record<string, unknown>) => void;
 }
@@ -43,7 +43,6 @@ export function Table<T extends Record<string, unknown>>({
   filter: controlledFilter,
   onFilterChange,
   tableKey,
-  onSaveRow,
   onCancelRow,
   onSubmit,
 }: TableProps<T>) {
@@ -81,13 +80,8 @@ export function Table<T extends Record<string, unknown>>({
       const transformedData = Object.fromEntries(
         Object.entries(data).map(([key, value]) => [key, String(value)]),
       );
+      Logger('DEBUGGING: onSubmit in table' + JSON.stringify(transformedData));
       onSubmit(transformedData);
-    }
-    if (currentRowData && onSaveRow) {
-      const transformedData = Object.fromEntries(
-        Object.entries(data).map(([key, value]) => [key, String(value)]),
-      ) as Partial<T>;
-      onSaveRow(currentRowData as T, transformedData);
     }
     setIsModalOpen(false);
   };

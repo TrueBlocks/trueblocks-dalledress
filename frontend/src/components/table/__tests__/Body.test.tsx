@@ -134,7 +134,7 @@ describe('Body', () => {
   });
 
   it('renders editable form with Save and Cancel buttons when expanded', () => {
-    const onSaveRow = vi.fn();
+    const onSubmit = vi.fn();
     const onCancelRow = vi.fn();
     const setExpandedRowIndex = vi.fn();
 
@@ -149,7 +149,7 @@ describe('Body', () => {
               handleRowClick={handleRowClick}
               expandedRowIndex={0}
               setExpandedRowIndex={setExpandedRowIndex}
-              onSaveRow={onSaveRow}
+              onSubmit={onSubmit}
               onCancelRow={onCancelRow}
             />
           </tbody>

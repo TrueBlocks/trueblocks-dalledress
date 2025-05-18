@@ -283,16 +283,8 @@ export const Names = () => {
     }
   };
 
-  const handleSaveRow = (
-    row: Record<string, unknown>,
-    updated: Partial<Record<string, unknown>>,
-  ) => {
-    console.log('Saving row:', row, 'with updates:', updated);
-    // TODO: Implement actual save to backend later
-  };
-
-  const handleSubmit = (_: Record<string, unknown>) => {
-    Logger('Front end got returned from SaveName');
+  const handleSubmit = (data: Record<string, unknown>) => {
+    Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(data));
   };
 
   // Each tab gets its own TableProvider instance to ensure state isolation
@@ -330,7 +322,6 @@ export const Names = () => {
                 filter={filter}
                 onFilterChange={setFilter}
                 tableKey={tableKey}
-                onSaveRow={handleSaveRow}
                 onSubmit={handleSubmit}
               />
             </div>

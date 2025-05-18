@@ -406,7 +406,9 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 
 func (a *App) Reload() error {
 	a.names.ReloadNames()
-	msgs.EmitMessage(msgs.EventRefresh, a.GetAppPreferences().LastView)
+
+	lastView := a.GetAppPreferences().LastView
+	msgs.EmitMessage(msgs.EventRefresh, lastView)
 	return nil
 }
 

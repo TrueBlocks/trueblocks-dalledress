@@ -23,7 +23,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--mantine-color-white);
+  /* color: var(--mantine-color-white); */
 }
 
 .tags-table {
@@ -51,17 +51,17 @@
   text-overflow: ellipsis;
 }
 
-.tag-item:hover {
+/* .tag-item:hover {
   background-color: var(--mantine-color-dark-5);
-}
+} */
 
 .tag-item.selected {
-  background-color: var(--mantine-color-green-9);
-  color: var(--mantine-color-white);
+  background-color: var(--mantine-primary-color-3);
+  /* color: var(--mantine-color-white); */
 }
 
 .tag-item.focused {
-  outline: 2px solid var(--mantine-color-green-5);
+  /* outline: 2px solid var(--mantine-color-green-5); */
   outline-offset: -2px;
 }
 

@@ -38,11 +38,11 @@ export const Names = () => {
     getListTypeFromLabel(lastTab['/names'] || ''),
   );
   const [showTagsView, setShowTagsView] = useState<Record<string, boolean>>({
-    All: false,
-    Custom: false,
-    Prefund: false,
-    Regular: false,
-    Baddress: false,
+    All: true,
+    Custom: true,
+    Prefund: true,
+    Regular: true,
+    Baddress: true,
   });
 
   // References for each tab's TagsTable to support targeting specific instances

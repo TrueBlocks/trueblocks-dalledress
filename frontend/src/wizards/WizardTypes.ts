@@ -9,6 +9,7 @@ export interface WizardStateData {
   symbol: string;
   remoteExplorer: string;
   isFirstTimeSetup: boolean;
+  [key: string]: unknown;
 }
 
 export interface WizardValidationErrors {

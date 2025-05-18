@@ -88,8 +88,6 @@ export function RemoveName(arg1:string):Promise<void>;
 
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 
-export function SaveName(arg1:types.Name):Promise<void>;
-
 export function SetAppPreferences(arg1:preferences.AppPreferences):Promise<void>;
 
 export function SetChain(arg1:preferences.Chain):Promise<void>;

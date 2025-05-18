@@ -2,18 +2,8 @@ package app
 
 import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 )
-
-func (a *App) SaveName(name *types.Name) error {
-	if name == nil {
-		return nil
-	}
-
-	a.Logger("From SaveName in backend: " + name.String())
-	return nil
-}
 
 func (a *App) DeleteName(address string) error {
 	modData := &ModifyData{

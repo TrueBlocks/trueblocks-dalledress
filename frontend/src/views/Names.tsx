@@ -8,7 +8,6 @@ import {
   PublishNames,
   Reload,
   RemoveName,
-  SaveName,
   UndeleteName,
 } from '@app';
 import {
@@ -31,7 +30,6 @@ import {
 } from '@names';
 import { EventsOn } from '@runtime';
 
-import { createEnhancedName } from '../utils/NameTypeUtils';
 import './Names.css';
 
 export const FocusSider = 'focus-tags-table';
@@ -411,13 +409,8 @@ export const Names = () => {
   };
 
   const handleSubmit = (data: Record<string, unknown>) => {
-    // Convert the data to a proper Name object using our enhanced utility
-    const nameData = createEnhancedName(data);
-    SaveName(nameData).then(() => {
-      Logger('Front end got returned from SaveName');
-      // Reset editRowData after saving
-      setEditRowData(null);
-    });
+    Logger('Front end got returned from SaveName ' + JSON.stringify(data));
+    setEditRowData(null);
   };
 
   // Handle the cancel action for the edit modal

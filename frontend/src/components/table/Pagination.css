@@ -1,10 +1,10 @@
 .pagination {
   display: flex;
-  gap: 0.25rem;
+  gap: var(--mantine-spacing-xs);
 }
 
 .pagination button {
-  padding: 0.25rem 0.5rem;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
   border: 1px solid var(--mantine-color-dark-7);
   background-color: var(--mantine-color-dark-6);
   color: var(--mantine-color-white);

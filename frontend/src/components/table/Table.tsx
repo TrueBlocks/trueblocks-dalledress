@@ -29,8 +29,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   filter?: string;
   onFilterChange?: (filter: string) => void;
   tableKey: TableKey;
-  onCancelRow?: () => void;
-  onSubmit?: (data: Record<string, unknown>) => void;
+  onSubmit: (data: Record<string, unknown>) => void;
 }
 
 export function Table<T extends Record<string, unknown>>({
@@ -43,7 +42,6 @@ export function Table<T extends Record<string, unknown>>({
   filter: controlledFilter,
   onFilterChange,
   tableKey,
-  onCancelRow,
   onSubmit,
 }: TableProps<T>) {
   const { pagination } = usePagination(tableKey);
@@ -70,19 +68,11 @@ export function Table<T extends Record<string, unknown>>({
   const closeModal = () => {
     setIsModalOpen(false);
     focusTable();
-    if (onCancelRow) {
-      onCancelRow();
-    }
   };
 
-  const handleFormSubmit = (data: { [key: string]: FormDataEntryValue }) => {
-    if (onSubmit) {
-      const transformedData = Object.fromEntries(
-        Object.entries(data).map(([key, value]) => [key, String(value)]),
-      );
-      Logger('DEBUGGING: onSubmit in table' + JSON.stringify(transformedData));
-      onSubmit(transformedData);
-    }
+  const handleFormSubmit = (data: T) => {
+    Logger('DEBUGGING: onSubmit in Table' + JSON.stringify(data));
+    onSubmit(data);
     setIsModalOpen(false);
   };
 
@@ -229,33 +219,9 @@ export function Table<T extends Record<string, unknown>>({
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  if (onCancelRow) {
-    console.log('onCancelRow is available but not yet implemented.');
-  }
-
   return (
-    <div
-      className="table-outer-container"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        minHeight: 0,
-        position: 'relative',
-      }}
-    >
-      <div
-        className="top-pagination-container"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          flex: '0 0 auto',
-          zIndex: 2,
-          background: '#23272f',
-          borderBottom: '1px solid #333',
-        }}
-      >
+    <div className="table-outer-container">
+      <div className="top-pagination-container">
         <SearchBox value={filter} onChange={handleFilterChange} />
         <PerPage
           tableKey={tableKey}
@@ -271,15 +237,7 @@ export function Table<T extends Record<string, unknown>>({
         />
       </div>
 
-      <div
-        className="table-header-container"
-        style={{
-          flex: '0 0 auto',
-          zIndex: 2,
-          background: '#23272f',
-          borderBottom: '1px solid #333',
-        }}
-      >
+      <div className="table-header-container">
         <table
           className="data-table"
           style={{ width: '100%', tableLayout: 'fixed' }}
@@ -292,16 +250,7 @@ export function Table<T extends Record<string, unknown>>({
         </table>
       </div>
 
-      <div
-        className="table-body-scroll"
-        style={{
-          flex: '1 1 auto',
-          overflowY: 'auto',
-          minHeight: 0,
-          background: '#181818',
-        }}
-        onClick={focusTable}
-      >
+      <div className="table-body-scroll" onClick={focusTable}>
         <table
           className="data-table"
           ref={tableRef}
@@ -328,15 +277,7 @@ export function Table<T extends Record<string, unknown>>({
         </table>
       </div>
 
-      <div
-        className="table-footer"
-        style={{
-          flex: '0 0 auto',
-          zIndex: 2,
-          background: '#23272f',
-          borderTop: '1px solid #333',
-        }}
-      >
+      <div className="table-footer">
         <Stats namesLength={data.length} tableKey={tableKey} />
       </div>
 
@@ -347,7 +288,16 @@ export function Table<T extends Record<string, unknown>>({
         size="lg"
         closeOnClickOutside={true}
         closeOnEscape={true}
-        styles={{ header: { display: 'none' } }}
+        styles={{
+          header: { display: 'none' },
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent gray overlay
+            backdropFilter: 'blur(1px)', // Optional slight blur effect
+          },
+          inner: {
+            padding: '20px',
+          },
+        }}
       >
         <div onKeyDown={handleFormKeyDown}>
           <Form
@@ -360,13 +310,15 @@ export function Table<T extends Record<string, unknown>>({
               name: col.key,
               label: col.header || col.key,
               placeholder: `Enter ${col.header || col.key}`,
-              value: currentRowData ? String(currentRowData[col.key]) : '',
+              value: currentRowData
+                ? String((currentRowData as Record<string, unknown>)[col.key])
+                : '',
             }))}
             onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.target as HTMLFormElement);
-              const updatedData = Object.fromEntries(formData.entries());
-              handleFormSubmit(updatedData);
+              const data = Object.fromEntries(formData.entries());
+              handleFormSubmit(data as T);
             }}
             onCancel={closeModal}
             onChange={handleFieldChange}

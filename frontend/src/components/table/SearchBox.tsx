@@ -41,13 +41,12 @@ export function SearchBox({ value, onChange }: SearchBoxProps) {
   return (
     <input
       type="text"
-      placeholder="Search by name, address, tags, or source..."
+      placeholder="Search the table..."
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
       onFocus={handleFocus}
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
-      style={{ width: 220, marginRight: 8, padding: 4 }}
       aria-label="Search table"
     />
   );

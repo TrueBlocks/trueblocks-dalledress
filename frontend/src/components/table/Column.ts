@@ -1,6 +1,6 @@
 import { ChangeEvent, ReactNode } from 'react';
 
-export interface Column<T> {
+export interface Column<T extends Record<string, unknown>> {
   name?: string;
   key: string;
   header: string;

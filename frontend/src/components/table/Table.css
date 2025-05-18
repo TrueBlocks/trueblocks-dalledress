@@ -61,14 +61,41 @@
   box-shadow: none;
 }
 
-.table-footer {
+.table-outer-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+}
+
+.table-header-container {
+  flex: 0 0 auto;
+  z-index: 2;
+  background: var(--mantine-color-dark-6);
+}
+
+.table-body-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.top-pagination-container {
+  display: flex;
   align-items: center;
-  margin-top: 0.25rem;
-  padding-left: 0.75rem;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex: 0 0 auto;
+  z-index: 2;
+  border-bottom: 1px solid var(--mantine-color-dark-4);
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.table-footer {
+  flex: 0 0 auto;
+  z-index: 2;
+  border-top: 1px solid var(--mantine-color-dark-4);
 }
 
 .showing-entries {
@@ -83,9 +110,6 @@
 
 .pagination button {
   padding: 0.25rem 0.5rem;
-  border: 1px solid var(--mantine-color-dark-7);
-  background-color: var(--mantine-color-dark-6);
-  color: var(--mantine-color-white);
   cursor: pointer;
   border-radius: var(--mantine-radius-sm);
 }
@@ -100,7 +124,6 @@
 }
 
 .pagination button.active {
-  background-color: var(--mantine-color-dark-5);
   font-weight: bold;
 }
 
@@ -108,41 +131,18 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--mantine-color-white);
-  background-color: transparent;
   padding: 0.25rem 0.5rem;
   border: none;
 }
 
 .page-size-selector select {
-  padding: 0.25rem 0.5rem;
   border: 1px solid var(--mantine-color-dark-7);
   border-radius: var(--mantine-radius-sm);
-  background-color: var(--mantine-color-dark-6);
-  color: var(--mantine-color-white);
   cursor: pointer;
 }
 
 .page-size-selector select:focus {
   outline: none;
-}
-
-.page-size-selector option {
-  background-color: var(--mantine-color-dark-6);
-  color: var(--mantine-color-white);
-}
-
-.top-pagination-container {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0.5rem 0.75rem 0.25rem 0.75rem;
-  position: relative;
-  z-index: 1;
 }
 
 .table-tab-view .mantine-Tabs-tabsList {
@@ -161,4 +161,24 @@
 .mantine-integrated-table .data-table th {
   background-color: var(--mantine-primary-color-filled);
   color: var(--mantine-primary-color-contrast);
+}
+
+.data-table tr.deleted-row {
+  text-decoration: line-through;
+  opacity: 0.7;
+  background-color: rgba(255, 100, 100, 0.1);
+}
+
+.data-table tr.deleted-row td {
+  color: var(--mantine-color-gray-5);
+}
+
+.deleted-label {
+  font-size: 0.7rem;
+  color: var(--mantine-color-red-6);
+  background-color: rgba(255, 100, 100, 0.1);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  font-weight: bold;
 }

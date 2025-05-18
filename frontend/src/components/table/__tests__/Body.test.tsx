@@ -55,18 +55,20 @@ describe('Body', () => {
 
   it('renders all rows and columns', () => {
     render(
-      <table>
-        <tbody>
-          <Body
-            columns={columns}
-            data={names}
-            selectedRowIndex={1}
-            handleRowClick={handleRowClick}
-            expandedRowIndex={null}
-            setExpandedRowIndex={() => {}}
-          />
-        </tbody>
-      </table>,
+      <MantineProvider>
+        <table>
+          <tbody>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={1}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={null}
+              setExpandedRowIndex={() => {}}
+            />
+          </tbody>
+        </table>
+      </MantineProvider>,
     );
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('Bob')).toBeInTheDocument();
@@ -77,18 +79,20 @@ describe('Body', () => {
 
   it('calls handleRowClick when a row is clicked', () => {
     render(
-      <table>
-        <tbody>
-          <Body
-            columns={columns}
-            data={names}
-            selectedRowIndex={0}
-            handleRowClick={handleRowClick}
-            expandedRowIndex={null}
-            setExpandedRowIndex={() => {}}
-          />
-        </tbody>
-      </table>,
+      <MantineProvider>
+        <table>
+          <tbody>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={0}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={null}
+              setExpandedRowIndex={() => {}}
+            />
+          </tbody>
+        </table>
+      </MantineProvider>,
     );
     fireEvent.click(screen.getByText('Bob'));
     expect(handleRowClick).toHaveBeenCalledWith(1);
@@ -96,18 +100,20 @@ describe('Body', () => {
 
   it('applies selected class to the selected row', () => {
     render(
-      <table>
-        <tbody>
-          <Body
-            columns={columns}
-            data={names}
-            selectedRowIndex={2}
-            handleRowClick={handleRowClick}
-            expandedRowIndex={null}
-            setExpandedRowIndex={() => {}}
-          />
-        </tbody>
-      </table>,
+      <MantineProvider>
+        <table>
+          <tbody>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={2}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={null}
+              setExpandedRowIndex={() => {}}
+            />
+          </tbody>
+        </table>
+      </MantineProvider>,
     );
     const rows = screen.getAllByRole('row');
     expect(rows[2]?.className).toContain('selected');
@@ -115,18 +121,20 @@ describe('Body', () => {
 
   it('shows status text for deleted, custom, and prefund', () => {
     render(
-      <table>
-        <tbody>
-          <Body
-            columns={columns}
-            data={names}
-            selectedRowIndex={0}
-            handleRowClick={handleRowClick}
-            expandedRowIndex={null}
-            setExpandedRowIndex={() => {}}
-          />
-        </tbody>
-      </table>,
+      <MantineProvider>
+        <table>
+          <tbody>
+            <Body
+              columns={columns}
+              data={names}
+              selectedRowIndex={0}
+              handleRowClick={handleRowClick}
+              expandedRowIndex={null}
+              setExpandedRowIndex={() => {}}
+            />
+          </tbody>
+        </table>
+      </MantineProvider>,
     );
     expect(screen.getByText(/Deleted/)).toBeInTheDocument();
     expect(screen.getByText(/Custom/)).toBeInTheDocument();
@@ -135,7 +143,6 @@ describe('Body', () => {
 
   it('renders editable form with Save and Cancel buttons when expanded', () => {
     const onSubmit = vi.fn();
-    const onCancelRow = vi.fn();
     const setExpandedRowIndex = vi.fn();
 
     render(
@@ -150,7 +157,6 @@ describe('Body', () => {
               expandedRowIndex={0}
               setExpandedRowIndex={setExpandedRowIndex}
               onSubmit={onSubmit}
-              onCancelRow={onCancelRow}
             />
           </tbody>
         </table>

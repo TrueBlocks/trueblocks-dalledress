@@ -3,8 +3,9 @@ import React from 'react';
 import { sorting } from '@models';
 
 import type { Column } from '.';
+import './Header.css';
 
-export function Header<T>({
+export function Header<T extends Record<string, unknown>>({
   columns,
   sort,
   onSortChange,
@@ -69,22 +70,10 @@ export function Header<T>({
                   : undefined
               }
             >
-              <span
-                style={{ display: 'flex', width: '100%', alignItems: 'center' }}
-              >
-                <span
-                  className="header-label"
-                  style={{ flex: 1, textAlign: 'left' }}
-                >
-                  {col.header}
-                </span>
+              <span className="header-cell">
+                <span className="header-label">{col.header}</span>
                 {col.sortable && (
-                  <span
-                    className="sort-indicator"
-                    style={{ flex: 'none', textAlign: 'right' }}
-                  >
-                    {sortIndicator}
-                  </span>
+                  <span className="sort-indicator">{sortIndicator}</span>
                 )}
               </span>
             </th>

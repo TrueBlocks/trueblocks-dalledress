@@ -5,8 +5,8 @@
   max-height: 100%;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--mantine-color-gray-3);
-  border-radius: var(--mantine-radius-sm);
+  /* border: 1px solid var(--mantine-color-gray-3); */
+  /* border-radius: var(--mantine-radius-sm); */
   overflow: hidden;
   margin: var(--mantine-spacing-sm);
 }
@@ -16,14 +16,14 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-  border-bottom: 1px solid var(--mantine-color-gray-3);
+  /* border-bottom: 1px solid var(--mantine-color-gray-3); */
 }
 
 .tags-table-header h3 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  /* color: var(--mantine-color-white); */
+  color: var(--mantine-color-white);
 }
 
 .tags-table {
@@ -40,30 +40,32 @@
 }
 
 .tag-item {
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  /* padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm); // Handled by Button styles */
   cursor: pointer;
   transition:
     background-color 0.2s,
     color 0.2s;
   user-select: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* white-space: nowrap; // Handled by Button styles */
+  /* overflow: hidden; // Handled by Button styles */
+  /* text-overflow: ellipsis; // Handled by Button styles */
+  border: none; /* Remove existing border if any */
+  outline: none; /* Remove default browser outline */
 }
 
-/* .tag-item:hover {
-  background-color: var(--mantine-color-dark-5);
-} */
+/* .tag-item:hover { */
+/* background-color: var(--mantine-color-dark-5); */ /* Mantine Button will handle hover */
+/* } */
 
-.tag-item.selected {
-  background-color: var(--mantine-primary-color-3);
-  /* color: var(--mantine-color-white); */
-}
+/* .tag-item.selected { */
+/* background-color: var(--mantine-secondary-color); */ /* Mantine Button variant handles this */
+/* color: var(--mantine-color-white); */ /* Mantine Button variant handles this */
+/* } */
 
-.tag-item.focused {
-  /* outline: 2px solid var(--mantine-color-green-5); */
-  outline-offset: -2px;
-}
+/* .tag-item.focused { */
+/* outline: 2px solid var(--mantine-color-green-5); */ /* Removed as per request */
+/* outline-offset: -2px; */
+/* } */
 
 .no-tags {
   padding: var(--mantine-spacing-sm);
@@ -75,8 +77,8 @@
   padding: 2px 6px;
   font-size: 0.75rem;
   background: transparent;
-  border: 1px solid var(--mantine-color-gray-3);
-  border-radius: var(--mantine-radius-sm);
+  /* border: 1px solid var(--mantine-color-gray-3); */
+  /* border-radius: var(--mantine-radius-sm); */
   cursor: pointer;
   color: var(--mantine-color-gray-6);
 }

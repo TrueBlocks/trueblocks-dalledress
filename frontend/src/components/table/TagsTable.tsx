@@ -7,6 +7,8 @@ import {
   useState,
 } from 'react';
 
+import { Button, Stack } from '@mantine/core';
+
 import './Table.css';
 import './TagsTable.css';
 
@@ -27,7 +29,7 @@ export const TagsTable = forwardRef(function TagsTable(
 ) {
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const tagTableRef = useRef<HTMLDivElement | null>(null);
-  const tagItemsRef = useRef<(HTMLLIElement | null)[]>([]);
+  const tagItemsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Initialize or resize the refs array when tags change
   useEffect(() => {
@@ -146,23 +148,40 @@ export const TagsTable = forwardRef(function TagsTable(
         {tags.length === 0 ? (
           <div className="no-tags">No tags available</div>
         ) : (
-          <ul>
+          <Stack>
             {tags.map((tag, index) => (
-              <li
+              <Button
                 key={tag}
-                ref={(el) => {
+                ref={(el: HTMLButtonElement | null) => {
                   tagItemsRef.current[index] = el;
-                  return undefined;
                 }}
-                className={`tag-item ${selectedTag === tag ? 'selected' : ''} ${
-                  focusedIndex === index ? 'focused' : ''
-                }`}
+                fullWidth
+                variant={selectedTag === tag ? 'filled' : 'subtle'}
+                className={`tag-item ${selectedTag === tag ? 'selected' : ''}`}
                 onClick={() => handleTagSelect(tag, false)}
+                styles={{
+                  root: {
+                    paddingTop: 'var(--mantine-spacing-xs)',
+                    paddingBottom: 'var(--mantine-spacing-xs)',
+                    paddingLeft: 'var(--mantine-spacing-sm)',
+                    paddingRight: 'var(--mantine-spacing-sm)',
+                    height: 'auto',
+                  },
+                  inner: {
+                    justifyContent: 'flex-start',
+                  },
+                  label: {
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontWeight: 'normal', // Added this line
+                  },
+                }}
               >
                 {tag}
-              </li>
+              </Button>
             ))}
-          </ul>
+          </Stack>
         )}
       </div>
     </div>

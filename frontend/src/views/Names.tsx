@@ -21,6 +21,7 @@ import { EventsOn } from '@runtime';
 
 import './Names.css';
 
+type IndexableName = types.Name & { [key: string]: unknown };
 export const FocusSider = 'focus-tags-table';
 
 export const Names = () => {
@@ -28,7 +29,7 @@ export const Names = () => {
 
   const [sort, setSort] = useState<sorting.SortDef | null>(null);
   const [filter, setFilter] = useState('');
-  const [names, setNames] = useState<types.Name[]>([]);
+  const [names, setNames] = useState<IndexableName[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>([]);
@@ -88,7 +89,7 @@ export const Names = () => {
           sort as sorting.SortDef,
           filter ?? '',
         );
-        setNames(result.names || []);
+        setNames((result.names || []) as IndexableName[]);
         setTotalItems(result.total || 0);
         setTags(result.tags || []);
       } catch (err) {
@@ -284,7 +285,8 @@ export const Names = () => {
   };
 
   const handleSubmit = (data: Record<string, unknown>) => {
-    Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(data));
+    var name = data as IndexableName;
+    Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(name));
   };
 
   // Each tab gets its own TableProvider instance to ensure state isolation
@@ -314,7 +316,7 @@ export const Names = () => {
               <Table
                 key={`data-table-${tabLabel}`}
                 columns={nameColumns}
-                data={names as unknown as Record<string, unknown>[]}
+                data={names}
                 loading={loading}
                 error={error}
                 sort={sort}
@@ -330,7 +332,7 @@ export const Names = () => {
           <Table
             key={`data-table-${tabLabel}`}
             columns={nameColumns}
-            data={names as unknown as Record<string, unknown>[]}
+            data={names}
             loading={loading}
             error={error}
             sort={sort}
@@ -368,7 +370,7 @@ const nameColumns = [
   {
     key: 'actions',
     header: 'Actions',
-    render: (row: Record<string, unknown>) =>
+    render: (row: IndexableName) =>
       `${(row as { deleted?: boolean }).deleted ? 'Deleted ' : ''}`,
     sortable: false,
     editable: false,

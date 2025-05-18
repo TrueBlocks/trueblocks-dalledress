@@ -41,7 +41,6 @@ export const MainView = () => {
           overflowY: 'auto',
           overflowX: 'hidden',
           position: 'relative',
-          backgroundColor: 'black',
         }}
       >
         {MenuItems.filter(isComponentMenuItem).map((item) => (
@@ -54,7 +53,6 @@ export const MainView = () => {
       <div
         style={{
           width: '100%',
-          backgroundColor: 'white',
         }}
       >
         <StatusBar />

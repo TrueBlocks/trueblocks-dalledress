@@ -4,7 +4,7 @@ import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
 import { useFormHotkeys } from '@hooks';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
 
-export interface WizardFormProps<T = Record<string, unknown>> {
+export interface WizardFormProps<T extends Record<string, unknown>> {
   children?: ReactNode;
   title?: string;
   description?: string;
@@ -17,7 +17,7 @@ export interface WizardFormProps<T = Record<string, unknown>> {
   submitButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-export const WizardForm = <T = Record<string, unknown>,>({
+export const WizardForm = <T extends Record<string, unknown>>({
   children,
   title,
   description,

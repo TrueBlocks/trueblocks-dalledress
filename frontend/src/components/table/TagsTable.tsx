@@ -157,7 +157,9 @@ export const TagsTable = forwardRef(function TagsTable(
                 }}
                 fullWidth
                 variant={selectedTag === tag ? 'filled' : 'subtle'}
-                className={`tag-item ${selectedTag === tag ? 'selected' : ''}`}
+                className={`tag-item ${selectedTag === tag ? 'selected' : ''} ${
+                  focusedIndex === index ? 'focused' : ''
+                }`}
                 onClick={() => handleTagSelect(tag, false)}
                 styles={{
                   root: {

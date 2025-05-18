@@ -5,8 +5,6 @@
   max-height: 100%;
   display: flex;
   flex-direction: column;
-  /* border: 1px solid var(--mantine-color-gray-3); */
-  /* border-radius: var(--mantine-radius-sm); */
   overflow: hidden;
   margin: var(--mantine-spacing-sm);
 }
@@ -16,7 +14,6 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-  /* border-bottom: 1px solid var(--mantine-color-gray-3); */
 }
 
 .tags-table-header h3 {
@@ -40,32 +37,22 @@
 }
 
 .tag-item {
-  /* padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm); // Handled by Button styles */
   cursor: pointer;
   transition:
     background-color 0.2s,
     color 0.2s;
   user-select: none;
-  /* white-space: nowrap; // Handled by Button styles */
-  /* overflow: hidden; // Handled by Button styles */
-  /* text-overflow: ellipsis; // Handled by Button styles */
-  border: none; /* Remove existing border if any */
-  outline: none; /* Remove default browser outline */
+  border: none;
+  outline: none;
 }
 
-/* .tag-item:hover { */
-/* background-color: var(--mantine-color-dark-5); */ /* Mantine Button will handle hover */
-/* } */
-
-/* .tag-item.selected { */
-/* background-color: var(--mantine-secondary-color); */ /* Mantine Button variant handles this */
-/* color: var(--mantine-color-white); */ /* Mantine Button variant handles this */
-/* } */
-
-/* .tag-item.focused { */
-/* outline: 2px solid var(--mantine-color-green-5); */ /* Removed as per request */
-/* outline-offset: -2px; */
-/* } */
+.tag-item:not(.selected).focused {
+  background-color: var(--mantine-color-dark-5);
+  /* Alternatively, for a border:
+  border: 1px solid var(--mantine-color-blue-5);
+  outline: none; // Ensure default browser outline doesn't clash
+  */
+}
 
 .no-tags {
   padding: var(--mantine-spacing-sm);
@@ -77,8 +64,6 @@
   padding: 2px 6px;
   font-size: 0.75rem;
   background: transparent;
-  /* border: 1px solid var(--mantine-color-gray-3); */
-  /* border-radius: var(--mantine-radius-sm); */
   cursor: pointer;
   color: var(--mantine-color-gray-6);
 }

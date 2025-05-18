@@ -1,3 +1,4 @@
+import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -13,12 +14,14 @@ describe('TagsTable', () => {
 
   it('renders tags list correctly', () => {
     render(
-      <TagsTable
-        tags={mockTags}
-        onTagSelect={mockOnTagSelect}
-        selectedTag={null}
-        visible={true}
-      />,
+      <MantineProvider>
+        <TagsTable
+          tags={mockTags}
+          onTagSelect={mockOnTagSelect}
+          selectedTag={null}
+          visible={true}
+        />
+      </MantineProvider>,
     );
 
     // Check that all tags are rendered
@@ -32,12 +35,14 @@ describe('TagsTable', () => {
 
   it('not visible when visible prop is false', () => {
     render(
-      <TagsTable
-        tags={mockTags}
-        onTagSelect={mockOnTagSelect}
-        selectedTag={null}
-        visible={false}
-      />,
+      <MantineProvider>
+        <TagsTable
+          tags={mockTags}
+          onTagSelect={mockOnTagSelect}
+          selectedTag={null}
+          visible={false}
+        />{' '}
+      </MantineProvider>,
     );
 
     // Container should be empty - nothing should be rendered
@@ -47,26 +52,32 @@ describe('TagsTable', () => {
 
   it('shows selected tag correctly', () => {
     render(
-      <TagsTable
-        tags={mockTags}
-        onTagSelect={mockOnTagSelect}
-        selectedTag="Tag2"
-        visible={true}
-      />,
+      <MantineProvider>
+        <TagsTable
+          tags={mockTags}
+          onTagSelect={mockOnTagSelect}
+          selectedTag="Tag2"
+          visible={true}
+        />
+      </MantineProvider>,
     );
 
     // Tag2 should have the selected class
-    expect(screen.getByText('Tag2')).toHaveClass('selected');
+    expect(screen.getByRole('button', { name: 'Tag2' })).toHaveClass(
+      'selected',
+    );
   });
 
   it('calls onTagSelect when tag is clicked, with focus=false', () => {
     render(
-      <TagsTable
-        tags={mockTags}
-        onTagSelect={mockOnTagSelect}
-        selectedTag={null}
-        visible={true}
-      />,
+      <MantineProvider>
+        <TagsTable
+          tags={mockTags}
+          onTagSelect={mockOnTagSelect}
+          selectedTag={null}
+          visible={true}
+        />
+      </MantineProvider>,
     );
 
     // Click the second tag
@@ -76,12 +87,14 @@ describe('TagsTable', () => {
 
   it('toggles tag selection when clicking already selected tag', () => {
     render(
-      <TagsTable
-        tags={mockTags}
-        onTagSelect={mockOnTagSelect}
-        selectedTag="Tag2"
-        visible={true}
-      />,
+      <MantineProvider>
+        <TagsTable
+          tags={mockTags}
+          onTagSelect={mockOnTagSelect}
+          selectedTag="Tag2"
+          visible={true}
+        />
+      </MantineProvider>,
     );
 
     // Click the already selected tag should deselect it
@@ -91,12 +104,14 @@ describe('TagsTable', () => {
 
   it('calls onTagSelect with focus=true when pressing Enter', () => {
     render(
-      <TagsTable
-        tags={mockTags}
-        onTagSelect={mockOnTagSelect}
-        selectedTag={null}
-        visible={true}
-      />,
+      <MantineProvider>
+        <TagsTable
+          tags={mockTags}
+          onTagSelect={mockOnTagSelect}
+          selectedTag={null}
+          visible={true}
+        />
+      </MantineProvider>,
     );
 
     // Get the tags table using the test id
@@ -111,12 +126,14 @@ describe('TagsTable', () => {
 
   it('shows no tags message when tags array is empty', () => {
     render(
-      <TagsTable
-        tags={[]}
-        onTagSelect={mockOnTagSelect}
-        selectedTag={null}
-        visible={true}
-      />,
+      <MantineProvider>
+        <TagsTable
+          tags={[]}
+          onTagSelect={mockOnTagSelect}
+          selectedTag={null}
+          visible={true}
+        />
+      </MantineProvider>,
     );
 
     expect(screen.getByText('No tags available')).toBeInTheDocument();
@@ -124,12 +141,14 @@ describe('TagsTable', () => {
 
   it('handles keyboard navigation with arrow keys', () => {
     render(
-      <TagsTable
-        tags={mockTags}
-        onTagSelect={mockOnTagSelect}
-        selectedTag={null}
-        visible={true}
-      />,
+      <MantineProvider>
+        <TagsTable
+          tags={mockTags}
+          onTagSelect={mockOnTagSelect}
+          selectedTag={null}
+          visible={true}
+        />
+      </MantineProvider>,
     );
 
     // Get the tags table using the test id

@@ -7,7 +7,6 @@
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
   border: 1px solid var(--mantine-grey-7);
   background-color: var(--mantine-primary-color);
-  /* color: var(--mantine-color-white); */
   cursor: pointer;
   border-radius: var(--mantine-radius-sm);
 }
@@ -22,6 +21,5 @@
 }
 
 .pagination button.active {
-  /* background-color: var(--mantine-color-dark-5); */
   font-weight: bold;
 }

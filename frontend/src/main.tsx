@@ -8,8 +8,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from './App';
 
 const theme = createTheme({
-  // primaryColor: 'green',
-  primaryShade: 7,
+  primaryColor: 'green',
   fontFamily: 'Roman',
 });
 

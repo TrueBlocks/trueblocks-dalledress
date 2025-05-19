@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { CloseProject, GetOpenProjects, Logger, SwitchToProject } from '@app';
-import { useEvent } from '@hooks';
+import { useEvent, useIcons } from '@hooks';
 import {
   Button,
   Group,
@@ -12,7 +12,6 @@ import {
   Title,
 } from '@mantine/core';
 import { msgs } from '@models';
-import { FaExchangeAlt, FaFile, FaTrash } from 'react-icons/fa';
 
 // TODO: Use Project from project model
 interface Project {
@@ -27,6 +26,7 @@ interface Project {
 
 export const ProjectsList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const { Switch, File, Delete } = useIcons();
 
   const refreshProjects = async () => {
     try {
@@ -103,7 +103,7 @@ export const ProjectsList = () => {
                 size={24}
                 radius="xl"
               >
-                <FaFile size={16} />
+                <File size={16} />
               </ThemeIcon>
             }
           >
@@ -121,7 +121,7 @@ export const ProjectsList = () => {
                   <Button
                     variant="light"
                     size="compact"
-                    leftSection={<FaExchangeAlt size={16} />}
+                    leftSection={<Switch size={16} />}
                     onClick={() => handleSwitchProject(project.id)}
                   >
                     Switch
@@ -131,7 +131,7 @@ export const ProjectsList = () => {
                   variant="light"
                   color="red"
                   size="compact"
-                  leftSection={<FaTrash size={16} />}
+                  leftSection={<Delete size={16} />}
                   onClick={() =>
                     handleCloseProject(project.id, project.isDirty)
                   }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
+import { useIcons } from '@hooks';
 import {
   ActionIcon,
   AppShell,
@@ -8,11 +9,11 @@ import {
   Text,
   useMantineColorScheme,
 } from '@mantine/core';
-import { FaMoon, FaSun } from 'react-icons/fa';
 
 export const Header = () => {
   const [appName, setAppName] = useState('AppName');
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { Light, Dark } = useIcons();
 
   useEffect(() => {
     GetAppId().then((id) => {
@@ -33,11 +34,7 @@ export const Header = () => {
             onClick={() => toggleColorScheme()}
             title="Toggle color scheme"
           >
-            {colorScheme === 'dark' ? (
-              <FaSun size={18} />
-            ) : (
-              <FaMoon size={18} />
-            )}
+            {colorScheme === 'dark' ? <Light size={18} /> : <Dark size={18} />}
           </ActionIcon>
           <Text>Header Content</Text>
         </Group>

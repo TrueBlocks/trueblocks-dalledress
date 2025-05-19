@@ -103,6 +103,33 @@ vi.mock('@hooks', () => ({
       };
     }, [onCancel]);
   },
+  useIcons: () => ({
+    Home: () => null,
+    About: () => null,
+    History: () => null,
+    Khedra: () => null,
+    Names: () => null,
+    DalleDress: () => null,
+    Settings: () => null,
+    Wizard: () => null,
+    Switch: () => null,
+    File: () => null,
+    Twitter: () => null,
+    Github: () => null,
+    Website: () => null,
+    Email: () => null,
+    Add: () => null,
+    Edit: () => null,
+    Delete: () => null,
+    Undelete: () => null,
+    Remove: () => null,
+    ChevronLeft: () => null,
+    ChevronRight: () => null,
+    ChevronUp: () => null,
+    ChevronDown: () => null,
+    Light: () => null,
+    Dark: () => null,
+  }),
 }));
 
 describe('Wizard', () => {

@@ -9,18 +9,8 @@ import {
   Settings,
 } from '@views';
 import { Wizard } from '@wizards';
-import {
-  FaCog,
-  FaDatabase,
-  FaHome,
-  FaIndustry,
-  FaInfoCircle,
-  FaPalette,
-  FaUser,
-} from 'react-icons/fa';
 
 export interface MenuItem {
-  icon: React.ComponentType<{ size: number; style?: React.CSSProperties }>;
   label: string;
   path: string;
   position: 'top' | 'bottom' | 'hidden';
@@ -33,7 +23,6 @@ export interface MenuItem {
 
 export const MenuItems: MenuItem[] = [
   {
-    icon: FaHome,
     label: 'Home',
     path: '/',
     position: 'top',
@@ -43,7 +32,6 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    icon: FaInfoCircle,
     label: 'About',
     path: '/about',
     position: 'top',
@@ -53,7 +41,6 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    icon: FaDatabase,
     label: 'History',
     path: '/history',
     position: 'top',
@@ -63,7 +50,6 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    icon: FaIndustry,
     label: 'Khedra',
     path: '/khedra',
     position: 'top',
@@ -73,7 +59,6 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    icon: FaUser,
     label: 'Names',
     path: '/names',
     position: 'top',
@@ -83,7 +68,6 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    icon: FaPalette,
     label: 'DalleDress',
     path: '/dalledress',
     position: 'top',
@@ -93,7 +77,6 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    icon: FaCog,
     label: 'Settings',
     path: '/settings',
     position: 'bottom',
@@ -103,7 +86,6 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    icon: FaCog,
     path: '/wizard',
     label: 'Wizard',
     position: 'hidden',

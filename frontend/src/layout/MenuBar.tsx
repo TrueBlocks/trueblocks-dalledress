@@ -1,6 +1,7 @@
 import { SetMenuCollapsed } from '@app';
 import { ToggleButton, getBarWidth } from '@components';
 import { useAppContext } from '@contexts';
+import { useIcons } from '@hooks';
 import { AppShell, Button, Stack } from '@mantine/core';
 import { MenuItem, MenuItems } from 'src/Menu';
 
@@ -19,30 +20,32 @@ export const MenuBar = ({ disabled = false }: MenuBarProps) => {
 
   const topMenuItems = MenuItems.filter((item) => item.position === 'top');
   const botMenuItems = MenuItems.filter((item) => item.position === 'bottom');
+  const icons = useIcons();
 
-  const renderMenuItem = ({ icon: Icon, label, path }: MenuItem) => (
-    <Button
-      key={path}
-      variant={currentLocation === path ? 'filled' : 'subtle'}
-      fullWidth
-      h={36}
-      w={menuCollapsed ? 36 : '100%'}
-      leftSection={
-        <Icon size={16} style={{ marginLeft: menuCollapsed ? 9 : 0 }} />
-      }
-      justify={menuCollapsed ? 'center' : 'flex-start'}
-      px={menuCollapsed ? 0 : 'md'}
-      style={{
-        marginLeft: menuCollapsed ? -9 : 0,
-      }}
-      disabled={disabled}
-      onClick={() => {
-        if (!disabled) navigate(path);
-      }}
-    >
-      {!menuCollapsed && label}
-    </Button>
-  );
+  const renderMenuItem = ({ label, path }: MenuItem) => {
+    const Icon = icons[label as keyof typeof icons];
+    return (
+      <Button
+        key={path}
+        variant={currentLocation === path ? 'filled' : 'subtle'}
+        fullWidth
+        h={36}
+        w={menuCollapsed ? 36 : '100%'}
+        leftSection={<Icon style={{ marginLeft: menuCollapsed ? 9 : 0 }} />}
+        justify={menuCollapsed ? 'center' : 'flex-start'}
+        px={menuCollapsed ? 0 : 'md'}
+        style={{
+          marginLeft: menuCollapsed ? -9 : 0,
+        }}
+        disabled={disabled}
+        onClick={() => {
+          if (!disabled) navigate(path);
+        }}
+      >
+        {!menuCollapsed && label}
+      </Button>
+    );
+  };
 
   return (
     <AppShell.Navbar

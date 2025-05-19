@@ -2,10 +2,10 @@ import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import { GetUserPreferences, SetUserPreferences } from '@app';
 import { FormField, WizardForm } from '@components';
+import { useIcons } from '@hooks';
 import { ActionIcon, Card, Group, Tabs, Text } from '@mantine/core';
 import { msgs, preferences } from '@models';
 import { emitEvent } from '@utils';
-import { FaPlus, FaTrash } from 'react-icons/fa';
 
 import { WizardStepProps } from '.';
 import { WizardStateData } from './WizardTypes';
@@ -20,6 +20,7 @@ export const StepChainInfo = ({
 }: WizardStepProps) => {
   const { rpcUrl, chainName, chainId, symbol, remoteExplorer } = state.data;
   const { rpcError, chainError } = state.validation;
+  const { Add, Delete } = useIcons();
 
   const [chains, setChains] = useState<preferences.Chain[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>('new');
@@ -287,14 +288,14 @@ export const StepChainInfo = ({
                     onClick={(e) => handleRemoveChain(index, e)}
                     tabIndex={0}
                   >
-                    <FaTrash size={12} />
+                    <Delete size={12} />
                   </ActionIcon>
                 }
               >
                 {chain.chain}
               </Tabs.Tab>
             ))}
-            <Tabs.Tab value="new" rightSection={<FaPlus size={12} />}>
+            <Tabs.Tab value="new" rightSection={<Add size={12} />}>
               Add Chain
             </Tabs.Tab>
           </Tabs.List>

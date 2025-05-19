@@ -1,5 +1,5 @@
+import { useIcons } from '@hooks';
 import { ActionIcon } from '@mantine/core';
-import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 
 export const ToggleButton = ({
   collapsed,
@@ -10,17 +10,18 @@ export const ToggleButton = ({
   onToggle: () => void;
   direction: 'left' | 'right';
 }) => {
+  const { ChevronLeft, ChevronRight } = useIcons();
   const icon =
     direction === 'left' ? (
       collapsed ? (
-        <FaAngleDoubleRight />
+        <ChevronRight />
       ) : (
-        <FaAngleDoubleLeft />
+        <ChevronLeft />
       )
     ) : collapsed ? (
-      <FaAngleDoubleLeft />
+      <ChevronLeft />
     ) : (
-      <FaAngleDoubleRight />
+      <ChevronRight />
     );
 
   const alignment =

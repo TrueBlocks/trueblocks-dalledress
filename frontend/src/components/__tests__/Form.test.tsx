@@ -8,6 +8,35 @@ vi.mock('@app', () => ({
   Logger: vi.fn(),
 }));
 
+// Mock the useForm hook from Mantine
+vi.mock('@mantine/form', () => {
+  return {
+    useForm: () => {
+      const mockFormState: {
+        values: Record<string, unknown>;
+        errors: Record<string, string>;
+      } = {
+        values: {},
+        errors: {},
+      };
+
+      return {
+        values: mockFormState.values,
+        errors: mockFormState.errors,
+        setValues: (newValues: Record<string, unknown>) => {
+          Object.assign(mockFormState.values, newValues);
+          return mockFormState.values;
+        },
+        setFieldValue: (field: string, value: unknown) => {
+          mockFormState.values[field] = value;
+          return mockFormState.values;
+        },
+        validate: () => ({ hasErrors: false }),
+      };
+    },
+  };
+});
+
 vi.mock('react-hotkeys-hook', () => ({
   useHotkeys: (keys: string, handler: (e: KeyboardEvent) => void) => {
     if (keys === 'mod+a') {
@@ -29,6 +58,8 @@ describe('Form Component', () => {
           description="This is a test form."
           fields={[]}
           onSubmit={vi.fn()}
+          initialValues={{}}
+          validate={{}}
         />
       </MantineProvider>,
     );
@@ -54,6 +85,8 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
+          initialValues={{}}
+          validate={{}}
         />
       </MantineProvider>,
     );
@@ -81,6 +114,8 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
+          initialValues={{}}
+          validate={{}}
         />
       </MantineProvider>,
     );
@@ -109,6 +144,8 @@ describe('Form Component', () => {
           ]}
           onCancel={onCancel}
           onSubmit={vi.fn()}
+          initialValues={{}}
+          validate={{}}
         />
       </MantineProvider>,
     );
@@ -138,6 +175,8 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={onSubmit}
+          initialValues={{}}
+          validate={{}}
         />
       </MantineProvider>,
     );
@@ -177,6 +216,8 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
+          initialValues={{}}
+          validate={{}}
         />
       </MantineProvider>,
     );
@@ -215,6 +256,8 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
+          initialValues={{}}
+          validate={{}}
         />
       </MantineProvider>,
     );
@@ -252,6 +295,8 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
+          initialValues={{}}
+          validate={{}}
         />
       </MantineProvider>,
     );

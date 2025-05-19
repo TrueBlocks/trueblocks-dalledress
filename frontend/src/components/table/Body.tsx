@@ -19,6 +19,7 @@ export const Body = <T extends Record<string, unknown>>({
   selectedRowIndex,
   handleRowClick,
   noDataMessage = 'No data found.',
+  // eslint-disable-next-line unused-imports/no-unused-vars
   onSubmit,
 }: BodyProps<T>) => {
   if (data.length === 0) {

@@ -1,4 +1,11 @@
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { Logger } from '@app';
 import { useTableContext, useTableKeys } from '@components';
@@ -70,10 +77,13 @@ export const Table = <T extends Record<string, unknown>>({
     focusTable();
   };
 
-  const handleFormSubmit = (data: T) => {
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const data = Object.fromEntries(formData.entries());
     Logger('DEBUGGING: onSubmit in Table' + JSON.stringify(data));
     setIsModalOpen(false);
-    onSubmit(data);
+    onSubmit(data as T);
   };
 
   const { handleKeyDown } = useTableKeys({
@@ -312,12 +322,7 @@ export const Table = <T extends Record<string, unknown>>({
                 ? String((currentRowData as Record<string, unknown>)[col.key])
                 : '',
             }))}
-            onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              const data = Object.fromEntries(formData.entries());
-              handleFormSubmit(data as T);
-            }}
+            onSubmit={handleFormSubmit}
             onCancel={closeModal}
             onChange={handleFieldChange}
             initMode="edit"

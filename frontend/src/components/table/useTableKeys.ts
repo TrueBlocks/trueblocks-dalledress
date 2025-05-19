@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-import { Logger } from '@app';
 import { useTableContext } from '@components';
 import { TableKey } from '@contexts';
 
@@ -12,8 +11,6 @@ interface UseTableKeysProps {
   currentPage: number;
   totalPages: number;
   tableKey: TableKey;
-  expandedRowIndex?: number | null;
-  setExpandedRowIndex?: (idx: number | null) => void;
   onEnter?: () => void;
   onEscape?: () => void;
 }
@@ -24,8 +21,6 @@ export const useTableKeys = ({
   currentPage,
   totalPages,
   tableKey,
-  expandedRowIndex = null,
-  setExpandedRowIndex = () => {},
   onEnter,
   onEscape,
 }: UseTableKeysProps) => {
@@ -96,25 +91,10 @@ export const useTableKeys = ({
         case 'Enter':
           e.preventDefault();
           onEnter?.();
-          // If setExpandedRowIndex is the default no-op, call Logger for legacy/test compatibility
-          if (setExpandedRowIndex.toString() === '() => {}') {
-            Logger(
-              `Table ${tableKey.viewName}/${tableKey.tabName}: Enter key pressed`,
-            );
-          } else {
-            if (expandedRowIndex === selectedRowIndex) {
-              setExpandedRowIndex(null); // collapse if already open
-            } else {
-              setExpandedRowIndex(selectedRowIndex);
-            }
-          }
           break;
         case 'Escape':
           e.preventDefault();
           if (onEscape) onEscape();
-          if (expandedRowIndex !== null) {
-            setExpandedRowIndex(null);
-          }
           break;
       }
     },
@@ -126,9 +106,6 @@ export const useTableKeys = ({
       totalPages,
       setSelectedRowIndex,
       goToPage,
-      tableKey,
-      expandedRowIndex,
-      setExpandedRowIndex,
       onEnter,
       onEscape,
     ],

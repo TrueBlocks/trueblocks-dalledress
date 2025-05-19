@@ -284,9 +284,49 @@ export const Names = () => {
     }
   };
 
-  const handleSubmit = (data: Record<string, unknown>) => {
+  const handleFormSubmit = (data: Record<string, unknown>) => {
     var name = data as IndexableName;
     Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(name));
+  };
+
+  const tagsTable = (tabLabel: string) => {
+    return (
+      <TagsTable
+        key={`tags-table-${tabLabel}`}
+        tags={tags}
+        onTagSelect={handleTagSelect}
+        selectedTag={selectedTag}
+        visible={true}
+        ref={(ref) => {
+          if (ref) {
+            tagsTableRefs.current[tabLabel] = ref;
+          }
+          if (tabLabel === 'Custom' && ref) {
+            tagsTableRef.current = ref;
+          }
+        }}
+      />
+    );
+  };
+
+  const dataTable = (tabLabel: string) => {
+    return (
+      <>
+        <Table
+          key={`data-table-${tabLabel}`}
+          columns={nameColumns}
+          data={names}
+          loading={loading}
+          error={error}
+          sort={sort}
+          onSortChange={setSort}
+          filter={filter}
+          onFilterChange={setFilter}
+          tableKey={tableKey}
+          onSubmit={handleFormSubmit}
+        />
+      </>
+    );
   };
 
   const createTableContent = (tabLabel: string) => {
@@ -295,51 +335,13 @@ export const Names = () => {
       <TableProvider key={`table-provider-${tabLabel}`}>
         {tagsVisible ? (
           <div className="dual-table-layout">
-            <TagsTable
-              key={`tags-table-${tabLabel}`}
-              tags={tags}
-              onTagSelect={handleTagSelect}
-              selectedTag={selectedTag}
-              visible={true}
-              ref={(ref) => {
-                if (ref) {
-                  tagsTableRefs.current[tabLabel] = ref;
-                }
-                if (tabLabel === 'Custom' && ref) {
-                  tagsTableRef.current = ref;
-                }
-              }}
-            />
+            {tagsTable(tabLabel)}
             <div className="table-wrapper" ref={mainTableRef}>
-              <Table
-                key={`data-table-${tabLabel}`}
-                columns={nameColumns}
-                data={names}
-                loading={loading}
-                error={error}
-                sort={sort}
-                onSortChange={setSort}
-                filter={filter}
-                onFilterChange={setFilter}
-                tableKey={tableKey}
-                onSubmit={handleSubmit}
-              />
+              {dataTable(tabLabel)}
             </div>
           </div>
         ) : (
-          <Table
-            key={`data-table-${tabLabel}`}
-            columns={nameColumns}
-            data={names}
-            loading={loading}
-            error={error}
-            sort={sort}
-            onSortChange={setSort}
-            filter={filter}
-            onFilterChange={setFilter}
-            tableKey={tableKey}
-            onSubmit={handleSubmit}
-          />
+          dataTable(tabLabel)
         )}
       </TableProvider>
     );

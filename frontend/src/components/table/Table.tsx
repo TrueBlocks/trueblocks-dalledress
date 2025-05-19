@@ -72,8 +72,8 @@ export const Table = <T extends Record<string, unknown>>({
 
   const handleFormSubmit = (data: T) => {
     Logger('DEBUGGING: onSubmit in Table' + JSON.stringify(data));
-    onSubmit(data);
     setIsModalOpen(false);
+    onSubmit(data);
   };
 
   const { handleKeyDown } = useTableKeys({
@@ -270,8 +270,6 @@ export const Table = <T extends Record<string, unknown>>({
               selectedRowIndex={selectedRowIndex}
               handleRowClick={handleRowClick}
               noDataMessage="No data found."
-              expandedRowIndex={null}
-              setExpandedRowIndex={(_: number | null) => {}}
             />
           </tbody>
         </table>

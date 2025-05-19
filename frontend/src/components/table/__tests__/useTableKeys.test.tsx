@@ -475,23 +475,5 @@ describe('useTableKeys', () => {
 
       expect(mockGoToPage).not.toHaveBeenCalled();
     });
-
-    it('should handle Enter key correctly', () => {
-      const setExpandedRowIndex = vi.fn();
-      const props = {
-        itemCount: 5,
-        currentPage: 0,
-        totalPages: 2,
-        tableKey,
-        expandedRowIndex: null,
-        setExpandedRowIndex,
-      };
-      const { result } = renderHook(() => useTableKeys(props));
-      act(() => {
-        // use mockEvent helper instead of casting to any
-        result.current.handleKeyDown(mockEvent('Enter'));
-      });
-      expect(setExpandedRowIndex).toHaveBeenCalledWith(0);
-    });
   });
 });

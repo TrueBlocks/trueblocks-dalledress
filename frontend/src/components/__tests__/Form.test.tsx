@@ -3,6 +3,11 @@ import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { vi } from 'vitest';
 
+// Mock the Logger function to avoid errors in test environment
+vi.mock('@app', () => ({
+  Logger: vi.fn(),
+}));
+
 vi.mock('react-hotkeys-hook', () => ({
   useHotkeys: (keys: string, handler: (e: KeyboardEvent) => void) => {
     if (keys === 'mod+a') {

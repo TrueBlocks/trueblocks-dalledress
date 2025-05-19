@@ -63,8 +63,6 @@ describe('Body', () => {
               data={names}
               selectedRowIndex={1}
               handleRowClick={handleRowClick}
-              expandedRowIndex={null}
-              setExpandedRowIndex={() => {}}
             />
           </tbody>
         </table>
@@ -87,8 +85,6 @@ describe('Body', () => {
               data={names}
               selectedRowIndex={0}
               handleRowClick={handleRowClick}
-              expandedRowIndex={null}
-              setExpandedRowIndex={() => {}}
             />
           </tbody>
         </table>
@@ -108,8 +104,6 @@ describe('Body', () => {
               data={names}
               selectedRowIndex={2}
               handleRowClick={handleRowClick}
-              expandedRowIndex={null}
-              setExpandedRowIndex={() => {}}
             />
           </tbody>
         </table>
@@ -129,8 +123,6 @@ describe('Body', () => {
               data={names}
               selectedRowIndex={0}
               handleRowClick={handleRowClick}
-              expandedRowIndex={null}
-              setExpandedRowIndex={() => {}}
             />
           </tbody>
         </table>
@@ -139,34 +131,5 @@ describe('Body', () => {
     expect(screen.getByText(/Deleted/)).toBeInTheDocument();
     expect(screen.getByText(/Custom/)).toBeInTheDocument();
     expect(screen.getByText(/Prefund/)).toBeInTheDocument();
-  });
-
-  it('renders editable form with Save and Cancel buttons when expanded', () => {
-    const onSubmit = vi.fn();
-    const setExpandedRowIndex = vi.fn();
-
-    render(
-      <MantineProvider>
-        <table>
-          <tbody>
-            <Body
-              columns={columns}
-              data={names}
-              selectedRowIndex={0}
-              handleRowClick={handleRowClick}
-              expandedRowIndex={0}
-              setExpandedRowIndex={setExpandedRowIndex}
-              onSubmit={onSubmit}
-            />
-          </tbody>
-        </table>
-      </MantineProvider>,
-    );
-    expect(screen.getByText('Save')).toBeInTheDocument();
-    expect(screen.getByText('Cancel')).toBeInTheDocument();
-    expect(screen.getByLabelText('Name')).toBeInTheDocument();
-    expect(screen.getByLabelText('Address')).toBeInTheDocument();
-    expect(screen.getByLabelText('Tags')).toBeInTheDocument();
-    expect(screen.getByLabelText('Source')).toBeInTheDocument();
   });
 });

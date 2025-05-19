@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
+import { Logger } from '@app';
 import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
 import { useFormHotkeys } from '@hooks';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
@@ -36,8 +37,9 @@ export const Form = <T = Record<string, unknown>,>({
     setMode('edit');
   };
 
-  const handleSave = (e: FormEvent) => {
-    e?.preventDefault();
+  const handleFormSubmit = (e: FormEvent) => {
+    Logger('DEBUGGING: onSubmit in Form ' + e);
+    e.preventDefault();
     setMode('display');
     onSubmit(e);
   };
@@ -76,7 +78,7 @@ export const Form = <T = Record<string, unknown>,>({
     <Stack gap={compact ? 'xs' : 'md'}>
       {title && <Title order={3}>{title}</Title>}
       {description && <Text>{description}</Text>}
-      <form role="form" onSubmit={handleSave}>
+      <form role="form" onSubmit={handleFormSubmit}>
         <Stack gap={compact ? 'xs' : 'md'}>
           {processedFields.map((field, index) => renderField(field, index))}
           <Group justify="flex-end" mt={compact ? 'xs' : 'md'}>

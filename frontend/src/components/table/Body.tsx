@@ -1,10 +1,8 @@
 import React, { Fragment } from 'react';
 
-import { Logger } from '@app';
 import { Column } from '@components';
 
 import './Body.css';
-import { EditableRowForm } from './EditableRowForm';
 
 interface BodyProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
@@ -12,8 +10,6 @@ interface BodyProps<T extends Record<string, unknown>> {
   selectedRowIndex: number;
   handleRowClick: (index: number) => void;
   noDataMessage?: string;
-  expandedRowIndex: number | null;
-  setExpandedRowIndex: (index: number | null) => void;
   onSubmit?: (data: Record<string, unknown>) => void;
 }
 
@@ -23,8 +19,6 @@ export const Body = <T extends Record<string, unknown>>({
   selectedRowIndex,
   handleRowClick,
   noDataMessage = 'No data found.',
-  expandedRowIndex,
-  setExpandedRowIndex,
   onSubmit,
 }: BodyProps<T>) => {
   if (data.length === 0) {
@@ -55,27 +49,6 @@ export const Body = <T extends Record<string, unknown>>({
               </td>
             ))}
           </tr>
-          {expandedRowIndex === rowIndex && (
-            <tr>
-              <td colSpan={columns.length}>
-                <EditableRowForm
-                  row={row}
-                  columns={columns}
-                  onClose={() => {
-                    setExpandedRowIndex(null);
-                  }}
-                  onSubmit={(updatedData) => {
-                    Logger(
-                      'DEBUGGING: onSubmit in EditableRow' +
-                        JSON.stringify(updatedData),
-                    );
-                    if (onSubmit) onSubmit(updatedData);
-                    setExpandedRowIndex(null);
-                  }}
-                />
-              </td>
-            </tr>
-          )}
         </Fragment>
       ))}
     </>

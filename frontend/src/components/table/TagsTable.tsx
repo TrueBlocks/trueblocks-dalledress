@@ -98,7 +98,6 @@ export const TagsTable = forwardRef(function TagsTable(
         if (focusedIndex >= 0 && focusedIndex < tagsLength) {
           const tag = tags[focusedIndex];
           if (tag) {
-            // Pass true to indicate focus should move to main table
             handleTagSelect(tag, true);
           }
         }

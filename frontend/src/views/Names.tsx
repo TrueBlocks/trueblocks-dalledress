@@ -38,11 +38,11 @@ export const Names = () => {
     getListTypeFromLabel(lastTab['/names'] || ''),
   );
   const [showTagsView, setShowTagsView] = useState<Record<string, boolean>>({
-    All: true,
-    Custom: true,
-    Prefund: true,
-    Regular: true,
-    Baddress: true,
+    All: false,
+    Custom: false,
+    Prefund: false,
+    Regular: false,
+    Baddress: false,
   });
 
   // References for each tab's TagsTable to support targeting specific instances
@@ -93,7 +93,7 @@ export const Names = () => {
         setTotalItems(result.total || 0);
         setTags(result.tags || []);
       } catch (err) {
-        console.error('Error loading names:', err);
+        Logger('Error loading names: ' + err);
         setError(err instanceof Error ? err.message : 'Failed to load names');
         setNames([]);
         setTags([]);
@@ -289,7 +289,6 @@ export const Names = () => {
     Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(name));
   };
 
-  // Each tab gets its own TableProvider instance to ensure state isolation
   const createTableContent = (tabLabel: string) => {
     const tagsVisible = !!showTagsView[tabLabel];
     return (
@@ -303,7 +302,6 @@ export const Names = () => {
               selectedTag={selectedTag}
               visible={true}
               ref={(ref) => {
-                // Store the ref by tab name for targeted focusing
                 if (ref) {
                   tagsTableRefs.current[tabLabel] = ref;
                 }

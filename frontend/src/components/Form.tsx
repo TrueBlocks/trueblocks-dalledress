@@ -6,6 +6,24 @@ import { useFormHotkeys } from '@hooks';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
+// Helper function to recursively extract initial values
+const extractAllInitialValues = <T extends Record<string, unknown>>(
+  fieldsToExtract: FormField<T>[],
+  currentValues: Record<string, unknown> = {},
+): Record<string, unknown> => {
+  fieldsToExtract.forEach((field) => {
+    // If the field has a name and a defined value, add it.
+    if (field.name && typeof field.value !== 'undefined') {
+      currentValues[String(field.name)] = field.value;
+    }
+    // If the field itself has nested fields, recurse.
+    if (field.fields && field.fields.length > 0) {
+      extractAllInitialValues(field.fields, currentValues);
+    }
+  });
+  return currentValues;
+};
+
 export interface FormProps<T = Record<string, unknown>> {
   title?: string;
   description?: string;
@@ -24,7 +42,9 @@ export interface FormProps<T = Record<string, unknown>> {
   >;
 }
 
-export const Form = <T = Record<string, unknown>,>({
+export const Form = <
+  T extends Record<string, unknown> = Record<string, unknown>,
+>({
   title,
   description,
   fields,
@@ -47,21 +67,16 @@ export const Form = <T = Record<string, unknown>,>({
 
   // Initialize form values from fields
   useEffect(() => {
-    // Build values object from fields
-    const values: Record<string, unknown> = {};
-    fields.forEach((field) => {
-      if (field.name && field.value !== undefined) {
-        values[field.name] = field.value;
-      }
-    });
+    // Build new initial values object from fields, now recursively
+    const newInitialValues = extractAllInitialValues(fields);
 
-    try {
-      form.setValues(values);
-    } catch (e) {
-      Logger('Error setting form values:' + e);
-    }
+    // Update Mantine form's initial values and current values
+    // This ensures that if the `fields` prop changes, the form reflects these new definitions.
+    form.setInitialValues(newInitialValues);
+    form.setValues(newInitialValues);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array - only run once on mount
+  }, [fields]); // form.setInitialValues and form.setValues are stable, fields is the key dependency
 
   const handleEdit = () => {
     setMode('edit');

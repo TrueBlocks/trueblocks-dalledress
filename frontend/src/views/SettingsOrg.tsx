@@ -6,15 +6,15 @@ import { FormView } from '@layout';
 import { msgs, preferences } from '@models';
 import { emitEvent } from '@utils';
 
+type IndexableOrg = preferences.OrgPreferences & { [key: string]: unknown };
+
 export const SettingsOrg = () => {
-  const [formData, setFormData] = useState<preferences.OrgPreferences>({});
-  const [originalData, setOriginalData] = useState<preferences.OrgPreferences>(
-    {},
-  );
+  const [formData, setFormData] = useState<IndexableOrg>({});
+  const [originalData, setOriginalData] = useState<IndexableOrg>({});
 
   useEffect(() => {
     GetOrgPreferences().then((data) => {
-      setFormData(data);
+      setFormData(data as IndexableOrg);
       setOriginalData({ ...data });
     });
   }, []);
@@ -40,17 +40,17 @@ export const SettingsOrg = () => {
     Logger(`${name} = ${JSON.stringify(value)}`);
   };
 
-  const formFields: FormField<preferences.OrgPreferences>[] = [
+  const formFields: FormField<Record<string, unknown>>[] = [
     {
       name: 'developerName',
-      value: formData['developerName'] || '',
+      value: formData.developerName || '',
       label: 'Organization Name',
       placeholder: 'Enter your organization name',
       required: true,
     },
     {
       name: 'supportUrl',
-      value: formData['supportUrl'] || '',
+      value: formData.supportUrl || '',
       label: 'Support',
       placeholder: 'Enter your organization support url',
       required: true,
@@ -60,14 +60,14 @@ export const SettingsOrg = () => {
       fields: [
         {
           name: 'language',
-          value: formData['language'] || '',
+          value: formData.language || '',
           label: 'Language',
           placeholder: 'Enter your language',
           required: true,
         },
         {
           name: 'theme',
-          value: formData['theme'] || '',
+          value: formData.theme || '',
           label: 'Theme',
           placeholder: 'Enter your theme',
           required: true,
@@ -75,28 +75,28 @@ export const SettingsOrg = () => {
         },
         {
           name: 'telemetry',
-          value: formData['telemetry'] || '',
+          value: formData.telemetry ? 'true' : 'false', // Handle boolean
           label: 'Telemetry',
           placeholder: 'Enter your telemetry',
           sameLine: true,
         },
         {
           name: 'logLevel',
-          value: formData['logLevel'] || '',
+          value: formData.logLevel || '',
           label: 'Log Level',
           placeholder: 'Enter your log level',
           required: true,
         },
         {
           name: 'experimental',
-          value: formData['experimental'] || '',
+          value: formData.experimental ? 'true' : 'false', // Handle boolean
           label: 'Experimental',
           placeholder: 'Enter your experimental',
           sameLine: true,
         },
         {
           name: 'version',
-          value: formData['version'] || '',
+          value: formData.version || '',
           label: 'Version',
           placeholder: 'Enter your version',
           required: true,
@@ -108,7 +108,7 @@ export const SettingsOrg = () => {
   ];
 
   return (
-    <FormView<preferences.OrgPreferences>
+    <FormView<IndexableOrg>
       title="Edit / Manage Your Settings"
       formFields={formFields}
       onSubmit={handleSubmit}

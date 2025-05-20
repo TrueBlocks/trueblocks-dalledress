@@ -1,3 +1,4 @@
+import { Logger } from '@app';
 import { Form, FormField, FormProps } from '@components';
 import { Container } from '@mantine/core';
 
@@ -10,7 +11,7 @@ export interface FormViewProps<T> {
   onCancel?: FormProps<T>['onCancel'];
 }
 
-export const FormView = <T,>({
+export const FormView = <T extends Record<string, unknown>>({
   formFields,
   title,
   description,
@@ -18,6 +19,7 @@ export const FormView = <T,>({
   onChange,
   onCancel,
 }: FormViewProps<T>) => {
+  Logger('DEBUGGING1 FormView: ' + JSON.stringify(formFields, null, 2));
   return (
     <Container
       size="md"

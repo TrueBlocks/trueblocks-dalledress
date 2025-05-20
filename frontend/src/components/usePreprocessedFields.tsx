@@ -4,84 +4,127 @@ import { TextInput } from '@mantine/core';
 
 import { FormField } from './FormField';
 
-export const usePreprocessedFields = <T,>(
+export const usePreprocessedFields = <T extends Record<string, unknown>>(
   fields: FormField<T>[],
-  onChange?: (e: ChangeEvent<HTMLInputElement>) => void,
+  formOnChangeHandler?: (e: ChangeEvent<HTMLInputElement>) => void,
   formData: T = {} as T,
 ): FormField<T>[] => {
   const combineOnOneLine = useCallback(
-    (fields: (FormField<T> & { flex?: number })[]): FormField<T> => ({
+    (fieldsToCombine: (FormField<T> & { flex?: number })[]): FormField<T> => ({
       customRender: (
         <div style={{ display: 'flex', gap: '1rem' }}>
-          {fields.map((field) => (
-            <TextInput
-              key={field.name}
-              label={field.label}
-              placeholder={field.placeholder}
-              withAsterisk={field.required}
-              onChange={(e) => {
-                if (!field.readOnly) {
-                  field.onChange?.(e);
-                }
-              }}
-              error={field.error}
-              rightSection={field.rightSection}
-              onBlur={field.onBlur}
-              name={field.name}
-              readOnly={field.readOnly}
-              style={{
-                flex: field.flex || 1,
-              }}
-            />
-          ))}
+          {fieldsToCombine.map((field) => {
+            const fieldNameStr = String(field.name); // field.name could be symbol, number, string
+            let inputValue: string | number | undefined = undefined;
+
+            if (
+              formData &&
+              typeof formData === 'object' &&
+              fieldNameStr in formData
+            ) {
+              const formValue = formData[fieldNameStr as keyof T];
+              if (
+                typeof formValue === 'string' ||
+                typeof formValue === 'number'
+              ) {
+                inputValue = formValue;
+              } else if (formValue !== null && formValue !== undefined) {
+                inputValue = String(formValue); // Convert other types to string
+              }
+            }
+
+            return (
+              <TextInput
+                key={fieldNameStr}
+                label={field.label}
+                placeholder={field.placeholder}
+                withAsterisk={field.required}
+                value={inputValue === undefined ? '' : inputValue}
+                name={fieldNameStr}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  if (!field.readOnly && formOnChangeHandler) {
+                    formOnChangeHandler(event);
+                  }
+                }}
+                error={field.error}
+                rightSection={field.rightSection}
+                onBlur={field.onBlur}
+                readOnly={field.readOnly}
+                style={{
+                  flex: field.flex || 1,
+                }}
+              />
+            );
+          })}
         </div>
       ),
     }),
-    [],
+    [formData, formOnChangeHandler],
   );
 
   const preprocessFields = useCallback(
     (fieldsToProcess: FormField<T>[]): FormField<T>[] => {
       const acceptedFields: FormField<T>[] = [];
-      let currentGroup: FormField<T>[] = [];
+      let currentLineItems: (FormField<T> & { flex?: number })[] = [];
 
-      fieldsToProcess.forEach((field, index) => {
-        if (typeof field.editable === 'undefined') {
-          field.editable = true;
+      const finalizeCurrentLineGroup = () => {
+        if (currentLineItems.length > 0) {
+          const groupToAdd =
+            currentLineItems.length > 1
+              ? combineOnOneLine(currentLineItems)
+              : currentLineItems[0];
+          if (groupToAdd) {
+            acceptedFields.push(groupToAdd);
+          }
+          currentLineItems = [];
         }
-        if (field.editable === false) {
-          return;
-        }
+      };
+
+      fieldsToProcess.forEach((field) => {
+        if (!field) return; // Skip undefined fields
+
+        // Visibility and Editable checks (apply early)
+        if (typeof field.editable === 'undefined') field.editable = true;
+        if (!field.editable) return; // Skip non-editable fields
 
         const isVisible =
           typeof field.visible === 'function'
             ? field.visible(formData)
             : field.visible !== false;
+        if (!isVisible) return; // Skip non-visible fields
 
-        if (!isVisible) {
-          return;
-        }
-
+        // Handle nested fields (these are block items and finalize any current line)
         if (field.fields && field.fields.length > 0) {
-          field.fields = preprocessFields(field.fields);
-          acceptedFields.push(field);
-          return;
+          finalizeCurrentLineGroup(); // Finalize any pending line before this nested section
+          acceptedFields.push({
+            ...field, // This is the group header field
+            fields: preprocessFields(field.fields), // Recursively process children
+          });
+          return; // Move to the next top-level field
         }
 
-        if (currentGroup.length === 0 || field.sameLine) {
-          currentGroup.push(field);
+        // Handle fields without a name (these are also block items and finalize any current line)
+        // These fields cannot participate in sameLine grouping.
+        if (String(field.name || '').trim() === '') {
+          finalizeCurrentLineGroup(); // Finalize any pending line
+          acceptedFields.push(field); // Add unnamed field directly as its own item
+          return; // Move to the next top-level field
         }
 
-        const nextField = fieldsToProcess[index + 1];
-        if (!nextField || !nextField.sameLine) {
-          if (currentGroup.length > 1) {
-            acceptedFields.push(combineOnOneLine(currentGroup));
-          } else if (currentGroup[0]) {
-            acceptedFields.push(currentGroup[0]);
-          }
-          currentGroup = [];
+        // At this point, 'field' is a named, visible, editable, non-nested field.
+        // Apply sameLine logic:
+        if (!field.sameLine) {
+          // This field starts a new line.
+          finalizeCurrentLineGroup(); // Finalize the previous line of items.
+          currentLineItems.push(field as FormField<T> & { flex?: number }); // Add this field as the start of a new line.
+        } else {
+          // This field continues the current line or starts a new one if currentLineItems is empty.
+          currentLineItems.push(field as FormField<T> & { flex?: number });
         }
       });
+
+      // After iterating through all fields, finalize any remaining items in currentLineItems.
+      finalizeCurrentLineGroup();
 
       return acceptedFields;
     },

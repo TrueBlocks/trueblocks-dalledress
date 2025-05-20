@@ -245,6 +245,96 @@ describe('Form Component', () => {
     expect(inlineInputs[1]).toHaveValue('Smith');
   });
 
+  it('renders nested fields with sameLine correctly', () => {
+    const onSubmit = vi.fn();
+    render(
+      <MantineProvider>
+        <Form
+          title="Nested Test Form"
+          initMode="edit"
+          fields={[
+            {
+              name: 'topLevelField',
+              label: 'Top Level Field',
+              type: 'text',
+              value: 'TopValue',
+              placeholder: 'Enter top level value',
+              onChange: vi.fn(),
+            },
+            {
+              label: 'User Options', // This field acts as a grouper
+              fields: [
+                {
+                  name: 'language',
+                  label: 'Language',
+                  type: 'text',
+                  value: 'English',
+                  placeholder: 'Enter language',
+                  onChange: vi.fn(),
+                },
+                {
+                  name: 'theme',
+                  label: 'Theme',
+                  type: 'text',
+                  value: 'Dark',
+                  placeholder: 'Enter theme',
+                  sameLine: true,
+                  onChange: vi.fn(),
+                },
+                {
+                  name: 'notifications',
+                  label: 'Notifications',
+                  type: 'text',
+                  value: 'Enabled',
+                  placeholder: 'Enter notification preference',
+                  sameLine: true,
+                  onChange: vi.fn(),
+                },
+              ],
+            },
+            {
+              name: 'anotherTopLevelField',
+              label: 'Another Top Level Field',
+              type: 'text',
+              value: 'AnotherTopValue',
+              placeholder: 'Enter another top level value',
+              onChange: vi.fn(),
+            },
+          ]}
+          onSubmit={onSubmit}
+          validate={{}}
+        />
+      </MantineProvider>,
+    );
+
+    // Check top-level field
+    expect(screen.getByLabelText('Top Level Field')).toBeInTheDocument();
+    expect(screen.getByLabelText('Top Level Field')).toHaveValue('TopValue');
+
+    // Check for nested fields by label
+    expect(screen.getByLabelText('Language')).toBeInTheDocument();
+    expect(screen.getByLabelText('Language')).toHaveValue('English');
+
+    expect(screen.getByLabelText('Theme')).toBeInTheDocument();
+    expect(screen.getByLabelText('Theme')).toHaveValue('Dark');
+
+    expect(screen.getByLabelText('Notifications')).toBeInTheDocument();
+    expect(screen.getByLabelText('Notifications')).toHaveValue('Enabled');
+
+    // Check another top-level field to ensure processing continued
+    expect(
+      screen.getByLabelText('Another Top Level Field'),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Another Top Level Field')).toHaveValue(
+      'AnotherTopValue',
+    );
+
+    // Verify sameLine behavior for nested fields
+    const form = screen.getByRole('form');
+    const allInputs = within(form).getAllByRole('textbox');
+    expect(allInputs).toHaveLength(5);
+  });
+
   it('selects all text in the active input field when mod+a is pressed', () => {
     render(
       <MantineProvider>

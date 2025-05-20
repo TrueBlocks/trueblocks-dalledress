@@ -285,8 +285,36 @@ export const Names = () => {
   };
 
   const handleFormSubmit = (data: Record<string, unknown>) => {
+    // If source is empty, set it to 'TrueBlocks' before submitting
+    if (!data.source || data.source === '') {
+      data.source = 'TrueBlocks';
+    }
+
     var name = data as IndexableName;
     Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(name));
+  };
+
+  // Validation rules for form fields
+  const formValidation = {
+    name: (value: unknown) => {
+      if (!value || String(value).trim() === '') {
+        return 'Name is required';
+      }
+      return null;
+    },
+    address: (value: unknown) => {
+      if (!value || String(value).trim() === '') {
+        return 'Address is required';
+      }
+
+      // Ethereum address validation (0x + 40 hex characters)
+      const addressRegex = /^0x[a-fA-F0-9]{40}$/;
+      if (!addressRegex.test(String(value))) {
+        return 'Invalid Ethereum address format';
+      }
+
+      return null;
+    },
   };
 
   const tagsTable = (tabLabel: string) => {
@@ -324,6 +352,7 @@ export const Names = () => {
           onFilterChange={setFilter}
           tableKey={tableKey}
           onSubmit={handleFormSubmit}
+          validate={formValidation}
         />
       </>
     );

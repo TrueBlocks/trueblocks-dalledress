@@ -18,7 +18,6 @@ export interface FormProps<T = Record<string, unknown>> {
   submitButtonRef?: React.RefObject<HTMLButtonElement | null>;
   initMode?: 'display' | 'edit';
   compact?: boolean;
-  initialValues?: Record<string, unknown>;
   validate?: Record<
     string,
     (value: unknown, values: Record<string, unknown>) => string | null
@@ -35,7 +34,6 @@ export const Form = <T = Record<string, unknown>,>({
   submitButtonRef,
   initMode = 'display',
   compact = false,
-  initialValues = {},
   validate = {},
 }: FormProps<T>) => {
   const [loading, setLoading] = useState(true);
@@ -43,28 +41,27 @@ export const Form = <T = Record<string, unknown>,>({
 
   // Initialize Mantine form
   const form = useForm({
-    initialValues,
+    initialValues: {}, // Start with an empty object
     validate,
   });
 
-  // Initialize form values from fields if not provided
+  // Initialize form values from fields
   useEffect(() => {
-    const hasInitialValues = Object.keys(initialValues).length > 0;
-    if (!hasInitialValues) {
-      const values: Record<string, unknown> = {};
-      fields.forEach((field) => {
-        if (field.name) {
-          values[field.name] = field.value || '';
-        }
-      });
-      try {
-        form.setValues(values);
-      } catch (e) {
-        Logger('Error setting form values:' + e);
+    // Build values object from fields
+    const values: Record<string, unknown> = {};
+    fields.forEach((field) => {
+      if (field.name && field.value !== undefined) {
+        values[field.name] = field.value;
       }
+    });
+
+    try {
+      form.setValues(values);
+    } catch (e) {
+      Logger('Error setting form values:' + e);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array - only run once on mount, ignoring all dependencies intentionally
+  }, []); // Empty dependency array - only run once on mount
 
   const handleEdit = () => {
     setMode('edit');
@@ -126,7 +123,10 @@ export const Form = <T = Record<string, unknown>,>({
     const fieldWithError = {
       ...field,
       // Use Mantine form values instead of the field's own value
-      value: field.name ? form.values[field.name] : field.value,
+      value:
+        field.name && field.name in form.values
+          ? (form.values as Record<string, unknown>)[field.name]
+          : field.value,
       error: field.name ? form.errors[field.name] : undefined,
     };
 

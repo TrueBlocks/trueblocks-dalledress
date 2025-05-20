@@ -37,6 +37,10 @@ export interface TableProps<T extends Record<string, unknown>> {
   onFilterChange?: (filter: string) => void;
   tableKey: TableKey;
   onSubmit: (data: Record<string, unknown>) => void;
+  validate?: Record<
+    string,
+    (value: unknown, values: Record<string, unknown>) => string | null
+  >;
 }
 
 export const Table = <T extends Record<string, unknown>>({
@@ -50,6 +54,7 @@ export const Table = <T extends Record<string, unknown>>({
   onFilterChange,
   tableKey,
   onSubmit,
+  validate,
 }: TableProps<T>) => {
   const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
@@ -93,7 +98,8 @@ export const Table = <T extends Record<string, unknown>>({
     tableKey,
     onEnter: () => {
       if (selectedRowIndex >= 0 && selectedRowIndex < data.length) {
-        setCurrentRowData(data[selectedRowIndex] || null);
+        const rowData = data[selectedRowIndex] || null;
+        setCurrentRowData(rowData);
         setIsModalOpen(true);
       }
     },
@@ -319,7 +325,9 @@ export const Table = <T extends Record<string, unknown>>({
               label: col.header || col.key,
               placeholder: `Enter ${col.header || col.key}`,
               value: currentRowData
-                ? String((currentRowData as Record<string, unknown>)[col.key])
+                ? String(
+                    (currentRowData as Record<string, unknown>)[col.key] || '',
+                  )
                 : '',
             }))}
             onSubmit={handleFormSubmit}
@@ -327,6 +335,7 @@ export const Table = <T extends Record<string, unknown>>({
             onChange={handleFieldChange}
             initMode="edit"
             compact
+            validate={validate}
           />
         </div>
       </Modal>

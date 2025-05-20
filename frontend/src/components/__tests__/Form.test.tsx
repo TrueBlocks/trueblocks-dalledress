@@ -58,7 +58,6 @@ describe('Form Component', () => {
           description="This is a test form."
           fields={[]}
           onSubmit={vi.fn()}
-          initialValues={{}}
           validate={{}}
         />
       </MantineProvider>,
@@ -85,7 +84,6 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
-          initialValues={{}}
           validate={{}}
         />
       </MantineProvider>,
@@ -114,7 +112,6 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
-          initialValues={{}}
           validate={{}}
         />
       </MantineProvider>,
@@ -144,7 +141,6 @@ describe('Form Component', () => {
           ]}
           onCancel={onCancel}
           onSubmit={vi.fn()}
-          initialValues={{}}
           validate={{}}
         />
       </MantineProvider>,
@@ -175,7 +171,6 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={onSubmit}
-          initialValues={{}}
           validate={{}}
         />
       </MantineProvider>,
@@ -216,7 +211,6 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
-          initialValues={{}}
           validate={{}}
         />
       </MantineProvider>,
@@ -256,7 +250,6 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
-          initialValues={{}}
           validate={{}}
         />
       </MantineProvider>,
@@ -295,7 +288,6 @@ describe('Form Component', () => {
             },
           ]}
           onSubmit={vi.fn()}
-          initialValues={{}}
           validate={{}}
         />
       </MantineProvider>,

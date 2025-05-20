@@ -116,9 +116,6 @@ export const Form = <T = Record<string, unknown>,>({
   // Handle field blur - validate the field when it loses focus
   const handleFieldBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    // Only validate non-empty fields on blur, or fields that had a value and were cleared
-    // This prevents showing errors when users are just tabbing through a new form
     if (name && validate[name] && (value || form.isDirty(name))) {
       form.validateField(name);
     }

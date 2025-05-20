@@ -8,35 +8,6 @@ vi.mock('@app', () => ({
   Logger: vi.fn(),
 }));
 
-// Mock the useForm hook from Mantine
-vi.mock('@mantine/form', () => {
-  return {
-    useForm: () => {
-      const mockFormState: {
-        values: Record<string, unknown>;
-        errors: Record<string, string>;
-      } = {
-        values: {},
-        errors: {},
-      };
-
-      return {
-        values: mockFormState.values,
-        errors: mockFormState.errors,
-        setValues: (newValues: Record<string, unknown>) => {
-          Object.assign(mockFormState.values, newValues);
-          return mockFormState.values;
-        },
-        setFieldValue: (field: string, value: unknown) => {
-          mockFormState.values[field] = value;
-          return mockFormState.values;
-        },
-        validate: () => ({ hasErrors: false }),
-      };
-    },
-  };
-});
-
 vi.mock('react-hotkeys-hook', () => ({
   useHotkeys: (keys: string, handler: (e: KeyboardEvent) => void) => {
     if (keys === 'mod+a') {
@@ -299,5 +270,76 @@ describe('Form Component', () => {
 
     expect(input.selectionStart).toBe(0);
     expect(input.selectionEnd).toBe(input.value.length);
+  });
+
+  it('shows validation error when required field is empty', () => {
+    const onSubmit = vi.fn();
+    render(
+      <MantineProvider>
+        <Form
+          title="Validate Form"
+          initMode="edit"
+          fields={[
+            {
+              name: 'requiredField',
+              label: 'Required Field',
+              type: 'text',
+              value: '',
+              placeholder: 'Enter value',
+              required: true,
+              onChange: vi.fn(),
+            },
+          ]}
+          onSubmit={onSubmit}
+          validate={{
+            requiredField: (value) =>
+              !value ? 'Required Field is required' : null,
+          }}
+        />
+      </MantineProvider>,
+    );
+
+    // attempt to save without entering a value
+    fireEvent.click(screen.getByText('Save'));
+
+    // error message should appear, and onSubmit not called
+    expect(screen.getByText('Required Field is required')).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+
+  it('does not show validation error', () => {
+    const onSubmit = vi.fn();
+    render(
+      <MantineProvider>
+        <Form
+          title="Validate Form"
+          initMode="edit"
+          fields={[
+            {
+              name: 'requiredField',
+              label: 'Required Field',
+              type: 'text',
+              value: 'Data is here',
+              placeholder: 'Enter value',
+              required: true,
+              onChange: vi.fn(),
+            },
+          ]}
+          onSubmit={onSubmit}
+          validate={{
+            requiredField: (value) =>
+              !value ? 'Required Field is required' : null,
+          }}
+        />
+      </MantineProvider>,
+    );
+
+    // attempt to save
+    fireEvent.click(screen.getByText('Save'));
+
+    // error message should appear, and onSubmit not called
+    // expect(screen.getByText('Required Field is required')).not.toBeInTheDocument();
+    expect(onSubmit).toHaveBeenCalled();
   });
 });

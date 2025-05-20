@@ -324,6 +324,7 @@ export const Table = <T extends Record<string, unknown>>({
               name: col.key,
               label: col.header || col.key,
               placeholder: `Enter ${col.header || col.key}`,
+              sameLine: col.sameLine,
               value: currentRowData
                 ? String(
                     (currentRowData as Record<string, unknown>)[col.key] || '',

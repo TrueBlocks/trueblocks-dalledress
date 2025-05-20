@@ -132,7 +132,11 @@ export const Form = <T = Record<string, unknown>,>({
     submitButtonRef,
   });
 
-  const processedFields = usePreprocessedFields<T>(fields);
+  const processedFields = usePreprocessedFields<T>(
+    fields,
+    handleFieldChange,
+    form.values as T,
+  );
 
   const renderField = (field: FormField<T>, index: number) => {
     // Create a new field with error information from Mantine form

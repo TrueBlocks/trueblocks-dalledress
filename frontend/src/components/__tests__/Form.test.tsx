@@ -195,6 +195,7 @@ describe('Form Component', () => {
   });
 
   it('renders fields inline when sameLine is true', () => {
+    const onSubmit = vi.fn();
     render(
       <MantineProvider>
         <Form
@@ -205,41 +206,43 @@ describe('Form Component', () => {
               name: 'firstName',
               label: 'First Name',
               type: 'text',
-              value: '',
+              value: 'Alice',
               placeholder: 'Enter your first name',
-              sameLine: true,
               onChange: vi.fn(),
             },
             {
               name: 'lastName',
               label: 'Last Name',
               type: 'text',
-              value: '',
+              value: 'Smith',
               placeholder: 'Enter your last name',
               sameLine: true,
               onChange: vi.fn(),
             },
           ]}
-          onSubmit={vi.fn()}
+          onSubmit={onSubmit}
           validate={{}}
         />
       </MantineProvider>,
     );
 
-    // Verify that both fields are rendered
     const form = screen.getByRole('form');
-    const inlineContainers = within(form).getAllByRole('textbox');
+    const inlineInputs = within(form).getAllByRole('textbox');
 
     // Ensure both fields are rendered inline
-    expect(inlineContainers).toHaveLength(2);
-    expect(inlineContainers[0]).toHaveAttribute(
+    expect(inlineInputs).toHaveLength(2);
+    expect(inlineInputs[0]).toHaveAttribute(
       'placeholder',
       'Enter your first name',
     );
-    expect(inlineContainers[1]).toHaveAttribute(
+    expect(inlineInputs[1]).toHaveAttribute(
       'placeholder',
       'Enter your last name',
     );
+
+    // Assert that values are populated correctly even when sameLine is true
+    expect(inlineInputs[0]).toHaveValue('Alice');
+    expect(inlineInputs[1]).toHaveValue('Smith');
   });
 
   it('selects all text in the active input field when mod+a is pressed', () => {

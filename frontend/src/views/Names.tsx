@@ -395,7 +395,7 @@ const nameColumns = [
   { key: 'name', header: 'Name', sortable: true },
   { key: 'address', header: 'Address', sortable: true, readOnly: true },
   { key: 'tags', header: 'Tags', sortable: true },
-  { key: 'source', header: 'Source', sortable: true },
+  { key: 'source', header: 'Source', sortable: true, sameLine: true },
   {
     key: 'actions',
     header: 'Actions',

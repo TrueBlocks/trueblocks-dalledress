@@ -67,6 +67,7 @@ export const Form = <T = Record<string, unknown>,>({
     setMode('edit');
   };
 
+  // Handle form submission
   const handleFormSubmit = (e: FormEvent) => {
     Logger('DEBUGGING: onSubmit in Form ' + e);
     e.preventDefault();
@@ -77,10 +78,17 @@ export const Form = <T = Record<string, unknown>,>({
     // Only change mode to display if validation passes
     if (!hasErrors) {
       setMode('display');
-
-      // Pass the Mantine form values to the onSubmit handler
-      // This ensures we're using the values from Mantine's state
       onSubmit(e);
+    } else {
+      // Auto-focus the first field with an error
+      setTimeout(() => {
+        const firstErrorInput = document.querySelector(
+          '.mantine-TextInput-input[aria-invalid="true"]',
+        ) as HTMLInputElement;
+        if (firstErrorInput) {
+          firstErrorInput.focus();
+        }
+      }, 100);
     }
   };
 
@@ -102,6 +110,17 @@ export const Form = <T = Record<string, unknown>,>({
     // Call parent onChange if provided (for backward compatibility)
     if (onChange) {
       onChange(e);
+    }
+  };
+
+  // Handle field blur - validate the field when it loses focus
+  const handleFieldBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    // Only validate non-empty fields on blur, or fields that had a value and were cleared
+    // This prevents showing errors when users are just tabbing through a new form
+    if (name && validate[name] && (value || form.isDirty(name))) {
+      form.validateField(name);
     }
   };
 
@@ -128,6 +147,7 @@ export const Form = <T = Record<string, unknown>,>({
           ? (form.values as Record<string, unknown>)[field.name]
           : field.value,
       error: field.name ? form.errors[field.name] : undefined,
+      onBlur: handleFieldBlur, // Add onBlur handler for real-time validation
     };
 
     return (
@@ -136,6 +156,7 @@ export const Form = <T = Record<string, unknown>,>({
         field={fieldWithError as FormField<Record<string, unknown>>}
         mode={mode}
         onChange={handleFieldChange}
+        onBlur={handleFieldBlur}
         loading={loading}
         keyProp={field.name || index}
         autoFocus={index === 0}

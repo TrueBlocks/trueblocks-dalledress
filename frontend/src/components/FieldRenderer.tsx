@@ -7,13 +7,14 @@ export interface FieldRendererProps {
   field: FormField<Record<string, unknown>>;
   mode?: 'display' | 'edit';
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   loading?: boolean;
   keyProp?: string | number;
   autoFocus?: boolean;
 }
 
 export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
-  ({ field, mode, onChange, loading, keyProp, autoFocus }, ref) => {
+  ({ field, mode, onChange, onBlur, loading, keyProp, autoFocus }, ref) => {
     if (field.fields && field.fields.length > 0) {
       return (
         <Fieldset key={keyProp}>
@@ -25,6 +26,7 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
                 field={nestedField}
                 mode={mode}
                 onChange={onChange}
+                onBlur={onBlur}
                 loading={loading}
               />
             ))}
@@ -63,12 +65,30 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
               onChange(e);
             }
           }}
+          onBlur={(e) => {
+            field.onBlur?.(e);
+            if (onBlur) {
+              onBlur(e);
+            }
+          }}
           error={
             (!loading && field.error) ||
             (field.required && !field.value && `${field.label} is required`)
           }
+          styles={{
+            input: {
+              ...(field.error
+                ? {
+                    borderColor: '#fa5252',
+                    backgroundColor: 'rgba(250, 82, 82, 0.1)',
+                  }
+                : {}),
+            },
+            error: {
+              fontWeight: 500,
+            },
+          }}
           rightSection={field.rightSection}
-          onBlur={field.onBlur}
           name={field.name}
           readOnly={field.readOnly}
           disabled={field.readOnly}

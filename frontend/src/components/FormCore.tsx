@@ -12,7 +12,7 @@ export interface FormField<T = Record<string, unknown>> {
   required?: boolean;
   error?: string;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
-  onBlur?: () => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   rightSection?: ReactNode;
   hint?: string;
   visible?: boolean | ((formData: T) => boolean);

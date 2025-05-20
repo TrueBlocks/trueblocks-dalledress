@@ -83,5 +83,25 @@ func (a *App) ModifyName(modData *ModifyData) error {
 	a.names.List = newArray
 	namesMutex.Unlock()
 
+	/*
+	// Rebuild category arrays so GetNamesPage returns up-to-date data
+	a.names.Custom = a.names.Custom[:0]
+	a.names.Prefund = a.names.Prefund[:0]
+	a.names.Regular = a.names.Regular[:0]
+	a.names.Baddress = a.names.Baddress[:0]
+	for _, name := range a.names.List {
+		switch {
+		case name.Parts&types.Custom != 0:
+			a.names.Custom = append(a.names.Custom, name)
+		case name.Parts&types.Prefund != 0:
+			a.names.Prefund = append(a.names.Prefund, name)
+		case name.Parts&types.Baddress != 0:
+			a.names.Baddress = append(a.names.Baddress, name)
+		case name.Parts&types.Regular != 0:
+			a.names.Regular = append(a.names.Regular, name)
+		}
+	}
+	*/
+
 	return nil
 }

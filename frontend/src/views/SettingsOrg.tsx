@@ -75,7 +75,7 @@ export const SettingsOrg = () => {
         },
         {
           name: 'telemetry',
-          value: formData.telemetry ? 'true' : 'false', // Handle boolean
+          value: formData.telemetry ? 'true' : 'false',
           label: 'Telemetry',
           placeholder: 'Enter your telemetry',
           sameLine: true,
@@ -89,7 +89,7 @@ export const SettingsOrg = () => {
         },
         {
           name: 'experimental',
-          value: formData.experimental ? 'true' : 'false', // Handle boolean
+          value: formData.experimental ? 'true' : 'false',
           label: 'Experimental',
           placeholder: 'Enter your experimental',
           sameLine: true,

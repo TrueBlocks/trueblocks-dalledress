@@ -93,7 +93,6 @@ export const Names = () => {
         setTotalItems(result.total || 0);
         setTags(result.tags || []);
       } catch (err) {
-        Logger('Error loading names: ' + err);
         setError(err instanceof Error ? err.message : 'Failed to load names');
         setNames([]);
         setTags([]);
@@ -285,7 +284,6 @@ export const Names = () => {
   };
 
   const handleFormSubmit = (data: Record<string, unknown>) => {
-    // If source is empty, set it to 'TrueBlocks' before submitting
     if (!data.source || data.source === '') {
       data.source = 'TrueBlocks';
     }
@@ -294,7 +292,6 @@ export const Names = () => {
     Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(name));
   };
 
-  // Validation rules for form fields
   const formValidation = {
     name: (value: unknown) => {
       if (!value || String(value).trim() === '') {
@@ -307,7 +304,6 @@ export const Names = () => {
         return 'Address is required';
       }
 
-      // Ethereum address validation (0x + 40 hex characters)
       const addressRegex = /^0x[a-fA-F0-9]{40}$/;
       if (!addressRegex.test(String(value))) {
         return 'Invalid Ethereum address format';

@@ -1,4 +1,3 @@
-import { Logger } from '@app';
 import { Form, FormField, FormProps } from '@components';
 import { Container } from '@mantine/core';
 
@@ -19,7 +18,6 @@ export const FormView = <T extends Record<string, unknown>>({
   onChange,
   onCancel,
 }: FormViewProps<T>) => {
-  Logger('DEBUGGING1 FormView: ' + JSON.stringify(formFields, null, 2));
   return (
     <Container
       size="md"

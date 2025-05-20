@@ -307,7 +307,6 @@ describe('Form Component', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-
   it('does not show validation error', () => {
     const onSubmit = vi.fn();
     render(
@@ -341,5 +340,113 @@ describe('Form Component', () => {
     // error message should appear, and onSubmit not called
     // expect(screen.getByText('Required Field is required')).not.toBeInTheDocument();
     expect(onSubmit).toHaveBeenCalled();
+  });
+
+  it('shows error on field blur when validation fails', () => {
+    const onSubmit = vi.fn();
+    render(
+      <MantineProvider>
+        <Form
+          initMode="edit"
+          fields={[
+            {
+              name: 'field',
+              label: 'Field',
+              value: '',
+              placeholder: 'Enter field',
+              required: true,
+              onChange: vi.fn(),
+            },
+          ]}
+          onSubmit={onSubmit}
+          validate={{ field: (value) => (!value ? 'Field is required' : null) }}
+        />
+      </MantineProvider>,
+    );
+
+    const input = screen.getByPlaceholderText(
+      'Enter field',
+    ) as HTMLInputElement;
+    input.focus();
+    fireEvent.blur(input);
+
+    expect(screen.getByText('Field is required')).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('shows error for invalid Ethereum address on blur', () => {
+    const onSubmit = vi.fn();
+    render(
+      <MantineProvider>
+        <Form
+          initMode="edit"
+          fields={[
+            {
+              name: 'address',
+              label: 'Address',
+              value: '0x123',
+              placeholder: 'Enter address',
+              required: true,
+              onChange: vi.fn(),
+            },
+          ]}
+          onSubmit={onSubmit}
+          validate={{
+            address: (value) => {
+              if (!value) return 'Address is required';
+              if (!/^0x[a-fA-F0-9]{40}$/.test(value as string)) {
+                return 'Invalid Ethereum address';
+              }
+              return null;
+            },
+          }}
+        />
+      </MantineProvider>,
+    );
+    const input = screen.getByPlaceholderText(
+      'Enter address',
+    ) as HTMLInputElement;
+    fireEvent.blur(input);
+
+    expect(screen.getByText('Invalid Ethereum address')).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('does not show error for valid Ethereum address on blur', () => {
+    const onSubmit = vi.fn();
+    render(
+      <MantineProvider>
+        <Form
+          initMode="edit"
+          fields={[
+            {
+              name: 'address',
+              label: 'Address',
+              value: '0x1234567890abcdef1234567890abcdef12345678',
+              placeholder: 'Enter address',
+              required: true,
+              onChange: vi.fn(),
+            },
+          ]}
+          onSubmit={onSubmit}
+          validate={{
+            address: (value) => {
+              if (!value) return 'Address is required';
+              if (!/^0x[a-fA-F0-9]{40}$/.test(value as string)) {
+                return 'Invalid Ethereum address';
+              }
+              return null;
+            },
+          }}
+        />
+      </MantineProvider>,
+    );
+    const input = screen.getByPlaceholderText(
+      'Enter address',
+    ) as HTMLInputElement;
+    fireEvent.blur(input);
+
+    expect(screen.queryByText('Invalid Ethereum address')).toBeNull();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

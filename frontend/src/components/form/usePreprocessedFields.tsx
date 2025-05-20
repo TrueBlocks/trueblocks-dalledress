@@ -1,8 +1,7 @@
 import { ChangeEvent, useCallback, useMemo } from 'react';
 
+import { FormField } from '@components';
 import { TextInput } from '@mantine/core';
-
-import { FormField } from './FormField';
 
 export const usePreprocessedFields = <T extends Record<string, unknown>>(
   fields: FormField<T>[],

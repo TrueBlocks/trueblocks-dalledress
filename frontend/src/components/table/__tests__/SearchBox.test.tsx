@@ -9,6 +9,7 @@ import { SearchBox } from '../SearchBox';
 let focusControlsMock = vi.fn();
 vi.mock('@components', () => ({
   useTableContext: () => ({ focusControls: focusControlsMock }),
+  useFormHotkeys: vi.fn(), // Add this line
 }));
 
 describe('SearchBox', () => {

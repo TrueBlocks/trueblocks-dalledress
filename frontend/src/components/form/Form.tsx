@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
 import { Logger } from '@app';
 import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
-import { useFormHotkeys } from '@hooks';
+import { useFormHotkeys } from '@components';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 

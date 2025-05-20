@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { useTableContext } from '@components';
-import { useFormHotkeys } from '@hooks';
+import { useFormHotkeys, useTableContext } from '@components';
 
 interface SearchBoxProps {
   value: string;

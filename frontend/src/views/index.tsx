@@ -2,9 +2,7 @@ export { About } from './About';
 export { DalleDress } from './DalleDress';
 export { History } from './History';
 export { Home } from './Home';
-export { Names } from './Names';
-export { Settings } from './Settings';
-export { SettingsApp } from './SettingsApp';
-export { SettingsOrg } from './SettingsOrg';
-export { SettingsUser } from './SettingsUser';
 export { Khedra } from './Khedra';
+
+export * from './names';
+export * from './settings';

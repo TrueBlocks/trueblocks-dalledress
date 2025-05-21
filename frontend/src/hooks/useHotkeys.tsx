@@ -5,7 +5,7 @@ import { emitEvent, registerHotkeys } from '@utils';
 import { MenuItems } from 'src/Menu';
 import { useLocation } from 'wouter';
 
-import { FocusSider } from '../views/Names';
+import { FocusSider } from '../views/names/Names';
 
 interface BaseHotkey {
   type: 'navigation' | 'dev' | 'toggle';

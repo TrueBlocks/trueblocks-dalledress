@@ -7,13 +7,8 @@ import {
   useState,
 } from 'react';
 
-import {
-  GetAppPreferences,
-  IsReady,
-  Logger,
-  SetLastTab,
-  SetLastView,
-} from '@app';
+import { GetAppPreferences, IsReady, SetLastTab, SetLastView } from '@app';
+import { Log } from '@utils';
 import { useLocation } from 'wouter';
 
 interface AppContextType {
@@ -54,7 +49,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         [route]: tab,
       };
       SetLastTab(route, tab).catch((error) => {
-        Logger(`Failed to update lastTab in backend: ${error}`);
+        Log(`Failed to update lastTab in backend: ${error}`);
       });
       return updatedState;
     });

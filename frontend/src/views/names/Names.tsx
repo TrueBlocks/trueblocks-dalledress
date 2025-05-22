@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Logger } from '@app';
+import { EditName, GetNamesPage } from '@app';
 import {
   Table,
   TableProvider,
@@ -10,14 +10,10 @@ import {
 } from '@components';
 import { TableKey, useAppContext } from '@contexts';
 import { TabView } from '@layout';
-import { msgs, sorting, types } from '@models';
-import {
-  ClearSelectedTag,
-  GetNamesPage,
-  GetSelectedTag,
-  SetSelectedTag,
-} from '@names';
+import { sorting, types } from '@models';
+import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { EventsOn } from '@runtime';
+import { useEmitters } from '@utils';
 
 import './Names.css';
 
@@ -31,7 +27,6 @@ export const Names = () => {
   const [filter, setFilter] = useState('');
   const [names, setNames] = useState<IndexableName[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [listType, setListType] = useState<ListType>(
@@ -44,6 +39,7 @@ export const Names = () => {
     Regular: false,
     Baddress: false,
   });
+  const { emitStatus, emitError } = useEmitters();
 
   // References for each tab's TagsTable to support targeting specific instances
   const tagsTableRefs = useRef<Record<string, TagsTableHandle | null>>({});
@@ -66,10 +62,11 @@ export const Names = () => {
   useEffect(() => {
     const fetchSelectedTag = async () => {
       try {
-        const tag = await GetSelectedTag(listType);
-        setSelectedTag(tag || null);
+        GetSelectedTag(listType).then((tag) => {
+          setSelectedTag(tag || null);
+        });
       } catch (err) {
-        console.error('Error fetching selected tag:', err);
+        Log(`Error fetching selected tag: ${err}`);
         setSelectedTag(null);
       }
     };
@@ -79,33 +76,29 @@ export const Names = () => {
   useEffect(() => {
     const loadNames = async () => {
       setLoading(true);
-      setError(null);
-
-      try {
-        const result = await GetNamesPage(
-          listType,
-          pagination.currentPage * pagination.pageSize,
-          pagination.pageSize,
-          sort as sorting.SortDef,
-          filter ?? '',
-        );
-        setNames((result.names || []) as IndexableName[]);
-        setTotalItems(result.total || 0);
-        setTags(result.tags || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load names');
-        setNames([]);
-        setTags([]);
-      } finally {
-        setLoading(false);
-      }
+      // Log(`Names:loadNames ${listType}`);
+      GetNamesPage(
+        listType,
+        pagination.currentPage * pagination.pageSize,
+        pagination.pageSize,
+        sort as sorting.SortDef,
+        filter ?? '',
+      )
+        .then((result) => {
+          setNames((result.names || []) as IndexableName[]);
+          setTotalItems(result.total || 0);
+          setTags(result.tags || []);
+        })
+        .catch((err) => {
+          emitError(err);
+          setNames([]);
+          setTags([]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     };
     loadNames();
-
-    var unsubscribe = EventsOn(msgs.EventType.REFRESH, () => {
-      loadNames();
-    });
-    return unsubscribe;
   }, [
     listType,
     pagination.currentPage,
@@ -114,6 +107,7 @@ export const Names = () => {
     filter,
     selectedTag,
     setTotalItems,
+    emitError,
   ]);
 
   useEffect(() => {
@@ -124,10 +118,11 @@ export const Names = () => {
     // Fetch the selected tag for the new list type when changing tabs
     const fetchSelectedTag = async () => {
       try {
-        const tag = await GetSelectedTag(newListType);
-        setSelectedTag(tag || null);
+        GetSelectedTag(newListType).then((tag) => {
+          setSelectedTag(tag || null);
+        });
       } catch (err) {
-        console.error('Error fetching selected tag:', err);
+        Log(`Error fetching selected tag: ${err}`);
         setSelectedTag(null);
       }
     };
@@ -251,15 +246,15 @@ export const Names = () => {
     try {
       if (tag) {
         try {
-          await SetSelectedTag(listType, tag);
+          SetSelectedTag(listType, tag).then(() => {});
         } catch (e) {
-          console.error(`Error in SetSelectedTag: ${e}`);
+          Log(`Error in SetSelectedTag: ${e}`);
         }
       } else {
         try {
-          await ClearSelectedTag(listType);
+          ClearSelectedTag(listType).then(() => {});
         } catch (e) {
-          console.error(`Error in ClearSelectedTag: ${e}`);
+          Log(`Error in ClearSelectedTag: ${e}`);
         }
       }
       setSelectedTag(tag);
@@ -289,7 +284,37 @@ export const Names = () => {
     }
 
     var name = data as IndexableName;
-    Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(name));
+    // Log(`Names::handleFormSubmit: ${name.name} ${name.address}`);
+    EditName(name)
+      .then(() => {
+        // Log(`Names::returned from EditName: ${name.name} ${name.address}`);
+        GetNamesPage(
+          listType,
+          pagination.currentPage * pagination.pageSize,
+          pagination.pageSize,
+          sort as sorting.SortDef,
+          filter ?? '',
+        ).then((result) => {
+          // Log(`Names::returned from GetNamesPage`);
+          // Log(`Names::name.length: ${result.names.length}`);
+          // Log(`Names::total: ${result.total}`);
+          // Log(`Names::tags.length: ${result.tags.length}`);
+          // var nn = result.names.find((nnn) => {
+          //   return nnn.address === name.address;
+          // });
+          // Log(`Names::returned from GetNamesPage: ${nn?.name} ${nn?.address}`);
+          setNames((result.names || []) as IndexableName[]);
+          setTotalItems(result.total || 0);
+          setTags(result.tags || []);
+        });
+        emitStatus(
+          'Name updated successfully:' + name.name + ' ' + name.address,
+        );
+      })
+      .catch((err) => {
+        // Log(`Names::error: ${err}`);
+        emitError(err);
+      });
   };
 
   const formValidation = {
@@ -341,7 +366,6 @@ export const Names = () => {
           columns={nameColumns}
           data={names}
           loading={loading}
-          error={error}
           sort={sort}
           onSortChange={setSort}
           filter={filter}

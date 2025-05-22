@@ -4,8 +4,11 @@ import { MantineProvider } from '@mantine/core';
 import { RenderOptions, render } from '@testing-library/react';
 import { vi } from 'vitest';
 
+vi.mock('@utils', () => ({
+  Log: vi.fn(),
+}));
+
 vi.mock('@app', () => ({
-  Logger: vi.fn(),
   SetHelpCollapsed: vi.fn(),
   SetInitialized: vi.fn(),
   SetMenuCollapsed: vi.fn(),

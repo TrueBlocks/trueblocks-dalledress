@@ -3,9 +3,9 @@ import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { vi } from 'vitest';
 
-// Mock the Logger function to avoid errors in test environment
-vi.mock('@app', () => ({
-  Logger: vi.fn(),
+// Mock the Log function to avoid errors in test environment
+vi.mock('@utils', () => ({
+  Log: vi.fn(),
 }));
 
 vi.mock('react-hotkeys-hook', () => ({

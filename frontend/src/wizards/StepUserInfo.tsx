@@ -2,8 +2,7 @@ import { ChangeEvent, useEffect } from 'react';
 
 import { GetUserPreferences } from '@app';
 import { FormField, WizardForm } from '@components';
-import { msgs } from '@models';
-import { emitEvent } from '@utils';
+import { useEmitters } from '@utils';
 
 import { WizardStepProps } from '.';
 import { WizardStateData } from './WizardTypes';
@@ -18,6 +17,7 @@ export const StepUserInfo = ({
 }: WizardStepProps) => {
   const { name, email } = state.data;
   const { nameError, emailError } = state.validation;
+  const { emitStatus } = useEmitters();
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -30,17 +30,14 @@ export const StepUserInfo = ({
           });
         }
       } catch (error) {
-        emitEvent(
-          msgs.EventType.STATUS,
-          `Error trying to load user info: ${error}`,
-        );
+        emitStatus(`Error trying to load user info: ${error}`);
       }
     };
 
     if (!name && !email) {
       loadUserData();
     }
-  }, [name, email, updateData]);
+  }, [name, email, updateData, emitStatus]);
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;

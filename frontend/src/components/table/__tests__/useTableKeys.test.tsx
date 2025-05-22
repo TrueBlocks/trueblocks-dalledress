@@ -16,9 +16,9 @@ vi.mock('../usePagination', () => ({
   usePagination: vi.fn(),
 }));
 
-// Mock the Logger function
-vi.mock('@app', () => ({
-  Logger: vi.fn(),
+// Mock the Log function
+vi.mock('@utils', () => ({
+  Log: vi.fn(),
 }));
 
 // Helper function to create mock keyboard events

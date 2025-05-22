@@ -1,16 +1,17 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
-import { GetOrgPreferences, Logger, SetOrgPreferences } from '@app';
+import { GetOrgPreferences, SetOrgPreferences } from '@app';
 import { FormField } from '@components';
 import { FormView } from '@layout';
-import { msgs, preferences } from '@models';
-import { emitEvent } from '@utils';
+import { preferences } from '@models';
+import { useEmitters } from '@utils';
 
 type IndexableOrg = preferences.OrgPreferences & { [key: string]: unknown };
 
 export const SettingsOrg = () => {
   const [formData, setFormData] = useState<IndexableOrg>({});
   const [originalData, setOriginalData] = useState<IndexableOrg>({});
+  const { emitStatus } = useEmitters();
 
   useEffect(() => {
     GetOrgPreferences().then((data) => {
@@ -28,7 +29,7 @@ export const SettingsOrg = () => {
 
   const handleCancel = () => {
     setFormData({ ...originalData });
-    emitEvent(msgs.EventType.STATUS, `Changes were discarded`);
+    emitStatus(`Changes were discarded`);
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +38,7 @@ export const SettingsOrg = () => {
       ...prevFormData,
       [name]: value,
     }));
-    Logger(`${name} = ${JSON.stringify(value)}`);
+    // Log(`${name} = ${JSON.stringify(value)}`);
   };
 
   const formFields: FormField<Record<string, unknown>>[] = [

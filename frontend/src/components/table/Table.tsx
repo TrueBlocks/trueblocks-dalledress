@@ -7,12 +7,12 @@ import {
   useState,
 } from 'react';
 
-import { Logger } from '@app';
 import { useTableContext, useTableKeys } from '@components';
 import { Form } from '@components';
 import { TableKey } from '@contexts';
 import { Modal } from '@mantine/core';
 import { sorting } from '@models';
+import { Log } from '@utils';
 
 import {
   Body,
@@ -30,7 +30,6 @@ export interface TableProps<T extends Record<string, unknown>> {
   columns: Column<T>[];
   data: T[];
   loading: boolean;
-  error: string | null;
   sort?: sorting.SortDef | null;
   onSortChange?: (sort: sorting.SortDef | null) => void;
   filter?: string;
@@ -47,7 +46,6 @@ export const Table = <T extends Record<string, unknown>>({
   columns,
   data,
   loading,
-  error,
   sort: controlledSort,
   onSortChange,
   filter: controlledFilter,
@@ -86,7 +84,7 @@ export const Table = <T extends Record<string, unknown>>({
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const data = Object.fromEntries(formData.entries());
-    Logger('DEBUGGING: onSubmit in Table' + JSON.stringify(data));
+    // Log(`Table::handleFormSubmit: ${data['name']} ${data['address']}`);
     setIsModalOpen(false);
     onSubmit(data as T);
   };
@@ -233,7 +231,6 @@ export const Table = <T extends Record<string, unknown>>({
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="table-outer-container">

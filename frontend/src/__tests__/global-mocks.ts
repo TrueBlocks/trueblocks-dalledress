@@ -1,7 +1,10 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { beforeEach, vi } from 'vitest';
 
-// Mock @utils globally
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
 vi.mock('@utils', async (importOriginal) => {
   try {
     const original = await importOriginal();

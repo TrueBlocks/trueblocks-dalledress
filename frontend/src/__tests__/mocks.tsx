@@ -9,61 +9,127 @@ import {
 } from '@testing-library/react';
 import { vi } from 'vitest';
 
-const mockAppStatic = {
-  SetHelpCollapsed: vi.fn(),
-  SetInitialized: vi.fn(),
-  SetMenuCollapsed: vi.fn(),
+type AppBridgeFunctions = {
+  GetAppId: ReturnType<typeof vi.fn>;
+  GetWizardReturn: ReturnType<typeof vi.fn>;
+  GetUserPreferences: ReturnType<typeof vi.fn>;
+  SetUserPreferences: ReturnType<typeof vi.fn>;
+  IsReady: ReturnType<typeof vi.fn>;
+  GetAppPreferences: ReturnType<typeof vi.fn>;
+  SetLastView: ReturnType<typeof vi.fn>;
 };
 
-const mockRuntimeStatic = {
+type RuntimeBridgeFunctions = {
+  EventsEmit: ReturnType<typeof vi.fn>;
+};
+
+const createInitialMockAppBridge = (): AppBridgeFunctions => ({
+  GetAppId: vi.fn().mockResolvedValue('mockAppId'),
+  GetWizardReturn: vi.fn().mockResolvedValue('/mock-wizard-return'),
+  GetUserPreferences: vi
+    .fn()
+    .mockResolvedValue({ name: 'Mock User', email: 'mock@example.com' }),
+  SetUserPreferences: vi.fn().mockResolvedValue({}),
+  IsReady: vi.fn().mockResolvedValue(true),
+  GetAppPreferences: vi.fn().mockResolvedValue({
+    lastView: '/mock-default-view',
+    menuCollapsed: false,
+  }),
+  SetLastView: vi.fn().mockResolvedValue(undefined),
+});
+
+const createInitialMockRuntimeBridge = (): RuntimeBridgeFunctions => ({
   EventsEmit: vi.fn(),
-  EventsOn: vi.fn(),
-  EventsOff: vi.fn(),
+});
+
+export let mockAppBridge = createInitialMockAppBridge();
+export let mockRuntimeBridge = createInitialMockRuntimeBridge();
+
+vi.mock('../../wailsjs/go/app/App', () => mockAppBridge);
+vi.mock('../../wailsjs/runtime/runtime', () => mockRuntimeBridge);
+
+export const setupWailsMocks = (
+  appOverrides?: Partial<AppBridgeFunctions>,
+  runtimeOverrides?: Partial<RuntimeBridgeFunctions>,
+) => {
+  if (appOverrides) {
+    for (const key in appOverrides) {
+      const typedKey = key as keyof AppBridgeFunctions;
+      if (
+        Object.prototype.hasOwnProperty.call(mockAppBridge, typedKey) &&
+        Object.prototype.hasOwnProperty.call(appOverrides, typedKey)
+      ) {
+        const overrideFn = appOverrides[typedKey];
+        if (
+          typeof mockAppBridge[typedKey]?.mockImplementation === 'function' &&
+          typeof overrideFn === 'function'
+        ) {
+          mockAppBridge[typedKey].mockImplementation(overrideFn as any);
+        } else {
+          (mockAppBridge as any)[typedKey] = overrideFn;
+        }
+      } else {
+        console.warn(
+          `[setupWailsMocks] Attempted to override App.${typedKey}, but it's not defined in the central mockAppBridge or not provided in overrides.`,
+        );
+      }
+    }
+  }
+  if (runtimeOverrides) {
+    for (const key in runtimeOverrides) {
+      const typedKey = key as keyof RuntimeBridgeFunctions;
+      if (
+        Object.prototype.hasOwnProperty.call(mockRuntimeBridge, typedKey) &&
+        Object.prototype.hasOwnProperty.call(runtimeOverrides, typedKey)
+      ) {
+        const overrideFn = runtimeOverrides[typedKey];
+        if (
+          typeof mockRuntimeBridge[typedKey]?.mockImplementation ===
+            'function' &&
+          typeof overrideFn === 'function'
+        ) {
+          mockRuntimeBridge[typedKey].mockImplementation(overrideFn as any);
+        } else {
+          (mockRuntimeBridge as any)[typedKey] = overrideFn;
+        }
+      } else {
+        console.warn(
+          `[setupWailsMocks] Attempted to override Runtime.${typedKey}, but it's not defined in the central mockRuntimeBridge or not provided in overrides.`,
+        );
+      }
+    }
+  }
 };
 
-export const mockAppBridge = {
-  ...mockAppStatic,
-  GetAppId: vi.fn(() => Promise.resolve({ appName: 'Mocked App' })),
-  GetWizardReturn: vi.fn(() => Promise.resolve('/mocked-path')),
-  GetUserPreferences: vi.fn(() =>
-    Promise.resolve({ name: 'Mock User', email: 'mock@example.com' }),
-  ),
-  SetUserPreferences: vi.fn(() => Promise.resolve({})),
-  IsReady: vi.fn(() => Promise.resolve(true)),
-  GetAppPreferences: vi.fn(() =>
-    Promise.resolve({ lastView: '/', menuCollapsed: false }),
-  ),
-  SetLastView: vi.fn(() => Promise.resolve()),
-};
-
-export const mockRuntimeBridge = {
-  ...mockRuntimeStatic,
-};
-
-export function setupWailsMocks() {
-  vi.mock('@app', () => mockAppBridge);
-  vi.mock('@runtime', () => mockRuntimeBridge);
+export function AllTheProviders({
+  children,
+}: {
+  children: ReactNode;
+}): ReactElement {
+  return <MantineProvider>{children}</MantineProvider>;
 }
 
-const AllTheProviders = ({ children }: { children: ReactNode }) => {
-  return <MantineProvider>{children}</MantineProvider>;
-};
-
-const customRender = (
+function customRender(
   ui: ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>,
-) => rtlRender(ui, { wrapper: AllTheProviders, ...options });
+) {
+  return rtlRender(ui, { wrapper: AllTheProviders, ...options });
+}
 
 export * from '@testing-library/react';
 export { customRender as render, screen, fireEvent };
 
 const registeredHotkeys = new Map<string, (e: KeyboardEvent) => void>();
-export const mockUseHotkeys = vi.fn(
-  (key: string | string[], callback: (e: KeyboardEvent) => void) => {
-    const keys = Array.isArray(key) ? key : [key];
-    keys.forEach((k) => registeredHotkeys.set(k, callback));
-  },
-);
+
+const initialMockUseHotkeysImplementation = (
+  key: string | string[],
+  callback: (e: KeyboardEvent) => void,
+) => {
+  const keys = Array.isArray(key) ? key : [key];
+  keys.forEach((k) => registeredHotkeys.set(k, callback));
+};
+
+export let mockUseHotkeys = vi.fn(initialMockUseHotkeysImplementation);
 
 export function setupHotkeysMock() {
   vi.mock('react-hotkeys-hook', () => ({
@@ -94,67 +160,102 @@ export function clearRegisteredHotkeys() {
   registeredHotkeys.clear();
 }
 
-export const mockViewContextDefaultValue = {
+const createInitialViewContextDefaultValue = () => ({
   currentView: 'mockView',
   setCurrentView: vi.fn(),
   viewPagination: {},
   getPagination: vi.fn(() => ({ currentPage: 0, pageSize: 10, totalItems: 0 })),
   updatePagination: vi.fn(),
-};
+});
+export let mockViewContextDefaultValue = createInitialViewContextDefaultValue();
 
 export function setupContextMocks({
   customViewContext,
-}: { customViewContext?: Partial<typeof mockViewContextDefaultValue> } = {}) {
+}: {
+  customViewContext?: Partial<
+    ReturnType<typeof createInitialViewContextDefaultValue>
+  >;
+} = {}) {
+  const newDefaults = createInitialViewContextDefaultValue();
+  if (customViewContext) {
+    mockViewContextDefaultValue = {
+      ...newDefaults,
+      ...customViewContext,
+      setCurrentView:
+        customViewContext.setCurrentView || newDefaults.setCurrentView,
+      getPagination:
+        customViewContext.getPagination || newDefaults.getPagination,
+      updatePagination:
+        customViewContext.updatePagination || newDefaults.updatePagination,
+    };
+  } else {
+    mockViewContextDefaultValue = newDefaults;
+  }
+
   vi.mock('@contexts', async (importOriginal) => {
     const original = (await importOriginal()) as any;
     return {
       ...original,
-      useViewContext: () => ({
-        ...mockViewContextDefaultValue,
-        ...customViewContext,
-      }),
+      useViewContext: () => mockViewContextDefaultValue,
     };
   });
 }
 
-export const mockTableContextDefaultValue = {
-  focusState: 'table',
+const createInitialTableContextDefaultValue = () => ({
+  focusState: 'table' as 'table' | 'controls',
   selectedRowIndex: -1,
   setSelectedRowIndex: vi.fn(),
   focusTable: vi.fn(),
   focusControls: vi.fn(),
-  tableRef: { current: null },
-};
+  tableRef: { current: null as HTMLTableElement | null },
+});
+export let mockTableContextDefaultValue =
+  createInitialTableContextDefaultValue();
 
 export function setupComponentHookMocks({
   customTableContext,
-}: { customTableContext?: Partial<typeof mockTableContextDefaultValue> } = {}) {
+}: {
+  customTableContext?: Partial<
+    ReturnType<typeof createInitialTableContextDefaultValue>
+  >;
+} = {}) {
+  const newDefaults = createInitialTableContextDefaultValue();
+  if (customTableContext) {
+    mockTableContextDefaultValue = {
+      ...newDefaults,
+      ...customTableContext,
+      setSelectedRowIndex:
+        customTableContext.setSelectedRowIndex ||
+        newDefaults.setSelectedRowIndex,
+      focusTable: customTableContext.focusTable || newDefaults.focusTable,
+      focusControls:
+        customTableContext.focusControls || newDefaults.focusControls,
+    };
+  } else {
+    mockTableContextDefaultValue = newDefaults;
+  }
+
   vi.mock('@components', async (importOriginal) => {
     const original = (await importOriginal()) as any;
     return {
       ...original,
-      useTableContext: vi.fn(() => ({
-        ...mockTableContextDefaultValue,
-        ...customTableContext,
-      })),
+      useTableContext: vi.fn(() => mockTableContextDefaultValue),
       useFormHotkeys: vi.fn(),
     };
   });
 }
 
 export function resetAllCentralMocks() {
-  Object.values(mockAppBridge).forEach(
-    (fn) => typeof fn === 'function' && fn.mockClear(),
-  );
-  Object.values(mockRuntimeBridge).forEach(
-    (fn) => typeof fn === 'function' && fn.mockClear(),
-  );
-  mockUseHotkeys.mockClear();
+  // Reset Wails Bridge mocks by re-initializing them to their default state
+  mockAppBridge = createInitialMockAppBridge();
+  mockRuntimeBridge = createInitialMockRuntimeBridge();
+
+  // Reset Hotkeys mock
+  mockUseHotkeys.mockReset(); // Clears history, calls, and implementation
+  mockUseHotkeys.mockImplementation(initialMockUseHotkeysImplementation); // Restore initial impl.
   clearRegisteredHotkeys();
-  mockViewContextDefaultValue.setCurrentView.mockClear();
-  mockViewContextDefaultValue.getPagination.mockClear();
-  mockViewContextDefaultValue.updatePagination.mockClear();
-  mockTableContextDefaultValue.setSelectedRowIndex.mockClear();
-  mockTableContextDefaultValue.focusTable.mockClear();
-  mockTableContextDefaultValue.focusControls.mockClear();
+
+  // Reset Context mock values to their initial state
+  mockViewContextDefaultValue = createInitialViewContextDefaultValue();
+  mockTableContextDefaultValue = createInitialTableContextDefaultValue();
 }

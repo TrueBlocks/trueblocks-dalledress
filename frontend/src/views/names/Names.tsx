@@ -21,8 +21,10 @@ type IndexableName = types.Name & { [key: string]: unknown };
 export const FocusSider = 'focus-tags-table';
 
 // Helper function to remove undefined properties from an object
-function removeUndefinedProps(obj: Record<string, any>): Record<string, any> {
-  const result: Record<string, any> = {};
+function removeUndefinedProps(
+  obj: Record<string, unknown>,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   for (const key in obj) {
     if (
       Object.prototype.hasOwnProperty.call(obj, key) &&

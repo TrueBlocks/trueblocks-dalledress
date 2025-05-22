@@ -20,6 +20,20 @@ import './Names.css';
 type IndexableName = types.Name & { [key: string]: unknown };
 export const FocusSider = 'focus-tags-table';
 
+// Helper function to remove undefined properties from an object
+function removeUndefinedProps(obj: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const key in obj) {
+    if (
+      Object.prototype.hasOwnProperty.call(obj, key) &&
+      obj[key] !== undefined
+    ) {
+      result[key] = obj[key];
+    }
+  }
+  return result;
+}
+
 export const Names = () => {
   const { lastTab } = useAppContext();
 
@@ -283,36 +297,64 @@ export const Names = () => {
       data.source = 'TrueBlocks';
     }
 
-    var name = data as IndexableName;
-    // Log(`Names::handleFormSubmit: ${name.name} ${name.address}`);
-    UpdateName(name)
+    // Cast the form data to IndexableName. This assumes that the data from the form,
+    // combined with any defaults, is intended to be treated as an IndexableName for
+    // the optimistic update and for the UpdateName API call.
+    const submittedName = data as IndexableName;
+
+    const originalNames = [...names]; // 1. Save current names state
+
+    // 2. Optimistic UI Update
+    let optimisticNames: IndexableName[];
+    const existingNameIndex = originalNames.findIndex(
+      // Compare addresses. Assumes 'address' property is comparable and of the same type.
+      (n) => n.address === submittedName.address,
+    );
+
+    if (existingNameIndex !== -1) {
+      // Update existing name
+      optimisticNames = originalNames.map((n, index) =>
+        index === existingNameIndex
+          ? ({ ...n, ...removeUndefinedProps(submittedName) } as IndexableName) // Use helper
+          : n,
+      );
+    } else {
+      // Add new name: Prepend submittedName to the list for immediate visibility.
+      // The subsequent GetNamesPage call will provide the correctly sorted/paginated list.
+      optimisticNames = [submittedName, ...originalNames];
+    }
+    setNames(optimisticNames); // Update UI optimistically
+
+    // 3. Call UpdateName
+    UpdateName(submittedName)
       .then(() => {
-        // Log(`Names::returned from UpdateName: ${name.name} ${name.address}`);
-        GetNamesPage(
+        // 4. If UpdateName is successful, call GetNamesPage
+        return GetNamesPage(
           listType,
           pagination.currentPage * pagination.pageSize,
           pagination.pageSize,
           sort as sorting.SortDef,
           filter ?? '',
-        ).then((result) => {
-          // Log(`Names::returned from GetNamesPage`);
-          // Log(`Names::name.length: ${result.names.length}`);
-          // Log(`Names::total: ${result.total}`);
-          // Log(`Names::tags.length: ${result.tags.length}`);
-          // var nn = result.names.find((nnn) => {
-          //   return nnn.address === name.address;
-          // });
-          // Log(`Names::returned from GetNamesPage: ${nn?.name} ${nn?.address}`);
-          setNames((result.names || []) as IndexableName[]);
-          setTotalItems(result.total || 0);
-          setTags(result.tags || []);
-        });
+        );
+      })
+      .then((result) => {
+        // 5. Update UI with definitive result from GetNamesPage
+        setNames((result.names || []) as IndexableName[]);
+        setTotalItems(result.total || 0);
+        setTags(result.tags || []);
+
+        // Ensure address is stringified for the status message if it's not already a string.
+        const addressStr =
+          typeof submittedName.address === 'string'
+            ? submittedName.address
+            : String(submittedName.address); // Fallback to String() conversion
         emitStatus(
-          'Name updated successfully:' + name.name + ' ' + name.address,
+          `Name updated successfully: ${submittedName.name} ${addressStr}`,
         );
       })
       .catch((err) => {
-        // Log(`Names::error: ${err}`);
+        // 6. If there's an error anywhere in the chain, undo the optimistic setNames
+        setNames(originalNames); // Revert to the original names
         emitError(err);
       });
   };

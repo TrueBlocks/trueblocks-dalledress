@@ -2,12 +2,13 @@ package app
 
 import (
 	"os"
+	"runtime"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/menu/keys"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func (a *App) FileNew(_ *menu.CallbackData) {
@@ -21,7 +22,7 @@ func (a *App) FileNew(_ *menu.CallbackData) {
 }
 
 func (a *App) FileOpen(_ *menu.CallbackData) {
-	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+	path, err := wailsRuntime.OpenFileDialog(a.ctx, wailsRuntime.OpenDialogOptions{
 		Title: "Open Project File",
 	})
 	if err != nil || path == "" {
@@ -46,7 +47,7 @@ func (a *App) FileSave(_ *menu.CallbackData) {
 }
 
 func (a *App) FileSaveAs(_ *menu.CallbackData) {
-	path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+	path, err := wailsRuntime.SaveFileDialog(a.ctx, wailsRuntime.SaveDialogOptions{
 		Title: "Save Project As",
 	})
 	if err != nil || path == "" {
@@ -64,7 +65,7 @@ func (a *App) FileSaveAs(_ *menu.CallbackData) {
 
 func (a *App) FileQuit(_ *menu.CallbackData) {
 	if a.Projects.HasUnsavedChanges() {
-		response, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+		response, err := wailsRuntime.MessageDialog(a.ctx, wailsRuntime.MessageDialogOptions{
 			Title:   "Unsaved Changes",
 			Message: "Do you want to save changes before quitting?",
 			Buttons: []string{"Yes", "No", "Cancel"},
@@ -111,12 +112,9 @@ func (a *App) buildAppMenu() *menu.Menu {
 	file.AddText("Save", keys.CmdOrCtrl("s"), a.FileSave)
 	file.AddText("Save As", keys.CmdOrCtrl("shift+s"), a.FileSaveAs)
 
-	// Edit Menu
-	edit := appMenu.AddSubmenu("Edit")
-	edit.AddText("Cut", keys.CmdOrCtrl("x"), nil)        // menu.EditCut)
-	edit.AddText("Copy", keys.CmdOrCtrl("c"), nil)       // menu.EditCopy)
-	edit.AddText("Paste", keys.CmdOrCtrl("v"), nil)      // menu.EditPaste)
-	edit.AddText("Select All", keys.CmdOrCtrl("a"), nil) // menu.EditSelectAll)
+	if runtime.GOOS == "darwin" {
+		appMenu.Append(menu.EditMenu())
+	}
 
 	// Window Menu
 	window := appMenu.AddSubmenu("Window")
@@ -128,10 +126,10 @@ func (a *App) buildAppMenu() *menu.Menu {
 	// TODO: add applicastion name to this menu item
 	aboutLink := "https://" + preferences.GetAppId().Domain + "/about"
 	help.AddText("About", nil, func(_ *menu.CallbackData) {
-		runtime.BrowserOpenURL(a.ctx, aboutLink)
+		wailsRuntime.BrowserOpenURL(a.ctx, aboutLink)
 	})
 	help.AddText("Report Issue", nil, func(_ *menu.CallbackData) {
-		runtime.BrowserOpenURL(a.ctx, preferences.GetAppId().Github+"/issues")
+		wailsRuntime.BrowserOpenURL(a.ctx, preferences.GetAppId().Github+"/issues")
 	})
 
 	return appMenu

@@ -32,22 +32,27 @@ export const useFormHotkeys = ({
   useHotkeys(
     'enter',
     (e) => {
-      const activeElement = document.activeElement as HTMLInputElement;
+      const activeElement = document.activeElement as HTMLElement;
       if (mode === 'display') {
         e.preventDefault();
         setMode?.('edit');
         return;
       }
-      e.preventDefault();
-      const form = activeElement.closest('form') as HTMLFormElement;
-      if (form) {
-        const submitButton = form.querySelector(
-          'button[type="submit"]',
-        ) as HTMLButtonElement;
-        if (submitButton) {
-          submitButton.click();
+
+      // Only prevent default and attempt submission if not a TEXTAREA
+      if (activeElement && activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        const form = activeElement.closest('form') as HTMLFormElement;
+        if (form) {
+          const submitButton = form.querySelector(
+            'button[type="submit"]',
+          ) as HTMLButtonElement;
+          if (submitButton) {
+            submitButton.click();
+          }
         }
       }
+      // If it's a TEXTAREA, we do nothing here, allowing default 'Enter' behavior (new line)
     },
     { enableOnFormTags: true, enabled: enableKey('enter') },
   );

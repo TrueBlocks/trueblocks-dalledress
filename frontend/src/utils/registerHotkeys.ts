@@ -2,7 +2,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 type HotkeyHandler = (e: KeyboardEvent) => void;
 
-interface RegisterHotkeyOptions {
+export interface RegisterHotkeyOptions {
   enableOnFormTags?: boolean;
   enableOnContentEditable?: boolean;
   splitKey?: string;
@@ -14,7 +14,7 @@ interface RegisterHotkeyOptions {
   description?: string;
 }
 
-interface HotkeyConfig {
+export interface HotkeyConfig {
   key: string;
   handler: HotkeyHandler;
   options?: RegisterHotkeyOptions;

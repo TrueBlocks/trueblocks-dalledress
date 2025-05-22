@@ -2,6 +2,7 @@ import { Reload, SetHelpCollapsed, SetMenuCollapsed } from '@app';
 import { useAppContext } from '@contexts';
 import { msgs } from '@models';
 import { Log, emitEvent, registerHotkeys } from '@utils';
+import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
 import { MenuItems } from 'src/Menu';
 import { useLocation } from 'wouter';
 
@@ -39,11 +40,8 @@ export const useAppHotkeys = (): void => {
 
   const handleHotkey = async (
     hkType: Hotkey,
-    e: KeyboardEvent,
+    _e: KeyboardEvent,
   ): Promise<void> => {
-    e.preventDefault();
-    e.stopPropagation();
-
     try {
       switch (hkType.type) {
         case 'navigation':
@@ -81,7 +79,7 @@ export const useAppHotkeys = (): void => {
     }
   };
 
-  const toggleHotkeys = [
+  const toggleHotkeys: HotkeyConfig[] = [
     {
       key: 'mod+h',
       handler: (e: KeyboardEvent) =>
@@ -98,7 +96,7 @@ export const useAppHotkeys = (): void => {
           },
           e,
         ),
-      options: { enableOnFormTags: true },
+      options: { preventDefault: true, enableOnFormTags: true },
     },
     {
       key: 'mod+m',
@@ -116,7 +114,7 @@ export const useAppHotkeys = (): void => {
           },
           e,
         ),
-      options: { enableOnFormTags: true },
+      options: { preventDefault: true, enableOnFormTags: true },
     },
     {
       key: 'mod+r',
@@ -134,7 +132,7 @@ export const useAppHotkeys = (): void => {
           },
           e,
         ),
-      options: { enableOnFormTags: true },
+      options: { preventDefault: true, enableOnFormTags: true },
     },
     {
       key: 'mod+shift+e',
@@ -145,18 +143,17 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+shift+e',
             label: 'Focus tags sider',
             action: () => {
-              // Pass the current active tab information to better target the right TagsTable
               emitEvent(FocusSider, { activeTab: currentLocation });
             },
           },
           e,
         ),
-      options: { enableOnFormTags: true },
+      options: { preventDefault: true, enableOnFormTags: true },
     },
   ];
 
   const menuItemHotkeys = MenuItems.flatMap((item) => {
-    const hotkeyConfigs = [];
+    const hotkeyConfigs: HotkeyConfig[] = [];
 
     if (item.hotkey) {
       hotkeyConfigs.push({
@@ -195,6 +192,7 @@ export const useAppHotkeys = (): void => {
           }
           handleHotkey(hotkeyObj, e);
         },
+        options: { preventDefault: true },
       });
     }
 
@@ -235,12 +233,80 @@ export const useAppHotkeys = (): void => {
           }
           handleHotkey(hotkeyObj, e);
         },
+        options: { preventDefault: true },
       });
     }
 
     return hotkeyConfigs;
   });
 
-  const hotkeysConfig = [...menuItemHotkeys, ...toggleHotkeys];
+  const passthroughEditHotkeys: HotkeyConfig[] = [
+    {
+      key: 'mod+c',
+      handler: (_e: KeyboardEvent) => {
+        // Allow default browser action
+      },
+      options: {
+        preventDefault: false,
+        enableOnFormTags: true,
+      } as RegisterHotkeyOptions,
+    },
+    {
+      key: 'mod+v',
+      handler: (_e: KeyboardEvent) => {
+        // Allow default browser action
+      },
+      options: {
+        preventDefault: false,
+        enableOnFormTags: true,
+      } as RegisterHotkeyOptions,
+    },
+    {
+      key: 'mod+x',
+      handler: (_e: KeyboardEvent) => {
+        // Allow default browser action
+      },
+      options: {
+        preventDefault: false,
+        enableOnFormTags: true,
+      } as RegisterHotkeyOptions,
+    },
+    {
+      key: 'mod+z',
+      handler: (_e: KeyboardEvent) => {
+        // Allow default browser action
+      },
+      options: {
+        preventDefault: false,
+        enableOnFormTags: true,
+      } as RegisterHotkeyOptions,
+    },
+    {
+      key: 'mod+shift+z',
+      handler: (_e: KeyboardEvent) => {
+        // Allow default browser action
+      },
+      options: {
+        preventDefault: false,
+        enableOnFormTags: true,
+      } as RegisterHotkeyOptions,
+    },
+    {
+      key: 'mod+y', // Redo (alternative to mod+shift+z)
+      handler: (_e: KeyboardEvent) => {
+        // Allow default browser action
+      },
+      options: {
+        preventDefault: false,
+        enableOnFormTags: true,
+      } as RegisterHotkeyOptions,
+    },
+  ];
+
+  const hotkeysConfig: HotkeyConfig[] = [
+    ...menuItemHotkeys,
+    ...toggleHotkeys,
+    ...passthroughEditHotkeys,
+  ];
   registerHotkeys(hotkeysConfig);
 };

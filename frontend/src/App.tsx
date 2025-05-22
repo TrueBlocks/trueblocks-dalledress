@@ -18,11 +18,18 @@ function globalNavKeySquelcher(e: KeyboardEvent) {
     'PageDown',
     'Home',
     'End',
-    'Enter',
-    'Escape',
   ];
-  if (navKeys.includes(e.key)) {
-    // Only squelch if not handled by a focused control
+
+  const activeElement = document.activeElement as HTMLElement;
+  const isFormElement =
+    activeElement &&
+    (activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.tagName === 'SELECT' ||
+      activeElement.isContentEditable);
+
+  if (navKeys.includes(e.key) && !isFormElement) {
+    // Only squelch if not handled by a focused form control
     e.preventDefault();
   }
 }

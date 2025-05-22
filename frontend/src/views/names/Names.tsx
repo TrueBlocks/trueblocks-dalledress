@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { EditName, GetNamesPage } from '@app';
+import { GetNamesPage, UpdateName } from '@app';
 import {
   Table,
   TableProvider,
@@ -13,7 +13,7 @@ import { TabView } from '@layout';
 import { sorting, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { EventsOn } from '@runtime';
-import { useEmitters } from '@utils';
+import { Log, useEmitters } from '@utils';
 
 import './Names.css';
 
@@ -285,9 +285,9 @@ export const Names = () => {
 
     var name = data as IndexableName;
     // Log(`Names::handleFormSubmit: ${name.name} ${name.address}`);
-    EditName(name)
+    UpdateName(name)
       .then(() => {
-        // Log(`Names::returned from EditName: ${name.name} ${name.address}`);
+        // Log(`Names::returned from UpdateName: ${name.name} ${name.address}`);
         GetNamesPage(
           listType,
           pagination.currentPage * pagination.pageSize,

@@ -4,7 +4,6 @@ import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
 import { useFormHotkeys } from '@components';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { Log } from '@utils';
 
 // Helper function to recursively extract initial values
 const extractAllInitialValues = <T extends Record<string, unknown>>(

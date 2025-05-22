@@ -6,22 +6,21 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-func (a *App) EditName(nameToEdit *coreTypes.Name) error {
+func (a *App) UpdateName(nameToEdit *coreTypes.Name) error {
 	if err := a.ModifyName("update", nameToEdit); err != nil {
-		types.LogBackend("EditName error " + err.Error())
-		msgs.EmitError("EditName", err)
+		// types.LogBackend("UpdateName error " + err.Error())
+		msgs.EmitError("UpdateName", err)
 		return err
 	}
 
-	for _, name := range a.names.List {
-		if name.Address == nameToEdit.Address {
-			types.LogBackend("EditName success " + name.Name + " " + name.Address.Hex())
-		}
-	}
-	types.LogBackend(fmt.Sprintf("EditName Pointer value of n: %p\n", &a.names))
+	// for _, name := range a.names.List {
+	// 	if name.Address == nameToEdit.Address {
+	// 		types.LogBackend("UpdateName success " + name.Name + " " + name.Address.Hex())
+	// 	}
+	// }
+	// types.LogBackend(fmt.Sprintf("UpdateName Pointer value of n: %p\n", &a.names))
 	msgs.EmitMessage(msgs.EventRefresh, fmt.Sprintf("Address %s was updated", nameToEdit.Address.Hex()))
 	return nil
 }

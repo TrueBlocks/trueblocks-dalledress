@@ -7,7 +7,6 @@ import { vi } from 'vitest';
 
 import { Wizard } from '../Wizard';
 
-// Minimal mock for external APIs only
 vi.mock('@app', () => ({
   GetAppId: () => Promise.resolve({ appName: 'Test App' }),
   GetWizardReturn: () => Promise.resolve('/'),
@@ -16,7 +15,7 @@ vi.mock('@app', () => ({
   IsReady: () => Promise.resolve(true),
   GetAppPreferences: () =>
     Promise.resolve({ lastView: '/', menuCollapsed: false }),
-  SetLastView: () => Promise.resolve(), // <-- Add this line
+  SetLastView: () => Promise.resolve(),
 }));
 
 vi.mock('@runtime', () => ({
@@ -38,10 +37,19 @@ vi.mock('@contexts', async (importOriginal) => {
   });
 });
 
-// Minimal mock for wizardUtils
-vi.mock('@utils', () => ({
-  checkAndNavigateToWizard: () => Promise.resolve(null),
-}));
+// Minimal mock for wizardUtils - UPDATED
+vi.mock('@utils', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...actual, // Spread actual to keep other exports
+    checkAndNavigateToWizard: () => Promise.resolve(null),
+    useEmitters: () => ({
+      // Add the missing useEmitters mock
+      emitStatus: vi.fn(),
+      emitError: vi.fn(),
+    }),
+  };
+});
 
 // We need to make the step navigation actually work in our test
 let activeStep = 0;

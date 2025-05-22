@@ -12,7 +12,6 @@ import { Form } from '@components';
 import { TableKey } from '@contexts';
 import { Modal } from '@mantine/core';
 import { sorting } from '@models';
-import { Log } from '@utils';
 
 import {
   Body,

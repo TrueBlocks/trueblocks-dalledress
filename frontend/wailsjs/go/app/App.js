@@ -42,10 +42,6 @@ export function DeleteName(arg1) {
   return window['go']['app']['App']['DeleteName'](arg1);
 }
 
-export function EditName(arg1) {
-  return window['go']['app']['App']['EditName'](arg1);
-}
-
 export function FileNew(arg1) {
   return window['go']['app']['App']['FileNew'](arg1);
 }
@@ -220,4 +216,8 @@ export function SwitchToProject(arg1) {
 
 export function UndeleteName(arg1) {
   return window['go']['app']['App']['UndeleteName'](arg1);
+}
+
+export function UpdateName(arg1) {
+  return window['go']['app']['App']['UpdateName'](arg1);
 }

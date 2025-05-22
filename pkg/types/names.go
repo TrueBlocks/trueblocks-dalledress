@@ -2,14 +2,12 @@ package types
 
 import (
 	"fmt"
-	"log"
 	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/names"
@@ -352,6 +350,6 @@ func extractTagsFromNames(namesList []*types.Name) []string {
 	return uniqueTags
 }
 
-func LogBackend(msg string) {
-	log.Println(colors.BrightBlue+"BACKEND", msg, colors.Off)
-}
+// func LogBackend(msg string) {
+// 	log.Println(colors.BrightBlue+"BACKEND", msg, colors.Off)
+// }

@@ -37,20 +37,6 @@ vi.mock('@contexts', async (importOriginal) => {
   });
 });
 
-// Minimal mock for wizardUtils - UPDATED
-vi.mock('@utils', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>;
-  return {
-    ...actual, // Spread actual to keep other exports
-    checkAndNavigateToWizard: () => Promise.resolve(null),
-    useEmitters: () => ({
-      // Add the missing useEmitters mock
-      emitStatus: vi.fn(),
-      emitError: vi.fn(),
-    }),
-  };
-});
-
 // We need to make the step navigation actually work in our test
 let activeStep = 0;
 const mockUpdateUI = vi.fn().mockImplementation((data) => {

@@ -11,9 +11,16 @@ vi.mock('@utils', async (importOriginal) => {
     return {
       ...(original as object),
       Log: vi.fn(),
+      // Wizard-specific utilities
+      checkAndNavigateToWizard: () => Promise.resolve(null),
+      useEmitters: () => ({ emitStatus: vi.fn(), emitError: vi.fn() }),
     };
   } catch {
-    return { Log: vi.fn() };
+    return {
+      Log: vi.fn(),
+      checkAndNavigateToWizard: () => Promise.resolve(null),
+      useEmitters: () => ({ emitStatus: vi.fn(), emitError: vi.fn() }),
+    };
   }
 });
 

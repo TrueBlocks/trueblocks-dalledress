@@ -14,13 +14,6 @@ func (a *App) UpdateName(nameToEdit *coreTypes.Name) error {
 		msgs.EmitError("UpdateName", err)
 		return err
 	}
-
-	// for _, name := range a.names.List {
-	// 	if name.Address == nameToEdit.Address {
-	// 		types.LogBackend("UpdateName success " + name.Name + " " + name.Address.Hex())
-	// 	}
-	// }
-	// types.LogBackend(fmt.Sprintf("UpdateName Pointer value of n: %p\n", &a.names))
 	msgs.EmitMessage(msgs.EventRefresh, fmt.Sprintf("Address %s was updated", nameToEdit.Address.Hex()))
 	return nil
 }
@@ -76,7 +69,6 @@ func (a *App) CleanNames(tabName string) error {
 	// 	msgs.EmitError("CleanNames", err)
 	// 	return err
 	// }
-
 	msgs.EmitMessage(msgs.EventRefresh, "/names")
 	return nil
 }
@@ -92,7 +84,6 @@ func (a *App) PublishNames(tabName string) error {
 	// 	msgs.EmitError("PublishNames", err)
 	// 	return err
 	// }
-
 	msgs.EmitMessage(msgs.EventRefresh, "/names")
 	return nil
 }

@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
@@ -304,10 +303,6 @@ func (a *App) GetOpenProjects() []map[string]interface{} {
 	return result
 }
 
-func (a *App) LogFrontend(msg string) {
-	log.Println(colors.Green+"FRONTEND", msg, colors.Off)
-}
-
 func (a *App) GetUserPreferences() *preferences.UserPreferences {
 	return &a.Preferences.User
 }
@@ -423,5 +418,5 @@ func (a *App) GetNodeStatus() *coreTypes.MetaData {
 }
 
 func (a *App) GetNamesPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) types.NamesPage {
-	return a.names.GetNamesPage2(listType, first, pageSize, sortKey, filter)
+	return a.names.GetPage(listType, first, pageSize, sortKey, filter)
 }

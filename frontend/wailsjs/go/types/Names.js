@@ -6,8 +6,8 @@ export function ClearSelectedTag(arg1) {
   return window['go']['types']['Names']['ClearSelectedTag'](arg1);
 }
 
-export function GetNamesPage2(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['types']['Names']['GetNamesPage2'](arg1, arg2, arg3, arg4, arg5);
+export function GetPage(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['types']['Names']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetSelectedTag(arg1) {

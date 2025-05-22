@@ -82,18 +82,14 @@ func (n *Names) ClearSelectedTag(listType string) {
 	}
 }
 
-// GetNamesPage2 returns a page of names for the given list type and the total count.
-func (n *Names) GetNamesPage2(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
-	// LogBackend(fmt.Sprintf("n.GetNamesPage2 Pointer value of n: %p\n", n))
-	// LogBackend("in n.GetNamesPage2")
+// GetPage returns a page of names for the given list type and the total count.
+func (n *Names) GetPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
 	if len(n.List) == 0 {
-		// LogBackend("need to call LoadNames")
 		if err := n.LoadNames(nil); err != nil {
 			return NamesPage{Names: nil, Total: 0, Tags: []string{}}
 		}
 	}
 
-	// LogBackend("not calling LoadNames")
 	namesMutex.Lock()
 	defer namesMutex.Unlock()
 
@@ -214,12 +210,6 @@ func (n *Names) GetNamesPage2(listType string, first, pageSize int, sortKey sort
 	}
 
 	last := min(total, first+pageSize)
-	// for nn := first; nn < last; nn++ {
-	// 	if list[nn].Address.Hex() == "0x00a3819199113fc6a6e6ba1298afde7377e2009b" {
-	// 		LogBackend("n.GetNamesPage2 found 0x00a3819199113fc6a6e6ba1298afde7377e2009b:" + list[nn].Name)
-	// 	}
-	// }
-
 	return NamesPage{
 		Names: list[first:last],
 		Total: total,
@@ -252,7 +242,6 @@ func (n *Names) LoadNames(wg *sync.WaitGroup) error {
 		}
 	}
 
-	// LogBackend(fmt.Sprintf("Loadnames lineCount: %d %d", lineCount, customCount))
 	if lineCount == customCount {
 		return nil
 	}
@@ -265,7 +254,6 @@ func (n *Names) LoadNames(wg *sync.WaitGroup) error {
 	} else if (namesMap == nil) || (len(namesMap) == 0) {
 		return fmt.Errorf("no names found")
 	} else {
-		// LogBackend(fmt.Sprintf("Loaded %d names", len(namesMap)))
 		n.Map = namesMap
 		n.List = make([]*types.Name, 0, len(namesMap))
 		n.Custom = n.Custom[:0]
@@ -349,7 +337,3 @@ func extractTagsFromNames(namesList []*types.Name) []string {
 
 	return uniqueTags
 }
-
-// func LogBackend(msg string) {
-// 	log.Println(colors.BrightBlue+"BACKEND", msg, colors.Off)
-// }

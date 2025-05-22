@@ -1,7 +1,6 @@
 package app
 
 import (
-	"sync"
 	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
@@ -11,7 +10,8 @@ import (
 )
 
 var namesLock atomic.Int32
-var namesMutex sync.Mutex
+
+// var namesMutex sync.Mutex
 
 func (a *App) ModifyName(operation string, nameToModify *coreTypes.Name) error {
 	if !namesLock.CompareAndSwap(0, 1) {

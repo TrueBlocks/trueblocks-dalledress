@@ -19,7 +19,7 @@ func setupTestApp() *App {
 		},
 		names: types.NewNames(),
 	}
-	app.Reload()
+	_ = app.Reload()
 	return app
 }
 

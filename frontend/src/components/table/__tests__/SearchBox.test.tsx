@@ -3,18 +3,18 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { setupComponentHookMocks } from '../../../__tests__/mocks';
 import { SearchBox } from '../SearchBox';
 
-// Use a variable for the focusControls mock
-let focusControlsMock = vi.fn();
-vi.mock('@components', () => ({
-  useTableContext: () => ({ focusControls: focusControlsMock }),
-  useFormHotkeys: vi.fn(), // Add this line
-}));
+// Use a variable for the focusControls mock overridden by central mocks
+let focusControlsMock: ReturnType<typeof vi.fn>;
 
 describe('SearchBox', () => {
   beforeEach(() => {
     focusControlsMock = vi.fn();
+    setupComponentHookMocks({
+      customTableContext: { focusControls: focusControlsMock },
+    });
   });
 
   it('renders with initial value', () => {

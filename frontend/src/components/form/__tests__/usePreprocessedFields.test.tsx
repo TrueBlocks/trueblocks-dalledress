@@ -1,14 +1,16 @@
-import { ReactNode } from 'react';
-
 import { FormField, usePreprocessedFields } from '@components';
-import { MantineProvider } from '@mantine/core';
 import { renderHook } from '@testing-library/react';
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <MantineProvider>{children}</MantineProvider>
-);
+import {
+  AllTheProviders,
+  resetAllCentralMocks,
+} from '../../../__tests__/mocks';
 
 describe('usePreprocessedFields Hook', () => {
+  beforeEach(() => {
+    resetAllCentralMocks();
+  });
+
   test('filters out fields with visible=false', () => {
     const fields: FormField[] = [
       {
@@ -25,7 +27,7 @@ describe('usePreprocessedFields Hook', () => {
     ];
 
     const { result } = renderHook(() => usePreprocessedFields(fields), {
-      wrapper,
+      wrapper: AllTheProviders, // Use AllTheProviders
     });
 
     expect(result.current).toHaveLength(1);
@@ -50,7 +52,7 @@ describe('usePreprocessedFields Hook', () => {
     ];
 
     const { result } = renderHook(() => usePreprocessedFields(fields), {
-      wrapper,
+      wrapper: AllTheProviders, // Use AllTheProviders
     });
 
     expect(result.current).toHaveLength(1);
@@ -78,7 +80,7 @@ describe('usePreprocessedFields Hook', () => {
     ];
 
     const { result } = renderHook(() => usePreprocessedFields(fields), {
-      wrapper,
+      wrapper: AllTheProviders, // Use AllTheProviders
     });
 
     expect(result.current).toHaveLength(2);
@@ -109,7 +111,7 @@ describe('usePreprocessedFields Hook', () => {
     ];
 
     const { result } = renderHook(() => usePreprocessedFields(fields), {
-      wrapper,
+      wrapper: AllTheProviders, // Use AllTheProviders
     });
 
     expect(result.current).toHaveLength(2);
@@ -133,7 +135,7 @@ describe('usePreprocessedFields Hook', () => {
     ];
 
     const { result } = renderHook(() => usePreprocessedFields(fields), {
-      wrapper,
+      wrapper: AllTheProviders, // Use AllTheProviders
     });
 
     expect(result.current).toHaveLength(1);

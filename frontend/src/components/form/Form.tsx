@@ -1,8 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
-import { Logger } from '@app';
 import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
-import { useFormHotkeys } from '@hooks';
+import { useFormHotkeys } from '@components';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
@@ -84,15 +83,13 @@ export const Form = <
 
   // Handle form submission
   const handleFormSubmit = (e: FormEvent) => {
-    Logger('DEBUGGING: onSubmit in Form ' + e);
     e.preventDefault();
-
-    // Validate form before submission
     const { hasErrors } = form.validate();
-
-    // Only change mode to display if validation passes
     if (!hasErrors) {
       setMode('display');
+      // const formData = new FormData(e.target as HTMLFormElement);
+      // const data = Object.fromEntries(formData.entries());
+      // Log(`Form::handleFormSumit: ${data['name']} ${data['address']}`);
       onSubmit(e);
     } else {
       // Auto-focus the first field with an error

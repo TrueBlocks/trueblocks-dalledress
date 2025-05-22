@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
@@ -25,6 +26,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
@@ -57,7 +59,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 			App:  preferences.AppPreferences{},
 		},
 		Assets:     assets,
-		names:      types.Names{},
+		names:      types.NewNames(),
 		apiKeys:    make(map[string]string),
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
@@ -302,8 +304,8 @@ func (a *App) GetOpenProjects() []map[string]interface{} {
 	return result
 }
 
-func (a *App) Logger(msg string) {
-	log.Println(msg)
+func (a *App) LogFrontend(msg string) {
+	log.Println(colors.Green+"FRONTEND", msg, colors.Off)
 }
 
 func (a *App) GetUserPreferences() *preferences.UserPreferences {
@@ -405,8 +407,7 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 }
 
 func (a *App) Reload() error {
-	a.names.ReloadNames()
-
+	a.names = a.names.ReloadNames()
 	lastView := a.GetAppPreferences().LastView
 	msgs.EmitMessage(msgs.EventRefresh, lastView)
 	return nil
@@ -419,4 +420,8 @@ func (a *App) GetNodeStatus() *coreTypes.MetaData {
 
 	a.meta, _ = sdk.GetMetaData("gnosis")
 	return a.meta
+}
+
+func (a *App) GetNamesPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) types.NamesPage {
+	return a.names.GetNamesPage2(listType, first, pageSize, sortKey, filter)
 }

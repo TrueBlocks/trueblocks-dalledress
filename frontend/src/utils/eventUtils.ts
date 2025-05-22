@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { msgs } from '@models';
 import { EventsEmit } from '@runtime';
 
@@ -5,7 +7,7 @@ export const emitEvent = (eventType: string, data?: unknown) => {
   EventsEmit(eventType, data);
 };
 
-export const createEventEmitters = () => {
+const createEventEmitters = () => {
   return {
     emitStatus: (message: string) => emitEvent(msgs.EventType.STATUS, message),
     emitError: (message: string) => emitEvent(msgs.EventType.ERROR, message),
@@ -17,8 +19,6 @@ export const createEventEmitters = () => {
   };
 };
 
-export type EventEmitters = ReturnType<typeof createEventEmitters>;
-
-export const useEventEmitters = (): EventEmitters => {
-  return createEventEmitters();
+export const useEmitters = (): ReturnType<typeof createEventEmitters> => {
+  return useMemo(() => createEventEmitters(), []);
 };

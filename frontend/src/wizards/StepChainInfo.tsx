@@ -4,8 +4,8 @@ import { GetUserPreferences, SetUserPreferences } from '@app';
 import { FormField, WizardForm } from '@components';
 import { useIcons } from '@hooks';
 import { ActionIcon, Card, Group, Tabs, Text } from '@mantine/core';
-import { msgs, preferences } from '@models';
-import { emitEvent } from '@utils';
+import { preferences } from '@models';
+import { useEmitters } from '@utils';
 
 import { WizardStepProps } from '.';
 import { WizardStateData } from './WizardTypes';
@@ -21,10 +21,10 @@ export const StepChainInfo = ({
   const { rpcUrl, chainName, chainId, symbol, remoteExplorer } = state.data;
   const { rpcError, chainError } = state.validation;
   const { Add, Delete } = useIcons();
-
   const [chains, setChains] = useState<preferences.Chain[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>('new');
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const { emitStatus } = useEmitters();
 
   useEffect(() => {
     setTimeout(() => {
@@ -79,15 +79,12 @@ export const StepChainInfo = ({
           clearForm();
         }
       } catch (error) {
-        emitEvent(
-          msgs.EventType.STATUS,
-          `Error trying to load chains: ${error}`,
-        );
+        emitStatus(`Error trying to load chains: ${error}`);
       }
     };
 
     loadChains();
-  }, [clearForm, updateFormWithChain]);
+  }, [clearForm, updateFormWithChain, emitStatus]);
 
   const handleTabChange = (value: string | null) => {
     if (!value) {
@@ -143,22 +140,22 @@ export const StepChainInfo = ({
         }
       }
 
-      emitEvent(msgs.EventType.STATUS, 'Chain removed successfully');
+      emitStatus('Chain removed successfully');
     } catch (error) {
-      emitEvent(msgs.EventType.STATUS, `Error removing chain: ${error}`);
+      emitStatus(`Error removing chain: ${error}`);
     }
   };
 
   const saveChain = async () => {
     if (!chainName || !chainId || !symbol || !remoteExplorer || !rpcUrl) {
-      emitEvent(msgs.EventType.STATUS, 'Please fill all fields');
+      emitStatus('Please fill all fields');
       return false;
     }
 
     try {
       const chainIdNum = parseInt(chainId, 10);
       if (isNaN(chainIdNum)) {
-        emitEvent(msgs.EventType.STATUS, 'Chain ID must be a number');
+        emitStatus('Chain ID must be a number');
         return false;
       }
 
@@ -193,13 +190,12 @@ export const StepChainInfo = ({
 
       setChains(updatedChains);
 
-      emitEvent(
-        msgs.EventType.STATUS,
+      emitStatus(
         `Chain ${activeTab === 'new' ? 'added' : 'updated'} successfully`,
       );
       return true;
     } catch (error) {
-      emitEvent(msgs.EventType.STATUS, `Error saving chain: ${error}`);
+      emitStatus(`Error saving chain: ${error}`);
       return false;
     }
   };

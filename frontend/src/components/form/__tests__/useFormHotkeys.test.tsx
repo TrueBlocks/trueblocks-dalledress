@@ -1,4 +1,4 @@
-import { useFormHotkeys } from '@hooks';
+import { useFormHotkeys } from '@components';
 import { fireEvent, renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 

@@ -36,7 +36,6 @@ const defaultProps: TableProps<TestRow> = {
   columns: mockColumns,
   data: mockData,
   loading: false,
-  error: null,
   tableKey,
   onSubmit: vi.fn(),
 };
@@ -90,12 +89,6 @@ describe('Table', () => {
     it('shows loading state', () => {
       setupTest({ loading: true });
       expect(screen.getByText('Loading...')).toBeInTheDocument();
-    });
-
-    it('shows error state', () => {
-      const errorMessage = 'Failed to load data';
-      setupTest({ error: errorMessage });
-      expect(screen.getByText(`Error: ${errorMessage}`)).toBeInTheDocument();
     });
 
     it('shows no data message when data is empty', () => {

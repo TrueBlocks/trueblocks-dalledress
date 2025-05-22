@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
-import { GetUserInfoStatus, Logger } from '@app';
+import { GetUserInfoStatus } from '@app';
 import { useAppContext } from '@contexts';
-import { checkAndNavigateToWizard } from '@utils';
+import { Log, checkAndNavigateToWizard } from '@utils';
 
 import { WizardState } from '..';
 
@@ -23,12 +23,12 @@ export const useInitializationCheck = (
       try {
         await checkAndNavigateToWizard(navigate, isWizard);
       } catch (err) {
-        Logger('Failed to check wizard state: ' + err);
+        Log(`Failed to check wizard state: ${err}`);
         if (!isWizard) {
           try {
             navigate('/wizard');
           } catch (navError) {
-            Logger('Failed to navigate to wizard: ' + navError);
+            Log(`Failed to check wizard state: ${navError}`);
             window.location.href = '/wizard';
           }
         }
@@ -51,7 +51,7 @@ export const useInitializationCheck = (
         }
         return 2;
       } catch (error) {
-        Logger('Failed to verify completion step: ' + error);
+        Log(`Failed to verify completion step: ${error}`);
         return state.ui.activeStep;
       }
     }

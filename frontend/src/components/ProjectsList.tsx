@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { CloseProject, GetOpenProjects, Logger, SwitchToProject } from '@app';
+import { CloseProject, GetOpenProjects, SwitchToProject } from '@app';
 import { useEvent, useIcons } from '@hooks';
 import {
   Button,
@@ -12,6 +12,7 @@ import {
   Title,
 } from '@mantine/core';
 import { msgs } from '@models';
+import { Log } from '@utils';
 
 // TODO: Use Project from project model
 interface Project {
@@ -47,7 +48,7 @@ export const ProjectsList = () => {
 
       setProjects(sortedProjects);
     } catch (error) {
-      Logger(`Error fetching projects: ${error}`);
+      Log(`Error fetching projects: ${error}`);
     }
   };
 
@@ -63,7 +64,7 @@ export const ProjectsList = () => {
       await SwitchToProject(id);
       refreshProjects();
     } catch (error) {
-      Logger(`Error switching projects: ${error}`);
+      Log(`Error switching projects: ${error}`);
     }
   };
 
@@ -80,7 +81,7 @@ export const ProjectsList = () => {
       await CloseProject(id);
       refreshProjects();
     } catch (error) {
-      Logger(`Error closing project: ${error}`);
+      Log(`Error closing project: ${error}`);
     }
   };
 

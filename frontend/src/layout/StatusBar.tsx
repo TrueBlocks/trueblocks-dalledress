@@ -3,11 +3,21 @@ import { useEffect, useState } from 'react';
 import { useEvent } from '@hooks';
 import { msgs } from '@models';
 
+import './StatusBar.css';
+
 export const StatusBar = () => {
   const [status, setStatus] = useState('');
   const [visible, setVisible] = useState(false);
+  const [cn, setCn] = useState('okay');
 
   useEvent(msgs.EventType.STATUS, (message: string) => {
+    setCn('okay');
+    setStatus(message);
+    setVisible(true);
+  });
+
+  useEvent(msgs.EventType.ERROR, (message: string) => {
+    setCn('error');
     setStatus(message);
     setVisible(true);
   });
@@ -23,7 +33,7 @@ export const StatusBar = () => {
   if (!visible) return null;
 
   return (
-    <div style={{ backgroundColor: '$cffafe', color: 'black' }}>
+    <div className={cn}>
       <span>{status}</span>
     </div>
   );

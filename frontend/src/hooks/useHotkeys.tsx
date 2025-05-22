@@ -1,11 +1,11 @@
-import { Logger, Reload, SetHelpCollapsed, SetMenuCollapsed } from '@app';
+import { Reload, SetHelpCollapsed, SetMenuCollapsed } from '@app';
 import { useAppContext } from '@contexts';
 import { msgs } from '@models';
-import { emitEvent, registerHotkeys } from '@utils';
+import { Log, emitEvent, registerHotkeys } from '@utils';
 import { MenuItems } from 'src/Menu';
 import { useLocation } from 'wouter';
 
-import { FocusSider } from '../views/Names';
+import { FocusSider } from '../views/names/Names';
 
 interface BaseHotkey {
   type: 'navigation' | 'dev' | 'toggle';
@@ -70,7 +70,7 @@ export const useAppHotkeys = (): void => {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      Logger(errorMessage);
+      Log(errorMessage);
 
       if (
         (hkType.type === 'navigation' || hkType.type === 'dev') &&

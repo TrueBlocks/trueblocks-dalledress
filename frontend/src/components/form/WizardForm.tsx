@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, ReactNode, useEffect, useState } from 'react';
 
 import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
-import { useFormHotkeys } from '@hooks';
+import { useFormHotkeys } from '@components';
 import { Button, Group, Stack, Text, Title } from '@mantine/core';
 
 export interface WizardFormProps<T extends Record<string, unknown>> {

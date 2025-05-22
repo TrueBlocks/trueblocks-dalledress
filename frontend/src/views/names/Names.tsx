@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Logger } from '@app';
+import { GetNamesPage, UpdateName } from '@app';
 import {
   Table,
   TableProvider,
@@ -10,19 +10,31 @@ import {
 } from '@components';
 import { TableKey, useAppContext } from '@contexts';
 import { TabView } from '@layout';
-import { msgs, sorting, types } from '@models';
-import {
-  ClearSelectedTag,
-  GetNamesPage,
-  GetSelectedTag,
-  SetSelectedTag,
-} from '@names';
+import { sorting, types } from '@models';
+import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { EventsOn } from '@runtime';
+import { Log, useEmitters } from '@utils';
 
 import './Names.css';
 
 type IndexableName = types.Name & { [key: string]: unknown };
 export const FocusSider = 'focus-tags-table';
+
+// Helper function to remove undefined properties from an object
+function removeUndefinedProps(
+  obj: Record<string, unknown>,
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const key in obj) {
+    if (
+      Object.prototype.hasOwnProperty.call(obj, key) &&
+      obj[key] !== undefined
+    ) {
+      result[key] = obj[key];
+    }
+  }
+  return result;
+}
 
 export const Names = () => {
   const { lastTab } = useAppContext();
@@ -31,7 +43,6 @@ export const Names = () => {
   const [filter, setFilter] = useState('');
   const [names, setNames] = useState<IndexableName[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [listType, setListType] = useState<ListType>(
@@ -44,6 +55,7 @@ export const Names = () => {
     Regular: false,
     Baddress: false,
   });
+  const { emitStatus, emitError } = useEmitters();
 
   // References for each tab's TagsTable to support targeting specific instances
   const tagsTableRefs = useRef<Record<string, TagsTableHandle | null>>({});
@@ -66,10 +78,11 @@ export const Names = () => {
   useEffect(() => {
     const fetchSelectedTag = async () => {
       try {
-        const tag = await GetSelectedTag(listType);
-        setSelectedTag(tag || null);
+        GetSelectedTag(listType).then((tag) => {
+          setSelectedTag(tag || null);
+        });
       } catch (err) {
-        console.error('Error fetching selected tag:', err);
+        Log(`Error fetching selected tag: ${err}`);
         setSelectedTag(null);
       }
     };
@@ -79,33 +92,29 @@ export const Names = () => {
   useEffect(() => {
     const loadNames = async () => {
       setLoading(true);
-      setError(null);
-
-      try {
-        const result = await GetNamesPage(
-          listType,
-          pagination.currentPage * pagination.pageSize,
-          pagination.pageSize,
-          sort as sorting.SortDef,
-          filter ?? '',
-        );
-        setNames((result.names || []) as IndexableName[]);
-        setTotalItems(result.total || 0);
-        setTags(result.tags || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load names');
-        setNames([]);
-        setTags([]);
-      } finally {
-        setLoading(false);
-      }
+      // Log(`Names:loadNames ${listType}`);
+      GetNamesPage(
+        listType,
+        pagination.currentPage * pagination.pageSize,
+        pagination.pageSize,
+        sort as sorting.SortDef,
+        filter ?? '',
+      )
+        .then((result) => {
+          setNames((result.names || []) as IndexableName[]);
+          setTotalItems(result.total || 0);
+          setTags(result.tags || []);
+        })
+        .catch((err) => {
+          emitError(err);
+          setNames([]);
+          setTags([]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     };
     loadNames();
-
-    var unsubscribe = EventsOn(msgs.EventType.REFRESH, () => {
-      loadNames();
-    });
-    return unsubscribe;
   }, [
     listType,
     pagination.currentPage,
@@ -114,6 +123,7 @@ export const Names = () => {
     filter,
     selectedTag,
     setTotalItems,
+    emitError,
   ]);
 
   useEffect(() => {
@@ -124,10 +134,11 @@ export const Names = () => {
     // Fetch the selected tag for the new list type when changing tabs
     const fetchSelectedTag = async () => {
       try {
-        const tag = await GetSelectedTag(newListType);
-        setSelectedTag(tag || null);
+        GetSelectedTag(newListType).then((tag) => {
+          setSelectedTag(tag || null);
+        });
       } catch (err) {
-        console.error('Error fetching selected tag:', err);
+        Log(`Error fetching selected tag: ${err}`);
         setSelectedTag(null);
       }
     };
@@ -251,15 +262,15 @@ export const Names = () => {
     try {
       if (tag) {
         try {
-          await SetSelectedTag(listType, tag);
+          SetSelectedTag(listType, tag).then(() => {});
         } catch (e) {
-          console.error(`Error in SetSelectedTag: ${e}`);
+          Log(`Error in SetSelectedTag: ${e}`);
         }
       } else {
         try {
-          await ClearSelectedTag(listType);
+          ClearSelectedTag(listType).then(() => {});
         } catch (e) {
-          console.error(`Error in ClearSelectedTag: ${e}`);
+          Log(`Error in ClearSelectedTag: ${e}`);
         }
       }
       setSelectedTag(tag);
@@ -288,8 +299,66 @@ export const Names = () => {
       data.source = 'TrueBlocks';
     }
 
-    var name = data as IndexableName;
-    Logger('DEBUGGING: onSubmit in Names' + JSON.stringify(name));
+    // Cast the form data to IndexableName. This assumes that the data from the form,
+    // combined with any defaults, is intended to be treated as an IndexableName for
+    // the optimistic update and for the UpdateName API call.
+    const submittedName = data as IndexableName;
+
+    const originalNames = [...names]; // 1. Save current names state
+
+    // 2. Optimistic UI Update
+    let optimisticNames: IndexableName[];
+    const existingNameIndex = originalNames.findIndex(
+      // Compare addresses. Assumes 'address' property is comparable and of the same type.
+      (n) => n.address === submittedName.address,
+    );
+
+    if (existingNameIndex !== -1) {
+      // Update existing name
+      optimisticNames = originalNames.map((n, index) =>
+        index === existingNameIndex
+          ? ({ ...n, ...removeUndefinedProps(submittedName) } as IndexableName) // Use helper
+          : n,
+      );
+    } else {
+      // Add new name: Prepend submittedName to the list for immediate visibility.
+      // The subsequent GetNamesPage call will provide the correctly sorted/paginated list.
+      optimisticNames = [submittedName, ...originalNames];
+    }
+    setNames(optimisticNames); // Update UI optimistically
+
+    // 3. Call UpdateName
+    UpdateName(submittedName)
+      .then(() => {
+        // 4. If UpdateName is successful, call GetNamesPage
+        return GetNamesPage(
+          listType,
+          pagination.currentPage * pagination.pageSize,
+          pagination.pageSize,
+          sort as sorting.SortDef,
+          filter ?? '',
+        );
+      })
+      .then((result) => {
+        // 5. Update UI with definitive result from GetNamesPage
+        setNames((result.names || []) as IndexableName[]);
+        setTotalItems(result.total || 0);
+        setTags(result.tags || []);
+
+        // Ensure address is stringified for the status message if it's not already a string.
+        const addressStr =
+          typeof submittedName.address === 'string'
+            ? submittedName.address
+            : String(submittedName.address); // Fallback to String() conversion
+        emitStatus(
+          `Name updated successfully: ${submittedName.name} ${addressStr}`,
+        );
+      })
+      .catch((err) => {
+        // 6. If there's an error anywhere in the chain, undo the optimistic setNames
+        setNames(originalNames); // Revert to the original names
+        emitError(err);
+      });
   };
 
   const formValidation = {
@@ -341,7 +410,6 @@ export const Names = () => {
           columns={nameColumns}
           data={names}
           loading={loading}
-          error={error}
           sort={sort}
           onSortChange={setSort}
           filter={filter}

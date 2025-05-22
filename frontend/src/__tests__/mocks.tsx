@@ -118,6 +118,15 @@ function customRender(
 
 export * from '@testing-library/react';
 export { customRender as render, screen, fireEvent };
+// Global stub for pagination hook
+vi.mock('src/components/table/usePagination', () => ({
+  usePagination: vi.fn(() => ({
+    pagination: { currentPage: 0, pageSize: 10, totalItems: 100 },
+    goToPage: vi.fn(),
+    changePageSize: vi.fn(),
+    setTotalItems: vi.fn(),
+  })),
+}));
 
 const registeredHotkeys = new Map<string, (e: KeyboardEvent) => void>();
 

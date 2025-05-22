@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/names"
@@ -30,6 +31,22 @@ type Names struct {
 	RegularTags  []string      `json:"regularTags"`
 	BaddressTags []string      `json:"baddressTags"`
 	selectedTags map[string]string
+}
+
+func NewNames() Names {
+	return Names{
+		Map:          make(namesMap),
+		List:         make([]*types.Name, 0),
+		Custom:       make([]*types.Name, 0),
+		Prefund:      make([]*types.Name, 0),
+		Regular:      make([]*types.Name, 0),
+		Baddress:     make([]*types.Name, 0),
+		ListTags:     make([]string, 0),
+		CustomTags:   make([]string, 0),
+		PrefundTags:  make([]string, 0),
+		RegularTags:  make([]string, 0),
+		BaddressTags: make([]string, 0),
+	}
 }
 
 type NamesPage struct {
@@ -67,14 +84,18 @@ func (n *Names) ClearSelectedTag(listType string) {
 	}
 }
 
-// GetNamesPage returns a page of names for the given list type and the total count.
-func (n *Names) GetNamesPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
+// GetNamesPage2 returns a page of names for the given list type and the total count.
+func (n *Names) GetNamesPage2(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
+	// LogBackend(fmt.Sprintf("n.GetNamesPage2 Pointer value of n: %p\n", n))
+	// LogBackend("in n.GetNamesPage2")
 	if len(n.List) == 0 {
+		// LogBackend("need to call LoadNames")
 		if err := n.LoadNames(nil); err != nil {
 			return NamesPage{Names: nil, Total: 0, Tags: []string{}}
 		}
 	}
 
+	// LogBackend("not calling LoadNames")
 	namesMutex.Lock()
 	defer namesMutex.Unlock()
 
@@ -195,6 +216,12 @@ func (n *Names) GetNamesPage(listType string, first, pageSize int, sortKey sorti
 	}
 
 	last := min(total, first+pageSize)
+	// for nn := first; nn < last; nn++ {
+	// 	if list[nn].Address.Hex() == "0x00a3819199113fc6a6e6ba1298afde7377e2009b" {
+	// 		LogBackend("n.GetNamesPage2 found 0x00a3819199113fc6a6e6ba1298afde7377e2009b:" + list[nn].Name)
+	// 	}
+	// }
+
 	return NamesPage{
 		Names: list[first:last],
 		Total: total,
@@ -227,6 +254,7 @@ func (n *Names) LoadNames(wg *sync.WaitGroup) error {
 		}
 	}
 
+	// LogBackend(fmt.Sprintf("Loadnames lineCount: %d %d", lineCount, customCount))
 	if lineCount == customCount {
 		return nil
 	}
@@ -239,7 +267,7 @@ func (n *Names) LoadNames(wg *sync.WaitGroup) error {
 	} else if (namesMap == nil) || (len(namesMap) == 0) {
 		return fmt.Errorf("no names found")
 	} else {
-		log.Printf("Loaded %d names", len(namesMap))
+		// LogBackend(fmt.Sprintf("Loaded %d names", len(namesMap)))
 		n.Map = namesMap
 		n.List = make([]*types.Name, 0, len(namesMap))
 		n.Custom = n.Custom[:0]
@@ -293,9 +321,10 @@ func compare(nameI, nameJ types.Name) bool {
 	return ti < tj
 }
 
-func (n *Names) ReloadNames() {
-	*n = Names{selectedTags: n.selectedTags}
-	_ = n.LoadNames(nil)
+func (n *Names) ReloadNames() Names {
+	ret := Names{selectedTags: n.selectedTags}
+	_ = ret.LoadNames(nil)
+	return ret
 }
 
 // extractTagsFromNames extracts unique tags from a list of names
@@ -321,4 +350,8 @@ func extractTagsFromNames(namesList []*types.Name) []string {
 	sort.Strings(uniqueTags)
 
 	return uniqueTags
+}
+
+func LogBackend(msg string) {
+	log.Println(colors.BrightBlue+"BACKEND", msg, colors.Off)
 }

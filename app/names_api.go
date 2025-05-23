@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
@@ -14,7 +12,6 @@ func (a *App) UpdateName(nameToEdit *coreTypes.Name) error {
 		msgs.EmitError("UpdateName", err)
 		return err
 	}
-	msgs.EmitMessage(msgs.EventRefresh, fmt.Sprintf("Address %s was updated", nameToEdit.Address.Hex()))
 	return nil
 }
 
@@ -24,7 +21,6 @@ func (a *App) DeleteName(address string) error {
 		msgs.EmitError("DeleteName", err)
 		return err
 	}
-	msgs.EmitMessage(msgs.EventRefresh, fmt.Sprintf("Address %s was deleted", nameToEdit.Address.Hex()))
 	return nil
 }
 
@@ -34,7 +30,6 @@ func (a *App) UndeleteName(address string) error {
 		msgs.EmitError("UndeleteName", err)
 		return err
 	}
-	msgs.EmitMessage(msgs.EventRefresh, fmt.Sprintf("Address %s was undeleted", nameToEdit.Address.Hex()))
 	return nil
 }
 
@@ -44,7 +39,6 @@ func (a *App) RemoveName(address string) error {
 		msgs.EmitError("RemoveName", err)
 		return err
 	}
-	msgs.EmitMessage(msgs.EventRefresh, fmt.Sprintf("Address %s was removed", nameToEdit.Address.Hex()))
 	return nil
 }
 
@@ -54,7 +48,6 @@ func (a *App) AutonameName(address string) error {
 		msgs.EmitError("AutonameName", err)
 		return err
 	}
-	msgs.EmitMessage(msgs.EventRefresh, fmt.Sprintf("Address %s was autonamed", nameToEdit.Address.Hex()))
 	return nil
 }
 
@@ -69,7 +62,6 @@ func (a *App) CleanNames(tabName string) error {
 	// 	msgs.EmitError("CleanNames", err)
 	// 	return err
 	// }
-	msgs.EmitMessage(msgs.EventRefresh, "/names")
 	return nil
 }
 
@@ -84,6 +76,5 @@ func (a *App) PublishNames(tabName string) error {
 	// 	msgs.EmitError("PublishNames", err)
 	// 	return err
 	// }
-	msgs.EmitMessage(msgs.EventRefresh, "/names")
 	return nil
 }

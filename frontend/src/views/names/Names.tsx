@@ -19,7 +19,7 @@ import {
 } from '@components';
 import { TableKey, useAppContext } from '@contexts';
 import { TabView } from '@layout';
-import { sorting, types } from '@models';
+import { msgs, sorting, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
@@ -127,6 +127,12 @@ export const Names = () => {
         });
     };
     loadNames();
+
+    // Set up event listener for REFRESH events from backend
+    const unsubscribe = EventsOn(msgs.EventType.REFRESH, () => {
+      loadNames();
+    });
+    return unsubscribe;
   }, [
     listType,
     pagination.currentPage,
@@ -586,7 +592,37 @@ export const Names = () => {
 
   const dataTable = (tabLabel: string) => {
     const nameColumns: FormField<IndexableName>[] = [
-      createNameColumn('address', { readOnly: true }),
+      // Unnamed column with only Autoname action
+      {
+        name: '',
+        key: '',
+        header: '',
+        label: '',
+        type: 'text',
+        width: '40px',
+        render: (row: IndexableName) => {
+          const isDeleted = Boolean(row.deleted);
+          const addressStr =
+            typeof row.address === 'string' ? row.address : String(row.address);
+          const isProcessing = processingAddresses.has(addressStr);
+
+          return (
+            <div className="action-buttons-container">
+              <Action
+                icon="Autoname"
+                onClick={() => handleAction(addressStr, isDeleted, 'autoname')}
+                disabled={isProcessing}
+                title="Auto-Update"
+                size="sm"
+              />
+            </div>
+          );
+        },
+        sortable: false,
+        editable: false,
+        visible: true,
+      },
+      createNameColumn('address', { readOnly: true, width: '350px' }),
       createNameColumn('name'),
       createNameColumn('tags'),
       createNameColumn('source', { sameLine: true }),
@@ -597,16 +633,15 @@ export const Names = () => {
             typeof row.address === 'string' ? row.address : String(row.address);
           const isProcessing = processingAddresses.has(addressStr);
 
-          // Array of action buttons
+          // Array of action buttons (without Autoname)
           return (
             <div className="action-buttons-container">
               <Action
                 icon="Edit"
                 onClick={() => handleAction(addressStr, isDeleted, 'edit')}
                 disabled={isProcessing}
-                title="Edit Name"
+                title="Edit"
                 size="sm"
-                color="blue"
               />
               <Action
                 icon={isDeleted ? 'Undelete' : 'Delete'}
@@ -614,23 +649,13 @@ export const Names = () => {
                 disabled={isProcessing}
                 title={isDeleted ? 'Undelete' : 'Delete'}
                 size="sm"
-                color={isDeleted ? 'blue' : 'red'}
               />
               <Action
                 icon="Remove"
                 onClick={() => handleAction(addressStr, isDeleted, 'remove')}
                 disabled={isProcessing || !isDeleted}
-                title="Remove Name (only for deleted items)"
+                title="Remove"
                 size="sm"
-                color="red"
-              />
-              <Action
-                icon="Autoname"
-                onClick={() => handleAction(addressStr, isDeleted, 'autoname')}
-                disabled={isProcessing}
-                title="Auto-generate Name"
-                size="sm"
-                color="green"
               />
             </div>
           );

@@ -591,79 +591,76 @@ export const Names = () => {
   };
 
   const dataTable = (tabLabel: string) => {
-    const nameColumns: FormField<IndexableName>[] = [
-      // Unnamed column with only Autoname action
-      {
-        name: '',
-        key: '',
-        header: '',
-        label: '',
-        type: 'text',
-        width: '40px',
-        render: (row: IndexableName) => {
-          const isDeleted = Boolean(row.deleted);
-          const addressStr =
-            typeof row.address === 'string' ? row.address : String(row.address);
-          const isProcessing = processingAddresses.has(addressStr);
+    // Column override configurations
+    const autonameOverride: Partial<FormField<IndexableName>> = {
+      width: '40px',
+      sortable: false,
+      editable: false,
+      visible: true,
+      render: (row: IndexableName) => {
+        const isDeleted = Boolean(row.deleted);
+        const addressStr =
+          typeof row.address === 'string' ? row.address : String(row.address);
+        const isProcessing = processingAddresses.has(addressStr);
 
-          return (
-            <div className="action-buttons-container">
-              <Action
-                icon="Autoname"
-                onClick={() => handleAction(addressStr, isDeleted, 'autoname')}
-                disabled={isProcessing}
-                title="Auto-Update"
-                size="sm"
-              />
-            </div>
-          );
-        },
-        sortable: false,
-        editable: false,
-        visible: true,
+        return (
+          <div className="action-buttons-container">
+            <Action
+              icon="Autoname"
+              onClick={() => handleAction(addressStr, isDeleted, 'autoname')}
+              disabled={isProcessing}
+              title="Auto-Update"
+              size="sm"
+            />
+          </div>
+        );
       },
-      createNameColumn('address', { readOnly: true, width: '350px' }),
-      createNameColumn('name'),
-      createNameColumn('tags'),
-      createNameColumn('source', { sameLine: true }),
-      createNameColumn('actions', {
-        render: (row: IndexableName) => {
-          const isDeleted = Boolean(row.deleted);
-          const addressStr =
-            typeof row.address === 'string' ? row.address : String(row.address);
-          const isProcessing = processingAddresses.has(addressStr);
+    };
 
-          // Array of action buttons (without Autoname)
-          return (
-            <div className="action-buttons-container">
-              <Action
-                icon="Edit"
-                onClick={() => handleAction(addressStr, isDeleted, 'edit')}
-                disabled={isProcessing}
-                title="Edit"
-                size="sm"
-              />
-              <Action
-                icon={isDeleted ? 'Undelete' : 'Delete'}
-                onClick={() => handleAction(addressStr, isDeleted, 'delete')}
-                disabled={isProcessing}
-                title={isDeleted ? 'Undelete' : 'Delete'}
-                size="sm"
-              />
-              <Action
-                icon="Remove"
-                onClick={() => handleAction(addressStr, isDeleted, 'remove')}
-                disabled={isProcessing || !isDeleted}
-                title="Remove"
-                size="sm"
-              />
-            </div>
-          );
-        },
-        sortable: false,
-        editable: false,
-        visible: true,
-      }),
+    const actionsOverride: Partial<FormField<IndexableName>> = {
+      sortable: false,
+      editable: false,
+      visible: true,
+      render: (row: IndexableName) => {
+        const isDeleted = Boolean(row.deleted);
+        const addressStr =
+          typeof row.address === 'string' ? row.address : String(row.address);
+        const isProcessing = processingAddresses.has(addressStr);
+        return (
+          <div className="action-buttons-container">
+            <Action
+              icon="Edit"
+              onClick={() => handleAction(addressStr, isDeleted, 'edit')}
+              disabled={isProcessing}
+              title="Edit"
+              size="sm"
+            />
+            <Action
+              icon={isDeleted ? 'Undelete' : 'Delete'}
+              onClick={() => handleAction(addressStr, isDeleted, 'delete')}
+              disabled={isProcessing}
+              title={isDeleted ? 'Undelete' : 'Delete'}
+              size="sm"
+            />
+            <Action
+              icon="Remove"
+              onClick={() => handleAction(addressStr, isDeleted, 'remove')}
+              disabled={isProcessing || !isDeleted}
+              title="Remove"
+              size="sm"
+            />
+          </div>
+        );
+      },
+    };
+
+    const nameColumns: FormField<IndexableName>[] = [
+      createColumn('name'),
+      createColumn('', autonameOverride),
+      createColumn('address', { readOnly: true, width: '350px' }),
+      createColumn('tags'),
+      createColumn('source', { sameLine: true }),
+      createColumn('actions', actionsOverride),
     ];
 
     return (
@@ -718,8 +715,7 @@ export const Names = () => {
   );
 };
 
-// Helper function to create FormField objects for nameColumns
-const createNameColumn = (
+const createColumn = (
   baseName: string,
   overrides: Partial<FormField<IndexableName>> = {},
 ): FormField<IndexableName> => {
@@ -729,8 +725,8 @@ const createNameColumn = (
     key: baseName.toLowerCase(),
     header: capitalizedBase,
     label: capitalizedBase,
-    type: 'text', // Default type
-    sortable: true, // Default sortable
+    type: 'text',
+    sortable: true,
     ...overrides,
   };
 };

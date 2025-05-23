@@ -20,7 +20,7 @@ interface Project {
 
 export const ProjectsList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const { Switch, File, Delete } = useIcons();
+  const { File } = useIcons();
 
   const refreshProjects = async () => {
     try {

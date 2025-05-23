@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { GetNamesPage, UpdateName } from '@app';
+import { DeleteName, GetNamesPage, UndeleteName, UpdateName } from '@app';
 import {
+  Action,
   FormField,
   Table,
   TableProvider,
@@ -44,6 +45,9 @@ export const Names = () => {
   const [filter, setFilter] = useState('');
   const [names, setNames] = useState<IndexableName[]>([]);
   const [loading, setLoading] = useState(false);
+  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
+    new Set(),
+  );
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [listType, setListType] = useState<ListType>(
@@ -362,6 +366,89 @@ export const Names = () => {
       });
   };
 
+  // Action types for name operations
+  type NameActionType = 'delete' | 'edit' | 'remove' | 'autoname';
+
+  const handleAction = (
+    address: string,
+    isDeleted: boolean,
+    actionType: NameActionType = 'delete',
+  ) => {
+    const addressStr = address;
+
+    // Add address to processing set
+    setProcessingAddresses((prev) => new Set(prev).add(addressStr));
+
+    try {
+      // Handle different action types
+      if (actionType === 'delete') {
+        // Existing delete/undelete functionality
+        const originalNames = [...names]; // Save current names state
+
+        // Optimistic UI Update - toggle deleted state
+        const optimisticNames = originalNames.map((name) => {
+          // Convert address to string for comparison
+          const nameAddress =
+            typeof name.address === 'string'
+              ? name.address
+              : String(name.address);
+
+          return nameAddress === addressStr
+            ? ({ ...name, deleted: !isDeleted } as IndexableName)
+            : name;
+        });
+        setNames(optimisticNames);
+
+        // Determine which API to call based on current state
+        const apiCall = isDeleted
+          ? UndeleteName(addressStr)
+          : DeleteName(addressStr);
+
+        apiCall
+          .then(() => {
+            // If API call is successful, refresh the data to get the definitive state
+            return GetNamesPage(
+              listType,
+              pagination.currentPage * pagination.pageSize,
+              pagination.pageSize,
+              sort as sorting.SortDef,
+              filter ?? '',
+            );
+          })
+          .then((result) => {
+            // Update UI with definitive result from GetNamesPage
+            setNames((result.names || []) as IndexableName[]);
+            setTotalItems(result.total || 0);
+            setTags(result.tags || []);
+
+            const action = isDeleted ? 'undeleted' : 'deleted';
+            emitStatus(`Address ${addressStr} was ${action} successfully`);
+          })
+          .catch((err) => {
+            // If there's an error, revert the optimistic update
+            setNames(originalNames);
+            emitError(err);
+            Log(`Error in handleAction: ${err}`);
+          });
+      }
+      // Add placeholders for future action types
+      else if (actionType === 'edit') {
+        // Will be implemented in a future step
+      } else if (actionType === 'remove') {
+        // Will be implemented in a future step
+      } else if (actionType === 'autoname') {
+        // Will be implemented in a future step
+      }
+    } finally {
+      // Always clean up the processing state
+      setProcessingAddresses((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(addressStr);
+        return newSet;
+      });
+    }
+  };
+
   const formValidation = {
     name: (value: unknown) => {
       if (!value || String(value).trim() === '') {
@@ -404,6 +491,38 @@ export const Names = () => {
   };
 
   const dataTable = (tabLabel: string) => {
+    const nameColumns: FormField<IndexableName>[] = [
+      createNameColumn('address', { readOnly: true }),
+      createNameColumn('name'),
+      createNameColumn('tags'),
+      createNameColumn('source', { sameLine: true }),
+      createNameColumn('actions', {
+        render: (row: IndexableName) => {
+          const isDeleted = Boolean(row.deleted);
+          const addressStr =
+            typeof row.address === 'string' ? row.address : String(row.address);
+          const isProcessing = processingAddresses.has(addressStr);
+
+          // Array of action buttons
+          return (
+            <div className="action-buttons-container">
+              <Action
+                icon={isDeleted ? 'Undelete' : 'Delete'}
+                onClick={() => handleAction(addressStr, isDeleted)}
+                disabled={isProcessing}
+                title={isDeleted ? 'Undelete' : 'Delete'}
+                size="sm"
+                color={isDeleted ? 'blue' : 'red'}
+              />
+            </div>
+          );
+        },
+        sortable: false,
+        editable: false,
+        visible: true,
+      }),
+    ];
+
     return (
       <>
         <Table
@@ -472,21 +591,6 @@ const createNameColumn = (
     ...overrides,
   };
 };
-
-const nameColumns: FormField<IndexableName>[] = [
-  createNameColumn('address', { readOnly: true }),
-  createNameColumn('name'),
-  createNameColumn('tags'),
-  createNameColumn('source', { sameLine: true }),
-  createNameColumn('actions', {
-    render: (row: IndexableName) => (
-      <>{`${(row as { deleted?: boolean }).deleted ? 'Deleted ' : ''}`}</>
-    ),
-    sortable: false,
-    editable: false,
-    visible: false,
-  }),
-];
 
 const getListTypeFromLabel = (label: string): ListType => {
   const tabToListType: Record<string, ListType> = {

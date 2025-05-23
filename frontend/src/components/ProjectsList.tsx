@@ -1,16 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import { CloseProject, GetOpenProjects, SwitchToProject } from '@app';
+import { Action } from '@components';
 import { useEvent, useIcons } from '@hooks';
-import {
-  Button,
-  Group,
-  List,
-  Paper,
-  Text,
-  ThemeIcon,
-  Title,
-} from '@mantine/core';
+import { Group, List, Paper, Text, ThemeIcon, Title } from '@mantine/core';
 import { msgs } from '@models';
 import { Log } from '@utils';
 
@@ -119,26 +112,23 @@ export const ProjectsList = () => {
               </div>
               <Group gap="xs">
                 {!project.isActive && (
-                  <Button
+                  <Action
+                    icon="Switch"
+                    title="Switch to this project"
+                    color="blue"
                     variant="light"
-                    size="compact"
-                    leftSection={<Switch size={16} />}
                     onClick={() => handleSwitchProject(project.id)}
-                  >
-                    Switch
-                  </Button>
+                  />
                 )}
-                <Button
-                  variant="light"
+                <Action
+                  icon="Delete"
+                  title="Close project"
                   color="red"
-                  size="compact"
-                  leftSection={<Delete size={16} />}
+                  variant="light"
                   onClick={() =>
                     handleCloseProject(project.id, project.isDirty)
                   }
-                >
-                  Close
-                </Button>
+                />
               </Group>
             </Group>
           </List.Item>

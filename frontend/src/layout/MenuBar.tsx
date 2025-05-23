@@ -1,5 +1,5 @@
 import { SetMenuCollapsed } from '@app';
-import { ToggleButton, getBarWidth } from '@components';
+import { ChevronButton, getBarWidth } from '@components';
 import { useAppContext } from '@contexts';
 import { useIcons } from '@hooks';
 import { AppShell, Button, Stack } from '@mantine/core';
@@ -60,7 +60,7 @@ export const MenuBar = ({ disabled = false }: MenuBarProps) => {
     >
       <Stack h="100%" justify="space-between" gap="sm">
         <Stack gap="sm">
-          <ToggleButton
+          <ChevronButton
             collapsed={menuCollapsed}
             onToggle={() => toggleMenu(!menuCollapsed)}
             direction="left"

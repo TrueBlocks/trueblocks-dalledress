@@ -1,7 +1,6 @@
-import { useIcons } from '@hooks';
-import { ActionIcon } from '@mantine/core';
+import { Action } from './Action';
 
-export const ToggleButton = ({
+export const ChevronButton = ({
   collapsed,
   onToggle,
   direction,
@@ -10,20 +9,6 @@ export const ToggleButton = ({
   onToggle: () => void;
   direction: 'left' | 'right';
 }) => {
-  const { ChevronLeft, ChevronRight } = useIcons();
-  const icon =
-    direction === 'left' ? (
-      collapsed ? (
-        <ChevronRight />
-      ) : (
-        <ChevronLeft />
-      )
-    ) : collapsed ? (
-      <ChevronLeft />
-    ) : (
-      <ChevronRight />
-    );
-
   const alignment =
     direction === 'left'
       ? collapsed
@@ -40,7 +25,10 @@ export const ToggleButton = ({
         justifyContent: alignment,
       }}
     >
-      <ActionIcon
+      <Action
+        icon={direction === 'left' ? 'ChevronLeft' : 'ChevronRight'}
+        iconOff={direction === 'left' ? 'ChevronRight' : 'ChevronLeft'}
+        isOn={!collapsed}
         onClick={onToggle}
         variant="subtle"
         size="sm"
@@ -50,9 +38,7 @@ export const ToggleButton = ({
           paddingRight: direction === 'right' ? '0.5rem' : '',
           paddingLeft: direction !== 'right' ? '0.5rem' : '',
         }}
-      >
-        {icon}
-      </ActionIcon>
+      />
     </div>
   );
 };

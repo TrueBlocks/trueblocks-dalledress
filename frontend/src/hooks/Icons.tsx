@@ -23,8 +23,9 @@ import {
   BiSun,
   BiTransfer,
   BiTrash,
-  BiTrashAlt,
+  BiUndo,
   BiUser,
+  BiX,
 } from 'react-icons/bi';
 // A function that returns an IconSet using icons from react-icons/fa
 import {
@@ -49,9 +50,9 @@ import {
   FaQuestion,
   FaRandom,
   FaSun,
-  FaTrash,
-  FaTrashRestore,
+  FaTimes,
   FaTwitter,
+  FaUndo,
   FaUser,
 } from 'react-icons/fa';
 
@@ -113,8 +114,8 @@ const faIcons: IconSet = {
   Email: FaEnvelope,
   Add: FaPlus,
   Edit: FaEdit,
-  Delete: FaTrash,
-  Undelete: FaTrashRestore,
+  Delete: FaTimes,
+  Undelete: FaUndo,
   Remove: FaEraser,
   ChevronLeft: FaAngleDoubleLeft,
   ChevronRight: FaAngleDoubleRight,
@@ -142,8 +143,8 @@ const biIcons: IconSet = {
   Email: BiEnvelope,
   Add: BiPlus,
   Edit: BiPencil,
-  Delete: BiTrash,
-  Undelete: BiTrashAlt,
+  Delete: BiX,
+  Undelete: BiUndo,
   Remove: BiTrash,
   ChevronLeft: BiChevronsLeft,
   ChevronRight: BiChevronsRight,

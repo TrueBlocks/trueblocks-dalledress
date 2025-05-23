@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
-import { useIcons } from '@hooks';
-import { ActionIcon, Flex } from '@mantine/core';
+import { Flex } from '@mantine/core';
 import { BrowserOpenURL } from '@runtime';
+
+import { Action } from './Action';
 
 export const Socials = () => {
   const [appName, setAppName] = useState<string>('');
   const [twitter, setTwitter] = useState<string>('');
   const [github, setGithub] = useState<string>('');
-  const { Email, Website, Twitter, Github } = useIcons();
 
   useEffect(() => {
     GetAppId().then((id) => {
@@ -29,30 +29,34 @@ export const Socials = () => {
 
   return (
     <Flex gap="sm" align="center">
-      <ActionIcon
+      <Action
         variant="subtle"
         size="sm"
+        icon="Website"
         onClick={() => handleClick(`https://${appName}`)}
-      >
-        <Website />
-      </ActionIcon>
-      <ActionIcon
+        title="Visit our website"
+      />
+      <Action
         variant="subtle"
         size="sm"
+        icon="Github"
         onClick={() => handleClick(`${github}`)}
-      >
-        <Github />
-      </ActionIcon>
-      <ActionIcon
+        title="Check our GitHub"
+      />
+      <Action
         variant="subtle"
         size="sm"
+        icon="Twitter"
         onClick={() => handleClick(`https://x.com/${twitter}`)}
-      >
-        <Twitter />
-      </ActionIcon>
-      <ActionIcon variant="subtle" size="sm" onClick={handleEmailClick}>
-        <Email />
-      </ActionIcon>
+        title="Follow us on X/Twitter"
+      />
+      <Action
+        variant="subtle"
+        size="sm"
+        icon="Email"
+        onClick={handleEmailClick}
+        title="Contact us via email"
+      />
     </Flex>
   );
 };

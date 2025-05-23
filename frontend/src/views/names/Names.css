@@ -17,6 +17,13 @@
   flex-direction: row;
 }
 
+/* Action buttons container styles */
+.action-buttons-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 /* Original table-container styles are preserved */
 .table-wrapper {
   flex: 1;

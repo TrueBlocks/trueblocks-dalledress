@@ -8,25 +8,17 @@ import {
 } from 'react';
 
 import { useTableContext, useTableKeys } from '@components';
-import { Form } from '@components';
+import { Form, FormField } from '@components';
 import { TableKey } from '@contexts';
 import { Modal } from '@mantine/core';
 import { sorting } from '@models';
 
-import {
-  Body,
-  Column,
-  Header,
-  Pagination,
-  PerPage,
-  Stats,
-  usePagination,
-} from '.';
+import { Body, Header, Pagination, PerPage, Stats, usePagination } from '.';
 import { SearchBox } from './SearchBox';
 import './Table.css';
 
 export interface TableProps<T extends Record<string, unknown>> {
-  columns: Column<T>[];
+  columns: FormField<T>[];
   data: T[];
   loading: boolean;
   sort?: sorting.SortDef | null;
@@ -206,7 +198,8 @@ export const Table = <T extends Record<string, unknown>>({
     const getValue = col.accessor
       ? (row: T) => (col.accessor ? col.accessor(row) : undefined)
       : (row: T) => {
-          return Object.prototype.hasOwnProperty.call(row, col.key)
+          return col.key !== undefined &&
+            Object.prototype.hasOwnProperty.call(row, col.key)
             ? (row as Record<string, unknown>)[col.key]
             : undefined;
         };
@@ -321,11 +314,14 @@ export const Table = <T extends Record<string, unknown>>({
               label: col.header || col.key,
               placeholder: `Enter ${col.header || col.key}`,
               sameLine: col.sameLine,
-              value: currentRowData
-                ? String(
-                    (currentRowData as Record<string, unknown>)[col.key] || '',
-                  )
-                : '',
+              value:
+                currentRowData && col.key !== undefined
+                  ? String(
+                      (currentRowData as Record<string, unknown>)[
+                        col.key as string
+                      ] ?? '',
+                    )
+                  : '',
             }))}
             onSubmit={handleFormSubmit}
             onCancel={closeModal}

@@ -7,6 +7,5 @@ export * from './Header';
 export * from './Stats';
 export * from './TagsTable';
 
-export * from './Column';
 export * from './usePagination';
 export * from './useTableKeys';

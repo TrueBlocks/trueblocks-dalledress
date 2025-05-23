@@ -1,4 +1,4 @@
-import { Column, Table, TableProps } from '@components';
+import { FormField, Table, TableProps } from '@components';
 import { TableKey } from '@contexts';
 import { MantineProvider } from '@mantine/core';
 import { render, screen } from '@testing-library/react';
@@ -12,7 +12,7 @@ type TestRow = {
   deleted?: boolean;
 };
 
-const mockColumns: Column<TestRow>[] = [
+const mockColumns: FormField<TestRow>[] = [
   { key: 'id', header: 'ID', sortable: true },
   { key: 'name', header: 'Name', sortable: true },
   { key: 'description', header: 'Description', sortable: false },
@@ -138,7 +138,7 @@ describe('Table', () => {
     });
 
     it('handles column with custom render function', () => {
-      const columnsWithCustomRenderer: Column<TestRow>[] = [
+      const columnsWithCustomRenderer: FormField<TestRow>[] = [
         ...mockColumns,
         {
           key: 'custom',

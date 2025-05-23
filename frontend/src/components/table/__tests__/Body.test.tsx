@@ -1,4 +1,4 @@
-import { Body, Column } from '@components';
+import { Body, FormField } from '@components';
 import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -14,7 +14,7 @@ describe('Body', () => {
     isPrefund?: boolean;
   };
 
-  const columns: Column<NameRow>[] = [
+  const columns: FormField<NameRow>[] = [
     { key: 'name', header: 'Name' },
     { key: 'address', header: 'Address' },
     { key: 'tags', header: 'Tags' },

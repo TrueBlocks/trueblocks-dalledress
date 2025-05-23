@@ -1,8 +1,8 @@
 import React from 'react';
 
+import { FormField } from '@components';
 import { sorting } from '@models';
 
-import type { Column } from '.';
 import './Header.css';
 
 export const Header = <T extends Record<string, unknown>>({
@@ -10,15 +10,17 @@ export const Header = <T extends Record<string, unknown>>({
   sort,
   onSortChange,
 }: {
-  columns: Column<T>[];
+  columns: FormField<T>[];
   sort?: sorting.SortDef | null;
   onSortChange?: (sort: sorting.SortDef | null) => void;
 }) => {
-  const handleClick = (col: Column<T>) => {
+  const handleClick = (col: FormField<T>) => {
     if (!onSortChange) return;
     if (!col.sortable) return;
     if (!sort || sort.key !== col.key) {
-      onSortChange({ key: col.key, direction: 'asc' });
+      if (typeof col.key === 'string') {
+        onSortChange({ key: col.key, direction: 'asc' });
+      }
     } else if (sort.direction === 'asc') {
       onSortChange({ key: col.key, direction: 'desc' });
     } else {

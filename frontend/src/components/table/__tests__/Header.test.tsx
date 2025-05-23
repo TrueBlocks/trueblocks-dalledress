@@ -1,9 +1,9 @@
-import { Column, Header } from '@components';
+import { FormField, Header } from '@components';
 import { render, screen } from '@testing-library/react';
 
 describe('Header', () => {
   it('renders all column headers', () => {
-    const columns: Column<any>[] = [
+    const columns: FormField<any>[] = [
       { key: 'name', header: 'Name' },
       { key: 'address', header: 'Address' },
       { key: 'tags', header: 'Tags' },

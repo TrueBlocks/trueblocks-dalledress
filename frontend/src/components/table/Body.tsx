@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 
-import { Column } from '@components';
+import { FormField } from '@components';
 
 import './Body.css';
 
 interface BodyProps<T extends Record<string, unknown>> {
-  columns: Column<T>[];
+  columns: FormField<T>[];
   data: T[];
   selectedRowIndex: number;
   handleRowClick: (index: number) => void;
@@ -46,7 +46,9 @@ export const Body = <T extends Record<string, unknown>>({
                   ? col.render(row, rowIndex)
                   : col.accessor
                     ? (col.accessor(row) as React.ReactNode)
-                    : (row[col.key] as React.ReactNode)}
+                    : col.key !== undefined
+                      ? (row[col.key as keyof T] as React.ReactNode)
+                      : null}
               </td>
             ))}
           </tr>

@@ -18,10 +18,6 @@ vi.mock('@app', () => ({
   SetLastView: () => Promise.resolve(),
 }));
 
-vi.mock('@runtime', () => ({
-  EventsEmit: vi.fn(),
-}));
-
 const mockNavigate = vi.fn();
 const mockCompleteWizard = vi.fn().mockResolvedValue(undefined);
 

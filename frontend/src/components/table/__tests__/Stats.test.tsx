@@ -4,7 +4,7 @@ import { Stats } from 'src/components/table/Stats';
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock the usePagination hook
-vi.mock('src/components/table/usePagination', () => ({
+vi.mock('../usePagination', () => ({
   usePagination: vi.fn().mockImplementation(({ viewName, tabName }) => {
     // Different mock implementations for different test cases based on viewName/tabName
     if (viewName === 'test-view' && tabName === 'page1') {

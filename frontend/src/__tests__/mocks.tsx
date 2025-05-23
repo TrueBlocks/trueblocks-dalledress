@@ -23,6 +23,10 @@ type RuntimeBridgeFunctions = {
   EventsEmit: ReturnType<typeof vi.fn>;
 };
 
+const createInitialMockRuntimeBridge = (): RuntimeBridgeFunctions => ({
+  EventsEmit: vi.fn(),
+});
+
 const createInitialMockAppBridge = (): AppBridgeFunctions => ({
   GetAppId: vi.fn().mockResolvedValue('mockAppId'),
   GetWizardReturn: vi.fn().mockResolvedValue('/mock-wizard-return'),
@@ -36,10 +40,6 @@ const createInitialMockAppBridge = (): AppBridgeFunctions => ({
     menuCollapsed: false,
   }),
   SetLastView: vi.fn().mockResolvedValue(undefined),
-});
-
-const createInitialMockRuntimeBridge = (): RuntimeBridgeFunctions => ({
-  EventsEmit: vi.fn(),
 });
 
 export let mockAppBridge = createInitialMockAppBridge();

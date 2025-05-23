@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { DeleteName, GetNamesPage, UndeleteName, UpdateName } from '@app';
+import {
+  AutonameName,
+  DeleteName,
+  GetNamesPage,
+  RemoveName,
+  UndeleteName,
+  UpdateName,
+} from '@app';
 import {
   Action,
   FormField,
@@ -431,13 +438,100 @@ export const Names = () => {
             Log(`Error in handleAction: ${err}`);
           });
       }
-      // Add placeholders for future action types
+      // Add implementations for future action types
       else if (actionType === 'edit') {
-        // Will be implemented in a future step
+        // For edit, we could open a form or implement inline editing
+        // For now, we'll log that this functionality needs UI implementation
+        emitStatus(
+          `Edit functionality for ${addressStr} needs UI implementation`,
+        );
       } else if (actionType === 'remove') {
-        // Will be implemented in a future step
+        // Remove can only be performed on deleted items
+        if (!isDeleted) {
+          emitError(
+            'Cannot remove a name that is not deleted. Delete it first.',
+          );
+          return;
+        }
+
+        const originalNames = [...names]; // Save current names state
+
+        // Optimistic UI Update - remove the item from the list
+        const optimisticNames = originalNames.filter((name) => {
+          const nameAddress =
+            typeof name.address === 'string'
+              ? name.address
+              : String(name.address);
+          return nameAddress !== addressStr;
+        });
+        setNames(optimisticNames);
+
+        RemoveName(addressStr)
+          .then(() => {
+            // If API call is successful, refresh the data to get the definitive state
+            return GetNamesPage(
+              listType,
+              pagination.currentPage * pagination.pageSize,
+              pagination.pageSize,
+              sort as sorting.SortDef,
+              filter ?? '',
+            );
+          })
+          .then((result) => {
+            // Update UI with definitive result from GetNamesPage
+            setNames((result.names || []) as IndexableName[]);
+            setTotalItems(result.total || 0);
+            setTags(result.tags || []);
+
+            emitStatus(`Address ${addressStr} was removed successfully`);
+          })
+          .catch((err) => {
+            // If there's an error, revert the optimistic update
+            setNames(originalNames);
+            emitError(err);
+            Log(`Error in handleAction (remove): ${err}`);
+          });
       } else if (actionType === 'autoname') {
-        // Will be implemented in a future step
+        const originalNames = [...names]; // Save current names state
+
+        // Optimistic UI Update - update the name to show it's being processed
+        const optimisticNames = originalNames.map((name) => {
+          const nameAddress =
+            typeof name.address === 'string'
+              ? name.address
+              : String(name.address);
+
+          return nameAddress === addressStr
+            ? ({ ...name, name: 'Generating...' } as IndexableName)
+            : name;
+        });
+        setNames(optimisticNames);
+
+        AutonameName(addressStr)
+          .then(() => {
+            // If API call is successful, refresh the data to get the definitive state
+            return GetNamesPage(
+              listType,
+              pagination.currentPage * pagination.pageSize,
+              pagination.pageSize,
+              sort as sorting.SortDef,
+              filter ?? '',
+            );
+          })
+          .then((result) => {
+            // Update UI with definitive result from GetNamesPage
+            setNames((result.names || []) as IndexableName[]);
+            setTotalItems(result.total || 0);
+            setTags(result.tags || []);
+
+            emitStatus(`Address ${addressStr} was auto-named successfully`);
+          })
+          .catch((err) => {
+            // If there's an error, revert the optimistic update
+            setNames(originalNames);
+            emitError(err);
+            Log(`Error in handleAction (autoname): ${err}`);
+          });
       }
     } finally {
       // Always clean up the processing state
@@ -507,12 +601,36 @@ export const Names = () => {
           return (
             <div className="action-buttons-container">
               <Action
+                icon="Edit"
+                onClick={() => handleAction(addressStr, isDeleted, 'edit')}
+                disabled={isProcessing}
+                title="Edit Name"
+                size="sm"
+                color="blue"
+              />
+              <Action
                 icon={isDeleted ? 'Undelete' : 'Delete'}
-                onClick={() => handleAction(addressStr, isDeleted)}
+                onClick={() => handleAction(addressStr, isDeleted, 'delete')}
                 disabled={isProcessing}
                 title={isDeleted ? 'Undelete' : 'Delete'}
                 size="sm"
                 color={isDeleted ? 'blue' : 'red'}
+              />
+              <Action
+                icon="Remove"
+                onClick={() => handleAction(addressStr, isDeleted, 'remove')}
+                disabled={isProcessing || !isDeleted}
+                title="Remove Name (only for deleted items)"
+                size="sm"
+                color="red"
+              />
+              <Action
+                icon="Autoname"
+                onClick={() => handleAction(addressStr, isDeleted, 'autoname')}
+                disabled={isProcessing}
+                title="Auto-generate Name"
+                size="sm"
+                color="green"
               />
             </div>
           );

@@ -60,6 +60,8 @@ export const useIcons = (
     React.createElement(iconSet.Undelete, { size, ...props });
   const Remove: React.FC<IconProps> = (props = {}) =>
     React.createElement(iconSet.Remove, { size, ...props });
+  const Autoname: React.FC<IconProps> = (props = {}) =>
+    React.createElement(iconSet.Autoname, { size, ...props });
   const ChevronLeft: React.FC<IconProps> = (props = {}) =>
     React.createElement(iconSet.ChevronLeft, { size, ...props });
   const ChevronRight: React.FC<IconProps> = (props = {}) =>
@@ -94,6 +96,7 @@ export const useIcons = (
     Delete,
     Undelete,
     Remove,
+    Autoname,
     ChevronLeft,
     ChevronRight,
     ChevronUp,

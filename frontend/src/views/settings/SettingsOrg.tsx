@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 import { GetOrgPreferences, SetOrgPreferences } from '@app';
 import { FormField } from '@components';
@@ -20,10 +20,9 @@ export const SettingsOrg = () => {
     });
   }, []);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    SetOrgPreferences(formData).then(() => {
-      setOriginalData({ ...formData });
+  const handleSubmit = (values: IndexableOrg) => {
+    SetOrgPreferences(values).then(() => {
+      setOriginalData({ ...values });
     });
   };
 
@@ -80,6 +79,7 @@ export const SettingsOrg = () => {
           label: 'Telemetry',
           placeholder: 'Enter your telemetry',
           sameLine: true,
+          type: 'checkbox',
         },
         {
           name: 'logLevel',
@@ -94,6 +94,7 @@ export const SettingsOrg = () => {
           label: 'Experimental',
           placeholder: 'Enter your experimental',
           sameLine: true,
+          type: 'checkbox',
         },
         {
           name: 'version',

@@ -27,7 +27,7 @@ export interface FormProps<T = Record<string, unknown>> {
   title?: string;
   description?: string;
   fields: FormField<T>[];
-  onSubmit: (e: FormEvent) => void;
+  onSubmit: (values: T) => void; // Changed from (e: FormEvent) => void
   onBack?: () => void;
   onCancel?: () => void;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -87,10 +87,7 @@ export const Form = <
     const { hasErrors } = form.validate();
     if (!hasErrors) {
       setMode('display');
-      // const formData = new FormData(e.target as HTMLFormElement);
-      // const data = Object.fromEntries(formData.entries());
-      // Log(`Form::handleFormSumit: ${data['name']} ${data['address']}`);
-      onSubmit(e);
+      onSubmit(form.values as T); // Changed from onSubmit(e)
     } else {
       // Auto-focus the first field with an error
       setTimeout(() => {
@@ -179,7 +176,11 @@ export const Form = <
 
   return (
     <Stack gap={compact ? 'xs' : 'md'}>
-      {title && <Title order={3}>{title}</Title>}
+      {title && (
+        <Title order={3} mt="md">
+          {title}
+        </Title>
+      )}
       {description && <Text>{description}</Text>}
       <form role="form" onSubmit={handleFormSubmit}>
         <Stack gap={compact ? 'xs' : 'md'}>

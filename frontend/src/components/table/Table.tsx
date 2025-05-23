@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
@@ -71,13 +64,10 @@ export const Table = <T extends Record<string, unknown>>({
     focusTable();
   };
 
-  const handleFormSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const data = Object.fromEntries(formData.entries());
-    // Log(`Table::handleFormSubmit: ${data['name']} ${data['address']}`);
+  const handleModalFormSubmit = (values: T) => {
     setIsModalOpen(false);
-    onSubmit(data as T);
+    onSubmit(values);
+    focusTable();
   };
 
   const { handleKeyDown } = useTableKeys({
@@ -300,6 +290,11 @@ export const Table = <T extends Record<string, unknown>>({
           inner: {
             padding: '20px',
           },
+          content: {
+            // Target the modal content itself
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', // Add a subtle box shadow
+            border: '1px solid var(--mantine-color-gray-3)', // Add a light border, theme-aware
+          },
         }}
       >
         <div onKeyDown={handleFormKeyDown}>
@@ -309,21 +304,26 @@ export const Table = <T extends Record<string, unknown>>({
             )} ${tableKey.viewName
               .replace(/^\//, '')
               .replace(/\b\w/g, (char) => char.toUpperCase())}`}
-            fields={columns.map((col) => ({
-              name: col.key,
-              label: col.header || col.key,
-              placeholder: `Enter ${col.header || col.key}`,
-              sameLine: col.sameLine,
-              value:
-                currentRowData && col.key !== undefined
-                  ? String(
-                      (currentRowData as Record<string, unknown>)[
-                        col.key as string
-                      ] ?? '',
-                    )
-                  : '',
-            }))}
-            onSubmit={handleFormSubmit}
+            fields={columns.map((col) => {
+              const fieldDefinition: FormField<T> = {
+                ...col,
+                name: col.name || col.key,
+                label: col.label || col.header || col.name || col.key,
+                placeholder:
+                  col.placeholder ||
+                  `Enter ${col.label || col.header || col.name || col.key}`,
+                value:
+                  currentRowData && (col.name || col.key) !== undefined
+                    ? String(
+                        (currentRowData as Record<string, unknown>)[
+                          (col.name || col.key) as string
+                        ] ?? '',
+                      )
+                    : '',
+              };
+              return fieldDefinition;
+            })}
+            onSubmit={handleModalFormSubmit}
             onCancel={closeModal}
             onChange={handleFieldChange}
             initMode="edit"

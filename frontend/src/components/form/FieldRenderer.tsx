@@ -83,6 +83,12 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
                     backgroundColor: 'rgba(250, 82, 82, 0.1)',
                   }
                 : {}),
+              ...(field.readOnly
+                ? {
+                    color: 'var(--mantine-color-text)', // Use Mantine's text color variable for theme adaptability
+                    opacity: 0.6, // Slightly reduce opacity to differentiate but keep readable
+                  }
+                : {}),
             },
             error: {
               fontWeight: 500,

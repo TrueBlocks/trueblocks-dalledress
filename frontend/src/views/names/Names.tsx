@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, UpdateName } from '@app';
 import {
+  FormField,
   Table,
   TableProvider,
   TagsTable,
@@ -455,19 +456,36 @@ export const Names = () => {
   );
 };
 
-const nameColumns = [
-  { key: 'name', header: 'Name', sortable: true },
-  { key: 'address', header: 'Address', sortable: true, readOnly: true },
-  { key: 'tags', header: 'Tags', sortable: true },
-  { key: 'source', header: 'Source', sortable: true, sameLine: true },
-  {
-    key: 'actions',
-    header: 'Actions',
-    render: (row: IndexableName) =>
-      `${(row as { deleted?: boolean }).deleted ? 'Deleted ' : ''}`,
+// Helper function to create FormField objects for nameColumns
+const createNameColumn = (
+  baseName: string,
+  overrides: Partial<FormField<IndexableName>> = {},
+): FormField<IndexableName> => {
+  const capitalizedBase = baseName.charAt(0).toUpperCase() + baseName.slice(1);
+  return {
+    name: baseName.toLowerCase(),
+    key: baseName.toLowerCase(),
+    header: capitalizedBase,
+    label: capitalizedBase,
+    type: 'text', // Default type
+    sortable: true, // Default sortable
+    ...overrides,
+  };
+};
+
+const nameColumns: FormField<IndexableName>[] = [
+  createNameColumn('address', { readOnly: true }),
+  createNameColumn('name'),
+  createNameColumn('tags'),
+  createNameColumn('source', { sameLine: true }),
+  createNameColumn('actions', {
+    render: (row: IndexableName) => (
+      <>{`${(row as { deleted?: boolean }).deleted ? 'Deleted ' : ''}`}</>
+    ),
     sortable: false,
     editable: false,
-  },
+    visible: false,
+  }),
 ];
 
 const getListTypeFromLabel = (label: string): ListType => {

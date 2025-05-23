@@ -1,28 +1,99 @@
-import { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { MantineProvider } from '@mantine/core';
-import {
-  RenderOptions,
-  fireEvent,
-  render as rtlRender,
-  screen,
-} from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import type { RenderOptions } from '@testing-library/react';
 import { vi } from 'vitest';
 
-type AppBridgeFunctions = {
-  GetAppId: ReturnType<typeof vi.fn>;
-  GetWizardReturn: ReturnType<typeof vi.fn>;
-  GetUserPreferences: ReturnType<typeof vi.fn>;
-  SetUserPreferences: ReturnType<typeof vi.fn>;
-  IsReady: ReturnType<typeof vi.fn>;
-  GetAppPreferences: ReturnType<typeof vi.fn>;
-  SetLastView: ReturnType<typeof vi.fn>;
+import type { RegisterHotkeyOptions } from '../utils/registerHotkeys';
+
+// Type fallbacks for Wails bridge functions
+type AppBridgeFunctions = any;
+type RuntimeBridgeFunctions = any;
+
+// --- Hotkey Mocking --- //
+interface RegisteredHotkeyInfo {
+  handler: (event: KeyboardEvent) => void;
+  options?: RegisterHotkeyOptions;
+}
+
+export const registeredHotkeys = new Map<string, RegisteredHotkeyInfo>();
+
+export const initialMockUseHotkeysImplementation = (
+  key: string,
+  handler: (event: KeyboardEvent) => void,
+  options?: RegisterHotkeyOptions,
+) => {
+  registeredHotkeys.set(key, { handler, options });
 };
 
-type RuntimeBridgeFunctions = {
-  EventsEmit: ReturnType<typeof vi.fn>;
-};
+export let mockUseHotkeys = vi.fn(initialMockUseHotkeysImplementation);
 
+export function triggerHotkey(key: string, eventArgs?: Partial<KeyboardEvent>) {
+  const registration = registeredHotkeys.get(key);
+  // Corrected condition: check if registration and its handler exist
+  if (registration?.handler) {
+    const { handler } = registration;
+
+    const lowerKey = key.toLowerCase();
+    const hasMod = lowerKey.includes('mod+');
+    const hasMeta = lowerKey.includes('meta+');
+    const hasCtrl = lowerKey.includes('ctrl+');
+    const hasShift = lowerKey.includes('shift+');
+    const hasAlt = lowerKey.includes('alt+');
+
+    const keyParts = key.split('+');
+    // Use pop() to get the last element, provide a fallback to empty string if undefined
+    const baseKey: string = keyParts.pop() || '';
+
+    const mockEvent: KeyboardEvent = {
+      key: baseKey, // This is where event.key gets its value
+      metaKey: hasMod || hasMeta || (eventArgs?.metaKey ?? false),
+      ctrlKey:
+        hasCtrl ||
+        (hasMod && !(hasMeta || eventArgs?.metaKey)) ||
+        (eventArgs?.ctrlKey ?? false),
+      shiftKey: hasShift || (eventArgs?.shiftKey ?? false),
+      altKey: hasAlt || (eventArgs?.altKey ?? false),
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      bubbles: eventArgs?.bubbles ?? true,
+      cancelable: eventArgs?.cancelable ?? true,
+      composed: eventArgs?.composed ?? true,
+      code: eventArgs?.code ?? `Key${baseKey.toUpperCase()}`, // baseKey is now definitely a string
+      location: eventArgs?.location ?? 0,
+      repeat: eventArgs?.repeat ?? false,
+      isComposing: eventArgs?.isComposing ?? false,
+      view: eventArgs?.view ?? window,
+      detail: eventArgs?.detail ?? 0,
+      which: eventArgs?.which ?? 0,
+      target: eventArgs?.target ?? document.body,
+      currentTarget: eventArgs?.currentTarget ?? document.body,
+      eventPhase: eventArgs?.eventPhase ?? 0,
+      timeStamp: eventArgs?.timeStamp ?? Date.now(),
+      type: eventArgs?.type ?? 'keydown',
+      getModifierState: (keyArg: string) => {
+        if (keyArg === 'Meta') return mockEvent.metaKey;
+        if (keyArg === 'Control') return mockEvent.ctrlKey;
+        if (keyArg === 'Shift') return mockEvent.shiftKey;
+        if (keyArg === 'Alt') return mockEvent.altKey;
+        return false;
+      },
+      ...eventArgs,
+    } as KeyboardEvent;
+
+    handler(mockEvent);
+    return mockEvent;
+  }
+  return null;
+}
+
+export function clearRegisteredHotkeys() {
+  registeredHotkeys.clear();
+}
+// --- End Hotkey Mocking --- //
+
+// --- Wails Bridge Mocking --- //
 const createInitialMockRuntimeBridge = (): RuntimeBridgeFunctions => ({
   EventsEmit: vi.fn(),
 });
@@ -48,59 +119,59 @@ export let mockRuntimeBridge = createInitialMockRuntimeBridge();
 vi.mock('../../wailsjs/go/app/App', () => mockAppBridge);
 vi.mock('../../wailsjs/runtime/runtime', () => mockRuntimeBridge);
 
-export const setupWailsMocks = (
-  appOverrides?: Partial<AppBridgeFunctions>,
-  runtimeOverrides?: Partial<RuntimeBridgeFunctions>,
-) => {
+export const setupWailsMocks = ({
+  appOverrides,
+  runtimeOverrides,
+}: {
+  appOverrides?: Partial<AppBridgeFunctions>;
+  runtimeOverrides?: Partial<RuntimeBridgeFunctions>;
+} = {}) => {
+  let currentAppMock = createInitialMockAppBridge();
+  let currentRuntimeMock = createInitialMockRuntimeBridge();
+
   if (appOverrides) {
     for (const key in appOverrides) {
-      const typedKey = key as keyof AppBridgeFunctions;
-      if (
-        Object.prototype.hasOwnProperty.call(mockAppBridge, typedKey) &&
-        Object.prototype.hasOwnProperty.call(appOverrides, typedKey)
-      ) {
-        const overrideFn = appOverrides[typedKey];
-        if (
-          typeof mockAppBridge[typedKey]?.mockImplementation === 'function' &&
-          typeof overrideFn === 'function'
-        ) {
-          mockAppBridge[typedKey].mockImplementation(overrideFn as any);
+      if (Object.prototype.hasOwnProperty.call(appOverrides, key)) {
+        const overrideFn = (appOverrides as any)[key];
+        if (key in currentAppMock) {
+          (currentAppMock as any)[key] = vi.fn(overrideFn as any);
         } else {
-          (mockAppBridge as any)[typedKey] = overrideFn;
+          console.warn(
+            `[setupWailsMocks] Attempted to override App.${key}, but it's not defined in the initial mock.`,
+          );
         }
-      } else {
-        console.warn(
-          `[setupWailsMocks] Attempted to override App.${typedKey}, but it's not defined in the central mockAppBridge or not provided in overrides.`,
-        );
       }
     }
   }
+
   if (runtimeOverrides) {
     for (const key in runtimeOverrides) {
-      const typedKey = key as keyof RuntimeBridgeFunctions;
-      if (
-        Object.prototype.hasOwnProperty.call(mockRuntimeBridge, typedKey) &&
-        Object.prototype.hasOwnProperty.call(runtimeOverrides, typedKey)
-      ) {
-        const overrideFn = runtimeOverrides[typedKey];
-        if (
-          typeof mockRuntimeBridge[typedKey]?.mockImplementation ===
-            'function' &&
-          typeof overrideFn === 'function'
-        ) {
-          mockRuntimeBridge[typedKey].mockImplementation(overrideFn as any);
+      if (Object.prototype.hasOwnProperty.call(runtimeOverrides, key)) {
+        const overrideFn = (runtimeOverrides as any)[key];
+        if (key in currentRuntimeMock) {
+          (currentRuntimeMock as any)[key] = vi.fn(overrideFn as any);
         } else {
-          (mockRuntimeBridge as any)[typedKey] = overrideFn;
+          console.warn(
+            `[setupWailsMocks] Attempted to override Runtime.${key}, but it's not defined in the initial mock.`,
+          );
         }
-      } else {
-        console.warn(
-          `[setupWailsMocks] Attempted to override Runtime.${typedKey}, but it's not defined in the central mockRuntimeBridge or not provided in overrides.`,
-        );
       }
     }
   }
-};
 
+  if (typeof window !== 'undefined') {
+    (window as any).go = {
+      app: currentAppMock,
+      runtime: currentRuntimeMock,
+    };
+  }
+
+  Object.assign(mockAppBridge, currentAppMock);
+  Object.assign(mockRuntimeBridge, currentRuntimeMock);
+};
+// --- End Wails Bridge Mocking --- //
+
+// --- Rendering Utilities --- //
 export function AllTheProviders({
   children,
 }: {
@@ -113,62 +184,14 @@ function customRender(
   ui: ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>,
 ) {
-  return rtlRender(ui, { wrapper: AllTheProviders, ...options });
+  return render(ui, { wrapper: AllTheProviders, ...options });
 }
 
 export * from '@testing-library/react';
 export { customRender as render, screen, fireEvent };
-// Global stub for pagination hook
-vi.mock('src/components/table/usePagination', () => ({
-  usePagination: vi.fn(() => ({
-    pagination: { currentPage: 0, pageSize: 10, totalItems: 100 },
-    goToPage: vi.fn(),
-    changePageSize: vi.fn(),
-    setTotalItems: vi.fn(),
-  })),
-}));
+// --- End Rendering Utilities --- //
 
-const registeredHotkeys = new Map<string, (e: KeyboardEvent) => void>();
-
-const initialMockUseHotkeysImplementation = (
-  key: string | string[],
-  callback: (e: KeyboardEvent) => void,
-) => {
-  const keys = Array.isArray(key) ? key : [key];
-  keys.forEach((k) => registeredHotkeys.set(k, callback));
-};
-
-export let mockUseHotkeys = vi.fn(initialMockUseHotkeysImplementation);
-
-export function setupHotkeysMock() {
-  vi.mock('react-hotkeys-hook', () => ({
-    useHotkeys: mockUseHotkeys,
-  }));
-}
-
-export function triggerHotkey(key: string, eventArgs?: Partial<KeyboardEvent>) {
-  const handler = registeredHotkeys.get(key);
-  if (handler) {
-    const mockEvent = {
-      key: key.split('+').pop() || key,
-      metaKey: key.includes('mod+') || key.includes('meta+'),
-      ctrlKey: key.includes('ctrl+'),
-      shiftKey: key.includes('shift+'),
-      altKey: key.includes('alt+'),
-      preventDefault: vi.fn(),
-      stopPropagation: vi.fn(),
-      ...eventArgs,
-    } as KeyboardEvent;
-    handler(mockEvent);
-    return mockEvent;
-  }
-  return null;
-}
-
-export function clearRegisteredHotkeys() {
-  registeredHotkeys.clear();
-}
-
+// --- Context Mocking --- //
 const createInitialViewContextDefaultValue = () => ({
   currentView: 'mockView',
   setCurrentView: vi.fn(),
@@ -218,6 +241,7 @@ const createInitialTableContextDefaultValue = () => ({
   focusControls: vi.fn(),
   tableRef: { current: null as HTMLTableElement | null },
 });
+
 export let mockTableContextDefaultValue =
   createInitialTableContextDefaultValue();
 
@@ -253,18 +277,27 @@ export function setupComponentHookMocks({
     };
   });
 }
+// --- End Context Mocking --- //
 
+// --- Global Reset Utility --- //
 export function resetAllCentralMocks() {
-  // Reset Wails Bridge mocks by re-initializing them to their default state
+  // Reset Wails Bridge mocks
   mockAppBridge = createInitialMockAppBridge();
   mockRuntimeBridge = createInitialMockRuntimeBridge();
+  if (typeof window !== 'undefined') {
+    (window as any).go = {
+      app: mockAppBridge,
+      runtime: mockRuntimeBridge,
+    };
+  }
 
   // Reset Hotkeys mock
-  mockUseHotkeys.mockReset(); // Clears history, calls, and implementation
-  mockUseHotkeys.mockImplementation(initialMockUseHotkeysImplementation); // Restore initial impl.
+  mockUseHotkeys.mockReset();
+  mockUseHotkeys.mockImplementation(initialMockUseHotkeysImplementation);
   clearRegisteredHotkeys();
 
-  // Reset Context mock values to their initial state
+  // Reset Context mock values
   mockViewContextDefaultValue = createInitialViewContextDefaultValue();
   mockTableContextDefaultValue = createInitialTableContextDefaultValue();
 }
+// --- End Global Reset Utility --- //

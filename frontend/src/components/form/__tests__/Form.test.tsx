@@ -3,19 +3,23 @@ import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { vi } from 'vitest';
 
-vi.mock('react-hotkeys-hook', () => ({
-  useHotkeys: (keys: string, handler: (e: KeyboardEvent) => void) => {
-    if (keys === 'mod+a') {
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
-          handler(e);
-        }
-      });
-    }
-  },
-}));
+import {
+  // mockUseHotkeys, // No longer directly needed here as it's accessed via the async import
+  resetAllCentralMocks,
+  triggerHotkey,
+} from '../../../__tests__/mocks';
+
+// Add the shared mock for react-hotkeys-hook, using an async factory
+vi.mock('react-hotkeys-hook', async () => {
+  const mocks = await import('../../../__tests__/mocks');
+  return { useHotkeys: mocks.mockUseHotkeys };
+});
 
 describe('Form Component', () => {
+  beforeEach(() => {
+    resetAllCentralMocks();
+  });
+
   it('renders the form with a title and description', () => {
     render(
       <MantineProvider>
@@ -341,7 +345,7 @@ describe('Form Component', () => {
               name: 'username',
               label: 'Username',
               type: 'text',
-              value: 'JohnDoe',
+              value: 'TestUser', // Added a value to select
               placeholder: 'Enter your username',
               onChange: vi.fn(),
             },
@@ -354,7 +358,7 @@ describe('Form Component', () => {
 
     const input = screen.getByLabelText('Username') as HTMLInputElement;
     input.focus();
-    fireEvent.keyDown(input, { key: 'a', metaKey: true });
+    triggerHotkey('mod+a'); // New way using shared mock
 
     expect(input.selectionStart).toBe(0);
     expect(input.selectionEnd).toBe(input.value.length);

@@ -1,5 +1,6 @@
 export * from './Action';
 export * from './ChevronButton';
+export * from './Chips';
 export * from './NodeStatus';
 export * from './ProjectsList';
 export * from './Socials';

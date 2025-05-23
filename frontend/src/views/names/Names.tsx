@@ -10,11 +10,13 @@ import {
 } from '@app';
 import {
   Action,
+  Chips,
   FormField,
   Table,
   TableProvider,
   TagsTable,
   TagsTableHandle,
+  mapNameToChips,
   usePagination,
 } from '@components';
 import { TableKey, useAppContext } from '@contexts';
@@ -654,10 +656,23 @@ export const Names = () => {
       },
     };
 
+    const chipsOverride: Partial<FormField<IndexableName>> = {
+      sortable: false,
+      editable: false,
+      visible: true,
+      width: '180px',
+      render: (row: IndexableName) => {
+        const nameObject = row as unknown as types.Name; // Cast to types.Name
+        const chipItems = mapNameToChips(nameObject);
+        return <Chips items={chipItems} />;
+      },
+    };
+
     const nameColumns: FormField<IndexableName>[] = [
       createColumn('name'),
       createColumn('', autonameOverride),
       createColumn('address', { readOnly: true, width: '350px' }),
+      createColumn('chips', chipsOverride),
       createColumn('tags'),
       createColumn('source', { sameLine: true }),
       createColumn('actions', actionsOverride),

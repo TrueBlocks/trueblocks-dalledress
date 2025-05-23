@@ -224,6 +224,7 @@ export function setupContextMocks({
     mockViewContextDefaultValue = newDefaults;
   }
 
+  // TODO: Consider refactoring this vi.mock to be top-level like @components if needed globally
   vi.mock('@contexts', async (importOriginal) => {
     const original = (await importOriginal()) as any;
     return {
@@ -239,11 +240,36 @@ const createInitialTableContextDefaultValue = () => ({
   setSelectedRowIndex: vi.fn(),
   focusTable: vi.fn(),
   focusControls: vi.fn(),
+  useTableContext: vi.fn(),
   tableRef: { current: null as HTMLTableElement | null },
 });
 
 export let mockTableContextDefaultValue =
   createInitialTableContextDefaultValue();
+
+// Define mock spies for hooks from @components
+export const mockUseTableContext = vi.fn(() => mockTableContextDefaultValue);
+export const mockUseFormHotkeys = vi.fn(); // Basic spy, can be configured if needed
+
+// Top-level mock for @components
+// This ensures that any import of @components gets these mocked hooks
+vi.mock('@components', async (importOriginal) => {
+  try {
+    const originalModule = await importOriginal();
+    return {
+      ...(originalModule as any), // Spread other potential exports from @components
+      useTableContext: mockUseTableContext,
+      useFormHotkeys: mockUseFormHotkeys,
+    };
+  } catch {
+    // If @components has no actual module (e.g., only types or if resolution fails during test setup)
+    // return only the mocks. This can happen in some test environments or if path aliases are tricky.
+    return {
+      useTableContext: mockUseTableContext,
+      useFormHotkeys: mockUseFormHotkeys,
+    };
+  }
+});
 
 export function setupComponentHookMocks({
   customTableContext,
@@ -257,6 +283,7 @@ export function setupComponentHookMocks({
     mockTableContextDefaultValue = {
       ...newDefaults,
       ...customTableContext,
+      // Ensure functions provided in customTableContext are used, or fall back to newDefaults' spies
       setSelectedRowIndex:
         customTableContext.setSelectedRowIndex ||
         newDefaults.setSelectedRowIndex,
@@ -267,15 +294,8 @@ export function setupComponentHookMocks({
   } else {
     mockTableContextDefaultValue = newDefaults;
   }
-
-  vi.mock('@components', async (importOriginal) => {
-    const original = (await importOriginal()) as any;
-    return {
-      ...original,
-      useTableContext: vi.fn(() => mockTableContextDefaultValue),
-      useFormHotkeys: vi.fn(),
-    };
-  });
+  // mockUseTableContext will automatically return the updated mockTableContextDefaultValue
+  // No longer need the vi.mock('@components', ...) here as it's top-level.
 }
 // --- End Context Mocking --- //
 
@@ -299,5 +319,13 @@ export function resetAllCentralMocks() {
   // Reset Context mock values
   mockViewContextDefaultValue = createInitialViewContextDefaultValue();
   mockTableContextDefaultValue = createInitialTableContextDefaultValue();
+
+  // Reset and re-initialize implementations for @components hooks
+  mockUseTableContext.mockReset();
+  mockUseTableContext.mockImplementation(() => mockTableContextDefaultValue);
+
+  mockUseFormHotkeys.mockReset();
+  // If mockUseFormHotkeys needs a default implementation, add it here:
+  // mockUseFormHotkeys.mockImplementation(() => { /* default behavior */ });
 }
 // --- End Global Reset Utility --- //

@@ -1,13 +1,11 @@
-// Now import modules
 import { useTableContext } from '@components';
 import { TableKey } from '@contexts';
 import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { usePagination } from '../usePagination';
 import { useTableKeys } from '../useTableKeys';
 
-// Mock dependencies before imports
 vi.mock('@components', () => ({
   useTableContext: vi.fn(),
 }));
@@ -29,25 +27,37 @@ function mockEvent(
 }
 
 describe('useTableKeys', () => {
-  const mockTableContext = {
-    focusState: 'table',
+  const createMockTableContext = (
+    overrides: Partial<ReturnType<typeof useTableContext>> = {},
+  ) => ({
+    focusState: 'table' as 'table' | 'controls' | 'none',
     selectedRowIndex: 1,
     setSelectedRowIndex: vi.fn(),
     focusTable: vi.fn(),
     focusControls: vi.fn(),
-    tableRef: { current: null },
-  };
+    tableRef: { current: null as HTMLDivElement | null },
+    columnDefs: [],
+    setColumnDefs: vi.fn(),
+    gridRef: { current: null },
+    searchState: { term: '', isActive: false, results: [], count: 0 },
+    setSearchState: vi.fn(),
+    clearSearch: vi.fn(),
+    currentView: undefined,
+    setCurrentView: vi.fn(),
+    editMode: false,
+    setEditMode: vi.fn(),
+    detailViewName: undefined,
+    setDetailViewName: vi.fn(),
+    ...overrides,
+  });
 
   const mockGoToPage = vi.fn();
   const tableKey: TableKey = { viewName: 'test-view', tabName: 'test-tab' };
 
-  // Setup for each test
   beforeEach(() => {
     vi.clearAllMocks();
-    (useTableContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockTableContext,
-    );
-    (usePagination as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+
+    (usePagination as Mock).mockReturnValue({
       pagination: { currentPage: 0, pageSize: 10, totalItems: 100 },
       goToPage: mockGoToPage,
     });
@@ -56,10 +66,10 @@ describe('useTableKeys', () => {
   // Group 1: Focus state behavior
   describe('Focus state behavior', () => {
     it('should do nothing when focusState is not "table"', () => {
-      (useTableContext as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-        ...mockTableContext,
+      const mockContextValue = createMockTableContext({
         focusState: 'controls',
       });
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
 
       const { result } = renderHook(() =>
         useTableKeys({
@@ -74,11 +84,14 @@ describe('useTableKeys', () => {
         result.current.handleKeyDown(mockEvent('ArrowDown'));
       });
 
-      expect(mockTableContext.setSelectedRowIndex).not.toHaveBeenCalled();
+      expect(mockContextValue.setSelectedRowIndex).not.toHaveBeenCalled();
       expect(mockGoToPage).not.toHaveBeenCalled();
     });
 
     it('should call focusTable when requestFocus is called', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -92,13 +105,16 @@ describe('useTableKeys', () => {
         result.current.requestFocus();
       });
 
-      expect(mockTableContext.focusTable).toHaveBeenCalled();
+      expect(mockContextValue.focusTable).toHaveBeenCalled();
     });
   });
 
   // Group 2: Vertical navigation (ArrowUp/ArrowDown) tests
   describe('Vertical navigation', () => {
     it('should handle ArrowDown key - within items', () => {
+      const mockContextValue = createMockTableContext({ selectedRowIndex: 1 });
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -112,12 +128,13 @@ describe('useTableKeys', () => {
         result.current.handleKeyDown(mockEvent('ArrowDown'));
       });
 
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(2);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(2);
       expect(mockGoToPage).not.toHaveBeenCalled();
     });
 
     it('should handle ArrowDown key - navigate to next page', () => {
-      mockTableContext.selectedRowIndex = 4;
+      const mockContextValue = createMockTableContext({ selectedRowIndex: 4 });
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
 
       const { result } = renderHook(() =>
         useTableKeys({
@@ -133,11 +150,12 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).toHaveBeenCalledWith(1);
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(0);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(0);
     });
 
     it('should handle ArrowUp key - within items', () => {
-      mockTableContext.selectedRowIndex = 2;
+      const mockContextValue = createMockTableContext({ selectedRowIndex: 2 });
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
 
       const { result } = renderHook(() =>
         useTableKeys({
@@ -152,12 +170,13 @@ describe('useTableKeys', () => {
         result.current.handleKeyDown(mockEvent('ArrowUp'));
       });
 
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(1);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(1);
       expect(mockGoToPage).not.toHaveBeenCalled();
     });
 
     it('should handle ArrowUp key - navigate to previous page', () => {
-      mockTableContext.selectedRowIndex = 0;
+      const mockContextValue = createMockTableContext({ selectedRowIndex: 0 });
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
 
       const { result } = renderHook(() =>
         useTableKeys({
@@ -173,16 +192,21 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).toHaveBeenCalledWith(0);
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(-1);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(-1);
     });
 
     it('should not navigate down at last row of last page', () => {
-      mockTableContext.selectedRowIndex = 4;
+      const mockContextValue = createMockTableContext({ selectedRowIndex: 4 });
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 1, pageSize: 5, totalItems: 10 }, // Last page
+        goToPage: mockGoToPage,
+      });
 
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
-          currentPage: 1, // Last page
+          currentPage: 1, // Already on last page
           totalPages: 2,
           tableKey,
         }),
@@ -193,16 +217,21 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).not.toHaveBeenCalled();
-      expect(mockTableContext.setSelectedRowIndex).not.toHaveBeenCalled();
+      expect(mockContextValue.setSelectedRowIndex).not.toHaveBeenCalled();
     });
 
     it('should not navigate up at first row of first page', () => {
-      mockTableContext.selectedRowIndex = 0;
+      const mockContextValue = createMockTableContext({ selectedRowIndex: 0 });
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 5, totalItems: 10 }, // First page
+        goToPage: mockGoToPage,
+      });
 
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
-          currentPage: 0, // First page
+          currentPage: 0, // Already on first page
           totalPages: 2,
           tableKey,
         }),
@@ -213,13 +242,19 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).not.toHaveBeenCalled();
-      expect(mockTableContext.setSelectedRowIndex).not.toHaveBeenCalled();
+      expect(mockContextValue.setSelectedRowIndex).not.toHaveBeenCalled();
     });
   });
 
-  // Group 3: Page navigation (PageUp/PageDown) tests
   describe('Page navigation', () => {
     it('should handle PageUp key', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 1, pageSize: 5, totalItems: 10 },
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -237,6 +272,13 @@ describe('useTableKeys', () => {
     });
 
     it('should handle PageDown key', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 5, totalItems: 10 },
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -254,10 +296,17 @@ describe('useTableKeys', () => {
     });
 
     it('should not navigate to previous page when already on the first page', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 5, totalItems: 10 }, // First page
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
-          currentPage: 0, // First page
+          currentPage: 0, // Already on first page
           totalPages: 2,
           tableKey,
         }),
@@ -271,10 +320,17 @@ describe('useTableKeys', () => {
     });
 
     it('should not navigate to next page when already on the last page', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 1, pageSize: 5, totalItems: 10 }, // Last page
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
-          currentPage: 1, // Last page
+          currentPage: 1, // Already on last page
           totalPages: 2,
           tableKey,
         }),
@@ -288,9 +344,15 @@ describe('useTableKeys', () => {
     });
   });
 
-  // Group 4: Home/End navigation tests
   describe('Home/End navigation', () => {
     it('should handle Home key', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 1, pageSize: 5, totalItems: 10 }, // Not on first page
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -305,10 +367,17 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).toHaveBeenCalledWith(0);
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(0);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(0);
     });
 
     it('should handle Home key with Ctrl modifier', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 1, pageSize: 5, totalItems: 10 },
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -323,10 +392,17 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).toHaveBeenCalledWith(0);
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(0);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(0);
     });
 
     it('should handle Home key with Meta modifier', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 1, pageSize: 5, totalItems: 10 },
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -341,10 +417,17 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).toHaveBeenCalledWith(0);
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(0);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(0);
     });
 
     it('should handle End key', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 5, totalItems: 10 }, // Not on last page
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -359,10 +442,17 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).toHaveBeenCalledWith(1);
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(4);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(4);
     });
 
     it('should handle End key with Ctrl modifier', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 5, totalItems: 10 },
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -377,10 +467,17 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).toHaveBeenCalledWith(1);
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(4);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(4);
     });
 
     it('should handle End key with Meta modifier', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 5, totalItems: 10 },
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
@@ -395,14 +492,21 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).toHaveBeenCalledWith(1);
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(4);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(4);
     });
 
     it('should not change page when Home is pressed on first page', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 5, totalItems: 10 }, // Already on first page
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
-          currentPage: 0, // Already on first page
+          currentPage: 0,
           totalPages: 2,
           tableKey,
         }),
@@ -413,14 +517,21 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).not.toHaveBeenCalled();
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(0);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(0);
     });
 
     it('should not change page when End is pressed on last page', () => {
+      const mockContextValue = createMockTableContext({ selectedRowIndex: 2 });
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 1, pageSize: 5, totalItems: 10 }, // Already on last page
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
-          currentPage: 1, // Already on last page
+          currentPage: 1,
           totalPages: 2,
           tableKey,
         }),
@@ -431,17 +542,24 @@ describe('useTableKeys', () => {
       });
 
       expect(mockGoToPage).not.toHaveBeenCalled();
-      expect(mockTableContext.setSelectedRowIndex).toHaveBeenCalledWith(4);
+      expect(mockContextValue.setSelectedRowIndex).toHaveBeenCalledWith(4);
     });
   });
 
   describe('Special cases', () => {
     it('should handle empty data set correctly', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 10, totalItems: 0 }, // Empty dataset
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
-          itemCount: 0, // Empty table
+          itemCount: 0,
           currentPage: 0,
-          totalPages: 1,
+          totalPages: 1, // Or 0, depending on calculation for empty set
           tableKey,
         }),
       );
@@ -450,16 +568,23 @@ describe('useTableKeys', () => {
         result.current.handleKeyDown(mockEvent('ArrowDown'));
       });
 
-      expect(mockTableContext.setSelectedRowIndex).not.toHaveBeenCalled();
+      expect(mockContextValue.setSelectedRowIndex).not.toHaveBeenCalled();
       expect(mockGoToPage).not.toHaveBeenCalled();
     });
 
     it('should handle single page dataset correctly', () => {
+      const mockContextValue = createMockTableContext();
+      (useTableContext as Mock).mockReturnValue(mockContextValue);
+      (usePagination as Mock).mockReturnValueOnce({
+        pagination: { currentPage: 0, pageSize: 10, totalItems: 5 }, // Single page
+        goToPage: mockGoToPage,
+      });
+
       const { result } = renderHook(() =>
         useTableKeys({
           itemCount: 5,
           currentPage: 0,
-          totalPages: 1, // Only one page
+          totalPages: 1,
           tableKey,
         }),
       );

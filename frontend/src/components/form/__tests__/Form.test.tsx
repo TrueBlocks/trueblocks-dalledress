@@ -4,12 +4,10 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { vi } from 'vitest';
 
 import {
-  // mockUseHotkeys, // No longer directly needed here as it's accessed via the async import
   resetAllCentralMocks,
   triggerHotkey,
 } from '../../../__tests__/mocks';
 
-// Add the shared mock for react-hotkeys-hook, using an async factory
 vi.mock('react-hotkeys-hook', async () => {
   const mocks = await import('../../../__tests__/mocks');
   return { useHotkeys: mocks.mockUseHotkeys };
@@ -358,7 +356,7 @@ describe('Form Component', () => {
 
     const input = screen.getByLabelText('Username') as HTMLInputElement;
     input.focus();
-    triggerHotkey('mod+a'); // New way using shared mock
+    triggerHotkey('mod+a');
 
     expect(input.selectionStart).toBe(0);
     expect(input.selectionEnd).toBe(input.value.length);

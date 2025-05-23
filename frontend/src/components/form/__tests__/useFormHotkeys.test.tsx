@@ -25,10 +25,8 @@ describe('useFormHotkeys', () => {
       }),
     );
 
-    // Simulate Enter key press
     triggerHotkey('enter');
 
-    // Verify mode change
     expect(setMode).toHaveBeenCalledWith('edit');
   });
 

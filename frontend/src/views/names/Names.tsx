@@ -361,7 +361,7 @@ export const Names = () => {
       })
       .then((result) => {
         // 5. Update UI with definitive result from GetNamesPage
-        setNames((result.names || []) as IndexableName[]);
+        setNames(optimisticNames);
         setTotalItems(result.total || 0);
         setTags(result.tags || []);
 
@@ -673,7 +673,6 @@ export const Names = () => {
       createColumn('', autonameOverride),
       createColumn('address', { readOnly: true, width: '350px' }),
       createColumn('chips', chipsOverride),
-      createColumn('tags'),
       createColumn('source', { sameLine: true }),
       createColumn('actions', actionsOverride),
     ];

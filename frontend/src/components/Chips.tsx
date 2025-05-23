@@ -23,7 +23,9 @@ export const Chips: React.FC<ChipsProps> = ({ items }) => {
   }
 
   return (
-    <Group gap="xs">
+    <Group gap={4} justify="flex-start" align="center">
+      {' '}
+      {/* Replaced SimpleGrid with Group, using gap prop */}
       {items.map((chip) => (
         <Tooltip
           key={chip.id}
@@ -33,7 +35,7 @@ export const Chips: React.FC<ChipsProps> = ({ items }) => {
           <Badge
             size="xs"
             color={chip.color || 'blue'}
-            variant="filled"
+            variant="light"
             styles={(theme) => ({
               root: {
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -60,7 +62,7 @@ export function mapNameToChips(name: types.Name): ChipItem[] {
   if (name.isContract) {
     chipItems.push({
       id: 'contract',
-      label: 'Contract',
+      label: 'CNTRCT', // Shortened label to 6 chars
       color: 'blue',
       tooltip: 'This address is a smart contract',
     });
@@ -69,7 +71,7 @@ export function mapNameToChips(name: types.Name): ChipItem[] {
   if (name.isErc20) {
     chipItems.push({
       id: 'erc20',
-      label: 'ERC20',
+      label: 'ERC20', // Already <= 6 chars
       color: 'green',
       tooltip: 'This contract implements the ERC-20 token standard',
     });
@@ -78,8 +80,8 @@ export function mapNameToChips(name: types.Name): ChipItem[] {
   if (name.isErc721) {
     chipItems.push({
       id: 'erc721',
-      label: 'NFT',
-      color: 'purple',
+      label: 'NFT', // Already <= 6 chars
+      color: 'grape',
       tooltip: 'This contract implements the ERC-721 NFT standard',
     });
   }
@@ -87,9 +89,48 @@ export function mapNameToChips(name: types.Name): ChipItem[] {
   if (name.isPrefund) {
     chipItems.push({
       id: 'prefund',
-      label: 'Prefund',
+      label: 'PRFUND', // Label is 6 chars
       color: 'orange',
       tooltip: 'This address was allocated ETH in the genesis block',
+    });
+  }
+
+  if (name.isCustom) {
+    chipItems.push({
+      id: 'custom',
+      label: 'CUSTOM', // Shortened label to 6 chars
+      color: 'pink',
+      tooltip: 'This address was edited by the user',
+    });
+  }
+
+  // Add chips for tags, avoiding duplicates with boolean flags
+  if (name.tags && typeof name.tags === 'string' && name.tags.trim() !== '') {
+    const tagsArray = name.tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter((tag) => tag !== '');
+
+    tagsArray.forEach((tag: string) => {
+      const lowerTag = tag.toLowerCase();
+      // Check if the tag corresponds to an existing boolean chip
+      if (name.isErc20 && lowerTag.includes('erc20')) return;
+      if (
+        name.isErc721 &&
+        (lowerTag.includes('erc721') || lowerTag.includes('nft'))
+      )
+        return;
+      if (name.isPrefund && lowerTag.includes('prefund')) return;
+      if (name.isContract && lowerTag.includes('contract')) return;
+      // Consider adding deduplication for 'custom' if a 'custom' tag might appear
+      // if (name.isCustom && lowerTag.includes('custom')) return;
+
+      chipItems.push({
+        id: `tag-${tag}`,
+        label: tag.substring(0, 6), // Shortened label to 6 chars
+        color: 'gray',
+        tooltip: `Tag: ${tag}`,
+      });
     });
   }
 

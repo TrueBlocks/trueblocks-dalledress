@@ -1,40 +1,17 @@
 import { useFormHotkeys } from '@components';
-import { fireEvent, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 
-vi.mock('react-hotkeys-hook', () => ({
-  useHotkeys: (key: string, handler: (e: KeyboardEvent) => void) => {
-    document.addEventListener('keydown', (e) => {
-      if (
-        (key === 'mod+a' && (e.metaKey || e.ctrlKey) && e.key === 'a') ||
-        (key === 'enter' && e.key === 'Enter') ||
-        (key === 'esc' && e.key === 'Escape')
-      ) {
-        handler(e as KeyboardEvent);
-      }
-    });
-  },
-}));
+import { resetAllCentralMocks, triggerHotkey } from '../../../__tests__/mocks';
+
+vi.mock('react-hotkeys-hook', async () => {
+  const mocks = await import('../../../__tests__/mocks');
+  return { useHotkeys: mocks.mockUseHotkeys };
+});
 
 describe('useFormHotkeys', () => {
-  test('ESC key calls onCancel in edit mode', () => {
-    const setMode = vi.fn();
-    const onCancel = vi.fn();
-
-    renderHook(() =>
-      useFormHotkeys({
-        mode: 'edit',
-        setMode,
-        onCancel,
-      }),
-    );
-
-    // Simulate ESC key press
-    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
-
-    // Verify that it changes mode and calls onCancel
-    expect(setMode).toHaveBeenCalledWith('display');
-    expect(onCancel).toHaveBeenCalled();
+  beforeEach(() => {
+    resetAllCentralMocks();
   });
 
   test('Enter key changes to edit mode when in display mode', () => {
@@ -49,7 +26,7 @@ describe('useFormHotkeys', () => {
     );
 
     // Simulate Enter key press
-    fireEvent.keyDown(document, { key: 'Enter', code: 'Enter' });
+    triggerHotkey('enter');
 
     // Verify mode change
     expect(setMode).toHaveBeenCalledWith('edit');
@@ -72,7 +49,7 @@ describe('useFormHotkeys', () => {
       }),
     );
 
-    fireEvent.keyDown(input, { key: 'a', metaKey: true });
+    triggerHotkey('mod+a');
 
     expect(mockSetSelectionRange).toHaveBeenCalledWith(0, input.value.length);
 
@@ -90,7 +67,7 @@ describe('useFormHotkeys', () => {
       }),
     );
 
-    fireEvent.keyDown(document, { key: 'Enter' });
+    triggerHotkey('enter');
 
     expect(setMode).toHaveBeenCalledWith('edit');
   });
@@ -107,7 +84,7 @@ describe('useFormHotkeys', () => {
       }),
     );
 
-    fireEvent.keyDown(document, { key: 'Escape' });
+    triggerHotkey('esc');
 
     expect(setMode).toHaveBeenCalledWith('display');
     expect(onCancel).toHaveBeenCalled();
@@ -134,7 +111,7 @@ describe('useFormHotkeys', () => {
       }),
     );
 
-    fireEvent.keyDown(input, { key: 'Enter' });
+    triggerHotkey('enter');
 
     expect(submitButton.click).toHaveBeenCalled();
 

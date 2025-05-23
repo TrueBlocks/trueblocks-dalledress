@@ -8,9 +8,7 @@ import {
 import { registerHotkeys } from '../registerHotkeys';
 import type { RegisterHotkeyOptions } from '../registerHotkeys';
 
-// Mock the react-hotkeys-hook module
 vi.mock('react-hotkeys-hook', async () => {
-  // Dynamically import the mocks to avoid hoisting issues
   const mocks = await import('../../__tests__/mocks');
   return { useHotkeys: mocks.mockUseHotkeys };
 });

@@ -9,6 +9,7 @@ interface ActionProps extends Omit<ActionIconProps, 'children' | 'onClick'> {
   isOn?: boolean;
   onClick: () => void;
   disabled?: boolean;
+  isSubdued?: boolean;
   title?: string;
 }
 
@@ -18,6 +19,7 @@ export const Action = ({
   isOn = true,
   onClick,
   disabled = false,
+  isSubdued = false,
   title,
   ...mantineProps
 }: ActionProps) => {
@@ -32,11 +34,17 @@ export const Action = ({
     }
   };
 
+  const style: React.CSSProperties = {};
+  if (isSubdued && !disabled) {
+    style.opacity = 0.6;
+  }
+
   return (
     <ActionIcon
       onClick={handleClick}
       disabled={disabled}
       title={title}
+      style={style}
       {...mantineProps}
     >
       <IconComponent />

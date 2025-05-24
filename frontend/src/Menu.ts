@@ -42,7 +42,7 @@ export const MenuItems: MenuItem[] = [
   },
   {
     label: 'History',
-    path: '/history',
+    path: '/history/:address',
     position: 'top',
     component: History,
     hotkey: 'mod+3',

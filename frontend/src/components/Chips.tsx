@@ -7,13 +7,15 @@ export interface ChipItem {
   label: string; // Text to display
   color?: string; // Badge color (defaults to 'blue' if not provided)
   tooltip?: string; // Optional explanation tooltip
+  clickValue: string; // Value to use for filtering when clicked
 }
 
 interface ChipsProps {
   items: ChipItem[];
+  onChipClick?: (value: string) => void; // Optional click handler
 }
 
-export const Chips: React.FC<ChipsProps> = ({ items }) => {
+export const Chips: React.FC<ChipsProps> = ({ items, onChipClick }) => {
   if (items.length === 0) {
     return (
       <Badge size="xs" color="gray" variant="outline" opacity={0.6}>
@@ -24,7 +26,6 @@ export const Chips: React.FC<ChipsProps> = ({ items }) => {
 
   return (
     <Group gap={4} justify="flex-start" align="center">
-      {' '}
       {/* Replaced SimpleGrid with Group, using gap prop */}
       {items.map((chip) => (
         <Tooltip
@@ -39,13 +40,23 @@ export const Chips: React.FC<ChipsProps> = ({ items }) => {
             styles={(theme) => ({
               root: {
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                cursor:
+                  onChipClick && chip.clickValue
+                    ? 'pointer'
+                    : chip.tooltip
+                      ? 'help'
+                      : 'default',
                 '&:hover': {
                   transform: 'translateY(-1px)',
                   boxShadow: theme.shadows.xs,
-                  cursor: chip.tooltip ? 'help' : 'default',
                 },
               },
             })}
+            onClick={() => {
+              if (onChipClick && chip.clickValue) {
+                onChipClick(chip.clickValue);
+              }
+            }}
           >
             {chip.label}
           </Badge>
@@ -62,45 +73,50 @@ export function mapNameToChips(name: types.Name): ChipItem[] {
   if (name.isContract) {
     chipItems.push({
       id: 'contract',
-      label: 'CNTRCT', // Shortened label to 6 chars
+      label: 'CONTRACT',
       color: 'blue',
       tooltip: 'This address is a smart contract',
+      clickValue: 'contract',
     });
   }
 
   if (name.isErc20) {
     chipItems.push({
       id: 'erc20',
-      label: 'ERC20', // Already <= 6 chars
+      label: 'ERC20',
       color: 'green',
       tooltip: 'This contract implements the ERC-20 token standard',
+      clickValue: 'erc20',
     });
   }
 
   if (name.isErc721) {
     chipItems.push({
       id: 'erc721',
-      label: 'NFT', // Already <= 6 chars
+      label: 'NFT',
       color: 'grape',
       tooltip: 'This contract implements the ERC-721 NFT standard',
+      clickValue: 'erc721',
     });
   }
 
   if (name.isPrefund) {
     chipItems.push({
       id: 'prefund',
-      label: 'PRFUND', // Label is 6 chars
+      label: 'PREFUND',
       color: 'orange',
       tooltip: 'This address was allocated ETH in the genesis block',
+      clickValue: 'prefund',
     });
   }
 
   if (name.isCustom) {
     chipItems.push({
       id: 'custom',
-      label: 'CUSTOM', // Shortened label to 6 chars
+      label: 'CUSTOM',
       color: 'pink',
       tooltip: 'This address was edited by the user',
+      clickValue: 'custom',
     });
   }
 
@@ -113,7 +129,6 @@ export function mapNameToChips(name: types.Name): ChipItem[] {
 
     tagsArray.forEach((tag: string) => {
       const lowerTag = tag.toLowerCase();
-      // Check if the tag corresponds to an existing boolean chip
       if (name.isErc20 && lowerTag.includes('erc20')) return;
       if (
         name.isErc721 &&
@@ -122,14 +137,13 @@ export function mapNameToChips(name: types.Name): ChipItem[] {
         return;
       if (name.isPrefund && lowerTag.includes('prefund')) return;
       if (name.isContract && lowerTag.includes('contract')) return;
-      // Consider adding deduplication for 'custom' if a 'custom' tag might appear
-      // if (name.isCustom && lowerTag.includes('custom')) return;
 
       chipItems.push({
         id: `tag-${tag}`,
-        label: tag.substring(0, 6), // Shortened label to 6 chars
+        label: tag.substring(0, 8),
         color: 'gray',
         tooltip: `Tag: ${tag}`,
+        clickValue: tag, // Use the full tag for clickValue
       });
     });
   }

@@ -25,6 +25,7 @@ import { msgs, sorting, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
+import { useLocation } from 'wouter';
 
 import './Names.css';
 
@@ -48,7 +49,8 @@ function removeUndefinedProps(
 }
 
 export const Names = () => {
-  const { lastTab } = useAppContext();
+  const { lastTab, setSelectedAddress } = useAppContext();
+  const [, setLocation] = useLocation();
 
   const [sort, setSort] = useState<sorting.SortDef | null>(null);
   const [filter, setFilter] = useState('');
@@ -87,6 +89,14 @@ export const Names = () => {
   );
 
   const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
+
+  const handleChipClick = (value: string) => {
+    if (filter === value) {
+      setFilter('');
+    } else {
+      setFilter(value);
+    }
+  };
 
   // Load the selected tag when the list type changes
   useEffect(() => {
@@ -361,7 +371,7 @@ export const Names = () => {
       })
       .then((result) => {
         // 5. Update UI with definitive result from GetNamesPage
-        setNames(optimisticNames);
+        setNames((result.names || []) as IndexableName[]);
         setTotalItems(result.total || 0);
         setTags(result.tags || []);
 
@@ -502,6 +512,8 @@ export const Names = () => {
       } else if (actionType === 'autoname') {
         const originalNames = [...names]; // Save current names state
 
+        // TODO: If the user tries to autoname an address and it's not a contract but it is marked as isContract, unset isContract.
+
         // Optimistic UI Update - update the name to show it's being processed
         const optimisticNames = originalNames.map((name) => {
           const nameAddress =
@@ -604,6 +616,7 @@ export const Names = () => {
         const addressStr =
           typeof row.address === 'string' ? row.address : String(row.address);
         const isProcessing = processingAddresses.has(addressStr);
+        const isContract = Boolean(row.isContract);
 
         return (
           <div className="action-buttons-container">
@@ -611,6 +624,7 @@ export const Names = () => {
               icon="Autoname"
               onClick={() => handleAction(addressStr, isDeleted, 'autoname')}
               disabled={isProcessing}
+              isSubdued={!isContract && !isProcessing}
               title="Auto-Update"
               size="sm"
             />
@@ -630,6 +644,16 @@ export const Names = () => {
         const isProcessing = processingAddresses.has(addressStr);
         return (
           <div className="action-buttons-container">
+            <Action
+              icon="History"
+              onClick={() => {
+                setSelectedAddress(addressStr);
+                setLocation(`/history/${addressStr}`);
+              }}
+              disabled={isProcessing}
+              title="View History"
+              size="sm"
+            />
             <Action
               icon="Edit"
               onClick={() => handleAction(addressStr, isDeleted, 'edit')}
@@ -662,9 +686,9 @@ export const Names = () => {
       visible: true,
       width: '180px',
       render: (row: IndexableName) => {
-        const nameObject = row as unknown as types.Name; // Cast to types.Name
+        const nameObject = row as unknown as types.Name;
         const chipItems = mapNameToChips(nameObject);
-        return <Chips items={chipItems} />;
+        return <Chips items={chipItems} onChipClick={handleChipClick} />;
       },
     };
 
@@ -672,8 +696,8 @@ export const Names = () => {
       createColumn('name'),
       createColumn('', autonameOverride),
       createColumn('address', { readOnly: true, width: '350px' }),
-      createColumn('chips', chipsOverride),
       createColumn('source', { sameLine: true }),
+      createColumn('chips', chipsOverride),
       createColumn('actions', actionsOverride),
     ];
 

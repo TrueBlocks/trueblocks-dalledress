@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/kbinani/screenshot"
 )
 
@@ -66,7 +67,7 @@ func NewAppPreferences() *AppPreferences {
 func GetAppPreferences() (AppPreferences, error) {
 	path := getAppPrefsPath()
 
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	if !file.FileExists(path) {
 		defaults := AppPreferences{
 			Version:          "1.0",
 			RecentProjects:   []string{},
@@ -75,7 +76,6 @@ func GetAppPreferences() (AppPreferences, error) {
 			Bounds:           NewBounds(),
 			LastTab:          make(map[string]string),
 		}
-
 		if err := SetAppPreferences(&defaults); err != nil {
 			return AppPreferences{}, err
 		}
@@ -83,13 +83,9 @@ func GetAppPreferences() (AppPreferences, error) {
 		return defaults, nil
 	}
 
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return AppPreferences{}, err
-	}
-
 	var appPrefs AppPreferences
-	if err := json.Unmarshal(data, &appPrefs); err != nil {
+	contents := file.AsciiFileToString(path)
+	if err := json.Unmarshal([]byte(contents), &appPrefs); err != nil {
 		return AppPreferences{}, err
 	}
 

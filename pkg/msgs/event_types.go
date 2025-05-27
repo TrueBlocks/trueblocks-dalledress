@@ -5,8 +5,8 @@ type EventType string
 const (
 	EventVersion EventType = "1.0"
 
-	EventStatus EventType = "statusbar:log"
-	EventError  EventType = "error:message"
+	EventStatus EventType = "statusbar:status"
+	EventError  EventType = "statusbar:error"
 
 	EventManager         EventType = "manager:change"
 	EventProjectsUpdated EventType = "projects:updated"
@@ -15,6 +15,8 @@ const (
 	EventAppReady   EventType = "app:ready"
 	EventViewChange EventType = "app:view-changed"
 	EventRefresh    EventType = "app:refresh"
+
+	EventDataLoaded EventType = "data:loaded"
 
 	EventTabCycle EventType = "hotkey:tab-cycle"
 
@@ -34,6 +36,7 @@ var AllMessages = []struct {
 	{EventViewChange, "VIEW_CHANGE"},
 	{EventRefresh, "REFRESH"},
 	{EventVersion, "VERSION"},
+	{EventDataLoaded, "DATA_LOADED"},
 	{EventTabCycle, "TAB_CYCLE"},
 	{EventImagesChanged, "IMAGES_CHANGED"},
 }

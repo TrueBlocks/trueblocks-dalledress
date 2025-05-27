@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"embed"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -80,21 +79,12 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	return app, appMenu
 }
 
-func (a App) String() string {
-	bytes, _ := json.MarshalIndent(a, "", "  ")
-	return string(bytes)
-}
-
 func (a *App) GetContext() context.Context {
 	return a.ctx
 }
 
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
-
-	if err := a.names.LoadNames(nil); err != nil {
-		msgs.EmitError("Failed to load names database", err)
-	}
 
 	msgs.InitializeContext(ctx)
 
@@ -140,6 +130,10 @@ func (a *App) Startup(ctx context.Context) {
 func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 	if a.IsReady() {
+		if err := a.names.LoadNames(nil); err != nil {
+			msgs.EmitError("Failed to load names database", err)
+		}
+
 		if !a.Preferences.App.Bounds.IsValid() {
 			// Sometimes, during development, the window size is corrupted
 			// and we need to reset it to a default value. Should really
@@ -405,6 +399,7 @@ func (a *App) Reload() error {
 	a.names = a.names.ReloadNames()
 	lastView := a.GetAppPreferences().LastView
 	msgs.EmitMessage(msgs.EventRefresh, lastView)
+	msgs.EmitMessage(msgs.EventStatus, "The data was reloaded")
 	return nil
 }
 

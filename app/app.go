@@ -38,6 +38,7 @@ type App struct {
 	Projects    *project.Manager
 	chainList   *utils.ChainList
 	names       types.NamesCollection
+	abis        types.AbisCollection
 	meta        *coreTypes.MetaData
 	fileServer  *fileserver.FileServer
 	locked      int32
@@ -46,6 +47,43 @@ type App struct {
 	ensMap      map[string]base.Address
 	renderCtxs  map[base.Address][]*output.RenderCtx
 	Dalle       *dalle.Context
+	cancelMutex       sync.Mutex
+	activeCancelFuncs []context.CancelFunc
+}
+
+func (a *App) RegisterCancel(cancel context.CancelFunc) {
+	a.cancelMutex.Lock()
+	defer a.cancelMutex.Unlock()
+	a.activeCancelFuncs = append(a.activeCancelFuncs, cancel)
+}
+
+func (a *App) UnregisterCancel(cancelToRemove context.CancelFunc) {
+	a.cancelMutex.Lock()
+	defer a.cancelMutex.Unlock()
+	newActiveCancelFuncs := []context.CancelFunc{}
+	candidateToRemoveStr := fmt.Sprintf("%p", cancelToRemove)
+	for _, cf := range a.activeCancelFuncs {
+		if fmt.Sprintf("%p", cf) != candidateToRemoveStr {
+			newActiveCancelFuncs = append(newActiveCancelFuncs, cf)
+		}
+	}
+	a.activeCancelFuncs = newActiveCancelFuncs
+}
+
+func (a *App) CancelAllStreams() {
+	a.cancelMutex.Lock()
+	defer a.cancelMutex.Unlock()
+	for _, cancel := range a.activeCancelFuncs {
+		if cancel != nil {
+			cancel() // Call the cancel function
+		}
+	}
+	a.activeCancelFuncs = []context.CancelFunc{} // Clear the list
+	msgs.EmitMessage(msgs.EventStatus, "All data loading operations cancelled.")
+}
+
+func (a *App) EmitEvent(eventType msgs.EventType, payload interface{}) {
+	runtime.EventsEmit(a.ctx, string(eventType), payload)
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -62,6 +100,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 	}
+	app.abis = types.NewAbisCollection(app)
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
@@ -133,6 +172,8 @@ func (a *App) DomReady(ctx context.Context) {
 		if err := a.names.LoadNames(nil); err != nil {
 			msgs.EmitError("Failed to load names database", err)
 		}
+
+		a.abis.EnsureInitialLoad()
 
 		if !a.Preferences.App.Bounds.IsValid() {
 			// Sometimes, during development, the window size is corrupted
@@ -397,6 +438,7 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 
 func (a *App) Reload() error {
 	a.names = a.names.ReloadNames()
+	a.abis.Reload()
 	lastView := a.GetAppPreferences().LastView
 	msgs.EmitMessage(msgs.EventRefresh, lastView)
 	msgs.EmitMessage(msgs.EventStatus, "The data was reloaded")

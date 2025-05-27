@@ -166,8 +166,8 @@ export namespace menu {
 export namespace msgs {
 	
 	export enum EventType {
-	    STATUS = "statusbar:log",
-	    ERROR = "error:message",
+	    STATUS = "statusbar:status",
+	    ERROR = "statusbar:error",
 	    MANAGER = "manager:change",
 	    PROJECTS_UPDATED = "projects:updated",
 	    APP_INIT = "app:initialized",
@@ -175,6 +175,7 @@ export namespace msgs {
 	    VIEW_CHANGE = "app:view-changed",
 	    REFRESH = "app:refresh",
 	    VERSION = "1.0",
+	    DATA_LOADED = "data:loaded",
 	    TAB_CYCLE = "hotkey:tab-cycle",
 	    IMAGES_CHANGED = "images:changed",
 	}
@@ -458,6 +459,211 @@ export namespace sync {
 }
 
 export namespace types {
+	
+	export class Parameter {
+	    components?: Parameter[];
+	    indexed?: boolean;
+	    internalType?: string;
+	    name: string;
+	    strDefault?: string;
+	    type: string;
+	    value?: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new Parameter(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.components = this.convertValues(source["components"], Parameter);
+	        this.indexed = source["indexed"];
+	        this.internalType = source["internalType"];
+	        this.name = source["name"];
+	        this.strDefault = source["strDefault"];
+	        this.type = source["type"];
+	        this.value = source["value"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Function {
+	    anonymous?: boolean;
+	    constant?: boolean;
+	    encoding: string;
+	    inputs: Parameter[];
+	    message?: string;
+	    name: string;
+	    outputs: Parameter[];
+	    signature?: string;
+	    stateMutability?: string;
+	    type: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Function(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.anonymous = source["anonymous"];
+	        this.constant = source["constant"];
+	        this.encoding = source["encoding"];
+	        this.inputs = this.convertValues(source["inputs"], Parameter);
+	        this.message = source["message"];
+	        this.name = source["name"];
+	        this.outputs = this.convertValues(source["outputs"], Parameter);
+	        this.signature = source["signature"];
+	        this.stateMutability = source["stateMutability"];
+	        this.type = source["type"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Abi {
+	    address: base.Address;
+	    fileSize: number;
+	    functions: Function[];
+	    hasConstructor: boolean;
+	    hasFallback: boolean;
+	    isEmpty: boolean;
+	    isKnown: boolean;
+	    lastModDate: string;
+	    nEvents: number;
+	    nFunctions: number;
+	    name: string;
+	    path: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Abi(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.address = this.convertValues(source["address"], base.Address);
+	        this.fileSize = source["fileSize"];
+	        this.functions = this.convertValues(source["functions"], Function);
+	        this.hasConstructor = source["hasConstructor"];
+	        this.hasFallback = source["hasFallback"];
+	        this.isEmpty = source["isEmpty"];
+	        this.isKnown = source["isKnown"];
+	        this.lastModDate = source["lastModDate"];
+	        this.nEvents = source["nEvents"];
+	        this.nFunctions = source["nFunctions"];
+	        this.name = source["name"];
+	        this.path = source["path"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class AbisPage {
+	    Type: string;
+	    Abis?: Abi[];
+	    Functions?: Function[];
+	    TotalItems: number;
+	    IsLoading: boolean;
+	    IsFullyLoaded: boolean;
+	    ExpectedTotal: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new AbisPage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.Type = source["Type"];
+	        this.Abis = this.convertValues(source["Abis"], Abi);
+	        this.Functions = this.convertValues(source["Functions"], Function);
+	        this.TotalItems = source["TotalItems"];
+	        this.IsLoading = source["IsLoading"];
+	        this.IsFullyLoaded = source["IsFullyLoaded"];
+	        this.ExpectedTotal = source["ExpectedTotal"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class DataLoadedPayload {
+	    dataType: string;
+	    currentCount: number;
+	    expectedTotal: number;
+	    isFullyLoaded: boolean;
+	    category?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DataLoadedPayload(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.dataType = source["dataType"];
+	        this.currentCount = source["currentCount"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isFullyLoaded = source["isFullyLoaded"];
+	        this.category = source["category"];
+	    }
+	}
 	
 	export class MetaData {
 	    client: number;

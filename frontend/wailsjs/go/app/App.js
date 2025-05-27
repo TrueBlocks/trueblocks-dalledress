@@ -18,6 +18,10 @@ export function Cancel(arg1) {
   return window['go']['app']['App']['Cancel'](arg1);
 }
 
+export function CancelAllStreams() {
+  return window['go']['app']['App']['CancelAllStreams']();
+}
+
 export function ChangeImageStorageLocation(arg1) {
   return window['go']['app']['App']['ChangeImageStorageLocation'](arg1);
 }
@@ -38,8 +42,16 @@ export function ConvertToAddress(arg1) {
   return window['go']['app']['App']['ConvertToAddress'](arg1);
 }
 
+export function DeleteAbi(arg1) {
+  return window['go']['app']['App']['DeleteAbi'](arg1);
+}
+
 export function DeleteName(arg1) {
   return window['go']['app']['App']['DeleteName'](arg1);
+}
+
+export function EmitEvent(arg1, arg2) {
+  return window['go']['app']['App']['EmitEvent'](arg1, arg2);
 }
 
 export function FileNew(arg1) {
@@ -60,6 +72,10 @@ export function FileSave(arg1) {
 
 export function FileSaveAs(arg1) {
   return window['go']['app']['App']['FileSaveAs'](arg1);
+}
+
+export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['app']['App']['GetAbisPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetAppId() {
@@ -100,6 +116,10 @@ export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
 
 export function GetNodeStatus() {
   return window['go']['app']['App']['GetNodeStatus']();
+}
+
+export function GetOneAbi(arg1) {
+  return window['go']['app']['App']['GetOneAbi'](arg1);
 }
 
 export function GetOpenProjects() {
@@ -148,6 +168,10 @@ export function ModifyName(arg1, arg2) {
 
 export function PublishNames(arg1) {
   return window['go']['app']['App']['PublishNames'](arg1);
+}
+
+export function RegisterCancel(arg1) {
+  return window['go']['app']['App']['RegisterCancel'](arg1);
 }
 
 export function RegisterCtx(arg1) {
@@ -210,10 +234,6 @@ export function SetUserPreferences(arg1) {
   return window['go']['app']['App']['SetUserPreferences'](arg1);
 }
 
-export function String() {
-  return window['go']['app']['App']['String']();
-}
-
 export function SwitchToProject(arg1) {
   return window['go']['app']['App']['SwitchToProject'](arg1);
 }
@@ -222,6 +242,14 @@ export function UndeleteName(arg1) {
   return window['go']['app']['App']['UndeleteName'](arg1);
 }
 
+export function UnregisterCancel(arg1) {
+  return window['go']['app']['App']['UnregisterCancel'](arg1);
+}
+
 export function UpdateName(arg1) {
   return window['go']['app']['App']['UpdateName'](arg1);
+}
+
+export function WailsExports() {
+  return window['go']['app']['App']['WailsExports']();
 }

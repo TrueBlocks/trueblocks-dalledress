@@ -40,6 +40,7 @@ func main() {
 			a,
 			&project.Project{},
 			&types.NamesCollection{},
+			&types.AbisCollection{},
 		},
 		EnumBind: []interface{}{
 			msgs.AllMessages,

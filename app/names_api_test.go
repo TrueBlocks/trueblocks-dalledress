@@ -19,6 +19,7 @@ func setupTestApp() *App {
 		},
 		names: types.NewNames(),
 	}
+	app.abis = types.NewAbisCollection(app)
 	_ = app.Reload()
 	return app
 }

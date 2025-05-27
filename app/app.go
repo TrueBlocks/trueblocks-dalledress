@@ -38,7 +38,7 @@ type App struct {
 	Preferences *preferences.Preferences
 	Projects    *project.Manager
 	chainList   *utils.ChainList
-	names       types.Names
+	names       types.NamesCollection
 	meta        *coreTypes.MetaData
 	fileServer  *fileserver.FileServer
 	locked      int32

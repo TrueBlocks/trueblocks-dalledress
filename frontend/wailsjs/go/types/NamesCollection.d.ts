@@ -12,6 +12,6 @@ export function GetSelectedTag(arg1:string):Promise<string>;
 
 export function LoadNames(arg1:sync.WaitGroup):Promise<void>;
 
-export function ReloadNames():Promise<types.Names>;
+export function ReloadNames():Promise<types.NamesCollection>;
 
 export function SetSelectedTag(arg1:string,arg2:string):Promise<void>;

@@ -8,8 +8,8 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
 )
 
-func makeTestNames() Names {
-	return Names{
+func makeTestNames() NamesCollection {
+	return NamesCollection{
 		Map: map[base.Address]types.Name{
 			base.HexToAddress("0x1"): {Address: base.HexToAddress("0x1"), Tags: "custom", Parts: types.Custom},
 			base.HexToAddress("0x2"): {Address: base.HexToAddress("0x2"), Tags: "prefund", Parts: types.Prefund},
@@ -32,7 +32,7 @@ func makeTestNames() Names {
 var noSort = sorting.SortDef{}
 
 func TestNamesStructFields(t *testing.T) {
-	names := Names{
+	names := NamesCollection{
 		Map:  make(map[base.Address]types.Name),
 		List: []*types.Name{},
 	}
@@ -57,7 +57,7 @@ func TestNamesStructFields(t *testing.T) {
 }
 
 func TestGetNamesPagination(t *testing.T) {
-	names := Names{
+	names := NamesCollection{
 		List: []*types.Name{
 			{Tags: "a"}, {Tags: "b"}, {Tags: "c"}, {Tags: "d"}, {Tags: "e"},
 		},
@@ -75,7 +75,7 @@ func TestGetNamesPagination(t *testing.T) {
 }
 
 func TestLoadNamesNoReloadIfCountsMatch(t *testing.T) {
-	names := Names{
+	names := NamesCollection{
 		List: []*types.Name{
 			{Parts: types.Custom},
 			{Parts: types.Custom},
@@ -133,7 +133,7 @@ func TestGetNames_OutOfRange(t *testing.T) {
 }
 
 func TestGetNames_Filtering(t *testing.T) {
-	names := Names{
+	names := NamesCollection{
 		List: []*types.Name{
 			{Name: "Alice", Address: base.HexToAddress("0x1"), Tags: "custom", Source: "manual", Parts: types.Custom},
 			{Name: "Bob", Address: base.HexToAddress("0x2"), Tags: "prefund", Source: "imported", Parts: types.Prefund},

@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": false,
@@ -27,46 +23,20 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@components": [
-        "src/components"
-      ],
-      "@contexts": [
-        "src/contexts"
-      ],
-      "@hooks": [
-        "src/hooks"
-      ],
-      "@layout": [
-        "src/layout"
-      ],
-      "@views": [
-        "src/views"
-      ],
-      "@wizards": [
-        "src/wizards"
-      ],
-      "@utils": [
-        "src/utils"
-      ],
-      "@runtime": [
-        "wailsjs/runtime"
-      ],
-      "@app": [
-        "wailsjs/go/app/App"
-      ],
-      "@names": [
-        "wailsjs/go/types/Names"
-      ],
-      "@models": [
-        "wailsjs/go/models"
-      ]
+      "@components": ["src/components"],
+      "@contexts": ["src/contexts"],
+      "@hooks": ["src/hooks"],
+      "@layout": ["src/layout"],
+      "@views": ["src/views"],
+      "@wizards": ["src/wizards"],
+      "@utils": ["src/utils"],
+      "@runtime": ["wailsjs/runtime"],
+      "@app": ["wailsjs/go/app/App"],
+      "@names": ["wailsjs/go/types/NamesCollection"],
+      "@models": ["wailsjs/go/models"]
     }
   },
-  "include": [
-    "src",
-    "wailsjs",
-    "tests"
-  ],
+  "include": ["src", "wailsjs", "tests"],
   "references": [
     {
       "path": "./tsconfig.node.json"

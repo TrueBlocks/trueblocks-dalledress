@@ -16,7 +16,7 @@ import (
 )
 
 type namesMap map[base.Address]types.Name
-type Names struct {
+type NamesCollection struct {
 	Map          namesMap      `json:"map"`
 	List         []*types.Name `json:"list"`
 	Custom       []*types.Name `json:"custom"`
@@ -31,8 +31,8 @@ type Names struct {
 	selectedTags map[string]string
 }
 
-func NewNames() Names {
-	return Names{
+func NewNames() NamesCollection {
+	return NamesCollection{
 		Map:          make(namesMap),
 		List:         make([]*types.Name, 0),
 		Custom:       make([]*types.Name, 0),
@@ -54,7 +54,7 @@ type NamesPage struct {
 }
 
 // GetSelectedTag returns the currently selected tag for a list type
-func (n *Names) GetSelectedTag(listType string) string {
+func (n *NamesCollection) GetSelectedTag(listType string) string {
 	if n.selectedTags == nil {
 		n.selectedTags = make(map[string]string)
 	}
@@ -63,7 +63,7 @@ func (n *Names) GetSelectedTag(listType string) string {
 }
 
 // SetSelectedTag sets the selected tag for a specific list type
-func (n *Names) SetSelectedTag(listType string, tag string) {
+func (n *NamesCollection) SetSelectedTag(listType string, tag string) {
 	if n.selectedTags == nil {
 		n.selectedTags = make(map[string]string)
 	}
@@ -76,14 +76,14 @@ func (n *Names) SetSelectedTag(listType string, tag string) {
 }
 
 // ClearSelectedTag clears the selected tag for a specific list type
-func (n *Names) ClearSelectedTag(listType string) {
+func (n *NamesCollection) ClearSelectedTag(listType string) {
 	if n.selectedTags != nil {
 		delete(n.selectedTags, listType)
 	}
 }
 
 // GetPage returns a page of names for the given list type and the total count.
-func (n *Names) GetPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
+func (n *NamesCollection) GetPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
 	if len(n.List) == 0 {
 		if err := n.LoadNames(nil); err != nil {
 			return NamesPage{Names: nil, Total: 0, Tags: []string{}}
@@ -219,8 +219,8 @@ func (n *Names) GetPage(listType string, first, pageSize int, sortKey sorting.So
 
 var namesMutex sync.Mutex
 
-// LoadNames loads the names database into the Names struct and populates all category lists.
-func (n *Names) LoadNames(wg *sync.WaitGroup) error {
+// LoadNames loads the names database into the NamesCollection struct and populates all category lists.
+func (n *NamesCollection) LoadNames(wg *sync.WaitGroup) error {
 	namesMutex.Lock()
 	defer func() {
 		if wg != nil {
@@ -307,8 +307,8 @@ func compare(nameI, nameJ types.Name) bool {
 	return ti < tj
 }
 
-func (n *Names) ReloadNames() Names {
-	ret := Names{selectedTags: n.selectedTags}
+func (n *NamesCollection) ReloadNames() NamesCollection {
+	ret := NamesCollection{selectedTags: n.selectedTags}
 	_ = ret.LoadNames(nil)
 	return ret
 }

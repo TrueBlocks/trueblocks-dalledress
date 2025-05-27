@@ -542,7 +542,7 @@ export namespace types {
 		    return a;
 		}
 	}
-	export class Names {
+	export class NamesCollection {
 	    map: Record<string, Name>;
 	    list: Name[];
 	    custom: Name[];
@@ -556,7 +556,7 @@ export namespace types {
 	    baddressTags: string[];
 	
 	    static createFrom(source: any = {}) {
-	        return new Names(source);
+	        return new NamesCollection(source);
 	    }
 	
 	    constructor(source: any = {}) {

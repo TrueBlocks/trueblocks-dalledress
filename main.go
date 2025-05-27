@@ -39,7 +39,7 @@ func main() {
 		Bind: []interface{}{
 			a,
 			&project.Project{},
-			&types.Names{},
+			&types.NamesCollection{},
 		},
 		EnumBind: []interface{}{
 			msgs.AllMessages,

@@ -17,6 +17,7 @@ import (
 
 type namesMap map[base.Address]types.Name
 type NamesCollection struct {
+	App          App           `json:"app"`
 	Map          namesMap      `json:"map"`
 	List         []*types.Name `json:"list"`
 	Custom       []*types.Name `json:"custom"`
@@ -31,8 +32,9 @@ type NamesCollection struct {
 	selectedTags map[string]string
 }
 
-func NewNames() NamesCollection {
+func NewNamesCollection(app App) NamesCollection {
 	return NamesCollection{
+		App:          app,
 		Map:          make(namesMap),
 		List:         make([]*types.Name, 0),
 		Custom:       make([]*types.Name, 0),

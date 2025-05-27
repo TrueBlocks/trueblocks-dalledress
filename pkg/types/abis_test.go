@@ -1,4 +1,4 @@
-// ADD_ABIS_CODE
+// ABIS_CODE
 package types
 
 import (

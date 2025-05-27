@@ -1,4 +1,4 @@
-// ADD_ABIS_CODE
+// ABIS_CODE
 package types
 
 import (
@@ -9,7 +9,6 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
@@ -17,14 +16,6 @@ import (
 )
 
 var refreshRate = 91
-
-type App interface {
-	EmitEvent(eventType msgs.EventType, payload interface{})
-	// TODO: This is incorrect. We need to register the rendering context
-	// TODO: in the app so we can cancel it later. I'm not sure this does that.
-	RegisterCtx(addr base.Address) *output.RenderCtx
-	Cancel(addr base.Address) (int, bool)
-}
 
 type AbisCollection struct {
 	App App

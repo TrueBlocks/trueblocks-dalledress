@@ -96,12 +96,12 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 			App:  preferences.AppPreferences{},
 		},
 		Assets:     assets,
-		names:      types.NewNames(),
 		apiKeys:    make(map[string]string),
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 	}
 	// ADD_ABIS_CODE
+	app.names = types.NewNamesCollection(app)
 	app.abis = types.NewAbisCollection(app)
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())

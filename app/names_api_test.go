@@ -17,9 +17,9 @@ func setupTestApp() *App {
 			User: preferences.UserPreferences{},
 			App:  preferences.AppPreferences{},
 		},
-		names: types.NewNames(),
 	}
 	// ADD_ABIS_CODE
+	app.names = types.NewNamesCollection(app)
 	app.abis = types.NewAbisCollection(app)
 	_ = app.Reload()
 	return app

@@ -30,21 +30,24 @@ export const useIcons = (
     createElement(iconSet.History, { size, ...props });
   const Khedra: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Khedra, { size, ...props });
-  const Names: FC<IconProps> = (props = {}) =>
-    createElement(iconSet.Names, { size, ...props });
   const DalleDress: FC<IconProps> = (props = {}) =>
     createElement(iconSet.DalleDress, { size, ...props });
-  // ABIS_CODE
-  const ABIs: FC<IconProps> = (props = {}) =>
-    createElement(iconSet.ABIs, { size, ...props });
   const Settings: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Settings, { size, ...props });
   const Wizard: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Wizard, { size, ...props });
+
+  // ABIS_CODE
+  const Names: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Names, { size, ...props });
+  const ABIs: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.ABIs, { size, ...props });
+
   const Switch: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Switch, { size, ...props });
   const File: FC<IconProps> = (props = {}) =>
     createElement(iconSet.File, { size, ...props });
+
   const Twitter: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Twitter, { size, ...props });
   const Github: FC<IconProps> = (props = {}) =>
@@ -53,6 +56,7 @@ export const useIcons = (
     createElement(iconSet.Website, { size, ...props });
   const Email: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Email, { size, ...props });
+
   const Add: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Add, { size, ...props });
   const Edit: FC<IconProps> = (props = {}) =>
@@ -65,6 +69,7 @@ export const useIcons = (
     createElement(iconSet.Remove, { size, ...props });
   const Autoname: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Autoname, { size, ...props });
+
   const ChevronLeft: FC<IconProps> = (props = {}) =>
     createElement(iconSet.ChevronLeft, { size, ...props });
   const ChevronRight: FC<IconProps> = (props = {}) =>
@@ -84,24 +89,29 @@ export const useIcons = (
     About,
     History,
     Khedra,
-    Names,
     DalleDress,
-    // ABIS_CODE
-    ABIs,
     Settings,
     Wizard,
+
+    // ABIS_CODE
+    Names,
+    ABIs,
+
     Switch,
     File,
+
     Twitter,
     Github,
     Website,
     Email,
+
     Add,
     Edit,
     Delete,
     Undelete,
     Remove,
     Autoname,
+
     ChevronLeft,
     ChevronRight,
     ChevronUp,

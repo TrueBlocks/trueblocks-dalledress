@@ -96,12 +96,13 @@ export type IconSet = {
   About: IconType;
   History: IconType;
   Khedra: IconType;
-  Names: IconType;
   DalleDress: IconType;
-  // ABIS_CODE
-  ABIs: IconType;
   Settings: IconType;
   Wizard: IconType;
+
+  // ABIS_CODE
+  Names: IconType;
+  ABIs: IconType;
 
   // File operations
   Switch: IconType;
@@ -138,24 +139,29 @@ const faIcons: IconSet = {
   About: FaQuestion,
   History: FaHistory,
   Khedra: FaIndustry,
-  Names: FaUser,
   DalleDress: FaPalette,
-  // ABIS_CODE
-  ABIs: FaListAlt,
   Settings: FaCog,
   Wizard: FaHatWizard,
+
+  // ABIS_CODE
+  Names: FaUser,
+  ABIs: FaListAlt,
+
   Switch: FaRandom,
   File: FaFile,
+
   Twitter: FaTwitter,
   Github: FaGithub,
   Website: FaGlobe,
   Email: FaEnvelope,
+
   Add: FaPlus,
   Edit: FaEdit,
   Delete: FaTimes,
   Undelete: FaUndo,
   Remove: FaEraser,
   Autoname: FaMagic,
+
   ChevronLeft: FaAngleDoubleLeft,
   ChevronRight: FaAngleDoubleRight,
   ChevronUp: FaAngleDoubleUp,
@@ -170,24 +176,29 @@ const biIcons: IconSet = {
   About: BiInfoCircle,
   History: BiHistory,
   Khedra: BiBuildings,
-  Names: BiUser,
   DalleDress: BiPalette,
-  // ABIS_CODE
-  ABIs: BiListUl,
   Settings: BiCog,
   Wizard: BiCog,
+
+  // ABIS_CODE
+  Names: BiUser,
+  ABIs: BiListUl,
+
   Switch: BiTransfer,
   File: BiFile,
+
   Twitter: BiLogoTwitter,
   Github: BiLogoGithub,
   Website: BiGlobe,
   Email: BiEnvelope,
+
   Add: BiPlus,
   Edit: BiPencil,
   Delete: BiX,
   Undelete: BiUndo,
   Remove: BiTrash,
   Autoname: BiBot,
+
   ChevronLeft: BiChevronsLeft,
   ChevronRight: BiChevronsRight,
   ChevronUp: BiChevronsUp,

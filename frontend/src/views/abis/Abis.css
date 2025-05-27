@@ -1,4 +1,4 @@
-// ABIS_CODE
+/* // ABIS_CODE */
 .abisView {
   padding: var(--mantine-spacing-md);
   height: 100%;
@@ -12,14 +12,8 @@
   overflow-y: auto;
 }
 
-.abisTable {
-  width: 100%;
-}
-
 .abisRowExpanded {
-  background-color: var(
-    --mantine-color-gray-1
-  );
+  background-color: var(--mantine-color-gray-1);
 }
 
 .abisButton {

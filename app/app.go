@@ -38,16 +38,16 @@ type App struct {
 	Projects    *project.Manager
 	chainList   *utils.ChainList
 	// ADD_ABIS_CODE
-	names       types.NamesCollection
-	abis        types.AbisCollection
-	meta        *coreTypes.MetaData
-	fileServer  *fileserver.FileServer
-	locked      int32
-	ctx         context.Context
-	apiKeys     map[string]string
-	ensMap      map[string]base.Address
-	renderCtxs  map[base.Address][]*output.RenderCtx
-	Dalle       *dalle.Context
+	names             types.NamesCollection
+	abis              types.AbisCollection
+	meta              *coreTypes.MetaData
+	fileServer        *fileserver.FileServer
+	locked            int32
+	ctx               context.Context
+	apiKeys           map[string]string
+	ensMap            map[string]base.Address
+	renderCtxs        map[base.Address][]*output.RenderCtx
+	Dalle             *dalle.Context
 	cancelMutex       sync.Mutex
 	activeCancelFuncs []context.CancelFunc
 }
@@ -440,6 +440,7 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 }
 
 func (a *App) Reload() error {
+	a.CancelAllStreams()
 	a.names = a.names.ReloadNames()
 	// ADD_ABIS_CODE
 	a.abis.Reload()

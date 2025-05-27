@@ -100,7 +100,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 	}
-	// ADD_ABIS_CODE
+	// ADD_ROUTE
 	app.names = types.NewNamesCollection(app)
 	app.abis = types.NewAbisCollection(app)
 

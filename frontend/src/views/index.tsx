@@ -6,3 +6,4 @@ export { Khedra } from './Khedra';
 
 export * from './names';
 export * from './settings';
+export * from './abis';

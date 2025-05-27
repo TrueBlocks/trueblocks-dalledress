@@ -1,5 +1,6 @@
 import { SetInitialized } from '@app';
 import {
+  Abis,
   About,
   DalleDress,
   History,
@@ -77,12 +78,21 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
+    label: 'ABIs',
+    path: '/abis',
+    position: 'top',
+    component: Abis,
+    hotkey: 'mod+7',
+    altHotkey: 'alt+7',
+    type: 'navigation',
+  },
+  {
     label: 'Settings',
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+7',
-    altHotkey: 'alt+7',
+    hotkey: 'mod+8',
+    altHotkey: 'alt+8',
     type: 'navigation',
   },
   {

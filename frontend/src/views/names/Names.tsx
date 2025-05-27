@@ -780,5 +780,4 @@ const getListTypeFromLabel = (label: string): ListType => {
   return tabToListType[label] || 'all';
 };
 
-// Define the ListType directly here as it's not exposed from the Wails bindings
 export type ListType = 'all' | 'custom' | 'prefund' | 'regular' | 'baddress';

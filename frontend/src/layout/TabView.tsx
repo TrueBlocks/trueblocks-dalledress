@@ -15,9 +15,10 @@ interface Tab {
 interface TabViewProps {
   tabs: Tab[];
   route: string;
+  onTabChange?: (newTab: string) => void;
 }
 
-export const TabView = ({ tabs, route }: TabViewProps) => {
+export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   const { lastTab, setLastTab } = useAppContext();
   const defaultTab = lastTab[route] || tabs[0]?.label || '';
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
@@ -41,17 +42,28 @@ export const TabView = ({ tabs, route }: TabViewProps) => {
         const newTab = event.key.startsWith('alt+') ? prevTab() : nextTab();
         setActiveTab(newTab);
         setLastTab(route, newTab); // Synchronize with AppContext
+        if (onTabChange) {
+          onTabChange(newTab);
+        }
       }
     },
   );
+
+  const handleTabChange = (newTab: string | null) => {
+    if (newTab === null) return;
+    setActiveTab(newTab);
+    setLastTab(route, newTab);
+    if (onTabChange) {
+      onTabChange(newTab);
+    }
+  };
 
   return (
     <div className="tab-view-container">
       <Tabs
         value={activeTab}
         onChange={(value) => {
-          setActiveTab(value || tabs[0]?.label || '');
-          setLastTab(route, value || tabs[0]?.label || '');
+          handleTabChange(value);
         }}
       >
         <Tabs.List>

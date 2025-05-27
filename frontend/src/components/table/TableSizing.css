@@ -1,0 +1,143 @@
+/* Table Column Sizing System - Composable Edition */
+/* Use CSS custom properties for consistent, semantic column sizing */
+/* Classes can be combined for flexible column sizing */
+
+:root {
+  /* Base semantic column width variables */
+  --col-address: 400px; /* Wide enough for 42-character addresses */
+  --col-encoding: 550px; /* Function encodings */
+  --col-signature: 300px; /* Function signatures */
+  --col-date: 200px; /* Date formats */
+  --col-actions: 120px; /* Action buttons */
+  --col-content-sm: 100px; /* Small consistent size (numbers, counts) */
+  --col-content-md: 120px; /* Medium consistent size */
+  --col-content-lg: 160px; /* Large consistent size */
+  --col-content-xl: 200px; /* Extra large consistent size */
+}
+
+/* =================================== */
+/* Base Width Classes (Semantic Sizes) */
+/* =================================== */
+/* These set initial width values */
+
+.col-base-address {
+  width: var(--col-address);
+}
+
+.col-base-encoding {
+  width: var(--col-encoding);
+}
+
+.col-base-signature {
+  width: var(--col-signature);
+}
+
+.col-base-date {
+  width: var(--col-date);
+}
+
+.col-base-actions {
+  width: var(--col-actions);
+}
+
+.col-base-sm {
+  width: var(--col-content-sm);
+}
+
+.col-base-md {
+  width: var(--col-content-md);
+}
+
+.col-base-lg {
+  width: var(--col-content-lg);
+}
+
+.col-base-xl {
+  width: var(--col-content-xl);
+}
+
+/* ============================== */
+/* Sizing Behavior Modifiers */
+/* ============================== */
+/* These override width for specific behaviors */
+
+/* Content-driven sizing (overrides any base width) */
+.col-min {
+  width: min-content !important;
+}
+
+.col-max {
+  width: max-content !important;
+}
+
+.col-fit {
+  width: fit-content !important;
+}
+
+.col-expand {
+  width: auto !important;
+}
+
+/* ============================== */
+/* Backward Compatibility */
+/* ============================== */
+/* Keep the old class names for existing code */
+
+.col-address {
+  width: var(--col-address);
+}
+.col-encoding {
+  width: var(--col-encoding);
+}
+.col-signature {
+  width: var(--col-signature);
+}
+.col-date {
+  width: var(--col-date);
+}
+.col-actions {
+  width: var(--col-actions);
+}
+.col-content-sm {
+  width: var(--col-content-sm);
+}
+.col-content-md {
+  width: var(--col-content-md);
+}
+.col-content-lg {
+  width: var(--col-content-lg);
+}
+.col-content-xl {
+  width: var(--col-content-xl);
+}
+.col-content {
+  width: min-content;
+}
+
+/* ============================== */
+/* Usage Examples with Composition */
+/* ============================== */
+/*
+Basic usage (same as before):
+  width="col-address"           -> 340px fixed width
+  width="col-min"              -> min-content
+
+Composed usage (NEW!):
+  width="col-base-address col-min"    -> Start with address width, but shrink to min-content
+  width="col-base-sm col-fit"         -> Start with small width, but fit to content
+  width="col-base-lg col-expand"      -> Start with large width, but expand to fill
+
+The modifiers (.col-min, .col-max, .col-fit, .col-expand) will override 
+any base width due to !important specificity.
+*/
+
+/* ============================== */
+/* Responsive Adjustments */
+/* ============================== */
+@media (max-width: 768px) {
+  :root {
+    --col-address: 280px; /* Shorter on mobile */
+    --col-signature: 250px; /* Shorter on mobile */
+    --col-encoding: 150px; /* Shorter on mobile */
+  }
+}

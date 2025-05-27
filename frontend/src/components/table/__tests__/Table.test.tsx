@@ -87,7 +87,7 @@ describe('Table', () => {
   // Group 2: State handling tests
   describe('State handling', () => {
     it('shows loading state', () => {
-      setupTest({ loading: true });
+      setupTest({ loading: true, data: [] });
       expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
 

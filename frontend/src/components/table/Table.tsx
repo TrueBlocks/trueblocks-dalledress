@@ -9,6 +9,7 @@ import { sorting } from '@models';
 import { Body, Header, Pagination, PerPage, Stats, usePagination } from '.';
 import { SearchBox } from './SearchBox';
 import './Table.css';
+import './TableSizing.css';
 
 export interface TableProps<T extends Record<string, unknown>> {
   columns: FormField<T>[];
@@ -24,6 +25,8 @@ export interface TableProps<T extends Record<string, unknown>> {
     string,
     (value: unknown, values: Record<string, unknown>) => string | null
   >;
+  collectionIsLoading?: boolean;
+  collectionIsFullyLoaded?: boolean;
 }
 
 export const Table = <T extends Record<string, unknown>>({
@@ -37,6 +40,8 @@ export const Table = <T extends Record<string, unknown>>({
   tableKey,
   onSubmit,
   validate,
+  collectionIsLoading,
+  collectionIsFullyLoaded,
 }: TableProps<T>) => {
   const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
@@ -212,8 +217,6 @@ export const Table = <T extends Record<string, unknown>>({
     setCurrentRowData(data[index] || null);
   };
 
-  if (loading) return <div>Loading...</div>;
-
   return (
     <div className="table-outer-container">
       <div className="top-pagination-container">
@@ -255,17 +258,63 @@ export const Table = <T extends Record<string, unknown>>({
         >
           <colgroup>
             {columns.map((col) => (
-              <col key={col.key} style={{ width: col.width || 'auto' }} />
+              <col
+                key={col.key}
+                className={
+                  typeof col.width === 'string' && col.width.startsWith('col-')
+                    ? col.width
+                    : undefined
+                }
+                style={
+                  typeof col.width === 'string' && col.width.startsWith('col-')
+                    ? undefined
+                    : { width: col.width || 'auto' }
+                }
+              />
             ))}
           </colgroup>
           <tbody>
-            <Body
-              columns={columns}
-              data={sortedData}
-              selectedRowIndex={selectedRowIndex}
-              handleRowClick={handleRowClick}
-              noDataMessage="No data found."
-            />
+            {loading && data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  style={{
+                    textAlign: 'left',
+                    padding: '20px',
+                    color: 'red',
+                  }}
+                >
+                  Loading...
+                </td>
+              </tr>
+            ) : (
+              <>
+                <Body
+                  columns={columns}
+                  data={sortedData}
+                  selectedRowIndex={selectedRowIndex}
+                  handleRowClick={handleRowClick}
+                  noDataMessage="No data found."
+                />
+                {collectionIsLoading &&
+                  !collectionIsFullyLoaded &&
+                  data.length > 0 && (
+                    <tr>
+                      <td
+                        colSpan={columns.length}
+                        style={{
+                          textAlign: 'center',
+                          padding: '10px',
+                          fontStyle: 'italic',
+                          color: 'var(--mantine-color-gray-6)',
+                        }}
+                      >
+                        Loading more items...
+                      </td>
+                    </tr>
+                  )}
+              </>
+            )}
           </tbody>
         </table>
       </div>

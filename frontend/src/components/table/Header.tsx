@@ -48,15 +48,28 @@ export const Header = <T extends Record<string, unknown>>({
               sortIndicator = ' ⇅';
             }
           }
+          const classNames = [
+            col.className || '', // Custom class from column definition
+            col.sortable ? 'sortable' : '',
+            isSorted ? 'sorted' : '',
+            typeof col.width === 'string' && col.width.startsWith('col-')
+              ? col.width
+              : '',
+          ]
+            .filter(Boolean)
+            .join(' ');
+
           return (
             <th
               key={col.key}
-              style={col.width ? { width: col.width } : undefined}
-              className={
-                (col.className || '') +
-                (col.sortable ? ' sortable' : '') +
-                (isSorted ? ' sorted' : '')
+              style={
+                typeof col.width === 'string' && col.width.startsWith('col-')
+                  ? undefined
+                  : col.width
+                    ? { width: col.width }
+                    : undefined
               }
+              className={classNames}
               onClick={col.sortable ? () => handleClick(col) : undefined}
               tabIndex={col.sortable ? 0 : undefined}
               aria-sort={ariaSort}

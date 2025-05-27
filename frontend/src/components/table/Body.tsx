@@ -40,17 +40,39 @@ export const Body = <T extends Record<string, unknown>>({
             onClick={() => handleRowClick(rowIndex)}
             aria-selected={selectedRowIndex === rowIndex}
           >
-            {columns.map((col) => (
-              <td key={col.key} className={col.className}>
-                {col.render
-                  ? col.render(row, rowIndex)
-                  : col.accessor
-                    ? (col.accessor(row) as React.ReactNode)
-                    : col.key !== undefined
-                      ? (row[col.key as keyof T] as React.ReactNode)
-                      : null}
-              </td>
-            ))}
+            {columns.map((col) => {
+              const cellClassNames = [
+                col.className || '',
+                typeof col.width === 'string' && col.width.startsWith('col-')
+                  ? col.width
+                  : '',
+              ]
+                .filter(Boolean)
+                .join(' ');
+
+              return (
+                <td
+                  key={col.key}
+                  className={cellClassNames}
+                  style={
+                    typeof col.width === 'string' &&
+                    col.width.startsWith('col-')
+                      ? undefined
+                      : col.width
+                        ? { width: col.width }
+                        : undefined
+                  }
+                >
+                  {col.render
+                    ? col.render(row, rowIndex)
+                    : col.accessor
+                      ? (col.accessor(row) as React.ReactNode)
+                      : col.key !== undefined
+                        ? (row[col.key as keyof T] as React.ReactNode)
+                        : null}
+                </td>
+              );
+            })}
           </tr>
         </Fragment>
       ))}

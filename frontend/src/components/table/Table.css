@@ -13,17 +13,24 @@
   border-collapse: collapse;
   margin-top: 0;
   outline: none;
+  border: 1px solid rgba(128, 128, 128, 0.25);
 }
 
 .data-table th,
 .data-table td {
   padding: 0.5rem;
   text-align: left;
-  border-bottom: 1px solid var(--mantine-color-gray-3);
+  border-bottom: 1px solid rgba(128, 128, 128, 0.25);
+  border-right: 1px solid rgba(128, 128, 128, 0.25);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: top;
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+  border-right: none;
 }
 
 .data-table th {

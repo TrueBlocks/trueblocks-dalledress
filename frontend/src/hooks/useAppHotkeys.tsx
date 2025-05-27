@@ -1,7 +1,12 @@
-import { Reload, SetHelpCollapsed, SetMenuCollapsed } from '@app';
+import {
+  CancelAllStreams,
+  Reload,
+  SetHelpCollapsed,
+  SetMenuCollapsed,
+} from '@app';
 import { useAppContext } from '@contexts';
 import { msgs } from '@models';
-import { Log, emitEvent, registerHotkeys } from '@utils';
+import { Log, emitEvent, registerHotkeys, useEmitters } from '@utils';
 import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
 import { MenuItems } from 'src/Menu';
 import { useLocation } from 'wouter';
@@ -37,6 +42,7 @@ export const useAppHotkeys = (): void => {
   const { menuCollapsed, setMenuCollapsed } = useAppContext();
   const { helpCollapsed, setHelpCollapsed } = useAppContext();
   const [, navigate] = useLocation();
+  const { emitStatus, emitError } = useEmitters();
 
   const handleHotkey = async (
     hkType: Hotkey,
@@ -240,7 +246,7 @@ export const useAppHotkeys = (): void => {
     return hotkeyConfigs;
   });
 
-  const passthroughEditHotkeys: HotkeyConfig[] = [
+  const editHotkeys: HotkeyConfig[] = [
     {
       key: 'mod+c',
       handler: (_e: KeyboardEvent) => {
@@ -303,10 +309,34 @@ export const useAppHotkeys = (): void => {
     },
   ];
 
+  const globalHotkeys: HotkeyConfig[] = [
+    {
+      key: 'escape',
+      handler: (_e: KeyboardEvent) => {
+        CancelAllStreams()
+          .then(() => {
+            emitStatus('Cancellation request sent via Escape key.');
+          })
+          .catch((err: Error) => {
+            emitError(
+              `Failed to send cancellation request via Escape key: ${
+                err.message || 'Unknown error'
+              }`,
+            );
+          });
+      },
+      options: {
+        enableOnFormTags: true,
+        preventDefault: true,
+      } as RegisterHotkeyOptions,
+    },
+  ];
+
   const hotkeysConfig: HotkeyConfig[] = [
     ...menuItemHotkeys,
     ...toggleHotkeys,
-    ...passthroughEditHotkeys,
+    ...editHotkeys,
+    ...globalHotkeys,
   ];
   registerHotkeys(hotkeysConfig);
 };

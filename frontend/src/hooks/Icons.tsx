@@ -44,6 +44,7 @@ import {
   BiHistory,
   BiHome,
   BiInfoCircle,
+  BiListUl,
   BiLogoGithub,
   BiLogoTwitter,
   BiMoon,
@@ -74,6 +75,7 @@ import {
   FaHistory,
   FaHome,
   FaIndustry,
+  FaListAlt,
   FaMagic,
   FaMoon,
   FaPalette,
@@ -96,6 +98,7 @@ export type IconSet = {
   Khedra: IconType;
   Names: IconType;
   DalleDress: IconType;
+  ABIs: IconType;
   Settings: IconType;
   Wizard: IconType;
 
@@ -136,6 +139,7 @@ const faIcons: IconSet = {
   Khedra: FaIndustry,
   Names: FaUser,
   DalleDress: FaPalette,
+  ABIs: FaListAlt,
   Settings: FaCog,
   Wizard: FaHatWizard,
   Switch: FaRandom,
@@ -166,6 +170,7 @@ const biIcons: IconSet = {
   Khedra: BiBuildings,
   Names: BiUser,
   DalleDress: BiPalette,
+  ABIs: BiListUl,
   Settings: BiCog,
   Wizard: BiCog,
   Switch: BiTransfer,

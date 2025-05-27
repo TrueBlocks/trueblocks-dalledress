@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, createElement } from 'react';
 
 import { getIconSet } from './Icons';
 
@@ -22,58 +22,60 @@ export const useIcons = (
 
   // Create explicit named components for each icon to preserve component names in React DevTools
   // This properly types the components as React components that can be used in JSX
-  const Home: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Home, { size, ...props });
-  const About: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.About, { size, ...props });
-  const History: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.History, { size, ...props });
-  const Khedra: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Khedra, { size, ...props });
-  const Names: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Names, { size, ...props });
-  const DalleDress: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.DalleDress, { size, ...props });
-  const Settings: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Settings, { size, ...props });
-  const Wizard: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Wizard, { size, ...props });
-  const Switch: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Switch, { size, ...props });
-  const File: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.File, { size, ...props });
-  const Twitter: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Twitter, { size, ...props });
-  const Github: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Github, { size, ...props });
-  const Website: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Website, { size, ...props });
-  const Email: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Email, { size, ...props });
-  const Add: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Add, { size, ...props });
-  const Edit: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Edit, { size, ...props });
-  const Delete: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Delete, { size, ...props });
-  const Undelete: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Undelete, { size, ...props });
-  const Remove: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Remove, { size, ...props });
-  const Autoname: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Autoname, { size, ...props });
-  const ChevronLeft: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.ChevronLeft, { size, ...props });
-  const ChevronRight: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.ChevronRight, { size, ...props });
-  const ChevronUp: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.ChevronUp, { size, ...props });
-  const ChevronDown: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.ChevronDown, { size, ...props });
-  const Light: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Light, { size, ...props });
-  const Dark: React.FC<IconProps> = (props = {}) =>
-    React.createElement(iconSet.Dark, { size, ...props });
+  const Home: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Home, { size, ...props });
+  const About: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.About, { size, ...props });
+  const History: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.History, { size, ...props });
+  const Khedra: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Khedra, { size, ...props });
+  const Names: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Names, { size, ...props });
+  const DalleDress: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.DalleDress, { size, ...props });
+  const ABIs: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.ABIs, { size, ...props });
+  const Settings: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Settings, { size, ...props });
+  const Wizard: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Wizard, { size, ...props });
+  const Switch: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Switch, { size, ...props });
+  const File: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.File, { size, ...props });
+  const Twitter: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Twitter, { size, ...props });
+  const Github: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Github, { size, ...props });
+  const Website: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Website, { size, ...props });
+  const Email: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Email, { size, ...props });
+  const Add: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Add, { size, ...props });
+  const Edit: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Edit, { size, ...props });
+  const Delete: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Delete, { size, ...props });
+  const Undelete: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Undelete, { size, ...props });
+  const Remove: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Remove, { size, ...props });
+  const Autoname: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Autoname, { size, ...props });
+  const ChevronLeft: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.ChevronLeft, { size, ...props });
+  const ChevronRight: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.ChevronRight, { size, ...props });
+  const ChevronUp: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.ChevronUp, { size, ...props });
+  const ChevronDown: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.ChevronDown, { size, ...props });
+  const Light: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Light, { size, ...props });
+  const Dark: FC<IconProps> = (props = {}) =>
+    createElement(iconSet.Dark, { size, ...props });
 
   // Return all the components
   return {
@@ -83,6 +85,7 @@ export const useIcons = (
     Khedra,
     Names,
     DalleDress,
+    ABIs,
     Settings,
     Wizard,
     Switch,

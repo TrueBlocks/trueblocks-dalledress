@@ -749,6 +749,7 @@ export namespace types {
 		}
 	}
 	export class NamesCollection {
+	    app: any;
 	    map: Record<string, Name>;
 	    list: Name[];
 	    custom: Name[];
@@ -767,6 +768,7 @@ export namespace types {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.app = source["app"];
 	        this.map = this.convertValues(source["map"], Name, true);
 	        this.list = this.convertValues(source["list"], Name);
 	        this.custom = this.convertValues(source["custom"], Name);

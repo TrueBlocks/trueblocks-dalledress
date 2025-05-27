@@ -39,8 +39,8 @@ func main() {
 		Bind: []interface{}{
 			a,
 			&project.Project{},
+			// ADD_ROUTE
 			&types.NamesCollection{},
-			// ADD_ABIS_CODE
 			&types.AbisCollection{},
 		},
 		EnumBind: []interface{}{

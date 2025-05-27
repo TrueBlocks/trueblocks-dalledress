@@ -171,11 +171,10 @@ func (a *App) Startup(ctx context.Context) {
 func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 	if a.IsReady() {
+		// ADD_ROUTE
 		if err := a.names.LoadNames(nil); err != nil {
 			msgs.EmitError("Failed to load names database", err)
 		}
-
-		// ADD_ABIS_CODE
 		a.abis.EnsureInitialLoad()
 
 		if !a.Preferences.App.Bounds.IsValid() {
@@ -441,8 +440,8 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 
 func (a *App) Reload() error {
 	a.CancelAllStreams()
+	// ADD_ROUTE
 	a.names = a.names.ReloadNames()
-	// ADD_ABIS_CODE
 	a.abis.Reload()
 	lastView := a.GetAppPreferences().LastView
 	msgs.EmitMessage(msgs.EventRefresh, lastView)

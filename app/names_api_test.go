@@ -1,3 +1,4 @@
+// ADD_ROUTE
 package app
 
 import (
@@ -5,25 +6,8 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
-
-func setupTestApp() *App {
-	app := &App{
-		Preferences: &preferences.Preferences{
-			Org:  preferences.OrgPreferences{},
-			User: preferences.UserPreferences{},
-			App:  preferences.AppPreferences{},
-		},
-	}
-	// ADD_ABIS_CODE
-	app.names = types.NewNamesCollection(app)
-	app.abis = types.NewAbisCollection(app)
-	_ = app.Reload()
-	return app
-}
 
 func TestModifyName(t *testing.T) {
 	app := setupTestApp()

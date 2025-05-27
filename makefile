@@ -6,6 +6,9 @@ update:
 	@go mod tidy
 	@cd frontend ; yarn upgrade --latest ; cd -
 
+make_code:
+	@cd scripts ; go build -o /Users/jrush/source/make_code make_code.go
+
 lint:
 	@yarn lint
 

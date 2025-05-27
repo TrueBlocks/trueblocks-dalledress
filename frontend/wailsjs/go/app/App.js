@@ -75,13 +75,7 @@ export function FileSaveAs(arg1) {
 }
 
 export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetAbisPage'](
-    arg1,
-    arg2,
-    arg3,
-    arg4,
-    arg5,
-  );
+  return window['go']['app']['App']['GetAbisPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetAppId() {
@@ -117,13 +111,7 @@ export function GetMarkdown(arg1, arg2, arg3) {
 }
 
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetNamesPage'](
-    arg1,
-    arg2,
-    arg3,
-    arg4,
-    arg5,
-  );
+  return window['go']['app']['App']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetNodeStatus() {

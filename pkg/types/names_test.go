@@ -1,3 +1,4 @@
+// ADD_ROUTE
 package types
 
 import (

@@ -1,14 +1,9 @@
 import { SetInitialized } from '@app';
+import { About, DalleDress, History, Home, Khedra, Settings } from '@views';
 import {
-  // ABIS_CODE
+  // ADD_ROUTE
   Abis,
-  About,
-  DalleDress,
-  History,
-  Home,
-  Khedra,
   Names,
-  Settings,
 } from '@views';
 import { Wizard } from '@wizards';
 
@@ -61,15 +56,6 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    label: 'Names',
-    path: '/names',
-    position: 'top',
-    component: Names,
-    hotkey: 'mod+5',
-    altHotkey: 'alt+5',
-    type: 'navigation',
-  },
-  {
     label: 'DalleDress',
     path: '/dalledress',
     position: 'top',
@@ -78,7 +64,7 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+6',
     type: 'navigation',
   },
-  // ABIS_CODE
+  // ADD_ROUTE
   {
     label: 'ABIs',
     path: '/abis',
@@ -86,6 +72,15 @@ export const MenuItems: MenuItem[] = [
     component: Abis,
     hotkey: 'mod+7',
     altHotkey: 'alt+7',
+    type: 'navigation',
+  },
+  {
+    label: 'Names',
+    path: '/names',
+    position: 'top',
+    component: Names,
+    hotkey: 'mod+5',
+    altHotkey: 'alt+5',
     type: 'navigation',
   },
   {

@@ -100,7 +100,7 @@ export type IconSet = {
   Settings: IconType;
   Wizard: IconType;
 
-  // ABIS_CODE
+  // ADD_ROUTE
   Names: IconType;
   ABIs: IconType;
 
@@ -143,7 +143,7 @@ const faIcons: IconSet = {
   Settings: FaCog,
   Wizard: FaHatWizard,
 
-  // ABIS_CODE
+  // ADD_ROUTE
   Names: FaUser,
   ABIs: FaListAlt,
 
@@ -180,7 +180,7 @@ const biIcons: IconSet = {
   Settings: BiCog,
   Wizard: BiCog,
 
-  // ABIS_CODE
+  // ADD_ROUTE
   Names: BiUser,
   ABIs: BiListUl,
 

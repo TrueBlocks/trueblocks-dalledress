@@ -1,3 +1,4 @@
+// ADD_ROUTE
 Welcome to the **Names** view! This section provides information about managing names in your application.
 
 ## Tabs Overview

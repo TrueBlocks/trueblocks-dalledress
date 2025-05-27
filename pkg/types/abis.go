@@ -1,4 +1,4 @@
-// ABIS_CODE
+// ADD_ROUTE
 package types
 
 import (

@@ -34,6 +34,7 @@ export const useIcons = (
     createElement(iconSet.Names, { size, ...props });
   const DalleDress: FC<IconProps> = (props = {}) =>
     createElement(iconSet.DalleDress, { size, ...props });
+  // ABIS_CODE
   const ABIs: FC<IconProps> = (props = {}) =>
     createElement(iconSet.ABIs, { size, ...props });
   const Settings: FC<IconProps> = (props = {}) =>
@@ -85,6 +86,7 @@ export const useIcons = (
     Khedra,
     Names,
     DalleDress,
+    // ABIS_CODE
     ABIs,
     Settings,
     Wizard,

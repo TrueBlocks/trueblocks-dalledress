@@ -1,5 +1,6 @@
 import { SetInitialized } from '@app';
 import {
+  // ABIS_CODE
   Abis,
   About,
   DalleDress,
@@ -77,6 +78,7 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+6',
     type: 'navigation',
   },
+  // ABIS_CODE
   {
     label: 'ABIs',
     path: '/abis',

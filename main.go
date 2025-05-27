@@ -40,6 +40,7 @@ func main() {
 			a,
 			&project.Project{},
 			&types.NamesCollection{},
+			// ADD_ABIS_CODE
 			&types.AbisCollection{},
 		},
 		EnumBind: []interface{}{

@@ -98,6 +98,7 @@ export type IconSet = {
   Khedra: IconType;
   Names: IconType;
   DalleDress: IconType;
+  // ABIS_CODE
   ABIs: IconType;
   Settings: IconType;
   Wizard: IconType;
@@ -139,6 +140,7 @@ const faIcons: IconSet = {
   Khedra: FaIndustry,
   Names: FaUser,
   DalleDress: FaPalette,
+  // ABIS_CODE
   ABIs: FaListAlt,
   Settings: FaCog,
   Wizard: FaHatWizard,
@@ -170,6 +172,7 @@ const biIcons: IconSet = {
   Khedra: BiBuildings,
   Names: BiUser,
   DalleDress: BiPalette,
+  // ABIS_CODE
   ABIs: BiListUl,
   Settings: BiCog,
   Wizard: BiCog,

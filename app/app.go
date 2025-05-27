@@ -37,6 +37,7 @@ type App struct {
 	Preferences *preferences.Preferences
 	Projects    *project.Manager
 	chainList   *utils.ChainList
+	// ADD_ABIS_CODE
 	names       types.NamesCollection
 	abis        types.AbisCollection
 	meta        *coreTypes.MetaData
@@ -100,6 +101,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		renderCtxs: make(map[base.Address][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 	}
+	// ADD_ABIS_CODE
 	app.abis = types.NewAbisCollection(app)
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
@@ -173,6 +175,7 @@ func (a *App) DomReady(ctx context.Context) {
 			msgs.EmitError("Failed to load names database", err)
 		}
 
+		// ADD_ABIS_CODE
 		a.abis.EnsureInitialLoad()
 
 		if !a.Preferences.App.Bounds.IsValid() {
@@ -438,6 +441,7 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 
 func (a *App) Reload() error {
 	a.names = a.names.ReloadNames()
+	// ADD_ABIS_CODE
 	a.abis.Reload()
 	lastView := a.GetAppPreferences().LastView
 	msgs.EmitMessage(msgs.EventRefresh, lastView)

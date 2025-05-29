@@ -507,6 +507,15 @@ func TestReloadCancellation(t *testing.T) {
 		t.Error("RegisterCtx should return non-nil context")
 	}
 
+	// Simulate a reload operation by cancelling the context
+	cancelled, found := mockApp.Cancel(abisAddr)
+	if !found {
+		t.Error("Cancel should find the registered context")
+	}
+	if cancelled != 1 {
+		t.Errorf("Expected 1 cancelled context, got %d", cancelled)
+	}
+
 	// Verify the context was cancelled and removed
 	if len(mockApp.RegisteredCtxs) != 0 {
 		t.Errorf("Expected 0 registered contexts after reload, got %d", len(mockApp.RegisteredCtxs))

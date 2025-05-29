@@ -13,7 +13,3 @@ export function EnsureInitialLoad() {
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['types']['AbisCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
-
-export function Reload() {
-  return window['go']['types']['AbisCollection']['Reload']();
-}

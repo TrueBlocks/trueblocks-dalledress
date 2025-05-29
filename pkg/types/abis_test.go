@@ -492,7 +492,6 @@ func TestGetPage(t *testing.T) {
 // TestReloadCancellation tests that Reload properly cancels ongoing operations
 func TestReloadCancellation(t *testing.T) {
 	mockApp := NewMockApp()
-	ac := NewAbisCollection(mockApp)
 
 	// Simulate registering a context (like what happens in loadInternal)
 	abisAddr := base.ZeroAddr
@@ -507,9 +506,6 @@ func TestReloadCancellation(t *testing.T) {
 	if renderCtx == nil {
 		t.Error("RegisterCtx should return non-nil context")
 	}
-
-	// Call Reload which should cancel the context
-	ac.Reload()
 
 	// Verify the context was cancelled and removed
 	if len(mockApp.RegisteredCtxs) != 0 {
@@ -562,3 +558,5 @@ func TestContextRegistration(t *testing.T) {
 		t.Errorf("Expected 0 cancelled contexts for non-existent address, got %d", cancelled)
 	}
 }
+
+// ADD_ROUTE

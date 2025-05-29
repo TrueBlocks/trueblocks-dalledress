@@ -13,9 +13,12 @@ func setupTestApp() *App {
 			App:  preferences.AppPreferences{},
 		},
 	}
+
 	// ADD_ROUTE
 	app.names = types.NewNamesCollection(app)
 	app.abis = types.NewAbisCollection(app)
+	// ADD_ROUTE
+
 	_ = app.Reload()
 	return app
 }

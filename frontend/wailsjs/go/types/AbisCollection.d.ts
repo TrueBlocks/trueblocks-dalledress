@@ -8,5 +8,3 @@ export function Delete(arg1:string):Promise<void>;
 export function EnsureInitialLoad():Promise<void>;
 
 export function GetPage(arg1:string,arg2:number,arg3:number,arg4:sorting.SortDef,arg5:string):Promise<types.AbisPage>;
-
-export function Reload():Promise<void>;

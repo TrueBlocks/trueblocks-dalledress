@@ -120,33 +120,5 @@ export function mapNameToChips(name: types.Name): ChipItem[] {
     });
   }
 
-  // Add chips for tags, avoiding duplicates with boolean flags
-  if (name.tags && typeof name.tags === 'string' && name.tags.trim() !== '') {
-    const tagsArray = name.tags
-      .split(',')
-      .map((tag) => tag.trim())
-      .filter((tag) => tag !== '');
-
-    tagsArray.forEach((tag: string) => {
-      const lowerTag = tag.toLowerCase();
-      if (name.isErc20 && lowerTag.includes('erc20')) return;
-      if (
-        name.isErc721 &&
-        (lowerTag.includes('erc721') || lowerTag.includes('nft'))
-      )
-        return;
-      if (name.isPrefund && lowerTag.includes('prefund')) return;
-      if (name.isContract && lowerTag.includes('contract')) return;
-
-      chipItems.push({
-        id: `tag-${tag}`,
-        label: tag.substring(0, 8),
-        color: 'gray',
-        tooltip: `Tag: ${tag}`,
-        clickValue: tag, // Use the full tag for clickValue
-      });
-    });
-  }
-
   return chipItems;
 }

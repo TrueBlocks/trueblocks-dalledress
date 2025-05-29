@@ -9,3 +9,4 @@ Welcome to the **Abis** view! This section provides information about managing a
 4. **Events**: A list of all the events found in all the downloaded and known abis.
 
 For further assistance, please contact support.
+// ADD_ROUTE

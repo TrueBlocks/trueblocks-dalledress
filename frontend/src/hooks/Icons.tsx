@@ -103,6 +103,7 @@ export type IconSet = {
   // ADD_ROUTE
   Names: IconType;
   ABIs: IconType;
+  // ADD_ROUTE
 
   // File operations
   Switch: IconType;
@@ -146,6 +147,7 @@ const faIcons: IconSet = {
   // ADD_ROUTE
   Names: FaUser,
   ABIs: FaListAlt,
+  // ADD_ROUTE
 
   Switch: FaRandom,
   File: FaFile,
@@ -183,6 +185,7 @@ const biIcons: IconSet = {
   // ADD_ROUTE
   Names: BiUser,
   ABIs: BiListUl,
+  // ADD_ROUTE
 
   Switch: BiTransfer,
   File: BiFile,

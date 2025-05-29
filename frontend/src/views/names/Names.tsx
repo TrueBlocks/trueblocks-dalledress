@@ -698,6 +698,7 @@ export const Names = () => {
       createColumn('', autonameOverride),
       createColumn('address', { readOnly: true, width: '350px' }),
       createColumn('source', { sameLine: true }),
+      createColumn('tags'),
       createColumn('chips', chipsOverride),
       createColumn('actions', actionsOverride),
     ];
@@ -782,3 +783,4 @@ const getListTypeFromLabel = (label: string): ListType => {
 };
 
 export type ListType = 'all' | 'custom' | 'prefund' | 'regular' | 'baddress';
+// ADD_ROUTE

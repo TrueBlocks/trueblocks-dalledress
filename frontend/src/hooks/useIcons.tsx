@@ -42,6 +42,7 @@ export const useIcons = (
     createElement(iconSet.Names, { size, ...props });
   const ABIs: FC<IconProps> = (props = {}) =>
     createElement(iconSet.ABIs, { size, ...props });
+  // ADD_ROUTE
 
   const Switch: FC<IconProps> = (props = {}) =>
     createElement(iconSet.Switch, { size, ...props });
@@ -96,6 +97,7 @@ export const useIcons = (
     // ADD_ROUTE
     Names,
     ABIs,
+    // ADD_ROUTE
 
     Switch,
     File,

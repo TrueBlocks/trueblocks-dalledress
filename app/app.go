@@ -37,9 +37,10 @@ type App struct {
 	Preferences *preferences.Preferences
 	Projects    *project.Manager
 	chainList   *utils.ChainList
-	// ADD_ABIS_CODE
-	names             types.NamesCollection
-	abis              types.AbisCollection
+	// ADD_ROUTE
+	names  types.NamesCollection
+	abis   types.AbisCollection
+	// ADD_ROUTE
 	meta              *coreTypes.MetaData
 	fileServer        *fileserver.FileServer
 	locked            int32
@@ -103,6 +104,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	// ADD_ROUTE
 	app.names = types.NewNamesCollection(app)
 	app.abis = types.NewAbisCollection(app)
+	// ADD_ROUTE
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
@@ -176,6 +178,7 @@ func (a *App) DomReady(ctx context.Context) {
 			msgs.EmitError("Failed to load names database", err)
 		}
 		a.abis.EnsureInitialLoad()
+		// ADD_ROUTE
 
 		if !a.Preferences.App.Bounds.IsValid() {
 			// Sometimes, during development, the window size is corrupted
@@ -441,8 +444,10 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 func (a *App) Reload() error {
 	a.CancelAllStreams()
 	// ADD_ROUTE
+	a.Cancel(base.ZeroAddr)
 	a.names = a.names.ReloadNames()
-	a.abis.Reload()
+	a.abis = types.NewAbisCollection(a)
+	// ADD_ROUTE
 	lastView := a.GetAppPreferences().LastView
 	msgs.EmitMessage(msgs.EventRefresh, lastView)
 	msgs.EmitMessage(msgs.EventStatus, "The data was reloaded")

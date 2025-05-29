@@ -4,6 +4,7 @@ import {
   // ADD_ROUTE
   Abis,
   Names,
+  // ADD_ROUTE
 } from '@views';
 import { Wizard } from '@wizards';
 
@@ -83,6 +84,7 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+5',
     type: 'navigation',
   },
+  // ADD_ROUTE
   {
     label: 'Settings',
     path: '/settings',

@@ -32,3 +32,5 @@ func (a *App) DeleteAbi(address string) error {
 	a.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
 	return a.abis.Delete(address)
 }
+
+// ADD_ROUTE

@@ -42,6 +42,7 @@ func main() {
 			// ADD_ROUTE
 			&types.NamesCollection{},
 			&types.AbisCollection{},
+			// ADD_ROUTE
 		},
 		EnumBind: []interface{}{
 			msgs.AllMessages,

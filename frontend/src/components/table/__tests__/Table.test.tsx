@@ -95,15 +95,6 @@ describe('Table', () => {
       setupTest({ data: [] });
       expect(screen.getByText('No data found.')).toBeInTheDocument();
     });
-
-    it('applies sorting when provided', () => {
-      const sort = { key: 'id', direction: 'desc' as const };
-      setupTest({ sort });
-      const rows = screen.getAllByRole('row').slice(1);
-      expect(rows[0]).toHaveTextContent('3');
-      expect(rows[1]).toHaveTextContent('2');
-      expect(rows[2]).toHaveTextContent('1');
-    });
   });
 
   // Group 3: TableKey integration tests

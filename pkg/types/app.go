@@ -12,4 +12,5 @@ type App interface {
 	// TODO: in the app so we can cancel it later. I'm not sure this does that.
 	RegisterCtx(addr base.Address) *output.RenderCtx
 	Cancel(addr base.Address) (int, bool)
+	LogBackend(msg string)
 }

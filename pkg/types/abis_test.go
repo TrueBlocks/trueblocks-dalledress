@@ -20,6 +20,9 @@ type MockApp struct {
 	}
 }
 
+func (m *MockApp) LogBackend(msg string) {
+}
+
 func (m *MockApp) RegisterCtx(addr base.Address) *output.RenderCtx {
 	if m.RegisteredCtxs == nil {
 		m.RegisteredCtxs = make(map[base.Address]*output.RenderCtx)
@@ -61,7 +64,7 @@ func NewMockApp() *MockApp {
 func TestNewAbisCollection(t *testing.T) {
 	mockApp := NewMockApp()
 	ac := NewAbisCollection(mockApp)
-	if ac.isFullyLoaded { // Changed from ac.loaded to ac.isFullyLoaded
+	if ac.isLoaded { // Changed from ac.loaded to ac.isLoaded
 		t.Error("NewAbisCollection should not be fully loaded")
 	}
 	if ac.isLoading { // Added check for isLoading
@@ -85,7 +88,7 @@ func TestNewAbisCollection(t *testing.T) {
 func TestLoadAbis(t *testing.T) {
 	mockApp := NewMockApp()
 	ac := NewAbisCollection(mockApp)
-	if ac.isFullyLoaded { // Changed from ac.loaded
+	if ac.isLoaded { // Changed from ac.loaded
 		t.Fatalf("NewAbisCollection should not be loaded initially")
 	}
 
@@ -93,7 +96,7 @@ func TestLoadAbis(t *testing.T) {
 	// Note: EnsureInitialLoad is async. Testing its completion requires a different approach.
 	// For now, we'll assume it kicks off the process.
 	// We can check isLoading state.
-	// if !ac.isLoading && !ac.isFullyLoaded { // It might be fully loaded if there's nothing to load
+	// if !ac.isLoading && !ac.isLoaded { // It might be fully loaded if there's nothing to load
 	// 	// This check is tricky due to async nature.
 	// 	// t.Fatalf("AbisCollection should be loading or fully loaded after EnsureInitialLoad()")
 	// }
@@ -102,7 +105,7 @@ func TestLoadAbis(t *testing.T) {
 	// of loadInternal and the removal of the synchronous Load method.
 	// We cannot directly check ac.loaded or counts immediately after EnsureInitialLoad.
 	// We would need to:
-	// 1. Wait for isFullyLoaded to become true (with a timeout).
+	// 1. Wait for isLoaded to become true (with a timeout).
 	// 2. Or, inspect events emitted by MockApp.
 	// For now, this part of the test is effectively disabled or needs to be redesigned.
 	t.Skip("TestLoadAbis needs rework for asynchronous loading via EnsureInitialLoad and loadInternal.")
@@ -160,7 +163,7 @@ func TestGetPage(t *testing.T) {
 	// This bypasses the async loading for the purpose of testing GetPage's logic.
 	// In a real scenario, you'd wait or use a more complex setup.
 	ac.mutex.Lock()
-	ac.isFullyLoaded = true // Simulate loaded state
+	ac.isLoaded = true // Simulate loaded state
 	// Populate with some dummy data for testing pagination and filtering
 	ac.downloadedAbis = []coreTypes.Abi{
 		{Name: "TestABI1", Address: base.HexToAddress("0x1")},   // Use base.HexToAddress

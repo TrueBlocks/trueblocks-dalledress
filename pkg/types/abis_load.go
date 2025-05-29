@@ -15,7 +15,7 @@ var refreshRate = 31
 
 func (ac *AbisCollection) EnsureInitialLoad() {
 	ac.mutex.Lock()
-	if !ac.isFullyLoaded && !ac.isLoading {
+	if !ac.isLoaded && !ac.isLoading {
 		ac.isLoading = true
 		go ac.loadInternal()
 	}
@@ -36,7 +36,7 @@ func (ac *AbisCollection) loadInternal() {
 	ac.allFunctions = make([]coreTypes.Function, 0)
 	ac.allEvents = make([]coreTypes.Function, 0)
 	ac.seenEncodings = make(map[string]bool) // Reset deduplication map
-	ac.isFullyLoaded = false
+	ac.isLoaded = false
 	ac.expectedFunctions = 0
 	ac.expectedEvents = 0
 	ac.expectedDownloaded = 0
@@ -80,14 +80,14 @@ func (ac *AbisCollection) loadInternal() {
 	if len(addrMap) == 0 {
 		logger.Info(fmt.Sprintln("AbisCollection.loadInternal: no non-known ABI addresses to fetch detailed functions/events."))
 		ac.mutex.Lock()
-		ac.isFullyLoaded = true
+		ac.isLoaded = true
 		statusMsg := "ABI details loaded: No new items to fetch."
 		msgs.EmitStatus(statusMsg)
 		ac.App.EmitEvent(msgs.EventDataLoaded, DataLoadedPayload{
 			DataType:      "functions-events",
 			CurrentCount:  currentCount,
 			ExpectedTotal: ac.expectedFunctions + ac.expectedEvents,
-			IsFullyLoaded: true,
+			IsLoaded:      true,
 			Category:      "abis",
 		})
 		ac.mutex.Unlock()
@@ -167,7 +167,7 @@ ProcessingLoop:
 					DataType:      "functions-events",
 					CurrentCount:  currentCount,
 					ExpectedTotal: ac.expectedFunctions + ac.expectedEvents,
-					IsFullyLoaded: false,
+					IsLoaded:      false,
 					Category:      "abis",
 				}
 				ac.App.EmitEvent(msgs.EventDataLoaded, payload)
@@ -192,7 +192,7 @@ ProcessingLoop:
 	}
 
 	ac.mutex.Lock()
-	ac.isFullyLoaded = true
+	ac.isLoaded = true
 	finalCount := len(ac.allFunctions) + len(ac.allEvents)
 	finalStatus := fmt.Sprintf("ABI details fully loaded: %d functions/events.", finalCount)
 	msgs.EmitStatus(finalStatus)
@@ -200,9 +200,10 @@ ProcessingLoop:
 		DataType:      "functions-events",
 		CurrentCount:  finalCount,
 		ExpectedTotal: ac.expectedFunctions + ac.expectedEvents,
-		IsFullyLoaded: true,
+		IsLoaded:      true,
 		Category:      "abis",
 	})
 	ac.mutex.Unlock()
 }
+
 // ADD_ROUTE

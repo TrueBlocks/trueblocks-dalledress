@@ -13,7 +13,7 @@ type AbisCollection struct {
 	mutex sync.RWMutex
 
 	isLoading          bool
-	isFullyLoaded      bool
+	isLoaded           bool
 	expectedFunctions  int
 	expectedEvents     int
 	expectedDownloaded int

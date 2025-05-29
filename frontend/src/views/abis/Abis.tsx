@@ -59,8 +59,7 @@ export const Abis = () => {
 
   const [collectionIsLoading, setCollectionIsLoading] =
     useState<boolean>(false);
-  const [collectionIsFullyLoaded, setCollectionIsFullyLoaded] =
-    useState<boolean>(false);
+  const [collectionIsLoaded, setCollectionIsLoaded] = useState<boolean>(false);
 
   const tableKey = useMemo((): TableKey => {
     return { viewName: '/abis', tabName: listType };
@@ -82,7 +81,7 @@ export const Abis = () => {
       );
 
       setCollectionIsLoading(result.IsLoading);
-      setCollectionIsFullyLoaded(result.IsFullyLoaded);
+      setCollectionIsLoaded(result.IsLoaded);
 
       if (listType === 'Downloaded') {
         setDownloadedAbis((result.Abis as IndexedAbi[]) || []);
@@ -126,12 +125,12 @@ export const Abis = () => {
       const eventPayload = payload as types.DataLoadedPayload;
 
       if (eventPayload) {
-        setCollectionIsFullyLoaded(eventPayload.isFullyLoaded);
-        setCollectionIsLoading(!eventPayload.isFullyLoaded);
+        setCollectionIsLoaded(eventPayload.isLoaded);
+        setCollectionIsLoading(!eventPayload.isLoaded);
 
         if (
           eventPayload.dataType === 'functions-events' ||
-          !eventPayload.isFullyLoaded
+          !eventPayload.isLoaded
         ) {
           fetchData();
         }
@@ -154,7 +153,7 @@ export const Abis = () => {
 
   const handleRefresh = () => {
     setCollectionIsLoading(true);
-    setCollectionIsFullyLoaded(false);
+    setCollectionIsLoaded(false);
     Reload().then(() => {
       fetchData();
       emitStatus('Reloaded ABI data. Fetching fresh data...');
@@ -224,14 +223,14 @@ export const Abis = () => {
             setSelectedAddress(addressStr);
             setLocation(`/history/${addressStr}`);
           }}
-          disabled={!collectionIsFullyLoaded || isProcessing}
+          disabled={!collectionIsLoaded || isProcessing}
           title="View History"
           size="sm"
         />
         <Action
           icon={'Delete'}
           onClick={() => handleAction(addressStr, false)}
-          disabled={!collectionIsFullyLoaded || isProcessing}
+          disabled={!collectionIsLoaded || isProcessing}
           title={'Delete'}
           size="sm"
         />
@@ -347,7 +346,7 @@ export const Abis = () => {
             data={data}
             loading={loading}
             collectionIsLoading={collectionIsLoading}
-            collectionIsFullyLoaded={collectionIsFullyLoaded}
+            collectionIsLoaded={collectionIsLoaded}
             sort={currentSort}
             onSortChange={setCurrentSort}
             filter={currentFilter}

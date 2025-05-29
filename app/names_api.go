@@ -5,7 +5,13 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
+
+func (a *App) GetNamesPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) types.NamesPage {
+	return a.names.GetPage(listType, first, pageSize, sortKey, filter)
+}
 
 func (a *App) UpdateName(nameToEdit *coreTypes.Name) error {
 	if err := a.ModifyName("update", nameToEdit); err != nil {

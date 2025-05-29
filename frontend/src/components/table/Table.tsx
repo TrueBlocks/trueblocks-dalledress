@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
@@ -26,7 +26,7 @@ export interface TableProps<T extends Record<string, unknown>> {
     (value: unknown, values: Record<string, unknown>) => string | null
   >;
   collectionIsLoading?: boolean;
-  collectionIsFullyLoaded?: boolean;
+  collectionIsLoaded?: boolean;
 }
 
 export const Table = <T extends Record<string, unknown>>({
@@ -41,7 +41,7 @@ export const Table = <T extends Record<string, unknown>>({
   onSubmit,
   validate,
   collectionIsLoading,
-  collectionIsFullyLoaded,
+  collectionIsLoaded,
 }: TableProps<T>) => {
   const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
@@ -186,32 +186,6 @@ export const Table = <T extends Record<string, unknown>>({
     else setInternalFilter(v);
   };
 
-  const sortedData = useMemo(() => {
-    if (!sort || !sort.key) return data;
-    const col = columns.find((c) => c.key === sort.key);
-    if (!col) return data;
-    const getValue = col.accessor
-      ? (row: T) => (col.accessor ? col.accessor(row) : undefined)
-      : (row: T) => {
-          return col.key !== undefined &&
-            Object.prototype.hasOwnProperty.call(row, col.key)
-            ? (row as Record<string, unknown>)[col.key]
-            : undefined;
-        };
-    return [...data].sort((a, b) => {
-      const va = getValue(a);
-      const vb = getValue(b);
-      if (va == null && vb == null) return 0;
-      if (va == null) return sort.direction === 'asc' ? -1 : 1;
-      if (vb == null) return sort.direction === 'asc' ? 1 : -1;
-      if (typeof va === 'number' && typeof vb === 'number')
-        return sort.direction === 'asc' ? va - vb : vb - va;
-      return sort.direction === 'asc'
-        ? String(va).localeCompare(String(vb))
-        : String(vb).localeCompare(String(va));
-    });
-  }, [data, sort, columns]);
-
   const handleRowClick = (index: number) => {
     setSelectedRowIndex(index);
     setCurrentRowData(data[index] || null);
@@ -291,13 +265,13 @@ export const Table = <T extends Record<string, unknown>>({
               <>
                 <Body
                   columns={columns}
-                  data={sortedData}
+                  data={data}
                   selectedRowIndex={selectedRowIndex}
                   handleRowClick={handleRowClick}
                   noDataMessage="No data found."
                 />
                 {collectionIsLoading &&
-                  !collectionIsFullyLoaded &&
+                  !collectionIsLoaded &&
                   data.length > 0 && (
                     <tr>
                       <td

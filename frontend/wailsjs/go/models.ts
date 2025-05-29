@@ -607,9 +607,9 @@ export namespace types {
 	    Abis?: Abi[];
 	    Functions?: Function[];
 	    TotalItems: number;
-	    IsLoading: boolean;
-	    IsFullyLoaded: boolean;
 	    ExpectedTotal: number;
+	    IsLoading: boolean;
+	    IsLoaded: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new AbisPage(source);
@@ -621,9 +621,9 @@ export namespace types {
 	        this.Abis = this.convertValues(source["Abis"], Abi);
 	        this.Functions = this.convertValues(source["Functions"], Function);
 	        this.TotalItems = source["TotalItems"];
-	        this.IsLoading = source["IsLoading"];
-	        this.IsFullyLoaded = source["IsFullyLoaded"];
 	        this.ExpectedTotal = source["ExpectedTotal"];
+	        this.IsLoading = source["IsLoading"];
+	        this.IsLoaded = source["IsLoaded"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -648,7 +648,7 @@ export namespace types {
 	    dataType: string;
 	    currentCount: number;
 	    expectedTotal: number;
-	    isFullyLoaded: boolean;
+	    isLoaded: boolean;
 	    category?: string;
 	
 	    static createFrom(source: any = {}) {
@@ -660,7 +660,7 @@ export namespace types {
 	        this.dataType = source["dataType"];
 	        this.currentCount = source["currentCount"];
 	        this.expectedTotal = source["expectedTotal"];
-	        this.isFullyLoaded = source["isFullyLoaded"];
+	        this.isLoaded = source["isLoaded"];
 	        this.category = source["category"];
 	    }
 	}

@@ -24,7 +24,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
@@ -38,8 +37,8 @@ type App struct {
 	Projects    *project.Manager
 	chainList   *utils.ChainList
 	// ADD_ROUTE
-	names  types.NamesCollection
-	abis   types.AbisCollection
+	names types.NamesCollection
+	abis  types.AbisCollection
 	// ADD_ROUTE
 	meta              *coreTypes.MetaData
 	fileServer        *fileserver.FileServer
@@ -461,8 +460,4 @@ func (a *App) GetNodeStatus() *coreTypes.MetaData {
 
 	a.meta, _ = sdk.GetMetaData("gnosis")
 	return a.meta
-}
-
-func (a *App) GetNamesPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) types.NamesPage {
-	return a.names.GetPage(listType, first, pageSize, sortKey, filter)
 }

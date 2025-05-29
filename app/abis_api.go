@@ -2,12 +2,11 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types" // Import your new types package
-	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
+
+// We need these functions so that the App's abis records get handled
 
 func (a *App) GetAbisPage(
 	kind string,
@@ -19,17 +18,6 @@ func (a *App) GetAbisPage(
 }
 
 func (a *App) DeleteAbi(address string) error {
-	opts := sdk.AbisOptions{
-		Addrs: []string{address},
-		Globals: sdk.Globals{
-			Decache: true,
-		},
-	}
-	if _, _, err := opts.Abis(); err != nil {
-		return err
-	}
-
-	a.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
 	return a.abis.Delete(address)
 }
 

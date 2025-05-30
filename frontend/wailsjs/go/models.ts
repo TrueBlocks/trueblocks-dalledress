@@ -609,13 +609,13 @@ export namespace types {
 		}
 	}
 	export class AbisPage {
-	    Kind: ListKind;
-	    Abis?: Abi[];
-	    Functions?: Function[];
-	    TotalItems: number;
-	    ExpectedTotal: number;
-	    IsLoading: boolean;
-	    IsLoaded: boolean;
+	    kind: ListKind;
+	    abis?: Abi[];
+	    functions?: Function[];
+	    totalItems: number;
+	    expectedTotal: number;
+	    isLoading: boolean;
+	    isLoaded: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new AbisPage(source);
@@ -623,13 +623,13 @@ export namespace types {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Kind = source["Kind"];
-	        this.Abis = this.convertValues(source["Abis"], Abi);
-	        this.Functions = this.convertValues(source["Functions"], Function);
-	        this.TotalItems = source["TotalItems"];
-	        this.ExpectedTotal = source["ExpectedTotal"];
-	        this.IsLoading = source["IsLoading"];
-	        this.IsLoaded = source["IsLoaded"];
+	        this.kind = source["kind"];
+	        this.abis = this.convertValues(source["abis"], Abi);
+	        this.functions = this.convertValues(source["functions"], Function);
+	        this.totalItems = source["totalItems"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isLoading = source["isLoading"];
+	        this.isLoaded = source["isLoaded"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

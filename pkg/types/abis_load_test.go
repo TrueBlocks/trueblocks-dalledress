@@ -7,67 +7,67 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 )
 
-// TestEnsureInitialLoad tests the EnsureInitialLoad function from abis_load.go
-func TestEnsureInitialLoad(t *testing.T) {
+// TestLoadData tests the LoadData function from abis_load.go
+func TestLoadData(t *testing.T) {
 	mockApp := NewMockApp()
 	ac := NewAbisCollection(mockApp)
 
 	// Verify initial state
-	if ac.isLoaded {
-		t.Error("NewAbisCollection should not be fully loaded")
+	if ac.isKnownLoaded || ac.isDownloadedLoaded || ac.isFuncsLoaded || ac.isEventsLoaded {
+		t.Error("NewAbisCollection should not have any loaded flags set")
 	}
-	if ac.isLoading {
+	if ac.isLoading == 1 {
 		t.Error("NewAbisCollection should not be loading")
 	}
 
-	// Call EnsureInitialLoad
-	ac.EnsureInitialLoad()
+	// Call LoadData
+	ac.LoadData(AbisKnown)
 
-	// After calling EnsureInitialLoad, it should either be loading or loaded
+	// After calling LoadData, it should either be loading or loaded
 	// Note: Due to the asynchronous nature, we can't easily test completion without
 	// more complex synchronization mechanisms
 	ac.mutex.RLock()
-	isLoadingOrLoaded := ac.isLoading || ac.isLoaded
+	isLoadingOrLoaded := ac.isLoading == 1 || ac.isKnownLoaded
 	ac.mutex.RUnlock()
 
 	if !isLoadingOrLoaded {
-		t.Error("After EnsureInitialLoad, collection should be loading or loaded")
+		t.Error("After LoadData, collection should be loading or loaded")
 	}
 
-	// Test that calling EnsureInitialLoad again doesn't start another loading process
+	// Test that calling LoadData again doesn't start another loading process
 	// when already loading/loaded
-	prevState := ac.isLoading || ac.isLoaded
-	ac.EnsureInitialLoad()
+	prevState := ac.isLoading == 1 || ac.isKnownLoaded
+	ac.LoadData(AbisKnown)
 
 	ac.mutex.RLock()
-	newState := ac.isLoading || ac.isLoaded
+	newState := ac.isLoading == 1 || ac.isKnownLoaded
 	ac.mutex.RUnlock()
 
 	if !prevState || !newState {
-		t.Error("EnsureInitialLoad should not change state when already loading/loaded")
+		t.Error("LoadData should not change state when already loading/loaded")
 	}
 }
 
 func TestLoadAbis(t *testing.T) {
 	mockApp := NewMockApp()
 	ac := NewAbisCollection(mockApp)
-	if ac.isLoaded {
-		t.Fatalf("NewAbisCollection should not be loaded initially")
+	if ac.isDownloadedLoaded || ac.isKnownLoaded || ac.isFuncsLoaded || ac.isEventsLoaded {
+		t.Fatalf("NewAbisCollection should not have any loaded flags set initially")
 	}
 
-	ac.EnsureInitialLoad()
-	// Note: EnsureInitialLoad is async. Testing its completion requires a different approach.
+	ac.LoadData(AbisKnown)
+	// Note: LoadData is async. Testing its completion requires a different approach.
 	// For now, we'll assume it kicks off the process.
 	// We can check isLoading state.
 
 	// The rest of this test needs significant rework due to the asynchronous nature
 	// of loadInternal and the removal of the synchronous Load method.
-	// We cannot directly check ac.loaded or counts immediately after EnsureInitialLoad.
+	// We cannot directly check ac.loaded or counts immediately after LoadData.
 	// We would need to:
 	// 1. Wait for isLoaded to become true (with a timeout).
 	// 2. Or, inspect events emitted by MockApp.
 	// For now, this part of the test is effectively disabled or needs to be redesigned.
-	t.Skip("TestLoadAbis needs rework for asynchronous loading via EnsureInitialLoad and loadInternal.")
+	t.Skip("TestLoadAbis needs rework for asynchronous loading via LoadData and loadInternal.")
 }
 
 // TestReloadCancellation tests that Reload properly cancels ongoing operations

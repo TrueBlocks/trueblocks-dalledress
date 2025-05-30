@@ -270,23 +270,6 @@ export const Table = <T extends Record<string, unknown>>({
                   handleRowClick={handleRowClick}
                   noDataMessage="No data found."
                 />
-                {collectionIsLoading &&
-                  !collectionIsLoaded &&
-                  data.length > 0 && (
-                    <tr>
-                      <td
-                        colSpan={columns.length}
-                        style={{
-                          textAlign: 'center',
-                          padding: '10px',
-                          fontStyle: 'italic',
-                          color: 'var(--mantine-color-gray-6)',
-                        }}
-                      >
-                        Loading more items...
-                      </td>
-                    </tr>
-                  )}
               </>
             )}
           </tbody>

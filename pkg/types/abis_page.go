@@ -11,17 +11,17 @@ import (
 )
 
 type AbisPage struct {
-	Kind          ListKind             `json:"Kind"`
-	Abis          []coreTypes.Abi      `json:"Abis,omitempty"`
-	Functions     []coreTypes.Function `json:"Functions,omitempty"`
-	TotalItems    int                  `json:"TotalItems"`
-	ExpectedTotal int                  `json:"ExpectedTotal"`
-	IsLoading     bool                 `json:"IsLoading"`
-	IsLoaded      bool                 `json:"IsLoaded"`
+	Kind          ListKind             `json:"kind"`
+	Abis          []coreTypes.Abi      `json:"abis,omitempty"`
+	Functions     []coreTypes.Function `json:"functions,omitempty"`
+	TotalItems    int                  `json:"totalItems"`
+	ExpectedTotal int                  `json:"expectedTotal"`
+	IsLoading     bool                 `json:"isLoading"`
+	IsLoaded      bool                 `json:"isLoaded"`
 }
 
-func (ac *AbisCollection) GetPage(kind ListKind, first, pageSize int, sortDef *sorting.SortDef, filter string) (AbisPage, error) {
-	ac.EnsureInitialLoad()
+func (ac *AbisCollection) GetPage(listKind ListKind, first, pageSize int, sortDef *sorting.SortDef, filter string) (AbisPage, error) {
+	ac.LoadData(listKind)
 
 	ac.mutex.RLock()
 	defer ac.mutex.RUnlock()
@@ -31,7 +31,7 @@ func (ac *AbisCollection) GetPage(kind ListKind, first, pageSize int, sortDef *s
 	var sourceFunctions []coreTypes.Function
 	var expectedTotal int
 
-	switch kind {
+	switch listKind {
 	case "Downloaded":
 		sourceAbis = ac.downloadedAbis
 		expectedTotal = ac.expectedDownloaded
@@ -45,19 +45,31 @@ func (ac *AbisCollection) GetPage(kind ListKind, first, pageSize int, sortDef *s
 		sourceFunctions = ac.allEvents
 		expectedTotal = ac.expectedEvents
 	default:
-		return AbisPage{}, fmt.Errorf("unknown ABI page kind: %s", kind)
+		return AbisPage{}, fmt.Errorf("unknown ABI page kind: %s", listKind)
+	}
+
+	var isLoaded bool
+	switch listKind {
+	case "Downloaded":
+		isLoaded = ac.isDownloadedLoaded
+	case "Known":
+		isLoaded = ac.isKnownLoaded
+	case "Functions":
+		isLoaded = ac.isFuncsLoaded
+	case "Events":
+		isLoaded = ac.isEventsLoaded
 	}
 
 	page := AbisPage{
-		Kind:          kind,
-		IsLoading:     ac.isLoading,
-		IsLoaded:      ac.isLoaded,
+		Kind:          listKind,
+		IsLoading:     ac.isLoading == 1,
+		IsLoaded:      isLoaded,
 		ExpectedTotal: expectedTotal,
 	}
 	filter = strings.ToLower(filter)
 	sortSpec := sorting.ConvertToSortSpec(sortDef)
 
-	switch kind {
+	switch listKind {
 	case "Downloaded", "Known":
 		filteredAbis := make([]coreTypes.Abi, 0)
 		for _, item := range sourceAbis {

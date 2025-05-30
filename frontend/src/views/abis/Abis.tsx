@@ -19,28 +19,15 @@ import { Log, useEmitters } from '@utils';
 import { useLocation } from 'wouter';
 
 import './Abis.css';
+import { AbiRow, IndexedAbi, IndexedFunction, TableConfigProps } from './Types';
 
-type IndexedAbi = types.Abi & {
-  [key: string]: unknown;
-};
-
-type IndexedFunction = types.Function & {
-  [key: string]: unknown;
-};
-
+//--------------------------------------------------------------------
 export const Abis = () => {
-  // Example usage of composable CSS column sizing:
-  // Basic: width: 'col-address'           -> 340px fixed width
-  // Basic: width: 'col-min'              -> min-content
-  // Composed: width: 'col-base-address col-min'    -> Start with 340px, but shrink to min-content
-  // Composed: width: 'col-base-sm col-fit'         -> Start with 100px, but fit to content
-  // Composed: width: 'col-base-lg col-expand'      -> Start with 160px, but expand to fill
-
   const { emitStatus, emitError } = useEmitters();
   const { lastTab, setSelectedAddress } = useAppContext();
   const [, setLocation] = useLocation();
 
-  const [listType, setListType] = useState<types.ListKind>(
+  const [listKind, setListKind] = useState<types.ListKind>(
     (lastTab['/abis'] as types.ListKind) || types.ListKind.DOWNLOADED,
   );
   const [downloadedAbis, setDownloadedAbis] = useState<IndexedAbi[]>([]);
@@ -54,14 +41,14 @@ export const Abis = () => {
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
-
-  const [collectionIsLoading, setCollectionIsLoading] =
-    useState<boolean>(false);
-  const [collectionIsLoaded, setCollectionIsLoaded] = useState<boolean>(false);
+  const [isDownloadedLoaded, setIsDownloadedLoaded] = useState<boolean>(false);
+  const [isKnownLoaded, setIsKnownLoaded] = useState<boolean>(false);
+  const [isFuncsLoaded, setIsFuncsLoaded] = useState<boolean>(false);
+  const [isEventsLoaded, setIsEventsLoaded] = useState<boolean>(false);
 
   const tableKey = useMemo((): TableKey => {
-    return { viewName: '/abis', tabName: listType };
-  }, [listType]);
+    return { viewName: '/abis', tabName: listKind };
+  }, [listKind]);
 
   const { pagination, setTotalItems } = usePagination(tableKey);
 
@@ -71,51 +58,66 @@ export const Abis = () => {
     try {
       const sortArgument = currentSort === null ? undefined : currentSort;
       const result = await GetAbisPage(
-        listType,
+        listKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sortArgument as sorting.SortDef,
         currentFilter,
       );
 
-      setCollectionIsLoading(result.IsLoading);
-      setCollectionIsLoaded(result.IsLoaded);
-
-      if (listType === 'Downloaded') {
-        setDownloadedAbis((result.Abis as IndexedAbi[]) || []);
-      } else if (listType === 'Known') {
-        setKnownAbis((result.Abis as IndexedAbi[]) || []);
-      } else if (listType === 'Functions') {
-        setFunctions((result.Functions as IndexedFunction[]) || []);
-      } else if (listType === 'Events') {
-        setEvents((result.Functions as IndexedFunction[]) || []);
+      switch (listKind) {
+        case types.ListKind.DOWNLOADED:
+          setIsDownloadedLoaded(result.isLoaded);
+          break;
+        case types.ListKind.KNOWN:
+          setIsKnownLoaded(result.isLoaded);
+          break;
+        case types.ListKind.FUNCTIONS:
+          setIsFuncsLoaded(result.isLoaded);
+          break;
+        case types.ListKind.EVENTS:
+          setIsEventsLoaded(result.isLoaded);
+          break;
       }
-      setTotalItems(result.TotalItems || 0);
-      // emitStatus(
-      //   `Fetched ${result.Abis?.length || result.Functions?.length} ${listType} items for current page.`,
-      // );
+
+      switch (listKind) {
+        case types.ListKind.DOWNLOADED:
+          setDownloadedAbis((result.abis as IndexedAbi[]) || []);
+          break;
+        case types.ListKind.KNOWN:
+          setKnownAbis((result.abis as IndexedAbi[]) || []);
+          break;
+        case types.ListKind.FUNCTIONS:
+          setFunctions((result.functions as IndexedFunction[]) || []);
+          break;
+        case types.ListKind.EVENTS:
+          setEvents((result.functions as IndexedFunction[]) || []);
+          break;
+        default:
+          throw new Error(`Unknown list kind: ${listKind}`);
+      }
+      setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
       const e = err as Error;
       setError(e);
-      emitError(`${e.message} Failed to fetch ${listType}`);
-      Log(`Error fetching ${listType}: ${e}`);
+      emitError(`${e.message} Failed to fetch ${listKind}`);
+      Log(`Error fetching ${listKind}: ${e}`);
     } finally {
       setLoading(false);
     }
   }, [
     currentSort,
-    listType,
+    listKind,
     pagination.currentPage,
     pagination.pageSize,
     currentFilter,
-    // emitStatus,
     setTotalItems,
     emitError,
   ]);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, listType]);
+  }, [fetchData, listKind]);
 
   useEffect(() => {
     const eventName = msgs.EventType.DATA_LOADED;
@@ -123,8 +125,21 @@ export const Abis = () => {
       const eventPayload = payload as types.DataLoadedPayload;
 
       if (eventPayload) {
-        setCollectionIsLoaded(eventPayload.isLoaded);
-        setCollectionIsLoading(!eventPayload.isLoaded);
+        setLoading(!eventPayload.isLoaded);
+        switch (listKind) {
+          case types.ListKind.DOWNLOADED:
+            setIsDownloadedLoaded(eventPayload.isLoaded);
+            break;
+          case types.ListKind.KNOWN:
+            setIsKnownLoaded(eventPayload.isLoaded);
+            break;
+          case types.ListKind.FUNCTIONS:
+            setIsFuncsLoaded(eventPayload.isLoaded);
+            break;
+          case types.ListKind.EVENTS:
+            setIsEventsLoaded(eventPayload.isLoaded);
+            break;
+        }
 
         if (
           eventPayload.dataType === 'functions-events' ||
@@ -140,34 +155,37 @@ export const Abis = () => {
         unlisten();
       }
     };
-  }, [fetchData]);
+  }, [fetchData, listKind]);
 
   useEffect(() => {
     const currentTabLabel = lastTab['/abis'] as types.ListKind | undefined;
-    if (currentTabLabel && currentTabLabel !== listType) {
-      setListType(currentTabLabel);
+    if (currentTabLabel && currentTabLabel !== listKind) {
+      setListKind(currentTabLabel);
     }
-  }, [lastTab, listType]);
+  }, [lastTab, listKind]);
 
-  const handleRefresh = () => {
-    setCollectionIsLoading(true);
-    setCollectionIsLoaded(false);
-    Reload().then(() => {
-      fetchData();
-      emitStatus('Reloaded ABI data. Fetching fresh data...');
-    });
-  };
+  useHotkeys([
+    [
+      'mod+r',
+      () => {
+        setLoading(true);
+        setIsDownloadedLoaded(false);
+        setIsKnownLoaded(false);
+        setIsFuncsLoaded(false);
+        setIsEventsLoaded(false);
+        Reload().then(() => {
+          fetchData();
+          emitStatus('Reloaded ABI data. Fetching fresh data...');
+        });
+      },
+    ],
+  ]);
 
-  useHotkeys([['mod+r', handleRefresh]]);
-
-  type IndexableAbi = types.Abi & { [key: string]: unknown };
   const handleAction = (address: string, _isDeleted: boolean) => {
     const addressStr = address;
     setProcessingAddresses((prev) => new Set(prev).add(addressStr));
     try {
       const original = [...downloadedAbis];
-
-      // Optimistic UI Update - remove the deleted item
       const optimisticNames = original.filter((abi) => {
         const nameAddress =
           typeof abi.address === 'string' ? abi.address : String(abi.address);
@@ -180,15 +198,15 @@ export const Abis = () => {
           // If API call is successful, refresh the data to get the definitive state
           const sortArgument = currentSort === null ? undefined : currentSort;
           const result = await GetAbisPage(
-            listType,
+            listKind,
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
             sortArgument as sorting.SortDef,
             currentFilter,
           );
 
-          setDownloadedAbis((result.Abis || []) as IndexableAbi[]);
-          setTotalItems(result.ExpectedTotal || 0);
+          setDownloadedAbis((result.abis || []) as IndexedAbi[]);
+          setTotalItems(result.expectedTotal || 0);
 
           const action = 'deleted';
           emitStatus(`Address ${addressStr} was ${action} successfully`);
@@ -209,34 +227,146 @@ export const Abis = () => {
     }
   };
 
-  const renderActions = (item: types.Abi | types.Function) => {
-    const addressStr = 'address' in item ? item.address.toString() : '';
-    const isProcessing = processingAddresses.has(addressStr);
+  const handleTableSubmit = (formData: Record<string, unknown>) => {
+    Log(`Table submitted: ${formData}`);
+  };
+
+  const renderTable = (listKind: types.ListKind) => {
+    const config: TableConfigProps = {
+      downloadedAbis,
+      knownAbis,
+      functions,
+      events,
+      isDownloadedLoaded,
+      isKnownLoaded,
+      isFuncsLoaded,
+      isEventsLoaded,
+      processingAddresses,
+      setSelectedAddress,
+      setLocation,
+      handleAction,
+    };
+
+    const { data, columns } = getTableConfig(listKind, config);
 
     return (
-      <Group gap="xs">
-        <Action
-          icon="History"
-          onClick={() => {
-            setSelectedAddress(addressStr);
-            setLocation(`/history/${addressStr}`);
-          }}
-          disabled={!collectionIsLoaded || isProcessing}
-          title="View History"
-          size="sm"
-        />
-        <Action
-          icon={'Delete'}
-          onClick={() => handleAction(addressStr, false)}
-          disabled={!collectionIsLoaded || isProcessing}
-          title={'Delete'}
-          size="sm"
-        />
-      </Group>
+      <TableProvider>
+        <div className="tableContainer">
+          <Table<AbiRow>
+            columns={columns}
+            data={data}
+            loading={loading}
+            collectionIsLoading={loading}
+            collectionIsLoaded={
+              listKind === types.ListKind.DOWNLOADED
+                ? isDownloadedLoaded
+                : listKind === types.ListKind.KNOWN
+                  ? isKnownLoaded
+                  : listKind === types.ListKind.FUNCTIONS
+                    ? isFuncsLoaded
+                    : isEventsLoaded
+            }
+            sort={currentSort}
+            onSortChange={setCurrentSort}
+            filter={currentFilter}
+            onFilterChange={setCurrentFilter}
+            tableKey={tableKey}
+            onSubmit={handleTableSubmit}
+          />
+        </div>
+      </TableProvider>
     );
   };
 
-  let abiColumns: FormField<types.Abi>[] = [
+  const createOneTab = (listKind: types.ListKind) => {
+    return {
+      label: listKind,
+      value: listKind,
+      content: renderTable(listKind),
+    };
+  };
+
+  const tabs = [
+    createOneTab(types.ListKind.DOWNLOADED),
+    createOneTab(types.ListKind.KNOWN),
+    createOneTab(types.ListKind.FUNCTIONS),
+    createOneTab(types.ListKind.EVENTS),
+  ];
+
+  return (
+    <div className="abisView">
+      <TabView tabs={tabs} route="/abis" />
+      {error && (
+        <div className="error-message-placeholder">
+          <h3>{`Error fetching ${listKind}`}</h3>
+          <p>{error.message}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+//--------------------------------------------------------------------
+const getTableConfig = (
+  listKind: types.ListKind,
+  config: TableConfigProps,
+): {
+  data: AbiRow[];
+  columns: FormField<AbiRow>[];
+} => {
+  const abiColumns = createAbiColumns(
+    listKind,
+    listKind === types.ListKind.DOWNLOADED
+      ? config.isDownloadedLoaded
+      : listKind === types.ListKind.KNOWN
+        ? config.isKnownLoaded
+        : listKind === types.ListKind.FUNCTIONS
+          ? config.isFuncsLoaded
+          : config.isEventsLoaded,
+    config.processingAddresses,
+    config.setSelectedAddress,
+    config.setLocation,
+    config.handleAction,
+  ) as FormField<AbiRow>[];
+
+  const funcColumns = createFunctionColumns() as FormField<AbiRow>[];
+
+  switch (listKind) {
+    case types.ListKind.FUNCTIONS:
+      return {
+        data: config.functions as AbiRow[],
+        columns: funcColumns,
+      };
+    case types.ListKind.EVENTS:
+      return {
+        data: config.events as AbiRow[],
+        columns: funcColumns,
+      };
+    case types.ListKind.KNOWN:
+      return {
+        data: config.knownAbis as AbiRow[],
+        columns: abiColumns,
+      };
+    case types.ListKind.DOWNLOADED:
+    // fall through
+    default:
+      return {
+        data: config.downloadedAbis as AbiRow[],
+        columns: abiColumns,
+      };
+  }
+};
+
+//--------------------------------------------------------------------
+const createAbiColumns = (
+  listKind: types.ListKind,
+  collectionIsLoaded: boolean,
+  processingAddresses: Set<string>,
+  setSelectedAddress: (address: string) => void,
+  setLocation: (path: string) => void,
+  handleAction: (address: string, isDeleted: boolean) => void,
+): FormField<types.Abi>[] => {
+  const baseColumns: FormField<types.Abi>[] = [
     {
       key: 'address',
       header: 'Address',
@@ -281,18 +411,34 @@ export const Abis = () => {
       width: 'col-date',
     },
   ];
-  if (listType === 'Known') {
-    abiColumns = abiColumns.slice(1);
-  } else {
-    abiColumns.push({
-      key: 'actions',
-      header: 'Actions',
-      width: 'col-actions',
-      render: (row: types.Abi) => renderActions(row),
-    });
-  }
 
-  const functionColumns: FormField<types.Function>[] = [
+  if (listKind === 'Known') {
+    return baseColumns.slice(1);
+  } else {
+    return [
+      ...baseColumns,
+      {
+        key: 'actions',
+        header: 'Actions',
+        width: 'col-actions',
+        render: (row: types.Abi) => {
+          return renderActions(
+            row,
+            collectionIsLoaded,
+            processingAddresses,
+            setSelectedAddress,
+            setLocation,
+            handleAction,
+          );
+        },
+      },
+    ];
+  }
+};
+
+//--------------------------------------------------------------------
+const createFunctionColumns = (): FormField<types.Function>[] => {
+  return [
     {
       key: 'encoding',
       header: 'Encoding',
@@ -310,76 +456,40 @@ export const Abis = () => {
       sortable: true,
     },
   ];
+};
 
-  type TableRow = (types.Abi | types.Function) & {
-    [key: string]: unknown;
-  };
-
-  const handleTableSubmit = (formData: Record<string, unknown>) => {
-    Log(`Table submitted: ${formData}`);
-  };
-
-  const renderTable = (listKind: types.ListKind) => {
-    let data: TableRow[] = [];
-    let columns: FormField<TableRow>[] = [];
-    if (listKind === 'Downloaded') {
-      data = downloadedAbis as TableRow[];
-      columns = abiColumns as FormField<TableRow>[];
-    } else if (listKind === 'Known') {
-      data = knownAbis as TableRow[];
-      columns = abiColumns as FormField<TableRow>[];
-    } else if (listKind === 'Functions') {
-      data = functions as TableRow[];
-      columns = functionColumns as FormField<TableRow>[];
-    } else if (listKind === 'Events') {
-      data = events as TableRow[];
-      columns = functionColumns as FormField<TableRow>[];
-    }
-
-    return (
-      <TableProvider>
-        <div className="tableContainer">
-          <Table<TableRow>
-            columns={columns}
-            data={data}
-            loading={loading}
-            collectionIsLoading={collectionIsLoading}
-            collectionIsLoaded={collectionIsLoaded}
-            sort={currentSort}
-            onSortChange={setCurrentSort}
-            filter={currentFilter}
-            onFilterChange={setCurrentFilter}
-            tableKey={tableKey}
-            onSubmit={handleTableSubmit}
-          />
-        </div>
-      </TableProvider>
-    );
-  };
-
-  const createTab = (value: types.ListKind) => ({
-    label: value as string,
-    value: value,
-    content: renderTable(value),
-  });
-
-  const tabsConfig = [
-    createTab(types.ListKind.DOWNLOADED),
-    createTab(types.ListKind.KNOWN),
-    createTab(types.ListKind.FUNCTIONS),
-    createTab(types.ListKind.EVENTS),
-  ];
-
+//--------------------------------------------------------------------
+const renderActions = (
+  item: types.Abi | types.Function,
+  collectionIsLoaded: boolean,
+  processingAddresses: Set<string>,
+  setSelectedAddress: (address: string) => void,
+  setLocation: (path: string) => void,
+  handleAction: (address: string, isDeleted: boolean) => void,
+): React.ReactNode => {
+  const addressStr = 'address' in item ? item.address.toString() : '';
+  const isProcessing = processingAddresses.has(addressStr);
   return (
-    <div className="abisView">
-      <TabView tabs={tabsConfig} route="/abis" />
-      {error && (
-        <div className="error-message-placeholder">
-          <h3>{`Error fetching ${listType}`}</h3>
-          <p>{error.message}</p>
-        </div>
-      )}
-    </div>
+    <Group gap="xs">
+      <Action
+        icon="History"
+        onClick={() => {
+          setSelectedAddress(addressStr);
+          setLocation(`/history/${addressStr}`);
+        }}
+        disabled={!collectionIsLoaded || isProcessing}
+        title="View History"
+        size="sm"
+      />
+      <Action
+        icon={'Delete'}
+        onClick={() => handleAction(addressStr, false)}
+        disabled={!collectionIsLoaded || isProcessing}
+        title={'Delete'}
+        size="sm"
+      />
+    </Group>
   );
 };
+
 // ADD_ROUTE

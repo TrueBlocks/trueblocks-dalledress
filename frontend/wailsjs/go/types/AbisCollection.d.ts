@@ -3,8 +3,12 @@
 import {types} from '../models';
 import {sorting} from '../models';
 
+export function ClearCache(arg1:types.ListKind,arg2:boolean):Promise<void>;
+
 export function Delete(arg1:string):Promise<void>;
 
-export function EnsureInitialLoad():Promise<void>;
-
 export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sorting.SortDef,arg5:string):Promise<types.AbisPage>;
+
+export function LoadData(arg1:types.ListKind):Promise<void>;
+
+export function NeedsUpdate(arg1:types.ListKind):Promise<boolean>;

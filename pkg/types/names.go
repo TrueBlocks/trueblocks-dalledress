@@ -57,36 +57,36 @@ type NamesPage struct {
 }
 
 // GetSelectedTag returns the currently selected tag for a list type
-func (n *NamesCollection) GetSelectedTag(listType string) string {
+func (n *NamesCollection) GetSelectedTag(listKind string) string {
 	if n.selectedTags == nil {
 		n.selectedTags = make(map[string]string)
 	}
 
-	return n.selectedTags[listType]
+	return n.selectedTags[listKind]
 }
 
 // SetSelectedTag sets the selected tag for a specific list type
-func (n *NamesCollection) SetSelectedTag(listType string, tag string) {
+func (n *NamesCollection) SetSelectedTag(listKind string, tag string) {
 	if n.selectedTags == nil {
 		n.selectedTags = make(map[string]string)
 	}
 
 	if tag == "" {
-		delete(n.selectedTags, listType)
+		delete(n.selectedTags, listKind)
 	} else {
-		n.selectedTags[listType] = tag
+		n.selectedTags[listKind] = tag
 	}
 }
 
 // ClearSelectedTag clears the selected tag for a specific list type
-func (n *NamesCollection) ClearSelectedTag(listType string) {
+func (n *NamesCollection) ClearSelectedTag(listKind string) {
 	if n.selectedTags != nil {
-		delete(n.selectedTags, listType)
+		delete(n.selectedTags, listKind)
 	}
 }
 
 // GetPage returns a page of names for the given list type and the total count.
-func (n *NamesCollection) GetPage(listType string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
+func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
 	if len(n.List) == 0 {
 		if err := n.LoadNames(nil); err != nil {
 			return NamesPage{Names: nil, Total: 0, Tags: []string{}}
@@ -97,7 +97,7 @@ func (n *NamesCollection) GetPage(listType string, first, pageSize int, sortKey 
 	defer namesMutex.Unlock()
 
 	var list []*types.Name
-	switch listType {
+	switch listKind {
 	case "custom":
 		list = n.Custom
 	case "prefund":
@@ -115,7 +115,7 @@ func (n *NamesCollection) GetPage(listType string, first, pageSize int, sortKey 
 		filters = append(filters, filter)
 	}
 
-	if selectedTag := n.GetSelectedTag(listType); selectedTag != "" {
+	if selectedTag := n.GetSelectedTag(listKind); selectedTag != "" {
 		filters = append(filters, selectedTag)
 	}
 
@@ -160,7 +160,7 @@ func (n *NamesCollection) GetPage(listType string, first, pageSize int, sortKey 
 	total := len(list)
 	if total == 0 || first >= total {
 		var tags []string
-		switch listType {
+		switch listKind {
 		case "custom":
 			tags = n.CustomTags
 		case "prefund":
@@ -199,7 +199,7 @@ func (n *NamesCollection) GetPage(listType string, first, pageSize int, sortKey 
 	}
 
 	var tags []string
-	switch listType {
+	switch listKind {
 	case "custom":
 		tags = n.CustomTags
 	case "prefund":

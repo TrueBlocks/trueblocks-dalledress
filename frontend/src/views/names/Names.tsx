@@ -62,7 +62,7 @@ export const Names = () => {
   );
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const [listType, setListType] = useState<ListType>(
+  const [listKind, setListKind] = useState<ListType>(
     getListTypeFromLabel(lastTab['/names'] || ''),
   );
   const [showTagsView, setShowTagsView] = useState<Record<string, boolean>>({
@@ -84,9 +84,9 @@ export const Names = () => {
   const tableKey = useMemo<TableKey>(
     () => ({
       viewName: '/names',
-      tabName: listType,
+      tabName: listKind,
     }),
-    [listType],
+    [listKind],
   );
 
   const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
@@ -103,7 +103,7 @@ export const Names = () => {
   useEffect(() => {
     const fetchSelectedTag = async () => {
       try {
-        GetSelectedTag(listType).then((tag) => {
+        GetSelectedTag(listKind).then((tag) => {
           setSelectedTag(tag || null);
         });
       } catch (err) {
@@ -112,14 +112,14 @@ export const Names = () => {
       }
     };
     fetchSelectedTag();
-  }, [listType]);
+  }, [listKind]);
 
   useEffect(() => {
     const loadNames = async () => {
       setLoading(true);
-      // Log(`Names:loadNames ${listType}`);
+      // Log(`Names:loadNames ${listKind}`);
       GetNamesPage(
-        listType,
+        listKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort as sorting.SortDef,
@@ -147,7 +147,7 @@ export const Names = () => {
     });
     return unsubscribe;
   }, [
-    listType,
+    listKind,
     pagination.currentPage,
     pagination.pageSize,
     sort,
@@ -160,7 +160,7 @@ export const Names = () => {
   useEffect(() => {
     const currentTabLabel = lastTab['/names'] || '';
     const newListType = getListTypeFromLabel(currentTabLabel);
-    setListType(newListType);
+    setListKind(newListType);
 
     // Fetch the selected tag for the new list type when changing tabs
     const fetchSelectedTag = async () => {
@@ -293,13 +293,13 @@ export const Names = () => {
     try {
       if (tag) {
         try {
-          SetSelectedTag(listType, tag).then(() => {});
+          SetSelectedTag(listKind, tag).then(() => {});
         } catch (e) {
           Log(`Error in SetSelectedTag: ${e}`);
         }
       } else {
         try {
-          ClearSelectedTag(listType).then(() => {});
+          ClearSelectedTag(listKind).then(() => {});
         } catch (e) {
           Log(`Error in ClearSelectedTag: ${e}`);
         }
@@ -363,7 +363,7 @@ export const Names = () => {
       .then(() => {
         // 4. If UpdateName is successful, call GetNamesPage
         return GetNamesPage(
-          listType,
+          listKind,
           pagination.currentPage * pagination.pageSize,
           pagination.pageSize,
           sort as sorting.SortDef,
@@ -434,7 +434,7 @@ export const Names = () => {
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
-              listType,
+              listKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort as sorting.SortDef,
@@ -489,7 +489,7 @@ export const Names = () => {
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
-              listType,
+              listKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort as sorting.SortDef,
@@ -532,7 +532,7 @@ export const Names = () => {
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
-              listType,
+              listKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort as sorting.SortDef,

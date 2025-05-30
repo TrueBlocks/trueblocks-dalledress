@@ -1,4 +1,5 @@
 import React, {
+  ReactNode,
   createContext,
   useCallback,
   useContext,
@@ -29,9 +30,7 @@ const TableContext = createContext<TableContextProps>({
 });
 
 // TableProvider provides the table context to its children, managing focus and selection state.
-export const TableProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const TableProvider = ({ children }: { children: ReactNode }) => {
   const [focusState, setFocusState] = useState<TableFocusState>('table');
   const [selectedRowIndex, setSelectedRowIndex] = useState<number>(-1);
   const tableRef = useRef<HTMLTableElement | null>(null);

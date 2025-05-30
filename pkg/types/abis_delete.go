@@ -24,7 +24,7 @@ func (ac *AbisCollection) Delete(address string) error {
 	for i, abi := range ac.downloadedAbis {
 		if abi.Address.Hex() == address {
 			ac.downloadedAbis = append(ac.downloadedAbis[:i], ac.downloadedAbis[i+1:]...)
-			msgs.EmitStatus(fmt.Sprintf("Deleted downloaded ABI for address: %s", address))
+			msgs.EmitStatus(fmt.Sprintf("Deleted ABI for address: %s", address))
 			ac.App.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
 			return nil
 		}

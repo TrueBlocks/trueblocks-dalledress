@@ -460,6 +460,12 @@ export namespace sync {
 
 export namespace types {
 	
+	export enum ListKind {
+	    DOWNLOADED = "Downloaded",
+	    KNOWN = "Known",
+	    FUNCTIONS = "Functions",
+	    EVENTS = "Events",
+	}
 	export class Parameter {
 	    components?: Parameter[];
 	    indexed?: boolean;
@@ -603,7 +609,7 @@ export namespace types {
 		}
 	}
 	export class AbisPage {
-	    Type: string;
+	    Kind: ListKind;
 	    Abis?: Abi[];
 	    Functions?: Function[];
 	    TotalItems: number;
@@ -617,7 +623,7 @@ export namespace types {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.Type = source["Type"];
+	        this.Kind = source["Kind"];
 	        this.Abis = this.convertValues(source["Abis"], Abi);
 	        this.Functions = this.convertValues(source["Functions"], Function);
 	        this.TotalItems = source["TotalItems"];

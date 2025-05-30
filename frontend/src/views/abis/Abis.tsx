@@ -20,8 +20,6 @@ import { useLocation } from 'wouter';
 
 import './Abis.css';
 
-export type AbisListType = 'Downloaded' | 'Known' | 'Functions' | 'Events';
-
 type IndexedAbi = types.Abi & {
   [key: string]: unknown;
 };
@@ -42,8 +40,8 @@ export const Abis = () => {
   const { lastTab, setSelectedAddress } = useAppContext();
   const [, setLocation] = useLocation();
 
-  const [listType, setListType] = useState<AbisListType>(
-    (lastTab['/abis'] as AbisListType) || 'Downloaded',
+  const [listType, setListType] = useState<types.ListKind>(
+    (lastTab['/abis'] as types.ListKind) || types.ListKind.DOWNLOADED,
   );
   const [downloadedAbis, setDownloadedAbis] = useState<IndexedAbi[]>([]);
   const [knownAbis, setKnownAbis] = useState<IndexedAbi[]>([]);
@@ -145,7 +143,7 @@ export const Abis = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    const currentTabLabel = lastTab['/abis'] as AbisListType | undefined;
+    const currentTabLabel = lastTab['/abis'] as types.ListKind | undefined;
     if (currentTabLabel && currentTabLabel !== listType) {
       setListType(currentTabLabel);
     }
@@ -321,19 +319,19 @@ export const Abis = () => {
     Log(`Table submitted: ${formData}`);
   };
 
-  const renderTable = (currentListType: AbisListType) => {
+  const renderTable = (listKind: types.ListKind) => {
     let data: TableRow[] = [];
     let columns: FormField<TableRow>[] = [];
-    if (currentListType === 'Downloaded') {
+    if (listKind === 'Downloaded') {
       data = downloadedAbis as TableRow[];
       columns = abiColumns as FormField<TableRow>[];
-    } else if (currentListType === 'Known') {
+    } else if (listKind === 'Known') {
       data = knownAbis as TableRow[];
       columns = abiColumns as FormField<TableRow>[];
-    } else if (currentListType === 'Functions') {
+    } else if (listKind === 'Functions') {
       data = functions as TableRow[];
       columns = functionColumns as FormField<TableRow>[];
-    } else if (currentListType === 'Events') {
+    } else if (listKind === 'Events') {
       data = events as TableRow[];
       columns = functionColumns as FormField<TableRow>[];
     }
@@ -359,27 +357,17 @@ export const Abis = () => {
     );
   };
 
+  const createTab = (value: types.ListKind) => ({
+    label: value as string,
+    value: value,
+    content: renderTable(value),
+  });
+
   const tabsConfig = [
-    {
-      label: 'Downloaded',
-      value: 'Downloaded',
-      content: renderTable('Downloaded'),
-    },
-    {
-      label: 'Known',
-      value: 'Known',
-      content: renderTable('Known'),
-    },
-    {
-      label: 'Functions',
-      value: 'Functions',
-      content: renderTable('Functions'),
-    },
-    {
-      label: 'Events',
-      value: 'Events',
-      content: renderTable('Events'),
-    },
+    createTab(types.ListKind.DOWNLOADED),
+    createTab(types.ListKind.KNOWN),
+    createTab(types.ListKind.FUNCTIONS),
+    createTab(types.ListKind.EVENTS),
   ];
 
   return (

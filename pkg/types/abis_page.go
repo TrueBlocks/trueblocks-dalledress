@@ -11,7 +11,7 @@ import (
 )
 
 type AbisPage struct {
-	Kind          string               `json:"Type"`
+	Kind          ListKind             `json:"Kind"`
 	Abis          []coreTypes.Abi      `json:"Abis,omitempty"`
 	Functions     []coreTypes.Function `json:"Functions,omitempty"`
 	TotalItems    int                  `json:"TotalItems"`
@@ -20,7 +20,7 @@ type AbisPage struct {
 	IsLoaded      bool                 `json:"IsLoaded"`
 }
 
-func (ac *AbisCollection) GetPage(kind string, first, pageSize int, sortDef *sorting.SortDef, filter string) (AbisPage, error) {
+func (ac *AbisCollection) GetPage(kind ListKind, first, pageSize int, sortDef *sorting.SortDef, filter string) (AbisPage, error) {
 	ac.EnsureInitialLoad()
 
 	ac.mutex.RLock()

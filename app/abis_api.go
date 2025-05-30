@@ -9,7 +9,7 @@ import (
 // We need these functions so that the App's abis records get handled
 
 func (a *App) GetAbisPage(
-	kind string,
+	kind types.ListKind,
 	first, pageSize int,
 	sort *sorting.SortDef,
 	filter string,

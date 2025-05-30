@@ -3,8 +3,8 @@
 import {base} from '../models';
 import {msgs} from '../models';
 import {menu} from '../models';
-import {sorting} from '../models';
 import {types} from '../models';
+import {sorting} from '../models';
 import {preferences} from '../models';
 import {utils} from '../models';
 import {context} from '../models';
@@ -48,7 +48,7 @@ export function FileSave(arg1:menu.CallbackData):Promise<void>;
 
 export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
-export function GetAbisPage(arg1:string,arg2:number,arg3:number,arg4:sorting.SortDef,arg5:string):Promise<types.AbisPage>;
+export function GetAbisPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sorting.SortDef,arg5:string):Promise<types.AbisPage>;
 
 export function GetAppId():Promise<preferences.Id>;
 

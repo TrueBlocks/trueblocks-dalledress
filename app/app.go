@@ -25,6 +25,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -38,7 +39,7 @@ type App struct {
 	chainList   *utils.ChainList
 	// ADD_ROUTE
 	names types.NamesCollection
-	abis  types.AbisCollection
+	abis  abis.AbisCollection
 	// ADD_ROUTE
 	meta              *coreTypes.MetaData
 	fileServer        *fileserver.FileServer
@@ -102,7 +103,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	}
 	// ADD_ROUTE
 	app.names = types.NewNamesCollection(app)
-	app.abis = types.NewAbisCollection(app)
+	app.abis = abis.NewAbisCollection(app)
 	// ADD_ROUTE
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())

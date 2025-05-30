@@ -1,20 +1,19 @@
 package types
 
+import "strings"
+
 type ListKind string
 
-const (
-	AbisDownloaded ListKind = "Downloaded"
-	AbisKnown      ListKind = "Known"
-	AbisFunctions  ListKind = "Functions"
-	AbisEvents     ListKind = "Events"
-)
-
-var AllListKinds = []struct {
+type ListKindDef struct {
 	Value  ListKind `json:"value"`
 	TSName string   `json:"tsname"`
-}{
-	{AbisDownloaded, "DOWNLOADED"},
-	{AbisKnown, "KNOWN"},
-	{AbisFunctions, "FUNCTIONS"},
-	{AbisEvents, "EVENTS"},
+}
+
+var AllListKinds = []ListKindDef{}
+
+func RegisterKind(listKind ListKind) {
+	AllListKinds = append(AllListKinds, ListKindDef{
+		listKind,
+		strings.ToUpper(string(listKind)),
+	})
 }

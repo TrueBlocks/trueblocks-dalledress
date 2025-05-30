@@ -1,15 +1,17 @@
 // ADD_ROUTE
-package types
+package abis
 
 import (
 	"sync/atomic"
+
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 var refreshRate = 31
 
 // LoadData kicks off a go routine that streams the requested data making it available
 // to GetPage as soon as it becomes available (even partially).
-func (ac *AbisCollection) LoadData(listKind ListKind) {
+func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 	if !atomic.CompareAndSwapInt32(&ac.isLoading, 0, 1) {
 		return
 	}
@@ -23,7 +25,7 @@ func (ac *AbisCollection) LoadData(listKind ListKind) {
 }
 
 // NeedsUpdate checks if the AbisCollection needs to be updated.
-func (ac *AbisCollection) NeedsUpdate(listKind ListKind) bool {
+func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
 	ac.mutex.RLock()
 	defer ac.mutex.RUnlock()
 

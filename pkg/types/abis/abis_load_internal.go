@@ -1,5 +1,5 @@
 // ADD_ROUTE
-package types
+package abis
 
 import (
 	"fmt"
@@ -9,13 +9,14 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 // loadInternal is the core logic for loading ABIs, functions, and events. It runs as a
 // goroutine and updates the AbisCollection state as it processes the data reporting its
 // progress through the msgs system.
-func (ac *AbisCollection) loadInternal(listKind ListKind) {
+func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 	defer func() {
 		atomic.StoreInt32(&ac.isLoading, 0)
 	}()
@@ -95,7 +96,7 @@ func (ac *AbisCollection) loadInternal(listKind ListKind) {
 
 		statusMsg := "ABI details loaded: No new items to fetch."
 		msgs.EmitStatus(statusMsg)
-		ac.App.EmitEvent(msgs.EventDataLoaded, DataLoadedPayload{
+		ac.App.EmitEvent(msgs.EventDataLoaded, types.DataLoadedPayload{
 			DataType:      "functions-events",
 			CurrentCount:  currentCount,
 			ExpectedTotal: ac.expectedFunctions + ac.expectedEvents,
@@ -191,7 +192,7 @@ ProcessingLoop:
 				case AbisFunctions, AbisEvents:
 					isLoaded = currentCount >= (ac.expectedFunctions + ac.expectedEvents)
 				}
-				payload := DataLoadedPayload{
+				payload := types.DataLoadedPayload{
 					DataType:      "functions-events",
 					CurrentCount:  currentCount,
 					ExpectedTotal: ac.expectedFunctions + ac.expectedEvents,
@@ -233,7 +234,7 @@ ProcessingLoop:
 	finalCount := len(ac.allFunctions) + len(ac.allEvents)
 	finalStatus := fmt.Sprintf("ABI details fully loaded: %d functions/events.", finalCount)
 	msgs.EmitStatus(finalStatus)
-	ac.App.EmitEvent(msgs.EventDataLoaded, DataLoadedPayload{
+	ac.App.EmitEvent(msgs.EventDataLoaded, types.DataLoadedPayload{
 		DataType:      "functions-events",
 		CurrentCount:  finalCount,
 		ExpectedTotal: ac.expectedFunctions + ac.expectedEvents,

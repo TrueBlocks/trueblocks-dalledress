@@ -1,5 +1,5 @@
 // ADD_ROUTE
-package types
+package abis
 
 import (
 	"strings"
@@ -97,7 +97,7 @@ func TestGetPage(t *testing.T) {
 				filter = "FILTER_WHEN_NO_ITEMS_EXIST"
 			}
 			t.Run(tc.name, func(t *testing.T) {
-				page, err := ac.GetPage("Downloaded", tc.first, tc.pageSize, nil, filter)
+				page, err := ac.GetPage(AbisDownloaded, tc.first, tc.pageSize, nil, filter)
 				if err != nil {
 					t.Fatalf("GetPage returned error: %v", err)
 				}
@@ -183,7 +183,7 @@ func TestGetPage(t *testing.T) {
 				filter = "FILTER_WHEN_NO_ITEMS_EXIST"
 			}
 			t.Run(tc.name, func(t *testing.T) {
-				page, err := ac.GetPage("Known", tc.first, tc.pageSize, nil, filter)
+				page, err := ac.GetPage(AbisKnown, tc.first, tc.pageSize, nil, filter)
 				if err != nil {
 					t.Fatalf("GetPage returned error: %v", err)
 				}
@@ -272,7 +272,7 @@ func TestGetPage(t *testing.T) {
 			}
 			t.Run(tc.name, func(t *testing.T) {
 				// Assuming sortDef is nil for these tests as in original
-				page, err := ac.GetPage("Functions", tc.first, tc.pageSize, nil, filter)
+				page, err := ac.GetPage(AbisFunctions, tc.first, tc.pageSize, nil, filter)
 				if err != nil {
 					t.Fatalf("GetPage returned error: %v", err)
 				}
@@ -345,7 +345,7 @@ func TestGetPage(t *testing.T) {
 				filter = "FILTER_WHEN_NO_EVENTS_EXIST"
 			}
 			t.Run(tc.name, func(t *testing.T) {
-				page, err := ac.GetPage("Events", tc.first, tc.pageSize, nil, filter)
+				page, err := ac.GetPage(AbisEvents, tc.first, tc.pageSize, nil, filter)
 				if err != nil {
 					t.Fatalf("GetPage returned error: %v", err)
 				}
@@ -372,4 +372,5 @@ func TestGetPage(t *testing.T) {
 		}
 	})
 }
+
 // ADD_ROUTE

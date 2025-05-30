@@ -1,5 +1,5 @@
 // ADD_ROUTE
-package types
+package abis
 
 import (
 	"fmt"
@@ -7,11 +7,12 @@ import (
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 type AbisPage struct {
-	Kind          ListKind             `json:"kind"`
+	Kind          types.ListKind       `json:"kind"`
 	Abis          []coreTypes.Abi      `json:"abis,omitempty"`
 	Functions     []coreTypes.Function `json:"functions,omitempty"`
 	TotalItems    int                  `json:"totalItems"`
@@ -20,7 +21,7 @@ type AbisPage struct {
 	IsLoaded      bool                 `json:"isLoaded"`
 }
 
-func (ac *AbisCollection) GetPage(listKind ListKind, first, pageSize int, sortDef *sorting.SortDef, filter string) (AbisPage, error) {
+func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, sortDef *sorting.SortDef, filter string) (AbisPage, error) {
 	ac.LoadData(listKind)
 
 	ac.mutex.RLock()
@@ -32,16 +33,16 @@ func (ac *AbisCollection) GetPage(listKind ListKind, first, pageSize int, sortDe
 	var expectedTotal int
 
 	switch listKind {
-	case "Downloaded":
+	case AbisDownloaded:
 		sourceAbis = ac.downloadedAbis
 		expectedTotal = ac.expectedDownloaded
-	case "Known":
+	case AbisKnown:
 		sourceAbis = ac.knownAbis
 		expectedTotal = ac.expectedKnown
-	case "Functions":
+	case AbisFunctions:
 		sourceFunctions = ac.allFunctions
 		expectedTotal = ac.expectedFunctions
-	case "Events":
+	case AbisEvents:
 		sourceFunctions = ac.allEvents
 		expectedTotal = ac.expectedEvents
 	default:
@@ -50,13 +51,13 @@ func (ac *AbisCollection) GetPage(listKind ListKind, first, pageSize int, sortDe
 
 	var isLoaded bool
 	switch listKind {
-	case "Downloaded":
+	case AbisDownloaded:
 		isLoaded = ac.isDownloadedLoaded
-	case "Known":
+	case AbisKnown:
 		isLoaded = ac.isKnownLoaded
-	case "Functions":
+	case AbisFunctions:
 		isLoaded = ac.isFuncsLoaded
-	case "Events":
+	case AbisEvents:
 		isLoaded = ac.isEventsLoaded
 	}
 
@@ -70,7 +71,7 @@ func (ac *AbisCollection) GetPage(listKind ListKind, first, pageSize int, sortDe
 	sortSpec := sorting.ConvertToSortSpec(sortDef)
 
 	switch listKind {
-	case "Downloaded", "Known":
+	case AbisDownloaded, AbisKnown:
 		filteredAbis := make([]coreTypes.Abi, 0)
 		for _, item := range sourceAbis {
 			if filter == "" || strings.Contains(strings.ToLower(item.Name), filter) || strings.Contains(strings.ToLower(item.Address.Hex()), filter) {
@@ -92,7 +93,7 @@ func (ac *AbisCollection) GetPage(listKind ListKind, first, pageSize int, sortDe
 		}
 		page.TotalItems = len(filteredAbis)
 
-	case "Functions", "Events":
+	case AbisFunctions, AbisEvents:
 		filteredFunctions := make([]coreTypes.Function, 0)
 		for _, item := range sourceFunctions {
 			name := strings.ToLower(item.Name)

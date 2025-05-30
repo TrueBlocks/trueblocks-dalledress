@@ -1,15 +1,30 @@
 // ADD_ROUTE
-package types
+package abis
 
 import (
 	"fmt"
 	"sync"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
+const (
+	AbisDownloaded types.ListKind = "downloaded"
+	AbisKnown      types.ListKind = "known"
+	AbisFunctions  types.ListKind = "functions"
+	AbisEvents     types.ListKind = "events"
+)
+
+func init() {
+	types.RegisterKind(AbisDownloaded)
+	types.RegisterKind(AbisKnown)
+	types.RegisterKind(AbisFunctions)
+	types.RegisterKind(AbisEvents)
+}
+
 type AbisCollection struct {
-	App       App
+	App       types.App
 	mutex     sync.RWMutex
 	deduper   map[string]struct{}
 	isLoading int32
@@ -31,7 +46,7 @@ type AbisCollection struct {
 	allEvents      []coreTypes.Function
 }
 
-func NewAbisCollection(app App) AbisCollection {
+func NewAbisCollection(app types.App) AbisCollection {
 	return AbisCollection{
 		App:            app,
 		deduper:        make(map[string]struct{}),
@@ -42,7 +57,7 @@ func NewAbisCollection(app App) AbisCollection {
 	}
 }
 
-func (ac *AbisCollection) ClearCache(listKind ListKind, loaded bool) {
+func (ac *AbisCollection) ClearCache(listKind types.ListKind, loaded bool) {
 	ac.mutex.Lock()
 	defer ac.mutex.Unlock()
 

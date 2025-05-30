@@ -256,16 +256,6 @@ export const Abis = () => {
             columns={columns}
             data={data}
             loading={loading}
-            collectionIsLoading={loading}
-            collectionIsLoaded={
-              listKind === types.ListKind.DOWNLOADED
-                ? isDownloadedLoaded
-                : listKind === types.ListKind.KNOWN
-                  ? isKnownLoaded
-                  : listKind === types.ListKind.FUNCTIONS
-                    ? isFuncsLoaded
-                    : isEventsLoaded
-            }
             sort={currentSort}
             onSortChange={setCurrentSort}
             filter={currentFilter}
@@ -412,7 +402,7 @@ const createAbiColumns = (
     },
   ];
 
-  if (listKind === 'Known') {
+  if (listKind === types.ListKind.KNOWN) {
     return baseColumns.slice(1);
   } else {
     return [

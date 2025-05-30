@@ -9,6 +9,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -41,7 +42,7 @@ func main() {
 			&project.Project{},
 			// ADD_ROUTE
 			&types.NamesCollection{},
-			&types.AbisCollection{},
+			&abis.AbisCollection{},
 			// ADD_ROUTE
 		},
 		EnumBind: []interface{}{

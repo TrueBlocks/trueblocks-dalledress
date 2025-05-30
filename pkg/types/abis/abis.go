@@ -2,7 +2,6 @@
 package abis
 
 import (
-	"fmt"
 	"sync"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
@@ -30,11 +29,9 @@ type AbisCollection struct {
 	isLoading int32
 
 	isDownloadedLoaded bool
-	expectedDownloaded int
 	downloadedAbis     []coreTypes.Abi
 
 	isKnownLoaded bool
-	expectedKnown int
 	knownAbis     []coreTypes.Abi
 
 	isFuncsLoaded     bool
@@ -54,24 +51,6 @@ func NewAbisCollection(app types.App) AbisCollection {
 		knownAbis:      make([]coreTypes.Abi, 0),
 		allFunctions:   make([]coreTypes.Function, 0),
 		allEvents:      make([]coreTypes.Function, 0),
-	}
-}
-
-func (ac *AbisCollection) ClearCache(listKind types.ListKind, loaded bool) {
-	ac.mutex.Lock()
-	defer ac.mutex.Unlock()
-
-	switch listKind {
-	case AbisDownloaded:
-		ac.isDownloadedLoaded = loaded
-	case AbisKnown:
-		ac.isKnownLoaded = loaded
-	case AbisFunctions:
-		ac.isFuncsLoaded = loaded
-	case AbisEvents:
-		ac.isEventsLoaded = loaded
-	default:
-		ac.App.LogBackend(fmt.Sprintf("Unknown ListKind in ClearCache: %s", listKind))
 	}
 }
 

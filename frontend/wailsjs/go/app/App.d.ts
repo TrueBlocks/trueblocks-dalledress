@@ -19,7 +19,7 @@ export function AutonameName(arg1:string):Promise<void>;
 
 export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
-export function Cancel(arg1:base.Address):Promise<number|boolean>;
+export function Cancel(arg1:string):Promise<number|boolean>;
 
 export function CancelAllStreams():Promise<void>;
 
@@ -97,7 +97,7 @@ export function PublishNames(arg1:string):Promise<void>;
 
 export function RegisterCancel(arg1:context.CancelFunc):Promise<void>;
 
-export function RegisterCtx(arg1:base.Address):Promise<output.RenderCtx>;
+export function RegisterCtx(arg1:string):Promise<output.RenderCtx>;
 
 export function Reload():Promise<void>;
 

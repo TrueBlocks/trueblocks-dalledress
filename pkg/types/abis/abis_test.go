@@ -4,14 +4,13 @@ package abis
 import (
 	"testing"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 )
 
 // MockApp is a mock implementation of the App interface for testing.
 type MockApp struct {
-	RegisteredCtxs map[base.Address]*output.RenderCtx
+	RegisteredCtxs map[string]*output.RenderCtx
 	Events         []struct {
 		EventType msgs.EventType
 		Payload   interface{}
@@ -21,22 +20,22 @@ type MockApp struct {
 func (m *MockApp) LogBackend(msg string) {
 }
 
-func (m *MockApp) RegisterCtx(addr base.Address) *output.RenderCtx {
+func (m *MockApp) RegisterCtx(key string) *output.RenderCtx {
 	if m.RegisteredCtxs == nil {
-		m.RegisteredCtxs = make(map[base.Address]*output.RenderCtx)
+		m.RegisteredCtxs = make(map[string]*output.RenderCtx)
 	}
 	renderCtx := output.NewStreamingContext()
-	m.RegisteredCtxs[addr] = renderCtx
+	m.RegisteredCtxs[key] = renderCtx
 	return renderCtx
 }
 
-func (m *MockApp) Cancel(addr base.Address) (int, bool) {
+func (m *MockApp) Cancel(key string) (int, bool) {
 	if m.RegisteredCtxs == nil {
 		return 0, false
 	}
-	if ctx, exists := m.RegisteredCtxs[addr]; exists {
+	if ctx, exists := m.RegisteredCtxs[key]; exists {
 		ctx.Cancel()
-		delete(m.RegisteredCtxs, addr)
+		delete(m.RegisteredCtxs, key)
 		return 1, true
 	}
 	return 0, false
@@ -51,7 +50,7 @@ func (m *MockApp) EmitEvent(eventType msgs.EventType, payload interface{}) {
 
 func NewMockApp() *MockApp {
 	return &MockApp{
-		RegisteredCtxs: make(map[base.Address]*output.RenderCtx),
+		RegisteredCtxs: make(map[string]*output.RenderCtx),
 		Events: make([]struct {
 			EventType msgs.EventType
 			Payload   interface{}

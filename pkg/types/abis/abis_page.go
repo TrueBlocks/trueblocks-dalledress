@@ -30,21 +30,21 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 	// Get direct reference to slice - no copying!
 	var sourceAbis []coreTypes.Abi
 	var sourceFunctions []coreTypes.Function
-	var expectedTotal int
+	var listLen int
 
 	switch listKind {
 	case AbisDownloaded:
 		sourceAbis = ac.downloadedAbis
-		expectedTotal = ac.expectedDownloaded
+		listLen = len(ac.downloadedAbis)
 	case AbisKnown:
 		sourceAbis = ac.knownAbis
-		expectedTotal = ac.expectedKnown
+		listLen = len(ac.knownAbis)
 	case AbisFunctions:
 		sourceFunctions = ac.allFunctions
-		expectedTotal = ac.expectedFunctions
+		listLen = len(ac.allFunctions)
 	case AbisEvents:
 		sourceFunctions = ac.allEvents
-		expectedTotal = ac.expectedEvents
+		listLen = len(ac.allEvents)
 	default:
 		return AbisPage{}, fmt.Errorf("unknown ABI page kind: %s", listKind)
 	}
@@ -65,7 +65,7 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 		Kind:          listKind,
 		IsLoading:     ac.isLoading == 1,
 		IsLoaded:      isLoaded,
-		ExpectedTotal: expectedTotal,
+		ExpectedTotal: listLen,
 	}
 	filter = strings.ToLower(filter)
 	sortSpec := sorting.ConvertToSortSpec(sortDef)

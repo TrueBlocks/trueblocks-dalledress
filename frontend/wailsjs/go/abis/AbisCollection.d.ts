@@ -4,7 +4,7 @@ import {types} from '../models';
 import {sorting} from '../models';
 import {abis} from '../models';
 
-export function ClearCache(arg1:types.ListKind,arg2:boolean):Promise<void>;
+export function ClearCache(arg1:types.ListKind):Promise<void>;
 
 export function Delete(arg1:string):Promise<void>;
 

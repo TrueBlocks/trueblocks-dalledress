@@ -75,7 +75,7 @@ func TestReloadCancellation(t *testing.T) {
 	mockApp := NewMockApp()
 
 	// Simulate registering a context (like what happens in loadInternal)
-	abisAddr := base.ZeroAddr
+	abisAddr := base.ZeroAddr.Hex()
 	renderCtx := mockApp.RegisterCtx(abisAddr)
 
 	// Verify the context was registered
@@ -112,8 +112,8 @@ func TestContextRegistration(t *testing.T) {
 	mockApp := NewMockApp()
 
 	// Test RegisterCtx
-	addr1 := base.HexToAddress("0x1234567890123456789012345678901234567890")
-	addr2 := base.HexToAddress("0x2234567890123456789012345678901234567890")
+	addr1 := "0x1234567890123456789012345678901234567890"
+	addr2 := "0x2234567890123456789012345678901234567890"
 
 	ctx1 := mockApp.RegisterCtx(addr1)
 	ctx2 := mockApp.RegisterCtx(addr2)
@@ -139,7 +139,7 @@ func TestContextRegistration(t *testing.T) {
 	}
 
 	// Test Cancel for non-existent address
-	nonExistentAddr := base.HexToAddress("0x9999999999999999999999999999999999999999")
+	nonExistentAddr := "0x9999999999999999999999999999999999999999"
 	cancelled, found = mockApp.Cancel(nonExistentAddr)
 	if found {
 		t.Error("Cancel should not find non-existent context")

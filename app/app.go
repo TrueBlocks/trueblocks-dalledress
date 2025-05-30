@@ -47,7 +47,7 @@ type App struct {
 	ctx               context.Context
 	apiKeys           map[string]string
 	ensMap            map[string]base.Address
-	renderCtxs        map[base.Address][]*output.RenderCtx
+	renderCtxs        map[string][]*output.RenderCtx
 	Dalle             *dalle.Context
 	cancelMutex       sync.Mutex
 	activeCancelFuncs []context.CancelFunc
@@ -98,7 +98,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		},
 		Assets:     assets,
 		apiKeys:    make(map[string]string),
-		renderCtxs: make(map[base.Address][]*output.RenderCtx),
+		renderCtxs: make(map[string][]*output.RenderCtx),
 		ensMap:     make(map[string]base.Address),
 	}
 	// ADD_ROUTE
@@ -366,27 +366,27 @@ func (app *App) GetChainList() *utils.ChainList {
 
 var r sync.Mutex
 
-func (a *App) RegisterCtx(addr base.Address) *output.RenderCtx {
+func (a *App) RegisterCtx(key string) *output.RenderCtx {
 	r.Lock()
 	defer r.Unlock()
 
 	rCtx := output.NewStreamingContext()
-	a.renderCtxs[addr] = append(a.renderCtxs[addr], rCtx)
+	a.renderCtxs[key] = append(a.renderCtxs[key], rCtx)
 	return rCtx
 }
 
-func (a *App) Cancel(addr base.Address) (int, bool) {
+func (a *App) Cancel(key string) (int, bool) {
 	if len(a.renderCtxs) == 0 {
 		return 0, false
 	}
-	if a.renderCtxs[addr] == nil {
+	if a.renderCtxs[key] == nil {
 		return 0, true
 	}
-	n := len(a.renderCtxs[addr])
-	for i := 0; i < len(a.renderCtxs[addr]); i++ {
-		a.renderCtxs[addr][i].Cancel()
+	n := len(a.renderCtxs[key])
+	for i := 0; i < len(a.renderCtxs[key]); i++ {
+		a.renderCtxs[key][i].Cancel()
 	}
-	a.renderCtxs[addr] = nil
+	a.renderCtxs[key] = nil
 	return n, true
 }
 
@@ -442,7 +442,7 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 
 func (a *App) Reload() error {
 	a.CancelAllStreams()
-	a.Cancel(base.ZeroAddr)
+	a.Cancel(base.ZeroAddr.Hex())
 
 	lastView := a.GetAppPreferences().LastView
 	lastTab := a.GetLastTab(lastView)
@@ -450,7 +450,7 @@ func (a *App) Reload() error {
 	// ADD_ROUTE
 	switch lastView {
 	case "/abis":
-		a.abis.ClearCache(types.ListKind(lastTab), false)
+		a.abis.ClearCache(types.ListKind(lastTab))
 		a.abis.LoadData(types.ListKind(lastTab))
 	case "/names":
 		a.names = a.names.ReloadNames()
@@ -458,7 +458,7 @@ func (a *App) Reload() error {
 	// ADD_ROUTE
 
 	msgs.EmitMessage(msgs.EventRefresh, lastView)
-	msgs.EmitMessage(msgs.EventStatus, "The data was reloaded")
+	// msgs.EmitMessage(msgs.EventStatus, "The data was reloaded")
 	return nil
 }
 

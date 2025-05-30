@@ -9,6 +9,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -71,8 +72,8 @@ func (ac *AbisCollection) loadDownloadedAbis() (string, types.DataLoadedPayload)
 		return itemPtr
 	}
 
-	finalStatus, finalPayload, _ := loadStreamingData(
-		ac,
+	finalStatus, finalPayload, _ := streaming.LoadStreamingData(
+		ac.App,
 		contextKey,
 		queryFunc,
 		filterFunc,
@@ -80,7 +81,8 @@ func (ac *AbisCollection) loadDownloadedAbis() (string, types.DataLoadedPayload)
 		&ac.downloadedAbis,
 		&ac.expectedDownloaded,
 		&ac.isDownloadedLoaded,
-		"downloaded-abis",
+		"functions-events",
+		&ac.mutex,
 	)
 
 	return finalStatus, finalPayload
@@ -111,8 +113,8 @@ func (ac *AbisCollection) loadKnownAbis() (string, types.DataLoadedPayload) {
 		return itemPtr
 	}
 
-	finalStatus, finalPayload, _ := loadStreamingData(
-		ac,
+	finalStatus, finalPayload, _ := streaming.LoadStreamingData(
+		ac.App,
 		contextKey,
 		queryFunc,
 		filterFunc,
@@ -121,6 +123,7 @@ func (ac *AbisCollection) loadKnownAbis() (string, types.DataLoadedPayload) {
 		&ac.expectedKnown,
 		&ac.isKnownLoaded,
 		"functions-events",
+		&ac.mutex,
 	)
 
 	return finalStatus, finalPayload
@@ -161,8 +164,8 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 		return itemPtr
 	}
 
-	finalStatus, finalPayload, _ := loadStreamingData(
-		ac,
+	finalStatus, finalPayload, _ := streaming.LoadStreamingData(
+		ac.App,
 		contextKey,
 		queryFunc,
 		filterFunc,
@@ -171,6 +174,7 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 		&ac.expectedFunctions,
 		&ac.isFuncsLoaded,
 		"functions-events",
+		&ac.mutex,
 	)
 
 	return finalStatus, finalPayload
@@ -213,8 +217,8 @@ func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
 		return itemPtr
 	}
 
-	finalStatus, finalPayload, _ := loadStreamingData(
-		ac,
+	finalStatus, finalPayload, _ := streaming.LoadStreamingData(
+		ac.App,
 		contextKey,
 		queryFunc,
 		filterFunc,
@@ -223,114 +227,10 @@ func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
 		&ac.expectedEvents,
 		&ac.isEventsLoaded,
 		"functions-events",
+		&ac.mutex,
 	)
 
 	return finalStatus, finalPayload
-}
-
-// ----------------------------------------------------------------
-// loadStreamingData is a generic method that handles streaming data of any type T
-func loadStreamingData[T any](
-	ac *AbisCollection,
-	contextKey string,
-	queryFunc func(*output.RenderCtx),
-	filterFunc func(item *T) bool,
-	processItemFunc func(itemIntf interface{}) *T,
-	targetSlice *[]T,
-	expectedCount *int,
-	loadedFlag *bool,
-	dataTypeName string,
-) (string, types.DataLoadedPayload, error) {
-	ac.App.Cancel(contextKey)
-	defer func() {
-		ac.App.Cancel(contextKey)
-	}()
-
-	renderCtx := ac.App.RegisterCtx(contextKey)
-	done := make(chan struct{})
-
-	go func() {
-		defer func() {
-			if renderCtx.ModelChan != nil {
-				close(renderCtx.ModelChan)
-			}
-			if renderCtx.ErrorChan != nil {
-				close(renderCtx.ErrorChan)
-			}
-			close(done)
-		}()
-
-		queryFunc(renderCtx)
-	}()
-
-	modelChanClosed := false
-	errorChanClosed := false
-
-	for !modelChanClosed || !errorChanClosed {
-		select {
-		case itemIntf, ok := <-renderCtx.ModelChan:
-			if !ok {
-				modelChanClosed = true
-				continue
-			}
-
-			itemPtr := processItemFunc(itemIntf)
-			if itemPtr == nil {
-				logger.Info(fmt.Sprintf("AbisCollection.loadStreamingData: unexpected item type: %T", itemIntf))
-				continue
-			}
-
-			if filterFunc(itemPtr) {
-				ac.mutex.Lock()
-				*targetSlice = append(*targetSlice, *itemPtr)
-				ac.mutex.Unlock()
-
-				if len(*targetSlice)%refreshRate == 0 {
-					ac.mutex.RLock()
-					isLoaded := len(*targetSlice) >= *expectedCount
-					payload := types.DataLoadedPayload{
-						DataType:      dataTypeName,
-						CurrentCount:  len(*targetSlice),
-						ExpectedTotal: *expectedCount,
-						IsLoaded:      isLoaded,
-						Category:      "abis",
-					}
-					ac.App.EmitEvent(msgs.EventDataLoaded, payload)
-					statusMsg := fmt.Sprintf("Loading %s: %d processed.", dataTypeName, len(*targetSlice))
-					if *expectedCount > 0 {
-						statusMsg = fmt.Sprintf("Loading %s: %d of %d processed.", dataTypeName, len(*targetSlice), *expectedCount)
-					}
-					msgs.EmitStatus(statusMsg)
-					ac.mutex.RUnlock()
-				}
-			}
-
-		case streamErr, ok := <-renderCtx.ErrorChan:
-			if !ok {
-				errorChanClosed = true
-				continue
-			}
-			msgs.EmitError("AbisCollection.loadStreamingData: streaming error", streamErr)
-
-		case <-done:
-			// Stream initialization completed
-		}
-	}
-
-	ac.mutex.Lock()
-	*loadedFlag = true
-	ac.mutex.Unlock()
-
-	finalStatus := fmt.Sprintf("%s loaded: %d items.", dataTypeName, len(*targetSlice))
-	finalPayload := types.DataLoadedPayload{
-		Category:      "abis",
-		DataType:      dataTypeName,
-		IsLoaded:      true,
-		CurrentCount:  len(*targetSlice),
-		ExpectedTotal: len(*targetSlice),
-	}
-
-	return finalStatus, finalPayload, nil
 }
 
 // ADD_ROUTE

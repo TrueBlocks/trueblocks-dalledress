@@ -7,8 +7,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-var refreshRate = 31
-
 // LoadData kicks off a go routine that streams the requested data making it available
 // to GetPage as soon as it becomes available (even partially).
 func (ac *AbisCollection) LoadData(listKind types.ListKind) {

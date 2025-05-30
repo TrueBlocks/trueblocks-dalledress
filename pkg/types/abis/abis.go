@@ -2,6 +2,7 @@
 package abis
 
 import (
+	"fmt"
 	"sync"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
@@ -53,6 +54,52 @@ func NewAbisCollection(app types.App) AbisCollection {
 		knownAbis:      make([]coreTypes.Abi, 0),
 		allFunctions:   make([]coreTypes.Function, 0),
 		allEvents:      make([]coreTypes.Function, 0),
+	}
+}
+
+func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
+	ac.mutex.Lock()
+	defer ac.mutex.Unlock()
+
+	switch listKind {
+	case AbisDownloaded:
+		ac.expectedDownloaded = len(ac.downloadedAbis)
+		ac.isDownloadedLoaded = false
+		ac.downloadedAbis = make([]coreTypes.Abi, 0)
+	case AbisKnown:
+		ac.expectedKnown = len(ac.knownAbis)
+		ac.isKnownLoaded = false
+		ac.knownAbis = make([]coreTypes.Abi, 0)
+	case AbisFunctions:
+		ac.expectedFunctions = len(ac.allFunctions)
+		ac.isFuncsLoaded = false
+		ac.allFunctions = make([]coreTypes.Function, 0)
+	case AbisEvents:
+		ac.expectedEvents = len(ac.allEvents)
+		ac.isEventsLoaded = false
+		ac.allEvents = make([]coreTypes.Function, 0)
+	default:
+		ac.App.LogBackend(fmt.Sprintf("Unknown ListKind in ClearCache: %s", listKind))
+	}
+	ac.deduper = make(map[string]struct{})
+}
+
+// NeedsUpdate checks if the AbisCollection needs to be updated.
+func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
+	ac.mutex.RLock()
+	defer ac.mutex.RUnlock()
+
+	switch listKind {
+	case AbisDownloaded:
+		return !ac.isDownloadedLoaded
+	case AbisKnown:
+		return !ac.isKnownLoaded
+	case AbisFunctions:
+		return !ac.isFuncsLoaded
+	case AbisEvents:
+		return !ac.isEventsLoaded
+	default:
+		return true
 	}
 }
 

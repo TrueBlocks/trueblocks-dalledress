@@ -244,17 +244,19 @@ export const Table = <T extends Record<string, unknown>>({
             ))}
           </colgroup>
           <tbody>
-            {loading && data.length === 0 ? (
+            {data.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
                   style={{
                     textAlign: 'left',
                     padding: '20px',
-                    color: 'red',
+                    color: loading
+                      ? 'var(--mantine-color-blue-6)'
+                      : 'var(--mantine-color-gray-6)',
                   }}
                 >
-                  Loading...
+                  {loading ? 'Loading...' : 'No data found.'}
                 </td>
               </tr>
             ) : (
@@ -264,7 +266,7 @@ export const Table = <T extends Record<string, unknown>>({
                   data={data}
                   selectedRowIndex={selectedRowIndex}
                   handleRowClick={handleRowClick}
-                  noDataMessage="No data found."
+                  noDataMessage={loading ? 'Loading...' : 'No data found.'}
                 />
               </>
             )}

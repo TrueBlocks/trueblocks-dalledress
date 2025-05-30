@@ -125,7 +125,6 @@ export const Abis = () => {
       const eventPayload = payload as types.DataLoadedPayload;
 
       if (eventPayload) {
-        setLoading(!eventPayload.isLoaded);
         switch (listKind) {
           case types.ListKind.DOWNLOADED:
             setIsDownloadedLoaded(eventPayload.isLoaded);
@@ -249,13 +248,29 @@ export const Abis = () => {
 
     const { data, columns } = getTableConfig(listKind, config);
 
+    // Determine if the current collection is still loading
+    const isCurrentCollectionLoading = (() => {
+      switch (listKind) {
+        case types.ListKind.DOWNLOADED:
+          return !isDownloadedLoaded;
+        case types.ListKind.KNOWN:
+          return !isKnownLoaded;
+        case types.ListKind.FUNCTIONS:
+          return !isFuncsLoaded;
+        case types.ListKind.EVENTS:
+          return !isEventsLoaded;
+        default:
+          return loading;
+      }
+    })();
+
     return (
       <TableProvider>
         <div className="tableContainer">
           <Table<AbiRow>
             columns={columns}
             data={data}
-            loading={loading}
+            loading={loading || isCurrentCollectionLoading}
             sort={currentSort}
             onSortChange={setCurrentSort}
             filter={currentFilter}

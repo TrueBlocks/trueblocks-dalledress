@@ -367,8 +367,8 @@ func TestGetPage(t *testing.T) {
 		_, err := ac.GetPage("UnknownKind", 0, 1, nil, "")
 		if err == nil {
 			t.Error("Expected error for invalid kind, got nil")
-		} else if !strings.Contains(strings.ToLower(err.Error()), "unknown abi page kind") {
-			t.Errorf("Expected error message for 'unknown abi page kind', got: %v", err)
+		} else if !strings.Contains(strings.ToLower(err.Error()), "invalid list kind") {
+			t.Errorf("Expected error message for 'invalid list kind', got: %v", err)
 		}
 	})
 }

@@ -13,9 +13,11 @@ func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
 
 	switch listKind {
 	case AbisDownloaded:
+		ac.expectedDownloaded = len(ac.downloadedAbis)
 		ac.isDownloadedLoaded = false
 		ac.downloadedAbis = make([]coreTypes.Abi, 0)
 	case AbisKnown:
+		ac.expectedKnown = len(ac.knownAbis)
 		ac.isKnownLoaded = false
 		ac.knownAbis = make([]coreTypes.Abi, 0)
 	case AbisFunctions:

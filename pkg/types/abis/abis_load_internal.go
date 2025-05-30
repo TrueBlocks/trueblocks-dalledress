@@ -24,59 +24,14 @@ func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 
 	ac.ClearCache(listKind)
 
-	finalStatus := ""
-	finalPayload := types.DataLoadedPayload{
-		Category: "abis",
-		DataType: "functions-events",
-		IsLoaded: true,
-	}
+	var finalStatus string
+	var finalPayload types.DataLoadedPayload
 
 	switch listKind {
 	case AbisDownloaded:
-		listOpts := sdk.AbisOptions{
-			Globals: sdk.Globals{Cache: true, Verbose: true},
-		}
-		if sdkAbis, _, err := listOpts.AbisList(); err != nil || sdkAbis == nil {
-			msgs.EmitError("AbisCollection.loadInternal: error fetching ABI list", err)
-			return
-		} else {
-			ac.mutex.Lock()
-			ac.downloadedAbis = make([]coreTypes.Abi, 0, len(ac.downloadedAbis))
-			for _, abi := range sdkAbis {
-				if !abi.IsKnown {
-					ac.downloadedAbis = append(ac.downloadedAbis, abi)
-				}
-			}
-			ac.isDownloadedLoaded = true
-			ac.mutex.Unlock()
-
-			finalStatus = fmt.Sprintf("Loaded %d downloaded abis", len(ac.downloadedAbis))
-			finalPayload.CurrentCount = len(ac.downloadedAbis)
-			finalPayload.ExpectedTotal = len(ac.downloadedAbis)
-		}
+		finalStatus, finalPayload = ac.loadDownloadedAbis()
 	case AbisKnown:
-		listOpts := sdk.AbisOptions{
-			Globals: sdk.Globals{Cache: true, Verbose: true},
-			Known:   true,
-		}
-		if sdkAbis, _, err := listOpts.AbisList(); err != nil || sdkAbis == nil {
-			msgs.EmitError("AbisCollection.loadInternal: error fetching ABI list", err)
-			return
-		} else {
-			ac.mutex.Lock()
-			ac.knownAbis = make([]coreTypes.Abi, 0, len(ac.knownAbis))
-			for _, abi := range sdkAbis {
-				if abi.IsKnown {
-					ac.knownAbis = append(ac.knownAbis, abi)
-				}
-			}
-			ac.isKnownLoaded = true
-			ac.mutex.Unlock()
-
-			finalStatus = fmt.Sprintf("Loaded %d known abis", len(ac.knownAbis))
-			finalPayload.CurrentCount = len(ac.knownAbis)
-			finalPayload.ExpectedTotal = len(ac.knownAbis)
-		}
+		finalStatus, finalPayload = ac.loadKnownAbis()
 	case AbisFunctions:
 		finalStatus, finalPayload = ac.loadFunctions()
 	case AbisEvents:
@@ -89,6 +44,188 @@ func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 
 	msgs.EmitStatus(finalStatus)
 	ac.App.EmitEvent(msgs.EventDataLoaded, finalPayload)
+}
+
+// ----------------------------------------------------------------
+// loadDownloadedAbis loads ABI that are downloaded (and not known) asynchronously and returns status, payload
+func (ac *AbisCollection) loadDownloadedAbis() (string, types.DataLoadedPayload) {
+	contextKey := "abis-load-internal-downloaded"
+
+	queryFunc := func(renderCtx *output.RenderCtx) {
+		listOpts := sdk.AbisOptions{
+			Globals:   sdk.Globals{Cache: true, Verbose: true},
+			RenderCtx: renderCtx,
+		}
+		listOpts.AbisList()
+	}
+
+	filterFunc := func(item *coreTypes.Abi) bool {
+		return !item.IsKnown // Filter for downloaded (not known) ABIs
+	}
+
+	processItemFunc := func(itemIntf interface{}) *coreTypes.Abi {
+		itemPtr, ok := itemIntf.(*coreTypes.Abi)
+		if !ok {
+			return nil
+		}
+		return itemPtr
+	}
+
+	finalStatus, finalPayload, _ := loadStreamingData(
+		ac,
+		contextKey,
+		queryFunc,
+		filterFunc,
+		processItemFunc,
+		&ac.downloadedAbis,
+		&ac.expectedDownloaded,
+		&ac.isDownloadedLoaded,
+		"downloaded-abis",
+	)
+
+	return finalStatus, finalPayload
+}
+
+// ----------------------------------------------------------------
+func (ac *AbisCollection) loadKnownAbis() (string, types.DataLoadedPayload) {
+	contextKey := "abis-load-internal-known"
+
+	queryFunc := func(renderCtx *output.RenderCtx) {
+		listOpts := sdk.AbisOptions{
+			Globals:   sdk.Globals{Cache: true, Verbose: true},
+			Known:     true,
+			RenderCtx: renderCtx,
+		}
+		listOpts.AbisList()
+	}
+
+	filterFunc := func(item *coreTypes.Abi) bool {
+		return item.IsKnown
+	}
+
+	processItemFunc := func(itemIntf interface{}) *coreTypes.Abi {
+		itemPtr, ok := itemIntf.(*coreTypes.Abi)
+		if !ok {
+			return nil
+		}
+		return itemPtr
+	}
+
+	finalStatus, finalPayload, _ := loadStreamingData(
+		ac,
+		contextKey,
+		queryFunc,
+		filterFunc,
+		processItemFunc,
+		&ac.knownAbis,
+		&ac.expectedKnown,
+		&ac.isKnownLoaded,
+		"functions-events",
+	)
+
+	return finalStatus, finalPayload
+}
+
+// ----------------------------------------------------------------
+// loadFunctions loads ABI functions asynchronously and returns status, payload, and error
+func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
+	contextKey := "abis-load-internal-functions"
+
+	queryFunc := func(renderCtx *output.RenderCtx) {
+		detailOpts := sdk.AbisOptions{
+			Globals:   sdk.Globals{Cache: true},
+			RenderCtx: renderCtx,
+		}
+		detailOpts.AbisDetails()
+	}
+
+	filterFunc := func(item *coreTypes.Function) bool {
+		if item.FunctionType == "event" {
+			return false
+		}
+
+		ac.mutex.Lock()
+		defer ac.mutex.Unlock()
+		if _, exists := ac.deduper[item.Encoding]; exists {
+			return false
+		}
+		ac.deduper[item.Encoding] = struct{}{}
+		return true
+	}
+
+	processItemFunc := func(itemIntf interface{}) *coreTypes.Function {
+		itemPtr, ok := itemIntf.(*coreTypes.Function)
+		if !ok {
+			return nil
+		}
+		return itemPtr
+	}
+
+	finalStatus, finalPayload, _ := loadStreamingData(
+		ac,
+		contextKey,
+		queryFunc,
+		filterFunc,
+		processItemFunc,
+		&ac.allFunctions,
+		&ac.expectedFunctions,
+		&ac.isFuncsLoaded,
+		"functions-events",
+	)
+
+	return finalStatus, finalPayload
+}
+
+// ----------------------------------------------------------------
+// loadEvents loads ABI events asynchronously and returns status, payload
+func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
+	contextKey := "abis-load-internal-events"
+
+	queryFunc := func(renderCtx *output.RenderCtx) {
+		detailOpts := sdk.AbisOptions{
+			Globals:   sdk.Globals{Cache: true},
+			RenderCtx: renderCtx,
+		}
+		detailOpts.AbisDetails()
+	}
+
+	filterFunc := func(item *coreTypes.Function) bool {
+		// First check if it's an event (not a function)
+		if item.FunctionType != "event" {
+			return false
+		}
+
+		// Then check deduper for events only
+		ac.mutex.Lock()
+		defer ac.mutex.Unlock()
+		if _, exists := ac.deduper[item.Encoding]; exists {
+			return false
+		}
+		ac.deduper[item.Encoding] = struct{}{}
+		return true
+	}
+
+	processItemFunc := func(itemIntf interface{}) *coreTypes.Function {
+		itemPtr, ok := itemIntf.(*coreTypes.Function)
+		if !ok {
+			return nil
+		}
+		return itemPtr
+	}
+
+	finalStatus, finalPayload, _ := loadStreamingData(
+		ac,
+		contextKey,
+		queryFunc,
+		filterFunc,
+		processItemFunc,
+		&ac.allEvents,
+		&ac.expectedEvents,
+		&ac.isEventsLoaded,
+		"functions-events",
+	)
+
+	return finalStatus, finalPayload
 }
 
 // ----------------------------------------------------------------
@@ -194,108 +331,6 @@ func loadStreamingData[T any](
 	}
 
 	return finalStatus, finalPayload, nil
-}
-
-// ----------------------------------------------------------------
-// loadFunctions loads ABI functions asynchronously and returns status, payload, and error
-func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
-	contextKey := "abis-load-internal-functions"
-
-	queryFunc := func(renderCtx *output.RenderCtx) {
-		detailOpts := sdk.AbisOptions{
-			Globals:   sdk.Globals{Cache: true},
-			RenderCtx: renderCtx,
-		}
-		detailOpts.AbisDetails()
-	}
-
-	filterFunc := func(item *coreTypes.Function) bool {
-		if item.FunctionType == "event" {
-			return false
-		}
-
-		ac.mutex.Lock()
-		defer ac.mutex.Unlock()
-		if _, exists := ac.deduper[item.Encoding]; exists {
-			return false
-		}
-		ac.deduper[item.Encoding] = struct{}{}
-		return true
-	}
-
-	processItemFunc := func(itemIntf interface{}) *coreTypes.Function {
-		itemPtr, ok := itemIntf.(*coreTypes.Function)
-		if !ok {
-			return nil
-		}
-		return itemPtr
-	}
-
-	finalStatus, finalPayload, _ := loadStreamingData(
-		ac,
-		contextKey,
-		queryFunc,
-		filterFunc,
-		processItemFunc,
-		&ac.allFunctions,
-		&ac.expectedFunctions,
-		&ac.isFuncsLoaded,
-		"functions-events",
-	)
-
-	return finalStatus, finalPayload
-}
-
-// ----------------------------------------------------------------
-// loadEvents loads ABI events asynchronously and returns status, payload
-func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
-	contextKey := "abis-load-internal-events"
-
-	queryFunc := func(renderCtx *output.RenderCtx) {
-		detailOpts := sdk.AbisOptions{
-			Globals:   sdk.Globals{Cache: true},
-			RenderCtx: renderCtx,
-		}
-		detailOpts.AbisDetails()
-	}
-
-	filterFunc := func(item *coreTypes.Function) bool {
-		// First check if it's an event (not a function)
-		if item.FunctionType != "event" {
-			return false
-		}
-
-		// Then check deduper for events only
-		ac.mutex.Lock()
-		defer ac.mutex.Unlock()
-		if _, exists := ac.deduper[item.Encoding]; exists {
-			return false
-		}
-		ac.deduper[item.Encoding] = struct{}{}
-		return true
-	}
-
-	processItemFunc := func(itemIntf interface{}) *coreTypes.Function {
-		itemPtr, ok := itemIntf.(*coreTypes.Function)
-		if !ok {
-			return nil
-		}
-		return itemPtr
-	}
-
-	finalStatus, finalPayload, _ := loadStreamingData(
-		ac,
-		contextKey,
-		queryFunc,
-		filterFunc,
-		processItemFunc,
-		&ac.allEvents,
-		&ac.expectedEvents,
-		&ac.isEventsLoaded,
-		"functions-events",
-	)
-
-	return finalStatus, finalPayload
 }
 
 // ADD_ROUTE

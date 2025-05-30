@@ -29,9 +29,11 @@ type AbisCollection struct {
 	isLoading int32
 
 	isDownloadedLoaded bool
+	expectedDownloaded int
 	downloadedAbis     []coreTypes.Abi
 
 	isKnownLoaded bool
+	expectedKnown int
 	knownAbis     []coreTypes.Abi
 
 	isFuncsLoaded     bool

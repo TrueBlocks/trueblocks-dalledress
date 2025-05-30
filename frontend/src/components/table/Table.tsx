@@ -25,8 +25,6 @@ export interface TableProps<T extends Record<string, unknown>> {
     string,
     (value: unknown, values: Record<string, unknown>) => string | null
   >;
-  collectionIsLoading?: boolean;
-  collectionIsLoaded?: boolean;
 }
 
 export const Table = <T extends Record<string, unknown>>({
@@ -40,8 +38,6 @@ export const Table = <T extends Record<string, unknown>>({
   tableKey,
   onSubmit,
   validate,
-  collectionIsLoading,
-  collectionIsLoaded,
 }: TableProps<T>) => {
   const { pagination } = usePagination(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;

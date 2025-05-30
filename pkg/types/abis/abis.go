@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	AbisDownloaded types.ListKind = "downloaded"
-	AbisKnown      types.ListKind = "known"
-	AbisFunctions  types.ListKind = "functions"
-	AbisEvents     types.ListKind = "events"
+	AbisDownloaded types.ListKind = "Downloaded"
+	AbisKnown      types.ListKind = "Known"
+	AbisFunctions  types.ListKind = "Functions"
+	AbisEvents     types.ListKind = "Events"
 )
 
 func init() {

@@ -21,7 +21,6 @@ func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 		atomic.StoreInt32(&ac.isLoading, 0)
 	}()
 
-	// At the start, reset flags and slices under a write lock
 	ac.mutex.Lock()
 	switch listKind {
 	case AbisDownloaded:
@@ -82,15 +81,18 @@ func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 	if len(addrMap) == 0 {
 		logger.Info(fmt.Sprintln("AbisCollection.loadInternal: no non-known ABI addresses to fetch detailed functions/events."))
 		ac.mutex.Lock()
+		expected := 0
 		switch listKind {
-		case AbisDownloaded:
-			ac.isDownloadedLoaded = true
-		case AbisKnown:
-			ac.isKnownLoaded = true
+		// case AbisDownloaded:
+		// 	ac.isDownloadedLoaded = true
+		// case AbisKnown:
+		// 	ac.isKnownLoaded = true
 		case AbisFunctions:
-			ac.isFuncsLoaded = true
+			// ac.isFuncsLoaded = true
+			expected = ac.expectedFunctions
 		case AbisEvents:
-			ac.isEventsLoaded = true
+			// ac.isEventsLoaded = true
+			expected = ac.expectedEvents
 		}
 		ac.mutex.Unlock()
 
@@ -99,7 +101,7 @@ func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 		ac.App.EmitEvent(msgs.EventDataLoaded, types.DataLoadedPayload{
 			DataType:      "functions-events",
 			CurrentCount:  currentCount,
-			ExpectedTotal: ac.expectedFunctions + ac.expectedEvents,
+			ExpectedTotal: expected,
 			IsLoaded:      true,
 			Category:      "abis",
 		})

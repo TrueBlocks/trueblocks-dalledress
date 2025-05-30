@@ -508,10 +508,10 @@ export namespace sync {
 export namespace types {
 	
 	export enum ListKind {
-	    DOWNLOADED = "downloaded",
-	    KNOWN = "known",
-	    FUNCTIONS = "functions",
-	    EVENTS = "events",
+	    DOWNLOADED = "Downloaded",
+	    KNOWN = "Known",
+	    FUNCTIONS = "Functions",
+	    EVENTS = "Events",
 	}
 	export class Parameter {
 	    components?: Parameter[];

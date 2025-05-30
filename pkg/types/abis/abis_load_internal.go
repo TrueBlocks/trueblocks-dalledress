@@ -6,12 +6,14 @@ import (
 	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
+// ----------------------------------------------------------------
 // loadInternal is the core logic for loading ABIs, functions, and events. It runs as a
 // goroutine and updates the AbisCollection state as it processes the data reporting its
 // progress through the msgs system.
@@ -89,20 +91,25 @@ func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 	ac.App.EmitEvent(msgs.EventDataLoaded, finalPayload)
 }
 
-// loadFunctions loads ABI functions asynchronously and returns status, payload, and error
-func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
-	contextKey := "abis-load-internal-functions"
-	ac.App.Cancel(contextKey) // cancel any previous context for this key
+// ----------------------------------------------------------------
+// loadStreamingData is a generic method that handles streaming data of any type T
+func loadStreamingData[T any](
+	ac *AbisCollection,
+	contextKey string,
+	queryFunc func(*output.RenderCtx),
+	filterFunc func(item *T) bool,
+	processItemFunc func(itemIntf interface{}) *T,
+	targetSlice *[]T,
+	expectedCount *int,
+	loadedFlag *bool,
+	dataTypeName string,
+) (string, types.DataLoadedPayload, error) {
+	ac.App.Cancel(contextKey)
 	defer func() {
-		ac.App.Cancel(contextKey) // ensure we clean up the context
+		ac.App.Cancel(contextKey)
 	}()
 
 	renderCtx := ac.App.RegisterCtx(contextKey)
-	detailOpts := sdk.AbisOptions{
-		Globals:   sdk.Globals{Cache: true},
-		RenderCtx: renderCtx,
-	}
-
 	done := make(chan struct{})
 
 	go func() {
@@ -116,10 +123,7 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 			close(done)
 		}()
 
-		_, _, streamInitiationErr := detailOpts.AbisDetails()
-		if streamInitiationErr != nil {
-			logger.Info(fmt.Sprintf("AbisCollection.loadInternal: error initiating stream: %v", streamInitiationErr))
-		}
+		queryFunc(renderCtx)
 	}()
 
 	modelChanClosed := false
@@ -133,41 +137,35 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 				continue
 			}
 
-			itemPtr, okAssert := itemIntf.(*coreTypes.Function)
-			if !okAssert {
-				logger.Info(fmt.Sprintf("AbisCollection.loadInternal: unexpected item type: %T", itemIntf))
+			itemPtr := processItemFunc(itemIntf)
+			if itemPtr == nil {
+				logger.Info(fmt.Sprintf("AbisCollection.loadStreamingData: unexpected item type: %T", itemIntf))
 				continue
 			}
 
-			ac.mutex.Lock()
-			if _, exists := ac.deduper[itemPtr.Encoding]; exists {
+			if filterFunc(itemPtr) {
+				ac.mutex.Lock()
+				*targetSlice = append(*targetSlice, *itemPtr)
 				ac.mutex.Unlock()
-				continue
-			}
 
-			ac.deduper[itemPtr.Encoding] = struct{}{}
-			if itemPtr.FunctionType != "event" {
-				ac.allFunctions = append(ac.allFunctions, *itemPtr)
-			}
-			ac.mutex.Unlock()
-
-			if len(ac.allFunctions)%refreshRate == 0 {
-				ac.mutex.RLock()
-				isLoaded := len(ac.allFunctions) >= (ac.expectedFunctions)
-				payload := types.DataLoadedPayload{
-					DataType:      "functions-events",
-					CurrentCount:  len(ac.allFunctions),
-					ExpectedTotal: ac.expectedFunctions,
-					IsLoaded:      isLoaded,
-					Category:      "abis",
+				if len(*targetSlice)%refreshRate == 0 {
+					ac.mutex.RLock()
+					isLoaded := len(*targetSlice) >= *expectedCount
+					payload := types.DataLoadedPayload{
+						DataType:      dataTypeName,
+						CurrentCount:  len(*targetSlice),
+						ExpectedTotal: *expectedCount,
+						IsLoaded:      isLoaded,
+						Category:      "abis",
+					}
+					ac.App.EmitEvent(msgs.EventDataLoaded, payload)
+					statusMsg := fmt.Sprintf("Loading %s: %d processed.", dataTypeName, len(*targetSlice))
+					if *expectedCount > 0 {
+						statusMsg = fmt.Sprintf("Loading %s: %d of %d processed.", dataTypeName, len(*targetSlice), *expectedCount)
+					}
+					msgs.EmitStatus(statusMsg)
+					ac.mutex.RUnlock()
 				}
-				ac.App.EmitEvent(msgs.EventDataLoaded, payload)
-				statusMsg := fmt.Sprintf("Loading ABI details: %d processed.", len(ac.allFunctions))
-				if (ac.expectedFunctions) > 0 {
-					statusMsg = fmt.Sprintf("Loading ABI details: %d of %d processed.", len(ac.allFunctions), ac.expectedFunctions)
-				}
-				msgs.EmitStatus(statusMsg)
-				ac.mutex.RUnlock()
 			}
 
 		case streamErr, ok := <-renderCtx.ErrorChan:
@@ -175,7 +173,7 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 				errorChanClosed = true
 				continue
 			}
-			msgs.EmitError("AbisCollection.loadInternal: streaming error", streamErr)
+			msgs.EmitError("AbisCollection.loadStreamingData: streaming error", streamErr)
 
 		case <-done:
 			// Stream initialization completed
@@ -183,126 +181,119 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 	}
 
 	ac.mutex.Lock()
-	ac.isFuncsLoaded = true
+	*loadedFlag = true
 	ac.mutex.Unlock()
 
-	finalStatus := fmt.Sprintf("ABI function details loaded: %d functions.", len(ac.allFunctions))
+	finalStatus := fmt.Sprintf("%s loaded: %d items.", dataTypeName, len(*targetSlice))
 	finalPayload := types.DataLoadedPayload{
 		Category:      "abis",
-		DataType:      "functions-events",
+		DataType:      dataTypeName,
 		IsLoaded:      true,
-		CurrentCount:  len(ac.allFunctions),
-		ExpectedTotal: len(ac.allFunctions),
+		CurrentCount:  len(*targetSlice),
+		ExpectedTotal: len(*targetSlice),
 	}
+
+	return finalStatus, finalPayload, nil
+}
+
+// ----------------------------------------------------------------
+// loadFunctions loads ABI functions asynchronously and returns status, payload, and error
+func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
+	contextKey := "abis-load-internal-functions"
+
+	queryFunc := func(renderCtx *output.RenderCtx) {
+		detailOpts := sdk.AbisOptions{
+			Globals:   sdk.Globals{Cache: true},
+			RenderCtx: renderCtx,
+		}
+		detailOpts.AbisDetails()
+	}
+
+	filterFunc := func(item *coreTypes.Function) bool {
+		if item.FunctionType == "event" {
+			return false
+		}
+
+		ac.mutex.Lock()
+		defer ac.mutex.Unlock()
+		if _, exists := ac.deduper[item.Encoding]; exists {
+			return false
+		}
+		ac.deduper[item.Encoding] = struct{}{}
+		return true
+	}
+
+	processItemFunc := func(itemIntf interface{}) *coreTypes.Function {
+		itemPtr, ok := itemIntf.(*coreTypes.Function)
+		if !ok {
+			return nil
+		}
+		return itemPtr
+	}
+
+	finalStatus, finalPayload, _ := loadStreamingData(
+		ac,
+		contextKey,
+		queryFunc,
+		filterFunc,
+		processItemFunc,
+		&ac.allFunctions,
+		&ac.expectedFunctions,
+		&ac.isFuncsLoaded,
+		"functions-events",
+	)
 
 	return finalStatus, finalPayload
 }
 
+// ----------------------------------------------------------------
 // loadEvents loads ABI events asynchronously and returns status, payload
 func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
 	contextKey := "abis-load-internal-events"
-	ac.App.Cancel(contextKey) // cancel any previous context for this key
-	defer func() {
-		ac.App.Cancel(contextKey) // ensure we clean up the context
-	}()
 
-	renderCtx := ac.App.RegisterCtx(contextKey)
-	detailOpts := sdk.AbisOptions{
-		Globals:   sdk.Globals{Cache: true},
-		RenderCtx: renderCtx,
-	}
-
-	done := make(chan struct{})
-
-	go func() {
-		defer func() {
-			if renderCtx.ModelChan != nil {
-				close(renderCtx.ModelChan)
-			}
-			if renderCtx.ErrorChan != nil {
-				close(renderCtx.ErrorChan)
-			}
-			close(done)
-		}()
-
-		_, _, streamInitiationErr := detailOpts.AbisDetails()
-		if streamInitiationErr != nil {
-			logger.Info(fmt.Sprintf("AbisCollection.loadInternal: error initiating stream: %v", streamInitiationErr))
+	queryFunc := func(renderCtx *output.RenderCtx) {
+		detailOpts := sdk.AbisOptions{
+			Globals:   sdk.Globals{Cache: true},
+			RenderCtx: renderCtx,
 		}
-	}()
+		detailOpts.AbisDetails()
+	}
 
-	modelChanClosed := false
-	errorChanClosed := false
-
-	for !modelChanClosed || !errorChanClosed {
-		select {
-		case itemIntf, ok := <-renderCtx.ModelChan:
-			if !ok {
-				modelChanClosed = true
-				continue
-			}
-
-			itemPtr, okAssert := itemIntf.(*coreTypes.Function)
-			if !okAssert {
-				logger.Info(fmt.Sprintf("AbisCollection.loadInternal: unexpected item type: %T", itemIntf))
-				continue
-			}
-
-			ac.mutex.Lock()
-			if _, exists := ac.deduper[itemPtr.Encoding]; exists {
-				ac.mutex.Unlock()
-				continue
-			}
-
-			ac.deduper[itemPtr.Encoding] = struct{}{}
-			if itemPtr.FunctionType == "event" {
-				ac.allEvents = append(ac.allEvents, *itemPtr)
-			}
-			ac.mutex.Unlock()
-
-			if len(ac.allEvents)%refreshRate == 0 {
-				ac.mutex.RLock()
-				isLoaded := len(ac.allEvents) >= (ac.expectedEvents)
-				payload := types.DataLoadedPayload{
-					DataType:      "functions-events",
-					CurrentCount:  len(ac.allEvents),
-					ExpectedTotal: ac.expectedEvents,
-					IsLoaded:      isLoaded,
-					Category:      "abis",
-				}
-				ac.App.EmitEvent(msgs.EventDataLoaded, payload)
-				statusMsg := fmt.Sprintf("Loading ABI details: %d processed.", len(ac.allEvents))
-				if (ac.expectedEvents) > 0 {
-					statusMsg = fmt.Sprintf("Loading ABI details: %d of %d processed.", len(ac.allEvents), ac.expectedEvents)
-				}
-				msgs.EmitStatus(statusMsg)
-				ac.mutex.RUnlock()
-			}
-
-		case streamErr, ok := <-renderCtx.ErrorChan:
-			if !ok {
-				errorChanClosed = true
-				continue
-			}
-			msgs.EmitError("AbisCollection.loadInternal: streaming error", streamErr)
-
-		case <-done:
-			// Stream initialization completed
+	filterFunc := func(item *coreTypes.Function) bool {
+		// First check if it's an event (not a function)
+		if item.FunctionType != "event" {
+			return false
 		}
+
+		// Then check deduper for events only
+		ac.mutex.Lock()
+		defer ac.mutex.Unlock()
+		if _, exists := ac.deduper[item.Encoding]; exists {
+			return false
+		}
+		ac.deduper[item.Encoding] = struct{}{}
+		return true
 	}
 
-	ac.mutex.Lock()
-	ac.isEventsLoaded = true
-	ac.mutex.Unlock()
-
-	finalStatus := fmt.Sprintf("ABI event details loaded: %d events.", len(ac.allEvents))
-	finalPayload := types.DataLoadedPayload{
-		Category:      "abis",
-		DataType:      "functions-events",
-		IsLoaded:      true,
-		CurrentCount:  len(ac.allEvents),
-		ExpectedTotal: len(ac.allEvents),
+	processItemFunc := func(itemIntf interface{}) *coreTypes.Function {
+		itemPtr, ok := itemIntf.(*coreTypes.Function)
+		if !ok {
+			return nil
+		}
+		return itemPtr
 	}
+
+	finalStatus, finalPayload, _ := loadStreamingData(
+		ac,
+		contextKey,
+		queryFunc,
+		filterFunc,
+		processItemFunc,
+		&ac.allEvents,
+		&ac.expectedEvents,
+		&ac.isEventsLoaded,
+		"functions-events",
+	)
 
 	return finalStatus, finalPayload
 }

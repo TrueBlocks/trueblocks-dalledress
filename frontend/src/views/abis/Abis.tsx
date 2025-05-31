@@ -1,25 +1,20 @@
 // ADD_ROUTE
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { DeleteAbi, GetAbisPage, Reload } from '@app';
-import {
-  Action,
-  FormField,
-  Table,
-  TableProvider,
-  usePagination,
-} from '@components';
+import { Table, TableProvider, usePagination } from '@components';
 import { TableKey, useAppContext } from '@contexts';
 import { TabView } from '@layout';
-import { Group, Text } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { msgs, sorting, types } from '@models';
 import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
+import { getTableConfig } from 'src/views/abis/utilities';
 import { useLocation } from 'wouter';
 
 import './Abis.css';
-import { AbiRow, IndexedAbi, IndexedFunction, TableConfigProps } from './Types';
+import { ABIS_ROUTE, ACTION_MESSAGES, DEFAULT_LIST_KIND } from './constants';
+import { AbiRow, IndexedAbi, IndexedFunction, TableConfigProps } from './types';
 
 //--------------------------------------------------------------------
 export const Abis = () => {
@@ -28,8 +23,9 @@ export const Abis = () => {
   const [, setLocation] = useLocation();
 
   const [listKind, setListKind] = useState<types.ListKind>(
-    (lastTab['/abis'] as types.ListKind) || types.ListKind.DOWNLOADED,
+    (lastTab[ABIS_ROUTE] as types.ListKind) || DEFAULT_LIST_KIND,
   );
+  const listKindRef = useRef(listKind);
   const [downloadedAbis, setDownloadedAbis] = useState<IndexedAbi[]>([]);
   const [knownAbis, setKnownAbis] = useState<IndexedAbi[]>([]);
   const [functions, setFunctions] = useState<IndexedFunction[]>([]);
@@ -47,7 +43,7 @@ export const Abis = () => {
   const [isEventsLoaded, setIsEventsLoaded] = useState<boolean>(false);
 
   const tableKey = useMemo((): TableKey => {
-    return { viewName: '/abis', tabName: listKind };
+    return { viewName: ABIS_ROUTE, tabName: listKind };
   }, [listKind]);
 
   const { pagination, setTotalItems } = usePagination(tableKey);
@@ -106,15 +102,19 @@ export const Abis = () => {
   ]);
 
   useEffect(() => {
+    listKindRef.current = listKind;
+  }, [listKind]);
+
+  useEffect(() => {
     fetchData();
-  }, [fetchData, listKind]);
+  }, [fetchData]);
 
   useEffect(() => {
     const eventName = msgs.EventType.DATA_LOADED;
     const unlisten = EventsOn(eventName, (payload: unknown) => {
       const eventPayload = payload as types.DataLoadedPayload;
       if (eventPayload) {
-        switch (listKind) {
+        switch (listKindRef.current) {
           case types.ListKind.DOWNLOADED:
             setIsDownloadedLoaded(eventPayload.isLoaded);
             fetchData();
@@ -140,14 +140,14 @@ export const Abis = () => {
         unlisten();
       }
     };
-  }, [fetchData, listKind]);
+  }, [fetchData]);
 
   useEffect(() => {
-    const currentTabLabel = lastTab['/abis'] as types.ListKind | undefined;
-    if (currentTabLabel && currentTabLabel !== listKind) {
+    const currentTabLabel = lastTab[ABIS_ROUTE] as types.ListKind | undefined;
+    if (currentTabLabel && currentTabLabel !== listKindRef.current) {
       setListKind(currentTabLabel);
     }
-  }, [lastTab, listKind]);
+  }, [lastTab]);
 
   useHotkeys([
     [
@@ -160,7 +160,7 @@ export const Abis = () => {
         setIsEventsLoaded(false);
         Reload().then(() => {
           fetchData();
-          emitStatus('Reloaded ABI data. Fetching fresh data...');
+          emitStatus(ACTION_MESSAGES.RELOAD_STATUS);
         });
       },
     ],
@@ -192,8 +192,7 @@ export const Abis = () => {
           setDownloadedAbis((result.abis || []) as IndexedAbi[]);
           setTotalItems(result.totalItems || 0);
 
-          const action = 'deleted';
-          emitStatus(`Address ${address} was ${action} successfully`);
+          emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
         })
         .catch((err) => {
           // If there's an error, revert the optimistic update
@@ -284,7 +283,7 @@ export const Abis = () => {
 
   return (
     <div className="abisView">
-      <TabView tabs={tabs} route="/abis" />
+      <TabView tabs={tabs} route={ABIS_ROUTE} />
       {error && (
         <div className="error-message-placeholder">
           <h3>{`Error fetching ${listKind}`}</h3>
@@ -292,192 +291,6 @@ export const Abis = () => {
         </div>
       )}
     </div>
-  );
-};
-
-//--------------------------------------------------------------------
-const getTableConfig = (
-  listKind: types.ListKind,
-  config: TableConfigProps,
-): {
-  data: AbiRow[];
-  columns: FormField<AbiRow>[];
-} => {
-  const abiColumns = createAbiColumns(
-    listKind,
-    listKind === types.ListKind.DOWNLOADED
-      ? config.isDownloadedLoaded
-      : listKind === types.ListKind.KNOWN
-        ? config.isKnownLoaded
-        : listKind === types.ListKind.FUNCTIONS
-          ? config.isFuncsLoaded
-          : config.isEventsLoaded,
-    config.processingAddresses,
-    config.setSelectedAddress,
-    config.setLocation,
-    config.handleAction,
-  ) as FormField<AbiRow>[];
-
-  const funcColumns = createFunctionColumns() as FormField<AbiRow>[];
-
-  switch (listKind) {
-    case types.ListKind.FUNCTIONS:
-      return {
-        data: config.functions as AbiRow[],
-        columns: funcColumns,
-      };
-    case types.ListKind.EVENTS:
-      return {
-        data: config.events as AbiRow[],
-        columns: funcColumns,
-      };
-    case types.ListKind.KNOWN:
-      return {
-        data: config.knownAbis as AbiRow[],
-        columns: abiColumns,
-      };
-    case types.ListKind.DOWNLOADED:
-    // fall through
-    default:
-      return {
-        data: config.downloadedAbis as AbiRow[],
-        columns: abiColumns,
-      };
-  }
-};
-
-//--------------------------------------------------------------------
-const createAbiColumns = (
-  listKind: types.ListKind,
-  collectionIsLoaded: boolean,
-  processingAddresses: Set<string>,
-  setSelectedAddress: (address: string) => void,
-  setLocation: (path: string) => void,
-  handleAction: (address: string) => void,
-): FormField<types.Abi>[] => {
-  const baseColumns: FormField<types.Abi>[] = [
-    {
-      key: 'address',
-      header: 'Address',
-      sortable: true,
-      width: 'col-address',
-      render: (row: types.Abi) => (
-        <Text size="sm" ff="monospace">
-          {row.address.toString()}
-        </Text>
-      ),
-    },
-    {
-      key: 'name',
-      header: 'Name',
-      sortable: true,
-    },
-    {
-      key: 'nFunctions',
-      header: 'Functions',
-      sortable: true,
-      width: 'col-base-md',
-      render: (row: types.Abi) => <Text ta="right">{row.nFunctions}</Text>,
-    },
-    {
-      key: 'nEvents',
-      header: 'Events',
-      sortable: true,
-      width: 'col-base-md',
-      render: (row: types.Abi) => <Text ta="right">{row.nEvents}</Text>,
-    },
-    {
-      key: 'fileSize',
-      header: 'Size (bytes)',
-      sortable: true,
-      width: 'col-base-md',
-      render: (row: types.Abi) => <Text ta="right">{row.fileSize}</Text>,
-    },
-    {
-      key: 'lastModDate',
-      header: 'Last Modified',
-      sortable: true,
-      width: 'col-date',
-    },
-  ];
-
-  if (listKind === types.ListKind.KNOWN) {
-    return baseColumns.slice(1);
-  } else {
-    return [
-      ...baseColumns,
-      {
-        key: 'actions',
-        header: 'Actions',
-        width: 'col-actions',
-        render: (row: types.Abi) => {
-          return renderActions(
-            row as AbiRow,
-            collectionIsLoaded,
-            processingAddresses,
-            setSelectedAddress,
-            setLocation,
-            handleAction,
-          );
-        },
-      },
-    ];
-  }
-};
-
-//--------------------------------------------------------------------
-const createFunctionColumns = (): FormField<types.Function>[] => {
-  return [
-    {
-      key: 'encoding',
-      header: 'Encoding',
-      sortable: true,
-      width: 'col-encoding',
-    },
-    {
-      key: 'name',
-      header: 'Name',
-      sortable: true,
-    },
-    {
-      key: 'signature',
-      header: 'Signature',
-      sortable: true,
-    },
-  ];
-};
-
-//--------------------------------------------------------------------
-const renderActions = (
-  item: types.Abi | types.Function,
-  collectionIsLoaded: boolean,
-  processingAddresses: Set<string>,
-  setSelectedAddress: (address: string) => void,
-  setLocation: (path: string) => void,
-  handleAction: (address: string) => void,
-): React.ReactNode => {
-  const addressStr = 'address' in item ? String(item.address) : '';
-  const isProcessing = processingAddresses.has(addressStr);
-  return (
-    <Group gap="xs">
-      <Action
-        icon="History"
-        onClick={() => {
-          setSelectedAddress(addressStr);
-          setLocation(`/history/${addressStr}`);
-        }}
-        disabled={!collectionIsLoaded || isProcessing}
-        title="View History"
-        size="sm"
-      />
-      <Action
-        icon={'Delete'}
-        onClick={() => handleAction(addressStr)}
-        disabled={!collectionIsLoaded || isProcessing}
-        title={'Delete'}
-        size="sm"
-      />
-    </Group>
   );
 };
 

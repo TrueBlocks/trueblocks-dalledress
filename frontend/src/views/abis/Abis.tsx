@@ -14,7 +14,15 @@ import { useLocation } from 'wouter';
 
 import './Abis.css';
 import { ABIS_ROUTE, ACTION_MESSAGES, DEFAULT_LIST_KIND } from './constants';
+import {
+  DownloadedAbisTab,
+  EventsTab,
+  FunctionsTab,
+  KnownAbisTab,
+} from './index';
 import { AbiRow, IndexedAbi, IndexedFunction, TableConfigProps } from './types';
+
+const USE_NEW_TAB_COMPONENTS = true;
 
 //--------------------------------------------------------------------
 export const Abis = () => {
@@ -214,6 +222,87 @@ export const Abis = () => {
     Log(`Table submitted: ${formData}`);
   };
 
+  const renderNewTable = (listKind: types.ListKind) => {
+    const shouldShowLoading = (() => {
+      switch (listKind) {
+        case types.ListKind.DOWNLOADED:
+          return loading && downloadedAbis.length === 0;
+        case types.ListKind.KNOWN:
+          return loading && knownAbis.length === 0;
+        case types.ListKind.FUNCTIONS:
+          return loading && functions.length === 0;
+        case types.ListKind.EVENTS:
+          return loading && events.length === 0;
+        default:
+          return loading;
+      }
+    })();
+
+    const commonError = error;
+
+    switch (listKind) {
+      case types.ListKind.DOWNLOADED:
+        return (
+          <DownloadedAbisTab
+            data={downloadedAbis}
+            loading={shouldShowLoading}
+            error={commonError}
+            sort={currentSort}
+            onSortChange={setCurrentSort}
+            filter={currentFilter}
+            onFilterChange={setCurrentFilter}
+            onSubmit={handleTableSubmit}
+            onDelete={handleAction}
+            tableKey={tableKey}
+          />
+        );
+      case types.ListKind.KNOWN:
+        return (
+          <KnownAbisTab
+            data={knownAbis}
+            loading={shouldShowLoading}
+            error={commonError}
+            sort={currentSort}
+            onSortChange={setCurrentSort}
+            filter={currentFilter}
+            onFilterChange={setCurrentFilter}
+            onSubmit={handleTableSubmit}
+            tableKey={tableKey}
+          />
+        );
+      case types.ListKind.FUNCTIONS:
+        return (
+          <FunctionsTab
+            data={functions}
+            loading={shouldShowLoading}
+            error={commonError}
+            sort={currentSort}
+            onSortChange={setCurrentSort}
+            filter={currentFilter}
+            onFilterChange={setCurrentFilter}
+            onSubmit={handleTableSubmit}
+            tableKey={tableKey}
+          />
+        );
+      case types.ListKind.EVENTS:
+        return (
+          <EventsTab
+            data={events}
+            loading={shouldShowLoading}
+            error={commonError}
+            sort={currentSort}
+            onSortChange={setCurrentSort}
+            filter={currentFilter}
+            onFilterChange={setCurrentFilter}
+            onSubmit={handleTableSubmit}
+            tableKey={tableKey}
+          />
+        );
+      default:
+        return <div>Unknown list kind: {listKind}</div>;
+    }
+  };
+
   const renderTable = (listKind: types.ListKind) => {
     const config: TableConfigProps = {
       downloadedAbis,
@@ -270,7 +359,9 @@ export const Abis = () => {
     return {
       label: listKind,
       value: listKind,
-      content: renderTable(listKind),
+      content: USE_NEW_TAB_COMPONENTS
+        ? renderNewTable(listKind)
+        : renderTable(listKind),
     };
   };
 

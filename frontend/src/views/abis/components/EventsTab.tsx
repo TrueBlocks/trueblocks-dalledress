@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { BaseTab, FormField } from '@components';
-import { types } from '@models';
+import { sorting, types } from '@models';
 
 import { FUNCTION_COLUMNS } from '../columnDefinitions';
 
@@ -9,14 +9,26 @@ interface EventsTabProps {
   data: types.Function[];
   loading: boolean;
   error: Error | null;
+  sort?: sorting.SortDef | null;
+  onSortChange?: (sort: sorting.SortDef | null) => void;
+  filter?: string;
+  onFilterChange?: (filter: string) => void;
+  onSubmit?: (formData: Record<string, unknown>) => void;
   onSelect?: (encoding: string) => void;
+  tableKey: { viewName: string; tabName: string };
 }
 
 export const EventsTab = ({
   data,
   loading,
   error,
+  sort,
+  onSortChange,
+  filter,
+  onFilterChange,
+  onSubmit,
   onSelect,
+  tableKey,
 }: EventsTabProps) => {
   const handleAction = (item: Record<string, unknown>) => {
     const event = item as unknown as types.Function;
@@ -35,10 +47,13 @@ export const EventsTab = ({
       }
       loading={loading}
       error={error}
+      sort={sort}
+      onSortChange={onSortChange}
+      filter={filter}
+      onFilterChange={onFilterChange}
+      onSubmit={onSubmit}
       onAction={handleAction}
-      tableKey={{ viewName: 'abis', tabName: 'events' }}
-      emptyMessage="No events found"
-      loadingMessage="Loading events..."
+      tableKey={tableKey}
     />
   );
 };

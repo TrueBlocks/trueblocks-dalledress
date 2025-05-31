@@ -260,6 +260,16 @@ vi.mock('@components', async (importOriginal) => {
       ...(originalModule as any), // Spread other potential exports from @components
       useTableContext: mockUseTableContext,
       useFormHotkeys: mockUseFormHotkeys,
+      // Add commonly needed component mocks
+      TableProvider: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="mock-table-provider">{children}</div>
+      ),
+      Table: ({ data }: { data: any[] }) => (
+        <div data-testid="mock-table">
+          Table with {data ? data.length : 0} items
+        </div>
+      ),
+      FormField: vi.fn(),
     };
   } catch {
     // If @components has no actual module (e.g., only types or if resolution fails during test setup)
@@ -267,6 +277,15 @@ vi.mock('@components', async (importOriginal) => {
     return {
       useTableContext: mockUseTableContext,
       useFormHotkeys: mockUseFormHotkeys,
+      TableProvider: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="mock-table-provider">{children}</div>
+      ),
+      Table: ({ data }: { data: any[] }) => (
+        <div data-testid="mock-table">
+          Table with {data ? data.length : 0} items
+        </div>
+      ),
+      FormField: vi.fn(),
     };
   }
 });
@@ -325,7 +344,5 @@ export function resetAllCentralMocks() {
   mockUseTableContext.mockImplementation(() => mockTableContextDefaultValue);
 
   mockUseFormHotkeys.mockReset();
-  // If mockUseFormHotkeys needs a default implementation, add it here:
-  // mockUseFormHotkeys.mockImplementation(() => { /* default behavior */ });
 }
 // --- End Global Reset Utility --- //

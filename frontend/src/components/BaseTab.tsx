@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { FormField, Table } from '@components';
+import { FormField, Table, TableProvider } from '@components';
+import { sorting } from '@models';
 
 interface BaseTabProps<T extends Record<string, unknown>> {
   data: T[];
@@ -8,63 +9,43 @@ interface BaseTabProps<T extends Record<string, unknown>> {
   tableKey: { viewName: string; tabName: string };
   loading: boolean;
   error: Error | null;
+  sort?: sorting.SortDef | null;
+  onSortChange?: (sort: sorting.SortDef | null) => void;
+  filter?: string;
+  onFilterChange?: (filter: string) => void;
+  onSubmit?: (formData: Record<string, unknown>) => void;
   onAction?: (item: T) => void;
-  pagination?: {
-    currentPage: number;
-    pageSize: number;
-    totalItems: number;
-  };
-  emptyMessage?: string;
-  loadingMessage?: string;
 }
 
 export function BaseTab<T extends Record<string, unknown>>({
   data,
   columns,
   loading,
-  error,
+  error: _error,
+  sort,
+  onSortChange,
+  filter,
+  onFilterChange,
+  onSubmit,
   onAction: _onAction,
   tableKey,
-  pagination: _pagination,
-  emptyMessage = 'No data available',
-  loadingMessage = 'Loading...',
 }: BaseTabProps<T>) {
-  // Handle loading state
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <p>{loadingMessage}</p>
-      </div>
-    );
-  }
-
-  // Handle error state
-  if (error) {
-    return (
-      <div className="error-message-placeholder">
-        <h3>Error loading data</h3>
-        <p>{error.message}</p>
-      </div>
-    );
-  }
-
-  // Handle empty state
-  if (!data || data.length === 0) {
-    return (
-      <div className="empty-state">
-        <p>{emptyMessage}</p>
-      </div>
-    );
-  }
-
-  // Render the table
+  // Always render table structure - let Table component handle all states
   return (
-    <Table
-      data={data as Record<string, unknown>[]}
-      columns={columns as FormField<Record<string, unknown>>[]}
-      tableKey={tableKey}
-      loading={loading}
-      onSubmit={() => {}}
-    />
+    <TableProvider>
+      <div className="tableContainer">
+        <Table
+          data={data as Record<string, unknown>[]}
+          columns={columns as FormField<Record<string, unknown>>[]}
+          tableKey={tableKey}
+          loading={loading}
+          sort={sort}
+          onSortChange={onSortChange}
+          filter={filter}
+          onFilterChange={onFilterChange}
+          onSubmit={onSubmit || (() => {})}
+        />
+      </div>
+    </TableProvider>
   );
 }

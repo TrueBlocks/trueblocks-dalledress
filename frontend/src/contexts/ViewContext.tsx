@@ -6,6 +6,8 @@ import {
   useState,
 } from 'react';
 
+import { sorting } from '@models';
+
 import { TableKey, tableKeyToString } from '.';
 
 // Pagination interfaces
@@ -13,6 +15,15 @@ export interface PaginationState {
   currentPage: number;
   pageSize: number;
   totalItems: number;
+}
+
+// Sorting and filtering interfaces
+export interface SortingState {
+  [key: string]: sorting.SortDef | null; // keyed by tableKeyToString(tableKey)
+}
+
+export interface FilteringState {
+  [key: string]: string; // keyed by tableKey.viewName
 }
 
 // Create stable reference for initial state to prevent new object creation
@@ -35,6 +46,12 @@ interface ViewContextType {
     tableKey: TableKey,
     changes: Partial<PaginationState>,
   ) => void;
+  viewSorting: SortingState;
+  getSorting: (tableKey: TableKey) => sorting.SortDef | null;
+  updateSorting: (tableKey: TableKey, sort: sorting.SortDef | null) => void;
+  viewFiltering: FilteringState;
+  getFiltering: (tableKey: TableKey) => string;
+  updateFiltering: (tableKey: TableKey, filter: string) => void;
 }
 
 export const ViewContext = createContext<ViewContextType>({
@@ -43,11 +60,19 @@ export const ViewContext = createContext<ViewContextType>({
   viewPagination: {},
   getPagination: () => initialPaginationState,
   updatePagination: () => {},
+  viewSorting: {},
+  getSorting: () => null,
+  updateSorting: () => {},
+  viewFiltering: {},
+  getFiltering: () => '',
+  updateFiltering: () => {},
 });
 
 export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   const [currentView, setCurrentView] = useState('');
   const [viewPagination, setViewPagination] = useState<ViewPaginationState>({});
+  const [viewSorting, setViewSorting] = useState<SortingState>({});
+  const [viewFiltering, setViewFiltering] = useState<FilteringState>({});
 
   const getPagination = useCallback(
     (tableKey: TableKey) => {
@@ -74,6 +99,41 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
     [],
   );
 
+  const getSorting = useCallback(
+    (tableKey: TableKey) => {
+      const key = tableKeyToString(tableKey);
+      return viewSorting[key] || null;
+    },
+    [viewSorting],
+  );
+
+  const updateSorting = useCallback(
+    (tableKey: TableKey, sort: sorting.SortDef | null) => {
+      setViewSorting((prev) => {
+        const key = tableKeyToString(tableKey);
+        return {
+          ...prev,
+          [key]: sort,
+        };
+      });
+    },
+    [],
+  );
+
+  const getFiltering = useCallback(
+    (tableKey: TableKey) => {
+      return viewFiltering[tableKey.viewName] || '';
+    },
+    [viewFiltering],
+  );
+
+  const updateFiltering = useCallback((tableKey: TableKey, filter: string) => {
+    setViewFiltering((prev) => ({
+      ...prev,
+      [tableKey.viewName]: filter,
+    }));
+  }, []);
+
   return (
     <ViewContext.Provider
       value={{
@@ -82,6 +142,12 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
         viewPagination,
         getPagination,
         updatePagination,
+        viewSorting,
+        getSorting,
+        updateSorting,
+        viewFiltering,
+        getFiltering,
+        updateFiltering,
       }}
     >
       {children}
@@ -95,4 +161,34 @@ export const useViewContext = () => {
     throw new Error('useViewContext must be used within a ViewContextProvider');
   }
   return context;
+};
+
+// Hook for sorting state (per-tab)
+export const useSorting = (tableKey: TableKey) => {
+  const { getSorting, updateSorting } = useViewContext();
+
+  const sort = getSorting(tableKey);
+  const setSorting = useCallback(
+    (sort: sorting.SortDef | null) => {
+      updateSorting(tableKey, sort);
+    },
+    [tableKey, updateSorting],
+  );
+
+  return { sort, setSorting };
+};
+
+// Hook for filtering state (per-view)
+export const useFiltering = (tableKey: TableKey) => {
+  const { getFiltering, updateFiltering } = useViewContext();
+
+  const filter = getFiltering(tableKey);
+  const setFiltering = useCallback(
+    (filter: string) => {
+      updateFiltering(tableKey, filter);
+    },
+    [tableKey, updateFiltering],
+  );
+
+  return { filter, setFiltering };
 };

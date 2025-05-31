@@ -15,11 +15,12 @@ export interface PaginationState {
   totalItems: number;
 }
 
-export const initialPaginationState: PaginationState = {
+// Create stable reference for initial state to prevent new object creation
+export const initialPaginationState: PaginationState = Object.freeze({
   currentPage: 0,
   pageSize: 10,
   totalItems: 0,
-};
+});
 
 export interface ViewPaginationState {
   [key: string]: PaginationState;
@@ -40,7 +41,7 @@ export const ViewContext = createContext<ViewContextType>({
   currentView: '',
   setCurrentView: () => {},
   viewPagination: {},
-  getPagination: () => ({ ...initialPaginationState }),
+  getPagination: () => initialPaginationState,
   updatePagination: () => {},
 });
 
@@ -51,7 +52,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   const getPagination = useCallback(
     (tableKey: TableKey) => {
       const key = tableKeyToString(tableKey);
-      return viewPagination[key] || { ...initialPaginationState };
+      return viewPagination[key] || initialPaginationState;
     },
     [viewPagination],
   );

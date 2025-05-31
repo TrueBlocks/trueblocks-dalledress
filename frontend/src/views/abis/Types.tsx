@@ -26,5 +26,5 @@ export interface TableConfigProps {
   processingAddresses: Set<string>;
   setSelectedAddress: (address: string) => void;
   setLocation: (path: string) => void;
-  handleAction: (address: string, isDeleted: boolean) => void;
+  handleAction: (address: string) => void;
 }

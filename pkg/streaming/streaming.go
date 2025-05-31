@@ -21,7 +21,6 @@ func LoadStreamingData[T any](
 	targetSlice *[]T,
 	expectedCount *int,
 	loadedFlag *bool,
-	dataTypeName string,
 	m interface {
 		Lock()
 		Unlock()
@@ -77,15 +76,14 @@ func LoadStreamingData[T any](
 					m.RLock()
 					isLoaded := len(*targetSlice) >= *expectedCount
 					payload := types.DataLoadedPayload{
-						DataType:      dataTypeName,
 						CurrentCount:  len(*targetSlice),
 						ExpectedTotal: *expectedCount,
 						IsLoaded:      isLoaded,
 					}
 					app.EmitEvent(msgs.EventDataLoaded, payload)
-					statusMsg := fmt.Sprintf("Loading %s: %d processed.", dataTypeName, len(*targetSlice))
+					statusMsg := fmt.Sprintf("Loading: %d processed.", len(*targetSlice))
 					if *expectedCount > 0 {
-						statusMsg = fmt.Sprintf("Loading %s: %d of %d processed.", dataTypeName, len(*targetSlice), *expectedCount)
+						statusMsg = fmt.Sprintf("Loading: %d of %d processed.", len(*targetSlice), *expectedCount)
 					}
 					msgs.EmitStatus(statusMsg)
 					m.RUnlock()
@@ -108,9 +106,8 @@ func LoadStreamingData[T any](
 	*loadedFlag = true
 	m.Unlock()
 
-	finalStatus := fmt.Sprintf("%s loaded: %d items.", dataTypeName, len(*targetSlice))
+	finalStatus := fmt.Sprintf("loaded: %d items.", len(*targetSlice))
 	finalPayload := types.DataLoadedPayload{
-		DataType:      dataTypeName,
 		IsLoaded:      true,
 		CurrentCount:  len(*targetSlice),
 		ExpectedTotal: len(*targetSlice),

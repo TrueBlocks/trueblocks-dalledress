@@ -107,7 +107,7 @@ func getAbiSearchFields(item coreTypes.Abi) []string {
 }
 
 // ------------------------------------------------------------------------------
-func getAbiSortFunc(items []coreTypes.Abi, sortSpec interface{}) error {
+func getAbiSortFunc(items []coreTypes.Abi, sortSpec sdk.SortSpec) error {
 	return streaming.SortPageSlice(items, sortSpec, sdk.SortAbis)
 }
 
@@ -117,7 +117,7 @@ func getFunctionSearchFields(item coreTypes.Function) []string {
 }
 
 // ------------------------------------------------------------------------------
-func getFunctionSortFunc(items []coreTypes.Function, sortSpec interface{}) error {
+func getFunctionSortFunc(items []coreTypes.Function, sortSpec sdk.SortSpec) error {
 	return streaming.SortPageSlice(items, sortSpec, sdk.SortFunctions)
 }
 

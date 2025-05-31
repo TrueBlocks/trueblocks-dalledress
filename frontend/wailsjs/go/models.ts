@@ -656,7 +656,6 @@ export namespace types {
 		}
 	}
 	export class DataLoadedPayload {
-	    dataType: string;
 	    currentCount: number;
 	    expectedTotal: number;
 	    isLoaded: boolean;
@@ -667,7 +666,6 @@ export namespace types {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.dataType = source["dataType"];
 	        this.currentCount = source["currentCount"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isLoaded = source["isLoaded"];

@@ -96,6 +96,7 @@ export const Abis = () => {
         default:
           throw new Error(`Unknown list kind: ${listKind}`);
       }
+
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
       const e = err as Error;
@@ -123,28 +124,24 @@ export const Abis = () => {
     const eventName = msgs.EventType.DATA_LOADED;
     const unlisten = EventsOn(eventName, (payload: unknown) => {
       const eventPayload = payload as types.DataLoadedPayload;
-
       if (eventPayload) {
         switch (listKind) {
           case types.ListKind.DOWNLOADED:
             setIsDownloadedLoaded(eventPayload.isLoaded);
+            fetchData();
             break;
           case types.ListKind.KNOWN:
             setIsKnownLoaded(eventPayload.isLoaded);
+            fetchData();
             break;
           case types.ListKind.FUNCTIONS:
             setIsFuncsLoaded(eventPayload.isLoaded);
+            fetchData();
             break;
           case types.ListKind.EVENTS:
             setIsEventsLoaded(eventPayload.isLoaded);
+            fetchData();
             break;
-        }
-
-        if (
-          eventPayload.dataType === 'functions-events' ||
-          !eventPayload.isLoaded
-        ) {
-          fetchData();
         }
       }
     });

@@ -99,7 +99,6 @@ func (ac *AbisCollection) loadDownloadedAbis() (string, types.DataLoadedPayload)
 		&ac.downloadedAbis,
 		&ac.expectedDownloaded,
 		&ac.isDownloadedLoaded,
-		"functions-events",
 		&ac.mutex,
 	)
 
@@ -143,7 +142,6 @@ func (ac *AbisCollection) loadKnownAbis() (string, types.DataLoadedPayload) {
 		&ac.knownAbis,
 		&ac.expectedKnown,
 		&ac.isKnownLoaded,
-		"functions-events",
 		&ac.mutex,
 	)
 
@@ -197,7 +195,6 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 		&ac.allFunctions,
 		&ac.expectedFunctions,
 		&ac.isFuncsLoaded,
-		"functions-events",
 		&ac.mutex,
 	)
 
@@ -253,7 +250,6 @@ func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
 		&ac.allEvents,
 		&ac.expectedEvents,
 		&ac.isEventsLoaded,
-		"functions-events",
 		&ac.mutex,
 	)
 

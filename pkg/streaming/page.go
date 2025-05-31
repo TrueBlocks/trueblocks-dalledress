@@ -33,13 +33,8 @@ func PaginateSlice[T any](items []T, first, pageSize int) []T {
 	return items[start:end]
 }
 
-func SortPageSlice[T any](items []T, sortSpec interface{}, sortFn func([]T, sdk.SortSpec) error) error {
-	if sortSpec != nil {
-		if spec, ok := sortSpec.(sdk.SortSpec); ok {
-			return sortFn(items, spec)
-		}
-	}
-	return nil
+func SortPageSlice[T any](items []T, sortSpec sdk.SortSpec, sortFn func([]T, sdk.SortSpec) error) error {
+	return sortFn(items, sortSpec)
 }
 
 func CreatePageFilter[T any](filter string, searchFields func(T) []string) func(T) bool {
@@ -60,8 +55,8 @@ func CreatePageFilter[T any](filter string, searchFields func(T) []string) func(
 func ProcessPage[T any](
 	typeName string,
 	sourceSlice *[]T,
-	sortSpec interface{},
-	sortFn func([]T, interface{}) error,
+	sortSpec sdk.SortSpec,
+	sortFn func([]T, sdk.SortSpec) error,
 	filterFn func(T) bool,
 	first, pageSize int,
 ) (paginatedItems []T, totalFiltered, totalSource int, err error) {

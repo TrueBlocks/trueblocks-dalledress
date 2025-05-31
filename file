@@ -1,0 +1,141 @@
+yarn run v1.22.22
+$ export $(grep -v '^#' ../.env | xargs) >/dev/null && yarn test-go && yarn test-tsx && yarn test-dalle
+grep: ../.env: No such file or directory
+$ go test ./...
+?   	github.com/TrueBlocks/trueblocks-dalledress	[no test files]
+?   	github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver	[no test files]
+?   	github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs	[no test files]
+?   	github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting	[no test files]
+ok  	github.com/TrueBlocks/trueblocks-dalledress/app	(cached)
+ok  	github.com/TrueBlocks/trueblocks-dalledress/pkg/markdown	(cached)
+ok  	github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences	(cached)
+ok  	github.com/TrueBlocks/trueblocks-dalledress/pkg/project	(cached)
+ok  	github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming	(cached)
+ok  	github.com/TrueBlocks/trueblocks-dalledress/pkg/types	(cached)
+?   	github.com/TrueBlocks/trueblocks-dalledress/pkg/validation	[no test files]
+ok  	github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis	(cached)
+$ cd frontend && yarn vitest run && cd ..
+$ /Users/jrush/Development/trueblocks-dalledress/frontend/node_modules/.bin/vitest run
+
+ RUN  v3.1.4 /Users/jrush/Development/trueblocks-dalledress/frontend
+
+ ✓ src/contexts/__tests__/ViewContext.test.tsx (5 tests) 16ms
+ ✓ src/components/table/__tests__/useTableKeys.test.tsx (22 tests) 28ms
+ ✓ src/utils/__tests__/registerHotkeys.test.tsx (7 tests) 6ms
+ ✓ src/components/table/__tests__/TagsTable.test.tsx (8 tests) 134ms
+ ✓ src/components/table/__tests__/usePagination.test.ts (5 tests) 16ms
+ ✓ src/wizards/__tests__/WizardBasic.test.tsx (2 tests) 159ms
+ ✓ src/components/table/__tests__/Pagination.test.tsx (7 tests) 121ms
+ ✓ src/components/form/__tests__/FieldRenderer.test.tsx (9 tests) 153ms
+ ✓ src/components/__tests__/Action.test.tsx (17 tests) 139ms
+ ✓ src/components/form/__tests__/Form.test.tsx (14 tests) 287ms
+ ✓ src/components/table/__tests__/Table.test.tsx (9 tests) 169ms
+ ✓ src/components/table/__tests__/Stats.test.tsx (4 tests) 22ms
+ ✓ src/components/form/__tests__/usePreprocessedFields.test.tsx (5 tests) 36ms
+ ✓ src/__tests__/appReady.test.tsx (2 tests) 44ms
+ ✓ src/components/table/__tests__/Body.test.tsx (4 tests) 95ms
+ ✓ src/components/form/__tests__/useFormHotkeys.test.tsx (5 tests) 23ms
+ ❯ src/components/__tests__/BaseTab.test.tsx (6 tests | 6 failed) 40ms
+   × BaseTab > shows loading state 21ms
+     → screen.getByText is not a function
+   × BaseTab > shows custom loading message 4ms
+     → screen.getByText is not a function
+   × BaseTab > shows error state 4ms
+     → screen.getByText is not a function
+   × BaseTab > shows empty state 3ms
+     → screen.getByText is not a function
+   × BaseTab > shows custom empty message 5ms
+     → screen.getByText is not a function
+   × BaseTab > renders table with data 2ms
+     → screen.getByText is not a function
+ ✓ src/components/table/__tests__/SearchBox.test.tsx (5 tests) 32ms
+ ✓ src/components/table/__tests__/PerPage.test.tsx (3 tests) 80ms
+ ✓ src/components/table/__tests__/TableContext.test.tsx (1 test) 18ms
+ ✓ src/components/table/__tests__/Header.test.tsx (1 test) 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/__tests__/BaseTab.test.tsx > BaseTab > shows loading state
+TypeError: screen.getByText is not a function
+ ❯ src/components/__tests__/BaseTab.test.tsx:40:19
+     38|     );
+     39| 
+     40|     expect(screen.getByText('Loading...')).toBeInTheDocument();
+       |                   ^
+     41|   });
+     42| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/components/__tests__/BaseTab.test.tsx > BaseTab > shows custom loading message
+TypeError: screen.getByText is not a function
+ ❯ src/components/__tests__/BaseTab.test.tsx:55:19
+     53|     );
+     54| 
+     55|     expect(screen.getByText('Custom loading...')).toBeInTheDocument();
+       |                   ^
+     56|   });
+     57| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/components/__tests__/BaseTab.test.tsx > BaseTab > shows error state
+TypeError: screen.getByText is not a function
+ ❯ src/components/__tests__/BaseTab.test.tsx:71:19
+     69|     );
+     70| 
+     71|     expect(screen.getByText('Error loading data')).toBeInTheDocument();
+       |                   ^
+     72|     expect(screen.getByText('Test error')).toBeInTheDocument();
+     73|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/components/__tests__/BaseTab.test.tsx > BaseTab > shows empty state
+TypeError: screen.getByText is not a function
+ ❯ src/components/__tests__/BaseTab.test.tsx:86:19
+     84|     );
+     85| 
+     86|     expect(screen.getByText('No data available')).toBeInTheDocument();
+       |                   ^
+     87|   });
+     88| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/components/__tests__/BaseTab.test.tsx > BaseTab > shows custom empty message
+TypeError: screen.getByText is not a function
+ ❯ src/components/__tests__/BaseTab.test.tsx:101:19
+     99|     );
+    100| 
+    101|     expect(screen.getByText('Custom empty message')).toBeInTheDocument…
+       |                   ^
+    102|   });
+    103| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/components/__tests__/BaseTab.test.tsx > BaseTab > renders table with data
+TypeError: screen.getByText is not a function
+ ❯ src/components/__tests__/BaseTab.test.tsx:116:19
+    114| 
+    115|     // Our mock Table shows this message
+    116|     expect(screen.getByText('Table with 2 items')).toBeInTheDocument();
+       |                   ^
+    117|     expect(screen.getByTestId('mock-table')).toBeInTheDocument();
+    118|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed | 20 passed (21)
+      Tests  6 failed | 135 passed (141)
+   Start at  12:55:47
+   Duration  3.57s (transform 783ms, setup 1.87s, collect 12.88s, tests 1.64s, environment 7.35s, prepare 1.24s)
+
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

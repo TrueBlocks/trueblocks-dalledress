@@ -1,4 +1,5 @@
 export * from './Action';
+export * from './BaseTab';
 export * from './ChevronButton';
 export * from './Chips';
 export * from './NodeStatus';

@@ -73,7 +73,7 @@ func LoadStreamingData[T any](
 				*targetSlice = append(*targetSlice, *itemPtr)
 				m.Unlock()
 
-				if len(*targetSlice)%refreshRate == 0 {
+				if len(*targetSlice) == 7 || (len(*targetSlice) > 7 && len(*targetSlice)%refreshRate == 0) {
 					m.RLock()
 					isLoaded := len(*targetSlice) >= *expectedCount
 					payload := types.DataLoadedPayload{
@@ -81,7 +81,6 @@ func LoadStreamingData[T any](
 						CurrentCount:  len(*targetSlice),
 						ExpectedTotal: *expectedCount,
 						IsLoaded:      isLoaded,
-						Category:      "abis",
 					}
 					app.EmitEvent(msgs.EventDataLoaded, payload)
 					statusMsg := fmt.Sprintf("Loading %s: %d processed.", dataTypeName, len(*targetSlice))
@@ -111,7 +110,6 @@ func LoadStreamingData[T any](
 
 	finalStatus := fmt.Sprintf("%s loaded: %d items.", dataTypeName, len(*targetSlice))
 	finalPayload := types.DataLoadedPayload{
-		Category:      "abis",
 		DataType:      dataTypeName,
 		IsLoaded:      true,
 		CurrentCount:  len(*targetSlice),

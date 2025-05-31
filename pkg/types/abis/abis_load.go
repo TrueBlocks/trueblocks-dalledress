@@ -72,7 +72,10 @@ func (ac *AbisCollection) loadDownloadedAbis() (string, types.DataLoadedPayload)
 			Globals:   sdk.Globals{Cache: true, Verbose: true},
 			RenderCtx: renderCtx,
 		}
-		listOpts.AbisList()
+		if _, _, err := listOpts.AbisList(); err != nil {
+			logger.Error(fmt.Sprintf("AbisCollection.loadDownloadedAbis: %v", err))
+			return
+		}
 	}
 
 	filterFunc := func(item *coreTypes.Abi) bool {
@@ -113,7 +116,10 @@ func (ac *AbisCollection) loadKnownAbis() (string, types.DataLoadedPayload) {
 			Known:     true,
 			RenderCtx: renderCtx,
 		}
-		listOpts.AbisList()
+		if _, _, err := listOpts.AbisList(); err != nil {
+			logger.Error(fmt.Sprintf("AbisCollection.loadKnownAbis: %v", err))
+			return
+		}
 	}
 
 	filterFunc := func(item *coreTypes.Abi) bool {
@@ -154,7 +160,10 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 			Globals:   sdk.Globals{Cache: true},
 			RenderCtx: renderCtx,
 		}
-		detailOpts.AbisDetails()
+		if _, _, err := detailOpts.AbisDetails(); err != nil {
+			logger.Error(fmt.Sprintf("AbisCollection.loadFunctions: %v", err))
+			return
+		}
 	}
 
 	filterFunc := func(item *coreTypes.Function) bool {
@@ -205,7 +214,10 @@ func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
 			Globals:   sdk.Globals{Cache: true},
 			RenderCtx: renderCtx,
 		}
-		detailOpts.AbisDetails()
+		if _, _, err := detailOpts.AbisDetails(); err != nil {
+			logger.Error(fmt.Sprintf("AbisCollection.loadEvents: %v", err))
+			return
+		}
 	}
 
 	filterFunc := func(item *coreTypes.Function) bool {

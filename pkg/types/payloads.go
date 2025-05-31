@@ -5,5 +5,4 @@ type DataLoadedPayload struct {
 	CurrentCount  int    `json:"currentCount"`
 	ExpectedTotal int    `json:"expectedTotal"`
 	IsLoaded      bool   `json:"isLoaded"`
-	Category      string `json:"category,omitempty"`
 }

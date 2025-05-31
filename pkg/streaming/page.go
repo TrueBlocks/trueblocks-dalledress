@@ -68,7 +68,7 @@ func ProcessPage[T any](
 	filteredItems := FilterPageSlice(sourceSlice, filterFn)
 
 	if err := sortFn(filteredItems, sortSpec); err != nil {
-		return nil, 0, 0, fmt.Errorf("Error sorting %s: %w", typeName, err)
+		return nil, 0, 0, fmt.Errorf("error sorting %s: %w", typeName, err)
 	}
 
 	paginatedItems = PaginateSlice(filteredItems, first, pageSize)

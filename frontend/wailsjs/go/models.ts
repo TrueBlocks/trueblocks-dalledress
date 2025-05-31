@@ -660,7 +660,6 @@ export namespace types {
 	    currentCount: number;
 	    expectedTotal: number;
 	    isLoaded: boolean;
-	    category?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DataLoadedPayload(source);
@@ -672,7 +671,6 @@ export namespace types {
 	        this.currentCount = source["currentCount"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isLoaded = source["isLoaded"];
-	        this.category = source["category"];
 	    }
 	}
 	

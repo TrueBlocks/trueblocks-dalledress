@@ -68,29 +68,18 @@ export const Abis = () => {
       switch (listKind) {
         case types.ListKind.DOWNLOADED:
           setIsDownloadedLoaded(result.isLoaded);
-          break;
-        case types.ListKind.KNOWN:
-          setIsKnownLoaded(result.isLoaded);
-          break;
-        case types.ListKind.FUNCTIONS:
-          setIsFuncsLoaded(result.isLoaded);
-          break;
-        case types.ListKind.EVENTS:
-          setIsEventsLoaded(result.isLoaded);
-          break;
-      }
-
-      switch (listKind) {
-        case types.ListKind.DOWNLOADED:
           setDownloadedAbis((result.abis as IndexedAbi[]) || []);
           break;
         case types.ListKind.KNOWN:
+          setIsKnownLoaded(result.isLoaded);
           setKnownAbis((result.abis as IndexedAbi[]) || []);
           break;
         case types.ListKind.FUNCTIONS:
+          setIsFuncsLoaded(result.isLoaded);
           setFunctions((result.functions as IndexedFunction[]) || []);
           break;
         case types.ListKind.EVENTS:
+          setIsEventsLoaded(result.isLoaded);
           setEvents((result.functions as IndexedFunction[]) || []);
           break;
         default:
@@ -99,7 +88,7 @@ export const Abis = () => {
 
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      const e = err as Error;
+      const e = err instanceof Error ? err : new Error(String(err));
       setError(e);
       emitError(`${e.message} Failed to fetch ${listKind}`);
       Log(`Error fetching ${listKind}: ${e}`);
@@ -177,19 +166,18 @@ export const Abis = () => {
     ],
   ]);
 
-  const handleAction = (address: string, _isDeleted: boolean) => {
-    const addressStr = address;
-    setProcessingAddresses((prev) => new Set(prev).add(addressStr));
+  const handleAction = (address: string) => {
+    setProcessingAddresses((prev) => new Set(prev).add(address));
     try {
       const original = [...downloadedAbis];
       const optimisticNames = original.filter((abi) => {
         const nameAddress =
           typeof abi.address === 'string' ? abi.address : String(abi.address);
-        return nameAddress !== addressStr;
+        return nameAddress !== address;
       });
       setDownloadedAbis(optimisticNames as IndexedAbi[]);
 
-      DeleteAbi(addressStr)
+      DeleteAbi(address)
         .then(async () => {
           // If API call is successful, refresh the data to get the definitive state
           const sortArgument = currentSort === null ? undefined : currentSort;
@@ -202,10 +190,10 @@ export const Abis = () => {
           );
 
           setDownloadedAbis((result.abis || []) as IndexedAbi[]);
-          setTotalItems(result.expectedTotal || 0);
+          setTotalItems(result.totalItems || 0);
 
           const action = 'deleted';
-          emitStatus(`Address ${addressStr} was ${action} successfully`);
+          emitStatus(`Address ${address} was ${action} successfully`);
         })
         .catch((err) => {
           // If there's an error, revert the optimistic update
@@ -217,7 +205,7 @@ export const Abis = () => {
       // Always clean up the processing state
       setProcessingAddresses((prev) => {
         const newSet = new Set(prev);
-        newSet.delete(addressStr);
+        newSet.delete(address);
         return newSet;
       });
     }
@@ -245,17 +233,16 @@ export const Abis = () => {
 
     const { data, columns } = getTableConfig(listKind, config);
 
-    // Determine if the current collection is still loading
-    const isCurrentCollectionLoading = (() => {
+    const shouldShowLoading = (() => {
       switch (listKind) {
         case types.ListKind.DOWNLOADED:
-          return !isDownloadedLoaded;
+          return loading && downloadedAbis.length === 0;
         case types.ListKind.KNOWN:
-          return !isKnownLoaded;
+          return loading && knownAbis.length === 0;
         case types.ListKind.FUNCTIONS:
-          return !isFuncsLoaded;
+          return loading && functions.length === 0;
         case types.ListKind.EVENTS:
-          return !isEventsLoaded;
+          return loading && events.length === 0;
         default:
           return loading;
       }
@@ -267,7 +254,7 @@ export const Abis = () => {
           <Table<AbiRow>
             columns={columns}
             data={data}
-            loading={loading || isCurrentCollectionLoading}
+            loading={shouldShowLoading}
             sort={currentSort}
             onSortChange={setCurrentSort}
             filter={currentFilter}
@@ -366,7 +353,7 @@ const createAbiColumns = (
   processingAddresses: Set<string>,
   setSelectedAddress: (address: string) => void,
   setLocation: (path: string) => void,
-  handleAction: (address: string, isDeleted: boolean) => void,
+  handleAction: (address: string) => void,
 ): FormField<types.Abi>[] => {
   const baseColumns: FormField<types.Abi>[] = [
     {
@@ -425,7 +412,7 @@ const createAbiColumns = (
         width: 'col-actions',
         render: (row: types.Abi) => {
           return renderActions(
-            row,
+            row as AbiRow,
             collectionIsLoaded,
             processingAddresses,
             setSelectedAddress,
@@ -467,9 +454,9 @@ const renderActions = (
   processingAddresses: Set<string>,
   setSelectedAddress: (address: string) => void,
   setLocation: (path: string) => void,
-  handleAction: (address: string, isDeleted: boolean) => void,
+  handleAction: (address: string) => void,
 ): React.ReactNode => {
-  const addressStr = 'address' in item ? item.address.toString() : '';
+  const addressStr = 'address' in item ? String(item.address) : '';
   const isProcessing = processingAddresses.has(addressStr);
   return (
     <Group gap="xs">
@@ -485,7 +472,7 @@ const renderActions = (
       />
       <Action
         icon={'Delete'}
-        onClick={() => handleAction(addressStr, false)}
+        onClick={() => handleAction(addressStr)}
         disabled={!collectionIsLoaded || isProcessing}
         title={'Delete'}
         size="sm"

@@ -27,36 +27,36 @@ func TestGetPage(t *testing.T) {
 	ac.isFuncsLoaded = true
 	ac.isEventsLoaded = true
 	// Populate with some dummy data for testing pagination and filtering
-	ac.downloadedAbis = []coreTypes.Abi{
+	ac.downloaded = []coreTypes.Abi{
 		{Name: "TestABI1", Address: base.HexToAddress("0x1")},   // Use base.HexToAddress
 		{Name: "AnotherABI", Address: base.HexToAddress("0x2")}, // Use base.HexToAddress
 	}
-	ac.knownAbis = []coreTypes.Abi{
+	ac.known = []coreTypes.Abi{
 		{Name: "KnownABI1", Address: base.HexToAddress("0x3")}, // Use base.HexToAddress
 	}
-	ac.allFunctions = []coreTypes.Function{
+	ac.functions = []coreTypes.Function{
 		{Name: "func1", Signature: "func1()"},
 		{Name: "func2", Signature: "func2(uint256)"},
 	}
-	ac.allEvents = []coreTypes.Function{
+	ac.events = []coreTypes.Function{
 		{Name: "event1", Signature: "event1()"},
 	}
 	ac.mutex.Unlock()
 	t.Run("DownloadedAbis", func(t *testing.T) {
-		if len(ac.downloadedAbis) == 0 {
-			t.Skip("Skipping DownloadedAbis tests as ac.downloadedAbis is empty")
+		if len(ac.downloaded) == 0 {
+			t.Skip("Skipping DownloadedAbis tests as ac.downloaded is empty")
 		}
-		nItems := len(ac.downloadedAbis)
+		nItems := len(ac.downloaded)
 		var itemName, itemAddr string
 		if nItems > 0 {
-			itemName = ac.downloadedAbis[0].Name
-			itemAddr = ac.downloadedAbis[0].Address.Hex()
+			itemName = ac.downloaded[0].Name
+			itemAddr = ac.downloaded[0].Address.Hex()
 		}
 
 		countMatches := func(filter string) int {
 			count := 0
 			lFilter := strings.ToLower(filter)
-			for _, abi := range ac.downloadedAbis {
+			for _, abi := range ac.downloaded {
 				if filter == "" || strings.Contains(strings.ToLower(abi.Name), lFilter) || strings.Contains(strings.ToLower(abi.Address.Hex()), lFilter) {
 					count++
 				}
@@ -129,20 +129,20 @@ func TestGetPage(t *testing.T) {
 	})
 
 	t.Run("KnownAbis", func(t *testing.T) {
-		if len(ac.knownAbis) == 0 {
-			t.Skip("Skipping KnownAbis tests as ac.knownAbis is empty")
+		if len(ac.known) == 0 {
+			t.Skip("Skipping KnownAbis tests as ac.known is empty")
 		}
-		nItems := len(ac.knownAbis)
+		nItems := len(ac.known)
 		var itemName, itemAddr string
 		if nItems > 0 {
-			itemName = ac.knownAbis[0].Name
-			itemAddr = ac.knownAbis[0].Address.Hex()
+			itemName = ac.known[0].Name
+			itemAddr = ac.known[0].Address.Hex()
 		}
 
 		countMatches := func(filter string) int {
 			count := 0
 			lFilter := strings.ToLower(filter)
-			for _, abi := range ac.knownAbis {
+			for _, abi := range ac.known {
 				if filter == "" || strings.Contains(strings.ToLower(abi.Name), lFilter) || strings.Contains(strings.ToLower(abi.Address.Hex()), lFilter) {
 					count++
 				}
@@ -216,16 +216,16 @@ func TestGetPage(t *testing.T) {
 	})
 
 	t.Run("Functions", func(t *testing.T) {
-		if len(ac.allFunctions) == 0 {
+		if len(ac.functions) == 0 {
 			t.Skip("Skipping Functions tests: no functions found.")
 			return
 		}
 
-		nItems := len(ac.allFunctions)
+		nItems := len(ac.functions)
 		var itemName, itemSig string
 		if nItems > 0 {
-			itemName = ac.allFunctions[0].Name
-			itemSig = ac.allFunctions[0].Signature
+			itemName = ac.functions[0].Name
+			itemSig = ac.functions[0].Signature
 		}
 
 		countMatches := func(filter string) int {
@@ -234,7 +234,7 @@ func TestGetPage(t *testing.T) {
 			}
 			count := 0
 			lFilter := strings.ToLower(filter)
-			for _, f := range ac.allFunctions {
+			for _, f := range ac.functions {
 				if strings.Contains(strings.ToLower(f.Name), lFilter) ||
 					strings.Contains(strings.ToLower(f.Signature), lFilter) {
 					count++
@@ -291,16 +291,16 @@ func TestGetPage(t *testing.T) {
 	})
 
 	t.Run("Events", func(t *testing.T) {
-		if len(ac.allEvents) == 0 {
+		if len(ac.events) == 0 {
 			t.Skip("Skipping Events tests: no events found.")
 			return
 		}
 
-		nItems := len(ac.allEvents)
+		nItems := len(ac.events)
 		var itemName, itemSig string
 		if nItems > 0 {
-			itemName = ac.allEvents[0].Name
-			itemSig = ac.allEvents[0].Signature
+			itemName = ac.events[0].Name
+			itemSig = ac.events[0].Signature
 		}
 
 		countMatches := func(filter string) int {
@@ -309,7 +309,7 @@ func TestGetPage(t *testing.T) {
 			}
 			count := 0
 			lFilter := strings.ToLower(filter)
-			for _, e := range ac.allEvents {
+			for _, e := range ac.events {
 				if strings.Contains(strings.ToLower(e.Name), lFilter) || strings.Contains(strings.ToLower(e.Signature), lFilter) {
 					count++
 				}

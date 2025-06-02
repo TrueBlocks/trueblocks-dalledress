@@ -1,6 +1,7 @@
 import { FormField, Header } from '@components';
 import { render, screen } from '@testing-library/react';
 
+const mockTableKey = { viewName: 'test', tabName: 'test' };
 describe('Header', () => {
   it('renders all column headers', () => {
     const columns: FormField<any>[] = [
@@ -12,7 +13,7 @@ describe('Header', () => {
     ];
     render(
       <table>
-        <Header columns={columns} />
+        <Header columns={columns} tableKey={mockTableKey} />
       </table>,
     );
     expect(screen.getByText('Name')).toBeInTheDocument();

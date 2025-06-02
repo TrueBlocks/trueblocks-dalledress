@@ -7,11 +7,8 @@ import { usePagination } from '../usePagination';
 const baseMockContext = {
   currentView: '',
   setCurrentView: vi.fn(),
-  viewPagination: {},
-  viewSorting: {},
   getSorting: vi.fn(),
   updateSorting: vi.fn(),
-  viewFiltering: {},
   getFiltering: vi.fn(),
   updateFiltering: vi.fn(),
 };

@@ -1,30 +1,28 @@
 import React from 'react';
 
 import { FormField } from '@components';
-import { sorting } from '@models';
+import { TableKey, useSorting } from '@contexts';
 
 import './Header.css';
 
 export const Header = <T extends Record<string, unknown>>({
   columns,
-  sort,
-  onSortChange,
+  tableKey,
 }: {
   columns: FormField<T>[];
-  sort?: sorting.SortDef | null;
-  onSortChange?: (sort: sorting.SortDef | null) => void;
+  tableKey: TableKey;
 }) => {
+  const { sort, setSorting } = useSorting(tableKey);
   const handleClick = (col: FormField<T>) => {
-    if (!onSortChange) return;
     if (!col.sortable) return;
     if (!sort || sort.key !== col.key) {
       if (typeof col.key === 'string') {
-        onSortChange({ key: col.key, direction: 'asc' });
+        setSorting({ key: col.key, direction: 'asc' });
       }
     } else if (sort.direction === 'asc') {
-      onSortChange({ key: col.key, direction: 'desc' });
+      setSorting({ key: col.key, direction: 'desc' });
     } else {
-      onSortChange(null); // Remove sort
+      setSorting(null); // Remove sort
     }
   };
 

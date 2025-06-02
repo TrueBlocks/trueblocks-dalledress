@@ -21,9 +21,9 @@ func (ac *AbisCollection) Delete(address string) error {
 
 	ac.mutex.Lock()
 	defer ac.mutex.Unlock()
-	for i, abi := range ac.downloadedAbis {
+	for i, abi := range ac.downloaded {
 		if abi.Address.Hex() == address {
-			ac.downloadedAbis = append(ac.downloadedAbis[:i], ac.downloadedAbis[i+1:]...)
+			ac.downloaded = append(ac.downloaded[:i], ac.downloaded[i+1:]...)
 			msgs.EmitStatus(fmt.Sprintf("Deleted ABI for address: %s", address))
 			ac.App.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
 			return nil

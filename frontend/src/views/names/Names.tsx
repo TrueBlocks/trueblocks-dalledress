@@ -20,7 +20,7 @@ import {
   mapNameToChips,
   usePagination,
 } from '@components';
-import { TableKey, useAppContext } from '@contexts';
+import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { TabView } from '@layout';
 import { msgs, sorting, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
@@ -53,8 +53,6 @@ export const Names = () => {
   const { lastTab, setSelectedAddress } = useAppContext();
   const [, setLocation] = useLocation();
 
-  const [sort, setSort] = useState<sorting.SortDef | null>(null);
-  const [filter, setFilter] = useState('');
   const [names, setNames] = useState<IndexableName[]>([]);
   const [loading, setLoading] = useState(false);
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
@@ -74,13 +72,6 @@ export const Names = () => {
   });
   const { emitStatus, emitError } = useEmitters();
 
-  // References for each tab's TagsTable to support targeting specific instances
-  const tagsTableRefs = useRef<Record<string, TagsTableHandle | null>>({});
-  const mainTableRef = useRef<HTMLDivElement>(null);
-
-  // Single ref for backward compatibility
-  const tagsTableRef = useRef<TagsTableHandle>(null);
-
   const tableKey = useMemo<TableKey>(
     () => ({
       viewName: '/names',
@@ -89,13 +80,23 @@ export const Names = () => {
     [listKind],
   );
 
+  const { sort } = useSorting(tableKey);
+  const { filter, setFiltering } = useFiltering(tableKey);
+
+  // References for each tab's TagsTable to support targeting specific instances
+  const tagsTableRefs = useRef<Record<string, TagsTableHandle | null>>({});
+  const mainTableRef = useRef<HTMLDivElement>(null);
+
+  // Single ref for backward compatibility
+  const tagsTableRef = useRef<TagsTableHandle>(null);
+
   const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
 
   const handleChipClick = (value: string) => {
     if (filter === value) {
-      setFilter('');
+      setFiltering('');
     } else {
-      setFilter(value);
+      setFiltering(value);
     }
   };
 
@@ -710,10 +711,6 @@ export const Names = () => {
           columns={nameColumns}
           data={names}
           loading={loading}
-          sort={sort}
-          onSortChange={setSort}
-          filter={filter}
-          onFilterChange={setFilter}
           tableKey={tableKey}
           onSubmit={handleFormSubmit}
           validate={formValidation}

@@ -2,9 +2,8 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
-import { TableKey } from '@contexts';
+import { TableKey, useFiltering } from '@contexts';
 import { Modal } from '@mantine/core';
-import { sorting } from '@models';
 
 import { Body, Header, Pagination, PerPage, Stats, usePagination } from '.';
 import { SearchBox } from './SearchBox';
@@ -15,10 +14,6 @@ export interface TableProps<T extends Record<string, unknown>> {
   columns: FormField<T>[];
   data: T[];
   loading: boolean;
-  sort?: sorting.SortDef | null;
-  onSortChange?: (sort: sorting.SortDef | null) => void;
-  filter?: string;
-  onFilterChange?: (filter: string) => void;
   tableKey: TableKey;
   onSubmit: (data: Record<string, unknown>) => void;
   validate?: Record<
@@ -31,15 +26,12 @@ export const Table = <T extends Record<string, unknown>>({
   columns,
   data,
   loading,
-  sort: controlledSort,
-  onSortChange,
-  filter: controlledFilter,
-  onFilterChange,
   tableKey,
   onSubmit,
   validate,
 }: TableProps<T>) => {
   const { pagination } = usePagination(tableKey);
+  const { filter, setFiltering } = useFiltering(tableKey);
   const { currentPage, pageSize, totalItems } = pagination;
   const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -165,23 +157,6 @@ export const Table = <T extends Record<string, unknown>>({
     }
   }, [data, selectedRowIndex, setSelectedRowIndex]);
 
-  const [internalSort, setInternalSort] = useState<sorting.SortDef | null>(
-    null,
-  );
-  const sort = controlledSort !== undefined ? controlledSort : internalSort;
-  const handleSortChange = (nextSort: sorting.SortDef | null) => {
-    if (onSortChange) onSortChange(nextSort);
-    else setInternalSort(nextSort);
-  };
-
-  const [internalFilter, setInternalFilter] = useState('');
-  const filter =
-    controlledFilter !== undefined ? controlledFilter : internalFilter;
-  const handleFilterChange = (v: string) => {
-    if (onFilterChange) onFilterChange(v);
-    else setInternalFilter(v);
-  };
-
   const handleRowClick = (index: number) => {
     setSelectedRowIndex(index);
     setCurrentRowData(data[index] || null);
@@ -190,7 +165,7 @@ export const Table = <T extends Record<string, unknown>>({
   return (
     <div className="table-outer-container">
       <div className="top-pagination-container">
-        <SearchBox value={filter} onChange={handleFilterChange} />
+        <SearchBox value={filter} onChange={setFiltering} />
         <PerPage
           tableKey={tableKey}
           pageSize={pageSize}
@@ -210,11 +185,7 @@ export const Table = <T extends Record<string, unknown>>({
           className="data-table"
           style={{ width: '100%', tableLayout: 'fixed' }}
         >
-          <Header
-            columns={columns}
-            sort={sort}
-            onSortChange={handleSortChange}
-          />
+          <Header columns={columns} tableKey={tableKey} />
         </table>
       </div>
 

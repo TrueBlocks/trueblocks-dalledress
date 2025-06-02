@@ -15,8 +15,8 @@ export type AbiRow = (types.Abi | types.Function) & {
 
 //--------------------------------------------------------------------
 export interface TableConfigProps {
-  downloadedAbis: IndexedAbi[];
-  knownAbis: IndexedAbi[];
+  downloaded: IndexedAbi[];
+  known: IndexedAbi[];
   functions: IndexedFunction[];
   events: IndexedFunction[];
   isDownloadedLoaded: boolean;

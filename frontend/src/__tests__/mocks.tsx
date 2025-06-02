@@ -195,7 +195,6 @@ export { customRender as render, screen, fireEvent };
 const createInitialViewContextDefaultValue = () => ({
   currentView: 'mockView',
   setCurrentView: vi.fn(),
-  viewPagination: {},
   getPagination: vi.fn(() => ({ currentPage: 0, pageSize: 10, totalItems: 0 })),
   updatePagination: vi.fn(),
 });

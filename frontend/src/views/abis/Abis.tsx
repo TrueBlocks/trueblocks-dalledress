@@ -1,28 +1,24 @@
+/*
+TableConfigProps
+getTableConfig
+*/
 // ADD_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { DeleteAbi, GetAbisPage, Reload } from '@app';
-import { Table, TableProvider, usePagination } from '@components';
-import { TableKey, useAppContext } from '@contexts';
+import { usePagination } from '@components';
+import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { msgs, sorting, types } from '@models';
 import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
-import { getTableConfig } from 'src/views/abis/utilities';
 import { useLocation } from 'wouter';
 
 import './Abis.css';
 import { ABIS_ROUTE, ACTION_MESSAGES, DEFAULT_LIST_KIND } from './constants';
-import {
-  DownloadedAbisTab,
-  EventsTab,
-  FunctionsTab,
-  KnownAbisTab,
-} from './index';
-import { AbiRow, IndexedAbi, IndexedFunction, TableConfigProps } from './types';
-
-const USE_NEW_TAB_COMPONENTS = true;
+import { DownloadedTab, EventsTab, FunctionsTab, KnownTab } from './index';
+import { IndexedAbi, IndexedFunction } from './types';
 
 //--------------------------------------------------------------------
 export const Abis = () => {
@@ -34,14 +30,12 @@ export const Abis = () => {
     (lastTab[ABIS_ROUTE] as types.ListKind) || DEFAULT_LIST_KIND,
   );
   const listKindRef = useRef(listKind);
-  const [downloadedAbis, setDownloadedAbis] = useState<IndexedAbi[]>([]);
-  const [knownAbis, setKnownAbis] = useState<IndexedAbi[]>([]);
+  const [downloaded, setDownloaded] = useState<IndexedAbi[]>([]);
+  const [known, setKnown] = useState<IndexedAbi[]>([]);
   const [functions, setFunctions] = useState<IndexedFunction[]>([]);
   const [events, setEvents] = useState<IndexedFunction[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  const [currentSort, setCurrentSort] = useState<sorting.SortDef | null>(null);
-  const [currentFilter, setCurrentFilter] = useState<string>('');
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
@@ -55,28 +49,30 @@ export const Abis = () => {
   }, [listKind]);
 
   const { pagination, setTotalItems } = usePagination(tableKey);
+  const { sort } = useSorting(tableKey);
+  const { filter } = useFiltering(tableKey);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const sortArgument = currentSort === null ? undefined : currentSort;
+      const sortArgument = sort === null ? undefined : sort;
       const result = await GetAbisPage(
         listKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sortArgument as sorting.SortDef,
-        currentFilter,
+        filter,
       );
 
       switch (listKind) {
         case types.ListKind.DOWNLOADED:
           setIsDownloadedLoaded(result.isLoaded);
-          setDownloadedAbis((result.abis as IndexedAbi[]) || []);
+          setDownloaded((result.abis as IndexedAbi[]) || []);
           break;
         case types.ListKind.KNOWN:
           setIsKnownLoaded(result.isLoaded);
-          setKnownAbis((result.abis as IndexedAbi[]) || []);
+          setKnown((result.abis as IndexedAbi[]) || []);
           break;
         case types.ListKind.FUNCTIONS:
           setIsFuncsLoaded(result.isLoaded);
@@ -100,11 +96,11 @@ export const Abis = () => {
       setLoading(false);
     }
   }, [
-    currentSort,
+    sort,
     listKind,
     pagination.currentPage,
     pagination.pageSize,
-    currentFilter,
+    filter,
     setTotalItems,
     emitError,
   ]);
@@ -177,34 +173,34 @@ export const Abis = () => {
   const handleAction = (address: string) => {
     setProcessingAddresses((prev) => new Set(prev).add(address));
     try {
-      const original = [...downloadedAbis];
+      const original = [...downloaded];
       const optimisticNames = original.filter((abi) => {
         const nameAddress =
           typeof abi.address === 'string' ? abi.address : String(abi.address);
         return nameAddress !== address;
       });
-      setDownloadedAbis(optimisticNames as IndexedAbi[]);
+      setDownloaded(optimisticNames as IndexedAbi[]);
 
       DeleteAbi(address)
         .then(async () => {
           // If API call is successful, refresh the data to get the definitive state
-          const sortArgument = currentSort === null ? undefined : currentSort;
+          const sortArgument = sort === null ? undefined : sort;
           const result = await GetAbisPage(
             listKind,
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
             sortArgument as sorting.SortDef,
-            currentFilter,
+            filter,
           );
 
-          setDownloadedAbis((result.abis || []) as IndexedAbi[]);
+          setDownloaded((result.abis || []) as IndexedAbi[]);
           setTotalItems(result.totalItems || 0);
 
           emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
         })
         .catch((err) => {
           // If there's an error, revert the optimistic update
-          setDownloadedAbis(optimisticNames as IndexedAbi[]);
+          setDownloaded(optimisticNames as IndexedAbi[]);
           emitError(err);
           Log(`Error in handleAction: ${err}`);
         });
@@ -222,35 +218,14 @@ export const Abis = () => {
     Log(`Table submitted: ${formData}`);
   };
 
-  const renderNewTable = (listKind: types.ListKind) => {
-    const shouldShowLoading = (() => {
-      switch (listKind) {
-        case types.ListKind.DOWNLOADED:
-          return loading && downloadedAbis.length === 0;
-        case types.ListKind.KNOWN:
-          return loading && knownAbis.length === 0;
-        case types.ListKind.FUNCTIONS:
-          return loading && functions.length === 0;
-        case types.ListKind.EVENTS:
-          return loading && events.length === 0;
-        default:
-          return loading;
-      }
-    })();
-
-    const commonError = error;
-
+  const renderTable = (listKind: types.ListKind) => {
     switch (listKind) {
       case types.ListKind.DOWNLOADED:
         return (
-          <DownloadedAbisTab
-            data={downloadedAbis}
-            loading={shouldShowLoading}
-            error={commonError}
-            sort={currentSort}
-            onSortChange={setCurrentSort}
-            filter={currentFilter}
-            onFilterChange={setCurrentFilter}
+          <DownloadedTab
+            data={downloaded}
+            loading={loading && downloaded.length === 0}
+            error={error}
             onSubmit={handleTableSubmit}
             onDelete={handleAction}
             tableKey={tableKey}
@@ -258,14 +233,10 @@ export const Abis = () => {
         );
       case types.ListKind.KNOWN:
         return (
-          <KnownAbisTab
-            data={knownAbis}
-            loading={shouldShowLoading}
-            error={commonError}
-            sort={currentSort}
-            onSortChange={setCurrentSort}
-            filter={currentFilter}
-            onFilterChange={setCurrentFilter}
+          <KnownTab
+            data={known}
+            loading={loading && known.length === 0}
+            error={error}
             onSubmit={handleTableSubmit}
             tableKey={tableKey}
           />
@@ -274,12 +245,8 @@ export const Abis = () => {
         return (
           <FunctionsTab
             data={functions}
-            loading={shouldShowLoading}
-            error={commonError}
-            sort={currentSort}
-            onSortChange={setCurrentSort}
-            filter={currentFilter}
-            onFilterChange={setCurrentFilter}
+            loading={loading && functions.length === 0}
+            error={error}
             onSubmit={handleTableSubmit}
             tableKey={tableKey}
           />
@@ -288,12 +255,8 @@ export const Abis = () => {
         return (
           <EventsTab
             data={events}
-            loading={shouldShowLoading}
-            error={commonError}
-            sort={currentSort}
-            onSortChange={setCurrentSort}
-            filter={currentFilter}
-            onFilterChange={setCurrentFilter}
+            loading={loading && events.length === 0}
+            error={error}
             onSubmit={handleTableSubmit}
             tableKey={tableKey}
           />
@@ -303,65 +266,11 @@ export const Abis = () => {
     }
   };
 
-  const renderTable = (listKind: types.ListKind) => {
-    const config: TableConfigProps = {
-      downloadedAbis,
-      knownAbis,
-      functions,
-      events,
-      isDownloadedLoaded,
-      isKnownLoaded,
-      isFuncsLoaded,
-      isEventsLoaded,
-      processingAddresses,
-      setSelectedAddress,
-      setLocation,
-      handleAction,
-    };
-
-    const { data, columns } = getTableConfig(listKind, config);
-
-    const shouldShowLoading = (() => {
-      switch (listKind) {
-        case types.ListKind.DOWNLOADED:
-          return loading && downloadedAbis.length === 0;
-        case types.ListKind.KNOWN:
-          return loading && knownAbis.length === 0;
-        case types.ListKind.FUNCTIONS:
-          return loading && functions.length === 0;
-        case types.ListKind.EVENTS:
-          return loading && events.length === 0;
-        default:
-          return loading;
-      }
-    })();
-
-    return (
-      <TableProvider>
-        <div className="tableContainer">
-          <Table<AbiRow>
-            columns={columns}
-            data={data}
-            loading={shouldShowLoading}
-            sort={currentSort}
-            onSortChange={setCurrentSort}
-            filter={currentFilter}
-            onFilterChange={setCurrentFilter}
-            tableKey={tableKey}
-            onSubmit={handleTableSubmit}
-          />
-        </div>
-      </TableProvider>
-    );
-  };
-
   const createOneTab = (listKind: types.ListKind) => {
     return {
       label: listKind,
       value: listKind,
-      content: USE_NEW_TAB_COMPONENTS
-        ? renderNewTable(listKind)
-        : renderTable(listKind),
+      content: renderTable(listKind),
     };
   };
 
@@ -384,5 +293,3 @@ export const Abis = () => {
     </div>
   );
 };
-
-// ADD_ROUTE

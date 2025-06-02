@@ -45,14 +45,14 @@ export const getTableConfig = (
       };
     case types.ListKind.KNOWN:
       return {
-        data: config.knownAbis as AbiRow[],
+        data: config.known as AbiRow[],
         columns: abiColumns,
       };
     case types.ListKind.DOWNLOADED:
     // fall through
     default:
       return {
-        data: config.downloadedAbis as AbiRow[],
+        data: config.downloaded as AbiRow[],
         columns: abiColumns,
       };
   }

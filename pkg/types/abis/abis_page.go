@@ -43,7 +43,7 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 	case AbisDownloaded:
 		if page.Abis, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
 			"downloaded abis",
-			&ac.downloadedAbis,
+			&ac.downloaded,
 			sortSpec,
 			getAbiSortFunc,
 			streaming.CreatePageFilter(filter, getAbiSearchFields),
@@ -57,7 +57,7 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 	case AbisKnown:
 		if page.Abis, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
 			"known abis",
-			&ac.knownAbis,
+			&ac.known,
 			sortSpec,
 			getAbiSortFunc,
 			streaming.CreatePageFilter(filter, getAbiSearchFields),
@@ -71,7 +71,7 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 	case AbisFunctions:
 		if page.Functions, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
 			"functions",
-			&ac.allFunctions,
+			&ac.functions,
 			sortSpec,
 			getFunctionSortFunc,
 			streaming.CreatePageFilter(filter, getFunctionSearchFields),
@@ -85,7 +85,7 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 	case AbisEvents:
 		if page.Functions, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
 			"events",
-			&ac.allEvents,
+			&ac.events,
 			sortSpec,
 			getFunctionSortFunc,
 			streaming.CreatePageFilter(filter, getFunctionSearchFields),

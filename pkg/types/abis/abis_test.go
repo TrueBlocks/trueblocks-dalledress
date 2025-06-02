@@ -73,17 +73,17 @@ func TestNewAbisCollection(t *testing.T) {
 		t.Error("NewAbisCollection should not be loading")
 	}
 	// Check that slices are initialized (non-nil and empty)
-	if ac.downloadedAbis == nil || len(ac.downloadedAbis) != 0 {
-		t.Errorf("NewAbisCollection.downloadedAbis not initialized correctly: got %v, want empty non-nil slice", ac.downloadedAbis)
+	if ac.downloaded == nil || len(ac.downloaded) != 0 {
+		t.Errorf("NewAbisCollection.downloaded not initialized correctly: got %v, want empty non-nil slice", ac.downloaded)
 	}
-	if ac.knownAbis == nil || len(ac.knownAbis) != 0 {
-		t.Errorf("NewAbisCollection.knownAbis not initialized correctly: got %v, want empty non-nil slice", ac.knownAbis)
+	if ac.known == nil || len(ac.known) != 0 {
+		t.Errorf("NewAbisCollection.known not initialized correctly: got %v, want empty non-nil slice", ac.known)
 	}
-	if ac.allFunctions == nil || len(ac.allFunctions) != 0 {
-		t.Errorf("NewAbisCollection.allFunctions not initialized correctly: got %v", ac.allFunctions)
+	if ac.functions == nil || len(ac.functions) != 0 {
+		t.Errorf("NewAbisCollection.functions not initialized correctly: got %v", ac.functions)
 	}
-	if ac.allEvents == nil || len(ac.allEvents) != 0 {
-		t.Errorf("NewAbisCollection.allEvents not initialized correctly: got %v", ac.allEvents)
+	if ac.events == nil || len(ac.events) != 0 {
+		t.Errorf("NewAbisCollection.events not initialized correctly: got %v", ac.events)
 	}
 }
 
@@ -92,13 +92,13 @@ func TestAbisCollection_ClearCache(t *testing.T) {
 	ac := NewAbisCollection(mockApp)
 
 	// Simulate some initial data
-	ac.downloadedAbis = []coreTypes.Abi{{}}
+	ac.downloaded = []coreTypes.Abi{{}}
 	ac.isDownloadedLoaded = true
-	ac.knownAbis = []coreTypes.Abi{{}, {}}
+	ac.known = []coreTypes.Abi{{}, {}}
 	ac.isKnownLoaded = true
-	ac.allFunctions = []coreTypes.Function{{}}
+	ac.functions = []coreTypes.Function{{}}
 	ac.isFuncsLoaded = true
-	ac.allEvents = []coreTypes.Function{{}, {}, {}}
+	ac.events = []coreTypes.Function{{}, {}, {}}
 	ac.isEventsLoaded = true
 
 	// Test clearing downloaded ABIs
@@ -109,8 +109,8 @@ func TestAbisCollection_ClearCache(t *testing.T) {
 	if ac.expectedDownloaded != 1 {
 		t.Errorf("ClearCache(AbisDownloaded) should set expectedDownloaded to 1, got %d", ac.expectedDownloaded)
 	}
-	if len(ac.downloadedAbis) != 0 {
-		t.Errorf("ClearCache(AbisDownloaded) should clear downloadedAbis, got length %d", len(ac.downloadedAbis))
+	if len(ac.downloaded) != 0 {
+		t.Errorf("ClearCache(AbisDownloaded) should clear downloaded, got length %d", len(ac.downloaded))
 	}
 
 	// Test clearing known ABIs
@@ -121,8 +121,8 @@ func TestAbisCollection_ClearCache(t *testing.T) {
 	if ac.expectedKnown != 2 {
 		t.Errorf("ClearCache(AbisKnown) should set expectedKnown to 2, got %d", ac.expectedKnown)
 	}
-	if len(ac.knownAbis) != 0 {
-		t.Errorf("ClearCache(AbisKnown) should clear knownAbis, got length %d", len(ac.knownAbis))
+	if len(ac.known) != 0 {
+		t.Errorf("ClearCache(AbisKnown) should clear known, got length %d", len(ac.known))
 	}
 
 	// Test clearing functions
@@ -133,8 +133,8 @@ func TestAbisCollection_ClearCache(t *testing.T) {
 	if ac.expectedFunctions != 1 {
 		t.Errorf("ClearCache(AbisFunctions) should set expectedFunctions to 1, got %d", ac.expectedFunctions)
 	}
-	if len(ac.allFunctions) != 0 {
-		t.Errorf("ClearCache(AbisFunctions) should clear allFunctions, got length %d", len(ac.allFunctions))
+	if len(ac.functions) != 0 {
+		t.Errorf("ClearCache(AbisFunctions) should clear functions, got length %d", len(ac.functions))
 	}
 
 	// Test clearing events
@@ -145,8 +145,8 @@ func TestAbisCollection_ClearCache(t *testing.T) {
 	if ac.expectedEvents != 3 {
 		t.Errorf("ClearCache(AbisEvents) should set expectedEvents to 3, got %d", ac.expectedEvents)
 	}
-	if len(ac.allEvents) != 0 {
-		t.Errorf("ClearCache(AbisEvents) should clear allEvents, got length %d", len(ac.allEvents))
+	if len(ac.events) != 0 {
+		t.Errorf("ClearCache(AbisEvents) should clear events, got length %d", len(ac.events))
 	}
 
 	// Verify deduper is cleared

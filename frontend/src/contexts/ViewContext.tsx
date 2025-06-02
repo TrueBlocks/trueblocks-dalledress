@@ -17,13 +17,16 @@ export interface PaginationState {
   totalItems: number;
 }
 
-// Sorting and filtering interfaces
-export interface SortingState {
+export interface ViewSortState {
   [key: string]: sorting.SortDef | null; // keyed by tableKeyToString(tableKey)
 }
 
-export interface FilteringState {
+export interface ViewFilterState {
   [key: string]: string; // keyed by tableKey.viewName
+}
+
+export interface ViewPaginationState {
+  [key: string]: PaginationState;
 }
 
 // Create stable reference for initial state to prevent new object creation
@@ -33,23 +36,16 @@ export const initialPaginationState: PaginationState = Object.freeze({
   totalItems: 0,
 });
 
-export interface ViewPaginationState {
-  [key: string]: PaginationState;
-}
-
 interface ViewContextType {
   currentView: string;
   setCurrentView: (view: string) => void;
-  viewPagination: ViewPaginationState;
   getPagination: (tableKey: TableKey) => PaginationState;
   updatePagination: (
     tableKey: TableKey,
     changes: Partial<PaginationState>,
   ) => void;
-  viewSorting: SortingState;
   getSorting: (tableKey: TableKey) => sorting.SortDef | null;
   updateSorting: (tableKey: TableKey, sort: sorting.SortDef | null) => void;
-  viewFiltering: FilteringState;
   getFiltering: (tableKey: TableKey) => string;
   updateFiltering: (tableKey: TableKey, filter: string) => void;
 }
@@ -57,13 +53,10 @@ interface ViewContextType {
 export const ViewContext = createContext<ViewContextType>({
   currentView: '',
   setCurrentView: () => {},
-  viewPagination: {},
   getPagination: () => initialPaginationState,
   updatePagination: () => {},
-  viewSorting: {},
   getSorting: () => null,
   updateSorting: () => {},
-  viewFiltering: {},
   getFiltering: () => '',
   updateFiltering: () => {},
 });
@@ -71,8 +64,8 @@ export const ViewContext = createContext<ViewContextType>({
 export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   const [currentView, setCurrentView] = useState('');
   const [viewPagination, setViewPagination] = useState<ViewPaginationState>({});
-  const [viewSorting, setViewSorting] = useState<SortingState>({});
-  const [viewFiltering, setViewFiltering] = useState<FilteringState>({});
+  const [viewSorting, setViewSorting] = useState<ViewSortState>({});
+  const [viewFiltering, setViewFiltering] = useState<ViewFilterState>({});
 
   const getPagination = useCallback(
     (tableKey: TableKey) => {
@@ -139,13 +132,10 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
       value={{
         currentView,
         setCurrentView,
-        viewPagination,
         getPagination,
         updatePagination,
-        viewSorting,
         getSorting,
         updateSorting,
-        viewFiltering,
         getFiltering,
         updateFiltering,
       }}
@@ -167,13 +157,13 @@ export const useViewContext = () => {
 export const useSorting = (tableKey: TableKey) => {
   const { getSorting, updateSorting } = useViewContext();
 
-  const sort = getSorting(tableKey);
   const setSorting = useCallback(
     (sort: sorting.SortDef | null) => {
       updateSorting(tableKey, sort);
     },
     [tableKey, updateSorting],
   );
+  const sort = getSorting(tableKey);
 
   return { sort, setSorting };
 };
@@ -182,13 +172,13 @@ export const useSorting = (tableKey: TableKey) => {
 export const useFiltering = (tableKey: TableKey) => {
   const { getFiltering, updateFiltering } = useViewContext();
 
-  const filter = getFiltering(tableKey);
   const setFiltering = useCallback(
     (filter: string) => {
       updateFiltering(tableKey, filter);
     },
     [tableKey, updateFiltering],
   );
+  const filter = getFiltering(tableKey);
 
   return { filter, setFiltering };
 };

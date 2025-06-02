@@ -31,29 +31,29 @@ type AbisCollection struct {
 
 	isDownloadedLoaded bool
 	expectedDownloaded int
-	downloadedAbis     []coreTypes.Abi
+	downloaded         []coreTypes.Abi
 
 	isKnownLoaded bool
 	expectedKnown int
-	knownAbis     []coreTypes.Abi
+	known         []coreTypes.Abi
 
 	isFuncsLoaded     bool
 	expectedFunctions int
-	allFunctions      []coreTypes.Function
+	functions         []coreTypes.Function
 
 	isEventsLoaded bool
 	expectedEvents int
-	allEvents      []coreTypes.Function
+	events         []coreTypes.Function
 }
 
 func NewAbisCollection(app types.App) AbisCollection {
 	return AbisCollection{
-		App:            app,
-		deduper:        make(map[string]struct{}),
-		downloadedAbis: make([]coreTypes.Abi, 0),
-		knownAbis:      make([]coreTypes.Abi, 0),
-		allFunctions:   make([]coreTypes.Function, 0),
-		allEvents:      make([]coreTypes.Function, 0),
+		App:        app,
+		deduper:    make(map[string]struct{}),
+		downloaded: make([]coreTypes.Abi, 0),
+		known:      make([]coreTypes.Abi, 0),
+		functions:  make([]coreTypes.Function, 0),
+		events:     make([]coreTypes.Function, 0),
 	}
 }
 
@@ -63,21 +63,21 @@ func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
 
 	switch listKind {
 	case AbisDownloaded:
-		ac.expectedDownloaded = len(ac.downloadedAbis)
+		ac.expectedDownloaded = len(ac.downloaded)
 		ac.isDownloadedLoaded = false
-		ac.downloadedAbis = make([]coreTypes.Abi, 0)
+		ac.downloaded = make([]coreTypes.Abi, 0)
 	case AbisKnown:
-		ac.expectedKnown = len(ac.knownAbis)
+		ac.expectedKnown = len(ac.known)
 		ac.isKnownLoaded = false
-		ac.knownAbis = make([]coreTypes.Abi, 0)
+		ac.known = make([]coreTypes.Abi, 0)
 	case AbisFunctions:
-		ac.expectedFunctions = len(ac.allFunctions)
+		ac.expectedFunctions = len(ac.functions)
 		ac.isFuncsLoaded = false
-		ac.allFunctions = make([]coreTypes.Function, 0)
+		ac.functions = make([]coreTypes.Function, 0)
 	case AbisEvents:
-		ac.expectedEvents = len(ac.allEvents)
+		ac.expectedEvents = len(ac.events)
 		ac.isEventsLoaded = false
-		ac.allEvents = make([]coreTypes.Function, 0)
+		ac.events = make([]coreTypes.Function, 0)
 	default:
 		ac.App.LogBackend(fmt.Sprintf("Unknown ListKind in ClearCache: %s", listKind))
 	}

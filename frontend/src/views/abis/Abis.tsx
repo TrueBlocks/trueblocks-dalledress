@@ -13,7 +13,6 @@ import { useHotkeys } from '@mantine/hooks';
 import { msgs, sorting, types } from '@models';
 import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
-import { useLocation } from 'wouter';
 
 import './Abis.css';
 import { ABIS_ROUTE, ACTION_MESSAGES, DEFAULT_LIST_KIND } from './constants';
@@ -23,8 +22,9 @@ import { IndexedAbi, IndexedFunction } from './types';
 //--------------------------------------------------------------------
 export const Abis = () => {
   const { emitStatus, emitError } = useEmitters();
-  const { lastTab, setSelectedAddress } = useAppContext();
-  const [, setLocation] = useLocation();
+  // const { lastTab, setSelectedAddress } = useAppContext();
+  // const [, setLocation] = useLocation();
+  const { lastTab } = useAppContext();
 
   const [listKind, setListKind] = useState<types.ListKind>(
     (lastTab[ABIS_ROUTE] as types.ListKind) || DEFAULT_LIST_KIND,
@@ -36,13 +36,18 @@ export const Abis = () => {
   const [events, setEvents] = useState<IndexedFunction[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
-    new Set(),
-  );
-  const [isDownloadedLoaded, setIsDownloadedLoaded] = useState<boolean>(false);
-  const [isKnownLoaded, setIsKnownLoaded] = useState<boolean>(false);
-  const [isFuncsLoaded, setIsFuncsLoaded] = useState<boolean>(false);
-  const [isEventsLoaded, setIsEventsLoaded] = useState<boolean>(false);
+  // const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
+  //   new Set(),
+  // );
+  // const [isDownloadedLoaded, setIsDownloadedLoaded] = useState<boolean>(false);
+  // const [isKnownLoaded, setIsKnownLoaded] = useState<boolean>(false);
+  // const [isFuncsLoaded, setIsFuncsLoaded] = useState<boolean>(false);
+  // const [isEventsLoaded, setIsEventsLoaded] = useState<boolean>(false);
+  const [, setProcessingAddresses] = useState<Set<string>>(new Set());
+  const [, setIsDownloadedLoaded] = useState<boolean>(false);
+  const [, setIsKnownLoaded] = useState<boolean>(false);
+  const [, setIsFuncsLoaded] = useState<boolean>(false);
+  const [, setIsEventsLoaded] = useState<boolean>(false);
 
   const tableKey = useMemo((): TableKey => {
     return { viewName: ABIS_ROUTE, tabName: listKind };

@@ -19,8 +19,8 @@ func (ac *AbisCollection) Delete(address string) error {
 		return err
 	}
 
-	ac.mutex.Lock()
-	defer ac.mutex.Unlock()
+	ac.downloadedMutex.Lock()
+	defer ac.downloadedMutex.Unlock()
 	for i, abi := range ac.downloaded {
 		if abi.Address.Hex() == address {
 			ac.downloaded = append(ac.downloaded[:i], ac.downloaded[i+1:]...)

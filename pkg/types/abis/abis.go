@@ -25,24 +25,27 @@ func init() {
 
 type AbisCollection struct {
 	App       types.App
-	mutex     sync.RWMutex
 	isLoading int32
 
 	isDownloadedLoaded bool
 	expectedDownloaded int
 	downloaded         []coreTypes.Abi
+	downloadedMutex sync.RWMutex
 
 	isKnownLoaded bool
 	expectedKnown int
 	known         []coreTypes.Abi
+	knownMutex      sync.RWMutex
 
 	isFuncsLoaded     bool
 	expectedFunctions int
 	functions         []coreTypes.Function
+	functionsMutex  sync.RWMutex
 
 	isEventsLoaded bool
 	expectedEvents int
 	events         []coreTypes.Function
+	eventsMutex     sync.RWMutex
 }
 
 func NewAbisCollection(app types.App) AbisCollection {
@@ -56,23 +59,28 @@ func NewAbisCollection(app types.App) AbisCollection {
 }
 
 func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
-	ac.mutex.Lock()
-	defer ac.mutex.Unlock()
-
 	switch listKind {
 	case AbisDownloaded:
+		ac.downloadedMutex.Lock()
+		defer ac.downloadedMutex.Unlock()
 		ac.expectedDownloaded = len(ac.downloaded)
 		ac.isDownloadedLoaded = false
 		ac.downloaded = make([]coreTypes.Abi, 0)
 	case AbisKnown:
+		ac.knownMutex.Lock()
+		defer ac.knownMutex.Unlock()
 		ac.expectedKnown = len(ac.known)
 		ac.isKnownLoaded = false
 		ac.known = make([]coreTypes.Abi, 0)
 	case AbisFunctions:
+		ac.functionsMutex.Lock()
+		defer ac.functionsMutex.Unlock()
 		ac.expectedFunctions = len(ac.functions)
 		ac.isFuncsLoaded = false
 		ac.functions = make([]coreTypes.Function, 0)
 	case AbisEvents:
+		ac.eventsMutex.Lock()
+		defer ac.eventsMutex.Unlock()
 		ac.expectedEvents = len(ac.events)
 		ac.isEventsLoaded = false
 		ac.events = make([]coreTypes.Function, 0)
@@ -83,17 +91,22 @@ func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
 
 // NeedsUpdate checks if the AbisCollection needs to be updated.
 func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
-	ac.mutex.RLock()
-	defer ac.mutex.RUnlock()
-
 	switch listKind {
 	case AbisDownloaded:
+		ac.downloadedMutex.RLock()
+		defer ac.downloadedMutex.RUnlock()
 		return !ac.isDownloadedLoaded
 	case AbisKnown:
+		ac.knownMutex.RLock()
+		defer ac.knownMutex.RUnlock()
 		return !ac.isKnownLoaded
 	case AbisFunctions:
+		ac.functionsMutex.RLock()
+		defer ac.functionsMutex.RUnlock()
 		return !ac.isFuncsLoaded
 	case AbisEvents:
+		ac.eventsMutex.RLock()
+		defer ac.eventsMutex.RUnlock()
 		return !ac.isEventsLoaded
 	default:
 		return true

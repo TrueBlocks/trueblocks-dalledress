@@ -21,27 +21,36 @@ func TestGetPage(t *testing.T) {
 	// Let's simulate a loaded state for GetPage tests for now.
 	// This bypasses the async loading for the purpose of testing GetPage's logic.
 	// In a real scenario, you'd wait or use a more complex setup.
-	ac.mutex.Lock()
+	ac.downloadedMutex.Lock()
 	ac.isDownloadedLoaded = true
-	ac.isKnownLoaded = true
-	ac.isFuncsLoaded = true
-	ac.isEventsLoaded = true
 	// Populate with some dummy data for testing pagination and filtering
 	ac.downloaded = []coreTypes.Abi{
 		{Name: "TestABI1", Address: base.HexToAddress("0x1")},   // Use base.HexToAddress
 		{Name: "AnotherABI", Address: base.HexToAddress("0x2")}, // Use base.HexToAddress
 	}
+	ac.downloadedMutex.Unlock()
+
+	ac.knownMutex.Lock()
+	ac.isKnownLoaded = true
 	ac.known = []coreTypes.Abi{
 		{Name: "KnownABI1", Address: base.HexToAddress("0x3")}, // Use base.HexToAddress
 	}
+	ac.knownMutex.Unlock()
+
+	ac.functionsMutex.Lock()
+	ac.isFuncsLoaded = true
 	ac.functions = []coreTypes.Function{
 		{Name: "func1", Signature: "func1()"},
 		{Name: "func2", Signature: "func2(uint256)"},
 	}
+	ac.functionsMutex.Unlock()
+
+	ac.eventsMutex.Lock()
+	ac.isEventsLoaded = true
 	ac.events = []coreTypes.Function{
 		{Name: "event1", Signature: "event1()"},
 	}
-	ac.mutex.Unlock()
+	ac.eventsMutex.Unlock()
 	t.Run("DownloadedAbis", func(t *testing.T) {
 		if len(ac.downloaded) == 0 {
 			t.Skip("Skipping DownloadedAbis tests as ac.downloaded is empty")

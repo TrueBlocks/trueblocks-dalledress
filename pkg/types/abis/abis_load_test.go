@@ -26,9 +26,9 @@ func TestLoadData(t *testing.T) {
 	// After calling LoadData, it should either be loading or loaded
 	// Note: Due to the asynchronous nature, we can't easily test completion without
 	// more complex synchronization mechanisms
-	ac.mutex.RLock()
+	ac.knownMutex.RLock()
 	isLoadingOrLoaded := ac.isLoading == 1 || ac.isKnownLoaded
-	ac.mutex.RUnlock()
+	ac.knownMutex.RUnlock()
 
 	if !isLoadingOrLoaded {
 		t.Error("After LoadData, collection should be loading or loaded")
@@ -39,9 +39,9 @@ func TestLoadData(t *testing.T) {
 	prevState := ac.isLoading == 1 || ac.isKnownLoaded
 	ac.LoadData(AbisKnown)
 
-	ac.mutex.RLock()
+	ac.knownMutex.RLock()
 	newState := ac.isLoading == 1 || ac.isKnownLoaded
-	ac.mutex.RUnlock()
+	ac.knownMutex.RUnlock()
 
 	if !prevState || !newState {
 		t.Error("LoadData should not change state when already loading/loaded")

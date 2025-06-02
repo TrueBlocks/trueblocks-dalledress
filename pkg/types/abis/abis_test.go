@@ -218,10 +218,10 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 	mockApp := NewMockApp()
 	ac := NewAbisCollection(mockApp)
 
-	// Test concurrent access to NeedsUpdate and ClearCache
-	done := make(chan bool, 2)
+	// Test concurrent access to NeedsUpdate and ClearCache across all slice types
+	done := make(chan bool, 4)
 
-	// Goroutine 1: repeatedly check NeedsUpdate
+	// Goroutine 1: repeatedly check NeedsUpdate for downloaded and known
 	go func() {
 		for i := 0; i < 100; i++ {
 			ac.NeedsUpdate(AbisDownloaded)
@@ -230,7 +230,7 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 		done <- true
 	}()
 
-	// Goroutine 2: repeatedly clear cache
+	// Goroutine 2: repeatedly clear cache for downloaded and known
 	go func() {
 		for i := 0; i < 100; i++ {
 			ac.ClearCache(AbisDownloaded)
@@ -239,11 +239,31 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 		done <- true
 	}()
 
-	// Wait for both goroutines to complete
+	// Goroutine 3: repeatedly check NeedsUpdate for functions and events
+	go func() {
+		for i := 0; i < 100; i++ {
+			ac.NeedsUpdate(AbisFunctions)
+			ac.NeedsUpdate(AbisEvents)
+		}
+		done <- true
+	}()
+
+	// Goroutine 4: repeatedly clear cache for functions and events
+	go func() {
+		for i := 0; i < 100; i++ {
+			ac.ClearCache(AbisFunctions)
+			ac.ClearCache(AbisEvents)
+		}
+		done <- true
+	}()
+
+	// Wait for all goroutines to complete
+	<-done
+	<-done
 	<-done
 	<-done
 
-	// If we get here without panicking, the mutex is working
+	// If we get here without panicking, the per-slice mutexes are working
 	t.Log("Thread safety test completed successfully")
 }
 

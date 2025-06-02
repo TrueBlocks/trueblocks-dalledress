@@ -27,20 +27,19 @@ type AbisPage struct {
 func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, sortDef *sorting.SortDef, filter string) (AbisPage, error) {
 	ac.LoadData(listKind)
 
-	ac.mutex.RLock()
-	defer ac.mutex.RUnlock()
-
 	filter = strings.ToLower(filter)
 	sortSpec := sorting.ConvertToSortSpec(sortDef)
 	var err error
 	var page = AbisPage{
 		Kind:      listKind,
 		IsLoading: ac.isLoading == 1,
-		IsLoaded:  ac.isKnownLoaded,
 	}
 
 	switch listKind {
 	case AbisDownloaded:
+		ac.downloadedMutex.RLock()
+		defer ac.downloadedMutex.RUnlock()
+		page.IsLoaded = ac.isDownloadedLoaded
 		if page.Abis, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
 			"downloaded abis",
 			&ac.downloaded,
@@ -55,6 +54,9 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 		}
 
 	case AbisKnown:
+		ac.knownMutex.RLock()
+		defer ac.knownMutex.RUnlock()
+		page.IsLoaded = ac.isKnownLoaded
 		if page.Abis, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
 			"known abis",
 			&ac.known,
@@ -69,6 +71,9 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 		}
 
 	case AbisFunctions:
+		ac.functionsMutex.RLock()
+		defer ac.functionsMutex.RUnlock()
+		page.IsLoaded = ac.isFuncsLoaded
 		if page.Functions, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
 			"functions",
 			&ac.functions,
@@ -83,6 +88,9 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 		}
 
 	case AbisEvents:
+		ac.eventsMutex.RLock()
+		defer ac.eventsMutex.RUnlock()
+		page.IsLoaded = ac.isEventsLoaded
 		if page.Functions, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
 			"events",
 			&ac.events,

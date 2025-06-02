@@ -104,7 +104,7 @@ func (ac *AbisCollection) loadDownloadedAbis(listKind types.ListKind) (string, t
 		&ac.expectedDownloaded,
 		&ac.isDownloadedLoaded,
 		listKind,
-		&ac.mutex,
+		&ac.downloadedMutex,
 	)
 
 	return finalStatus, finalPayload
@@ -148,7 +148,7 @@ func (ac *AbisCollection) loadKnownAbis(listKind types.ListKind) (string, types.
 		&ac.expectedKnown,
 		&ac.isKnownLoaded,
 		listKind,
-		&ac.mutex,
+		&ac.knownMutex,
 	)
 
 	return finalStatus, finalPayload
@@ -206,7 +206,7 @@ func (ac *AbisCollection) loadFunctions(listKind types.ListKind) (string, types.
 		&ac.expectedFunctions,
 		&ac.isFuncsLoaded,
 		listKind,
-		&ac.mutex,
+		&ac.functionsMutex,
 	)
 
 	return finalStatus, finalPayload
@@ -266,7 +266,7 @@ func (ac *AbisCollection) loadEvents(listKind types.ListKind) (string, types.Dat
 		&ac.expectedEvents,
 		&ac.isEventsLoaded,
 		listKind,
-		&ac.mutex,
+		&ac.eventsMutex,
 	)
 
 	return finalStatus, finalPayload

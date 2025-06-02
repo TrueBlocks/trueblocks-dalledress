@@ -21,6 +21,7 @@ func LoadStreamingData[T any](
 	targetSlice *[]T,
 	expectedCount *int,
 	loadedFlag *bool,
+	listKind types.ListKind,
 	m interface {
 		Lock()
 		Unlock()
@@ -79,11 +80,12 @@ func LoadStreamingData[T any](
 						CurrentCount:  len(*targetSlice),
 						ExpectedTotal: *expectedCount,
 						IsLoaded:      isLoaded,
+						ListKind:      string(listKind),
 					}
 					app.EmitEvent(msgs.EventDataLoaded, payload)
-					statusMsg := fmt.Sprintf("Loading: %d processed.", len(*targetSlice))
+					statusMsg := fmt.Sprintf("Loading %s: %d processed.", listKind, len(*targetSlice))
 					if *expectedCount > 0 {
-						statusMsg = fmt.Sprintf("Loading: %d of %d processed.", len(*targetSlice), *expectedCount)
+						statusMsg = fmt.Sprintf("Loading %s: %d of %d processed.", listKind, len(*targetSlice), *expectedCount)
 					}
 					msgs.EmitStatus(statusMsg)
 					m.RUnlock()
@@ -111,6 +113,7 @@ func LoadStreamingData[T any](
 		IsLoaded:      true,
 		CurrentCount:  len(*targetSlice),
 		ExpectedTotal: len(*targetSlice),
+		ListKind:      string(listKind),
 	}
 
 	return finalStatus, finalPayload, nil

@@ -45,13 +45,13 @@ func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 
 	switch listKind {
 	case AbisDownloaded:
-		finalStatus, finalPayload = ac.loadDownloadedAbis()
+		finalStatus, finalPayload = ac.loadDownloadedAbis(listKind)
 	case AbisKnown:
-		finalStatus, finalPayload = ac.loadKnownAbis()
+		finalStatus, finalPayload = ac.loadKnownAbis(listKind)
 	case AbisFunctions:
-		finalStatus, finalPayload = ac.loadFunctions()
+		finalStatus, finalPayload = ac.loadFunctions(listKind)
 	case AbisEvents:
-		finalStatus, finalPayload = ac.loadEvents()
+		finalStatus, finalPayload = ac.loadEvents(listKind)
 
 	default:
 		logger.Error(fmt.Sprintf("AbisCollection.loadInternal: unexpected list kind: %v", listKind))
@@ -59,12 +59,15 @@ func (ac *AbisCollection) loadInternal(listKind types.ListKind) {
 	}
 
 	msgs.EmitStatus(finalStatus)
+	if finalPayload.ListKind == "" {
+		finalPayload.ListKind = string(listKind)
+	}
 	ac.App.EmitEvent(msgs.EventDataLoaded, finalPayload)
 }
 
 // ----------------------------------------------------------------
 // loadDownloadedAbis loads ABI that are downloaded (and not known) asynchronously and returns status, payload
-func (ac *AbisCollection) loadDownloadedAbis() (string, types.DataLoadedPayload) {
+func (ac *AbisCollection) loadDownloadedAbis(listKind types.ListKind) (string, types.DataLoadedPayload) {
 	contextKey := "abis-load-internal-downloaded"
 
 	queryFunc := func(renderCtx *output.RenderCtx) {
@@ -99,6 +102,7 @@ func (ac *AbisCollection) loadDownloadedAbis() (string, types.DataLoadedPayload)
 		&ac.downloadedAbis,
 		&ac.expectedDownloaded,
 		&ac.isDownloadedLoaded,
+		listKind,
 		&ac.mutex,
 	)
 
@@ -106,7 +110,7 @@ func (ac *AbisCollection) loadDownloadedAbis() (string, types.DataLoadedPayload)
 }
 
 // ----------------------------------------------------------------
-func (ac *AbisCollection) loadKnownAbis() (string, types.DataLoadedPayload) {
+func (ac *AbisCollection) loadKnownAbis(listKind types.ListKind) (string, types.DataLoadedPayload) {
 	contextKey := "abis-load-internal-known"
 
 	queryFunc := func(renderCtx *output.RenderCtx) {
@@ -142,6 +146,7 @@ func (ac *AbisCollection) loadKnownAbis() (string, types.DataLoadedPayload) {
 		&ac.knownAbis,
 		&ac.expectedKnown,
 		&ac.isKnownLoaded,
+		listKind,
 		&ac.mutex,
 	)
 
@@ -150,7 +155,7 @@ func (ac *AbisCollection) loadKnownAbis() (string, types.DataLoadedPayload) {
 
 // ----------------------------------------------------------------
 // loadFunctions loads ABI functions asynchronously and returns status, payload, and error
-func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
+func (ac *AbisCollection) loadFunctions(listKind types.ListKind) (string, types.DataLoadedPayload) {
 	contextKey := "abis-load-internal-functions"
 
 	queryFunc := func(renderCtx *output.RenderCtx) {
@@ -195,6 +200,7 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 		&ac.allFunctions,
 		&ac.expectedFunctions,
 		&ac.isFuncsLoaded,
+		listKind,
 		&ac.mutex,
 	)
 
@@ -203,7 +209,7 @@ func (ac *AbisCollection) loadFunctions() (string, types.DataLoadedPayload) {
 
 // ----------------------------------------------------------------
 // loadEvents loads ABI events asynchronously and returns status, payload
-func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
+func (ac *AbisCollection) loadEvents(listKind types.ListKind) (string, types.DataLoadedPayload) {
 	contextKey := "abis-load-internal-events"
 
 	queryFunc := func(renderCtx *output.RenderCtx) {
@@ -250,6 +256,7 @@ func (ac *AbisCollection) loadEvents() (string, types.DataLoadedPayload) {
 		&ac.allEvents,
 		&ac.expectedEvents,
 		&ac.isEventsLoaded,
+		listKind,
 		&ac.mutex,
 	)
 

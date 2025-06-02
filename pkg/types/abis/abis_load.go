@@ -3,6 +3,7 @@ package abis
 
 import (
 	"fmt"
+	"sync"
 	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
@@ -158,6 +159,10 @@ func (ac *AbisCollection) loadKnownAbis(listKind types.ListKind) (string, types.
 func (ac *AbisCollection) loadFunctions(listKind types.ListKind) (string, types.DataLoadedPayload) {
 	contextKey := "abis-load-internal-functions"
 
+	// Local deduper for function encodings (4-byte selectors)
+	functionDeduper := make(map[string]struct{})
+	var deduperMutex sync.Mutex
+
 	queryFunc := func(renderCtx *output.RenderCtx) {
 		detailOpts := sdk.AbisOptions{
 			Globals:   sdk.Globals{Cache: true},
@@ -174,12 +179,12 @@ func (ac *AbisCollection) loadFunctions(listKind types.ListKind) (string, types.
 			return false
 		}
 
-		ac.mutex.Lock()
-		defer ac.mutex.Unlock()
-		if _, exists := ac.deduper[item.Encoding]; exists {
+		deduperMutex.Lock()
+		defer deduperMutex.Unlock()
+		if _, exists := functionDeduper[item.Encoding]; exists {
 			return false
 		}
-		ac.deduper[item.Encoding] = struct{}{}
+		functionDeduper[item.Encoding] = struct{}{}
 		return true
 	}
 
@@ -212,6 +217,10 @@ func (ac *AbisCollection) loadFunctions(listKind types.ListKind) (string, types.
 func (ac *AbisCollection) loadEvents(listKind types.ListKind) (string, types.DataLoadedPayload) {
 	contextKey := "abis-load-internal-events"
 
+	// Local deduper for event encodings (32-byte hashes)
+	eventDeduper := make(map[string]struct{})
+	var deduperMutex sync.Mutex
+
 	queryFunc := func(renderCtx *output.RenderCtx) {
 		detailOpts := sdk.AbisOptions{
 			Globals:   sdk.Globals{Cache: true},
@@ -229,13 +238,13 @@ func (ac *AbisCollection) loadEvents(listKind types.ListKind) (string, types.Dat
 			return false
 		}
 
-		// Then check deduper for events only
-		ac.mutex.Lock()
-		defer ac.mutex.Unlock()
-		if _, exists := ac.deduper[item.Encoding]; exists {
+		// Then check local deduper for events only
+		deduperMutex.Lock()
+		defer deduperMutex.Unlock()
+		if _, exists := eventDeduper[item.Encoding]; exists {
 			return false
 		}
-		ac.deduper[item.Encoding] = struct{}{}
+		eventDeduper[item.Encoding] = struct{}{}
 		return true
 	}
 

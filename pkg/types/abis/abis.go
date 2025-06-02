@@ -26,7 +26,6 @@ func init() {
 type AbisCollection struct {
 	App       types.App
 	mutex     sync.RWMutex
-	deduper   map[string]struct{}
 	isLoading int32
 
 	isDownloadedLoaded bool
@@ -49,7 +48,6 @@ type AbisCollection struct {
 func NewAbisCollection(app types.App) AbisCollection {
 	return AbisCollection{
 		App:        app,
-		deduper:    make(map[string]struct{}),
 		downloaded: make([]coreTypes.Abi, 0),
 		known:      make([]coreTypes.Abi, 0),
 		functions:  make([]coreTypes.Function, 0),
@@ -81,7 +79,6 @@ func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
 	default:
 		ac.App.LogBackend(fmt.Sprintf("Unknown ListKind in ClearCache: %s", listKind))
 	}
-	ac.deduper = make(map[string]struct{})
 }
 
 // NeedsUpdate checks if the AbisCollection needs to be updated.

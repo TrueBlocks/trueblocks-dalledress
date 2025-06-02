@@ -148,11 +148,6 @@ func TestAbisCollection_ClearCache(t *testing.T) {
 	if len(ac.events) != 0 {
 		t.Errorf("ClearCache(AbisEvents) should clear events, got length %d", len(ac.events))
 	}
-
-	// Verify deduper is cleared
-	if len(ac.deduper) != 0 {
-		t.Error("ClearCache should clear deduper map")
-	}
 }
 
 func TestAbisCollection_ClearCache_UnknownListKind(t *testing.T) {

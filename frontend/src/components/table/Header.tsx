@@ -14,15 +14,16 @@ export const Header = <T extends Record<string, unknown>>({
 }) => {
   const { sort, setSorting } = useSorting(tableKey);
   const handleClick = (col: FormField<T>) => {
+    const field = sort.key
     if (!col.sortable) return;
-    if (!sort || sort.key !== col.key) {
+    if (field !== col.key) {
       if (typeof col.key === 'string') {
         setSorting({ key: col.key, direction: 'asc' });
       }
     } else if (sort.direction === 'asc') {
       setSorting({ key: col.key, direction: 'desc' });
     } else {
-      setSorting(null); // Remove sort
+      setSorting(null);
     }
   };
 
@@ -30,18 +31,18 @@ export const Header = <T extends Record<string, unknown>>({
     <thead>
       <tr>
         {columns.map((col) => {
-          const isSorted = sort && sort.key === col.key;
-          // Determine aria-sort value safely
+          const field = sort.key
+          const isSorted = field === col.key;
+          // Determine aria-sort value
           let ariaSort: 'ascending' | 'descending' | undefined;
           if (isSorted) {
-            ariaSort =
-              sort && sort.direction === 'asc' ? 'ascending' : 'descending';
+            ariaSort = sort.direction === 'asc' ? 'ascending' : 'descending';
           }
-          // Determine sort indicator safely
+          // Determine sort indicator
           let sortIndicator = '';
           if (col.sortable) {
             if (isSorted) {
-              sortIndicator = sort && sort.direction === 'asc' ? ' ▲' : ' ▼';
+              sortIndicator = sort.direction === 'asc' ? ' ▲' : ' ▼';
             } else {
               sortIndicator = ' ⇅';
             }

@@ -99,7 +99,6 @@ var ErrorAlreadyLoading = errors.New("already loading")
 
 // Load implements Repository.Load using your existing streaming system
 func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
-	// Check if already loading
 	if !r.state.StartLoading() {
 		return nil, ErrorAlreadyLoading
 	}

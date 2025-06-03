@@ -5,7 +5,7 @@ import { usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { msgs, sorting, types } from '@models';
+import { msgs, types } from '@models';
 import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
 
@@ -55,12 +55,11 @@ export const Abis = () => {
   const fetchData = useCallback(async () => {
     setError(null);
     try {
-      const sortArg = (sort === null ? undefined : sort) as sorting.SortDef;
       const result = await getAbisPage(
         listKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
-        sortArg,
+        sort,
         filter,
       );
 
@@ -166,12 +165,11 @@ export const Abis = () => {
 
       removeAbi(address)
         .then(async () => {
-          const sortArg = (sort === null ? undefined : sort) as sorting.SortDef;
           const result = await getAbisPage(
             listKind,
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
-            sortArg,
+            sort,
             filter,
           );
           setDownloaded(result.abis || []);

@@ -18,11 +18,11 @@ export interface PaginationState {
 }
 
 export interface ViewSortState {
-  [key: string]: sorting.SortDef | null; // keyed by tableKeyToString(tableKey)
+  [key: string]: sorting.SortDef | null;
 }
 
 export interface ViewFilterState {
-  [key: string]: string; // keyed by tableKey.viewName
+  [key: string]: string;
 }
 
 export interface ViewPaginationState {

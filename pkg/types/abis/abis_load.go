@@ -2,10 +2,10 @@
 package abis
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/repository"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -33,9 +33,7 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 func (ac *AbisCollection) loadDownloadedAbis() {
 	result, err := ac.downloadedRepo.Load(repository.LoadOptions{})
 	if err != nil {
-		if !errors.Is(err, repository.ErrorAlreadyLoading) {
-			logger.Error(fmt.Sprintf("AbisCollection.loadDownloadedAbis: %v", err))
-		}
+		logging.LogError("AbisCollection.loadDownloadedAbis: %v", err, repository.ErrorAlreadyLoading)
 		return
 	}
 	msgs.EmitStatus(result.Status)
@@ -45,7 +43,7 @@ func (ac *AbisCollection) loadDownloadedAbis() {
 func (ac *AbisCollection) loadKnownAbis() {
 	result, err := ac.knownRepo.Load(repository.LoadOptions{})
 	if err != nil {
-		logger.Error(fmt.Sprintf("AbisCollection.loadKnownAbis: %v", err))
+		logging.LogError("AbisCollection.loadKnownAbis: %v", err, repository.ErrorAlreadyLoading)
 		return
 	}
 	msgs.EmitStatus(result.Status)
@@ -55,7 +53,7 @@ func (ac *AbisCollection) loadKnownAbis() {
 func (ac *AbisCollection) loadFunctions() {
 	result, err := ac.functionsRepo.Load(repository.LoadOptions{})
 	if err != nil {
-		logger.Error(fmt.Sprintf("AbisCollection.loadFunctions: %v", err))
+		logging.LogError("AbisCollection.loadFunctions: %v", err, repository.ErrorAlreadyLoading)
 		return
 	}
 	msgs.EmitStatus(result.Status)
@@ -65,7 +63,7 @@ func (ac *AbisCollection) loadFunctions() {
 func (ac *AbisCollection) loadEvents() {
 	result, err := ac.eventsRepo.Load(repository.LoadOptions{})
 	if err != nil {
-		logger.Error(fmt.Sprintf("AbisCollection.loadEvents: %v", err))
+		logging.LogError("AbisCollection.loadEvents: %v", err, repository.ErrorAlreadyLoading)
 		return
 	}
 	msgs.EmitStatus(result.Status)

@@ -14,7 +14,7 @@ export const Header = <T extends Record<string, unknown>>({
 }) => {
   const { sort, setSorting } = useSorting(tableKey);
   const handleClick = (col: FormField<T>) => {
-    const field = sort.key
+    const field = sort.key;
     if (!col.sortable) return;
     if (field !== col.key) {
       if (typeof col.key === 'string') {
@@ -31,7 +31,7 @@ export const Header = <T extends Record<string, unknown>>({
     <thead>
       <tr>
         {columns.map((col) => {
-          const field = sort.key
+          const field = sort.key;
           const isSorted = field === col.key;
           // Determine aria-sort value
           let ariaSort: 'ascending' | 'descending' | undefined;

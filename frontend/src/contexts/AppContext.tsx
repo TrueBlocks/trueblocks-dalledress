@@ -38,7 +38,9 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [ready, setReady] = useState(false);
   const [menuCollapsed, setMenuCollapsed] = useState(true);
   const [helpCollapsed, setHelpCollapsed] = useState(true);
-  const [lastTab, setLastTabState] = useState<Record<string, types.ListKind>>({});
+  const [lastTab, setLastTabState] = useState<Record<string, types.ListKind>>(
+    {},
+  );
   const [selectedAddress, setSelectedAddressState] = useState<string | null>(
     null,
   );

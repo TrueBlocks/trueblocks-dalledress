@@ -48,6 +48,7 @@ type App struct {
 	apiKeys           map[string]string
 	ensMap            map[string]base.Address
 	renderCtxs        map[string][]*output.RenderCtx
+	renderCtxsMutex   sync.Mutex
 	Dalle             *dalle.Context
 	cancelMutex       sync.Mutex
 	activeCancelFuncs []context.CancelFunc
@@ -364,11 +365,9 @@ func (app *App) GetChainList() *utils.ChainList {
 	return app.chainList
 }
 
-var r sync.Mutex
-
 func (a *App) RegisterCtx(key string) *output.RenderCtx {
-	r.Lock()
-	defer r.Unlock()
+	a.renderCtxsMutex.Lock()
+	defer a.renderCtxsMutex.Unlock()
 
 	rCtx := output.NewStreamingContext()
 	a.renderCtxs[key] = append(a.renderCtxs[key], rCtx)
@@ -376,6 +375,9 @@ func (a *App) RegisterCtx(key string) *output.RenderCtx {
 }
 
 func (a *App) Cancel(key string) (int, bool) {
+	a.renderCtxsMutex.Lock()
+	defer a.renderCtxsMutex.Unlock()
+
 	if len(a.renderCtxs) == 0 {
 		return 0, false
 	}

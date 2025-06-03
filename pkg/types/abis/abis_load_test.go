@@ -3,45 +3,45 @@ package abis
 
 import (
 	"testing"
+	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/mocks"
 )
 
 // TestLoadData tests the LoadData function from abis_load.go
 func TestLoadData(t *testing.T) {
-	mockApp := NewMockApp()
+	mockApp := mocks.NewMockApp()
 	ac := NewAbisCollection(mockApp)
 
-	// Verify initial state
-	if ac.isKnownLoaded || ac.isDownloadedLoaded || ac.isFuncsLoaded || ac.isEventsLoaded {
-		t.Error("NewAbisCollection should not have any loaded flags set")
+	// Verify initial state - all repositories should not be loaded
+	if ac.downloadedRepo.IsLoaded() || ac.knownRepo.IsLoaded() || ac.functionsRepo.IsLoaded() || ac.eventsRepo.IsLoaded() {
+		t.Error("NewAbisCollection should not have any loaded repositories")
 	}
-	if ac.isLoading == 1 {
-		t.Error("NewAbisCollection should not be loading")
+	if ac.downloadedRepo.IsLoading() || ac.knownRepo.IsLoading() || ac.functionsRepo.IsLoading() || ac.eventsRepo.IsLoading() {
+		t.Error("NewAbisCollection should not have any loading repositories")
 	}
 
-	// Call LoadData
+	// Call LoadData for known ABIs
 	ac.LoadData(AbisKnown)
 
-	// After calling LoadData, it should either be loading or loaded
+	// Give the goroutine a moment to start
+	time.Sleep(10 * time.Millisecond)
+
+	// After calling LoadData, the known repository should either be loading or loaded
 	// Note: Due to the asynchronous nature, we can't easily test completion without
 	// more complex synchronization mechanisms
-	ac.knownMutex.RLock()
-	isLoadingOrLoaded := ac.isLoading == 1 || ac.isKnownLoaded
-	ac.knownMutex.RUnlock()
+	isLoadingOrLoaded := ac.knownRepo.IsLoading() || ac.knownRepo.IsLoaded()
 
 	if !isLoadingOrLoaded {
-		t.Error("After LoadData, collection should be loading or loaded")
+		t.Error("After LoadData, known repository should be loading or loaded")
 	}
 
-	// Test that calling LoadData again doesn't start another loading process
-	// when already loading/loaded
-	prevState := ac.isLoading == 1 || ac.isKnownLoaded
+	// Test that calling LoadData again doesn't cause issues when already loading/loaded
+	prevState := ac.knownRepo.IsLoading() || ac.knownRepo.IsLoaded()
 	ac.LoadData(AbisKnown)
 
-	ac.knownMutex.RLock()
-	newState := ac.isLoading == 1 || ac.isKnownLoaded
-	ac.knownMutex.RUnlock()
+	newState := ac.knownRepo.IsLoading() || ac.knownRepo.IsLoaded()
 
 	if !prevState || !newState {
 		t.Error("LoadData should not change state when already loading/loaded")
@@ -49,10 +49,12 @@ func TestLoadData(t *testing.T) {
 }
 
 func TestLoadAbis(t *testing.T) {
-	mockApp := NewMockApp()
+	mockApp := mocks.NewMockApp()
 	ac := NewAbisCollection(mockApp)
-	if ac.isDownloadedLoaded || ac.isKnownLoaded || ac.isFuncsLoaded || ac.isEventsLoaded {
-		t.Fatalf("NewAbisCollection should not have any loaded flags set initially")
+
+	// Verify initial state - all repositories should not be loaded
+	if ac.downloadedRepo.IsLoaded() || ac.knownRepo.IsLoaded() || ac.functionsRepo.IsLoaded() || ac.eventsRepo.IsLoaded() {
+		t.Fatalf("NewAbisCollection should not have any loaded repositories initially")
 	}
 
 	ac.LoadData(AbisKnown)
@@ -61,18 +63,18 @@ func TestLoadAbis(t *testing.T) {
 	// We can check isLoading state.
 
 	// The rest of this test needs significant rework due to the asynchronous nature
-	// of loadInternal and the removal of the synchronous Load method.
+	// of loadInternal and the repository pattern replacing direct slice management.
 	// We cannot directly check ac.loaded or counts immediately after LoadData.
 	// We would need to:
 	// 1. Wait for isLoaded to become true (with a timeout).
 	// 2. Or, inspect events emitted by MockApp.
 	// For now, this part of the test is effectively disabled or needs to be redesigned.
-	t.Skip("TestLoadAbis needs rework for asynchronous loading via LoadData and loadInternal.")
+	t.Skip("TestLoadAbis needs rework for asynchronous loading via LoadData and repository pattern.")
 }
 
 // TestReloadCancellation tests that Reload properly cancels ongoing operations
 func TestReloadCancellation(t *testing.T) {
-	mockApp := NewMockApp()
+	mockApp := mocks.NewMockApp()
 
 	// Simulate registering a context (like what happens in loadInternal)
 	abisAddr := base.ZeroAddr.Hex()
@@ -109,7 +111,7 @@ func TestReloadCancellation(t *testing.T) {
 
 // TestContextRegistration tests that contexts are properly registered and cleaned up
 func TestContextRegistration(t *testing.T) {
-	mockApp := NewMockApp()
+	mockApp := mocks.NewMockApp()
 
 	// Test RegisterCtx
 	addr1 := "0x1234567890123456789012345678901234567890"

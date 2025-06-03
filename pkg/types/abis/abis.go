@@ -3,10 +3,13 @@ package abis
 
 import (
 	"fmt"
-	"sync"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/repository"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 const (
@@ -24,92 +27,128 @@ func init() {
 }
 
 type AbisCollection struct {
-	App       types.App
-	isLoading int32
-
-	isDownloadedLoaded bool
-	expectedDownloaded int
-	downloaded         []coreTypes.Abi
-	downloadedMutex sync.RWMutex
-
-	isKnownLoaded bool
-	expectedKnown int
-	known         []coreTypes.Abi
-	knownMutex      sync.RWMutex
-
-	isFuncsLoaded     bool
-	expectedFunctions int
-	functions         []coreTypes.Function
-	functionsMutex  sync.RWMutex
-
-	isEventsLoaded bool
-	expectedEvents int
-	events         []coreTypes.Function
-	eventsMutex     sync.RWMutex
+	App            types.App
+	downloadedRepo repository.Repository[coreTypes.Abi]
+	knownRepo      repository.Repository[coreTypes.Abi]
+	functionsRepo  repository.Repository[coreTypes.Function]
+	eventsRepo     repository.Repository[coreTypes.Function]
 }
 
 func NewAbisCollection(app types.App) AbisCollection {
+	downloadedRepo := NewAbisRepository(app, AbisDownloaded, func(abi *coreTypes.Abi) bool {
+		return !abi.IsKnown
+	})
+	knownRepo := NewAbisRepository(app, AbisKnown, func(abi *coreTypes.Abi) bool {
+		return abi.IsKnown
+	})
+	functionsRepo := NewFunctionsRepository(app, AbisFunctions, func(item *coreTypes.Function) bool {
+		return item.FunctionType != "event"
+	})
+	eventsRepo := NewFunctionsRepository(app, AbisEvents, func(item *coreTypes.Function) bool {
+		return item.FunctionType == "event"
+	})
+
 	return AbisCollection{
-		App:        app,
-		downloaded: make([]coreTypes.Abi, 0),
-		known:      make([]coreTypes.Abi, 0),
-		functions:  make([]coreTypes.Function, 0),
-		events:     make([]coreTypes.Function, 0),
+		App:            app,
+		downloadedRepo: downloadedRepo,
+		knownRepo:      knownRepo,
+		functionsRepo:  functionsRepo,
+		eventsRepo:     eventsRepo,
 	}
 }
 
-func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
-	switch listKind {
-	case AbisDownloaded:
-		ac.downloadedMutex.Lock()
-		defer ac.downloadedMutex.Unlock()
-		ac.expectedDownloaded = len(ac.downloaded)
-		ac.isDownloadedLoaded = false
-		ac.downloaded = make([]coreTypes.Abi, 0)
-	case AbisKnown:
-		ac.knownMutex.Lock()
-		defer ac.knownMutex.Unlock()
-		ac.expectedKnown = len(ac.known)
-		ac.isKnownLoaded = false
-		ac.known = make([]coreTypes.Abi, 0)
-	case AbisFunctions:
-		ac.functionsMutex.Lock()
-		defer ac.functionsMutex.Unlock()
-		ac.expectedFunctions = len(ac.functions)
-		ac.isFuncsLoaded = false
-		ac.functions = make([]coreTypes.Function, 0)
-	case AbisEvents:
-		ac.eventsMutex.Lock()
-		defer ac.eventsMutex.Unlock()
-		ac.expectedEvents = len(ac.events)
-		ac.isEventsLoaded = false
-		ac.events = make([]coreTypes.Function, 0)
-	default:
-		ac.App.LogBackend(fmt.Sprintf("Unknown ListKind in ClearCache: %s", listKind))
+type AbisRepository struct {
+	*repository.BaseRepository[coreTypes.Abi]
+}
+
+func NewAbisRepository(
+	app types.App,
+	listKind types.ListKind,
+	filterFunc repository.FilterFunc[coreTypes.Abi],
+) *AbisRepository {
+
+	processFunc := func(itemIntf interface{}) *coreTypes.Abi {
+		itemPtr, ok := itemIntf.(*coreTypes.Abi)
+		if !ok {
+			return nil
+		}
+		return itemPtr
+	}
+
+	queryFunc := func(renderCtx *output.RenderCtx) {
+		listOpts := sdk.AbisOptions{
+			Globals:   sdk.Globals{Cache: true, Verbose: true},
+			RenderCtx: renderCtx,
+		}
+		if _, _, err := listOpts.AbisList(); err != nil {
+			logger.Error(fmt.Sprintf("AbisRepository query error: %v", err))
+		}
+	}
+
+	baseRepo := repository.NewBaseRepository(
+		app,
+		listKind,
+		filterFunc,
+		processFunc,
+		queryFunc,
+		nil, /* no dedup needed */
+	)
+
+	return &AbisRepository{
+		BaseRepository: baseRepo,
 	}
 }
 
-// NeedsUpdate checks if the AbisCollection needs to be updated.
-func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
-	switch listKind {
-	case AbisDownloaded:
-		ac.downloadedMutex.RLock()
-		defer ac.downloadedMutex.RUnlock()
-		return !ac.isDownloadedLoaded
-	case AbisKnown:
-		ac.knownMutex.RLock()
-		defer ac.knownMutex.RUnlock()
-		return !ac.isKnownLoaded
-	case AbisFunctions:
-		ac.functionsMutex.RLock()
-		defer ac.functionsMutex.RUnlock()
-		return !ac.isFuncsLoaded
-	case AbisEvents:
-		ac.eventsMutex.RLock()
-		defer ac.eventsMutex.RUnlock()
-		return !ac.isEventsLoaded
-	default:
-		return true
+type FunctionsRepository struct {
+	*repository.BaseRepository[coreTypes.Function]
+}
+
+func NewFunctionsRepository(
+	app types.App,
+	listKind types.ListKind,
+	filterFunc repository.FilterFunc[coreTypes.Function],
+) *FunctionsRepository {
+	processFunc := func(itemIntf interface{}) *coreTypes.Function {
+		itemPtr, ok := itemIntf.(*coreTypes.Function)
+		if !ok {
+			return nil
+		}
+		return itemPtr
+	}
+
+	queryFunc := func(renderCtx *output.RenderCtx) {
+		detailOpts := sdk.AbisOptions{
+			Globals:   sdk.Globals{Cache: true},
+			RenderCtx: renderCtx,
+		}
+		if _, _, err := detailOpts.AbisDetails(); err != nil {
+			logger.Error(fmt.Sprintf("FunctionsRepository query error: %v", err))
+		}
+	}
+
+	dedupeFunc := func(existing []coreTypes.Function, newItem *coreTypes.Function) bool {
+		if newItem == nil {
+			return false
+		}
+		for _, item := range existing {
+			if item.Encoding == newItem.Encoding {
+				return true
+			}
+		}
+		return false
+	}
+
+	baseRepo := repository.NewBaseRepository(
+		app,
+		listKind,
+		filterFunc,
+		processFunc,
+		queryFunc,
+		dedupeFunc,
+	)
+
+	return &FunctionsRepository{
+		BaseRepository: baseRepo,
 	}
 }
 

@@ -4,11 +4,12 @@ package abis
 import (
 	"fmt"
 
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-func (ac *AbisCollection) Delete(address string) error {
+func (ac *AbisCollection) Remove(address string) error {
 	opts := sdk.AbisOptions{
 		Addrs: []string{address},
 		Globals: sdk.Globals{
@@ -19,18 +20,19 @@ func (ac *AbisCollection) Delete(address string) error {
 		return err
 	}
 
-	ac.downloadedMutex.Lock()
-	defer ac.downloadedMutex.Unlock()
-	for i, abi := range ac.downloaded {
-		if abi.Address.Hex() == address {
-			ac.downloaded = append(ac.downloaded[:i], ac.downloaded[i+1:]...)
-			msgs.EmitStatus(fmt.Sprintf("Deleted ABI for address: %s", address))
-			ac.App.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
-			return nil
-		}
-	}
+	// Use targeted deletion instead of clearing entire cache
+	removed := ac.downloadedRepo.Remove(func(abi *coreTypes.Abi) bool {
+		return abi.Address.Hex() == address
+	})
 
-	return fmt.Errorf("ABI with address %s not found", address)
+	if removed {
+		msgs.EmitStatus(fmt.Sprintf("Deleted ABI for address: %s", address))
+	} else {
+		msgs.EmitStatus(fmt.Sprintf("ABI for address %s was not found in cache", address))
+	}
+	ac.App.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
+
+	return nil
 }
 
 // ADD_ROUTE

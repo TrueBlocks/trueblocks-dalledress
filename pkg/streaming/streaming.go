@@ -18,6 +18,7 @@ func LoadStreamingData[T any](
 	queryFunc func(*output.RenderCtx),
 	filterFunc func(item *T) bool,
 	processItemFunc func(itemIntf interface{}) *T,
+	dedupeFunc func(existing []T, newItem *T) bool, // Returns true if item should be added (not a duplicate)
 	targetSlice *[]T,
 	expectedCount *int,
 	loadedFlag *bool,
@@ -70,7 +71,10 @@ func LoadStreamingData[T any](
 
 			if filterFunc(itemPtr) {
 				m.Lock()
-				*targetSlice = append(*targetSlice, *itemPtr)
+				// Apply deduplication if provided
+				if dedupeFunc == nil || !dedupeFunc(*targetSlice, itemPtr) {
+					*targetSlice = append(*targetSlice, *itemPtr)
+				}
 				m.Unlock()
 
 				if len(*targetSlice) == 7 || (len(*targetSlice) > 7 && len(*targetSlice)%refreshRate == 0) {
@@ -82,7 +86,7 @@ func LoadStreamingData[T any](
 						IsLoaded:      isLoaded,
 						ListKind:      string(listKind),
 					}
-					app.EmitEvent(msgs.EventDataLoaded, payload)
+					msgs.EmitPayload(msgs.EventDataLoaded, payload)
 					statusMsg := fmt.Sprintf("Loading %s: %d processed.", listKind, len(*targetSlice))
 					if *expectedCount > 0 {
 						statusMsg = fmt.Sprintf("Loading %s: %d of %d processed.", listKind, len(*targetSlice), *expectedCount)

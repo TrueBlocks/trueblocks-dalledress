@@ -6,10 +6,10 @@ import {abis} from '../models';
 
 export function ClearCache(arg1:types.ListKind):Promise<void>;
 
-export function Delete(arg1:string):Promise<void>;
-
 export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sorting.SortDef,arg5:string):Promise<abis.AbisPage>;
 
 export function LoadData(arg1:types.ListKind):Promise<void>;
 
 export function NeedsUpdate(arg1:types.ListKind):Promise<boolean>;
+
+export function Remove(arg1:string):Promise<void>;

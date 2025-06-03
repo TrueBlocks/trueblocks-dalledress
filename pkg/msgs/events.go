@@ -21,23 +21,23 @@ func InitializeContext(ctx context.Context) {
 }
 
 // Update the EventEmitter type to not require context
-type EventEmitter func(messageType EventType, msgText string)
+type EventEmitter func(messageType EventType, msgText string, optionalPayload ...interface{})
 
 // Update defaultEmitter to use stored context
-var defaultEmitter EventEmitter = func(messageType EventType, msgText string) {
+var defaultEmitter EventEmitter = func(messageType EventType, msgText string, optionalPayload ...interface{}) {
 	contextMutex.RLock()
 	ctx := wailsContext
 	contextMutex.RUnlock()
 
 	if ctx != nil {
-		runtime.EventsEmit(ctx, string(messageType), msgText)
+		runtime.EventsEmit(ctx, string(messageType), msgText, optionalPayload)
 	}
 }
 
 func logEmitter(next EventEmitter) EventEmitter {
-	return func(messageType EventType, msgText string) {
-		log.Printf("EVENT: %s - %s", messageType, msgText)
-		next(messageType, msgText)
+	return func(messageType EventType, msgText string, optionalPayload ...interface{}) {
+		log.Printf("EVENT: %s - %s - %s", messageType, msgText, optionalPayload)
+		next(messageType, msgText, optionalPayload...)
 	}
 }
 
@@ -55,9 +55,16 @@ func DisableLogging() {
 	currentEmitter = defaultEmitter
 }
 
-// EmitMessage emits a message using the stored context
-func EmitMessage(messageType EventType, msgText string) {
+// EmitPayload emits a message using the stored context
+func EmitPayload(messageType EventType, payload ...interface{}) {
 	if currentEmitter != nil {
-		currentEmitter(messageType, msgText)
+		currentEmitter(messageType, "payload", payload)
+	}
+}
+
+// EmitMessage emits a message using the stored context
+func EmitMessage(messageType EventType, msgText string, payload ...interface{}) {
+	if currentEmitter != nil {
+		currentEmitter(messageType, msgText, payload)
 	}
 }

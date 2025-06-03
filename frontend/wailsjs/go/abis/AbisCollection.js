@@ -6,10 +6,6 @@ export function ClearCache(arg1) {
   return window['go']['abis']['AbisCollection']['ClearCache'](arg1);
 }
 
-export function Delete(arg1) {
-  return window['go']['abis']['AbisCollection']['Delete'](arg1);
-}
-
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -20,4 +16,8 @@ export function LoadData(arg1) {
 
 export function NeedsUpdate(arg1) {
   return window['go']['abis']['AbisCollection']['NeedsUpdate'](arg1);
+}
+
+export function Remove(arg1) {
+  return window['go']['abis']['AbisCollection']['Remove'](arg1);
 }

@@ -29,104 +29,166 @@ func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, 
 
 	filter = strings.ToLower(filter)
 	sortSpec := sorting.ConvertToSortSpec(sortDef)
-	var err error
 	var page = AbisPage{
-		Kind:      listKind,
-		IsLoading: ac.isLoading == 1,
+		Kind: listKind,
 	}
 
 	switch listKind {
 	case AbisDownloaded:
-		ac.downloadedMutex.RLock()
-		defer ac.downloadedMutex.RUnlock()
-		page.IsLoaded = ac.isDownloadedLoaded
-		if page.Abis, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
-			"downloaded abis",
-			&ac.downloaded,
-			sortSpec,
-			getAbiSortFunc,
-			streaming.CreatePageFilter(filter, getAbiSearchFields),
-			first, pageSize,
-		); err != nil {
-			return AbisPage{}, err
-		} else {
-			return page, nil
+		// Use Repository pattern for downloaded ABIs
+		page.IsLoading = ac.downloadedRepo.IsLoading()
+		page.IsLoaded = ac.downloadedRepo.IsLoaded()
+
+		// Create filter function from the string filter
+		filterFunc := func(abi *coreTypes.Abi) bool {
+			if filter == "" {
+				return true
+			}
+			searchFields := []string{abi.Name, abi.Address.Hex()}
+			for _, field := range searchFields {
+				if strings.Contains(strings.ToLower(field), filter) {
+					return true
+				}
+			}
+			return false
 		}
+
+		// Create wrapper sort function to match Repository interface
+		sortFunc := func(items []coreTypes.Abi, sortSpecInterface interface{}) error {
+			if sortSpec, ok := sortSpecInterface.(sdk.SortSpec); ok {
+				return streaming.SortPageSlice(items, sortSpec, sdk.SortAbis)
+			}
+			return nil // No sorting if type doesn't match
+		}
+
+		// Get paginated data from repository with sorting
+		result, err := ac.downloadedRepo.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
+		if err != nil {
+			return AbisPage{}, err
+		}
+
+		page.Abis = result.Items
+		page.TotalItems = result.TotalItems
+		page.ExpectedTotal = ac.downloadedRepo.ExpectedCount()
+		return page, nil
 
 	case AbisKnown:
-		ac.knownMutex.RLock()
-		defer ac.knownMutex.RUnlock()
-		page.IsLoaded = ac.isKnownLoaded
-		if page.Abis, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
-			"known abis",
-			&ac.known,
-			sortSpec,
-			getAbiSortFunc,
-			streaming.CreatePageFilter(filter, getAbiSearchFields),
-			first, pageSize,
-		); err != nil {
-			return AbisPage{}, err
-		} else {
-			return page, nil
+		// Use Repository pattern for known ABIs
+		page.IsLoading = ac.knownRepo.IsLoading()
+		page.IsLoaded = ac.knownRepo.IsLoaded()
+
+		// Create filter function from the string filter
+		filterFunc := func(abi *coreTypes.Abi) bool {
+			if filter == "" {
+				return true
+			}
+			searchFields := []string{abi.Name, abi.Address.Hex()}
+			for _, field := range searchFields {
+				if strings.Contains(strings.ToLower(field), filter) {
+					return true
+				}
+			}
+			return false
 		}
+
+		// Create wrapper sort function to match Repository interface
+		sortFunc := func(items []coreTypes.Abi, sortSpecInterface interface{}) error {
+			if sortSpec, ok := sortSpecInterface.(sdk.SortSpec); ok {
+				return streaming.SortPageSlice(items, sortSpec, sdk.SortAbis)
+			}
+			return nil // No sorting if type doesn't match
+		}
+
+		// Get paginated data from repository with sorting
+		result, err := ac.knownRepo.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
+		if err != nil {
+			return AbisPage{}, err
+		}
+
+		page.Abis = result.Items
+		page.TotalItems = result.TotalItems
+		page.ExpectedTotal = ac.knownRepo.ExpectedCount()
+		return page, nil
 
 	case AbisFunctions:
-		ac.functionsMutex.RLock()
-		defer ac.functionsMutex.RUnlock()
-		page.IsLoaded = ac.isFuncsLoaded
-		if page.Functions, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
-			"functions",
-			&ac.functions,
-			sortSpec,
-			getFunctionSortFunc,
-			streaming.CreatePageFilter(filter, getFunctionSearchFields),
-			first, pageSize,
-		); err != nil {
-			return AbisPage{}, err
-		} else {
-			return page, nil
+		// Use Repository pattern for functions
+		page.IsLoading = ac.functionsRepo.IsLoading()
+		page.IsLoaded = ac.functionsRepo.IsLoaded()
+
+		// Create filter function from the string filter
+		filterFunc := func(fn *coreTypes.Function) bool {
+			if filter == "" {
+				return true
+			}
+			searchFields := []string{fn.Name, fn.Signature, fn.Encoding}
+			for _, field := range searchFields {
+				if strings.Contains(strings.ToLower(field), filter) {
+					return true
+				}
+			}
+			return false
 		}
 
-	case AbisEvents:
-		ac.eventsMutex.RLock()
-		defer ac.eventsMutex.RUnlock()
-		page.IsLoaded = ac.isEventsLoaded
-		if page.Functions, page.TotalItems, page.ExpectedTotal, err = streaming.ProcessPage(
-			"events",
-			&ac.events,
-			sortSpec,
-			getFunctionSortFunc,
-			streaming.CreatePageFilter(filter, getFunctionSearchFields),
-			first, pageSize,
-		); err != nil {
-			return AbisPage{}, err
-		} else {
-			return page, nil
+		// Create wrapper sort function to match Repository interface
+		sortFunc := func(items []coreTypes.Function, sortSpecInterface interface{}) error {
+			if sortSpec, ok := sortSpecInterface.(sdk.SortSpec); ok {
+				return streaming.SortPageSlice(items, sortSpec, sdk.SortFunctions)
+			}
+			return nil // No sorting if type doesn't match
 		}
+
+		// Get paginated data from repository with sorting
+		result, err := ac.functionsRepo.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
+		if err != nil {
+			return AbisPage{}, err
+		}
+
+		page.Functions = result.Items
+		page.TotalItems = result.TotalItems
+		page.ExpectedTotal = ac.functionsRepo.ExpectedCount()
+		return page, nil
+
+	case AbisEvents:
+		// Use Repository pattern for events
+		page.IsLoading = ac.eventsRepo.IsLoading()
+		page.IsLoaded = ac.eventsRepo.IsLoaded()
+
+		// Create filter function from the string filter
+		filterFunc := func(fn *coreTypes.Function) bool {
+			if filter == "" {
+				return true
+			}
+			searchFields := []string{fn.Name, fn.Signature, fn.Encoding}
+			for _, field := range searchFields {
+				if strings.Contains(strings.ToLower(field), filter) {
+					return true
+				}
+			}
+			return false
+		}
+
+		// Create wrapper sort function to match Repository interface
+		sortFunc := func(items []coreTypes.Function, sortSpecInterface interface{}) error {
+			if sortSpec, ok := sortSpecInterface.(sdk.SortSpec); ok {
+				return streaming.SortPageSlice(items, sortSpec, sdk.SortFunctions)
+			}
+			return nil // No sorting if type doesn't match
+		}
+
+		// Get paginated data from repository with sorting
+		result, err := ac.eventsRepo.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
+		if err != nil {
+			return AbisPage{}, err
+		}
+
+		page.Functions = result.Items
+		page.TotalItems = result.TotalItems
+		page.ExpectedTotal = ac.eventsRepo.ExpectedCount()
+		return page, nil
 
 	default:
 		return AbisPage{}, fmt.Errorf("invalid list kind: %s", listKind)
 	}
-}
-
-// ------------------------------------------------------------------------------
-func getAbiSearchFields(item coreTypes.Abi) []string {
-	return []string{item.Name, item.Address.Hex()}
-}
-
-// ------------------------------------------------------------------------------
-func getAbiSortFunc(items []coreTypes.Abi, sortSpec sdk.SortSpec) error {
-	return streaming.SortPageSlice(items, sortSpec, sdk.SortAbis)
-}
-
-// ------------------------------------------------------------------------------
-func getFunctionSearchFields(item coreTypes.Function) []string {
-	return []string{item.Name, item.Signature, item.Encoding}
-}
-
-// ------------------------------------------------------------------------------
-func getFunctionSortFunc(items []coreTypes.Function, sortSpec sdk.SortSpec) error {
-	return streaming.SortPageSlice(items, sortSpec, sdk.SortFunctions)
 }
 
 // ADD_ROUTE

@@ -33,8 +33,6 @@ export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
 
-export function DeleteAbi(arg1:string):Promise<void>;
-
 export function DeleteName(arg1:string):Promise<void>;
 
 export function EmitEvent(arg1:msgs.EventType,arg2:any):Promise<void>;
@@ -100,6 +98,8 @@ export function RegisterCancel(arg1:context.CancelFunc):Promise<void>;
 export function RegisterCtx(arg1:string):Promise<output.RenderCtx>;
 
 export function Reload():Promise<void>;
+
+export function RemoveAbi(arg1:string):Promise<void>;
 
 export function RemoveName(arg1:string):Promise<void>;
 

@@ -5,7 +5,7 @@ getTableConfig
 // ADD_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { DeleteAbi, GetAbisPage, Reload } from '@app';
+import { GetAbisPage, Reload, RemoveAbi } from '@app';
 import { usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { TabView } from '@layout';
@@ -186,7 +186,7 @@ export const Abis = () => {
       });
       setDownloaded(optimisticNames as IndexedAbi[]);
 
-      DeleteAbi(address)
+      RemoveAbi(address)
         .then(async () => {
           // If API call is successful, refresh the data to get the definitive state
           const sortArgument = sort === null ? undefined : sort;

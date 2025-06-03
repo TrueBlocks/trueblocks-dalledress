@@ -7,8 +7,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 )
 
-// We need these functions so that the App's abis records get handled
-
 func (a *App) GetAbisPage(
 	kind types.ListKind,
 	first, pageSize int,
@@ -18,8 +16,8 @@ func (a *App) GetAbisPage(
 	return a.abis.GetPage(kind, first, pageSize, sort, filter)
 }
 
-func (a *App) DeleteAbi(address string) error {
-	return a.abis.Delete(address)
+func (a *App) RemoveAbi(address string) error {
+	return a.abis.Remove(address)
 }
 
 // ADD_ROUTE

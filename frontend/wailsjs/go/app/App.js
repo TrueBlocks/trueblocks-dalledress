@@ -42,10 +42,6 @@ export function ConvertToAddress(arg1) {
   return window['go']['app']['App']['ConvertToAddress'](arg1);
 }
 
-export function DeleteAbi(arg1) {
-  return window['go']['app']['App']['DeleteAbi'](arg1);
-}
-
 export function DeleteName(arg1) {
   return window['go']['app']['App']['DeleteName'](arg1);
 }
@@ -176,6 +172,10 @@ export function RegisterCtx(arg1) {
 
 export function Reload() {
   return window['go']['app']['App']['Reload']();
+}
+
+export function RemoveAbi(arg1) {
+  return window['go']['app']['App']['RemoveAbi'](arg1);
 }
 
 export function RemoveName(arg1) {

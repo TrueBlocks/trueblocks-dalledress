@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
@@ -94,11 +95,13 @@ func NewBaseRepository[T any](
 	}
 }
 
+var ErrorAlreadyLoading = errors.New("already loading")
+
 // Load implements Repository.Load using your existing streaming system
 func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	// Check if already loading
 	if !r.state.StartLoading() {
-		return nil, fmt.Errorf("already loading")
+		return nil, ErrorAlreadyLoading
 	}
 	defer r.state.StopLoading()
 

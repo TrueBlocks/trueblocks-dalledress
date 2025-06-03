@@ -2,6 +2,7 @@
 package abis
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
@@ -32,7 +33,9 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 func (ac *AbisCollection) loadDownloadedAbis() {
 	result, err := ac.downloadedRepo.Load(repository.LoadOptions{})
 	if err != nil {
-		logger.Error(fmt.Sprintf("AbisCollection.loadDownloadedAbis: %v", err))
+		if !errors.Is(err, repository.ErrorAlreadyLoading) {
+			logger.Error(fmt.Sprintf("AbisCollection.loadDownloadedAbis: %v", err))
+		}
 		return
 	}
 	msgs.EmitStatus(result.Status)

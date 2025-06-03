@@ -22,7 +22,7 @@ import {
 } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { TabView } from '@layout';
-import { msgs, sorting, types } from '@models';
+import { msgs, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
@@ -123,7 +123,7 @@ export const Names = () => {
         listKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
-        sort as sorting.SortDef,
+        sort,
         filter ?? '',
       )
         .then((result) => {
@@ -367,7 +367,7 @@ export const Names = () => {
           listKind,
           pagination.currentPage * pagination.pageSize,
           pagination.pageSize,
-          sort as sorting.SortDef,
+          sort,
           filter ?? '',
         );
       })
@@ -438,7 +438,7 @@ export const Names = () => {
               listKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
-              sort as sorting.SortDef,
+              sort,
               filter ?? '',
             );
           })
@@ -493,7 +493,7 @@ export const Names = () => {
               listKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
-              sort as sorting.SortDef,
+              sort,
               filter ?? '',
             );
           })
@@ -536,7 +536,7 @@ export const Names = () => {
               listKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
-              sort as sorting.SortDef,
+              sort,
               filter ?? '',
             );
           })

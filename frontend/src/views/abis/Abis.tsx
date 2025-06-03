@@ -34,27 +34,25 @@ export const Abis = () => {
     lastTab[ABIS_ROUTE] || DEFAULT_LIST_KIND,
   );
   const listKindRef = useRef(listKind);
-  const [downloaded, setDownloaded] = useState<types.Abi[]>([]);
-  const [known, setKnown] = useState<types.Abi[]>([]);
-  const [functions, setFunctions] = useState<types.Function[]>([]);
-  const [events, setEvents] = useState<types.Function[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
-  // const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
-  //   new Set(),
-  // );
-  const [, setProcessingAddresses] = useState<Set<string>>(new Set());
-
   const tableKey = useMemo((): TableKey => {
     return { viewName: ABIS_ROUTE, tabName: listKind };
   }, [listKind]);
 
+  const [downloaded, setDownloaded] = useState<types.Abi[]>([]);
+  const [known, setKnown] = useState<types.Abi[]>([]);
+  const [functions, setFunctions] = useState<types.Function[]>([]);
+  const [events, setEvents] = useState<types.Function[]>([]);
+
+  // const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
+  //   new Set(),
+  // );
+  const [, setProcessingAddresses] = useState<Set<string>>(new Set());
+  const [error, setError] = useState<Error | null>(null);
   const { pagination, setTotalItems } = usePagination(tableKey);
   const { sort } = useSorting(tableKey);
   const { filter } = useFiltering(tableKey);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
     setError(null);
     try {
       const sortArg = (sort === null ? undefined : sort) as sorting.SortDef;
@@ -89,8 +87,6 @@ export const Abis = () => {
       setError(e);
       emitError(`${e.message} Failed to fetch ${listKind}`);
       Log(`Error fetching ${listKind}: ${e}`);
-    } finally {
-      setLoading(false);
     }
   }, [
     sort,
@@ -149,7 +145,6 @@ export const Abis = () => {
     [
       'mod+r',
       () => {
-        setLoading(true);
         reload().then(() => {
           fetchData();
           emitStatus(ACTION_MESSAGES.RELOAD_STATUS);
@@ -179,10 +174,8 @@ export const Abis = () => {
             sortArg,
             filter,
           );
-
           setDownloaded(result.abis || []);
           setTotalItems(result.totalItems || 0);
-
           emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
         })
         .catch((err) => {
@@ -211,7 +204,7 @@ export const Abis = () => {
         return (
           <DownloadedTab
             data={downloaded}
-            loading={loading && downloaded.length === 0}
+            loading={downloaded.length === 0}
             error={error}
             onSubmit={handleTableSubmit}
             onDelete={handleAction}
@@ -222,7 +215,7 @@ export const Abis = () => {
         return (
           <KnownTab
             data={known}
-            loading={loading && known.length === 0}
+            loading={known.length === 0}
             error={error}
             onSubmit={handleTableSubmit}
             tableKey={tableKey}
@@ -232,7 +225,7 @@ export const Abis = () => {
         return (
           <FunctionsTab
             data={functions}
-            loading={loading && functions.length === 0}
+            loading={functions.length === 0}
             error={error}
             onSubmit={handleTableSubmit}
             tableKey={tableKey}
@@ -242,7 +235,7 @@ export const Abis = () => {
         return (
           <EventsTab
             data={events}
-            loading={loading && events.length === 0}
+            loading={events.length === 0}
             error={error}
             onSubmit={handleTableSubmit}
             tableKey={tableKey}

@@ -84,7 +84,7 @@ func (n *NamesCollection) ClearSelectedTag(key string) {
 }
 
 // GetPage returns a page of names for the given list type and the total count.
-func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortKey sorting.SortDef, filter string) NamesPage {
+func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortKey *sorting.SortDef, filter string) NamesPage {
 	if len(n.List) == 0 {
 		if err := n.LoadNames(nil); err != nil {
 			return NamesPage{Names: nil, Total: 0, Tags: []string{}}
@@ -174,7 +174,7 @@ func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortKey 
 	}
 
 	// Sorting
-	if sortKey.Key != "" {
+	if sortKey != nil && sortKey.Key != "" {
 		sort.SliceStable(list, func(i, j int) bool {
 			var vi, vj string
 			switch sortKey.Key {

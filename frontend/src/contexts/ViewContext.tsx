@@ -153,7 +153,6 @@ export const useViewContext = () => {
   return context;
 };
 
-// Hook for sorting state (per-tab)
 export const useSorting = (tableKey: TableKey) => {
   const { getSorting, updateSorting } = useViewContext();
 
@@ -163,7 +162,9 @@ export const useSorting = (tableKey: TableKey) => {
     },
     [tableKey, updateSorting],
   );
-  const sort = getSorting(tableKey);
+  // Get the sort value, but never return null - instead return a default empty SortDef
+  const sortValue = getSorting(tableKey);
+  const sort = sortValue || { key: '', direction: 'asc' };
 
   return { sort, setSorting };
 };
@@ -178,7 +179,7 @@ export const useFiltering = (tableKey: TableKey) => {
     },
     [tableKey, updateFiltering],
   );
-  const filter = getFiltering(tableKey);
 
+  const filter = getFiltering(tableKey);
   return { filter, setFiltering };
 };

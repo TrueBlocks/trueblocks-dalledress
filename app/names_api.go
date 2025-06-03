@@ -9,7 +9,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-func (a *App) GetNamesPage(listKind string, first, pageSize int, sortKey sorting.SortDef, filter string) types.NamesPage {
+func (a *App) GetNamesPage(listKind string, first, pageSize int, sortKey *sorting.SortDef, filter string) types.NamesPage {
 	return a.names.GetPage(listKind, first, pageSize, sortKey, filter)
 }
 

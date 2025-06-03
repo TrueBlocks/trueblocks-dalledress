@@ -30,7 +30,7 @@ func makeTestNames() NamesCollection {
 	}
 }
 
-var noSort = sorting.SortDef{}
+var noSort = &sorting.SortDef{}
 
 func TestNamesStructFields(t *testing.T) {
 	names := NamesCollection{

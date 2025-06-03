@@ -12,4 +12,14 @@
 .sort-indicator {
   flex: none;
   text-align: right;
+  font-weight: bold;
+  min-width: 1.5em;
+}
+
+th.sortable {
+  cursor: pointer;
+}
+
+th.sortable:hover .sort-indicator {
+  opacity: 0.8;
 }

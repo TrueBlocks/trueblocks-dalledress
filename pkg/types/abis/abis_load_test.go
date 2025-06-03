@@ -6,13 +6,12 @@ import (
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/mocks"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
 )
 
 // TestLoadData tests the LoadData function from abis_load.go
 func TestLoadData(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	// Verify initial state - all repositories should not be loaded
 	if ac.downloadedRepo.IsLoaded() || ac.knownRepo.IsLoaded() || ac.functionsRepo.IsLoaded() || ac.eventsRepo.IsLoaded() {
@@ -49,8 +48,7 @@ func TestLoadData(t *testing.T) {
 }
 
 func TestLoadAbis(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	// Verify initial state - all repositories should not be loaded
 	if ac.downloadedRepo.IsLoaded() || ac.knownRepo.IsLoaded() || ac.functionsRepo.IsLoaded() || ac.eventsRepo.IsLoaded() {
@@ -67,22 +65,19 @@ func TestLoadAbis(t *testing.T) {
 	// We cannot directly check ac.loaded or counts immediately after LoadData.
 	// We would need to:
 	// 1. Wait for isLoaded to become true (with a timeout).
-	// 2. Or, inspect events emitted by MockApp.
+	// 2. Or, inspect events emitted.
 	// For now, this part of the test is effectively disabled or needs to be redesigned.
 	t.Skip("TestLoadAbis needs rework for asynchronous loading via LoadData and repository pattern.")
 }
 
 // TestReloadCancellation tests that Reload properly cancels ongoing operations
 func TestReloadCancellation(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-
-	// Simulate registering a context (like what happens in loadInternal)
 	abisAddr := base.ZeroAddr.Hex()
-	renderCtx := mockApp.RegisterCtx(abisAddr)
+	renderCtx := streaming.RegisterCtx(abisAddr)
 
 	// Verify the context was registered
-	if len(mockApp.RegisteredCtxs) != 1 {
-		t.Errorf("Expected 1 registered context, got %d", len(mockApp.RegisteredCtxs))
+	if streaming.CtxCount(abisAddr) != 1 {
+		t.Errorf("Expected 1 registered context, got %d", streaming.CtxCount(abisAddr))
 	}
 
 	// Verify the context is not nil
@@ -91,7 +86,7 @@ func TestReloadCancellation(t *testing.T) {
 	}
 
 	// Simulate a reload operation by cancelling the context
-	cancelled, found := mockApp.Cancel(abisAddr)
+	cancelled, found := streaming.Cancel(abisAddr)
 	if !found {
 		t.Error("Cancel should find the registered context")
 	}
@@ -100,8 +95,8 @@ func TestReloadCancellation(t *testing.T) {
 	}
 
 	// Verify the context was cancelled and removed
-	if len(mockApp.RegisteredCtxs) != 0 {
-		t.Errorf("Expected 0 registered contexts after reload, got %d", len(mockApp.RegisteredCtxs))
+	if streaming.CtxCount(abisAddr) != 0 {
+		t.Errorf("Expected 0 registered contexts after reload, got %d", streaming.CtxCount(abisAddr))
 	}
 
 	// Note: We can't easily test if the context was actually cancelled since
@@ -111,17 +106,15 @@ func TestReloadCancellation(t *testing.T) {
 
 // TestContextRegistration tests that contexts are properly registered and cleaned up
 func TestContextRegistration(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-
-	// Test RegisterCtx
 	addr1 := "0x1234567890123456789012345678901234567890"
 	addr2 := "0x2234567890123456789012345678901234567890"
 
-	ctx1 := mockApp.RegisterCtx(addr1)
-	ctx2 := mockApp.RegisterCtx(addr2)
+	ctx1 := streaming.RegisterCtx(addr1)
+	ctx2 := streaming.RegisterCtx(addr2)
 
-	if len(mockApp.RegisteredCtxs) != 2 {
-		t.Errorf("Expected 2 registered contexts, got %d", len(mockApp.RegisteredCtxs))
+	cnt := streaming.CtxCount(addr1) + streaming.CtxCount(addr1)
+	if cnt != 2 {
+		t.Errorf("Expected 2 registered contexts, got %d", cnt)
 	}
 
 	if ctx1 == nil || ctx2 == nil {
@@ -129,20 +122,21 @@ func TestContextRegistration(t *testing.T) {
 	}
 
 	// Test Cancel for specific address
-	cancelled, found := mockApp.Cancel(addr1)
+	cancelled, found := streaming.Cancel(addr1)
 	if !found {
 		t.Error("Cancel should find the registered context")
 	}
 	if cancelled != 1 {
 		t.Errorf("Expected 1 cancelled context, got %d", cancelled)
 	}
-	if len(mockApp.RegisteredCtxs) != 1 {
-		t.Errorf("Expected 1 remaining context after cancel, got %d", len(mockApp.RegisteredCtxs))
+	cnt = streaming.CtxCount(addr1) + streaming.CtxCount(addr2)
+	if cnt != 1 {
+		t.Errorf("Expected 1 remaining context after cancel, got %d", cnt)
 	}
 
 	// Test Cancel for non-existent address
 	nonExistentAddr := "0x9999999999999999999999999999999999999999"
-	cancelled, found = mockApp.Cancel(nonExistentAddr)
+	cancelled, found = streaming.Cancel(nonExistentAddr)
 	if found {
 		t.Error("Cancel should not find non-existent context")
 	}

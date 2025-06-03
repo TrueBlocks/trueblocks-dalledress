@@ -27,29 +27,27 @@ func init() {
 }
 
 type AbisCollection struct {
-	App            types.App
 	downloadedRepo repository.Repository[coreTypes.Abi]
 	knownRepo      repository.Repository[coreTypes.Abi]
 	functionsRepo  repository.Repository[coreTypes.Function]
 	eventsRepo     repository.Repository[coreTypes.Function]
 }
 
-func NewAbisCollection(app types.App) AbisCollection {
-	downloadedRepo := NewAbisRepository(app, AbisDownloaded, func(abi *coreTypes.Abi) bool {
+func NewAbisCollection() AbisCollection {
+	downloadedRepo := NewAbisRepository(AbisDownloaded, func(abi *coreTypes.Abi) bool {
 		return !abi.IsKnown
 	})
-	knownRepo := NewAbisRepository(app, AbisKnown, func(abi *coreTypes.Abi) bool {
+	knownRepo := NewAbisRepository(AbisKnown, func(abi *coreTypes.Abi) bool {
 		return abi.IsKnown
 	})
-	functionsRepo := NewFunctionsRepository(app, AbisFunctions, func(item *coreTypes.Function) bool {
+	functionsRepo := NewFunctionsRepository(AbisFunctions, func(item *coreTypes.Function) bool {
 		return item.FunctionType != "event"
 	})
-	eventsRepo := NewFunctionsRepository(app, AbisEvents, func(item *coreTypes.Function) bool {
+	eventsRepo := NewFunctionsRepository(AbisEvents, func(item *coreTypes.Function) bool {
 		return item.FunctionType == "event"
 	})
 
 	return AbisCollection{
-		App:            app,
 		downloadedRepo: downloadedRepo,
 		knownRepo:      knownRepo,
 		functionsRepo:  functionsRepo,
@@ -62,7 +60,6 @@ type AbisRepository struct {
 }
 
 func NewAbisRepository(
-	app types.App,
 	listKind types.ListKind,
 	filterFunc repository.FilterFunc[coreTypes.Abi],
 ) *AbisRepository {
@@ -86,7 +83,6 @@ func NewAbisRepository(
 	}
 
 	baseRepo := repository.NewBaseRepository(
-		app,
 		listKind,
 		filterFunc,
 		processFunc,
@@ -104,7 +100,6 @@ type FunctionsRepository struct {
 }
 
 func NewFunctionsRepository(
-	app types.App,
 	listKind types.ListKind,
 	filterFunc repository.FilterFunc[coreTypes.Function],
 ) *FunctionsRepository {
@@ -139,7 +134,6 @@ func NewFunctionsRepository(
 	}
 
 	baseRepo := repository.NewBaseRepository(
-		app,
 		listKind,
 		filterFunc,
 		processFunc,

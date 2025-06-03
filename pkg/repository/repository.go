@@ -57,7 +57,6 @@ type PageResult[T any] struct {
 
 // BaseRepository provides common repository functionality
 type BaseRepository[T any] struct {
-	app         types.App
 	listKind    types.ListKind
 	filterFunc  FilterFunc[T]
 	processFunc func(interface{}) *T
@@ -77,7 +76,6 @@ type BaseRepository[T any] struct {
 
 // NewBaseRepository creates a new base repository
 func NewBaseRepository[T any](
-	app types.App,
 	listKind types.ListKind,
 	filterFunc FilterFunc[T],
 	processFunc func(interface{}) *T,
@@ -85,7 +83,6 @@ func NewBaseRepository[T any](
 	dedupeFunc func(existing []T, newItem *T) bool, // Optional deduplication function
 ) *BaseRepository[T] {
 	return &BaseRepository[T]{
-		app:         app,
 		listKind:    listKind,
 		filterFunc:  filterFunc,
 		processFunc: processFunc,
@@ -116,7 +113,6 @@ func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 
 	contextKey := fmt.Sprintf("repo-%s", r.listKind)
 	finalStatus, finalPayload, err := streaming.LoadStreamingData(
-		r.app,            // ← Your app (has RegisterCtx/Cancel methods)
 		contextKey,       // ← Escape key cancels using this key
 		r.queryFunc,      // ← Uses your rendering context
 		r.filterFunc,     // ← Your existing filter function

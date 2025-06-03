@@ -4,6 +4,7 @@ package abis
 import (
 	"fmt"
 
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
@@ -18,7 +19,7 @@ func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
 	case AbisEvents:
 		ac.eventsRepo.Clear()
 	default:
-		ac.App.LogBackend(fmt.Sprintf("Unknown ListKind in ClearCache: %s", listKind))
+		logging.LogBackend(fmt.Sprintf("Unknown ListKind in ClearCache: %s", listKind))
 	}
 }
 

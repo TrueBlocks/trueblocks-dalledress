@@ -1,9 +1,4 @@
-import {
-  CancelAllStreams,
-  Reload,
-  SetHelpCollapsed,
-  SetMenuCollapsed,
-} from '@app';
+import { CancelAll, Reload, SetHelpCollapsed, SetMenuCollapsed } from '@app';
 import { useAppContext } from '@contexts';
 import { msgs } from '@models';
 import { Log, emitEvent, registerHotkeys, useEmitters } from '@utils';
@@ -313,7 +308,7 @@ export const useAppHotkeys = (): void => {
     {
       key: 'escape',
       handler: (_e: KeyboardEvent) => {
-        CancelAllStreams()
+        CancelAll()
           .then(() => {
             emitStatus('Cancellation request sent via Escape key.');
           })

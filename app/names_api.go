@@ -15,7 +15,6 @@ func (a *App) GetNamesPage(listKind string, first, pageSize int, sortKey sorting
 
 func (a *App) UpdateName(nameToEdit *coreTypes.Name) error {
 	if err := a.ModifyName("update", nameToEdit); err != nil {
-		// types.LogBackend("UpdateName error " + err.Error())
 		msgs.EmitError("UpdateName", err)
 		return err
 	}

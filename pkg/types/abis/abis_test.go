@@ -5,13 +5,11 @@ import (
 	"testing"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/mocks"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 func TestNewAbisCollection(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	// Check that all repositories are properly initialized and not loaded
 	if ac.downloadedRepo == nil {
@@ -56,8 +54,7 @@ func TestNewAbisCollection(t *testing.T) {
 }
 
 func TestAbisCollection_ClearCache(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	// For all data types now using Repository pattern
 	// We can't easily simulate initial data without loading, so we test the clear operation
@@ -82,23 +79,8 @@ func TestAbisCollection_ClearCache(t *testing.T) {
 	}
 }
 
-func TestAbisCollection_ClearCache_UnknownListKind(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
-
-	// Test with unknown ListKind
-	unknownKind := types.ListKind("Unknown")
-	ac.ClearCache(unknownKind)
-
-	// Should have logged an error
-	if len(mockApp.LogMessages) == 0 {
-		t.Error("ClearCache with unknown ListKind should log an error message")
-	}
-}
-
 func TestAbisCollection_NeedsUpdate(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	// Initially all should need update (repositories not loaded)
 	if !ac.NeedsUpdate(AbisDownloaded) {
@@ -119,8 +101,7 @@ func TestAbisCollection_NeedsUpdate(t *testing.T) {
 }
 
 func TestAbisCollection_NeedsUpdate_UnknownListKind(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	// Test with unknown ListKind - should return true
 	unknownKind := types.ListKind("Unknown")
@@ -130,8 +111,7 @@ func TestAbisCollection_NeedsUpdate_UnknownListKind(t *testing.T) {
 }
 
 func TestAbisCollection_ThreadSafety(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	// Test concurrent access to NeedsUpdate and ClearCache across all slice types
 	done := make(chan bool, 4)
@@ -183,19 +163,16 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 }
 
 func TestAbisRepository(t *testing.T) {
-	app := mocks.NewMockApp()
-
-	// Test creating Abis repositories
-	downloadedRepo := NewAbisRepository(app, "Downloaded", func(abi *coreTypes.Abi) bool {
+	downloadedRepo := NewAbisRepository("Downloaded", func(abi *coreTypes.Abi) bool {
 		return !abi.IsKnown
 	})
-	knownRepo := NewAbisRepository(app, "Known", func(abi *coreTypes.Abi) bool {
+	knownRepo := NewAbisRepository("Known", func(abi *coreTypes.Abi) bool {
 		return abi.IsKnown
 	})
-	functionsRepo := NewFunctionsRepository(app, "Functions", func(item *coreTypes.Function) bool {
+	functionsRepo := NewFunctionsRepository("Functions", func(item *coreTypes.Function) bool {
 		return item.FunctionType != "event"
 	})
-	eventsRepo := NewFunctionsRepository(app, "Events", func(item *coreTypes.Function) bool {
+	eventsRepo := NewFunctionsRepository("Events", func(item *coreTypes.Function) bool {
 		return item.FunctionType == "event"
 	})
 

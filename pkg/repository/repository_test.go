@@ -4,15 +4,11 @@ import (
 	"testing"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/mocks"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/repository"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 func TestRepositoryPattern(t *testing.T) {
-	app := mocks.NewMockApp()
-
-	// Test creating a simple repository
 	filterFunc := func(item *string) bool {
 		return len(*item) > 3
 	}
@@ -43,7 +39,6 @@ func TestRepositoryPattern(t *testing.T) {
 	}
 
 	repo := repository.NewBaseRepository(
-		app,
 		types.ListKind("test"),
 		filterFunc,
 		processFunc,

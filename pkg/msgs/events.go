@@ -58,13 +58,13 @@ func DisableLogging() {
 // EmitPayload emits a message using the stored context
 func EmitPayload(messageType EventType, payload ...interface{}) {
 	if currentEmitter != nil {
-		currentEmitter(messageType, "payload", payload)
+		currentEmitter(messageType, "payload", payload...)
 	}
 }
 
 // EmitMessage emits a message using the stored context
 func EmitMessage(messageType EventType, msgText string, payload ...interface{}) {
 	if currentEmitter != nil {
-		currentEmitter(messageType, msgText, payload)
+		currentEmitter(messageType, msgText, payload...)
 	}
 }

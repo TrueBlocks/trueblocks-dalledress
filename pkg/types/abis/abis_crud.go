@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -30,7 +31,7 @@ func (ac *AbisCollection) Remove(address string) error {
 	} else {
 		msgs.EmitStatus(fmt.Sprintf("ABI for address %s was not found in cache", address))
 	}
-	ac.App.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
+	logging.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
 
 	return nil
 }

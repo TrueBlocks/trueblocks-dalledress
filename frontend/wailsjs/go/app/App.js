@@ -18,8 +18,8 @@ export function Cancel(arg1) {
   return window['go']['app']['App']['Cancel'](arg1);
 }
 
-export function CancelAllStreams() {
-  return window['go']['app']['App']['CancelAllStreams']();
+export function CancelAll() {
+  return window['go']['app']['App']['CancelAll']();
 }
 
 export function ChangeImageStorageLocation(arg1) {
@@ -44,10 +44,6 @@ export function ConvertToAddress(arg1) {
 
 export function DeleteName(arg1) {
   return window['go']['app']['App']['DeleteName'](arg1);
-}
-
-export function EmitEvent(arg1, arg2) {
-  return window['go']['app']['App']['EmitEvent'](arg1, arg2);
 }
 
 export function FileNew(arg1) {

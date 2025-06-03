@@ -4,13 +4,11 @@ package abis
 import (
 	"testing"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/mocks"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 func TestGetPage_BasicFunctionality(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	tests := []struct {
 		name     string
@@ -45,8 +43,7 @@ func TestGetPage_BasicFunctionality(t *testing.T) {
 }
 
 func TestGetPage_InvalidListKind(t *testing.T) {
-	mockApp := mocks.NewMockApp()
-	ac := NewAbisCollection(mockApp)
+	ac := NewAbisCollection()
 
 	_, err := ac.GetPage(types.ListKind("InvalidKind"), 0, 10, nil, "")
 	if err == nil {

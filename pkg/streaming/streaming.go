@@ -13,7 +13,6 @@ const refreshRate = 31
 
 // LoadStreamingData is a generic method that handles streaming data of any type T
 func LoadStreamingData[T any](
-	app types.App,
 	contextKey string,
 	queryFunc func(*output.RenderCtx),
 	filterFunc func(item *T) bool,
@@ -30,12 +29,12 @@ func LoadStreamingData[T any](
 		RUnlock()
 	},
 ) (string, types.DataLoadedPayload, error) {
-	app.Cancel(contextKey)
+	Cancel(contextKey)
 	defer func() {
-		app.Cancel(contextKey)
+		Cancel(contextKey)
 	}()
 
-	renderCtx := app.RegisterCtx(contextKey)
+	renderCtx := RegisterCtx(contextKey)
 	done := make(chan struct{})
 
 	go func() {

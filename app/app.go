@@ -24,6 +24,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -47,8 +48,6 @@ type App struct {
 	ctx               context.Context
 	apiKeys           map[string]string
 	ensMap            map[string]base.Address
-	renderCtxs        map[string][]*output.RenderCtx
-	renderCtxsMutex   sync.Mutex
 	Dalle             *dalle.Context
 	cancelMutex       sync.Mutex
 	activeCancelFuncs []context.CancelFunc
@@ -73,20 +72,16 @@ func (a *App) UnregisterCancel(cancelToRemove context.CancelFunc) {
 	a.activeCancelFuncs = newActiveCancelFuncs
 }
 
-func (a *App) CancelAllStreams() {
-	a.cancelMutex.Lock()
-	defer a.cancelMutex.Unlock()
-	for _, cancel := range a.activeCancelFuncs {
-		if cancel != nil {
-			cancel() // Call the cancel function
-		}
-	}
-	a.activeCancelFuncs = []context.CancelFunc{} // Clear the list
-	msgs.EmitMessage(msgs.EventStatus, "All data loading operations cancelled.")
+func (a *App) RegisterCtx(key string) *output.RenderCtx {
+	return streaming.RegisterCtx(key)
 }
 
-func (a *App) EmitEvent(eventType msgs.EventType, payload interface{}) {
-	runtime.EventsEmit(a.ctx, string(eventType), payload)
+func (a *App) Cancel(key string) (int, bool) {
+	return streaming.Cancel(key)
+}
+
+func (a *App) CancelAll() {
+	streaming.CancelAll()
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -97,14 +92,13 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 			User: preferences.UserPreferences{},
 			App:  preferences.AppPreferences{},
 		},
-		Assets:     assets,
-		apiKeys:    make(map[string]string),
-		renderCtxs: make(map[string][]*output.RenderCtx),
-		ensMap:     make(map[string]base.Address),
+		Assets:  assets,
+		apiKeys: make(map[string]string),
+		ensMap:  make(map[string]base.Address),
 	}
 	// ADD_ROUTE
-	app.names = types.NewNamesCollection(app)
-	app.abis = abis.NewAbisCollection(app)
+	app.names = types.NewNamesCollection()
+	app.abis = abis.NewAbisCollection()
 	// ADD_ROUTE
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
@@ -365,33 +359,6 @@ func (app *App) GetChainList() *utils.ChainList {
 	return app.chainList
 }
 
-func (a *App) RegisterCtx(key string) *output.RenderCtx {
-	a.renderCtxsMutex.Lock()
-	defer a.renderCtxsMutex.Unlock()
-
-	rCtx := output.NewStreamingContext()
-	a.renderCtxs[key] = append(a.renderCtxs[key], rCtx)
-	return rCtx
-}
-
-func (a *App) Cancel(key string) (int, bool) {
-	a.renderCtxsMutex.Lock()
-	defer a.renderCtxsMutex.Unlock()
-
-	if len(a.renderCtxs) == 0 {
-		return 0, false
-	}
-	if a.renderCtxs[key] == nil {
-		return 0, true
-	}
-	n := len(a.renderCtxs[key])
-	for i := 0; i < len(a.renderCtxs[key]); i++ {
-		a.renderCtxs[key][i].Cancel()
-	}
-	a.renderCtxs[key] = nil
-	return n, true
-}
-
 // GetProjectAddress returns the address of the active project
 func (a *App) GetProjectAddress() base.Address {
 	active := a.Projects.Active()
@@ -443,7 +410,7 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 }
 
 func (a *App) Reload() error {
-	a.CancelAllStreams()
+	a.CancelAll()
 	a.Cancel(base.ZeroAddr.Hex())
 
 	lastView := a.GetAppPreferences().LastView

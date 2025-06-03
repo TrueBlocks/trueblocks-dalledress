@@ -8,7 +8,7 @@ import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, msgs, types } from '@models';
 import { EventsOn } from '@runtime';
-import { Log, useEmitters } from '@utils';
+import { Log, getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import {
   ABIS_ROUTE,
@@ -27,8 +27,9 @@ import {
 
 //--------------------------------------------------------------------
 export const Abis = () => {
-  const { emitStatus, emitError } = useEmitters();
+  const { emitStatus } = useEmitters();
   const { lastTab } = useAppContext();
+  const { error, handleError, clearError } = useErrorHandler();
 
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[ABIS_ROUTE] || DEFAULT_LIST_KIND,
@@ -40,14 +41,13 @@ export const Abis = () => {
   );
 
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
-  const [error, setError] = useState<Error | null>(null);
   const { pagination, setTotalItems } = usePagination(tableKey);
   const { sort } = useSorting(tableKey);
   const { filter } = useFiltering(tableKey);
 
   // Fetch data from backend and update state
   const fetchData = useCallback(async () => {
-    setError(null);
+    clearError();
     try {
       const result = await getAbisPage(
         listKind,
@@ -59,19 +59,17 @@ export const Abis = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      const e = err instanceof Error ? err : new Error(String(err));
-      setError(e);
-      emitError(`${e.message} Failed to fetch ${listKind}`);
-      Log(`Error fetching ${listKind}: ${e}`);
+      handleError(err, `Failed to fetch ${listKind}`);
     }
   }, [
-    sort,
+    clearError,
     listKind,
     pagination.currentPage,
     pagination.pageSize,
+    sort,
     filter,
     setTotalItems,
-    emitError,
+    handleError,
   ]);
 
   useEffect(() => {
@@ -114,14 +112,11 @@ export const Abis = () => {
 
   // Optimistic delete action with proper type safety
   const _handleAction = (address: string) => {
+    clearError();
     try {
       const original = [...(pageData?.abis || [])];
       const optimisticValues = original.filter((abi) => {
-        // Handle both string and Address object types
-        const abiAddress =
-          typeof abi.address === 'string'
-            ? abi.address
-            : abi.address?.address?.join('') || '';
+        const abiAddress = getAddressString(abi.address);
         return abiAddress !== address;
       });
       setPageData((prev) => {
@@ -152,8 +147,7 @@ export const Abis = () => {
               abis: original,
             });
           });
-          emitError(err);
-          Log(`Error in handleAction: ${err}`);
+          handleError(err, 'handleAction');
         });
     } finally {
       // Always clean up the processing state if needed

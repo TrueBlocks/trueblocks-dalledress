@@ -6,9 +6,10 @@ import {
   useState,
 } from 'react';
 
-import { sorting } from '@models';
+import { sdk } from '@models';
 
 import { TableKey, tableKeyToString } from '.';
+import { createEmptySortSpec } from '../utils/sortSpec';
 
 // Pagination interfaces
 export interface PaginationState {
@@ -18,7 +19,7 @@ export interface PaginationState {
 }
 
 export interface ViewSortState {
-  [key: string]: sorting.SortDef | null;
+  [key: string]: sdk.SortSpec | null;
 }
 
 export interface ViewFilterState {
@@ -44,8 +45,8 @@ interface ViewContextType {
     tableKey: TableKey,
     changes: Partial<PaginationState>,
   ) => void;
-  getSorting: (tableKey: TableKey) => sorting.SortDef | null;
-  updateSorting: (tableKey: TableKey, sort: sorting.SortDef | null) => void;
+  getSorting: (tableKey: TableKey) => sdk.SortSpec | null;
+  updateSorting: (tableKey: TableKey, sort: sdk.SortSpec | null) => void;
   getFiltering: (tableKey: TableKey) => string;
   updateFiltering: (tableKey: TableKey, filter: string) => void;
 }
@@ -101,7 +102,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const updateSorting = useCallback(
-    (tableKey: TableKey, sort: sorting.SortDef | null) => {
+    (tableKey: TableKey, sort: sdk.SortSpec | null) => {
       setViewSorting((prev) => {
         const key = tableKeyToString(tableKey);
         return {
@@ -157,14 +158,14 @@ export const useSorting = (tableKey: TableKey) => {
   const { getSorting, updateSorting } = useViewContext();
 
   const setSorting = useCallback(
-    (sort: sorting.SortDef | null) => {
+    (sort: sdk.SortSpec | null) => {
       updateSorting(tableKey, sort);
     },
     [tableKey, updateSorting],
   );
-  // Get the sort value, but never return null - instead return a default empty SortDef
+  // Get the sort value, but never return null - instead return a default empty SortSpec
   const sortValue = getSorting(tableKey);
-  const sort = sortValue || { key: '', direction: 'asc' };
+  const sort = sortValue || createEmptySortSpec();
 
   return { sort, setSorting };
 };

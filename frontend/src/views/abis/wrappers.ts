@@ -1,5 +1,5 @@
 import { GetAbisPage, Reload, RemoveAbi } from '@app';
-import { abis, sorting, types } from '@models';
+import { abis, sdk, types } from '@models';
 
 // Wrappers for the Wails-generated functions to provide type safety and convenience
 
@@ -7,7 +7,7 @@ export const getAbisPage = (
   kind: types.ListKind,
   first: number,
   pageSize: number,
-  sort: sorting.SortDef,
+  sort: sdk.SortSpec,
   filter: string,
 ): Promise<abis.AbisPage> => {
   return GetAbisPage(kind, first, pageSize, sort, filter);

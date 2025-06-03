@@ -14,6 +14,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/names"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 type namesMap map[base.Address]types.Name
@@ -84,7 +85,7 @@ func (n *NamesCollection) ClearSelectedTag(key string) {
 }
 
 // GetPage returns a page of names for the given list type and the total count.
-func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortKey *sorting.SortDef, filter string) NamesPage {
+func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortSpec sdk.SortSpec, filter string) NamesPage {
 	if len(n.List) == 0 {
 		if err := n.LoadNames(nil); err != nil {
 			return NamesPage{Names: nil, Total: 0, Tags: []string{}}
@@ -174,10 +175,10 @@ func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortKey 
 	}
 
 	// Sorting
-	if sortKey != nil && sortKey.Key != "" {
+	if !sorting.IsEmptySort(sortSpec) {
 		sort.SliceStable(list, func(i, j int) bool {
 			var vi, vj string
-			switch sortKey.Key {
+			switch sorting.GetSortField(sortSpec) {
 			case "name":
 				vi, vj = list[i].Name, list[j].Name
 			case "address":
@@ -189,7 +190,7 @@ func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortKey 
 			default:
 				vi, vj = list[i].Name, list[j].Name
 			}
-			if sortKey.Direction == "desc" {
+			if sorting.GetSortDirection(sortSpec) == "desc" {
 				return vi > vj
 			}
 			return vi < vj

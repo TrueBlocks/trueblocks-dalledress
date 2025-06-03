@@ -3,7 +3,7 @@
 import {base} from '../models';
 import {menu} from '../models';
 import {types} from '../models';
-import {sorting} from '../models';
+import {sdk} from '../models';
 import {abis} from '../models';
 import {preferences} from '../models';
 import {utils} from '../models';
@@ -44,7 +44,7 @@ export function FileSave(arg1:menu.CallbackData):Promise<void>;
 
 export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
-export function GetAbisPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sorting.SortDef,arg5:string):Promise<abis.AbisPage>;
+export function GetAbisPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
 export function GetAppId():Promise<preferences.Id>;
 
@@ -62,7 +62,7 @@ export function GetLastTab(arg1:string):Promise<types.ListKind>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
-export function GetNamesPage(arg1:string,arg2:number,arg3:number,arg4:sorting.SortDef,arg5:string):Promise<types.NamesPage>;
+export function GetNamesPage(arg1:string,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.NamesPage>;
 
 export function GetNodeStatus():Promise<types.MetaData>;
 

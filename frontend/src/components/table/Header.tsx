@@ -3,6 +3,11 @@ import React from 'react';
 import { FormField } from '@components';
 import { TableKey, useSorting } from '@contexts';
 
+import {
+  createSingleFieldSortSpec,
+  getSortDirection,
+  getSortField,
+} from '../../utils/sortSpec';
 import './Header.css';
 
 export const Header = <T extends Record<string, unknown>>({
@@ -14,14 +19,14 @@ export const Header = <T extends Record<string, unknown>>({
 }) => {
   const { sort, setSorting } = useSorting(tableKey);
   const handleClick = (col: FormField<T>) => {
-    const field = sort.key;
+    const field = getSortField(sort);
     if (!col.sortable) return;
     if (field !== col.key) {
       if (typeof col.key === 'string') {
-        setSorting({ key: col.key, direction: 'asc' });
+        setSorting(createSingleFieldSortSpec(col.key, 'asc'));
       }
-    } else if (sort.direction === 'asc') {
-      setSorting({ key: col.key, direction: 'desc' });
+    } else if (getSortDirection(sort) === 'asc') {
+      setSorting(createSingleFieldSortSpec(col.key as string, 'desc'));
     } else {
       setSorting(null);
     }
@@ -31,18 +36,19 @@ export const Header = <T extends Record<string, unknown>>({
     <thead>
       <tr>
         {columns.map((col) => {
-          const field = sort.key;
+          const field = getSortField(sort);
           const isSorted = field === col.key;
           // Determine aria-sort value
           let ariaSort: 'ascending' | 'descending' | undefined;
           if (isSorted) {
-            ariaSort = sort.direction === 'asc' ? 'ascending' : 'descending';
+            ariaSort =
+              getSortDirection(sort) === 'asc' ? 'ascending' : 'descending';
           }
           // Determine sort indicator
           let sortIndicator = '';
           if (col.sortable) {
             if (isSorted) {
-              sortIndicator = sort.direction === 'asc' ? ' ▲' : ' ▼';
+              sortIndicator = getSortDirection(sort) === 'asc' ? ' ▲' : ' ▼';
             } else {
               sortIndicator = ' ⇅';
             }

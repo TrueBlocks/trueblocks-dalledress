@@ -469,20 +469,20 @@ export namespace project {
 
 }
 
-export namespace sorting {
+export namespace sdk {
 	
-	export class SortDef {
-	    key: string;
-	    direction: string;
+	export class SortSpec {
+	    fields: string[];
+	    orders: boolean[];
 	
 	    static createFrom(source: any = {}) {
-	        return new SortDef(source);
+	        return new SortSpec(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.key = source["key"];
-	        this.direction = source["direction"];
+	        this.fields = source["fields"];
+	        this.orders = source["orders"];
 	    }
 	}
 

@@ -4,6 +4,7 @@ package abis
 import (
 	"testing"
 
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
@@ -22,7 +23,7 @@ func TestGetPage_BasicFunctionality(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			page, err := ac.GetPage(tc.listKind, 0, 10, nil, "")
+			page, err := ac.GetPage(tc.listKind, 0, 10, sorting.EmptySortSpec(), "")
 			if err != nil {
 				t.Fatalf("GetPage returned error: %v", err)
 			}
@@ -45,7 +46,7 @@ func TestGetPage_BasicFunctionality(t *testing.T) {
 func TestGetPage_InvalidListKind(t *testing.T) {
 	ac := NewAbisCollection()
 
-	_, err := ac.GetPage(types.ListKind("InvalidKind"), 0, 10, nil, "")
+	_, err := ac.GetPage(types.ListKind("InvalidKind"), 0, 10, sorting.EmptySortSpec(), "")
 	if err == nil {
 		t.Error("Expected error for invalid list kind, got nil")
 	}

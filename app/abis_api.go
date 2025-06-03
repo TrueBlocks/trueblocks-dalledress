@@ -2,15 +2,15 @@
 package app
 
 import (
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types" // Import your new types package
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 func (a *App) GetAbisPage(
 	kind types.ListKind,
 	first, pageSize int,
-	sort *sorting.SortDef,
+	sort sdk.SortSpec,
 	filter string,
 ) (abis.AbisPage, error) {
 	return a.abis.GetPage(kind, first, pageSize, sort, filter)

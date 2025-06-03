@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -24,11 +23,10 @@ type AbisPage struct {
 }
 
 // ------------------------------------------------------------------------------
-func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, sortDef *sorting.SortDef, filter string) (AbisPage, error) {
+func (ac *AbisCollection) GetPage(listKind types.ListKind, first, pageSize int, sortSpec sdk.SortSpec, filter string) (AbisPage, error) {
 	ac.LoadData(listKind)
 
 	filter = strings.ToLower(filter)
-	sortSpec := sorting.ConvertToSortSpec(sortDef)
 	var page = AbisPage{
 		Kind: listKind,
 	}

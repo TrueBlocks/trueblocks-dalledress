@@ -11,7 +11,7 @@ import (
 
 const refreshRate = 31
 
-// LoadStreamingData is a generic method that handles streaming data of any type T
+// LoadStreamingData streams data of any type T with filtering, deduplication, and progress updates.
 func LoadStreamingData[T any](
 	contextKey string,
 	queryFunc func(*output.RenderCtx),
@@ -30,9 +30,7 @@ func LoadStreamingData[T any](
 	},
 ) (string, types.DataLoadedPayload, error) {
 	Cancel(contextKey)
-	defer func() {
-		Cancel(contextKey)
-	}()
+	defer func() { Cancel(contextKey) }()
 
 	renderCtx := RegisterCtx(contextKey)
 	done := make(chan struct{})

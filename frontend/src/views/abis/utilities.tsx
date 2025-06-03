@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
 
-import { FormField } from '@components';
-import { Action } from '@components';
+import { Action, FormField } from '@components';
 import { Group, Text } from '@mantine/core';
 import { types } from '@models';
 
+// Table configuration props for ABIs view
 interface TableConfigProps {
   downloaded: types.Abi[];
   known: types.Abi[];
@@ -22,13 +22,11 @@ interface TableConfigProps {
 
 type AbiRow = types.Abi | types.Function;
 
+// Returns table data and columns for the given list kind
 export const getTableConfig = (
   listKind: types.ListKind,
   config: TableConfigProps,
-): {
-  data: AbiRow[];
-  columns: FormField<AbiRow>[];
-} => {
+): { data: AbiRow[]; columns: FormField<AbiRow>[] } => {
   const abiColumns = createAbiColumns(
     listKind,
     listKind === types.ListKind.DOWNLOADED
@@ -48,27 +46,14 @@ export const getTableConfig = (
 
   switch (listKind) {
     case types.ListKind.FUNCTIONS:
-      return {
-        data: config.functions,
-        columns: funcColumns,
-      };
+      return { data: config.functions, columns: funcColumns };
     case types.ListKind.EVENTS:
-      return {
-        data: config.events,
-        columns: funcColumns,
-      };
+      return { data: config.events, columns: funcColumns };
     case types.ListKind.KNOWN:
-      return {
-        data: config.known,
-        columns: abiColumns,
-      };
+      return { data: config.known, columns: abiColumns };
     case types.ListKind.DOWNLOADED:
-    // fall through
     default:
-      return {
-        data: config.downloaded,
-        columns: abiColumns,
-      };
+      return { data: config.downloaded, columns: abiColumns };
   }
 };
 

@@ -16,6 +16,7 @@ type ContextManager struct {
 	renderCtxsMutex sync.Mutex
 }
 
+// GetContextManager returns the singleton context manager
 func GetContextManager() *ContextManager {
 	initOnce.Do(func() {
 		globalContextManager = &ContextManager{
@@ -25,6 +26,7 @@ func GetContextManager() *ContextManager {
 	return globalContextManager
 }
 
+// RegisterCtx registers a new RenderCtx for a given key
 func RegisterCtx(key string) *output.RenderCtx {
 	cm := GetContextManager()
 	cm.renderCtxsMutex.Lock()
@@ -35,6 +37,7 @@ func RegisterCtx(key string) *output.RenderCtx {
 	return rCtx
 }
 
+// CtxCount returns the number of contexts for a key
 func CtxCount(key string) int {
 	cm := GetContextManager()
 	cm.renderCtxsMutex.Lock()
@@ -43,6 +46,7 @@ func CtxCount(key string) int {
 	return len(cm.renderCtxs[key])
 }
 
+// Cancel closes and removes all contexts for a key
 func Cancel(key string) (int, bool) {
 	cm := GetContextManager()
 	cm.renderCtxsMutex.Lock()

@@ -1,22 +1,15 @@
 import { GetAbisPage, Reload, RemoveAbi } from '@app';
 import { abis, sdk, types } from '@models';
 
-// Wrappers for the Wails-generated functions to provide type safety and convenience
-
+// Type-safe wrappers for Wails-generated backend functions
 export const getAbisPage = (
   kind: types.ListKind,
   first: number,
   pageSize: number,
   sort: sdk.SortSpec,
   filter: string,
-): Promise<abis.AbisPage> => {
-  return GetAbisPage(kind, first, pageSize, sort, filter);
-};
+): Promise<abis.AbisPage> => GetAbisPage(kind, first, pageSize, sort, filter);
 
-export const removeAbi = (address: string): Promise<void> => {
-  return RemoveAbi(address);
-};
+export const removeAbi = (address: string): Promise<void> => RemoveAbi(address);
 
-export const reload = (): Promise<void> => {
-  return Reload();
-};
+export const reload = (): Promise<void> => Reload();

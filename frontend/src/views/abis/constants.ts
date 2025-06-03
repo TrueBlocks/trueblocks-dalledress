@@ -22,7 +22,7 @@ export const DATA_SETTERS = {
 // Default tab route
 export const ABIS_ROUTE = '/abis';
 
-// Action messages
+// Action messages for UI feedback
 export const ACTION_MESSAGES = {
   RELOAD_STATUS: 'Reloaded ABI data. Fetching fresh data...',
   DELETE_SUCCESS: (address: string) =>

@@ -3,6 +3,7 @@ package abis
 
 import "github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 
+// NeedsUpdate returns true if the given listKind's repo needs update
 func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
 	switch listKind {
 	case AbisDownloaded:

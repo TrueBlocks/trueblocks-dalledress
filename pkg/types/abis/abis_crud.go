@@ -10,18 +10,16 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
+// Remove deletes an ABI by address from the downloadedRepo and emits status
 func (ac *AbisCollection) Remove(address string) error {
 	opts := sdk.AbisOptions{
-		Addrs: []string{address},
-		Globals: sdk.Globals{
-			Decache: true,
-		},
+		Addrs:   []string{address},
+		Globals: sdk.Globals{Decache: true},
 	}
 	if _, _, err := opts.Abis(); err != nil {
 		return err
 	}
 
-	// Use targeted deletion instead of clearing entire cache
 	removed := ac.downloadedRepo.Remove(func(abi *coreTypes.Abi) bool {
 		return abi.Address.Hex() == address
 	})

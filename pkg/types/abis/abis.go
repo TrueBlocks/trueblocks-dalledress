@@ -12,6 +12,7 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
+// ListKind constants for ABI types
 const (
 	AbisDownloaded types.ListKind = "Downloaded"
 	AbisKnown      types.ListKind = "Known"
@@ -26,6 +27,8 @@ func init() {
 	types.RegisterKind(AbisEvents)
 }
 
+// AbisCollection orchestrates all ABI repositories
+// (Downloaded, Known, Functions, Events)
 type AbisCollection struct {
 	downloadedRepo repository.Repository[coreTypes.Abi]
 	knownRepo      repository.Repository[coreTypes.Abi]
@@ -34,15 +37,19 @@ type AbisCollection struct {
 }
 
 func NewAbisCollection() AbisCollection {
+	// Downloaded: not known
 	downloadedRepo := NewAbisRepository(AbisDownloaded, func(abi *coreTypes.Abi) bool {
 		return !abi.IsKnown
 	})
+	// Known: is known
 	knownRepo := NewAbisRepository(AbisKnown, func(abi *coreTypes.Abi) bool {
 		return abi.IsKnown
 	})
+	// Functions: not event
 	functionsRepo := NewFunctionsRepository(AbisFunctions, func(item *coreTypes.Function) bool {
 		return item.FunctionType != "event"
 	})
+	// Events: is event
 	eventsRepo := NewFunctionsRepository(AbisEvents, func(item *coreTypes.Function) bool {
 		return item.FunctionType == "event"
 	})
@@ -55,6 +62,7 @@ func NewAbisCollection() AbisCollection {
 	}
 }
 
+// AbisRepository wraps BaseRepository for coreTypes.Abi
 type AbisRepository struct {
 	*repository.BaseRepository[coreTypes.Abi]
 }
@@ -63,7 +71,6 @@ func NewAbisRepository(
 	listKind types.ListKind,
 	filterFunc repository.FilterFunc[coreTypes.Abi],
 ) *AbisRepository {
-
 	processFunc := func(itemIntf interface{}) *coreTypes.Abi {
 		itemPtr, ok := itemIntf.(*coreTypes.Abi)
 		if !ok {
@@ -71,7 +78,6 @@ func NewAbisRepository(
 		}
 		return itemPtr
 	}
-
 	queryFunc := func(renderCtx *output.RenderCtx) {
 		listOpts := sdk.AbisOptions{
 			Globals:   sdk.Globals{Cache: true, Verbose: true},
@@ -81,20 +87,17 @@ func NewAbisRepository(
 			logger.Error(fmt.Sprintf("AbisRepository query error: %v", err))
 		}
 	}
-
 	baseRepo := repository.NewBaseRepository(
 		listKind,
 		filterFunc,
 		processFunc,
 		queryFunc,
-		nil, /* no dedup needed */
+		nil, // no dedup needed
 	)
-
-	return &AbisRepository{
-		BaseRepository: baseRepo,
-	}
+	return &AbisRepository{BaseRepository: baseRepo}
 }
 
+// FunctionsRepository wraps BaseRepository for coreTypes.Function
 type FunctionsRepository struct {
 	*repository.BaseRepository[coreTypes.Function]
 }
@@ -110,7 +113,6 @@ func NewFunctionsRepository(
 		}
 		return itemPtr
 	}
-
 	queryFunc := func(renderCtx *output.RenderCtx) {
 		detailOpts := sdk.AbisOptions{
 			Globals:   sdk.Globals{Cache: true},
@@ -120,7 +122,6 @@ func NewFunctionsRepository(
 			logger.Error(fmt.Sprintf("FunctionsRepository query error: %v", err))
 		}
 	}
-
 	dedupeFunc := func(existing []coreTypes.Function, newItem *coreTypes.Function) bool {
 		if newItem == nil {
 			return false
@@ -132,7 +133,6 @@ func NewFunctionsRepository(
 		}
 		return false
 	}
-
 	baseRepo := repository.NewBaseRepository(
 		listKind,
 		filterFunc,
@@ -140,10 +140,7 @@ func NewFunctionsRepository(
 		queryFunc,
 		dedupeFunc,
 	)
-
-	return &FunctionsRepository{
-		BaseRepository: baseRepo,
-	}
+	return &FunctionsRepository{BaseRepository: baseRepo}
 }
 
 // ADD_ROUTE

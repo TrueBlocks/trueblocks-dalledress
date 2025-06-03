@@ -16,6 +16,7 @@ import {
   DEFAULT_LIST_KIND,
   getAbisPage,
   reload,
+  removeAbi,
 } from './';
 import './Abis.css';
 import {
@@ -35,9 +36,10 @@ export const Abis = () => {
     lastTab[ABIS_ROUTE] || DEFAULT_LIST_KIND,
   );
   const listKindRef = useRef(listKind);
-  const tableKey = useMemo((): TableKey => {
-    return { viewName: ABIS_ROUTE, tabName: listKind };
-  }, [listKind]);
+  const tableKey = useMemo(
+    (): TableKey => ({ viewName: ABIS_ROUTE, tabName: listKind }),
+    [listKind],
+  );
 
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -45,6 +47,7 @@ export const Abis = () => {
   const { sort } = useSorting(tableKey);
   const { filter } = useFiltering(tableKey);
 
+  // Fetch data from backend and update state
   const fetchData = useCallback(async () => {
     setError(null);
     try {
@@ -81,31 +84,14 @@ export const Abis = () => {
     fetchData();
   }, [fetchData]);
 
+  // Listen for backend data loaded events
   useEffect(() => {
     const eventName = msgs.EventType.DATA_LOADED;
     const unlisten = EventsOn(eventName, (payload: types.DataLoadedPayload) => {
-      if (payload) {
-        switch (listKindRef.current) {
-          case types.ListKind.DOWNLOADED:
-            fetchData();
-            break;
-          case types.ListKind.KNOWN:
-            fetchData();
-            break;
-          case types.ListKind.FUNCTIONS:
-            fetchData();
-            break;
-          case types.ListKind.EVENTS:
-            fetchData();
-            break;
-        }
-      }
+      if (payload) fetchData();
     });
-
     return () => {
-      if (typeof unlisten === 'function') {
-        unlisten();
-      }
+      if (typeof unlisten === 'function') unlisten();
     };
   }, [fetchData]);
 
@@ -128,67 +114,61 @@ export const Abis = () => {
     ],
   ]);
 
-  // const handleAction = (address: string) => {
-  //   // setProcessingAddresses((prev) => new Set(prev).add(address));
-  //   try {
-  //     const original = [...(pageData?.abis || [])];
-  //     const optimisticValues = original.filter((abi) => {
-  //       const nameAddress =
-  //         typeof abi.address === 'string' ? abi.address : String(abi.address);
-  //       return nameAddress !== address;
-  //     });
-  //     setPageData((prev) => {
-  //       if (!prev) return null;
-  //       // Create a new AbisPage instance to preserve methods like convertValues
-  //       return new abis.AbisPage({
-  //         ...prev,
-  //         abis: optimisticValues as types.Abi[],
-  //       });
-  //     });
-  //
-  //     removeAbi(address)
-  //       .then(async () => {
-  //         const result = await getAbisPage(
-  //           listKind,
-  //           pagination.currentPage * pagination.pageSize,
-  //           pagination.pageSize,
-  //           sort,
-  //           filter,
-  //         );
-  //         setPageData(result);
-  //         setTotalItems(result.totalItems || 0);
-  //         emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
-  //       })
-  //       .catch((err) => {
-  //         // If there's an error, revert the optimistic update
-  //         setPageData((prev) => {
-  //           if (!prev) return null;
-  //           return new abis.AbisPage({
-  //             ...prev,
-  //             abis: optimisticValues as types.Abi[],
-  //           });
-  //         });
-  //         emitError(err);
-  //         Log(`Error in handleAction: ${err}`);
-  //       });
-  //   } finally {
-  //     // Always clean up the processing state
-  //     // setProcessingAddresses((prev) => {
-  //     //   const newSet = new Set(prev);
-  //     //   newSet.delete(address);
-  //     //   return newSet;
-  //     // });
-  //   }
-  // };
+  // Optimistic delete action
+  const _handleAction = (address: string) => {
+    try {
+      const original = [...(pageData?.abis || [])];
+      const optimisticValues = original.filter((abi) => {
+        const nameAddress =
+          typeof abi.address === 'string' ? abi.address : String(abi.address);
+        return nameAddress !== address;
+      });
+      setPageData((prev) => {
+        if (!prev) return null;
+        return new abis.AbisPage({
+          ...prev,
+          abis: optimisticValues as types.Abi[],
+        });
+      });
+      removeAbi(address)
+        .then(async () => {
+          const result = await getAbisPage(
+            listKind,
+            pagination.currentPage * pagination.pageSize,
+            pagination.pageSize,
+            sort,
+            filter,
+          );
+          setPageData(result);
+          setTotalItems(result.totalItems || 0);
+          emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
+        })
+        .catch((err) => {
+          setPageData((prev) => {
+            if (!prev) return null;
+            return new abis.AbisPage({
+              ...prev,
+              abis: optimisticValues as types.Abi[],
+            });
+          });
+          emitError(err);
+          Log(`Error in handleAction: ${err}`);
+        });
+    } finally {
+      // Always clean up the processing state if needed
+    }
+  };
 
   const handleTableSubmit = (formData: Record<string, unknown>) => {
     Log(`Table submitted: ${formData}`);
   };
 
+  // Get current data for the active tab
   const getCurrentData = useCallback(() => {
     return pageData?.abis || pageData?.functions || [];
   }, [pageData]);
 
+  // Get columns for the current tab kind
   const getColumnsForKind = (
     kind: string,
   ): FormField<Record<string, unknown>>[] => {
@@ -209,26 +189,24 @@ export const Abis = () => {
     }
   };
 
-  const renderTable = () => {
-    return (
-      <BaseTab
-        data={getCurrentData() as unknown as Record<string, unknown>[]}
-        columns={getColumnsForKind(pageData?.kind || 'Downloaded')}
-        loading={!!pageData?.isLoading}
-        error={error}
-        onSubmit={handleTableSubmit}
-        tableKey={tableKey}
-      />
-    );
-  };
+  // Render the main table
+  const renderTable = () => (
+    <BaseTab
+      data={getCurrentData() as unknown as Record<string, unknown>[]}
+      columns={getColumnsForKind(pageData?.kind || 'Downloaded')}
+      loading={!!pageData?.isLoading}
+      error={error}
+      onSubmit={handleTableSubmit}
+      tableKey={tableKey}
+    />
+  );
 
-  const createOneTab = (listKind: types.ListKind) => {
-    return {
-      label: listKind,
-      value: listKind,
-      content: renderTable(),
-    };
-  };
+  // Create tab config for TabView
+  const createOneTab = (listKind: types.ListKind) => ({
+    label: listKind,
+    value: listKind,
+    content: renderTable(),
+  });
 
   const tabs = [
     createOneTab(types.ListKind.DOWNLOADED),

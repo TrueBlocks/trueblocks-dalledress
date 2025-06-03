@@ -83,7 +83,7 @@ func LoadStreamingData[T any](
 						CurrentCount:  len(*targetSlice),
 						ExpectedTotal: *expectedCount,
 						IsLoaded:      isLoaded,
-						ListKind:      string(listKind),
+						ListKind:      listKind,
 					}
 					msgs.EmitPayload(msgs.EventDataLoaded, payload)
 					statusMsg := fmt.Sprintf("Loading %s: %d processed.", listKind, len(*targetSlice))
@@ -116,7 +116,7 @@ func LoadStreamingData[T any](
 		IsLoaded:      true,
 		CurrentCount:  len(*targetSlice),
 		ExpectedTotal: len(*targetSlice),
-		ListKind:      string(listKind),
+		ListKind:      listKind,
 	}
 
 	return finalStatus, finalPayload, nil

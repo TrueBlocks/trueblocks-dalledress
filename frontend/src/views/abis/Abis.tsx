@@ -120,24 +120,23 @@ export const Abis = () => {
 
   useEffect(() => {
     const eventName = msgs.EventType.DATA_LOADED;
-    const unlisten = EventsOn(eventName, (payload: unknown) => {
-      const eventPayload = payload as types.DataLoadedPayload;
-      if (eventPayload) {
+    const unlisten = EventsOn(eventName, (payload: types.DataLoadedPayload) => {
+      if (payload) {
         switch (listKindRef.current) {
           case types.ListKind.DOWNLOADED:
-            setIsDownloadedLoaded(eventPayload.isLoaded);
+            setIsDownloadedLoaded(payload.isLoaded);
             fetchData();
             break;
           case types.ListKind.KNOWN:
-            setIsKnownLoaded(eventPayload.isLoaded);
+            setIsKnownLoaded(payload.isLoaded);
             fetchData();
             break;
           case types.ListKind.FUNCTIONS:
-            setIsFuncsLoaded(eventPayload.isLoaded);
+            setIsFuncsLoaded(payload.isLoaded);
             fetchData();
             break;
           case types.ListKind.EVENTS:
-            setIsEventsLoaded(eventPayload.isLoaded);
+            setIsEventsLoaded(payload.isLoaded);
             fetchData();
             break;
         }

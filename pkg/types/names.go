@@ -55,31 +55,31 @@ type NamesPage struct {
 }
 
 // GetSelectedTag returns the currently selected tag for a list type
-func (n *NamesCollection) GetSelectedTag(listKind string) string {
+func (n *NamesCollection) GetSelectedTag(key string) string {
 	if n.selectedTags == nil {
 		n.selectedTags = make(map[string]string)
 	}
 
-	return n.selectedTags[listKind]
+	return n.selectedTags[key]
 }
 
 // SetSelectedTag sets the selected tag for a specific list type
-func (n *NamesCollection) SetSelectedTag(listKind string, tag string) {
+func (n *NamesCollection) SetSelectedTag(key string, tag string) {
 	if n.selectedTags == nil {
 		n.selectedTags = make(map[string]string)
 	}
 
 	if tag == "" {
-		delete(n.selectedTags, listKind)
+		delete(n.selectedTags, key)
 	} else {
-		n.selectedTags[listKind] = tag
+		n.selectedTags[key] = tag
 	}
 }
 
 // ClearSelectedTag clears the selected tag for a specific list type
-func (n *NamesCollection) ClearSelectedTag(listKind string) {
+func (n *NamesCollection) ClearSelectedTag(key string) {
 	if n.selectedTags != nil {
-		delete(n.selectedTags, listKind)
+		delete(n.selectedTags, key)
 	}
 }
 

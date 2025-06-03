@@ -58,7 +58,7 @@ export function GetFilename():Promise<project.Project>;
 
 export function GetImageURL(arg1:string):Promise<string>;
 
-export function GetLastTab(arg1:string):Promise<string>;
+export function GetLastTab(arg1:string):Promise<types.ListKind>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
@@ -110,7 +110,7 @@ export function SetHelpCollapsed(arg1:boolean):Promise<void>;
 
 export function SetInitialized(arg1:boolean):Promise<void>;
 
-export function SetLastTab(arg1:string,arg2:string):Promise<void>;
+export function SetLastTab(arg1:string,arg2:types.ListKind):Promise<void>;
 
 export function SetLastView(arg1:string):Promise<void>;
 

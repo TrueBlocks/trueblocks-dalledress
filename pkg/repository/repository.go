@@ -145,7 +145,7 @@ func (r *BaseRepository[T]) getCachedResult() *StreamingResult {
 			CurrentCount:  len(r.data),
 			ExpectedTotal: len(r.data),
 			IsLoaded:      true,
-			ListKind:      string(r.listKind),
+			ListKind:      r.listKind,
 		},
 		Error: nil,
 	}

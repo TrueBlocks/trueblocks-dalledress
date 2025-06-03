@@ -659,7 +659,7 @@ export namespace types {
 	    currentCount: number;
 	    expectedTotal: number;
 	    isLoaded: boolean;
-	    listKind?: string;
+	    listKind?: ListKind;
 	
 	    static createFrom(source: any = {}) {
 	        return new DataLoadedPayload(source);

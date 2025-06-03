@@ -297,18 +297,18 @@ func (a *App) GetAppId() preferences.Id {
 	return preferences.GetAppId()
 }
 
-func (a *App) SetLastTab(route string, tab string) {
+func (a *App) SetLastTab(route string, tab types.ListKind) {
 	if !atomic.CompareAndSwapInt32(&a.locked, 0, 1) {
 		return
 	}
 	defer atomic.StoreInt32(&a.locked, 0)
 
-	a.Preferences.App.LastTab[route] = tab
+	a.Preferences.App.LastTab[route] = string(tab)
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-func (a *App) GetLastTab(route string) string {
-	return a.Preferences.App.LastTab[route]
+func (a *App) GetLastTab(route string) types.ListKind {
+	return types.ListKind(a.Preferences.App.LastTab[route])
 }
 
 func (a *App) GetOpenProjects() []map[string]interface{} {
@@ -419,8 +419,8 @@ func (a *App) Reload() error {
 	// ADD_ROUTE
 	switch lastView {
 	case "/abis":
-		a.abis.ClearCache(types.ListKind(lastTab))
-		a.abis.LoadData(types.ListKind(lastTab))
+		a.abis.ClearCache(lastTab)
+		a.abis.LoadData(lastTab)
 	case "/names":
 		a.names = a.names.ReloadNames()
 	}

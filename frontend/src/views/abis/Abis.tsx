@@ -28,8 +28,6 @@ import {
 //--------------------------------------------------------------------
 export const Abis = () => {
   const { emitStatus, emitError } = useEmitters();
-  // const { lastTab, setSelectedAddress } = useAppContext();
-  // const [, setLocation] = useLocation();
   const { lastTab } = useAppContext();
 
   const [listKind, setListKind] = useState<types.ListKind>(
@@ -114,20 +112,23 @@ export const Abis = () => {
     ],
   ]);
 
-  // Optimistic delete action
+  // Optimistic delete action with proper type safety
   const _handleAction = (address: string) => {
     try {
       const original = [...(pageData?.abis || [])];
       const optimisticValues = original.filter((abi) => {
-        const nameAddress =
-          typeof abi.address === 'string' ? abi.address : String(abi.address);
-        return nameAddress !== address;
+        // Handle both string and Address object types
+        const abiAddress =
+          typeof abi.address === 'string'
+            ? abi.address
+            : abi.address?.address?.join('') || '';
+        return abiAddress !== address;
       });
       setPageData((prev) => {
         if (!prev) return null;
         return new abis.AbisPage({
           ...prev,
-          abis: optimisticValues as types.Abi[],
+          abis: optimisticValues,
         });
       });
       removeAbi(address)
@@ -148,7 +149,7 @@ export const Abis = () => {
             if (!prev) return null;
             return new abis.AbisPage({
               ...prev,
-              abis: optimisticValues as types.Abi[],
+              abis: original,
             });
           });
           emitError(err);

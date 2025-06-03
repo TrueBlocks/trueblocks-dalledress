@@ -23,8 +23,8 @@ interface AppContextType {
   setMenuCollapsed: (collapsed: boolean) => void;
   helpCollapsed: boolean;
   setHelpCollapsed: (collapsed: boolean) => void;
-  lastTab: Record<string, string>;
-  setLastTab: (route: string, tab: string) => void;
+  lastTab: Record<string, types.ListKind>;
+  setLastTab: (route: string, tab: types.ListKind) => void;
   selectedAddress: string | null;
   setSelectedAddress: (address: string | null) => void;
 }
@@ -38,7 +38,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [ready, setReady] = useState(false);
   const [menuCollapsed, setMenuCollapsed] = useState(true);
   const [helpCollapsed, setHelpCollapsed] = useState(true);
-  const [lastTab, setLastTabState] = useState<Record<string, string>>({});
+  const [lastTab, setLastTabState] = useState<Record<string, types.ListKind>>({});
   const [selectedAddress, setSelectedAddressState] = useState<string | null>(
     null,
   );
@@ -48,13 +48,13 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     setIsDarkMode((prev) => !prev);
   };
 
-  const setLastTab = (route: string, tab: string) => {
+  const setLastTab = (route: string, tab: types.ListKind) => {
     setLastTabState((prev) => {
       const updatedState = {
         ...prev,
         [route]: tab,
       };
-      SetLastTab(route, tab as types.ListKind).catch((error) => {
+      SetLastTab(route, tab).catch((error) => {
         Log(`Failed to update lastTab in backend: ${error}`);
       });
       return updatedState;
@@ -78,7 +78,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
           setLastView(prefs.lastView || '/');
           setMenuCollapsed(prefs.menuCollapsed as boolean);
           setHelpCollapsed(prefs.helpCollapsed as boolean);
-          setLastTabState(prefs.lastTab || {});
+          setLastTabState(prefs.lastTab as Record<string, types.ListKind>);
           setReady(true);
           return;
         }

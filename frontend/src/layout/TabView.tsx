@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { useAppContext } from '@contexts';
 import { useEvent } from '@hooks';
 import { Tabs } from '@mantine/core';
-import { msgs } from '@models';
+import { msgs, types } from '@models';
 
 import './TabView.css';
 
@@ -20,8 +20,9 @@ interface TabViewProps {
 
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   const { lastTab, setLastTab } = useAppContext();
-  const defaultTab = lastTab[route] || tabs[0]?.label || '';
-  const [activeTab, setActiveTab] = useState<string>(defaultTab);
+  const [activeTab, setActiveTab] = useState<types.ListKind>(
+    lastTab[route] || ('' as types.ListKind),
+  );
 
   const nextTab = useCallback((): string => {
     const currentIndex = tabs.findIndex((tab) => tab.label === activeTab);
@@ -39,9 +40,11 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
     msgs.EventType.TAB_CYCLE,
     (event) => {
       if (event.route === route) {
-        const newTab = event.key.startsWith('alt+') ? prevTab() : nextTab();
+        const newTab = (
+          event.key.startsWith('alt+') ? prevTab() : nextTab()
+        ) as types.ListKind;
         setActiveTab(newTab);
-        setLastTab(route, newTab); // Synchronize with AppContext
+        setLastTab(route, newTab);
         if (onTabChange) {
           onTabChange(newTab);
         }
@@ -51,8 +54,9 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
 
   const handleTabChange = (newTab: string | null) => {
     if (newTab === null) return;
-    setActiveTab(newTab);
-    setLastTab(route, newTab);
+    const listKind = newTab as types.ListKind;
+    setActiveTab(listKind);
+    setLastTab(route, listKind);
     if (onTabChange) {
       onTabChange(newTab);
     }

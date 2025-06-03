@@ -27,7 +27,7 @@ export const Abis = () => {
   const { lastTab } = useAppContext();
 
   const [listKind, setListKind] = useState<types.ListKind>(
-    (lastTab[ABIS_ROUTE] as types.ListKind) || DEFAULT_LIST_KIND,
+    lastTab[ABIS_ROUTE] || DEFAULT_LIST_KIND,
   );
   const listKindRef = useRef(listKind);
   const [downloaded, setDownloaded] = useState<IndexedAbi[]>([]);
@@ -151,7 +151,7 @@ export const Abis = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    const currentTabLabel = lastTab[ABIS_ROUTE] as types.ListKind | undefined;
+    const currentTabLabel = lastTab[ABIS_ROUTE];
     if (currentTabLabel && currentTabLabel !== listKindRef.current) {
       setListKind(currentTabLabel);
     }

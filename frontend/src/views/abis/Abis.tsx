@@ -1,11 +1,6 @@
-/*
-TableConfigProps
-getTableConfig
-*/
 // ADD_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { GetAbisPage, Reload, RemoveAbi } from '@app';
 import { usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { TabView } from '@layout';
@@ -14,10 +9,19 @@ import { msgs, sorting, types } from '@models';
 import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
 
+import {
+  ABIS_ROUTE,
+  ACTION_MESSAGES,
+  DEFAULT_LIST_KIND,
+  DownloadedTab,
+  EventsTab,
+  FunctionsTab,
+  KnownTab,
+  getAbisPage,
+  reload,
+  removeAbi,
+} from './';
 import './Abis.css';
-import { ABIS_ROUTE, ACTION_MESSAGES, DEFAULT_LIST_KIND } from './constants';
-import { DownloadedTab, EventsTab, FunctionsTab, KnownTab } from './index';
-import { IndexedAbi, IndexedFunction } from './types';
 
 //--------------------------------------------------------------------
 export const Abis = () => {
@@ -30,24 +34,16 @@ export const Abis = () => {
     lastTab[ABIS_ROUTE] || DEFAULT_LIST_KIND,
   );
   const listKindRef = useRef(listKind);
-  const [downloaded, setDownloaded] = useState<IndexedAbi[]>([]);
-  const [known, setKnown] = useState<IndexedAbi[]>([]);
-  const [functions, setFunctions] = useState<IndexedFunction[]>([]);
-  const [events, setEvents] = useState<IndexedFunction[]>([]);
+  const [downloaded, setDownloaded] = useState<types.Abi[]>([]);
+  const [known, setKnown] = useState<types.Abi[]>([]);
+  const [functions, setFunctions] = useState<types.Function[]>([]);
+  const [events, setEvents] = useState<types.Function[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   // const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
   //   new Set(),
   // );
-  // const [isDownloadedLoaded, setIsDownloadedLoaded] = useState<boolean>(false);
-  // const [isKnownLoaded, setIsKnownLoaded] = useState<boolean>(false);
-  // const [isFuncsLoaded, setIsFuncsLoaded] = useState<boolean>(false);
-  // const [isEventsLoaded, setIsEventsLoaded] = useState<boolean>(false);
   const [, setProcessingAddresses] = useState<Set<string>>(new Set());
-  const [, setIsDownloadedLoaded] = useState<boolean>(false);
-  const [, setIsKnownLoaded] = useState<boolean>(false);
-  const [, setIsFuncsLoaded] = useState<boolean>(false);
-  const [, setIsEventsLoaded] = useState<boolean>(false);
 
   const tableKey = useMemo((): TableKey => {
     return { viewName: ABIS_ROUTE, tabName: listKind };
@@ -61,31 +57,27 @@ export const Abis = () => {
     setLoading(true);
     setError(null);
     try {
-      const sortArgument = sort === null ? undefined : sort;
-      const result = await GetAbisPage(
+      const sortArg = (sort === null ? undefined : sort) as sorting.SortDef;
+      const result = await getAbisPage(
         listKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
-        sortArgument as sorting.SortDef,
+        sortArg,
         filter,
       );
 
       switch (listKind) {
         case types.ListKind.DOWNLOADED:
-          setIsDownloadedLoaded(result.isLoaded);
-          setDownloaded((result.abis as IndexedAbi[]) || []);
+          setDownloaded(result.abis || []);
           break;
         case types.ListKind.KNOWN:
-          setIsKnownLoaded(result.isLoaded);
-          setKnown((result.abis as IndexedAbi[]) || []);
+          setKnown(result.abis || []);
           break;
         case types.ListKind.FUNCTIONS:
-          setIsFuncsLoaded(result.isLoaded);
-          setFunctions((result.functions as IndexedFunction[]) || []);
+          setFunctions(result.functions || []);
           break;
         case types.ListKind.EVENTS:
-          setIsEventsLoaded(result.isLoaded);
-          setEvents((result.functions as IndexedFunction[]) || []);
+          setEvents(result.functions || []);
           break;
         default:
           throw new Error(`Unknown list kind: ${listKind}`);
@@ -124,19 +116,15 @@ export const Abis = () => {
       if (payload) {
         switch (listKindRef.current) {
           case types.ListKind.DOWNLOADED:
-            setIsDownloadedLoaded(payload.isLoaded);
             fetchData();
             break;
           case types.ListKind.KNOWN:
-            setIsKnownLoaded(payload.isLoaded);
             fetchData();
             break;
           case types.ListKind.FUNCTIONS:
-            setIsFuncsLoaded(payload.isLoaded);
             fetchData();
             break;
           case types.ListKind.EVENTS:
-            setIsEventsLoaded(payload.isLoaded);
             fetchData();
             break;
         }
@@ -162,11 +150,7 @@ export const Abis = () => {
       'mod+r',
       () => {
         setLoading(true);
-        setIsDownloadedLoaded(false);
-        setIsKnownLoaded(false);
-        setIsFuncsLoaded(false);
-        setIsEventsLoaded(false);
-        Reload().then(() => {
+        reload().then(() => {
           fetchData();
           emitStatus(ACTION_MESSAGES.RELOAD_STATUS);
         });
@@ -178,33 +162,32 @@ export const Abis = () => {
     setProcessingAddresses((prev) => new Set(prev).add(address));
     try {
       const original = [...downloaded];
-      const optimisticNames = original.filter((abi) => {
+      const optimisticValues = original.filter((abi) => {
         const nameAddress =
           typeof abi.address === 'string' ? abi.address : String(abi.address);
         return nameAddress !== address;
       });
-      setDownloaded(optimisticNames as IndexedAbi[]);
+      setDownloaded(optimisticValues as types.Abi[]);
 
-      RemoveAbi(address)
+      removeAbi(address)
         .then(async () => {
-          // If API call is successful, refresh the data to get the definitive state
-          const sortArgument = sort === null ? undefined : sort;
-          const result = await GetAbisPage(
+          const sortArg = (sort === null ? undefined : sort) as sorting.SortDef;
+          const result = await getAbisPage(
             listKind,
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
-            sortArgument as sorting.SortDef,
+            sortArg,
             filter,
           );
 
-          setDownloaded((result.abis || []) as IndexedAbi[]);
+          setDownloaded(result.abis || []);
           setTotalItems(result.totalItems || 0);
 
           emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
         })
         .catch((err) => {
           // If there's an error, revert the optimistic update
-          setDownloaded(optimisticNames as IndexedAbi[]);
+          setDownloaded(optimisticValues as types.Abi[]);
           emitError(err);
           Log(`Error in handleAction: ${err}`);
         });

@@ -5,9 +5,23 @@ import { Action } from '@components';
 import { Group, Text } from '@mantine/core';
 import { types } from '@models';
 
-import { AbiRow, TableConfigProps } from './types';
+interface TableConfigProps {
+  downloaded: types.Abi[];
+  known: types.Abi[];
+  functions: types.Function[];
+  events: types.Function[];
+  isDownloadedLoaded: boolean;
+  isKnownLoaded: boolean;
+  isFuncsLoaded: boolean;
+  isEventsLoaded: boolean;
+  processingAddresses: Set<string>;
+  setSelectedAddress: (address: string) => void;
+  setLocation: (path: string) => void;
+  handleAction: (address: string) => void;
+}
 
-//--------------------------------------------------------------------
+type AbiRow = types.Abi | types.Function;
+
 export const getTableConfig = (
   listKind: types.ListKind,
   config: TableConfigProps,
@@ -35,24 +49,24 @@ export const getTableConfig = (
   switch (listKind) {
     case types.ListKind.FUNCTIONS:
       return {
-        data: config.functions as AbiRow[],
+        data: config.functions,
         columns: funcColumns,
       };
     case types.ListKind.EVENTS:
       return {
-        data: config.events as AbiRow[],
+        data: config.events,
         columns: funcColumns,
       };
     case types.ListKind.KNOWN:
       return {
-        data: config.known as AbiRow[],
+        data: config.known,
         columns: abiColumns,
       };
     case types.ListKind.DOWNLOADED:
     // fall through
     default:
       return {
-        data: config.downloaded as AbiRow[],
+        data: config.downloaded,
         columns: abiColumns,
       };
   }

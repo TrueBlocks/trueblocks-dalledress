@@ -18,9 +18,9 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 
 	switch listKind {
 	case AbisDownloaded:
-		go ac.loadDownloadedAbis()
+		go ac.loadDownloaded()
 	case AbisKnown:
-		go ac.loadKnownAbis()
+		go ac.loadKnown()
 	case AbisFunctions:
 		go ac.loadFunctions()
 	case AbisEvents:
@@ -30,17 +30,17 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 	}
 }
 
-func (ac *AbisCollection) loadDownloadedAbis() {
+func (ac *AbisCollection) loadDownloaded() {
 	if result, err := ac.downloadedRepo.Load(repository.LoadOptions{}); err != nil {
-		logging.LogError("loadDownloadedAbis: %v", err, repository.ErrorAlreadyLoading)
+		logging.LogError("loadDownloaded: %v", err, repository.ErrorAlreadyLoading)
 	} else {
 		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
 }
 
-func (ac *AbisCollection) loadKnownAbis() {
+func (ac *AbisCollection) loadKnown() {
 	if result, err := ac.knownRepo.Load(repository.LoadOptions{}); err != nil {
-		logging.LogError("loadKnownAbis: %v", err, repository.ErrorAlreadyLoading)
+		logging.LogError("loadKnown: %v", err, repository.ErrorAlreadyLoading)
 	} else {
 		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}

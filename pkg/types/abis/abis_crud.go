@@ -25,9 +25,9 @@ func (ac *AbisCollection) Remove(address string) error {
 	})
 
 	if removed {
-		msgs.EmitMessage(msgs.EventStatus, fmt.Sprintf("Deleted ABI for address: %s", address))
+		msgs.EmitStatus(fmt.Sprintf("deleted ABI for address: %s", address))
 	} else {
-		msgs.EmitMessage(msgs.EventStatus, fmt.Sprintf("ABI for address %s was not found in cache", address))
+		msgs.EmitStatus(fmt.Sprintf("ABI for address %s was not found in cache", address))
 	}
 	logging.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", address))
 

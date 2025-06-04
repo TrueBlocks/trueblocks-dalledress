@@ -28,7 +28,7 @@ func LoadStreamingData[T any](
 		RLock()
 		RUnlock()
 	},
-) (string, types.DataLoadedPayload, error) {
+) (types.DataLoadedPayload, error) {
 	Cancel(contextKey)
 	defer func() { Cancel(contextKey) }()
 
@@ -89,12 +89,8 @@ func LoadStreamingData[T any](
 						ListKind:      listKind,
 						Reason:        reason,
 					}
-					msgs.EmitPayload(msgs.EventDataLoaded, payload)
-					statusMsg := fmt.Sprintf("Loading %s: %d processed.", listKind, len(*targetSlice))
-					if *expectedCount > 0 {
-						statusMsg = fmt.Sprintf("Loading %s: %d of %d processed.", listKind, len(*targetSlice), *expectedCount)
-					}
-					msgs.EmitMessage(msgs.EventStatus, statusMsg)
+					msgs.EmitLoaded(reason, payload)
+					msgs.EmitStatus(fmt.Sprintf("loading %s: %d processed.", listKind, len(*targetSlice)))
 					m.RUnlock()
 				}
 			}
@@ -104,7 +100,7 @@ func LoadStreamingData[T any](
 				errorChanClosed = true
 				continue
 			}
-			msgs.EmitMessage(msgs.EventError, "LoadStreamingData: streaming error: "+streamErr.Error())
+			msgs.EmitError("LoadStreamingData", streamErr)
 
 		case <-done:
 			// Stream initialization completed
@@ -115,14 +111,12 @@ func LoadStreamingData[T any](
 	*loadedFlag = true
 	m.Unlock()
 
-	finalStatus := fmt.Sprintf("loaded: %d items.", len(*targetSlice))
-	finalPayload := types.DataLoadedPayload{
+	msgs.EmitStatus(fmt.Sprintf("loaded: %d items.", len(*targetSlice)))
+	return types.DataLoadedPayload{
 		IsLoaded:      true,
 		CurrentCount:  len(*targetSlice),
 		ExpectedTotal: len(*targetSlice),
 		ListKind:      listKind,
 		Reason:        "final",
-	}
-
-	return finalStatus, finalPayload, nil
+	}, nil
 }

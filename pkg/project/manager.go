@@ -11,17 +11,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 )
 
-const (
-	ProjectActivated  = "project_activated"
-	ProjectCreated    = "project_created"
-	ProjectSwitched   = "project_switched"
-	ProjectOpened     = "project_opened"
-	ProjectClosed     = "project_closed"
-	AllProjectsClosed = "all_projects_closed"
-	ProjectSaved      = "project_saved"
-	ProjectSavedAs    = "project_saved_as"
-)
-
 // Manager handles multiple Project instances, maintaining a collection of open projects
 // and tracking which one is currently active.
 type Manager struct {
@@ -63,7 +52,7 @@ func (m *Manager) SetActive(id string) error {
 	}
 
 	m.ActiveID = id
-	msgs.EmitMessage(msgs.EventManager, ProjectActivated)
+	msgs.EmitManager("project_activated")
 	return nil
 }
 
@@ -87,7 +76,7 @@ func (m *Manager) New(name string) *Project {
 	id := name
 	m.OpenProjects[id] = project
 	m.ActiveID = id
-	msgs.EmitMessage(msgs.EventManager, ProjectCreated)
+	msgs.EmitManager("project_created")
 	return project
 }
 
@@ -96,7 +85,7 @@ func (m *Manager) Open(path string) (*Project, error) {
 	for id, proj := range m.OpenProjects {
 		if proj.Path == path {
 			m.ActiveID = id
-			msgs.EmitMessage(msgs.EventManager, ProjectSwitched)
+			msgs.EmitManager("project_switched")
 			return proj, nil
 		}
 	}
@@ -112,7 +101,7 @@ func (m *Manager) Open(path string) (*Project, error) {
 
 	project.LastOpened = time.Now().Format(time.RFC3339)
 
-	msgs.EmitMessage(msgs.EventManager, ProjectOpened)
+	msgs.EmitManager("project_opened")
 	return project, nil
 }
 
@@ -134,7 +123,7 @@ func (m *Manager) Close(id string) error {
 		}
 	}
 
-	msgs.EmitMessage(msgs.EventManager, ProjectClosed)
+	msgs.EmitManager("project_closed")
 	return nil
 }
 
@@ -142,7 +131,7 @@ func (m *Manager) Close(id string) error {
 func (m *Manager) CloseAll() {
 	m.OpenProjects = make(map[string]*Project)
 	m.ActiveID = ""
-	msgs.EmitMessage(msgs.EventManager, AllProjectsClosed)
+	msgs.EmitManager("all_projects_closed")
 }
 
 // SaveActive saves the currently active project
@@ -159,9 +148,9 @@ func (m *Manager) SaveActive() error {
 
 	err := project.Save()
 	if err == nil {
-		msgs.EmitMessage(msgs.EventManager, ProjectSaved)
+		msgs.EmitManager("project_saved")
 	} else {
-		msgs.EmitMessage(msgs.EventError, "Save project: "+err.Error())
+		msgs.EmitError("SaveProject", err)
 	}
 	return err
 }
@@ -185,18 +174,18 @@ func (m *Manager) SaveActiveAs(path string) error {
 		}
 
 		if err == nil {
-			msgs.EmitMessage(msgs.EventManager, ProjectSavedAs)
+			msgs.EmitManager("project_saved_as")
 		} else {
-			msgs.EmitMessage(msgs.EventError, "Save project as: "+err.Error())
+			msgs.EmitError("SaveProjectAs", err)
 		}
 		return err
 	}
 
 	err := project.SaveAs(path)
 	if err == nil {
-		msgs.EmitMessage(msgs.EventManager, ProjectSavedAs)
+		msgs.EmitManager("project_saved_as")
 	} else {
-		msgs.EmitMessage(msgs.EventError, "Save project as: "+err.Error())
+		msgs.EmitError("SaveProjectAs", err)
 	}
 	return err
 }

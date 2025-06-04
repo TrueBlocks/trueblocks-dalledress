@@ -2,6 +2,7 @@ package msgs
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 
@@ -20,16 +21,7 @@ func InitializeContext(ctx context.Context) {
 	log.Println("Messaging context initialized")
 }
 
-func EmitPayload(messageType EventType, payload interface{}) {
-	contextMutex.RLock()
-	ctx := wailsContext
-	contextMutex.RUnlock()
-	if ctx != nil {
-		runtime.EventsEmit(ctx, string(messageType), payload)
-	}
-}
-
-func EmitMessage(messageType EventType, msgText string, payload ...interface{}) {
+func emitMessage(messageType EventType, msgText string, payload ...interface{}) {
 	contextMutex.RLock()
 	ctx := wailsContext
 	contextMutex.RUnlock()
@@ -37,4 +29,23 @@ func EmitMessage(messageType EventType, msgText string, payload ...interface{}) 
 	if ctx != nil {
 		runtime.EventsEmit(ctx, string(messageType), payload...)
 	}
+}
+
+// Sugar
+
+func EmitLoaded(msgText string, payload ...interface{}) {
+	emitMessage(EventDataLoaded, msgText, payload...)
+}
+
+func EmitStatus(msgText string, payload ...interface{}) {
+	emitMessage(EventStatus, msgText, payload...)
+}
+
+func EmitManager(msgText string, payload ...interface{}) {
+	emitMessage(EventManager, msgText, payload...)
+}
+
+func EmitError(msgText string, err error, payload ...interface{}) {
+	msg := fmt.Sprintf("%s: %v", msgText, err)
+	emitMessage(EventError, msg, payload...)
 }

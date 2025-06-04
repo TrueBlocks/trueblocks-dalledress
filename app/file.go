@@ -106,11 +106,11 @@ func (a *App) updateRecentProjects() {
 	path := activeProject.GetPath()
 
 	if err := a.Preferences.AddRecentProject(path); err != nil {
-		msgs.EmitMessage(msgs.EventError, "add recent project failed: "+err.Error())
+		msgs.EmitError("add recent project failed", err)
 		return
 	}
 
-	msgs.EmitMessage(msgs.EventProjectsUpdated, "")
+	msgs.EmitManager("update_recent_projects")
 }
 
 func (a *App) GetFilename() *project.Project {

@@ -26,48 +26,40 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 	case AbisEvents:
 		go ac.loadEvents()
 	default:
-		logger.Error(fmt.Sprintf("AbisCollection.LoadData: unexpected list kind: %v", listKind))
+		logger.Error(fmt.Sprintf("LoadData: unexpected list kind: %v", listKind))
 	}
 }
 
 func (ac *AbisCollection) loadDownloadedAbis() {
-	result, err := ac.downloadedRepo.Load(repository.LoadOptions{})
-	if err != nil {
-		logging.LogError("AbisCollection.loadDownloadedAbis: %v", err, repository.ErrorAlreadyLoading)
-		return
+	if result, err := ac.downloadedRepo.Load(repository.LoadOptions{}); err != nil {
+		logging.LogError("loadDownloadedAbis: %v", err, repository.ErrorAlreadyLoading)
+	} else {
+		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
-	msgs.EmitMessage(msgs.EventStatus, result.Status)
-	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 
 func (ac *AbisCollection) loadKnownAbis() {
-	result, err := ac.knownRepo.Load(repository.LoadOptions{})
-	if err != nil {
-		logging.LogError("AbisCollection.loadKnownAbis: %v", err, repository.ErrorAlreadyLoading)
-		return
+	if result, err := ac.knownRepo.Load(repository.LoadOptions{}); err != nil {
+		logging.LogError("loadKnownAbis: %v", err, repository.ErrorAlreadyLoading)
+	} else {
+		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
-	msgs.EmitMessage(msgs.EventStatus, result.Status)
-	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 
 func (ac *AbisCollection) loadFunctions() {
-	result, err := ac.functionsRepo.Load(repository.LoadOptions{})
-	if err != nil {
-		logging.LogError("AbisCollection.loadFunctions: %v", err, repository.ErrorAlreadyLoading)
-		return
+	if result, err := ac.functionsRepo.Load(repository.LoadOptions{}); err != nil {
+		logging.LogError("loadFunctions: %v", err, repository.ErrorAlreadyLoading)
+	} else {
+		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
-	msgs.EmitMessage(msgs.EventStatus, result.Status)
-	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 
 func (ac *AbisCollection) loadEvents() {
-	result, err := ac.eventsRepo.Load(repository.LoadOptions{})
-	if err != nil {
-		logging.LogError("AbisCollection.loadEvents: %v", err, repository.ErrorAlreadyLoading)
-		return
+	if result, err := ac.eventsRepo.Load(repository.LoadOptions{}); err != nil {
+		logging.LogError("loadEvents: %v", err, repository.ErrorAlreadyLoading)
+	} else {
+		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
-	msgs.EmitMessage(msgs.EventStatus, result.Status)
-	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 
 // ADD_ROUTE

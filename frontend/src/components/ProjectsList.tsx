@@ -49,7 +49,6 @@ export const ProjectsList = () => {
     refreshProjects();
   }, []);
 
-  useEvent(msgs.EventType.PROJECTS_UPDATED, refreshProjects);
   useEvent(msgs.EventType.MANAGER, refreshProjects);
 
   const handleSwitchProject = async (id: string) => {

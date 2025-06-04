@@ -143,7 +143,7 @@ export const Names = () => {
     loadNames();
 
     // Set up event listener for REFRESH events from backend
-    const unsubscribe = EventsOn(msgs.EventType.REFRESH, () => {
+    const unsubscribe = EventsOn(msgs.EventType.DATA_LOADED, () => {
       loadNames();
     });
     return unsubscribe;

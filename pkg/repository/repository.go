@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
@@ -27,7 +28,6 @@ type Repository[T any] interface {
 type FilterFunc[T any] func(*T) bool
 
 type StreamingResult struct {
-	Status  string                  // Status message from streaming
 	Payload types.DataLoadedPayload // Payload with counts and completion
 	Error   error                   // Any error that occurred
 }
@@ -88,7 +88,9 @@ func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	defer r.state.StopLoading()
 
 	if !opts.ForceReload && r.state.IsLoaded() {
-		return r.getCachedResult(), nil
+		msgs.EmitStatus(fmt.Sprintf("cached: %d items", len(r.data)))
+		cachedPayload := r.getCachedResult()
+		return cachedPayload, nil
 	}
 
 	r.mutex.Lock()
@@ -97,7 +99,7 @@ func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	r.mutex.Unlock()
 
 	contextKey := fmt.Sprintf("repo-%s", r.listKind)
-	finalStatus, finalPayload, err := streaming.LoadStreamingData(
+	finalPayload, err := streaming.LoadStreamingData(
 		contextKey,
 		r.queryFunc,
 		r.filterFunc,
@@ -109,9 +111,7 @@ func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 		r.listKind,
 		&r.mutex,
 	)
-
 	return &StreamingResult{
-		Status:  finalStatus,
 		Payload: finalPayload,
 		Error:   err,
 	}, nil
@@ -123,7 +123,6 @@ func (r *BaseRepository[T]) getCachedResult() *StreamingResult {
 	dataCopy := make([]T, len(r.data))
 	copy(dataCopy, r.data)
 	return &StreamingResult{
-		Status: fmt.Sprintf("cached: %d items", len(r.data)),
 		Payload: types.DataLoadedPayload{
 			CurrentCount:  len(r.data),
 			ExpectedTotal: len(r.data),

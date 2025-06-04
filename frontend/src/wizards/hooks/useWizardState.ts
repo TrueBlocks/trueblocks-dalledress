@@ -93,7 +93,7 @@ export const useWizardState = () => {
     }
   }, [updateData, updateAPI, updateUI]);
 
-  const submitUserInfo = async () => {
+  const submitUserInfo = useCallback(async () => {
     updateUI({ loading: true });
 
     try {
@@ -103,9 +103,9 @@ export const useWizardState = () => {
       updateUI({ loading: false });
       throw error;
     }
-  };
+  }, [state.data.name, state.data.email, updateUI]);
 
-  const submitChainInfo = async () => {
+  const submitChainInfo = useCallback(async () => {
     updateUI({ loading: true });
 
     try {
@@ -122,9 +122,17 @@ export const useWizardState = () => {
       updateValidation({ rpcError: String(error) });
       updateUI({ loading: false });
     }
-  };
+  }, [
+    state.data.chainName,
+    state.data.chainId,
+    state.data.symbol,
+    state.data.remoteExplorer,
+    state.data.rpcUrl,
+    updateUI,
+    updateValidation,
+  ]);
 
-  const completeWizard = async () => {
+  const completeWizard = useCallback(async () => {
     updateUI({ loading: true });
 
     try {
@@ -134,7 +142,7 @@ export const useWizardState = () => {
       updateUI({ loading: false });
       throw error;
     }
-  };
+  }, [updateUI]);
 
   useEffect(() => {
     loadInitialData();

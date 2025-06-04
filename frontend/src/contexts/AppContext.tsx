@@ -1,8 +1,10 @@
 import {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -46,11 +48,11 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   );
   const hasRedirected = useRef(false);
 
-  const toggleDarkMode = () => {
+  const toggleDarkMode = useCallback(() => {
     setIsDarkMode((prev) => !prev);
-  };
+  }, []);
 
-  const setLastTab = (route: string, tab: types.ListKind) => {
+  const setLastTab = useCallback((route: string, tab: types.ListKind) => {
     setLastTabState((prev) => {
       const updatedState = {
         ...prev,
@@ -61,11 +63,11 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       });
       return updatedState;
     });
-  };
+  }, []);
 
-  const setSelectedAddress = (address: string | null) => {
+  const setSelectedAddress = useCallback((address: string | null) => {
     setSelectedAddressState(address);
-  };
+  }, []);
 
   const isWizard = location.startsWith('/wizard');
 
@@ -106,27 +108,43 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [location, ready]);
 
+  const contextValue = useMemo(
+    () => ({
+      isDarkMode,
+      toggleDarkMode,
+      currentLocation: location,
+      navigate,
+      isWizard,
+      ready,
+      menuCollapsed,
+      setMenuCollapsed,
+      helpCollapsed,
+      setHelpCollapsed,
+      lastTab,
+      setLastTab,
+      selectedAddress,
+      setSelectedAddress,
+    }),
+    [
+      isDarkMode,
+      toggleDarkMode,
+      location,
+      navigate,
+      isWizard,
+      ready,
+      menuCollapsed,
+      setMenuCollapsed,
+      helpCollapsed,
+      setHelpCollapsed,
+      lastTab,
+      setLastTab,
+      selectedAddress,
+      setSelectedAddress,
+    ],
+  );
+
   return (
-    <AppContext.Provider
-      value={{
-        isDarkMode,
-        toggleDarkMode,
-        currentLocation: location,
-        navigate,
-        isWizard,
-        ready,
-        menuCollapsed,
-        setMenuCollapsed,
-        helpCollapsed,
-        setHelpCollapsed,
-        lastTab,
-        setLastTab,
-        selectedAddress,
-        setSelectedAddress,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
+    <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
   );
 };
 

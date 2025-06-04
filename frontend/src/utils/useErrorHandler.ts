@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Log, useEmitters } from '.';
 
@@ -18,5 +18,8 @@ export const useErrorHandler = () => {
 
   const clearError = useCallback(() => setError(null), []);
 
-  return { error, handleError, clearError };
+  return useMemo(
+    () => ({ error, handleError, clearError }),
+    [error, handleError, clearError],
+  );
 };

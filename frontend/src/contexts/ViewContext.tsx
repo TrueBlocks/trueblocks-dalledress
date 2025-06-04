@@ -3,6 +3,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from 'react';
 
@@ -10,6 +11,8 @@ import { sdk } from '@models';
 
 import { TableKey, tableKeyToString } from '.';
 import { createEmptySortSpec } from '../utils/sortSpec';
+
+const EMPTY_SORT = createEmptySortSpec();
 
 // Pagination interfaces
 export interface PaginationState {
@@ -128,21 +131,31 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
     }));
   }, []);
 
+  const contextValue = useMemo(
+    () => ({
+      currentView,
+      setCurrentView,
+      getPagination,
+      updatePagination,
+      getSorting,
+      updateSorting,
+      getFiltering,
+      updateFiltering,
+    }),
+    [
+      currentView,
+      setCurrentView,
+      getPagination,
+      updatePagination,
+      getSorting,
+      updateSorting,
+      getFiltering,
+      updateFiltering,
+    ],
+  );
+
   return (
-    <ViewContext.Provider
-      value={{
-        currentView,
-        setCurrentView,
-        getPagination,
-        updatePagination,
-        getSorting,
-        updateSorting,
-        getFiltering,
-        updateFiltering,
-      }}
-    >
-      {children}
-    </ViewContext.Provider>
+    <ViewContext.Provider value={contextValue}>{children}</ViewContext.Provider>
   );
 };
 
@@ -163,11 +176,12 @@ export const useSorting = (tableKey: TableKey) => {
     },
     [tableKey, updateSorting],
   );
+
   // Get the sort value, but never return null - instead return a default empty SortSpec
   const sortValue = getSorting(tableKey);
-  const sort = sortValue || createEmptySortSpec();
+  const sort = sortValue || EMPTY_SORT;
 
-  return { sort, setSorting };
+  return useMemo(() => ({ sort, setSorting }), [sort, setSorting]);
 };
 
 // Hook for filtering state (per-view)
@@ -182,5 +196,6 @@ export const useFiltering = (tableKey: TableKey) => {
   );
 
   const filter = getFiltering(tableKey);
-  return { filter, setFiltering };
+
+  return useMemo(() => ({ filter, setFiltering }), [filter, setFiltering]);
 };

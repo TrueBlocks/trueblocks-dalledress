@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { TableKey, useViewContext } from '@contexts';
 
@@ -31,10 +31,13 @@ export const usePagination = (tableKey: TableKey) => {
     [tableKey, updatePagination],
   );
 
-  return {
-    pagination,
-    goToPage,
-    changePageSize,
-    setTotalItems,
-  };
+  return useMemo(
+    () => ({
+      pagination,
+      goToPage,
+      changePageSize,
+      setTotalItems,
+    }),
+    [pagination, goToPage, changePageSize, setTotalItems],
+  );
 };

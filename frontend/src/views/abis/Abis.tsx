@@ -40,6 +40,9 @@ export const Abis = () => {
     [listKind],
   );
 
+  const renderCnt = useRef(0);
+  renderCnt.current += 1;
+
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
   const { pagination, setTotalItems } = usePagination(tableKey);
   const { sort } = useSorting(tableKey);
@@ -84,12 +87,14 @@ export const Abis = () => {
   useEffect(() => {
     const eventName = msgs.EventType.DATA_LOADED;
     const unlisten = EventsOn(eventName, (payload: types.DataLoadedPayload) => {
-      if (payload) fetchData();
+      if (payload?.listKind == listKind && payload?.reason === 'initial') {
+        fetchData();
+      }
     });
     return () => {
       if (typeof unlisten === 'function') unlisten();
     };
-  }, [fetchData]);
+  }, [fetchData, listKind]);
 
   useEffect(() => {
     const currentTabLabel = lastTab[ABIS_ROUTE];
@@ -219,6 +224,7 @@ export const Abis = () => {
           <p>{error.message}</p>
         </div>
       )}
+      <div>{`renderCnt: ${renderCnt.current}`}</div>
     </div>
   );
 };

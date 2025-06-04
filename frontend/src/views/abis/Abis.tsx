@@ -3,10 +3,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BaseTab, usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
+import { useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, msgs, types } from '@models';
-import { EventsOn } from '@runtime';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import {
@@ -49,7 +49,7 @@ export const Abis = () => {
     clearError();
     try {
       const result = await getAbisPage(
-        listKind,
+        listKindRef.current,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -58,11 +58,10 @@ export const Abis = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${listKind}`);
+      handleError(err, `Failed to fetch ${listKindRef.current}`);
     }
   }, [
     clearError,
-    listKind,
     pagination.currentPage,
     pagination.pageSize,
     sort,
@@ -82,18 +81,17 @@ export const Abis = () => {
     }
   }, [lastTab]);
 
-  useEffect(() => {
-    const eventName = msgs.EventType.DATA_LOADED;
-    const unlisten = EventsOn(eventName, (payload: types.DataLoadedPayload) => {
-      if (payload?.listKind === listKind) {
+  useEvent(
+    msgs.EventType.DATA_LOADED,
+    (_message: string, payload?: types.DataLoadedPayload) => {
+      if (payload?.listKind === listKindRef.current) {
         fetchData();
       }
-    });
-    fetchData(); // Initial fetch
+    },
+  );
 
-    return () => {
-      if (typeof unlisten === 'function') unlisten();
-    };
+  useEffect(() => {
+    fetchData();
   }, [fetchData, listKind]);
 
   useHotkeys([
@@ -126,7 +124,7 @@ export const Abis = () => {
       removeAbi(address)
         .then(async () => {
           const result = await getAbisPage(
-            listKind,
+            listKindRef.current,
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
             sort,

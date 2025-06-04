@@ -38,8 +38,8 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
 
   useEvent<{ route: string; key: string }>(
     msgs.EventType.TAB_CYCLE,
-    (event) => {
-      if (event.route === route) {
+    (_message: string, event?: { route: string; key: string }) => {
+      if (event?.route === route) {
         const newTab = (
           event.key.startsWith('alt+') ? prevTab() : nextTab()
         ) as types.ListKind;

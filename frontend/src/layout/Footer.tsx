@@ -41,7 +41,7 @@ export const FilePanel = () => {
     fetchFilename();
   }, []);
 
-  useEvent(msgs.EventType.MANAGER, async () => {
+  useEvent(msgs.EventType.MANAGER, async (_message?: string) => {
     setStatus(await GetFilename());
   });
 

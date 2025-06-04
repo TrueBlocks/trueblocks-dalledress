@@ -1,5 +1,5 @@
 // ADD_ROUTE
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   AutonameName,
@@ -21,10 +21,10 @@ import {
   usePagination,
 } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
+import { useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { msgs, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
-import { EventsOn } from '@runtime';
 import { Log, useEmitters } from '@utils';
 import { useLocation } from 'wouter';
 
@@ -115,48 +115,45 @@ export const Names = () => {
     fetchSelectedTag();
   }, [listKind]);
 
-  useEffect(() => {
-    const loadNames = async () => {
-      setLoading(true);
-      // Log(`Names:loadNames ${listKind}`);
-      GetNamesPage(
-        listKind,
-        pagination.currentPage * pagination.pageSize,
-        pagination.pageSize,
-        sort,
-        filter ?? '',
-      )
-        .then((result) => {
-          setNames((result.names || []) as IndexableName[]);
-          setTotalItems(result.total || 0);
-          setTags(result.tags || []);
-        })
-        .catch((err) => {
-          emitError(err);
-          setNames([]);
-          setTags([]);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    };
-    loadNames();
-
-    // Set up event listener for REFRESH events from backend
-    const unsubscribe = EventsOn(msgs.EventType.DATA_LOADED, () => {
-      loadNames();
-    });
-    return unsubscribe;
+  const loadNames = useCallback(async () => {
+    setLoading(true);
+    GetNamesPage(
+      listKind,
+      pagination.currentPage * pagination.pageSize,
+      pagination.pageSize,
+      sort,
+      filter ?? '',
+    )
+      .then((result) => {
+        setNames((result.names || []) as IndexableName[]);
+        setTotalItems(result.total || 0);
+        setTags(result.tags || []);
+      })
+      .catch((err) => {
+        emitError(err);
+        setNames([]);
+        setTags([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [
     listKind,
     pagination.currentPage,
     pagination.pageSize,
     sort,
     filter,
-    selectedTag,
     setTotalItems,
     emitError,
   ]);
+
+  useEvent(msgs.EventType.DATA_LOADED, (_message?: string) => {
+    loadNames();
+  });
+
+  useEffect(() => {
+    loadNames();
+  }, [loadNames]);
 
   useEffect(() => {
     const currentTabLabel = lastTab['/names'] || '';
@@ -253,8 +250,9 @@ export const Names = () => {
   }, [lastTab, showTagsView]);
 
   // Setup event listener for focusing the tags table
-  useEffect(() => {
-    const focusTagsTable = (_data: { activeTab?: string } = {}) => {
+  useEvent(
+    FocusSider,
+    (_message: string, _data: { activeTab?: string } = {}) => {
       // First try to derive tab from current location
       const currentTabLabel = lastTab['/names'] || 'Custom';
 
@@ -280,11 +278,8 @@ export const Names = () => {
       if (tagsTableRef.current) {
         tagsTableRef.current.focus();
       }
-    };
-
-    const unsubscribe = EventsOn(FocusSider, focusTagsTable);
-    return unsubscribe;
-  }, [lastTab]);
+    },
+  );
 
   // Handle tag selection
   const handleTagSelect = async (

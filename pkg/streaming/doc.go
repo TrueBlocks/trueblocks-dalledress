@@ -7,7 +7,7 @@
 //
 // Example:
 //
-//	status, payload, err := streaming.LoadStreamingData(
+//	status, payload, err := streaming.StreamData(
 //	    "context-key", queryFunc, filterFunc, processFunc, dedupeFunc,
 //	    &targetSlice, &expectedCount, &loadedFlag, listKind, &mutex,
 //	)

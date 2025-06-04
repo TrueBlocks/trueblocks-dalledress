@@ -47,7 +47,7 @@ export const useAppHotkeys = (): void => {
       switch (hkType.type) {
         case 'navigation':
           if (currentLocation === hkType.path) {
-            emitEvent(msgs.EventType.TAB_CYCLE, {
+            emitEvent(msgs.EventType.TAB_CYCLE, 'Tab cycle triggered', {
               route: hkType.path,
               key: hkType.hotkey,
             });
@@ -144,7 +144,9 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+shift+e',
             label: 'Focus tags sider',
             action: () => {
-              emitEvent(FocusSider, { activeTab: currentLocation });
+              emitEvent(FocusSider, 'Focus tags table', {
+                activeTab: currentLocation,
+              });
             },
           },
           e,

@@ -27,7 +27,10 @@ func emitMessage(messageType EventType, msgText string, payload ...interface{}) 
 	contextMutex.RUnlock()
 
 	if ctx != nil {
-		runtime.EventsEmit(ctx, string(messageType), payload...)
+		// Create args slice with message first, then payload
+		args := []interface{}{msgText}
+		args = append(args, payload...)
+		runtime.EventsEmit(ctx, string(messageType), args...)
 	}
 }
 

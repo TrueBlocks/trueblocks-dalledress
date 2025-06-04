@@ -11,8 +11,8 @@ import (
 
 const refreshRate = 31
 
-// LoadStreamingData streams data of any type T with filtering, deduplication, and progress updates.
-func LoadStreamingData[T any](
+// StreamData streams data of any type T with filtering, deduplication, and progress updates.
+func StreamData[T any](
 	contextKey string,
 	queryFunc func(*output.RenderCtx),
 	filterFunc func(item *T) bool,
@@ -62,7 +62,7 @@ func LoadStreamingData[T any](
 
 			itemPtr := processItemFunc(itemIntf)
 			if itemPtr == nil {
-				logger.Info(fmt.Sprintf("LoadStreamingData: unexpected item type: %T", itemIntf))
+				logger.Info(fmt.Sprintf("StreamData: unexpected item type: %T", itemIntf))
 				continue
 			}
 
@@ -100,7 +100,7 @@ func LoadStreamingData[T any](
 				errorChanClosed = true
 				continue
 			}
-			msgs.EmitError("LoadStreamingData", streamErr)
+			msgs.EmitError("StreamData", streamErr)
 
 		case <-done:
 			// Stream initialization completed

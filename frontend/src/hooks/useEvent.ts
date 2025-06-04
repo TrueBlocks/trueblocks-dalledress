@@ -2,12 +2,19 @@ import { useEffect } from 'react';
 
 import { EventsOff, EventsOn } from '@runtime';
 
-export const useEvent = function <T = string>(
+export const useEvent = function <T = unknown>(
   eventType: string,
-  callback: (data: T) => void,
+  callback: (message: string, payload?: T) => void,
 ) {
   useEffect(() => {
-    EventsOn(eventType, callback);
+    // Wrapper to handle Wails event arguments properly
+    const wrappedCallback = (...args: unknown[]) => {
+      const message = (args[0] as string) || '';
+      const payload = args[1] as T | undefined;
+      callback(message, payload);
+    };
+
+    EventsOn(eventType, wrappedCallback);
     return () => {
       EventsOff(eventType);
     };

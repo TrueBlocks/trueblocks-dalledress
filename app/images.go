@@ -87,7 +87,8 @@ func (a *App) watchImagesDir() {
 	go func() {
 		for range debounce {
 			time.Sleep(300 * time.Millisecond)
-			runtime.EventsEmit(a.ctx, "images:changed")
+			// TDOO: Technically, this should be an event
+			runtime.EventsEmit(a.ctx, "images:changed", "Images directory changed")
 		}
 	}()
 

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetAppId } from '@app';
 import { GetImageURL } from '@app';
 import { ProjectsList } from '@components';
+import { useEvent } from '@hooks';
 import {
   Button,
   Card,
@@ -16,7 +17,6 @@ import {
   Title,
 } from '@mantine/core';
 import { msgs } from '@models';
-import { EventsOn } from '@runtime';
 
 export const Home = () => {
   const [_, setAppName] = useState('Your App');
@@ -36,15 +36,11 @@ export const Home = () => {
       .catch(() => {
         setSampleImageUrl('');
       });
-
-    const off = EventsOn(msgs.EventType.IMAGES_CHANGED, () => {
-      setRefreshKey((prev) => prev + 1);
-    });
-
-    return () => {
-      off();
-    };
   }, [refreshKey]);
+
+  useEvent(msgs.EventType.IMAGES_CHANGED, (_message?: string) => {
+    setRefreshKey((prev) => prev + 1);
+  });
 
   return (
     <Container size="lg" py="xl">
@@ -57,6 +53,7 @@ export const Home = () => {
 
       <Paper p="md" withBorder>
         <Stack>
+          <div>{`refreshKey: ${refreshKey}`}</div>
           <Title order={3}>Sample Image</Title>
           {sampleImageUrl ? (
             <>

@@ -99,7 +99,7 @@ func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	r.mutex.Unlock()
 
 	contextKey := fmt.Sprintf("repo-%s", r.listKind)
-	finalPayload, err := streaming.LoadStreamingData(
+	finalPayload, err := streaming.StreamData(
 		contextKey,
 		r.queryFunc,
 		r.filterFunc,

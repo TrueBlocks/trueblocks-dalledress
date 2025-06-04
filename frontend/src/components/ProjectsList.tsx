@@ -49,7 +49,7 @@ export const ProjectsList = () => {
     refreshProjects();
   }, []);
 
-  useEvent(msgs.EventType.MANAGER, refreshProjects);
+  useEvent(msgs.EventType.MANAGER, (_message?: string) => refreshProjects());
 
   const handleSwitchProject = async (id: string) => {
     try {

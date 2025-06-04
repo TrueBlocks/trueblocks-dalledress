@@ -8,7 +8,7 @@ import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, msgs, types } from '@models';
 import { EventsOn } from '@runtime';
-import { Log, getAddressString, useEmitters, useErrorHandler } from '@utils';
+import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import {
   ABIS_ROUTE,
@@ -19,17 +19,15 @@ import {
   removeAbi,
 } from './';
 import './Abis.css';
-import {
-  ABI_COLUMNS,
-  FUNCTION_COLUMNS,
-  KNOWN_ABI_COLUMNS,
-} from './columnDefinitions';
 
 //--------------------------------------------------------------------
 export const Abis = () => {
   const { emitStatus } = useEmitters();
   const { lastTab } = useAppContext();
   const { error, handleError, clearError } = useErrorHandler();
+
+  const renderCount = useRef(0);
+  renderCount.current++;
 
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[ABIS_ROUTE] || DEFAULT_LIST_KIND,
@@ -39,9 +37,6 @@ export const Abis = () => {
     (): TableKey => ({ viewName: ABIS_ROUTE, tabName: listKind }),
     [listKind],
   );
-
-  const renderCnt = useRef(0);
-  renderCnt.current += 1;
 
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
   const { pagination, setTotalItems } = usePagination(tableKey);
@@ -87,7 +82,8 @@ export const Abis = () => {
   useEffect(() => {
     const eventName = msgs.EventType.DATA_LOADED;
     const unlisten = EventsOn(eventName, (payload: types.DataLoadedPayload) => {
-      if (payload?.listKind == listKind && payload?.reason === 'initial') {
+      if (payload?.listKind == listKind) {
+        // && payload?.reason === 'initial') {
         fetchData();
       }
     });
@@ -159,72 +155,170 @@ export const Abis = () => {
     }
   };
 
-  const handleTableSubmit = (formData: Record<string, unknown>) => {
-    Log(`Table submitted: ${formData}`);
-  };
-
-  // Get current data for the active tab
-  const getCurrentData = useCallback(() => {
-    return pageData?.abis || pageData?.functions || [];
-  }, [pageData]);
-
-  // Get columns for the current tab kind
-  const getColumnsForKind = (
-    kind: string,
-  ): FormField<Record<string, unknown>>[] => {
-    switch (kind) {
-      case 'Downloaded':
-        return ABI_COLUMNS as unknown as FormField<Record<string, unknown>>[];
-      case 'Known':
-        return KNOWN_ABI_COLUMNS as unknown as FormField<
-          Record<string, unknown>
-        >[];
-      case 'Functions':
-      case 'Events':
-        return FUNCTION_COLUMNS as unknown as FormField<
-          Record<string, unknown>
-        >[];
-      default:
-        return ABI_COLUMNS as unknown as FormField<Record<string, unknown>>[];
-    }
-  };
-
-  // Render the main table
-  const renderTable = () => (
-    <BaseTab
-      data={getCurrentData() as unknown as Record<string, unknown>[]}
-      columns={getColumnsForKind(pageData?.kind || 'Downloaded')}
-      loading={!!pageData?.isLoading}
-      error={error}
-      onSubmit={handleTableSubmit}
-      tableKey={tableKey}
-    />
+  const handleTableSubmit = useCallback(
+    (_formData: Record<string, unknown>) => {
+      // Log(`Table submitted: ${formData}`);
+    },
+    [],
   );
 
-  // Create tab config for TabView
-  const createOneTab = (listKind: types.ListKind) => ({
-    label: listKind,
-    value: listKind,
-    content: renderTable(),
-  });
+  // Get current data for the active tab
+  const currentData = useMemo(() => {
+    return pageData?.abis || pageData?.functions || [];
+  }, [pageData?.abis, pageData?.functions]);
 
-  const tabs = [
-    createOneTab(types.ListKind.DOWNLOADED),
-    createOneTab(types.ListKind.KNOWN),
-    createOneTab(types.ListKind.FUNCTIONS),
-    createOneTab(types.ListKind.EVENTS),
-  ];
+  const getColumnsForKind = useCallback(
+    (listKind: types.ListKind): FormField<Record<string, unknown>>[] => {
+      switch (listKind) {
+        case 'Functions':
+        case 'Events':
+          return getFunctionColumns();
+        case 'Known':
+          return getAbisColumns().filter((col) => {
+            const skip = col.key !== 'address';
+            return skip;
+          });
+        case 'Downloaded':
+        // fallthrough intended
+        default:
+          return getAbisColumns();
+      }
+    },
+    [],
+  );
+
+  const currentColumns = useMemo(
+    () => getColumnsForKind(pageData?.kind || types.ListKind.DOWNLOADED),
+    [pageData?.kind, getColumnsForKind],
+  );
+
+  const memoizedTable = useMemo(
+    () => (
+      <BaseTab
+        data={currentData as unknown as Record<string, unknown>[]}
+        columns={currentColumns}
+        loading={!!pageData?.isLoading}
+        error={error}
+        onSubmit={handleTableSubmit}
+        tableKey={tableKey}
+      />
+    ),
+    [
+      currentData,
+      currentColumns,
+      pageData?.isLoading,
+      error,
+      handleTableSubmit,
+      tableKey,
+    ],
+  );
+
+  const tabs = useMemo(
+    () => [
+      {
+        label: types.ListKind.DOWNLOADED,
+        value: types.ListKind.DOWNLOADED,
+        content: memoizedTable,
+      },
+      {
+        label: types.ListKind.KNOWN,
+        value: types.ListKind.KNOWN,
+        content: memoizedTable,
+      },
+      {
+        label: types.ListKind.FUNCTIONS,
+        value: types.ListKind.FUNCTIONS,
+        content: memoizedTable,
+      },
+      {
+        label: types.ListKind.EVENTS,
+        value: types.ListKind.EVENTS,
+        content: memoizedTable,
+      },
+    ],
+    [memoizedTable],
+  );
 
   return (
     <div className="abisView">
       <TabView tabs={tabs} route={ABIS_ROUTE} />
       {error && (
-        <div className="error-message-placeholder">
+        <div>
           <h3>{`Error fetching ${listKind}`}</h3>
           <p>{error.message}</p>
         </div>
       )}
-      <div>{`renderCnt: ${renderCnt.current}`}</div>
+      <div>{`renderCnt: ${renderCount.current}`}</div>
     </div>
   );
 };
+
+const getAbisColumns = (): FormField[] => [
+  {
+    key: 'address',
+    header: 'Address',
+    sortable: true,
+    type: 'text',
+  },
+  {
+    key: 'name',
+    header: 'Name',
+    sortable: true,
+    type: 'text',
+  },
+  {
+    key: 'fileSize',
+    header: 'File Size',
+    sortable: true,
+    type: 'number',
+  },
+  {
+    key: 'nFunctions',
+    header: 'Functions',
+    sortable: true,
+    type: 'number',
+  },
+  {
+    key: 'nEvents',
+    header: 'Events',
+    sortable: true,
+    type: 'number',
+  },
+  {
+    key: 'nErrors',
+    header: 'Errors',
+    sortable: true,
+    type: 'number',
+  },
+];
+
+const getFunctionColumns = (): FormField[] => [
+  {
+    key: 'encoding',
+    header: 'Encoding',
+    type: 'text',
+    sortable: true,
+    width: 'col-encoding',
+  },
+  {
+    key: 'name',
+    header: 'Name',
+    type: 'text',
+    sortable: true,
+    width: 'col-name',
+  },
+  {
+    key: 'type',
+    header: 'Type',
+    type: 'text',
+    sortable: true,
+    width: 'col-type',
+  },
+  {
+    key: 'signature',
+    header: 'Signature',
+    type: 'text',
+    sortable: true,
+    width: 'col-signature',
+  },
+];

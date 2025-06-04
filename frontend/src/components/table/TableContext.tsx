@@ -3,6 +3,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -46,14 +47,25 @@ export const TableProvider = ({ children }: { children: ReactNode }) => {
     setFocusState('controls');
   }, []);
 
-  const value: TableContextProps = {
-    focusState,
-    selectedRowIndex,
-    tableRef,
-    setSelectedRowIndex,
-    focusTable,
-    focusControls,
-  };
+  const value: TableContextProps = useMemo(
+    () => ({
+      focusState,
+      selectedRowIndex,
+      tableRef,
+      setSelectedRowIndex,
+      focusTable,
+      focusControls,
+    }),
+    [
+      focusState,
+      selectedRowIndex,
+      tableRef,
+      setSelectedRowIndex,
+      focusTable,
+      focusControls,
+    ],
+  );
+
   return (
     <TableContext.Provider value={value}>{children}</TableContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { IsInitialized, SetChain, SetInitialized, SetUserInfo } from '@app';
 import { preferences } from '@models';
@@ -140,15 +140,28 @@ export const useWizardState = () => {
     loadInitialData();
   }, [loadInitialData]);
 
-  return {
-    state,
-    updateData,
-    updateValidation,
-    updateUI,
-    updateAPI,
-    loadInitialData,
-    submitUserInfo,
-    submitChainInfo,
-    completeWizard,
-  };
+  return useMemo(
+    () => ({
+      state,
+      updateData,
+      updateValidation,
+      updateUI,
+      updateAPI,
+      loadInitialData,
+      submitUserInfo,
+      submitChainInfo,
+      completeWizard,
+    }),
+    [
+      state,
+      updateData,
+      updateValidation,
+      updateUI,
+      updateAPI,
+      loadInitialData,
+      submitUserInfo,
+      submitChainInfo,
+      completeWizard,
+    ],
+  );
 };

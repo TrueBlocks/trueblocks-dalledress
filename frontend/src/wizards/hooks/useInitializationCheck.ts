@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { GetUserInfoStatus } from '@app';
 import { useAppContext } from '@contexts';
@@ -40,7 +40,7 @@ export const useInitializationCheck = (
     return () => clearInterval(interval);
   }, [state.ui.initialLoading, isWizard, navigate, state.api]);
 
-  const verifyCompletionStep = async () => {
+  const verifyCompletionStep = useCallback(async () => {
     if (state.ui.activeStep === 2 && !state.ui.initialLoading) {
       try {
         const wizardState = await GetUserInfoStatus();
@@ -56,9 +56,12 @@ export const useInitializationCheck = (
       }
     }
     return state.ui.activeStep;
-  };
+  }, [state.ui.activeStep, state.ui.initialLoading]);
 
-  return {
-    verifyCompletionStep,
-  };
+  return useMemo(
+    () => ({
+      verifyCompletionStep,
+    }),
+    [verifyCompletionStep],
+  );
 };

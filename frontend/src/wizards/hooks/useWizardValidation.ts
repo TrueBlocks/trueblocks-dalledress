@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { WizardState, WizardValidationErrors } from '../WizardTypes';
 
@@ -84,10 +84,13 @@ export const useWizardValidation = (
     return nameValid && emailValid;
   }, [validateName, validateEmail]);
 
-  return {
-    validateName,
-    validateEmail,
-    validateRpc,
-    validateUserInfo,
-  };
+  return useMemo(
+    () => ({
+      validateName,
+      validateEmail,
+      validateRpc,
+      validateUserInfo,
+    }),
+    [validateName, validateEmail, validateRpc, validateUserInfo],
+  );
 };

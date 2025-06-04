@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useTableContext } from '@components';
 import { TableKey } from '@contexts';
@@ -117,8 +117,11 @@ export const useTableKeys = ({
     }
   }, [focusTable]);
 
-  return {
-    handleKeyDown,
-    requestFocus,
-  };
+  return useMemo(
+    () => ({
+      handleKeyDown,
+      requestFocus,
+    }),
+    [handleKeyDown, requestFocus],
+  );
 };

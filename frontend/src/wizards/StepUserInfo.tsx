@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 
 import { GetUserPreferences } from '@app';
 import { FormField, WizardForm } from '@components';
@@ -39,42 +39,60 @@ export const StepUserInfo = ({
     }
   }, [name, email, updateData, emitStatus]);
 
-  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    if (updateData) {
-      updateData({ name: newValue });
-    }
-  };
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    if (updateData) {
-      updateData({ email: newValue });
-    }
-  };
-
-  const formFields: FormField<WizardStateData>[] = [
-    {
-      name: 'name',
-      value: name,
-      label: 'Name',
-      placeholder: 'Enter your name',
-      required: true,
-      error: nameError,
-      onChange: handleNameChange,
-      onBlur: validateName,
+  const handleNameChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      if (updateData) {
+        updateData({ name: newValue });
+      }
     },
-    {
-      name: 'email',
-      value: email,
-      label: 'Email',
-      placeholder: 'Enter your email',
-      required: true,
-      error: emailError,
-      onChange: handleEmailChange,
-      onBlur: validateEmail,
+    [updateData],
+  );
+
+  const handleEmailChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      if (updateData) {
+        updateData({ email: newValue });
+      }
     },
-  ];
+    [updateData],
+  );
+
+  const formFields: FormField<WizardStateData>[] = useMemo(
+    () => [
+      {
+        name: 'name',
+        value: name,
+        label: 'Name',
+        placeholder: 'Enter your name',
+        required: true,
+        error: nameError,
+        onChange: handleNameChange,
+        onBlur: validateName,
+      },
+      {
+        name: 'email',
+        value: email,
+        label: 'Email',
+        placeholder: 'Enter your email',
+        required: true,
+        error: emailError,
+        onChange: handleEmailChange,
+        onBlur: validateEmail,
+      },
+    ],
+    [
+      name,
+      email,
+      nameError,
+      emailError,
+      handleNameChange,
+      handleEmailChange,
+      validateName,
+      validateEmail,
+    ],
+  );
 
   return (
     <WizardForm<WizardStateData>

@@ -1,3 +1,5 @@
+import { useCallback, useMemo } from 'react';
+
 import { WizardState, WizardUIState } from '..';
 
 export const useWizardNavigation = (
@@ -6,13 +8,16 @@ export const useWizardNavigation = (
 ) => {
   const { activeStep } = state.ui;
 
-  const goToPreviousStep = () => {
+  const goToPreviousStep = useCallback(() => {
     if (activeStep > 0) {
       updateUI({ activeStep: activeStep - 1 });
     }
-  };
+  }, [activeStep, updateUI]);
 
-  return {
-    goToPreviousStep,
-  };
+  return useMemo(
+    () => ({
+      goToPreviousStep,
+    }),
+    [goToPreviousStep],
+  );
 };

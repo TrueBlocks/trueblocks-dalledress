@@ -1,4 +1,11 @@
-import { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { GetUserPreferences, SetUserPreferences } from '@app';
 import { FormField, WizardForm } from '@components';
@@ -208,51 +215,64 @@ export const StepChainInfo = ({
     }
   };
 
-  const formFields: FormField<WizardStateData>[] = [
-    {
-      name: 'rpcUrl',
-      value: rpcUrl || '',
-      label: 'RPC URL',
-      placeholder: 'Enter your RPC endpoint',
-      required: true,
-      error: rpcError || '',
-      onChange: (e) => updateData?.({ rpcUrl: e.target.value }),
-      onBlur: validateRpc,
-    },
-    {
-      name: 'chainName',
-      value: chainName || '',
-      label: 'Chain Name',
-      placeholder: 'e.g. mainnet, gnosis',
-      required: true,
-      error: chainError || '',
-      onChange: (e) => updateData?.({ chainName: e.target.value }),
-    },
-    {
-      name: 'chainId',
-      value: chainId || '',
-      label: 'Chain ID',
-      placeholder: 'e.g. 1, 100',
-      required: true,
-      onChange: (e) => updateData?.({ chainId: e.target.value }),
-    },
-    {
-      name: 'symbol',
-      value: symbol || '',
-      label: 'Token Symbol',
-      placeholder: 'e.g. ETH, GNO',
-      required: true,
-      onChange: (e) => updateData?.({ symbol: e.target.value }),
-    },
-    {
-      name: 'remoteExplorer',
-      value: remoteExplorer || '',
-      label: 'Block Explorer URL',
-      placeholder: 'e.g. https://etherscan.io',
-      required: true,
-      onChange: (e) => updateData?.({ remoteExplorer: e.target.value }),
-    },
-  ];
+  const formFields: FormField<WizardStateData>[] = useMemo(
+    () => [
+      {
+        name: 'rpcUrl',
+        value: rpcUrl || '',
+        label: 'RPC URL',
+        placeholder: 'Enter your RPC endpoint',
+        required: true,
+        error: rpcError || '',
+        onChange: (e) => updateData?.({ rpcUrl: e.target.value }),
+        onBlur: validateRpc,
+      },
+      {
+        name: 'chainName',
+        value: chainName || '',
+        label: 'Chain Name',
+        placeholder: 'e.g. mainnet, gnosis',
+        required: true,
+        error: chainError || '',
+        onChange: (e) => updateData?.({ chainName: e.target.value }),
+      },
+      {
+        name: 'chainId',
+        value: chainId || '',
+        label: 'Chain ID',
+        placeholder: 'e.g. 1, 100',
+        required: true,
+        onChange: (e) => updateData?.({ chainId: e.target.value }),
+      },
+      {
+        name: 'symbol',
+        value: symbol || '',
+        label: 'Token Symbol',
+        placeholder: 'e.g. ETH, GNO',
+        required: true,
+        onChange: (e) => updateData?.({ symbol: e.target.value }),
+      },
+      {
+        name: 'remoteExplorer',
+        value: remoteExplorer || '',
+        label: 'Block Explorer URL',
+        placeholder: 'e.g. https://etherscan.io',
+        required: true,
+        onChange: (e) => updateData?.({ remoteExplorer: e.target.value }),
+      },
+    ],
+    [
+      rpcUrl,
+      chainName,
+      chainId,
+      symbol,
+      remoteExplorer,
+      rpcError,
+      chainError,
+      updateData,
+      validateRpc,
+    ],
+  );
 
   return (
     <WizardForm<WizardStateData>

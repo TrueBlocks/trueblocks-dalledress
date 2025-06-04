@@ -5,11 +5,11 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-func (a *App) GetNamesPage(listKind string, first, pageSize int, sortSpec sdk.SortSpec, filter string) types.NamesPage {
+func (a *App) GetNamesPage(listKind string, first, pageSize int, sortSpec sdk.SortSpec, filter string) names.NamesPage {
 	return a.names.GetPage(listKind, first, pageSize, sortSpec, filter)
 }
 

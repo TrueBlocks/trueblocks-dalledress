@@ -2,8 +2,8 @@ package app
 
 import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 )
 
 func setupTestApp() *App {
@@ -16,7 +16,7 @@ func setupTestApp() *App {
 	}
 
 	// ADD_ROUTE
-	app.names = types.NewNamesCollection()
+	app.names = names.NewNamesCollection()
 	app.abis = abis.NewAbisCollection()
 	// ADD_ROUTE
 

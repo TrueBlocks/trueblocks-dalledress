@@ -32,7 +32,7 @@
       "@utils": ["src/utils"],
       "@runtime": ["wailsjs/runtime"],
       "@app": ["wailsjs/go/app/App"],
-      "@names": ["wailsjs/go/types/NamesCollection"],
+      "@names": ["wailsjs/go/names/NamesCollection"],
       "@models": ["wailsjs/go/models"]
     }
   },

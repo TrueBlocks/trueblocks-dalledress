@@ -1,5 +1,5 @@
 // ADD_ROUTE
-package types
+package names
 
 import (
 	"testing"

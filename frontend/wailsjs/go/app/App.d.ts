@@ -9,6 +9,7 @@ import {preferences} from '../models';
 import {utils} from '../models';
 import {context} from '../models';
 import {project} from '../models';
+import {names} from '../models';
 import {app} from '../models';
 import {output} from '../models';
 
@@ -62,7 +63,7 @@ export function GetLastTab(arg1:string):Promise<types.ListKind>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
-export function GetNamesPage(arg1:string,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.NamesPage>;
+export function GetNamesPage(arg1:string,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
 export function GetNodeStatus():Promise<types.MetaData>;
 

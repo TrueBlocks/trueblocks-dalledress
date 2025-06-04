@@ -1,7 +1,7 @@
+// ADD_ROUTE
 import { GetAbisPage, Reload, RemoveAbi } from '@app';
 import { abis, sdk, types } from '@models';
 
-// Type-safe wrappers for Wails-generated backend functions
 export const getAbisPage = (
   kind: types.ListKind,
   first: number,
@@ -13,3 +13,5 @@ export const getAbisPage = (
 export const removeAbi = (address: string): Promise<void> => RemoveAbi(address);
 
 export const reload = (): Promise<void> => Reload();
+
+// ADD_ROUTE

@@ -1,12 +1,9 @@
+// ADD_ROUTE
 import { types } from '@models';
 
-// Default list kind when component first loads
-export const DEFAULT_LIST_KIND = types.ListKind.DOWNLOADED;
-
-// Default tab route
 export const ABIS_ROUTE = '/abis';
+export const ABIS_DEFAULT_LIST = types.ListKind.DOWNLOADED;
 
-// Action messages for UI feedback
 export const ACTION_MESSAGES = {
   RELOAD_STATUS: 'Reloaded ABI data. Fetching fresh data...',
   DELETE_SUCCESS: (address: string) =>
@@ -14,3 +11,5 @@ export const ACTION_MESSAGES = {
   DELETE_FAILURE: (address: string, error: string) =>
     `Failed to delete address ${address}: ${error}`,
 } as const;
+
+// ADD_ROUTE

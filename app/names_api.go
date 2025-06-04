@@ -15,7 +15,7 @@ func (a *App) GetNamesPage(listKind string, first, pageSize int, sortSpec sdk.So
 
 func (a *App) UpdateName(nameToEdit *coreTypes.Name) error {
 	if err := a.ModifyName("update", nameToEdit); err != nil {
-		msgs.EmitError("UpdateName", err)
+		msgs.EmitMessage(msgs.EventError, "UpdateName: "+err.Error())
 		return err
 	}
 	return nil
@@ -24,7 +24,7 @@ func (a *App) UpdateName(nameToEdit *coreTypes.Name) error {
 func (a *App) DeleteName(address string) error {
 	nameToEdit := &coreTypes.Name{Address: base.HexToAddress(address)}
 	if err := a.ModifyName("delete", nameToEdit); err != nil {
-		msgs.EmitError("DeleteName", err)
+		msgs.EmitMessage(msgs.EventError, "DeleteName: "+err.Error())
 		return err
 	}
 	return nil
@@ -33,7 +33,7 @@ func (a *App) DeleteName(address string) error {
 func (a *App) UndeleteName(address string) error {
 	nameToEdit := &coreTypes.Name{Address: base.HexToAddress(address)}
 	if err := a.ModifyName("undelete", nameToEdit); err != nil {
-		msgs.EmitError("UndeleteName", err)
+		msgs.EmitMessage(msgs.EventError, "UndeleteName: "+err.Error())
 		return err
 	}
 	return nil
@@ -42,7 +42,7 @@ func (a *App) UndeleteName(address string) error {
 func (a *App) RemoveName(address string) error {
 	nameToEdit := &coreTypes.Name{Address: base.HexToAddress(address)}
 	if err := a.ModifyName("remove", nameToEdit); err != nil {
-		msgs.EmitError("RemoveName", err)
+		msgs.EmitMessage(msgs.EventError, "RemoveName: "+err.Error())
 		return err
 	}
 	return nil
@@ -51,7 +51,7 @@ func (a *App) RemoveName(address string) error {
 func (a *App) AutonameName(address string) error {
 	nameToEdit := &coreTypes.Name{Address: base.HexToAddress(address)}
 	if err := a.ModifyName("autoname", nameToEdit); err != nil {
-		msgs.EmitError("AutonameName", err)
+		msgs.EmitMessage(msgs.EventError, "AutonameName: "+err.Error())
 		return err
 	}
 	return nil
@@ -65,7 +65,7 @@ func (a *App) CleanNames(tabName string) error {
 	// 	Clean: true,
 	// }
 	// if _, _, err := opts.CleanNames(); err != nil {
-	// 	msgs.EmitError("CleanNames", err)
+	// 	msgs.EmitMessage(msgs.EventError, "CleanNames: "+err.Error())
 	// 	return err
 	// }
 	return nil
@@ -79,7 +79,7 @@ func (a *App) PublishNames(tabName string) error {
 	// 	Publish: true,
 	// }
 	// if _, _, err := opts.PublishNames(); err != nil {
-	// 	msgs.EmitError("PublishNames", err)
+	// 	msgs.EmitMessage(msgs.EventError, "PublishNames: "+err.Error())
 	// 	return err
 	// }
 	return nil

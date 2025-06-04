@@ -32,7 +32,7 @@ func (a *App) ModifyName(operation string, nameToModify *coreTypes.Name) error {
 	opts.Globals.Chain = "mainnet" // namesChain
 
 	if _, _, err := opts.ModifyName(op, cd); err != nil {
-		msgs.EmitError("ModifyName", err)
+		msgs.EmitMessage(msgs.EventError, "ModifyName"+err.Error())
 		return err
 	}
 

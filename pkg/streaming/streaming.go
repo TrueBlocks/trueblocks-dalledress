@@ -94,7 +94,7 @@ func LoadStreamingData[T any](
 					if *expectedCount > 0 {
 						statusMsg = fmt.Sprintf("Loading %s: %d of %d processed.", listKind, len(*targetSlice), *expectedCount)
 					}
-					msgs.EmitStatus(statusMsg)
+					msgs.EmitMessage(msgs.EventStatus, statusMsg)
 					m.RUnlock()
 				}
 			}
@@ -104,7 +104,7 @@ func LoadStreamingData[T any](
 				errorChanClosed = true
 				continue
 			}
-			msgs.EmitError("LoadStreamingData: streaming error", streamErr)
+			msgs.EmitMessage(msgs.EventError, "LoadStreamingData: streaming error: "+streamErr.Error())
 
 		case <-done:
 			// Stream initialization completed

@@ -128,19 +128,19 @@ func (a *App) Startup(ctx context.Context) {
 
 	org, err := preferences.GetOrgPreferences()
 	if err != nil {
-		msgs.EmitError("Loading org preferences failed", err)
+		msgs.EmitMessage(msgs.EventError, "Loading org preferences failed: "+err.Error())
 		return
 	}
 
 	user, err := preferences.GetUserPreferences()
 	if err != nil {
-		msgs.EmitError("Loading user preferences failed", err)
+		msgs.EmitMessage(msgs.EventError, "Loading user preferences failed: "+err.Error())
 		return
 	}
 
 	appPrefs, err := preferences.GetAppPreferences()
 	if err != nil {
-		msgs.EmitError("Loading app preferences failed", err)
+		msgs.EmitMessage(msgs.EventError, "Loading app preferences failed: "+err.Error())
 		return
 	}
 
@@ -150,7 +150,7 @@ func (a *App) Startup(ctx context.Context) {
 
 	a.fileServer = fileserver.NewFileServer()
 	if err := a.fileServer.Start(); err != nil {
-		msgs.EmitError("Failed to start file server", err)
+		msgs.EmitMessage(msgs.EventError, "Failed to start file server: "+err.Error())
 	}
 	go a.watchImagesDir()
 
@@ -159,7 +159,7 @@ func (a *App) Startup(ctx context.Context) {
 		if file.FileExists(mostRecentPath) {
 			_, err := a.Projects.Open(mostRecentPath)
 			if err != nil {
-				msgs.EmitError("Failed to open recent project", err)
+				msgs.EmitMessage(msgs.EventError, "Failed to open recent project: "+err.Error())
 			}
 		}
 	}
@@ -170,7 +170,7 @@ func (a *App) DomReady(ctx context.Context) {
 	if a.IsReady() {
 		// ADD_ROUTE
 		if err := a.names.LoadNames(nil); err != nil {
-			msgs.EmitError("Failed to load names database", err)
+			msgs.EmitMessage(msgs.EventError, "Failed to load names database: "+err.Error())
 		}
 		// ADD_ROUTE
 

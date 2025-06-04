@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BaseTab, usePagination } from '@components';
-import type { FormField } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -11,39 +10,41 @@ import { EventsOn } from '@runtime';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import {
+  ABIS_DEFAULT_LIST,
   ABIS_ROUTE,
   ACTION_MESSAGES,
-  DEFAULT_LIST_KIND,
   getAbisPage,
+  getColumns,
   reload,
   removeAbi,
 } from './';
-import './Abis.css';
 
-//--------------------------------------------------------------------
 export const Abis = () => {
-  const { emitStatus } = useEmitters();
   const { lastTab } = useAppContext();
-  const { error, handleError, clearError } = useErrorHandler();
-
-  const renderCount = useRef(0);
-  renderCount.current++;
+  const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
 
   const [listKind, setListKind] = useState<types.ListKind>(
-    lastTab[ABIS_ROUTE] || DEFAULT_LIST_KIND,
+    lastTab[ABIS_ROUTE] || ABIS_DEFAULT_LIST,
   );
-  const listKindRef = useRef(listKind);
   const tableKey = useMemo(
     (): TableKey => ({ viewName: ABIS_ROUTE, tabName: listKind }),
     [listKind],
   );
 
-  const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
+  const { error, handleError, clearError } = useErrorHandler();
   const { pagination, setTotalItems } = usePagination(tableKey);
   const { sort } = useSorting(tableKey);
   const { filter } = useFiltering(tableKey);
+  const { emitStatus } = useEmitters();
 
-  // Fetch data from backend and update state
+  const listKindRef = useRef(listKind);
+  const renderCount = useRef(0);
+  renderCount.current++;
+
+  useEffect(() => {
+    listKindRef.current = listKind;
+  }, [listKind]);
+
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -70,34 +71,30 @@ export const Abis = () => {
     handleError,
   ]);
 
-  useEffect(() => {
-    listKindRef.current = listKind;
-  }, [listKind]);
+  const currentData = useMemo(() => {
+    return pageData?.abis || pageData?.functions || [];
+  }, [pageData?.abis, pageData?.functions]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const currentTab = lastTab[ABIS_ROUTE];
+    if (currentTab && currentTab !== listKindRef.current) {
+      setListKind(currentTab);
+    }
+  }, [lastTab]);
 
-  // Listen for backend data loaded events
   useEffect(() => {
     const eventName = msgs.EventType.DATA_LOADED;
     const unlisten = EventsOn(eventName, (payload: types.DataLoadedPayload) => {
-      if (payload?.listKind == listKind) {
-        // && payload?.reason === 'initial') {
+      if (payload?.listKind === listKind) {
         fetchData();
       }
     });
+    fetchData(); // Initial fetch
+
     return () => {
       if (typeof unlisten === 'function') unlisten();
     };
   }, [fetchData, listKind]);
-
-  useEffect(() => {
-    const currentTabLabel = lastTab[ABIS_ROUTE];
-    if (currentTabLabel && currentTabLabel !== listKindRef.current) {
-      setListKind(currentTabLabel);
-    }
-  }, [lastTab]);
 
   useHotkeys([
     [
@@ -105,7 +102,6 @@ export const Abis = () => {
       () => {
         reload().then(() => {
           fetchData();
-          emitStatus(ACTION_MESSAGES.RELOAD_STATUS);
         });
       },
     ],
@@ -155,51 +151,23 @@ export const Abis = () => {
     }
   };
 
-  const handleTableSubmit = useCallback(
-    (_formData: Record<string, unknown>) => {
-      // Log(`Table submitted: ${formData}`);
-    },
-    [],
-  );
-
-  // Get current data for the active tab
-  const currentData = useMemo(() => {
-    return pageData?.abis || pageData?.functions || [];
-  }, [pageData?.abis, pageData?.functions]);
-
-  const getColumnsForKind = useCallback(
-    (listKind: types.ListKind): FormField<Record<string, unknown>>[] => {
-      switch (listKind) {
-        case 'Functions':
-        case 'Events':
-          return getFunctionColumns();
-        case 'Known':
-          return getAbisColumns().filter((col) => {
-            const skip = col.key !== 'address';
-            return skip;
-          });
-        case 'Downloaded':
-        // fallthrough intended
-        default:
-          return getAbisColumns();
-      }
-    },
-    [],
-  );
+  const handleSubmit = useCallback((_formData: Record<string, unknown>) => {
+    // Log(`Table submitted: ${formData}`);
+  }, []);
 
   const currentColumns = useMemo(
-    () => getColumnsForKind(pageData?.kind || types.ListKind.DOWNLOADED),
-    [pageData?.kind, getColumnsForKind],
+    () => getColumns(pageData?.kind || ABIS_DEFAULT_LIST),
+    [pageData?.kind],
   );
 
-  const memoizedTable = useMemo(
+  const perTabTable = useMemo(
     () => (
       <BaseTab
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
         loading={!!pageData?.isLoading}
         error={error}
-        onSubmit={handleTableSubmit}
+        onSubmit={handleSubmit}
         tableKey={tableKey}
       />
     ),
@@ -208,7 +176,7 @@ export const Abis = () => {
       currentColumns,
       pageData?.isLoading,
       error,
-      handleTableSubmit,
+      handleSubmit,
       tableKey,
     ],
   );
@@ -218,29 +186,29 @@ export const Abis = () => {
       {
         label: types.ListKind.DOWNLOADED,
         value: types.ListKind.DOWNLOADED,
-        content: memoizedTable,
+        content: perTabTable,
       },
       {
         label: types.ListKind.KNOWN,
         value: types.ListKind.KNOWN,
-        content: memoizedTable,
+        content: perTabTable,
       },
       {
         label: types.ListKind.FUNCTIONS,
         value: types.ListKind.FUNCTIONS,
-        content: memoizedTable,
+        content: perTabTable,
       },
       {
         label: types.ListKind.EVENTS,
         value: types.ListKind.EVENTS,
-        content: memoizedTable,
+        content: perTabTable,
       },
     ],
-    [memoizedTable],
+    [perTabTable],
   );
 
   return (
-    <div className="abisView">
+    <div className="mainView">
       <TabView tabs={tabs} route={ABIS_ROUTE} />
       {error && (
         <div>
@@ -253,72 +221,4 @@ export const Abis = () => {
   );
 };
 
-const getAbisColumns = (): FormField[] => [
-  {
-    key: 'address',
-    header: 'Address',
-    sortable: true,
-    type: 'text',
-  },
-  {
-    key: 'name',
-    header: 'Name',
-    sortable: true,
-    type: 'text',
-  },
-  {
-    key: 'fileSize',
-    header: 'File Size',
-    sortable: true,
-    type: 'number',
-  },
-  {
-    key: 'nFunctions',
-    header: 'Functions',
-    sortable: true,
-    type: 'number',
-  },
-  {
-    key: 'nEvents',
-    header: 'Events',
-    sortable: true,
-    type: 'number',
-  },
-  {
-    key: 'nErrors',
-    header: 'Errors',
-    sortable: true,
-    type: 'number',
-  },
-];
-
-const getFunctionColumns = (): FormField[] => [
-  {
-    key: 'encoding',
-    header: 'Encoding',
-    type: 'text',
-    sortable: true,
-    width: 'col-encoding',
-  },
-  {
-    key: 'name',
-    header: 'Name',
-    type: 'text',
-    sortable: true,
-    width: 'col-name',
-  },
-  {
-    key: 'type',
-    header: 'Type',
-    type: 'text',
-    sortable: true,
-    width: 'col-type',
-  },
-  {
-    key: 'signature',
-    header: 'Signature',
-    type: 'text',
-    sortable: true,
-    width: 'col-signature',
-  },
-];
+// ADD_ROUTE

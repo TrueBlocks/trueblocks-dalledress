@@ -746,7 +746,7 @@ export const Names = () => {
   ];
 
   return (
-    <div className="table-tab-view">
+    <div className="mainView">
       <TabView tabs={tabs} route="/names" />
     </div>
   );

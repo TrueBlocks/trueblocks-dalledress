@@ -6,6 +6,8 @@ import { AppShell } from '@mantine/core';
 import { MenuItem, MenuItems } from 'src/Menu';
 import { Route } from 'wouter';
 
+import './MainView.css';
+
 function isComponentMenuItem(
   item: MenuItem,
 ): item is MenuItem & { component: React.ComponentType } {

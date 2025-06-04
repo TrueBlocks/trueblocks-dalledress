@@ -145,11 +145,11 @@
   outline: none;
 }
 
-.table-tab-view .mantine-Tabs-tabsList {
+.mainView .mantine-Tabs-tabsList {
   margin-bottom: 0;
 }
 
-.table-tab-view .mantine-Tabs-panel {
+.mainView .mantine-Tabs-panel {
   padding-top: 0;
 }
 

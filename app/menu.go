@@ -14,11 +14,11 @@ import (
 func (a *App) FileNew(_ *menu.CallbackData) {
 	// Simplified version without save prompts
 	if err := a.fileNew(); err != nil {
-		msgs.EmitError("File → New failed", err)
+		msgs.EmitMessage(msgs.EventError, "File → New failed: "+err.Error())
 		return
 	}
 	activeProject := a.Projects.Active()
-	msgs.EmitStatus("New file created " + activeProject.GetPath())
+	msgs.EmitMessage(msgs.EventStatus, "New file created "+activeProject.GetPath())
 }
 
 func (a *App) FileOpen(_ *menu.CallbackData) {
@@ -26,24 +26,24 @@ func (a *App) FileOpen(_ *menu.CallbackData) {
 		Title: "Open Project File",
 	})
 	if err != nil || path == "" {
-		msgs.EmitStatus("No file selected")
+		msgs.EmitMessage(msgs.EventStatus, "No file selected")
 		return
 	}
 
 	if err := a.fileOpen(path); err != nil {
-		msgs.EmitError("Open failed", err)
+		msgs.EmitMessage(msgs.EventError, "Open failed: "+err.Error())
 		return
 	}
 
-	msgs.EmitStatus("File opened")
+	msgs.EmitMessage(msgs.EventStatus, "File opened")
 }
 
 func (a *App) FileSave(_ *menu.CallbackData) {
 	if err := a.fileSave(); err != nil {
-		msgs.EmitError("Save failed", err)
+		msgs.EmitMessage(msgs.EventError, "Save failed: "+err.Error())
 		return
 	}
-	msgs.EmitStatus("File saved")
+	msgs.EmitMessage(msgs.EventStatus, "File saved")
 }
 
 func (a *App) FileSaveAs(_ *menu.CallbackData) {
@@ -51,16 +51,16 @@ func (a *App) FileSaveAs(_ *menu.CallbackData) {
 		Title: "Save Project As",
 	})
 	if err != nil || path == "" {
-		msgs.EmitStatus("Save As canceled")
+		msgs.EmitMessage(msgs.EventStatus, "Save As canceled")
 		return
 	}
 
 	if err := a.fileSaveAs(path, true); err != nil {
-		msgs.EmitError("Save As failed", err)
+		msgs.EmitMessage(msgs.EventError, "Save As failed: "+err.Error())
 		return
 	}
 
-	msgs.EmitStatus("File saved as")
+	msgs.EmitMessage(msgs.EventStatus, "File saved as")
 }
 
 func (a *App) FileQuit(_ *menu.CallbackData) {
@@ -72,14 +72,14 @@ func (a *App) FileQuit(_ *menu.CallbackData) {
 		})
 
 		if err != nil {
-			msgs.EmitError("Dialog error", err)
+			msgs.EmitMessage(msgs.EventError, "Dialog error: "+err.Error())
 			return
 		}
 
 		switch response {
 		case "Yes":
 			if err := a.fileSave(); err != nil {
-				msgs.EmitError("Save failed", err)
+				msgs.EmitMessage(msgs.EventError, "Save failed: "+err.Error())
 				return // Don't quit if save fails
 			}
 			// Continue to quit after successful save
@@ -88,7 +88,7 @@ func (a *App) FileQuit(_ *menu.CallbackData) {
 		}
 	}
 
-	msgs.EmitStatus("Quitting application")
+	msgs.EmitMessage(msgs.EventStatus, "Quitting application")
 	os.Exit(0)
 }
 

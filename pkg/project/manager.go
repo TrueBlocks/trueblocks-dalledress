@@ -63,7 +63,7 @@ func (m *Manager) SetActive(id string) error {
 	}
 
 	m.ActiveID = id
-	msgs.EmitManager(ProjectActivated)
+	msgs.EmitMessage(msgs.EventManager, ProjectActivated)
 	return nil
 }
 
@@ -87,7 +87,7 @@ func (m *Manager) New(name string) *Project {
 	id := name
 	m.OpenProjects[id] = project
 	m.ActiveID = id
-	msgs.EmitManager(ProjectCreated)
+	msgs.EmitMessage(msgs.EventManager, ProjectCreated)
 	return project
 }
 
@@ -96,7 +96,7 @@ func (m *Manager) Open(path string) (*Project, error) {
 	for id, proj := range m.OpenProjects {
 		if proj.Path == path {
 			m.ActiveID = id
-			msgs.EmitManager(ProjectSwitched)
+			msgs.EmitMessage(msgs.EventManager, ProjectSwitched)
 			return proj, nil
 		}
 	}
@@ -112,7 +112,7 @@ func (m *Manager) Open(path string) (*Project, error) {
 
 	project.LastOpened = time.Now().Format(time.RFC3339)
 
-	msgs.EmitManager(ProjectOpened)
+	msgs.EmitMessage(msgs.EventManager, ProjectOpened)
 	return project, nil
 }
 
@@ -134,7 +134,7 @@ func (m *Manager) Close(id string) error {
 		}
 	}
 
-	msgs.EmitManager(ProjectClosed)
+	msgs.EmitMessage(msgs.EventManager, ProjectClosed)
 	return nil
 }
 
@@ -142,7 +142,7 @@ func (m *Manager) Close(id string) error {
 func (m *Manager) CloseAll() {
 	m.OpenProjects = make(map[string]*Project)
 	m.ActiveID = ""
-	msgs.EmitManager(AllProjectsClosed)
+	msgs.EmitMessage(msgs.EventManager, AllProjectsClosed)
 }
 
 // SaveActive saves the currently active project
@@ -159,9 +159,9 @@ func (m *Manager) SaveActive() error {
 
 	err := project.Save()
 	if err == nil {
-		msgs.EmitManager(ProjectSaved)
+		msgs.EmitMessage(msgs.EventManager, ProjectSaved)
 	} else {
-		msgs.EmitError("Save project", err)
+		msgs.EmitMessage(msgs.EventError, "Save project: "+err.Error())
 	}
 	return err
 }
@@ -185,18 +185,18 @@ func (m *Manager) SaveActiveAs(path string) error {
 		}
 
 		if err == nil {
-			msgs.EmitManager(ProjectSavedAs)
+			msgs.EmitMessage(msgs.EventManager, ProjectSavedAs)
 		} else {
-			msgs.EmitError("Save project as", err)
+			msgs.EmitMessage(msgs.EventError, "Save project as: "+err.Error())
 		}
 		return err
 	}
 
 	err := project.SaveAs(path)
 	if err == nil {
-		msgs.EmitManager(ProjectSavedAs)
+		msgs.EmitMessage(msgs.EventManager, ProjectSavedAs)
 	} else {
-		msgs.EmitError("Save project as", err)
+		msgs.EmitMessage(msgs.EventError, "Save project as: "+err.Error())
 	}
 	return err
 }

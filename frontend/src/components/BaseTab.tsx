@@ -2,6 +2,8 @@ import React from 'react';
 
 import { FormField, Table, TableProvider } from '@components';
 
+import './BaseTab.css';
+
 interface BaseTabProps<T extends Record<string, unknown>> {
   data: T[];
   columns: FormField<T>[];

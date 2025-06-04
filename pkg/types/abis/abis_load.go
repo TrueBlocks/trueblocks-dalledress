@@ -36,7 +36,7 @@ func (ac *AbisCollection) loadDownloadedAbis() {
 		logging.LogError("AbisCollection.loadDownloadedAbis: %v", err, repository.ErrorAlreadyLoading)
 		return
 	}
-	msgs.EmitStatus(result.Status)
+	msgs.EmitMessage(msgs.EventStatus, result.Status)
 	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 
@@ -46,7 +46,7 @@ func (ac *AbisCollection) loadKnownAbis() {
 		logging.LogError("AbisCollection.loadKnownAbis: %v", err, repository.ErrorAlreadyLoading)
 		return
 	}
-	msgs.EmitStatus(result.Status)
+	msgs.EmitMessage(msgs.EventStatus, result.Status)
 	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 
@@ -56,7 +56,7 @@ func (ac *AbisCollection) loadFunctions() {
 		logging.LogError("AbisCollection.loadFunctions: %v", err, repository.ErrorAlreadyLoading)
 		return
 	}
-	msgs.EmitStatus(result.Status)
+	msgs.EmitMessage(msgs.EventStatus, result.Status)
 	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 
@@ -66,7 +66,7 @@ func (ac *AbisCollection) loadEvents() {
 		logging.LogError("AbisCollection.loadEvents: %v", err, repository.ErrorAlreadyLoading)
 		return
 	}
-	msgs.EmitStatus(result.Status)
+	msgs.EmitMessage(msgs.EventStatus, result.Status)
 	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 

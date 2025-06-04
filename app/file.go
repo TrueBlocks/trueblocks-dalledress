@@ -106,7 +106,7 @@ func (a *App) updateRecentProjects() {
 	path := activeProject.GetPath()
 
 	if err := a.Preferences.AddRecentProject(path); err != nil {
-		msgs.EmitError("add recent project failed", err)
+		msgs.EmitMessage(msgs.EventError, "add recent project failed: "+err.Error())
 		return
 	}
 

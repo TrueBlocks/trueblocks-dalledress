@@ -5,4 +5,5 @@ type DataLoadedPayload struct {
 	ExpectedTotal int      `json:"expectedTotal"`
 	IsLoaded      bool     `json:"isLoaded"`
 	ListKind      ListKind `json:"listKind,omitempty"`
+	Reason        string   `json:"reason,omitempty"`
 }

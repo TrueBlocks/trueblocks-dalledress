@@ -30,7 +30,8 @@ var defaultEmitter EventEmitter = func(messageType EventType, msgText string, op
 	contextMutex.RUnlock()
 
 	if ctx != nil {
-		runtime.EventsEmit(ctx, string(messageType), msgText, optionalPayload)
+		msg := string(messageType) + ": " + msgText
+		runtime.EventsEmit(ctx, msg, optionalPayload...)
 	}
 }
 
@@ -56,9 +57,12 @@ func DisableLogging() {
 }
 
 // EmitPayload emits a message using the stored context
-func EmitPayload(messageType EventType, payload ...interface{}) {
-	if currentEmitter != nil {
-		currentEmitter(messageType, "payload", payload...)
+func EmitPayload(messageType EventType, payload interface{}) {
+	contextMutex.RLock()
+	ctx := wailsContext
+	contextMutex.RUnlock()
+	if ctx != nil {
+		runtime.EventsEmit(ctx, string(messageType), payload)
 	}
 }
 

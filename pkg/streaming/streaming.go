@@ -74,14 +74,20 @@ func LoadStreamingData[T any](
 				}
 				m.Unlock()
 
-				if len(*targetSlice) == 7 || (len(*targetSlice) > 7 && len(*targetSlice)%refreshRate == 0) {
+				isFirstPage := len(*targetSlice) == 7
+				if isFirstPage || len(*targetSlice)%refreshRate == 0 {
 					m.RLock()
 					isLoaded := len(*targetSlice) >= *expectedCount
+					reason := "partial"
+					if isFirstPage {
+						reason = "initial"
+					}
 					payload := types.DataLoadedPayload{
 						CurrentCount:  len(*targetSlice),
 						ExpectedTotal: *expectedCount,
 						IsLoaded:      isLoaded,
 						ListKind:      listKind,
+						Reason:        reason,
 					}
 					msgs.EmitPayload(msgs.EventDataLoaded, payload)
 					statusMsg := fmt.Sprintf("Loading %s: %d processed.", listKind, len(*targetSlice))
@@ -115,6 +121,7 @@ func LoadStreamingData[T any](
 		CurrentCount:  len(*targetSlice),
 		ExpectedTotal: len(*targetSlice),
 		ListKind:      listKind,
+		Reason:        "final",
 	}
 
 	return finalStatus, finalPayload, nil

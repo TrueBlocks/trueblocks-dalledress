@@ -37,7 +37,7 @@ func (ac *AbisCollection) loadDownloadedAbis() {
 		return
 	}
 	msgs.EmitStatus(result.Status)
-	msgs.EmitPayload(msgs.EventDataLoaded, "", result.Payload)
+	msgs.EmitPayload(msgs.EventDataLoaded, result.Payload)
 }
 
 func (ac *AbisCollection) loadKnownAbis() {

@@ -129,6 +129,7 @@ func (r *BaseRepository[T]) getCachedResult() *StreamingResult {
 			ExpectedTotal: len(r.data),
 			IsLoaded:      true,
 			ListKind:      r.listKind,
+			Reason:        "initial",
 		},
 		Error: nil,
 	}

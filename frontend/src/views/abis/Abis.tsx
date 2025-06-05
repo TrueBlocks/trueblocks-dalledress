@@ -38,8 +38,8 @@ export const Abis = () => {
   const { emitStatus } = useEmitters();
 
   const listKindRef = useRef(listKind);
-  const renderCount = useRef(0);
-  renderCount.current++;
+  const renderCnt = useRef(0);
+  // renderCnt.current++;
 
   useEffect(() => {
     listKindRef.current = listKind;
@@ -214,7 +214,7 @@ export const Abis = () => {
           <p>{error.message}</p>
         </div>
       )}
-      <div>{`renderCnt: ${renderCount.current}`}</div>
+      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
 };

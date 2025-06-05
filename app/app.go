@@ -423,7 +423,7 @@ func (a *App) Reload() error {
 		a.abis.ClearCache(lastTab)
 		a.abis.LoadData(lastTab)
 	case "/names":
-		a.names = a.names.ReloadNames()
+		a.names = a.names.ClearCaches()
 	}
 	// ADD_ROUTE
 

@@ -9,7 +9,12 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-func (a *App) GetNamesPage(listKind string, first, pageSize int, sortSpec sdk.SortSpec, filter string) names.NamesPage {
+func (a *App) GetNamesPage(
+	listKind string,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (names.NamesPage, error) {
 	return a.names.GetPage(listKind, first, pageSize, sortSpec, filter)
 }
 

@@ -63,7 +63,7 @@ func TestGetNamesPagination(t *testing.T) {
 			{Tags: "a"}, {Tags: "b"}, {Tags: "c"}, {Tags: "d"}, {Tags: "e"},
 		},
 	}
-	page := names.GetPage("all", 1, 2, noSort, "")
+	page, _ := names.GetPage("all", 1, 2, noSort, "")
 	if page.Total != 5 {
 		t.Errorf("expected total 5, got %d", page.Total)
 	}
@@ -91,7 +91,7 @@ func TestLoadDataNoReloadIfCountsMatch(t *testing.T) {
 
 func TestGetNames_All(t *testing.T) {
 	names := makeTestNames()
-	page := names.GetPage("all", 0, 10, noSort, "")
+	page, _ := names.GetPage("all", 0, 10, noSort, "")
 	if page.Total != 4 {
 		t.Errorf("expected total 4, got %d", page.Total)
 	}
@@ -102,7 +102,7 @@ func TestGetNames_All(t *testing.T) {
 
 func TestGetNames_Custom(t *testing.T) {
 	names := makeTestNames()
-	page := names.GetPage("custom", 0, 10, noSort, "")
+	page, _ := names.GetPage("custom", 0, 10, noSort, "")
 	if page.Total != 1 {
 		t.Errorf("expected total 1, got %d", page.Total)
 	}
@@ -113,7 +113,7 @@ func TestGetNames_Custom(t *testing.T) {
 
 func TestGetNames_Paging(t *testing.T) {
 	names := makeTestNames()
-	page := names.GetPage("all", 2, 2, noSort, "")
+	page, _ := names.GetPage("all", 2, 2, noSort, "")
 	if page.Total != 4 {
 		t.Errorf("expected total 4, got %d", page.Total)
 	}
@@ -124,7 +124,7 @@ func TestGetNames_Paging(t *testing.T) {
 
 func TestGetNames_OutOfRange(t *testing.T) {
 	names := makeTestNames()
-	page := names.GetPage("all", 10, 2, noSort, "")
+	page, _ := names.GetPage("all", 10, 2, noSort, "")
 	if page.Total != 4 {
 		t.Errorf("expected total 4, got %d", page.Total)
 	}
@@ -144,37 +144,37 @@ func TestGetNames_Filtering(t *testing.T) {
 	}
 
 	// Filter by name
-	page := names.GetPage("all", 0, 10, noSort, "ali")
+	page, _ := names.GetPage("all", 0, 10, noSort, "ali")
 	if len(page.Names) != 1 || page.Names[0].Name != "Alice" {
 		t.Errorf("expected Alice, got %+v", page.Names)
 	}
 
 	// Filter by address
-	page = names.GetPage("all", 0, 10, noSort, "0x2")
+	page, _ = names.GetPage("all", 0, 10, noSort, "0x2")
 	if len(page.Names) != 1 || page.Names[0].Name != "Bob" {
 		t.Errorf("expected Bob, got %+v", page.Names)
 	}
 
 	// Filter by tags
-	page = names.GetPage("all", 0, 10, noSort, "regular")
+	page, _ = names.GetPage("all", 0, 10, noSort, "regular")
 	if len(page.Names) != 1 || page.Names[0].Name != "Charlie" {
 		t.Errorf("expected Charlie, got %+v", page.Names)
 	}
 
 	// Filter by source
-	page = names.GetPage("all", 0, 10, noSort, "manual")
+	page, _ = names.GetPage("all", 0, 10, noSort, "manual")
 	if len(page.Names) != 2 {
 		t.Errorf("expected 2 manual, got %+v", page.Names)
 	}
 
 	// Case-insensitive
-	page = names.GetPage("all", 0, 10, noSort, "ALICE")
+	page, _ = names.GetPage("all", 0, 10, noSort, "ALICE")
 	if len(page.Names) != 1 || page.Names[0].Name != "Alice" {
 		t.Errorf("expected Alice (case-insensitive), got %+v", page.Names)
 	}
 
 	// Empty filter returns all
-	page = names.GetPage("all", 0, 10, noSort, "")
+	page, _ = names.GetPage("all", 0, 10, noSort, "")
 	if len(page.Names) != 4 {
 		t.Errorf("expected all names, got %+v", page.Names)
 	}

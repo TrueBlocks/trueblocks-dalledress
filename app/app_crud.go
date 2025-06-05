@@ -36,6 +36,6 @@ func (a *App) ModifyName(operation string, nameToModify *coreTypes.Name) error {
 		return err
 	}
 
-	a.names = a.names.ReloadNames()
+	a.names = a.names.ClearCaches()
 	return nil
 }

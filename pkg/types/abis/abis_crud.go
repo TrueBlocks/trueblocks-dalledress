@@ -4,6 +4,7 @@ package abis
 import (
 	"fmt"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
@@ -11,9 +12,9 @@ import (
 )
 
 // Remove deletes an ABI by address from the downloadedRepo and emits status
-func (ac *AbisCollection) Remove(address string) error {
+func (ac *AbisCollection) Remove(address base.Address) error {
 	opts := sdk.AbisOptions{
-		Addrs:   []string{address},
+		Addrs:   []string{address.Hex()},
 		Globals: sdk.Globals{Decache: true},
 	}
 	if _, _, err := opts.Abis(); err != nil {
@@ -21,7 +22,7 @@ func (ac *AbisCollection) Remove(address string) error {
 	}
 
 	removed := ac.downloadedRepo.Remove(func(abi *coreTypes.Abi) bool {
-		return abi.Address.Hex() == address
+		return abi.Address == address
 	})
 
 	if removed {

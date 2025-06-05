@@ -14,8 +14,8 @@ export function GetSelectedTag(arg1) {
   return window['go']['names']['NamesCollection']['GetSelectedTag'](arg1);
 }
 
-export function LoadNames(arg1) {
-  return window['go']['names']['NamesCollection']['LoadNames'](arg1);
+export function LoadData(arg1) {
+  return window['go']['names']['NamesCollection']['LoadData'](arg1);
 }
 
 export function ReloadNames() {

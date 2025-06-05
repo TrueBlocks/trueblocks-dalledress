@@ -10,7 +10,7 @@ export function GetPage(arg1:string,arg2:number,arg3:number,arg4:sdk.SortSpec,ar
 
 export function GetSelectedTag(arg1:string):Promise<string>;
 
-export function LoadNames(arg1:sync.WaitGroup):Promise<void>;
+export function LoadData(arg1:sync.WaitGroup):Promise<void>;
 
 export function ReloadNames():Promise<names.NamesCollection>;
 

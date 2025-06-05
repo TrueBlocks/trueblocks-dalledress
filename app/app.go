@@ -170,7 +170,7 @@ func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 	if a.IsReady() {
 		// ADD_ROUTE
-		if err := a.names.LoadNames(nil); err != nil {
+		if err := a.names.LoadData(nil); err != nil {
 			msgs.EmitError("Failed to load names database", err)
 		}
 		// ADD_ROUTE

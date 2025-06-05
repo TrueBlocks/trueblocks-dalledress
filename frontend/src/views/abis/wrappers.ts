@@ -1,6 +1,6 @@
 // ADD_ROUTE
-import { GetAbisPage, Reload, RemoveAbi } from '@app';
-import { abis, sdk, types } from '@models';
+import { AbisCrudByAddr, GetAbisPage, Reload } from '@app';
+import { abis, crud, sdk, types } from '@models';
 
 export const getAbisPage = (
   kind: types.ListKind,
@@ -10,7 +10,8 @@ export const getAbisPage = (
   filter: string,
 ): Promise<abis.AbisPage> => GetAbisPage(kind, first, pageSize, sort, filter);
 
-export const removeAbi = (address: string): Promise<void> => RemoveAbi(address);
+export const removeAbi = (address: string): Promise<void> =>
+  AbisCrudByAddr(crud.Operation.REMOVE, address);
 
 export const reload = (): Promise<void> => Reload();
 

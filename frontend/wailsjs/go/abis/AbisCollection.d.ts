@@ -3,6 +3,7 @@
 import {types} from '../models';
 import {sdk} from '../models';
 import {abis} from '../models';
+import {base} from '../models';
 
 export function ClearCache(arg1:types.ListKind):Promise<void>;
 
@@ -12,4 +13,4 @@ export function LoadData(arg1:types.ListKind):Promise<void>;
 
 export function NeedsUpdate(arg1:types.ListKind):Promise<boolean>;
 
-export function Remove(arg1:string):Promise<void>;
+export function Remove(arg1:base.Address):Promise<void>;

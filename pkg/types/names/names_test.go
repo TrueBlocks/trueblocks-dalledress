@@ -75,7 +75,7 @@ func TestGetNamesPagination(t *testing.T) {
 	}
 }
 
-func TestLoadNamesNoReloadIfCountsMatch(t *testing.T) {
+func TestLoadDataNoReloadIfCountsMatch(t *testing.T) {
 	names := NamesCollection{
 		List: []*types.Name{
 			{Parts: types.Custom},
@@ -83,7 +83,7 @@ func TestLoadNamesNoReloadIfCountsMatch(t *testing.T) {
 		},
 	}
 	// Pass nil for WaitGroup to avoid negative counter panic.
-	err := names.LoadNames(nil)
+	err := names.LoadData(nil)
 	if err != nil && err.Error() != "no names found" {
 		t.Errorf("expected nil or 'no names found' error, got %v", err)
 	}

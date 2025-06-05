@@ -87,7 +87,7 @@ func (n *NamesCollection) ClearSelectedTag(key string) {
 // GetPage returns a page of names for the given list type and the total count.
 func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortSpec sdk.SortSpec, filter string) NamesPage {
 	if len(n.List) == 0 {
-		if err := n.LoadNames(nil); err != nil {
+		if err := n.LoadData(nil); err != nil {
 			return NamesPage{Names: nil, Total: 0, Tags: []string{}}
 		}
 	}
@@ -221,8 +221,8 @@ func (n *NamesCollection) GetPage(listKind string, first, pageSize int, sortSpec
 
 var namesMutex sync.Mutex
 
-// LoadNames loads the names database into the NamesCollection struct and populates all category lists.
-func (n *NamesCollection) LoadNames(wg *sync.WaitGroup) error {
+// LoadData loads the names database into the NamesCollection struct and populates all category lists.
+func (n *NamesCollection) LoadData(wg *sync.WaitGroup) error {
 	namesMutex.Lock()
 	defer func() {
 		if wg != nil {
@@ -311,7 +311,7 @@ func compare(nameI, nameJ types.Name) bool {
 
 func (n *NamesCollection) ReloadNames() NamesCollection {
 	ret := NamesCollection{selectedTags: n.selectedTags}
-	_ = ret.LoadNames(nil)
+	_ = ret.LoadData(nil)
 	return ret
 }
 

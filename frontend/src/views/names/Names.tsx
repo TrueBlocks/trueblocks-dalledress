@@ -84,6 +84,11 @@ export const Names = () => {
   // Single ref for backward compatibility
   const tagsTableRef = useRef<TagsTableHandle>(null);
 
+  // Store the openModal function for each table
+  const openModalRefs = useRef<
+    Record<string, ((data: IndexableName) => void) | null>
+  >({});
+
   const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
 
   const handleChipClick = (value: string) => {
@@ -444,9 +449,28 @@ export const Names = () => {
       }
       // Add implementations for future action types
       else if (actionType === 'edit') {
-        // For edit, we could open a form or implement inline editing
-        // For now, we'll log that this functionality needs UI implementation
-        emitStatus(`Edit functionality for ${address} needs UI implementation`);
+        const rowData = names.find((name) => {
+          const nameAddress =
+            typeof name.address === 'string'
+              ? name.address
+              : String(name.address);
+          return nameAddress === address;
+        });
+
+        if (rowData) {
+          // Find the current tab and use its openModal function
+          const currentTabLabel = lastTab['/names'] || 'Custom';
+          const openModalFn = openModalRefs.current[currentTabLabel];
+          if (openModalFn) {
+            openModalFn(rowData);
+          } else {
+            emitError(
+              `Could not find modal function for tab ${currentTabLabel}`,
+            );
+          }
+        } else {
+          emitError(`Could not find name data for address ${address}`);
+        }
       } else if (actionType === 'remove') {
         // Remove can only be performed on deleted items
         if (!isDeleted) {
@@ -696,6 +720,9 @@ export const Names = () => {
           tableKey={tableKey}
           onSubmit={handleFormSubmit}
           validate={formValidation}
+          onModalOpen={(openModal) => {
+            openModalRefs.current[tabLabel] = openModal;
+          }}
         />
       </>
     );

@@ -11,13 +11,7 @@ export function ClearSelectedTag(arg1) {
 }
 
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['names']['NamesCollection']['GetPage'](
-    arg1,
-    arg2,
-    arg3,
-    arg4,
-    arg5,
-  );
+  return window['go']['names']['NamesCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetSelectedTag(arg1) {

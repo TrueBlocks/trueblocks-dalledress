@@ -10,7 +10,7 @@ export const getAbisPage = (
   filter: string,
 ): Promise<abis.AbisPage> => GetAbisPage(kind, first, pageSize, sort, filter);
 
-export const removeAbi = (address: string): Promise<void> =>
+export const abisCrud = (address: string): Promise<void> =>
   AbisCrudByAddr(crud.Operation.REMOVE, address);
 
 export const reload = (): Promise<void> => Reload();

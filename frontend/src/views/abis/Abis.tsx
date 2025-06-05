@@ -13,10 +13,10 @@ import {
   ABIS_DEFAULT_LIST,
   ABIS_ROUTE,
   ACTION_MESSAGES,
+  abisCrud,
   getAbisPage,
   getColumns,
   reload,
-  removeAbi,
 } from './';
 
 export const Abis = () => {
@@ -121,7 +121,7 @@ export const Abis = () => {
           abis: optimisticValues,
         });
       });
-      removeAbi(address)
+      abisCrud(address)
         .then(async () => {
           const result = await getAbisPage(
             listKindRef.current,

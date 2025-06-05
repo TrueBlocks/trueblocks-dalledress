@@ -19,7 +19,7 @@ func (a *App) GetNamesPage(
 }
 
 func (a *App) NamesCrud(op crud.Operation, name *coreTypes.Name, address string) error {
-	if address != "" && name == nil {
+	if address != "" && name == nil || name.Address.IsZero() {
 		name = &coreTypes.Name{Address: base.HexToAddress(address)}
 	}
 

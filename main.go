@@ -49,6 +49,7 @@ func main() {
 		EnumBind: []interface{}{
 			msgs.AllMessages,
 			types.AllListKinds,
+			types.AllCruds,
 		},
 	}
 

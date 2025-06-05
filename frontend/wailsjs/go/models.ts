@@ -81,6 +81,19 @@ export namespace base {
 
 }
 
+export namespace crud {
+	
+	export enum Operation {
+	    CREATE = "create",
+	    UPDATE = "update",
+	    DELETE = "delete",
+	    UNDELETE = "undelete",
+	    REMOVE = "remove",
+	    AUTONAME = "autoname",
+	}
+
+}
+
 export namespace keys {
 	
 	export class Accelerator {

@@ -10,6 +10,7 @@ import { useHotkeys } from '@mantine/hooks';
 import { abis, crud, msgs, types } from '@models';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
+import { Address } from '../../types/address';
 import {
   ABIS_DEFAULT_LIST,
   ABIS_ROUTE,
@@ -106,7 +107,7 @@ export const Abis = () => {
   ]);
 
   // Optimistic delete action with proper type safety
-  const _handleAction = (address: string) => {
+  const _handleAction = (address: Address) => {
     clearError();
     try {
       const original = [...(pageData?.abis || [])];

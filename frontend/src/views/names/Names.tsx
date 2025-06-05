@@ -19,6 +19,7 @@ import { TabView } from '@layout';
 import { crud, msgs, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { Log, useEmitters } from '@utils';
+import { Address } from 'src/types/address';
 import { useLocation } from 'wouter';
 
 import './Names.css';
@@ -384,14 +385,12 @@ export const Names = () => {
   type NameActionType = 'delete' | 'edit' | 'remove' | 'autoname';
 
   const handleAction = (
-    address: string,
+    address: Address,
     isDeleted: boolean,
     actionType: NameActionType = 'delete',
   ) => {
-    const addressStr = address;
-
     // Add address to processing set
-    setProcessingAddresses((prev) => new Set(prev).add(addressStr));
+    setProcessingAddresses((prev) => new Set(prev).add(address));
 
     try {
       // Handle different action types
@@ -407,7 +406,7 @@ export const Names = () => {
               ? name.address
               : String(name.address);
 
-          return nameAddress === addressStr
+          return nameAddress === address
             ? ({ ...name, deleted: !isDeleted } as IndexableName)
             : name;
         });
@@ -416,7 +415,7 @@ export const Names = () => {
         const operation = isDeleted
           ? crud.Operation.UNDELETE
           : crud.Operation.DELETE;
-        NamesCrud(operation, {} as types.Name, addressStr)
+        NamesCrud(operation, {} as types.Name, address)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
@@ -434,7 +433,7 @@ export const Names = () => {
             setTags(result.tags || []);
 
             const action = isDeleted ? 'undeleted' : 'deleted';
-            emitStatus(`Address ${addressStr} was ${action} successfully`);
+            emitStatus(`Address ${address} was ${action} successfully`);
           })
           .catch((err) => {
             // If there's an error, revert the optimistic update
@@ -447,9 +446,7 @@ export const Names = () => {
       else if (actionType === 'edit') {
         // For edit, we could open a form or implement inline editing
         // For now, we'll log that this functionality needs UI implementation
-        emitStatus(
-          `Edit functionality for ${addressStr} needs UI implementation`,
-        );
+        emitStatus(`Edit functionality for ${address} needs UI implementation`);
       } else if (actionType === 'remove') {
         // Remove can only be performed on deleted items
         if (!isDeleted) {
@@ -467,11 +464,11 @@ export const Names = () => {
             typeof name.address === 'string'
               ? name.address
               : String(name.address);
-          return nameAddress !== addressStr;
+          return nameAddress !== address;
         });
         setNames(optimisticNames);
 
-        NamesCrud(crud.Operation.REMOVE, {} as types.Name, addressStr)
+        NamesCrud(crud.Operation.REMOVE, {} as types.Name, address)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
@@ -488,7 +485,7 @@ export const Names = () => {
             setTotalItems(result.total || 0);
             setTags(result.tags || []);
 
-            emitStatus(`Address ${addressStr} was removed successfully`);
+            emitStatus(`Address ${address} was removed successfully`);
           })
           .catch((err) => {
             // If there's an error, revert the optimistic update
@@ -508,13 +505,13 @@ export const Names = () => {
               ? name.address
               : String(name.address);
 
-          return nameAddress === addressStr
+          return nameAddress === address
             ? ({ ...name, name: 'Generating...' } as IndexableName)
             : name;
         });
         setNames(optimisticNames);
 
-        NamesCrud(crud.Operation.AUTONAME, {} as types.Name, addressStr)
+        NamesCrud(crud.Operation.AUTONAME, {} as types.Name, address)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
@@ -531,7 +528,7 @@ export const Names = () => {
             setTotalItems(result.total || 0);
             setTags(result.tags || []);
 
-            emitStatus(`Address ${addressStr} was auto-named successfully`);
+            emitStatus(`Address ${address} was auto-named successfully`);
           })
           .catch((err) => {
             // If there's an error, revert the optimistic update
@@ -544,7 +541,7 @@ export const Names = () => {
       // Always clean up the processing state
       setProcessingAddresses((prev) => {
         const newSet = new Set(prev);
-        newSet.delete(addressStr);
+        newSet.delete(address);
         return newSet;
       });
     }

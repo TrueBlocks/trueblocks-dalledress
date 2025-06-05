@@ -1,14 +1,7 @@
 // ADD_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-  AutonameName,
-  DeleteName,
-  GetNamesPage,
-  RemoveName,
-  UndeleteName,
-  UpdateName,
-} from '@app';
+import { GetNamesPage, NamesCrud } from '@app';
 import {
   Action,
   Chips,
@@ -23,7 +16,7 @@ import {
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useEvent } from '@hooks';
 import { TabView } from '@layout';
-import { msgs, types } from '@models';
+import { crud, msgs, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { Log, useEmitters } from '@utils';
 import { useLocation } from 'wouter';
@@ -354,8 +347,7 @@ export const Names = () => {
     }
     setNames(optimisticNames); // Update UI optimistically
 
-    // 3. Call UpdateName
-    UpdateName(submittedName)
+    NamesCrud(crud.Operation.UPDATE, submittedName, '')
       .then(() => {
         // 4. If UpdateName is successful, call GetNamesPage
         return GetNamesPage(
@@ -421,12 +413,10 @@ export const Names = () => {
         });
         setNames(optimisticNames);
 
-        // Determine which API to call based on current state
-        const apiCall = isDeleted
-          ? UndeleteName(addressStr)
-          : DeleteName(addressStr);
-
-        apiCall
+        const operation = isDeleted
+          ? crud.Operation.UNDELETE
+          : crud.Operation.DELETE;
+        NamesCrud(operation, {} as types.Name, addressStr)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
@@ -481,7 +471,7 @@ export const Names = () => {
         });
         setNames(optimisticNames);
 
-        RemoveName(addressStr)
+        NamesCrud(crud.Operation.REMOVE, {} as types.Name, addressStr)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
@@ -524,7 +514,7 @@ export const Names = () => {
         });
         setNames(optimisticNames);
 
-        AutonameName(addressStr)
+        NamesCrud(crud.Operation.AUTONAME, {} as types.Name, addressStr)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(

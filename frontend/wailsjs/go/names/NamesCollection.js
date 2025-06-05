@@ -10,6 +10,10 @@ export function ClearSelectedTag(arg1) {
   return window['go']['names']['NamesCollection']['ClearSelectedTag'](arg1);
 }
 
+export function Crud(arg1, arg2) {
+  return window['go']['names']['NamesCollection']['Crud'](arg1, arg2);
+}
+
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['names']['NamesCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

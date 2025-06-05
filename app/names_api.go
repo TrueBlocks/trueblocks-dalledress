@@ -3,8 +3,8 @@ package app
 
 import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -18,48 +18,12 @@ func (a *App) GetNamesPage(
 	return a.names.GetPage(listKind, first, pageSize, sortSpec, filter)
 }
 
-func (a *App) UpdateName(nameToEdit *coreTypes.Name) error {
-	if err := a.ModifyName("update", nameToEdit); err != nil {
-		msgs.EmitError("UpdateName", err)
-		return err
+func (a *App) NamesCrud(op crud.Operation, name *coreTypes.Name, address string) error {
+	if address != "" && name == nil {
+		name = &coreTypes.Name{Address: base.HexToAddress(address)}
 	}
-	return nil
-}
 
-func (a *App) DeleteName(address string) error {
-	nameToEdit := &coreTypes.Name{Address: base.HexToAddress(address)}
-	if err := a.ModifyName("delete", nameToEdit); err != nil {
-		msgs.EmitError("DeleteName", err)
-		return err
-	}
-	return nil
-}
-
-func (a *App) UndeleteName(address string) error {
-	nameToEdit := &coreTypes.Name{Address: base.HexToAddress(address)}
-	if err := a.ModifyName("undelete", nameToEdit); err != nil {
-		msgs.EmitError("UndeleteName", err)
-		return err
-	}
-	return nil
-}
-
-func (a *App) RemoveName(address string) error {
-	nameToEdit := &coreTypes.Name{Address: base.HexToAddress(address)}
-	if err := a.ModifyName("remove", nameToEdit); err != nil {
-		msgs.EmitError("RemoveName", err)
-		return err
-	}
-	return nil
-}
-
-func (a *App) AutonameName(address string) error {
-	nameToEdit := &coreTypes.Name{Address: base.HexToAddress(address)}
-	if err := a.ModifyName("autoname", nameToEdit); err != nil {
-		msgs.EmitError("AutonameName", err)
-		return err
-	}
-	return nil
+	return a.names.Crud(op, name)
 }
 
 func (a *App) CleanNames(tabName string) error {

@@ -14,13 +14,9 @@ import {names} from '../models';
 import {app} from '../models';
 import {output} from '../models';
 
-export function AbisCrud(arg1:crud.Operation,arg2:types.Abi):Promise<void>;
-
-export function AbisCrudByAddr(arg1:crud.Operation,arg2:string):Promise<void>;
+export function AbisCrud(arg1:crud.Operation,arg2:types.Abi,arg3:string):Promise<void>;
 
 export function AddrToName(arg1:base.Address):Promise<string>;
-
-export function AutonameName(arg1:string):Promise<void>;
 
 export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
@@ -37,8 +33,6 @@ export function CleanNames(arg1:string):Promise<void>;
 export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
-
-export function DeleteName(arg1:string):Promise<void>;
 
 export function FileNew(arg1:menu.CallbackData):Promise<void>;
 
@@ -92,7 +86,7 @@ export function LogBackend(arg1:string):Promise<void>;
 
 export function LogFrontend(arg1:string):Promise<void>;
 
-export function ModifyName(arg1:string,arg2:types.Name):Promise<void>;
+export function NamesCrud(arg1:crud.Operation,arg2:types.Name,arg3:string):Promise<void>;
 
 export function PublishNames(arg1:string):Promise<void>;
 
@@ -101,8 +95,6 @@ export function RegisterCancel(arg1:context.CancelFunc):Promise<void>;
 export function RegisterCtx(arg1:string):Promise<output.RenderCtx>;
 
 export function Reload():Promise<void>;
-
-export function RemoveName(arg1:string):Promise<void>;
 
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 
@@ -130,10 +122,6 @@ export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<voi
 
 export function SwitchToProject(arg1:string):Promise<void>;
 
-export function UndeleteName(arg1:string):Promise<void>;
-
 export function UnregisterCancel(arg1:context.CancelFunc):Promise<void>;
-
-export function UpdateName(arg1:types.Name):Promise<void>;
 
 export function WailsExports():Promise<types.DataLoadedPayload>;

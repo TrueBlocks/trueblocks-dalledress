@@ -1,4 +1,4 @@
-package app
+package names
 
 import (
 	"sync/atomic"
@@ -11,10 +11,8 @@ import (
 
 var namesLock atomic.Int32
 
-// TODO: Do we need this?
-// var namesMutex sync.Mutex
-
-func (a *App) ModifyName(operation string, nameToModify *coreTypes.Name) error {
+// Crud performs CRUD operations on names (moved from App)
+func (n *NamesCollection) Crud(operation crud.Operation, nameToModify *coreTypes.Name) error {
 	if !namesLock.CompareAndSwap(0, 1) {
 		return nil
 	}
@@ -22,20 +20,18 @@ func (a *App) ModifyName(operation string, nameToModify *coreTypes.Name) error {
 
 	nameToModify.IsCustom = true
 
-	op := crud.OpFromString(operation)
 	cd := crud.CrudFromName(*nameToModify)
 	opts := sdk.NamesOptions{
 		Globals: sdk.Globals{
-			Chain: "mainnet", // a.getChain(),
+			Chain: "mainnet", // namesChain
 		},
 	}
-	opts.Globals.Chain = "mainnet" // namesChain
 
-	if _, _, err := opts.ModifyName(op, cd); err != nil {
-		msgs.EmitError("ModifyName", err)
+	if _, _, err := opts.ModifyName(operation, cd); err != nil {
+		msgs.EmitError("Crud", err)
 		return err
 	}
 
-	a.names = a.names.ClearCache()
+	*n = n.ClearCache()
 	return nil
 }

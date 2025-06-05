@@ -1,19 +1,19 @@
 // ADD_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { AbisCrud } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { abis, msgs, types } from '@models';
+import { abis, crud, msgs, types } from '@models';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import {
   ABIS_DEFAULT_LIST,
   ABIS_ROUTE,
   ACTION_MESSAGES,
-  abisCrud,
   getAbisPage,
   getColumns,
   reload,
@@ -121,7 +121,7 @@ export const Abis = () => {
           abis: optimisticValues,
         });
       });
-      abisCrud(address)
+      AbisCrud(crud.Operation.REMOVE, {} as types.Abi, address)
         .then(async () => {
           const result = await getAbisPage(
             listKindRef.current,

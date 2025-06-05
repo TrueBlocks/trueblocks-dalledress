@@ -20,7 +20,7 @@ func (a *App) GetAbisPage(
 }
 
 func (a *App) AbisCrud(op crud.Operation, abi *coreTypes.Abi, address string) error {
-	if address != "" && abi == nil || abi.Address.IsZero() {
+	if address != "" && (abi == nil || abi.Address.IsZero()) {
 		abi = &coreTypes.Abi{Address: base.HexToAddress(address)}
 	}
 	return a.abis.Crud(op, abi)

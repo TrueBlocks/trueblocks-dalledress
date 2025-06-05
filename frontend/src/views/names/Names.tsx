@@ -665,7 +665,7 @@ export const Names = () => {
             <Action
               icon="Edit"
               onClick={() => handleAction(addressStr, isDeleted, 'edit')}
-              disabled={isProcessing}
+              disabled={isProcessing || isDeleted}
               title="Edit"
               size="sm"
             />

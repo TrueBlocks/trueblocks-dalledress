@@ -37,9 +37,8 @@ func (ac *AbisCollection) GetPage(
 
 	switch listKind {
 	case AbisDownloaded:
-		// Downloaded ABIs
-		page.IsLoading = ac.downloadedRepo.IsLoading()
-		page.IsLoaded = ac.downloadedRepo.IsLoaded()
+		page.IsLoading = ac.downloadedFacet.IsLoading()
+		page.IsLoaded = ac.downloadedFacet.IsLoaded()
 
 		filterFunc := func(abi *coreTypes.Abi) bool {
 			if filter == "" {
@@ -61,19 +60,18 @@ func (ac *AbisCollection) GetPage(
 			return nil
 		}
 
-		result, err := ac.downloadedRepo.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
+		result, err := ac.downloadedFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
 		if err != nil {
 			return AbisPage{}, err
 		}
 		page.Abis = result.Items
 		page.TotalItems = result.TotalItems
-		page.ExpectedTotal = ac.downloadedRepo.ExpectedCount()
+		page.ExpectedTotal = ac.downloadedFacet.ExpectedCount()
 		return page, nil
 
 	case AbisKnown:
-		// Known ABIs
-		page.IsLoading = ac.knownRepo.IsLoading()
-		page.IsLoaded = ac.knownRepo.IsLoaded()
+		page.IsLoading = ac.knownFacet.IsLoading()
+		page.IsLoaded = ac.knownFacet.IsLoaded()
 
 		filterFunc := func(abi *coreTypes.Abi) bool {
 			if filter == "" {
@@ -95,23 +93,22 @@ func (ac *AbisCollection) GetPage(
 			return nil
 		}
 
-		result, err := ac.knownRepo.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
+		result, err := ac.knownFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
 		if err != nil {
 			return AbisPage{}, err
 		}
 		page.Abis = result.Items
 		page.TotalItems = result.TotalItems
-		page.ExpectedTotal = ac.knownRepo.ExpectedCount()
+		page.ExpectedTotal = ac.knownFacet.ExpectedCount()
 		return page, nil
 
 	case AbisFunctions, AbisEvents:
-		// Functions or Events
-		repo := ac.functionsRepo
+		facet := ac.functionsFacet
 		if listKind == AbisEvents {
-			repo = ac.eventsRepo
+			facet = ac.eventsFacet
 		}
-		page.IsLoading = repo.IsLoading()
-		page.IsLoaded = repo.IsLoaded()
+		page.IsLoading = facet.IsLoading()
+		page.IsLoaded = facet.IsLoaded()
 
 		filterFunc := func(fn *coreTypes.Function) bool {
 			if filter == "" {
@@ -133,13 +130,13 @@ func (ac *AbisCollection) GetPage(
 			return nil
 		}
 
-		result, err := repo.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
+		result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc)
 		if err != nil {
 			return AbisPage{}, err
 		}
 		page.Functions = result.Items
 		page.TotalItems = result.TotalItems
-		page.ExpectedTotal = repo.ExpectedCount()
+		page.ExpectedTotal = facet.ExpectedCount()
 		return page, nil
 	}
 	return AbisPage{}, fmt.Errorf("unknown list kind: %s", listKind)

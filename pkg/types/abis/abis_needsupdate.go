@@ -3,17 +3,17 @@ package abis
 
 import "github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 
-// NeedsUpdate returns true if the given listKind's repo needs update
+// NeedsUpdate returns true if the given listKind's facet needs update
 func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
 	switch listKind {
 	case AbisDownloaded:
-		return ac.downloadedRepo.NeedsUpdate()
+		return ac.downloadedFacet.NeedsUpdate()
 	case AbisKnown:
-		return ac.knownRepo.NeedsUpdate()
+		return ac.knownFacet.NeedsUpdate()
 	case AbisFunctions:
-		return ac.functionsRepo.NeedsUpdate()
+		return ac.functionsFacet.NeedsUpdate()
 	case AbisEvents:
-		return ac.eventsRepo.NeedsUpdate()
+		return ac.eventsFacet.NeedsUpdate()
 	default:
 		return true
 	}

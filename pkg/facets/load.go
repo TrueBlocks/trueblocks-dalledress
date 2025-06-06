@@ -1,4 +1,4 @@
-package repository
+package facets
 
 import (
 	"errors"
@@ -11,8 +11,8 @@ import (
 
 var ErrorAlreadyLoading = errors.New("already loading")
 
-// Load implements Repository.Load using the streaming system
-func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
+// Load implements Facet.Load using the streaming system
+func (r *BaseFacet[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	if !r.state.StartLoading() {
 		return nil, ErrorAlreadyLoading
 	}
@@ -29,7 +29,7 @@ func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	r.loaded = false
 	r.mutex.Unlock()
 
-	contextKey := fmt.Sprintf("repo-%s", r.listKind)
+	contextKey := fmt.Sprintf("facet-%s", r.listKind)
 	finalPayload, err := streaming.StreamData(
 		contextKey,
 		r.queryFunc,
@@ -48,7 +48,7 @@ func (r *BaseRepository[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	}, nil
 }
 
-func (r *BaseRepository[T]) getCachedResult() *StreamingResult {
+func (r *BaseFacet[T]) getCachedResult() *StreamingResult {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 	dataCopy := make([]T, len(r.data))

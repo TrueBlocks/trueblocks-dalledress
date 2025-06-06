@@ -1,4 +1,4 @@
-package repository
+package facets
 
 import (
 	"sync"
@@ -7,9 +7,9 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-// Repository defines the contract for data access
+// Facet defines the contract for data access
 // Provides loading, paging, filtering, sorting, and cache management for type T
-type Repository[T any] interface {
+type Facet[T any] interface {
 	Load(opts LoadOptions) (*StreamingResult, error)
 	GetPage(first, pageSize int, filter FilterFunc[T], sortSpec interface{}, sortFunc func([]T, interface{}) error) (*PageResult[T], error)
 	IsLoading() bool
@@ -40,13 +40,13 @@ type PageResult[T any] struct {
 	IsLoaded   bool
 }
 
-// BaseRepository provides common repository functionality for type T
-type BaseRepository[T any] struct {
+// BaseFacet provides common facet functionality for type T
+type BaseFacet[T any] struct {
 	listKind      types.ListKind
 	filterFunc    FilterFunc[T]
 	processFunc   func(interface{}) *T
 	queryFunc     func(*output.RenderCtx)
-	dedupeFunc    func(existing []T, newItem *T) bool // Optional deduplication function
+	dedupeFunc    func(existing []T, newItem *T) bool
 	state         *LoadState
 	cache         *Cache[T]
 	data          []T
@@ -55,14 +55,14 @@ type BaseRepository[T any] struct {
 	mutex         sync.RWMutex
 }
 
-func NewBaseRepository[T any](
+func NewBaseFacet[T any](
 	listKind types.ListKind,
 	filterFunc FilterFunc[T],
 	processFunc func(interface{}) *T,
 	queryFunc func(*output.RenderCtx),
-	dedupeFunc func(existing []T, newItem *T) bool, // Optional deduplication function
-) *BaseRepository[T] {
-	return &BaseRepository[T]{
+	dedupeFunc func(existing []T, newItem *T) bool,
+) *BaseFacet[T] {
+	return &BaseFacet[T]{
 		listKind:    listKind,
 		filterFunc:  filterFunc,
 		processFunc: processFunc,
@@ -74,20 +74,20 @@ func NewBaseRepository[T any](
 	}
 }
 
-func (r *BaseRepository[T]) IsLoading() bool { return r.state.IsLoading() }
-func (r *BaseRepository[T]) IsLoaded() bool  { return r.state.IsLoaded() }
-func (r *BaseRepository[T]) Count() int {
+func (r *BaseFacet[T]) IsLoading() bool { return r.state.IsLoading() }
+func (r *BaseFacet[T]) IsLoaded() bool  { return r.state.IsLoaded() }
+func (r *BaseFacet[T]) Count() int {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 	return len(r.data)
 }
-func (r *BaseRepository[T]) ExpectedCount() int {
+func (r *BaseFacet[T]) ExpectedCount() int {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 	return r.expectedCount
 }
-func (r *BaseRepository[T]) NeedsUpdate() bool { return !r.state.IsLoaded() }
-func (r *BaseRepository[T]) Clear() {
+func (r *BaseFacet[T]) NeedsUpdate() bool { return !r.state.IsLoaded() }
+func (r *BaseFacet[T]) Clear() {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	r.data = r.data[:0]

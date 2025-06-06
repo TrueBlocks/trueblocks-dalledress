@@ -665,21 +665,21 @@ export const Names = () => {
             <Action
               icon="Edit"
               onClick={() => handleAction(addressStr, isDeleted, 'edit')}
-              disabled={isProcessing || isDeleted}
+              disabled={isProcessing || isDeleted || !row.isCustom}
               title="Edit"
               size="sm"
             />
             <Action
               icon={isDeleted ? 'Undelete' : 'Delete'}
               onClick={() => handleAction(addressStr, isDeleted, 'delete')}
-              disabled={isProcessing}
+              disabled={isProcessing || !row.isCustom}
               title={isDeleted ? 'Undelete' : 'Delete'}
               size="sm"
             />
             <Action
               icon="Remove"
               onClick={() => handleAction(addressStr, isDeleted, 'remove')}
-              disabled={isProcessing || !isDeleted}
+              disabled={isProcessing || !isDeleted || !row.isCustom}
               title="Remove"
               size="sm"
             />

@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/repository"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
@@ -31,32 +31,32 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 }
 
 func (ac *AbisCollection) loadDownloaded() {
-	if result, err := ac.downloadedRepo.Load(repository.LoadOptions{}); err != nil {
-		logging.LogError("loadDownloaded: %v", err, repository.ErrorAlreadyLoading)
+	if result, err := ac.downloadedFacet.Load(facets.LoadOptions{}); err != nil {
+		logging.LogError("loadDownloaded: %v", err, facets.ErrorAlreadyLoading)
 	} else {
 		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
 }
 
 func (ac *AbisCollection) loadKnown() {
-	if result, err := ac.knownRepo.Load(repository.LoadOptions{}); err != nil {
-		logging.LogError("loadKnown: %v", err, repository.ErrorAlreadyLoading)
+	if result, err := ac.knownFacet.Load(facets.LoadOptions{}); err != nil {
+		logging.LogError("loadKnown: %v", err, facets.ErrorAlreadyLoading)
 	} else {
 		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
 }
 
 func (ac *AbisCollection) loadFunctions() {
-	if result, err := ac.functionsRepo.Load(repository.LoadOptions{}); err != nil {
-		logging.LogError("loadFunctions: %v", err, repository.ErrorAlreadyLoading)
+	if result, err := ac.functionsFacet.Load(facets.LoadOptions{}); err != nil {
+		logging.LogError("loadFunctions: %v", err, facets.ErrorAlreadyLoading)
 	} else {
 		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
 }
 
 func (ac *AbisCollection) loadEvents() {
-	if result, err := ac.eventsRepo.Load(repository.LoadOptions{}); err != nil {
-		logging.LogError("loadEvents: %v", err, repository.ErrorAlreadyLoading)
+	if result, err := ac.eventsFacet.Load(facets.LoadOptions{}); err != nil {
+		logging.LogError("loadEvents: %v", err, facets.ErrorAlreadyLoading)
 	} else {
 		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}

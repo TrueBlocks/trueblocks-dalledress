@@ -11,92 +11,92 @@ import (
 func TestNewAbisCollection(t *testing.T) {
 	ac := NewAbisCollection()
 
-	// Check that all repositories are properly initialized and not loaded
-	if ac.downloadedRepo == nil {
-		t.Error("NewAbisCollection should initialize downloadedRepo")
+	// Check that all facets are properly initialized and not loaded
+	if ac.downloadedFacet == nil {
+		t.Error("NewAbisCollection should initialize downloadedFacet")
 	}
-	if ac.downloadedRepo.IsLoaded() {
-		t.Error("NewAbisCollection downloadedRepo should not be loaded initially")
+	if ac.downloadedFacet.IsLoaded() {
+		t.Error("NewAbisCollection downloadedFacet should not be loaded initially")
 	}
-	if ac.downloadedRepo.IsLoading() {
-		t.Error("NewAbisCollection downloadedRepo should not be loading initially")
-	}
-
-	if ac.knownRepo == nil {
-		t.Error("NewAbisCollection should initialize knownRepo")
-	}
-	if ac.knownRepo.IsLoaded() {
-		t.Error("NewAbisCollection knownRepo should not be loaded initially")
-	}
-	if ac.knownRepo.IsLoading() {
-		t.Error("NewAbisCollection knownRepo should not be loading initially")
+	if ac.downloadedFacet.IsLoading() {
+		t.Error("NewAbisCollection downloadedFacet should not be loading initially")
 	}
 
-	if ac.functionsRepo == nil {
-		t.Error("NewAbisCollection should initialize functionsRepo")
+	if ac.knownFacet == nil {
+		t.Error("NewAbisCollection should initialize knownFacet")
 	}
-	if ac.functionsRepo.IsLoaded() {
-		t.Error("NewAbisCollection functionsRepo should not be loaded initially")
+	if ac.knownFacet.IsLoaded() {
+		t.Error("NewAbisCollection knownFacet should not be loaded initially")
 	}
-	if ac.functionsRepo.IsLoading() {
-		t.Error("NewAbisCollection functionsRepo should not be loading initially")
+	if ac.knownFacet.IsLoading() {
+		t.Error("NewAbisCollection knownFacet should not be loading initially")
 	}
 
-	if ac.eventsRepo == nil {
-		t.Error("NewAbisCollection should initialize eventsRepo")
+	if ac.functionsFacet == nil {
+		t.Error("NewAbisCollection should initialize functionsFacet")
 	}
-	if ac.eventsRepo.IsLoaded() {
-		t.Error("NewAbisCollection eventsRepo should not be loaded initially")
+	if ac.functionsFacet.IsLoaded() {
+		t.Error("NewAbisCollection functionsFacet should not be loaded initially")
 	}
-	if ac.eventsRepo.IsLoading() {
-		t.Error("NewAbisCollection eventsRepo should not be loading initially")
+	if ac.functionsFacet.IsLoading() {
+		t.Error("NewAbisCollection functionsFacet should not be loading initially")
+	}
+
+	if ac.eventsFacet == nil {
+		t.Error("NewAbisCollection should initialize eventsFacet")
+	}
+	if ac.eventsFacet.IsLoaded() {
+		t.Error("NewAbisCollection eventsFacet should not be loaded initially")
+	}
+	if ac.eventsFacet.IsLoading() {
+		t.Error("NewAbisCollection eventsFacet should not be loading initially")
 	}
 }
 
 func TestAbisCollection_ClearCache(t *testing.T) {
 	ac := NewAbisCollection()
 
-	// For all data types now using Repository pattern
+	// For all data types now using Facet pattern
 	// We can't easily simulate initial data without loading, so we test the clear operation
 	ac.ClearCache(AbisDownloaded)
-	if ac.downloadedRepo.IsLoaded() {
-		t.Error("ClearCache(AbisDownloaded) should clear the repository loaded state")
+	if ac.downloadedFacet.IsLoaded() {
+		t.Error("ClearCache(AbisDownloaded) should clear the facet loaded state")
 	}
 
 	ac.ClearCache(AbisKnown)
-	if ac.knownRepo.IsLoaded() {
-		t.Error("ClearCache(AbisKnown) should clear the repository loaded state")
+	if ac.knownFacet.IsLoaded() {
+		t.Error("ClearCache(AbisKnown) should clear the facet loaded state")
 	}
 
 	ac.ClearCache(AbisFunctions)
-	if ac.functionsRepo.IsLoaded() {
-		t.Error("ClearCache(AbisFunctions) should clear the repository loaded state")
+	if ac.functionsFacet.IsLoaded() {
+		t.Error("ClearCache(AbisFunctions) should clear the facet loaded state")
 	}
 
 	ac.ClearCache(AbisEvents)
-	if ac.eventsRepo.IsLoaded() {
-		t.Error("ClearCache(AbisEvents) should clear the repository loaded state")
+	if ac.eventsFacet.IsLoaded() {
+		t.Error("ClearCache(AbisEvents) should clear the facet loaded state")
 	}
 }
 
 func TestAbisCollection_NeedsUpdate(t *testing.T) {
 	ac := NewAbisCollection()
 
-	// Initially all should need update (repositories not loaded)
+	// Initially all should need update (facets not loaded)
 	if !ac.NeedsUpdate(AbisDownloaded) {
-		t.Error("NeedsUpdate(AbisDownloaded) should return true when repository is not loaded")
+		t.Error("NeedsUpdate(AbisDownloaded) should return true when facet is not loaded")
 	}
 	if !ac.NeedsUpdate(AbisKnown) {
-		t.Error("NeedsUpdate(AbisKnown) should return true when repository is not loaded")
+		t.Error("NeedsUpdate(AbisKnown) should return true when facet is not loaded")
 	}
 	if !ac.NeedsUpdate(AbisFunctions) {
-		t.Error("NeedsUpdate(AbisFunctions) should return true when repository is not loaded")
+		t.Error("NeedsUpdate(AbisFunctions) should return true when facet is not loaded")
 	}
 	if !ac.NeedsUpdate(AbisEvents) {
-		t.Error("NeedsUpdate(AbisEvents) should return true when repository is not loaded")
+		t.Error("NeedsUpdate(AbisEvents) should return true when facet is not loaded")
 	}
 
-	// Note: We can't easily simulate loaded repositories in tests without actual data loading
+	// Note: We can't easily simulate loaded facets in tests without actual data loading
 	// so this test primarily verifies the initial state behavior
 }
 
@@ -162,58 +162,58 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 	t.Log("Thread safety test completed successfully")
 }
 
-func TestAbisRepository(t *testing.T) {
-	downloadedRepo := NewAbisRepository("Downloaded", func(abi *coreTypes.Abi) bool {
+func TestAbisFacet(t *testing.T) {
+	downloadedFacet := NewAbisFacet("Downloaded", func(abi *coreTypes.Abi) bool {
 		return !abi.IsKnown
 	})
-	knownRepo := NewAbisRepository("Known", func(abi *coreTypes.Abi) bool {
+	knownFacet := NewAbisFacet("Known", func(abi *coreTypes.Abi) bool {
 		return abi.IsKnown
 	})
-	functionsRepo := NewFunctionsRepository("Functions", func(item *coreTypes.Function) bool {
+	functionsFacet := NewFunctionsFacet("Functions", func(item *coreTypes.Function) bool {
 		return item.FunctionType != "event"
 	})
-	eventsRepo := NewFunctionsRepository("Events", func(item *coreTypes.Function) bool {
+	eventsFacet := NewFunctionsFacet("Events", func(item *coreTypes.Function) bool {
 		return item.FunctionType == "event"
 	})
 
-	if downloadedRepo == nil {
-		t.Error("Downloaded repository should not be nil")
+	if downloadedFacet == nil {
+		t.Error("Downloaded facet should not be nil")
 	}
 
-	if knownRepo == nil {
-		t.Error("Known repository should not be nil")
+	if knownFacet == nil {
+		t.Error("Known facet should not be nil")
 	}
 
-	if functionsRepo == nil {
-		t.Error("Functions repository should not be nil")
+	if functionsFacet == nil {
+		t.Error("Functions facet should not be nil")
 	}
 
-	if eventsRepo == nil {
-		t.Error("Events repository should not be nil")
+	if eventsFacet == nil {
+		t.Error("Events facet should not be nil")
 	}
 
 	// Test initial states
-	repos := []interface {
+	facets := []interface {
 		IsLoaded() bool
 		NeedsUpdate() bool
 		Count() int
-	}{downloadedRepo, knownRepo, functionsRepo, eventsRepo}
+	}{downloadedFacet, knownFacet, functionsFacet, eventsFacet}
 
-	for i, repo := range repos {
-		if repo.IsLoaded() {
-			t.Errorf("Repository %d should not be loaded initially", i)
+	for i, facet := range facets {
+		if facet.IsLoaded() {
+			t.Errorf("Facet %d should not be loaded initially", i)
 		}
 
-		if !repo.NeedsUpdate() {
-			t.Errorf("Repository %d should need update initially", i)
+		if !facet.NeedsUpdate() {
+			t.Errorf("Facet %d should need update initially", i)
 		}
 
-		if repo.Count() != 0 {
-			t.Errorf("Repository %d: expected count 0, got %d", i, repo.Count())
+		if facet.Count() != 0 {
+			t.Errorf("Facet %d: expected count 0, got %d", i, facet.Count())
 		}
 	}
 
-	t.Log("Abis repository test completed successfully")
+	t.Log("Abis facet test completed successfully")
 }
 
 // ADD_ROUTE

@@ -11,13 +11,13 @@ import (
 func (ac *AbisCollection) ClearCache(listKind types.ListKind) {
 	switch listKind {
 	case AbisDownloaded:
-		ac.downloadedRepo.Clear()
+		ac.downloadedFacet.Clear()
 	case AbisKnown:
-		ac.knownRepo.Clear()
+		ac.knownFacet.Clear()
 	case AbisFunctions:
-		ac.functionsRepo.Clear()
+		ac.functionsFacet.Clear()
 	case AbisEvents:
-		ac.eventsRepo.Clear()
+		ac.eventsFacet.Clear()
 	default:
 		logging.LogBackend(fmt.Sprintf("Unknown ListKind in ClearCache: %s", listKind))
 	}

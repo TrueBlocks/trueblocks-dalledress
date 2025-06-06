@@ -23,7 +23,7 @@ func (ac *AbisCollection) Crud(op crud.Operation, abi *coreTypes.Abi) error {
 			return err
 		}
 
-		removed := ac.downloadedRepo.Remove(func(existing *coreTypes.Abi) bool {
+		removed := ac.downloadedFacet.Remove(func(existing *coreTypes.Abi) bool {
 			return existing.Address == abi.Address
 		})
 

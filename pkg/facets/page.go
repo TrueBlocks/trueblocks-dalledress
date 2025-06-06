@@ -1,4 +1,4 @@
-package repository
+package facets
 
 import "fmt"
 
@@ -28,7 +28,7 @@ For example:
 This approach trades memory efficiency for slightly more complex access patterns.
 */
 // GetPage returns a filtered, sorted, and paginated page of data
-func (r *BaseRepository[T]) GetPage(first, pageSize int, filter FilterFunc[T], sortSpec interface{}, sortFunc func([]T, interface{}) error) (*PageResult[T], error) {
+func (r *BaseFacet[T]) GetPage(first, pageSize int, filter FilterFunc[T], sortSpec interface{}, sortFunc func([]T, interface{}) error) (*PageResult[T], error) {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
 	data := r.data

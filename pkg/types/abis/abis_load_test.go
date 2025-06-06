@@ -13,12 +13,12 @@ import (
 func TestLoadData(t *testing.T) {
 	ac := NewAbisCollection()
 
-	// Verify initial state - all repositories should not be loaded
-	if ac.downloadedRepo.IsLoaded() || ac.knownRepo.IsLoaded() || ac.functionsRepo.IsLoaded() || ac.eventsRepo.IsLoaded() {
-		t.Error("NewAbisCollection should not have any loaded repositories")
+	// Verify initial state - all facets should not be loaded
+	if ac.downloadedFacet.IsLoaded() || ac.knownFacet.IsLoaded() || ac.functionsFacet.IsLoaded() || ac.eventsFacet.IsLoaded() {
+		t.Error("NewAbisCollection should not have any loaded facets")
 	}
-	if ac.downloadedRepo.IsLoading() || ac.knownRepo.IsLoading() || ac.functionsRepo.IsLoading() || ac.eventsRepo.IsLoading() {
-		t.Error("NewAbisCollection should not have any loading repositories")
+	if ac.downloadedFacet.IsLoading() || ac.knownFacet.IsLoading() || ac.functionsFacet.IsLoading() || ac.eventsFacet.IsLoading() {
+		t.Error("NewAbisCollection should not have any loading facets")
 	}
 
 	// Call LoadData for known ABIs
@@ -27,20 +27,20 @@ func TestLoadData(t *testing.T) {
 	// Give the goroutine a moment to start
 	time.Sleep(10 * time.Millisecond)
 
-	// After calling LoadData, the known repository should either be loading or loaded
+	// After calling LoadData, the known facet should either be loading or loaded
 	// Note: Due to the asynchronous nature, we can't easily test completion without
 	// more complex synchronization mechanisms
-	isLoadingOrLoaded := ac.knownRepo.IsLoading() || ac.knownRepo.IsLoaded()
+	isLoadingOrLoaded := ac.knownFacet.IsLoading() || ac.knownFacet.IsLoaded()
 
 	if !isLoadingOrLoaded {
-		t.Error("After LoadData, known repository should be loading or loaded")
+		t.Error("After LoadData, known facet should be loading or loaded")
 	}
 
 	// Test that calling LoadData again doesn't cause issues when already loading/loaded
-	prevState := ac.knownRepo.IsLoading() || ac.knownRepo.IsLoaded()
+	prevState := ac.knownFacet.IsLoading() || ac.knownFacet.IsLoaded()
 	ac.LoadData(AbisKnown)
 
-	newState := ac.knownRepo.IsLoading() || ac.knownRepo.IsLoaded()
+	newState := ac.knownFacet.IsLoading() || ac.knownFacet.IsLoaded()
 
 	if !prevState || !newState {
 		t.Error("LoadData should not change state when already loading/loaded")
@@ -50,9 +50,9 @@ func TestLoadData(t *testing.T) {
 func TestLoadAbis(t *testing.T) {
 	ac := NewAbisCollection()
 
-	// Verify initial state - all repositories should not be loaded
-	if ac.downloadedRepo.IsLoaded() || ac.knownRepo.IsLoaded() || ac.functionsRepo.IsLoaded() || ac.eventsRepo.IsLoaded() {
-		t.Fatalf("NewAbisCollection should not have any loaded repositories initially")
+	// Verify initial state - all facets should not be loaded
+	if ac.downloadedFacet.IsLoaded() || ac.knownFacet.IsLoaded() || ac.functionsFacet.IsLoaded() || ac.eventsFacet.IsLoaded() {
+		t.Fatalf("NewAbisCollection should not have any loaded facets initially")
 	}
 
 	ac.LoadData(AbisKnown)
@@ -61,13 +61,13 @@ func TestLoadAbis(t *testing.T) {
 	// We can check isLoading state.
 
 	// The rest of this test needs significant rework due to the asynchronous nature
-	// of loadInternal and the repository pattern replacing direct slice management.
+	// of loadInternal and the facet pattern replacing direct slice management.
 	// We cannot directly check ac.loaded or counts immediately after LoadData.
 	// We would need to:
 	// 1. Wait for isLoaded to become true (with a timeout).
 	// 2. Or, inspect events emitted.
 	// For now, this part of the test is effectively disabled or needs to be redesigned.
-	t.Skip("TestLoadAbis needs rework for asynchronous loading via LoadData and repository pattern.")
+	t.Skip("TestLoadAbis needs rework for asynchronous loading via LoadData and facet pattern.")
 }
 
 // TestReloadCancellation tests that Reload properly cancels ongoing operations

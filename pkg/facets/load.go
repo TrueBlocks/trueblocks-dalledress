@@ -58,7 +58,6 @@ func (r *BaseFacet[T]) Load() (*StreamingResult, error) {
 					CurrentCount:  finalPayload.CurrentCount,
 					ExpectedTotal: r.expectedCnt,
 					ListKind:      r.listKind,
-					Reason:        "canceled",
 				},
 				Error: nil, // Don't return error if we have partial data
 			}, nil
@@ -81,7 +80,6 @@ func (r *BaseFacet[T]) getCachedResult() *StreamingResult {
 			CurrentCount:  len(r.data),
 			ExpectedTotal: len(r.data),
 			ListKind:      r.listKind,
-			Reason:        "initial",
 		},
 		Error: nil,
 	}

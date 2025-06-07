@@ -751,7 +751,6 @@ export namespace types {
 	    currentCount: number;
 	    expectedTotal: number;
 	    listKind?: ListKind;
-	    reason?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DataLoadedPayload(source);
@@ -762,7 +761,6 @@ export namespace types {
 	        this.currentCount = source["currentCount"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.listKind = source["listKind"];
-	        this.reason = source["reason"];
 	    }
 	}
 	

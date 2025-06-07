@@ -74,7 +74,7 @@ func TestLoadAbis(t *testing.T) {
 // TestReloadCancellation tests that Reload properly cancels ongoing operations
 func TestReloadCancellation(t *testing.T) {
 	abisAddr := base.ZeroAddr.Hex()
-	renderCtx := sources.RegisterCtx(abisAddr)
+	renderCtx := sources.RegisterContext(abisAddr)
 
 	// Verify the context was registered
 	if sources.CtxCount(abisAddr) != 1 {
@@ -83,7 +83,7 @@ func TestReloadCancellation(t *testing.T) {
 
 	// Verify the context is not nil
 	if renderCtx == nil {
-		t.Error("RegisterCtx should return non-nil context")
+		t.Error("RegisterContext should return non-nil context")
 	}
 
 	// Simulate a reload operation by cancelling the context
@@ -110,8 +110,8 @@ func TestContextRegistration(t *testing.T) {
 	addr1 := "0x1234567890123456789012345678901234567890"
 	addr2 := "0x2234567890123456789012345678901234567890"
 
-	ctx1 := sources.RegisterCtx(addr1)
-	ctx2 := sources.RegisterCtx(addr2)
+	ctx1 := sources.RegisterContext(addr1)
+	ctx2 := sources.RegisterContext(addr2)
 
 	cnt := sources.CtxCount(addr1) + sources.CtxCount(addr1)
 	if cnt != 2 {
@@ -119,7 +119,7 @@ func TestContextRegistration(t *testing.T) {
 	}
 
 	if ctx1 == nil || ctx2 == nil {
-		t.Error("RegisterCtx should return non-nil contexts")
+		t.Error("RegisterContext should return non-nil contexts")
 	}
 
 	// Test Cancel for specific address

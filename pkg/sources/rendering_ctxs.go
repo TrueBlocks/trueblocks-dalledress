@@ -26,8 +26,8 @@ func GetContextManager() *ContextManager {
 	return globalContextManager
 }
 
-// RegisterCtx registers a new RenderCtx for a given key
-func RegisterCtx(key string) *output.RenderCtx {
+// RegisterContext registers a new RenderCtx for a given key
+func RegisterContext(key string) *output.RenderCtx {
 	cm := GetContextManager()
 	cm.renderCtxsMutex.Lock()
 	defer cm.renderCtxsMutex.Unlock()

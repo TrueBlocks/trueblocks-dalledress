@@ -53,25 +53,6 @@ type App struct {
 	activeCancelFuncs []context.CancelFunc
 }
 
-func (a *App) RegisterCancel(cancel context.CancelFunc) {
-	a.cancelMutex.Lock()
-	defer a.cancelMutex.Unlock()
-	a.activeCancelFuncs = append(a.activeCancelFuncs, cancel)
-}
-
-func (a *App) UnregisterCancel(cancelToRemove context.CancelFunc) {
-	a.cancelMutex.Lock()
-	defer a.cancelMutex.Unlock()
-	newActiveCancelFuncs := []context.CancelFunc{}
-	candidateToRemoveStr := fmt.Sprintf("%p", cancelToRemove)
-	for _, cf := range a.activeCancelFuncs {
-		if fmt.Sprintf("%p", cf) != candidateToRemoveStr {
-			newActiveCancelFuncs = append(newActiveCancelFuncs, cf)
-		}
-	}
-	a.activeCancelFuncs = newActiveCancelFuncs
-}
-
 func (a *App) Cancel(key string) (int, bool) {
 	return sources.Cancel(key)
 }

@@ -89,8 +89,6 @@ export function NamesCrud(arg1:crud.Operation,arg2:types.Name,arg3:string):Promi
 
 export function PublishNames(arg1:string):Promise<void>;
 
-export function RegisterCancel(arg1:context.CancelFunc):Promise<void>;
-
 export function Reload():Promise<void>;
 
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
@@ -118,7 +116,5 @@ export function SetUserInfo(arg1:string,arg2:string):Promise<void>;
 export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<void>;
 
 export function SwitchToProject(arg1:string):Promise<void>;
-
-export function UnregisterCancel(arg1:context.CancelFunc):Promise<void>;
 
 export function WailsExports():Promise<types.DataLoadedPayload>;

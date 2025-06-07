@@ -154,10 +154,6 @@ export function PublishNames(arg1) {
   return window['go']['app']['App']['PublishNames'](arg1);
 }
 
-export function RegisterCancel(arg1) {
-  return window['go']['app']['App']['RegisterCancel'](arg1);
-}
-
 export function Reload() {
   return window['go']['app']['App']['Reload']();
 }
@@ -212,10 +208,6 @@ export function SetUserPreferences(arg1) {
 
 export function SwitchToProject(arg1) {
   return window['go']['app']['App']['SwitchToProject'](arg1);
-}
-
-export function UnregisterCancel(arg1) {
-  return window['go']['app']['App']['UnregisterCancel'](arg1);
 }
 
 export function WailsExports() {

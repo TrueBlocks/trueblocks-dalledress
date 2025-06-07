@@ -59,22 +59,22 @@ func TestAbisCollection_ClearCache(t *testing.T) {
 
 	// For all data types now using Facet pattern
 	// We can't easily simulate initial data without loading, so we test the clear operation
-	ac.ClearCache(AbisDownloaded)
+	ac.Reset(AbisDownloaded)
 	if ac.downloadedFacet.IsLoaded() {
 		t.Error("ClearCache(AbisDownloaded) should clear the facet loaded state")
 	}
 
-	ac.ClearCache(AbisKnown)
+	ac.Reset(AbisKnown)
 	if ac.knownFacet.IsLoaded() {
 		t.Error("ClearCache(AbisKnown) should clear the facet loaded state")
 	}
 
-	ac.ClearCache(AbisFunctions)
+	ac.Reset(AbisFunctions)
 	if ac.functionsFacet.IsLoaded() {
 		t.Error("ClearCache(AbisFunctions) should clear the facet loaded state")
 	}
 
-	ac.ClearCache(AbisEvents)
+	ac.Reset(AbisEvents)
 	if ac.eventsFacet.IsLoaded() {
 		t.Error("ClearCache(AbisEvents) should clear the facet loaded state")
 	}
@@ -129,8 +129,8 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 	// Goroutine 2: repeatedly clear cache for downloaded and known
 	go func() {
 		for i := 0; i < 100; i++ {
-			ac.ClearCache(AbisDownloaded)
-			ac.ClearCache(AbisKnown)
+			ac.Reset(AbisDownloaded)
+			ac.Reset(AbisKnown)
 		}
 		done <- true
 	}()
@@ -147,8 +147,8 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 	// Goroutine 4: repeatedly clear cache for functions and events
 	go func() {
 		for i := 0; i < 100; i++ {
-			ac.ClearCache(AbisFunctions)
-			ac.ClearCache(AbisEvents)
+			ac.Reset(AbisFunctions)
+			ac.Reset(AbisEvents)
 		}
 		done <- true
 	}()

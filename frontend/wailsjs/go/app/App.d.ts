@@ -19,7 +19,7 @@ export function AddrToName(arg1:base.Address):Promise<string>;
 
 export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
-export function CancelAll():Promise<void>;
+export function CancelFetch(arg1:types.ListKind):Promise<void>;
 
 export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 

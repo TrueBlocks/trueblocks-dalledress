@@ -50,8 +50,9 @@ type App struct {
 	Dalle      *dalle.Context
 }
 
-func (a *App) CancelAll() {
-	sources.CancelAll()
+func (a *App) CancelFetch(listKind types.ListKind) {
+	contextKey := fmt.Sprintf("facet-%s-%s", listKind, "sdk")
+	sources.CancelFetch(contextKey)
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -380,16 +381,13 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 }
 
 func (a *App) Reload() error {
-	a.CancelAll()
-
 	lastView := a.GetAppPreferences().LastView
 	lastTab := a.GetLastTab(lastView)
 
 	// ADD_ROUTE
 	switch lastView {
 	case "/abis":
-		a.abis.ClearCache(lastTab)
-		a.abis.LoadData(lastTab)
+		a.abis.Reset(lastTab)
 	case "/names":
 		a.names = a.names.ClearCache()
 	}

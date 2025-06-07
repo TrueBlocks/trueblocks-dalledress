@@ -1,6 +1,6 @@
-import { CancelAll, Reload, SetHelpCollapsed, SetMenuCollapsed } from '@app';
+import { CancelFetch, Reload, SetHelpCollapsed, SetMenuCollapsed } from '@app';
 import { useAppContext } from '@contexts';
-import { msgs } from '@models';
+import { msgs, types } from '@models';
 import { Log, emitEvent, registerHotkeys, useEmitters } from '@utils';
 import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
 import { MenuItems } from 'src/Menu';
@@ -33,7 +33,9 @@ interface ToggleHotkey extends BaseHotkey {
 type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
 
 export const useAppHotkeys = (): void => {
-  const { currentLocation } = useAppContext();
+  const { currentLocation, lastTab } = useAppContext();
+  const currentTab = lastTab[currentLocation] || '';
+
   const { menuCollapsed, setMenuCollapsed } = useAppContext();
   const { helpCollapsed, setHelpCollapsed } = useAppContext();
   const [, navigate] = useLocation();
@@ -310,7 +312,7 @@ export const useAppHotkeys = (): void => {
     {
       key: 'escape',
       handler: (_e: KeyboardEvent) => {
-        CancelAll()
+        CancelFetch(currentTab as types.ListKind)
           .then(() => {
             emitStatus('Cancellation request sent via Escape key.');
           })

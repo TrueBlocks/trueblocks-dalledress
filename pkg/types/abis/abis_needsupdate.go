@@ -1,21 +1,40 @@
 // ADD_ROUTE
 package abis
 
-import "github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+import (
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+)
 
 // NeedsUpdate checks if the specified facet needs to be updated
 func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
+	var result bool
+
 	switch listKind {
 	case AbisDownloaded:
-		return ac.downloadedFacet.NeedsUpdate()
+		result = ac.downloadedFacet.NeedsUpdate()
 	case AbisKnown:
-		return ac.knownFacet.NeedsUpdate()
+		result = ac.knownFacet.NeedsUpdate()
 	case AbisFunctions:
-		return ac.functionsFacet.NeedsUpdate()
+		result = ac.functionsFacet.NeedsUpdate()
 	case AbisEvents:
-		return ac.eventsFacet.NeedsUpdate()
+		result = ac.eventsFacet.NeedsUpdate()
 	default:
-		return true
+		result = true
+	}
+
+	return result
+}
+
+func (a *AbisCollection) Reset(listKind types.ListKind) {
+	switch listKind {
+	case AbisDownloaded:
+		a.downloadedFacet.Reset()
+	case AbisKnown:
+		a.knownFacet.Reset()
+	case AbisFunctions:
+		a.functionsFacet.Reset()
+	case AbisEvents:
+		a.eventsFacet.Reset()
 	}
 }
 

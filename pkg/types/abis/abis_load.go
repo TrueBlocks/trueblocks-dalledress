@@ -22,7 +22,7 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 	switch listKind {
 	case AbisDownloaded:
 		go func() {
-			if result, err := ac.downloadedFacet.Load(facets.LoadOptions{}); err != nil {
+			if result, err := ac.downloadedFacet.Load(); err != nil {
 				logging.LogError("LoadData.AbisDownloaded from source: %v", err, facets.ErrorAlreadyLoading)
 			} else {
 				msgs.EmitLoaded(result.Payload.Reason, result.Payload)
@@ -30,7 +30,7 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 		}()
 	case AbisKnown:
 		go func() {
-			if result, err := ac.knownFacet.Load(facets.LoadOptions{}); err != nil {
+			if result, err := ac.knownFacet.Load(); err != nil {
 				logging.LogError("LoadData.AbisKnown from source: %v", err, facets.ErrorAlreadyLoading)
 			} else {
 				msgs.EmitLoaded(result.Payload.Reason, result.Payload)
@@ -38,7 +38,7 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 		}()
 	case AbisFunctions:
 		go func() {
-			if result, err := ac.functionsFacet.Load(facets.LoadOptions{}); err != nil {
+			if result, err := ac.functionsFacet.Load(); err != nil {
 				logging.LogError("LoadData.AbisFunction from source: %v", err, facets.ErrorAlreadyLoading)
 			} else {
 				msgs.EmitLoaded(result.Payload.Reason, result.Payload)
@@ -46,7 +46,7 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 		}()
 	case AbisEvents:
 		go func() {
-			if result, err := ac.eventsFacet.Load(facets.LoadOptions{}); err != nil {
+			if result, err := ac.eventsFacet.Load(); err != nil {
 				logging.LogError("LoadData.AbisEvents from source: %v", err, facets.ErrorAlreadyLoading)
 			} else {
 				msgs.EmitLoaded(result.Payload.Reason, result.Payload)

@@ -7,7 +7,7 @@ export namespace abis {
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
-	    isLoaded: boolean;
+	    state: facets.LoadState;
 	
 	    static createFrom(source: any = {}) {
 	        return new AbisPage(source);
@@ -21,7 +21,7 @@ export namespace abis {
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];
-	        this.isLoaded = source["isLoaded"];
+	        this.state = source["state"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -90,6 +90,19 @@ export namespace crud {
 	    UNDELETE = "undelete",
 	    REMOVE = "remove",
 	    AUTONAME = "autoname",
+	}
+
+}
+
+export namespace facets {
+	
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
 	}
 
 }
@@ -737,7 +750,6 @@ export namespace types {
 	export class DataLoadedPayload {
 	    currentCount: number;
 	    expectedTotal: number;
-	    isLoaded: boolean;
 	    listKind?: ListKind;
 	    reason?: string;
 	
@@ -749,7 +761,6 @@ export namespace types {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.currentCount = source["currentCount"];
 	        this.expectedTotal = source["expectedTotal"];
-	        this.isLoaded = source["isLoaded"];
 	        this.listKind = source["listKind"];
 	        this.reason = source["reason"];
 	    }

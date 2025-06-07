@@ -87,7 +87,7 @@ func TestReloadCancellation(t *testing.T) {
 	}
 
 	// Simulate a reload operation by cancelling the context
-	cancelled, found := sources.Cancel(abisAddr)
+	cancelled, found := sources.UnregisterContext(abisAddr)
 	if !found {
 		t.Error("Cancel should find the registered context")
 	}
@@ -123,7 +123,7 @@ func TestContextRegistration(t *testing.T) {
 	}
 
 	// Test Cancel for specific address
-	cancelled, found := sources.Cancel(addr1)
+	cancelled, found := sources.UnregisterContext(addr1)
 	if !found {
 		t.Error("Cancel should find the registered context")
 	}
@@ -137,7 +137,7 @@ func TestContextRegistration(t *testing.T) {
 
 	// Test Cancel for non-existent address
 	nonExistentAddr := "0x9999999999999999999999999999999999999999"
-	cancelled, found = sources.Cancel(nonExistentAddr)
+	cancelled, found = sources.UnregisterContext(nonExistentAddr)
 	if found {
 		t.Error("Cancel should not find non-existent context")
 	}

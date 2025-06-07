@@ -2,9 +2,7 @@ package sources
 
 import (
 	"fmt"
-	"sync/atomic"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
@@ -20,7 +18,6 @@ func ProcessStream[T any](
 	isDupFunc func(existing []T, newItem *T) bool, // Returns true if item should be added (not a duplicate)
 	targetSlice *[]T,
 	expectedCnt *int,
-	loadedFlag *int32,
 	listKind types.ListKind,
 	m interface {
 		Lock()
@@ -28,15 +25,13 @@ func ProcessStream[T any](
 		RLock()
 		RUnlock()
 	},
+	onFirstData func(),
 ) (types.DataLoadedPayload, error) {
-	Cancel(contextKey)
-	defer func() { Cancel(contextKey) }()
+	renderCtx := RegisterContext(contextKey)
+	defer UnregisterContext(contextKey)
 
-	// renderCtx := RegisterCtx(contextKey)
-	renderCtx := output.NewStreamingContext()
 	done := make(chan struct{})
 	streamErr := make(chan error, 1)
-
 	go func() {
 		defer close(done)
 
@@ -51,8 +46,11 @@ func ProcessStream[T any](
 
 				isFirstPage := len(*targetSlice) == 7
 				if isFirstPage || len(*targetSlice)%refreshRate == 0 {
+					if isFirstPage && onFirstData != nil {
+						onFirstData()
+					}
+
 					m.RLock()
-					isLoaded := len(*targetSlice) >= *expectedCnt
 					reason := "partial"
 					if isFirstPage {
 						reason = "initial"
@@ -60,7 +58,6 @@ func ProcessStream[T any](
 					payload := types.DataLoadedPayload{
 						CurrentCount:  len(*targetSlice),
 						ExpectedTotal: *expectedCnt,
-						IsLoaded:      isLoaded,
 						ListKind:      listKind,
 						Reason:        reason,
 					}
@@ -77,22 +74,42 @@ func ProcessStream[T any](
 		}
 	}()
 
+	var streamingError error
 	select {
 	case <-done:
 		// Streaming completed successfully
 	case err := <-streamErr:
-		msgs.EmitError("ProcessStream", err)
-		return types.DataLoadedPayload{}, err
+		streamingError = err
+		// Don't return immediately - we want to preserve partial data
 	}
 
 	m.Lock()
-	atomic.StoreInt32(loadedFlag, 1)
 	itemCount := len(*targetSlice)
 	m.Unlock()
 
+	// If we have partial data, treat it as successful partial load
+	if itemCount > 0 {
+		reason := "final"
+		if streamingError != nil {
+			reason = "partial"
+		}
+
+		msgs.EmitStatus(fmt.Sprintf("loaded: %d items.", itemCount))
+		return types.DataLoadedPayload{
+			CurrentCount:  itemCount,
+			ExpectedTotal: itemCount,
+			ListKind:      listKind,
+			Reason:        reason,
+		}, nil
+	}
+
+	// Only return error if we have no data at all
+	if streamingError != nil {
+		return types.DataLoadedPayload{}, streamingError
+	}
+
 	msgs.EmitStatus(fmt.Sprintf("loaded: %d items.", itemCount))
 	return types.DataLoadedPayload{
-		IsLoaded:      true,
 		CurrentCount:  itemCount,
 		ExpectedTotal: itemCount,
 		ListKind:      listKind,

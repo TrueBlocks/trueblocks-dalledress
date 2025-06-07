@@ -14,8 +14,8 @@ export function BuildDalleDressForProject() {
   return window['go']['app']['App']['BuildDalleDressForProject']();
 }
 
-export function CancelAll() {
-  return window['go']['app']['App']['CancelAll']();
+export function CancelFetch(arg1) {
+  return window['go']['app']['App']['CancelFetch'](arg1);
 }
 
 export function ChangeImageStorageLocation(arg1) {

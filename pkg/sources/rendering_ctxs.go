@@ -12,7 +12,7 @@ var (
 )
 
 type ContextManager struct {
-	renderCtxs      map[string][]*output.RenderCtx
+	renderCtxs      map[string]*output.RenderCtx
 	renderCtxsMutex sync.Mutex
 }
 
@@ -20,7 +20,7 @@ type ContextManager struct {
 func GetContextManager() *ContextManager {
 	initOnce.Do(func() {
 		globalContextManager = &ContextManager{
-			renderCtxs: make(map[string][]*output.RenderCtx),
+			renderCtxs: make(map[string]*output.RenderCtx),
 		}
 	})
 	return globalContextManager
@@ -32,22 +32,17 @@ func RegisterContext(key string) *output.RenderCtx {
 	cm.renderCtxsMutex.Lock()
 	defer cm.renderCtxsMutex.Unlock()
 
+	if existingCtx := cm.renderCtxs[key]; existingCtx != nil {
+		existingCtx.Cancel()
+	}
+
 	rCtx := output.NewStreamingContext()
-	cm.renderCtxs[key] = append(cm.renderCtxs[key], rCtx)
+	cm.renderCtxs[key] = rCtx
 	return rCtx
 }
 
-// CtxCount returns the number of contexts for a key
-func CtxCount(key string) int {
-	cm := GetContextManager()
-	cm.renderCtxsMutex.Lock()
-	defer cm.renderCtxsMutex.Unlock()
-
-	return len(cm.renderCtxs[key])
-}
-
-// Cancel closes and removes all contexts for a key
-func Cancel(key string) (int, bool) {
+// UnregisterContext removes and cancels the context for a given key
+func UnregisterContext(key string) (int, bool) {
 	cm := GetContextManager()
 	cm.renderCtxsMutex.Lock()
 	defer cm.renderCtxsMutex.Unlock()
@@ -58,25 +53,33 @@ func Cancel(key string) (int, bool) {
 	if cm.renderCtxs[key] == nil {
 		return 0, false
 	}
-	n := len(cm.renderCtxs[key])
-	for i := 0; i < len(cm.renderCtxs[key]); i++ {
-		cm.renderCtxs[key][i].Cancel()
-	}
-	cm.renderCtxs[key] = nil
-	return n, true
+
+	cm.renderCtxs[key].Cancel()
+	delete(cm.renderCtxs, key)
+	return 1, true
 }
 
-func CancelAll() {
+// CtxCount returns the number of contexts for a key
+func CtxCount(key string) int {
 	cm := GetContextManager()
 	cm.renderCtxsMutex.Lock()
 	defer cm.renderCtxsMutex.Unlock()
 
-	for key := range cm.renderCtxs {
-		if cm.renderCtxs[key] != nil {
-			for i := 0; i < len(cm.renderCtxs[key]); i++ {
-				cm.renderCtxs[key][i].Cancel()
-			}
-			cm.renderCtxs[key] = nil
+	if cm.renderCtxs[key] != nil {
+		return 1
+	}
+	return 0
+}
+
+func CancelFetch(contextKey string) {
+	cm := GetContextManager()
+	cm.renderCtxsMutex.Lock()
+	defer cm.renderCtxsMutex.Unlock()
+
+	for key, ctx := range cm.renderCtxs {
+		if key == contextKey && ctx != nil {
+			ctx.Cancel()
+			delete(cm.renderCtxs, key)
 		}
 	}
 }

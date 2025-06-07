@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
@@ -50,6 +51,7 @@ func main() {
 			msgs.AllMessages,
 			types.AllListKinds,
 			types.AllCruds,
+			facets.AllStates,
 		},
 	}
 

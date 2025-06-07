@@ -60,14 +60,12 @@ func (r *BaseFacet[T]) GetPage(first, pageSize int, filter FilterFunc[T], sortSp
 		return &PageResult[T]{
 			Items:      []T{},
 			TotalItems: len(data),
-			HasMore:    false,
-			IsLoaded:   r.IsLoaded(),
+			State:      r.GetState(),
 		}, nil
 	}
 	return &PageResult[T]{
 		Items:      data[first:end],
 		TotalItems: len(data),
-		HasMore:    end < len(data),
-		IsLoaded:   r.IsLoaded(),
+		State:      r.GetState(),
 	}, nil
 }

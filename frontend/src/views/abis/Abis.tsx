@@ -7,7 +7,7 @@ import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { abis, crud, msgs, types } from '@models';
+import { abis, crud, facets, msgs, types } from '@models';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
@@ -23,6 +23,7 @@ import {
 export const Abis = () => {
   const { lastTab } = useAppContext();
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
+  const [state, setState] = useState<facets.LoadState>();
 
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[ABIS_ROUTE] || ABIS_DEFAULT_LIST,
@@ -56,6 +57,7 @@ export const Abis = () => {
         sort,
         filter,
       );
+      setState(result.state);
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
@@ -115,6 +117,7 @@ export const Abis = () => {
         const abiAddress = getAddressString(abi.address);
         return abiAddress !== address;
       });
+      setState(facets.LoadState.PENDING);
       setPageData((prev) => {
         if (!prev) return null;
         return new abis.AbisPage({
@@ -131,11 +134,13 @@ export const Abis = () => {
             sort,
             filter,
           );
+          setState(result.state);
           setPageData(result);
           setTotalItems(result.totalItems || 0);
           emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
         })
         .catch((err) => {
+          setState(facets.LoadState.ERROR);
           setPageData((prev) => {
             if (!prev) return null;
             return new abis.AbisPage({
@@ -208,6 +213,7 @@ export const Abis = () => {
 
   return (
     <div className="mainView">
+      <div>{`state: ${state}`}</div>
       <TabView tabs={tabs} route={ABIS_ROUTE} />
       {error && (
         <div>

@@ -90,7 +90,7 @@ func TestSourceBasedFacetIntegration(t *testing.T) {
 	// Test the Load method exists and can be called
 	// Note: We can't easily test actual loading without mocking the SDK
 	// but we can verify the method signature is correct
-	result, err := downloadedFacet.Load(facets.LoadOptions{})
+	result, err := downloadedFacet.Load()
 	if err != facets.ErrorAlreadyLoading {
 		// The method should be callable, though it may fail due to no actual SDK setup
 		// We're primarily testing that the interface is correctly implemented
@@ -419,8 +419,8 @@ func TestSourceBasedCollectionCompatibility(t *testing.T) {
 
 		t.Run("ClearCache-"+string(kind), func(t *testing.T) {
 			// Both should support cache clearing
-			oldCollection.ClearCache(kind)
-			newCollection.ClearCache(kind)
+			oldCollection.Reset(kind)
+			newCollection.Reset(kind)
 
 			// Should still need updates after clearing
 			if !oldCollection.NeedsUpdate(kind) {

@@ -3,10 +3,9 @@ import { Anchor, Breadcrumbs, Text } from '@mantine/core';
 
 export const Breadcrumb = () => {
   const { currentLocation, navigate, isWizard, lastTab } = useAppContext();
-
-  const pathnames = currentLocation.split('/').filter((x) => x);
   const currentTab = lastTab[currentLocation];
 
+  const pathnames = currentLocation.split('/').filter((x) => x);
   const breadcrumbItems = [
     { title: 'Home', path: '/' },
     ...pathnames.map((value, index) => {

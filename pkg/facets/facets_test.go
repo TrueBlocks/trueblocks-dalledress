@@ -61,8 +61,7 @@ func TestFacetPattern(t *testing.T) {
 		t.Errorf("Expected count 0, got %d", facet.Count())
 	}
 
-	opts := facets.LoadOptions{}
-	result, err := facet.Load(opts)
+	result, err := facet.Load()
 	if err != nil {
 		t.Errorf("Unexpected error with mock implementation: %v", err)
 	}

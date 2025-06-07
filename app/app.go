@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -42,15 +41,13 @@ type App struct {
 	names names.NamesCollection
 	abis  abis.AbisCollection
 	// ADD_ROUTE
-	meta              *coreTypes.MetaData
-	fileServer        *fileserver.FileServer
-	locked            int32
-	ctx               context.Context
-	apiKeys           map[string]string
-	ensMap            map[string]base.Address
-	Dalle             *dalle.Context
-	cancelMutex       sync.Mutex
-	activeCancelFuncs []context.CancelFunc
+	meta       *coreTypes.MetaData
+	fileServer *fileserver.FileServer
+	locked     int32
+	ctx        context.Context
+	apiKeys    map[string]string
+	ensMap     map[string]base.Address
+	Dalle      *dalle.Context
 }
 
 func (a *App) Cancel(key string) (int, bool) {

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
@@ -163,18 +164,36 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 }
 
 func TestAbisFacet(t *testing.T) {
-	downloadedFacet := NewAbisFacet("Downloaded", func(abi *coreTypes.Abi) bool {
-		return !abi.IsKnown
-	})
-	knownFacet := NewAbisFacet("Known", func(abi *coreTypes.Abi) bool {
-		return abi.IsKnown
-	})
-	functionsFacet := NewFunctionsFacet("Functions", func(item *coreTypes.Function) bool {
-		return item.FunctionType != "event"
-	})
-	eventsFacet := NewFunctionsFacet("Events", func(item *coreTypes.Function) bool {
-		return item.FunctionType == "event"
-	})
+	sharedAbisListSource := GetSharedAbisListSource()
+	sharedAbisDetailsSource := GetSharedAbisDetailsSource()
+
+	downloadedFacet := facets.NewBaseFacet(
+		AbisDownloaded,
+		func(abi *coreTypes.Abi) bool { return !abi.IsKnown },
+		nil,
+		sharedAbisListSource,
+	)
+
+	knownFacet := facets.NewBaseFacet(
+		AbisKnown,
+		func(abi *coreTypes.Abi) bool { return abi.IsKnown },
+		nil,
+		sharedAbisListSource,
+	)
+
+	functionsFacet := facets.NewBaseFacet(
+		AbisFunctions,
+		func(fn *coreTypes.Function) bool { return fn.FunctionType != "event" },
+		IsDupFuncByEncoding(),
+		sharedAbisDetailsSource,
+	)
+
+	eventsFacet := facets.NewBaseFacet(
+		AbisEvents,
+		func(fn *coreTypes.Function) bool { return fn.FunctionType == "event" },
+		IsDupFuncByEncoding(),
+		sharedAbisDetailsSource,
+	)
 
 	if downloadedFacet == nil {
 		t.Error("Downloaded facet should not be nil")
@@ -192,7 +211,7 @@ func TestAbisFacet(t *testing.T) {
 		t.Error("Events facet should not be nil")
 	}
 
-	// Test initial states
+	// Test initial states - all facets should implement the Facet interface
 	facets := []interface {
 		IsLoaded() bool
 		NeedsUpdate() bool
@@ -213,7 +232,23 @@ func TestAbisFacet(t *testing.T) {
 		}
 	}
 
-	t.Log("Abis facet test completed successfully")
+	if sharedAbisListSource == nil {
+		t.Error("Shared ABI list source should not be nil")
+	}
+
+	if sharedAbisDetailsSource == nil {
+		t.Error("Shared ABI details source should not be nil")
+	}
+
+	if GetSharedAbisListSource() != sharedAbisListSource {
+		t.Error("GetSharedAbisListSource should return the same instance (singleton pattern)")
+	}
+
+	if GetSharedAbisDetailsSource() != sharedAbisDetailsSource {
+		t.Error("GetSharedAbisDetailsSource should return the same instance (singleton pattern)")
+	}
+
+	t.Log("Abis facet test completed successfully - all facets created with shared sources")
 }
 
 // ADD_ROUTE

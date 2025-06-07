@@ -158,10 +158,6 @@ export function RegisterCancel(arg1) {
   return window['go']['app']['App']['RegisterCancel'](arg1);
 }
 
-export function RegisterCtx(arg1) {
-  return window['go']['app']['App']['RegisterCtx'](arg1);
-}
-
 export function Reload() {
   return window['go']['app']['App']['Reload']();
 }

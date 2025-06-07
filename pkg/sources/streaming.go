@@ -1,9 +1,8 @@
-package streaming
+package sources
 
 import (
 	"fmt"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -11,13 +10,13 @@ import (
 
 const refreshRate = 31
 
-// StreamData streams data of any type T with filtering, deduplication, and progress updates.
-func StreamData[T any](
+// ProcessStream streams data from a Source with all the existing streaming features:
+// filtering, deduplication, progress updates, and real-time messaging.
+func ProcessStream[T any](
 	contextKey string,
-	queryFunc func(*output.RenderCtx),
+	source Source[T],
 	filterFunc func(item *T) bool,
-	processItemFunc func(itemIntf interface{}) *T,
-	dedupeFunc func(existing []T, newItem *T) bool, // Returns true if item should be added (not a duplicate)
+	isDupFunc func(existing []T, newItem *T) bool, // Returns true if item should be added (not a duplicate)
 	targetSlice *[]T,
 	expectedCount *int,
 	loadedFlag *bool,
@@ -32,44 +31,19 @@ func StreamData[T any](
 	Cancel(contextKey)
 	defer func() { Cancel(contextKey) }()
 
-	renderCtx := RegisterCtx(contextKey)
+	// renderCtx := RegisterCtx(contextKey)
+	renderCtx := output.NewStreamingContext()
 	done := make(chan struct{})
+	streamErr := make(chan error, 1)
 
 	go func() {
-		defer func() {
-			if renderCtx.ModelChan != nil {
-				close(renderCtx.ModelChan)
-			}
-			if renderCtx.ErrorChan != nil {
-				close(renderCtx.ErrorChan)
-			}
-			close(done)
-		}()
+		defer close(done)
 
-		queryFunc(renderCtx)
-	}()
-
-	modelChanClosed := false
-	errorChanClosed := false
-
-	for !modelChanClosed || !errorChanClosed {
-		select {
-		case itemIntf, ok := <-renderCtx.ModelChan:
-			if !ok {
-				modelChanClosed = true
-				continue
-			}
-
-			itemPtr := processItemFunc(itemIntf)
-			if itemPtr == nil {
-				logger.Info(fmt.Sprintf("StreamData: unexpected item type: %T", itemIntf))
-				continue
-			}
-
+		err := source.Fetch(renderCtx, func(itemPtr *T) bool {
 			if filterFunc(itemPtr) {
 				m.Lock()
 				// Apply deduplication if provided
-				if dedupeFunc == nil || !dedupeFunc(*targetSlice, itemPtr) {
+				if isDupFunc == nil || !isDupFunc(*targetSlice, itemPtr) {
 					*targetSlice = append(*targetSlice, *itemPtr)
 				}
 				m.Unlock()
@@ -94,28 +68,32 @@ func StreamData[T any](
 					m.RUnlock()
 				}
 			}
+			return true // Continue streaming
+		})
 
-		case streamErr, ok := <-renderCtx.ErrorChan:
-			if !ok {
-				errorChanClosed = true
-				continue
-			}
-			msgs.EmitError("StreamData", streamErr)
-
-		case <-done:
-			// Stream initialization completed
+		if err != nil {
+			streamErr <- err
 		}
+	}()
+
+	select {
+	case <-done:
+		// Streaming completed successfully
+	case err := <-streamErr:
+		msgs.EmitError("ProcessStream", err)
+		return types.DataLoadedPayload{}, err
 	}
 
 	m.Lock()
 	*loadedFlag = true
+	itemCount := len(*targetSlice)
 	m.Unlock()
 
-	msgs.EmitStatus(fmt.Sprintf("loaded: %d items.", len(*targetSlice)))
+	msgs.EmitStatus(fmt.Sprintf("loaded: %d items.", itemCount))
 	return types.DataLoadedPayload{
 		IsLoaded:      true,
-		CurrentCount:  len(*targetSlice),
-		ExpectedTotal: len(*targetSlice),
+		CurrentCount:  itemCount,
+		ExpectedTotal: itemCount,
 		ListKind:      listKind,
 		Reason:        "final",
 	}, nil

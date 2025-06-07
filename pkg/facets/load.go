@@ -5,13 +5,13 @@ import (
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 var ErrorAlreadyLoading = errors.New("already loading")
 
-// Load implements Facet.Load using the streaming system
+// Load implements loading using a source instead of a queryFunc
 func (r *BaseFacet[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	if !r.state.StartLoading() {
 		return nil, ErrorAlreadyLoading
@@ -29,13 +29,12 @@ func (r *BaseFacet[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 	r.loaded = false
 	r.mutex.Unlock()
 
-	contextKey := fmt.Sprintf("facet-%s", r.listKind)
-	finalPayload, err := streaming.StreamData(
+	contextKey := fmt.Sprintf("facet-%s-%s", r.listKind, r.source.GetSourceType())
+	finalPayload, err := sources.ProcessStream(
 		contextKey,
-		r.queryFunc,
+		r.source,
 		r.filterFunc,
-		r.processFunc,
-		r.dedupeFunc,
+		r.isDupFunc,
 		&r.data,
 		&r.expectedCount,
 		&r.loaded,

@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
 )
 
 // TestLoadData tests the LoadData function from abis_load.go
 func TestLoadData(t *testing.T) {
+	// TODO: Turn this back on: Removed t.Parallel() to prevent concurrent SDK access causing race conditions
 	ac := NewAbisCollection()
 
 	// Verify initial state - all facets should not be loaded
@@ -73,11 +74,11 @@ func TestLoadAbis(t *testing.T) {
 // TestReloadCancellation tests that Reload properly cancels ongoing operations
 func TestReloadCancellation(t *testing.T) {
 	abisAddr := base.ZeroAddr.Hex()
-	renderCtx := streaming.RegisterCtx(abisAddr)
+	renderCtx := sources.RegisterCtx(abisAddr)
 
 	// Verify the context was registered
-	if streaming.CtxCount(abisAddr) != 1 {
-		t.Errorf("Expected 1 registered context, got %d", streaming.CtxCount(abisAddr))
+	if sources.CtxCount(abisAddr) != 1 {
+		t.Errorf("Expected 1 registered context, got %d", sources.CtxCount(abisAddr))
 	}
 
 	// Verify the context is not nil
@@ -86,7 +87,7 @@ func TestReloadCancellation(t *testing.T) {
 	}
 
 	// Simulate a reload operation by cancelling the context
-	cancelled, found := streaming.Cancel(abisAddr)
+	cancelled, found := sources.Cancel(abisAddr)
 	if !found {
 		t.Error("Cancel should find the registered context")
 	}
@@ -95,8 +96,8 @@ func TestReloadCancellation(t *testing.T) {
 	}
 
 	// Verify the context was cancelled and removed
-	if streaming.CtxCount(abisAddr) != 0 {
-		t.Errorf("Expected 0 registered contexts after reload, got %d", streaming.CtxCount(abisAddr))
+	if sources.CtxCount(abisAddr) != 0 {
+		t.Errorf("Expected 0 registered contexts after reload, got %d", sources.CtxCount(abisAddr))
 	}
 
 	// Note: We can't easily test if the context was actually cancelled since
@@ -109,10 +110,10 @@ func TestContextRegistration(t *testing.T) {
 	addr1 := "0x1234567890123456789012345678901234567890"
 	addr2 := "0x2234567890123456789012345678901234567890"
 
-	ctx1 := streaming.RegisterCtx(addr1)
-	ctx2 := streaming.RegisterCtx(addr2)
+	ctx1 := sources.RegisterCtx(addr1)
+	ctx2 := sources.RegisterCtx(addr2)
 
-	cnt := streaming.CtxCount(addr1) + streaming.CtxCount(addr1)
+	cnt := sources.CtxCount(addr1) + sources.CtxCount(addr1)
 	if cnt != 2 {
 		t.Errorf("Expected 2 registered contexts, got %d", cnt)
 	}
@@ -122,21 +123,21 @@ func TestContextRegistration(t *testing.T) {
 	}
 
 	// Test Cancel for specific address
-	cancelled, found := streaming.Cancel(addr1)
+	cancelled, found := sources.Cancel(addr1)
 	if !found {
 		t.Error("Cancel should find the registered context")
 	}
 	if cancelled != 1 {
 		t.Errorf("Expected 1 cancelled context, got %d", cancelled)
 	}
-	cnt = streaming.CtxCount(addr1) + streaming.CtxCount(addr2)
+	cnt = sources.CtxCount(addr1) + sources.CtxCount(addr2)
 	if cnt != 1 {
 		t.Errorf("Expected 1 remaining context after cancel, got %d", cnt)
 	}
 
 	// Test Cancel for non-existent address
 	nonExistentAddr := "0x9999999999999999999999999999999999999999"
-	cancelled, found = streaming.Cancel(nonExistentAddr)
+	cancelled, found = sources.Cancel(nonExistentAddr)
 	if found {
 		t.Error("Cancel should not find non-existent context")
 	}

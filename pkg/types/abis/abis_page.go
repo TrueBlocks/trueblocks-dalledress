@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -55,7 +55,7 @@ func (ac *AbisCollection) GetPage(
 
 		sortFunc := func(items []coreTypes.Abi, sortSpecInterface interface{}) error {
 			if sortSpec, ok := sortSpecInterface.(sdk.SortSpec); ok {
-				return streaming.SortPageSlice(items, sortSpec, sdk.SortAbis)
+				return facets.SortPageSlice(items, sortSpec, sdk.SortAbis)
 			}
 			return nil
 		}
@@ -88,7 +88,7 @@ func (ac *AbisCollection) GetPage(
 
 		sortFunc := func(items []coreTypes.Abi, sortSpecInterface interface{}) error {
 			if sortSpec, ok := sortSpecInterface.(sdk.SortSpec); ok {
-				return streaming.SortPageSlice(items, sortSpec, sdk.SortAbis)
+				return facets.SortPageSlice(items, sortSpec, sdk.SortAbis)
 			}
 			return nil
 		}
@@ -125,7 +125,7 @@ func (ac *AbisCollection) GetPage(
 
 		sortFunc := func(items []coreTypes.Function, sortSpecInterface interface{}) error {
 			if sortSpec, ok := sortSpecInterface.(sdk.SortSpec); ok {
-				return streaming.SortPageSlice(items, sortSpec, sdk.SortFunctions)
+				return facets.SortPageSlice(items, sortSpec, sdk.SortFunctions)
 			}
 			return nil
 		}

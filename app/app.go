@@ -16,7 +16,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
@@ -24,7 +23,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
@@ -73,16 +72,12 @@ func (a *App) UnregisterCancel(cancelToRemove context.CancelFunc) {
 	a.activeCancelFuncs = newActiveCancelFuncs
 }
 
-func (a *App) RegisterCtx(key string) *output.RenderCtx {
-	return streaming.RegisterCtx(key)
-}
-
 func (a *App) Cancel(key string) (int, bool) {
-	return streaming.Cancel(key)
+	return sources.Cancel(key)
 }
 
 func (a *App) CancelAll() {
-	streaming.CancelAll()
+	sources.CancelAll()
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -436,6 +431,8 @@ func (a *App) GetNodeStatus() *coreTypes.MetaData {
 	defer logger.SetLoggerWriter(w)
 	logger.SetLoggerWriter(io.Discard)
 
-	a.meta, _ = sdk.GetMetaData("gnosis")
+	chainName := preferences.GetPreferredChainName()
+	a.meta, _ = sdk.GetMetaData(chainName)
+
 	return a.meta
 }

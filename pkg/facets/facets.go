@@ -3,7 +3,7 @@ package facets
 import (
 	"sync"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
@@ -40,37 +40,35 @@ type PageResult[T any] struct {
 	IsLoaded   bool
 }
 
-// BaseFacet provides common facet functionality for type T
+// BaseFacet provides facet functionality using a source for data fetching
 type BaseFacet[T any] struct {
 	listKind      types.ListKind
 	filterFunc    FilterFunc[T]
-	processFunc   func(interface{}) *T
-	queryFunc     func(*output.RenderCtx)
-	dedupeFunc    func(existing []T, newItem *T) bool
+	isDupFunc     func(existing []T, newItem *T) bool
 	state         *LoadState
 	cache         *Cache[T]
 	data          []T
 	expectedCount int
 	loaded        bool
 	mutex         sync.RWMutex
+	source        sources.Source[T]
 }
 
+// NewBaseFacet creates a new facet that uses a source for data fetching
 func NewBaseFacet[T any](
 	listKind types.ListKind,
 	filterFunc FilterFunc[T],
-	processFunc func(interface{}) *T,
-	queryFunc func(*output.RenderCtx),
-	dedupeFunc func(existing []T, newItem *T) bool,
+	isDupFunc func(existing []T, newItem *T) bool,
+	source sources.Source[T],
 ) *BaseFacet[T] {
 	return &BaseFacet[T]{
-		listKind:    listKind,
-		filterFunc:  filterFunc,
-		processFunc: processFunc,
-		queryFunc:   queryFunc,
-		dedupeFunc:  dedupeFunc,
-		state:       NewLoadState(),
-		cache:       NewCache[T](),
-		data:        make([]T, 0),
+		listKind:   listKind,
+		filterFunc: filterFunc,
+		isDupFunc:  isDupFunc,
+		state:      NewLoadState(),
+		cache:      NewCache[T](),
+		data:       make([]T, 0),
+		source:     source,
 	}
 }
 

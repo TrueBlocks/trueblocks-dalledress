@@ -12,7 +12,6 @@ import {context} from '../models';
 import {project} from '../models';
 import {names} from '../models';
 import {app} from '../models';
-import {output} from '../models';
 
 export function AbisCrud(arg1:crud.Operation,arg2:types.Abi,arg3:string):Promise<void>;
 
@@ -91,8 +90,6 @@ export function NamesCrud(arg1:crud.Operation,arg2:types.Name,arg3:string):Promi
 export function PublishNames(arg1:string):Promise<void>;
 
 export function RegisterCancel(arg1:context.CancelFunc):Promise<void>;
-
-export function RegisterCtx(arg1:string):Promise<output.RenderCtx>;
 
 export function Reload():Promise<void>;
 

@@ -3,7 +3,7 @@ package abis
 
 import "github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 
-// NeedsUpdate returns true if the given listKind's facet needs update
+// NeedsUpdate checks if the specified facet needs to be updated
 func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
 	switch listKind {
 	case AbisDownloaded:

@@ -11,6 +11,9 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
+// LoadData demonstrates using sources for data loading (Phase 2 pattern)
+// This method shows how to use the enhanced source-based loading where multiple facets
+// share the same data sources, eliminating redundant SDK queries.
 func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 	if !ac.NeedsUpdate(listKind) {
 		return
@@ -18,47 +21,39 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 
 	switch listKind {
 	case AbisDownloaded:
-		go ac.loadDownloaded()
+		go func() {
+			if result, err := ac.downloadedFacet.Load(facets.LoadOptions{}); err != nil {
+				logging.LogError("LoadData.AbisDownloaded from source: %v", err, facets.ErrorAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(result.Payload.Reason, result.Payload)
+			}
+		}()
 	case AbisKnown:
-		go ac.loadKnown()
+		go func() {
+			if result, err := ac.knownFacet.Load(facets.LoadOptions{}); err != nil {
+				logging.LogError("LoadData.AbisKnown from source: %v", err, facets.ErrorAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(result.Payload.Reason, result.Payload)
+			}
+		}()
 	case AbisFunctions:
-		go ac.loadFunctions()
+		go func() {
+			if result, err := ac.functionsFacet.Load(facets.LoadOptions{}); err != nil {
+				logging.LogError("LoadData.AbisFunction from source: %v", err, facets.ErrorAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(result.Payload.Reason, result.Payload)
+			}
+		}()
 	case AbisEvents:
-		go ac.loadEvents()
+		go func() {
+			if result, err := ac.eventsFacet.Load(facets.LoadOptions{}); err != nil {
+				logging.LogError("LoadData.AbisEvents from source: %v", err, facets.ErrorAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(result.Payload.Reason, result.Payload)
+			}
+		}()
 	default:
 		logger.Error(fmt.Sprintf("LoadData: unexpected list kind: %v", listKind))
-	}
-}
-
-func (ac *AbisCollection) loadDownloaded() {
-	if result, err := ac.downloadedFacet.Load(facets.LoadOptions{}); err != nil {
-		logging.LogError("loadDownloaded: %v", err, facets.ErrorAlreadyLoading)
-	} else {
-		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
-	}
-}
-
-func (ac *AbisCollection) loadKnown() {
-	if result, err := ac.knownFacet.Load(facets.LoadOptions{}); err != nil {
-		logging.LogError("loadKnown: %v", err, facets.ErrorAlreadyLoading)
-	} else {
-		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
-	}
-}
-
-func (ac *AbisCollection) loadFunctions() {
-	if result, err := ac.functionsFacet.Load(facets.LoadOptions{}); err != nil {
-		logging.LogError("loadFunctions: %v", err, facets.ErrorAlreadyLoading)
-	} else {
-		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
-	}
-}
-
-func (ac *AbisCollection) loadEvents() {
-	if result, err := ac.eventsFacet.Load(facets.LoadOptions{}); err != nil {
-		logging.LogError("loadEvents: %v", err, facets.ErrorAlreadyLoading)
-	} else {
-		msgs.EmitLoaded(result.Payload.Reason, result.Payload)
 	}
 }
 

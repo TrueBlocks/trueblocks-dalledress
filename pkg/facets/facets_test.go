@@ -88,9 +88,10 @@ func TestFacetPattern(t *testing.T) {
 	}
 	if page == nil {
 		t.Error("Expected non-nil page result")
-	}
-	if len(page.Items) != expectedCount {
-		t.Errorf("Expected %d items in page, got %d", expectedCount, len(page.Items))
+	} else {
+		if len(page.Items) != expectedCount {
+			t.Errorf("Expected %d items in page, got %d", expectedCount, len(page.Items))
+		}
 	}
 
 	t.Log("Facet pattern test completed successfully")

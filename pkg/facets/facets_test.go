@@ -76,9 +76,9 @@ func TestFacetPattern(t *testing.T) {
 	}
 
 	// Check filtered results - should have 3 items: "abcd", "abcde", "hello"
-	expectedCount := 3
-	if facet.Count() != expectedCount {
-		t.Errorf("Expected count %d after filtering, got %d", expectedCount, facet.Count())
+	expectedCnt := 3
+	if facet.Count() != expectedCnt {
+		t.Errorf("Expected count %d after filtering, got %d", expectedCnt, facet.Count())
 	}
 
 	// Test paging
@@ -89,8 +89,8 @@ func TestFacetPattern(t *testing.T) {
 	if page == nil {
 		t.Error("Expected non-nil page result")
 	} else {
-		if len(page.Items) != expectedCount {
-			t.Errorf("Expected %d items in page, got %d", expectedCount, len(page.Items))
+		if len(page.Items) != expectedCnt {
+			t.Errorf("Expected %d items in page, got %d", expectedCnt, len(page.Items))
 		}
 	}
 

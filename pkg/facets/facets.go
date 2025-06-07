@@ -2,6 +2,7 @@ package facets
 
 import (
 	"sync"
+	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -15,10 +16,10 @@ type Facet[T any] interface {
 	IsFetching() bool
 	IsLoaded() bool
 	NeedsUpdate() bool
-	Clear()
 	Remove(predicate func(*T) bool) bool
-	Count() int
+	Clear()
 	ExpectedCount() int
+	Count() int
 }
 
 type FilterFunc[T any] func(*T) bool
@@ -42,16 +43,16 @@ type PageResult[T any] struct {
 
 // BaseFacet provides facet functionality using a source for data fetching
 type BaseFacet[T any] struct {
-	listKind      types.ListKind
-	filterFunc    FilterFunc[T]
-	isDupFunc     func(existing []T, newItem *T) bool
-	state         *LoadState
-	cache         *Cache[T]
-	data          []T
-	expectedCount int
-	loaded        bool
-	mutex         sync.RWMutex
-	source        sources.Source[T]
+	source      sources.Source[T]
+	data        []T
+	fetching    int32
+	loaded      int32
+	expectedCnt int
+	listKind    types.ListKind
+	filterFunc  FilterFunc[T]
+	isDupFunc   func(existing []T, newItem *T) bool
+	cache       *Cache[T]
+	mutex       sync.RWMutex
 }
 
 // NewBaseFacet creates a new facet that uses a source for data fetching
@@ -62,18 +63,18 @@ func NewBaseFacet[T any](
 	source sources.Source[T],
 ) *BaseFacet[T] {
 	return &BaseFacet[T]{
-		listKind:   listKind,
-		filterFunc: filterFunc,
-		isDupFunc:  isDupFunc,
-		state:      NewLoadState(),
-		cache:      NewCache[T](),
-		data:       make([]T, 0),
-		source:     source,
+		source:      source,
+		data:        make([]T, 0),
+		fetching:    0,
+		loaded:      0,
+		expectedCnt: 0,
+		listKind:    listKind,
+		filterFunc:  filterFunc,
+		isDupFunc:   isDupFunc,
+		cache:       NewCache[T](),
 	}
 }
 
-func (r *BaseFacet[T]) IsFetching() bool { return r.state.IsFetching() }
-func (r *BaseFacet[T]) IsLoaded() bool   { return r.state.IsLoaded() }
 func (r *BaseFacet[T]) Count() int {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
@@ -82,13 +83,37 @@ func (r *BaseFacet[T]) Count() int {
 func (r *BaseFacet[T]) ExpectedCount() int {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
-	return r.expectedCount
+	return r.expectedCnt
 }
-func (r *BaseFacet[T]) NeedsUpdate() bool { return !r.state.IsLoaded() }
 func (r *BaseFacet[T]) Clear() {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	r.data = r.data[:0]
-	r.loaded = false
-	r.state.Reset()
+	r.Reset()
+}
+
+func (r *BaseFacet[T]) StartFetching() bool {
+	return atomic.CompareAndSwapInt32(&r.fetching, 0, 1)
+}
+
+func (r *BaseFacet[T]) StopFetching() {
+	atomic.StoreInt32(&r.fetching, 0)
+	atomic.StoreInt32(&r.loaded, 1)
+}
+
+func (r *BaseFacet[T]) IsFetching() bool {
+	return atomic.LoadInt32(&r.fetching) == 1
+}
+
+func (r *BaseFacet[T]) NeedsUpdate() bool {
+	return !r.IsLoaded()
+}
+
+func (r *BaseFacet[T]) IsLoaded() bool {
+	return atomic.LoadInt32(&r.loaded) == 1
+}
+
+func (r *BaseFacet[T]) Reset() {
+	atomic.StoreInt32(&r.fetching, 0)
+	atomic.StoreInt32(&r.loaded, 0)
 }

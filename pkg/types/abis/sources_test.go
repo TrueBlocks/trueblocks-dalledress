@@ -257,13 +257,6 @@ func (m *MockSDKCallCounter) GetCounts() (int, int) {
 	return m.abisListCalls, m.abisDetsCalls
 }
 
-func (m *MockSDKCallCounter) Reset() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.abisListCalls = 0
-	m.abisDetsCalls = 0
-}
-
 // var globalMockCounter = &MockSDKCallCounter{}
 
 // TestSourceSharingArchitecture verifies that the source-sharing architecture is set up correctly

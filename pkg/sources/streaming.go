@@ -2,6 +2,7 @@ package sources
 
 import (
 	"fmt"
+	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
@@ -18,8 +19,8 @@ func ProcessStream[T any](
 	filterFunc func(item *T) bool,
 	isDupFunc func(existing []T, newItem *T) bool, // Returns true if item should be added (not a duplicate)
 	targetSlice *[]T,
-	expectedCount *int,
-	loadedFlag *bool,
+	expectedCnt *int,
+	loadedFlag *int32,
 	listKind types.ListKind,
 	m interface {
 		Lock()
@@ -51,14 +52,14 @@ func ProcessStream[T any](
 				isFirstPage := len(*targetSlice) == 7
 				if isFirstPage || len(*targetSlice)%refreshRate == 0 {
 					m.RLock()
-					isLoaded := len(*targetSlice) >= *expectedCount
+					isLoaded := len(*targetSlice) >= *expectedCnt
 					reason := "partial"
 					if isFirstPage {
 						reason = "initial"
 					}
 					payload := types.DataLoadedPayload{
 						CurrentCount:  len(*targetSlice),
-						ExpectedTotal: *expectedCount,
+						ExpectedTotal: *expectedCnt,
 						IsLoaded:      isLoaded,
 						ListKind:      listKind,
 						Reason:        reason,
@@ -85,7 +86,7 @@ func ProcessStream[T any](
 	}
 
 	m.Lock()
-	*loadedFlag = true
+	atomic.StoreInt32(loadedFlag, 1)
 	itemCount := len(*targetSlice)
 	m.Unlock()
 

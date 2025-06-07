@@ -61,13 +61,13 @@ func (r *BaseFacet[T]) GetPage(first, pageSize int, filter FilterFunc[T], sortSp
 			Items:      []T{},
 			TotalItems: len(data),
 			HasMore:    false,
-			IsLoaded:   r.state.IsLoaded(),
+			IsLoaded:   r.IsLoaded(),
 		}, nil
 	}
 	return &PageResult[T]{
 		Items:      data[first:end],
 		TotalItems: len(data),
 		HasMore:    end < len(data),
-		IsLoaded:   r.state.IsLoaded(),
+		IsLoaded:   r.IsLoaded(),
 	}, nil
 }

@@ -17,7 +17,7 @@ func (r *BaseFacet[T]) Remove(predicate func(*T) bool) bool {
 
 	if removed {
 		r.data = filteredData
-		r.expectedCount = len(r.data) // Update expected count after removal
+		r.expectedCnt = len(r.data) // Update expected count after removal
 	}
 
 	return removed

@@ -13,12 +13,12 @@ var ErrorAlreadyLoading = errors.New("already loading")
 
 // Load implements loading using a source instead of a queryFunc
 func (r *BaseFacet[T]) Load(opts LoadOptions) (*StreamingResult, error) {
-	if !r.state.StartFetching() {
+	if !r.StartFetching() {
 		return nil, ErrorAlreadyLoading
 	}
-	defer r.state.StopFetching()
+	defer r.StopFetching()
 
-	if !opts.ForceReload && r.state.IsLoaded() {
+	if !opts.ForceReload && r.IsLoaded() {
 		msgs.EmitStatus(fmt.Sprintf("cached: %d items", len(r.data)))
 		cachedPayload := r.getCachedResult()
 		return cachedPayload, nil
@@ -26,7 +26,6 @@ func (r *BaseFacet[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 
 	r.mutex.Lock()
 	r.data = r.data[:0]
-	r.loaded = false
 	r.mutex.Unlock()
 
 	contextKey := fmt.Sprintf("facet-%s-%s", r.listKind, r.source.GetSourceType())
@@ -36,7 +35,7 @@ func (r *BaseFacet[T]) Load(opts LoadOptions) (*StreamingResult, error) {
 		r.filterFunc,
 		r.isDupFunc,
 		&r.data,
-		&r.expectedCount,
+		&r.expectedCnt,
 		&r.loaded,
 		r.listKind,
 		&r.mutex,

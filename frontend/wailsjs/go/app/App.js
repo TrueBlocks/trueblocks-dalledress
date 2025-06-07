@@ -14,10 +14,6 @@ export function BuildDalleDressForProject() {
   return window['go']['app']['App']['BuildDalleDressForProject']();
 }
 
-export function Cancel(arg1) {
-  return window['go']['app']['App']['Cancel'](arg1);
-}
-
 export function CancelAll() {
   return window['go']['app']['App']['CancelAll']();
 }

@@ -53,8 +53,8 @@ func TestAbisCollectionWithSources(t *testing.T) {
 	if ac.downloadedFacet.IsLoaded() {
 		t.Error("downloadedFacet should not be loaded initially")
 	}
-	if ac.downloadedFacet.IsLoading() {
-		t.Error("downloadedFacet should not be loading initially")
+	if ac.downloadedFacet.IsFetching() {
+		t.Error("downloadedFacet should not be fetching initially")
 	}
 }
 
@@ -77,8 +77,8 @@ func TestSourceBasedFacetIntegration(t *testing.T) {
 	if downloadedFacet.IsLoaded() {
 		t.Error("New facet should not be loaded")
 	}
-	if downloadedFacet.IsLoading() {
-		t.Error("New facet should not be loading")
+	if downloadedFacet.IsFetching() {
+		t.Error("New facet should not be fetching")
 	}
 	if downloadedFacet.Count() != 0 {
 		t.Error("New facet should have count of 0")

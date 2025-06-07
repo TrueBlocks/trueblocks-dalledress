@@ -12,7 +12,7 @@ import (
 type Facet[T any] interface {
 	Load(opts LoadOptions) (*StreamingResult, error)
 	GetPage(first, pageSize int, filter FilterFunc[T], sortSpec interface{}, sortFunc func([]T, interface{}) error) (*PageResult[T], error)
-	IsLoading() bool
+	IsFetching() bool
 	IsLoaded() bool
 	NeedsUpdate() bool
 	Clear()
@@ -72,8 +72,8 @@ func NewBaseFacet[T any](
 	}
 }
 
-func (r *BaseFacet[T]) IsLoading() bool { return r.state.IsLoading() }
-func (r *BaseFacet[T]) IsLoaded() bool  { return r.state.IsLoaded() }
+func (r *BaseFacet[T]) IsFetching() bool { return r.state.IsFetching() }
+func (r *BaseFacet[T]) IsLoaded() bool   { return r.state.IsLoaded() }
 func (r *BaseFacet[T]) Count() int {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()

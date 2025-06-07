@@ -19,8 +19,8 @@ func TestNewAbisCollection(t *testing.T) {
 	if ac.downloadedFacet.IsLoaded() {
 		t.Error("NewAbisCollection downloadedFacet should not be loaded initially")
 	}
-	if ac.downloadedFacet.IsLoading() {
-		t.Error("NewAbisCollection downloadedFacet should not be loading initially")
+	if ac.downloadedFacet.IsFetching() {
+		t.Error("NewAbisCollection downloadedFacet should not be fetching initially")
 	}
 
 	if ac.knownFacet == nil {
@@ -29,8 +29,8 @@ func TestNewAbisCollection(t *testing.T) {
 	if ac.knownFacet.IsLoaded() {
 		t.Error("NewAbisCollection knownFacet should not be loaded initially")
 	}
-	if ac.knownFacet.IsLoading() {
-		t.Error("NewAbisCollection knownFacet should not be loading initially")
+	if ac.knownFacet.IsFetching() {
+		t.Error("NewAbisCollection knownFacet should not be fetching initially")
 	}
 
 	if ac.functionsFacet == nil {
@@ -39,8 +39,8 @@ func TestNewAbisCollection(t *testing.T) {
 	if ac.functionsFacet.IsLoaded() {
 		t.Error("NewAbisCollection functionsFacet should not be loaded initially")
 	}
-	if ac.functionsFacet.IsLoading() {
-		t.Error("NewAbisCollection functionsFacet should not be loading initially")
+	if ac.functionsFacet.IsFetching() {
+		t.Error("NewAbisCollection functionsFacet should not be fetching initially")
 	}
 
 	if ac.eventsFacet == nil {
@@ -49,8 +49,8 @@ func TestNewAbisCollection(t *testing.T) {
 	if ac.eventsFacet.IsLoaded() {
 		t.Error("NewAbisCollection eventsFacet should not be loaded initially")
 	}
-	if ac.eventsFacet.IsLoading() {
-		t.Error("NewAbisCollection eventsFacet should not be loading initially")
+	if ac.eventsFacet.IsFetching() {
+		t.Error("NewAbisCollection eventsFacet should not be fetching initially")
 	}
 }
 

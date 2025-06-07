@@ -164,7 +164,7 @@ export const Abis = () => {
       <BaseTab
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
-        loading={!!pageData?.isLoading}
+        loading={!!pageData?.isFetching}
         error={error}
         onSubmit={handleSubmit}
         tableKey={tableKey}
@@ -173,7 +173,7 @@ export const Abis = () => {
     [
       currentData,
       currentColumns,
-      pageData?.isLoading,
+      pageData?.isFetching,
       error,
       handleSubmit,
       tableKey,

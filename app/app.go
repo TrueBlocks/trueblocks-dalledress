@@ -50,10 +50,6 @@ type App struct {
 	Dalle      *dalle.Context
 }
 
-func (a *App) Cancel(key string) (int, bool) {
-	return sources.Cancel(key)
-}
-
 func (a *App) CancelAll() {
 	sources.CancelAll()
 }
@@ -385,7 +381,6 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 
 func (a *App) Reload() error {
 	a.CancelAll()
-	a.Cancel(base.ZeroAddr.Hex())
 
 	lastView := a.GetAppPreferences().LastView
 	lastTab := a.GetLastTab(lastView)

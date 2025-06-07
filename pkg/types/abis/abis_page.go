@@ -19,7 +19,7 @@ type AbisPage struct {
 	Functions     []coreTypes.Function `json:"functions,omitempty"`
 	TotalItems    int                  `json:"totalItems"`
 	ExpectedTotal int                  `json:"expectedTotal"`
-	IsLoading     bool                 `json:"isLoading"`
+	IsFetching    bool                 `json:"isFetching"`
 	IsLoaded      bool                 `json:"isLoaded"`
 }
 
@@ -37,7 +37,7 @@ func (ac *AbisCollection) GetPage(
 
 	switch listKind {
 	case AbisDownloaded:
-		page.IsLoading = ac.downloadedFacet.IsLoading()
+		page.IsFetching = ac.downloadedFacet.IsFetching()
 		page.IsLoaded = ac.downloadedFacet.IsLoaded()
 
 		filterFunc := func(abi *coreTypes.Abi) bool {
@@ -70,7 +70,7 @@ func (ac *AbisCollection) GetPage(
 		return page, nil
 
 	case AbisKnown:
-		page.IsLoading = ac.knownFacet.IsLoading()
+		page.IsFetching = ac.knownFacet.IsFetching()
 		page.IsLoaded = ac.knownFacet.IsLoaded()
 
 		filterFunc := func(abi *coreTypes.Abi) bool {
@@ -107,7 +107,7 @@ func (ac *AbisCollection) GetPage(
 		if listKind == AbisEvents {
 			facet = ac.eventsFacet
 		}
-		page.IsLoading = facet.IsLoading()
+		page.IsFetching = facet.IsFetching()
 		page.IsLoaded = facet.IsLoaded()
 
 		filterFunc := func(fn *coreTypes.Function) bool {

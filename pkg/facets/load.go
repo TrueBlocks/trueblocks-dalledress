@@ -13,10 +13,10 @@ var ErrorAlreadyLoading = errors.New("already loading")
 
 // Load implements loading using a source instead of a queryFunc
 func (r *BaseFacet[T]) Load(opts LoadOptions) (*StreamingResult, error) {
-	if !r.state.StartLoading() {
+	if !r.state.StartFetching() {
 		return nil, ErrorAlreadyLoading
 	}
-	defer r.state.StopLoading()
+	defer r.state.StopFetching()
 
 	if !opts.ForceReload && r.state.IsLoaded() {
 		msgs.EmitStatus(fmt.Sprintf("cached: %d items", len(r.data)))

@@ -18,8 +18,8 @@ func TestLoadData(t *testing.T) {
 	if ac.downloadedFacet.IsLoaded() || ac.knownFacet.IsLoaded() || ac.functionsFacet.IsLoaded() || ac.eventsFacet.IsLoaded() {
 		t.Error("NewAbisCollection should not have any loaded facets")
 	}
-	if ac.downloadedFacet.IsLoading() || ac.knownFacet.IsLoading() || ac.functionsFacet.IsLoading() || ac.eventsFacet.IsLoading() {
-		t.Error("NewAbisCollection should not have any loading facets")
+	if ac.downloadedFacet.IsFetching() || ac.knownFacet.IsFetching() || ac.functionsFacet.IsFetching() || ac.eventsFacet.IsFetching() {
+		t.Error("NewAbisCollection should not have any fetching facets")
 	}
 
 	// Call LoadData for known ABIs
@@ -28,23 +28,23 @@ func TestLoadData(t *testing.T) {
 	// Give the goroutine a moment to start
 	time.Sleep(10 * time.Millisecond)
 
-	// After calling LoadData, the known facet should either be loading or loaded
+	// After calling LoadData, the known facet should either be fetching or loaded
 	// Note: Due to the asynchronous nature, we can't easily test completion without
 	// more complex synchronization mechanisms
-	isLoadingOrLoaded := ac.knownFacet.IsLoading() || ac.knownFacet.IsLoaded()
+	isFetchingOrLoaded := ac.knownFacet.IsFetching() || ac.knownFacet.IsLoaded()
 
-	if !isLoadingOrLoaded {
-		t.Error("After LoadData, known facet should be loading or loaded")
+	if !isFetchingOrLoaded {
+		t.Error("After LoadData, known facet should be fetching or loaded")
 	}
 
-	// Test that calling LoadData again doesn't cause issues when already loading/loaded
-	prevState := ac.knownFacet.IsLoading() || ac.knownFacet.IsLoaded()
+	// Test that calling LoadData again doesn't cause issues when already fetching/loaded
+	prevState := ac.knownFacet.IsFetching() || ac.knownFacet.IsLoaded()
 	ac.LoadData(AbisKnown)
 
-	newState := ac.knownFacet.IsLoading() || ac.knownFacet.IsLoaded()
+	newState := ac.knownFacet.IsFetching() || ac.knownFacet.IsLoaded()
 
 	if !prevState || !newState {
-		t.Error("LoadData should not change state when already loading/loaded")
+		t.Error("LoadData should not change state when already fetching/loaded")
 	}
 }
 
@@ -59,7 +59,7 @@ func TestLoadAbis(t *testing.T) {
 	ac.LoadData(AbisKnown)
 	// Note: LoadData is async. Testing its completion requires a different approach.
 	// For now, we'll assume it kicks off the process.
-	// We can check isLoading state.
+	// We can check isFetching state.
 
 	// The rest of this test needs significant rework due to the asynchronous nature
 	// of loadInternal and the facet pattern replacing direct slice management.

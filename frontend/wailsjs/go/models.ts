@@ -6,7 +6,7 @@ export namespace abis {
 	    functions?: types.Function[];
 	    totalItems: number;
 	    expectedTotal: number;
-	    isLoading: boolean;
+	    isFetching: boolean;
 	    isLoaded: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -20,7 +20,7 @@ export namespace abis {
 	        this.functions = this.convertValues(source["functions"], types.Function);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
-	        this.isLoading = source["isLoading"];
+	        this.isFetching = source["isFetching"];
 	        this.isLoaded = source["isLoaded"];
 	    }
 	

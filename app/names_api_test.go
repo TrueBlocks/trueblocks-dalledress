@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestModifyName(t *testing.T) {
+func TestNamesCrud(t *testing.T) {
 	app := setupTestApp()
 	name := &coreTypes.Name{
 		Address: base.HexToAddress("0xbe0ed4138121ecfc5c0e56b40517da27e6c5226b"),
@@ -30,7 +31,7 @@ func TestModifyName(t *testing.T) {
 	}
 
 	t.Run("Add", func(t *testing.T) {
-		err := app.ModifyName("create", name)
+		err := app.NamesCrud(crud.Create, name, "")
 		assert.Nil(t, err)
 		n, exists := app.names.Map[name.Address]
 		assert.True(t, exists)
@@ -43,7 +44,7 @@ func TestModifyName(t *testing.T) {
 	})
 
 	t.Run("Autoname", func(t *testing.T) {
-		err := app.ModifyName("autoname", name)
+		err := app.NamesCrud(crud.Autoname, nil, name.Address.Hex())
 		assert.Nil(t, err)
 		n, exists := app.names.Map[name.Address]
 		assert.True(t, exists)
@@ -53,7 +54,7 @@ func TestModifyName(t *testing.T) {
 
 	t.Run("Edit", func(t *testing.T) {
 		name.Name = "UpdatedName"
-		err := app.ModifyName("update", name)
+		err := app.NamesCrud(crud.Update, name, "")
 		assert.Nil(t, err)
 		n, exists := app.names.Map[name.Address]
 		assert.True(t, exists)
@@ -62,7 +63,7 @@ func TestModifyName(t *testing.T) {
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-		err := app.ModifyName("delete", name)
+		err := app.NamesCrud(crud.Delete, nil, name.Address.Hex())
 		assert.Nil(t, err)
 		n, exists := app.names.Map[name.Address]
 		assert.True(t, exists)
@@ -70,7 +71,7 @@ func TestModifyName(t *testing.T) {
 	})
 
 	t.Run("Undelete", func(t *testing.T) {
-		err := app.ModifyName("undelete", name)
+		err := app.NamesCrud(crud.Undelete, nil, name.Address.Hex())
 		assert.Nil(t, err)
 		n, exists := app.names.Map[name.Address]
 		assert.True(t, exists)
@@ -78,7 +79,7 @@ func TestModifyName(t *testing.T) {
 	})
 
 	t.Run("Remove not deleted will fail", func(t *testing.T) {
-		err := app.ModifyName("remove", name)
+		err := app.NamesCrud(crud.Remove, nil, name.Address.Hex())
 		assert.NotNil(t, err)
 		n, exists := app.names.Map[name.Address]
 		assert.True(t, exists)
@@ -86,7 +87,7 @@ func TestModifyName(t *testing.T) {
 	})
 
 	t.Run("Delete again", func(t *testing.T) {
-		err := app.ModifyName("delete", name)
+		err := app.NamesCrud(crud.Delete, nil, name.Address.Hex())
 		assert.Nil(t, err)
 		n, exists := app.names.Map[name.Address]
 		assert.True(t, exists)
@@ -94,7 +95,7 @@ func TestModifyName(t *testing.T) {
 	})
 
 	t.Run("Remove", func(t *testing.T) {
-		err := app.ModifyName("remove", name)
+		err := app.NamesCrud(crud.Remove, nil, name.Address.Hex())
 		assert.Nil(t, err)
 		_, exists := app.names.Map[name.Address]
 		assert.False(t, exists)
@@ -106,15 +107,6 @@ func TestModifyName(t *testing.T) {
 			}
 		}
 		assert.False(t, found)
-	})
-
-	t.Run("Locking", func(t *testing.T) {
-		namesLock.CompareAndSwap(0, 1)
-		err := app.ModifyName("add", name)
-		assert.Nil(t, err)
-		_, exists := app.names.Map[name.Address]
-		assert.False(t, exists)
-		namesLock.CompareAndSwap(1, 0)
 	})
 }
 

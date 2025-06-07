@@ -1,5 +1,5 @@
 // ADD_ROUTE
-import { GetAbisPage, Reload, RemoveAbi } from '@app';
+import { GetAbisPage, Reload } from '@app';
 import { abis, sdk, types } from '@models';
 
 export const getAbisPage = (
@@ -9,8 +9,6 @@ export const getAbisPage = (
   sort: sdk.SortSpec,
   filter: string,
 ): Promise<abis.AbisPage> => GetAbisPage(kind, first, pageSize, sort, filter);
-
-export const removeAbi = (address: string): Promise<void> => RemoveAbi(address);
 
 export const reload = (): Promise<void> => Reload();
 

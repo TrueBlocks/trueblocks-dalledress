@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
@@ -20,6 +20,7 @@ export interface TableProps<T extends Record<string, unknown>> {
     string,
     (value: unknown, values: Record<string, unknown>) => string | null
   >;
+  onModalOpen?: (openModal: (data: T) => void) => void;
 }
 
 export const Table = <T extends Record<string, unknown>>({
@@ -29,6 +30,7 @@ export const Table = <T extends Record<string, unknown>>({
   tableKey,
   onSubmit,
   validate,
+  onModalOpen,
 }: TableProps<T>) => {
   const { pagination } = usePagination(tableKey);
   const { filter, setFiltering } = useFiltering(tableKey);
@@ -161,6 +163,18 @@ export const Table = <T extends Record<string, unknown>>({
     setSelectedRowIndex(index);
     setCurrentRowData(data[index] || null);
   };
+
+  const openModalWithData = useCallback((rowData: T) => {
+    setCurrentRowData(rowData);
+    setIsModalOpen(true);
+  }, []);
+
+  // Expose the openModalWithData function to parent component
+  useEffect(() => {
+    if (onModalOpen) {
+      onModalOpen(openModalWithData);
+    }
+  }, [onModalOpen, openModalWithData]);
 
   return (
     <div className="table-outer-container">

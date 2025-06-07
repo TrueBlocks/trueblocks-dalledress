@@ -33,11 +33,11 @@ func TestGetPage_BasicFunctionality(t *testing.T) {
 			}
 
 			if page.TotalItems != 0 {
-				t.Errorf("Expected 0 total items for empty repository, got %d", page.TotalItems)
+				t.Errorf("Expected 0 total items for empty facet, got %d", page.TotalItems)
 			}
 
 			if len(page.Abis) != 0 && len(page.Functions) != 0 {
-				t.Errorf("Expected empty results for empty repository")
+				t.Errorf("Expected empty results for empty facet")
 			}
 		})
 	}

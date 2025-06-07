@@ -2,6 +2,7 @@ package preferences
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -68,25 +69,20 @@ func GetAppPreferences() (AppPreferences, error) {
 	path := getAppPrefsPath()
 
 	if !file.FileExists(path) {
-		defaults := AppPreferences{
-			Version:          "1.0",
-			RecentProjects:   []string{},
-			LastView:         "/",
-			LastViewNoWizard: "/",
-			Bounds:           NewBounds(),
-			LastTab:          make(map[string]string),
-		}
+		defaults := *NewAppPreferences()
 		if err := SetAppPreferences(&defaults); err != nil {
 			return AppPreferences{}, err
 		}
-
 		return defaults, nil
 	}
 
 	var appPrefs AppPreferences
 	contents := file.AsciiFileToString(path)
 	if err := json.Unmarshal([]byte(contents), &appPrefs); err != nil {
-		return AppPreferences{}, err
+		appPrefs = *NewAppPreferences()
+		if err = SetAppPreferences(&appPrefs); err != nil {
+			return AppPreferences{}, fmt.Errorf("failed to save repaired preferences: %w", err)
+		}
 	}
 
 	// Initialize LastTab if nil

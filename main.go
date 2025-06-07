@@ -10,6 +10,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -41,13 +42,14 @@ func main() {
 			a,
 			&project.Project{},
 			// ADD_ROUTE
-			&types.NamesCollection{},
+			&names.NamesCollection{},
 			&abis.AbisCollection{},
 			// ADD_ROUTE
 		},
 		EnumBind: []interface{}{
 			msgs.AllMessages,
 			types.AllListKinds,
+			types.AllCruds,
 		},
 	}
 

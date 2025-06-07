@@ -6,7 +6,7 @@ export namespace abis {
 	    functions?: types.Function[];
 	    totalItems: number;
 	    expectedTotal: number;
-	    isLoading: boolean;
+	    isFetching: boolean;
 	    isLoaded: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -20,7 +20,7 @@ export namespace abis {
 	        this.functions = this.convertValues(source["functions"], types.Function);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
-	        this.isLoading = source["isLoading"];
+	        this.isFetching = source["isFetching"];
 	        this.isLoaded = source["isLoaded"];
 	    }
 	
@@ -77,6 +77,19 @@ export namespace base {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.address = source["address"];
 	    }
+	}
+
+}
+
+export namespace crud {
+	
+	export enum Operation {
+	    CREATE = "create",
+	    UPDATE = "update",
+	    DELETE = "delete",
+	    UNDELETE = "undelete",
+	    REMOVE = "remove",
+	    AUTONAME = "autoname",
 	}
 
 }
@@ -223,19 +236,91 @@ export namespace msgs {
 
 }
 
-export namespace output {
+export namespace names {
 	
-	export class RenderCtx {
-	
+	export class NamesCollection {
+	    map: Record<string, types.Name>;
+	    list: types.Name[];
+	    custom: types.Name[];
+	    prefund: types.Name[];
+	    regular: types.Name[];
+	    baddress: types.Name[];
+	    listTags: string[];
+	    customTags: string[];
+	    prefundTags: string[];
+	    regularTags: string[];
+	    baddressTags: string[];
 	
 	    static createFrom(source: any = {}) {
-	        return new RenderCtx(source);
+	        return new NamesCollection(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	
+	        this.map = this.convertValues(source["map"], types.Name, true);
+	        this.list = this.convertValues(source["list"], types.Name);
+	        this.custom = this.convertValues(source["custom"], types.Name);
+	        this.prefund = this.convertValues(source["prefund"], types.Name);
+	        this.regular = this.convertValues(source["regular"], types.Name);
+	        this.baddress = this.convertValues(source["baddress"], types.Name);
+	        this.listTags = source["listTags"];
+	        this.customTags = source["customTags"];
+	        this.prefundTags = source["prefundTags"];
+	        this.regularTags = source["regularTags"];
+	        this.baddressTags = source["baddressTags"];
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class NamesPage {
+	    names: types.Name[];
+	    total: number;
+	    tags: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new NamesPage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.names = this.convertValues(source["names"], types.Name);
+	        this.total = source["total"];
+	        this.tags = source["tags"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 
 }
@@ -733,90 +818,6 @@ export namespace types {
 	        this.tags = source["tags"];
 	        this.prefund = this.convertValues(source["prefund"], null);
 	        this.parts = source["parts"];
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class NamesCollection {
-	    map: Record<string, Name>;
-	    list: Name[];
-	    custom: Name[];
-	    prefund: Name[];
-	    regular: Name[];
-	    baddress: Name[];
-	    listTags: string[];
-	    customTags: string[];
-	    prefundTags: string[];
-	    regularTags: string[];
-	    baddressTags: string[];
-	
-	    static createFrom(source: any = {}) {
-	        return new NamesCollection(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.map = this.convertValues(source["map"], Name, true);
-	        this.list = this.convertValues(source["list"], Name);
-	        this.custom = this.convertValues(source["custom"], Name);
-	        this.prefund = this.convertValues(source["prefund"], Name);
-	        this.regular = this.convertValues(source["regular"], Name);
-	        this.baddress = this.convertValues(source["baddress"], Name);
-	        this.listTags = source["listTags"];
-	        this.customTags = source["customTags"];
-	        this.prefundTags = source["prefundTags"];
-	        this.regularTags = source["regularTags"];
-	        this.baddressTags = source["baddressTags"];
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class NamesPage {
-	    names: Name[];
-	    total: number;
-	    tags: string[];
-	
-	    static createFrom(source: any = {}) {
-	        return new NamesPage(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.names = this.convertValues(source["names"], Name);
-	        this.total = source["total"];
-	        this.tags = source["tags"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

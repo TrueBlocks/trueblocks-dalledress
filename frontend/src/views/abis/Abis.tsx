@@ -1,14 +1,16 @@
 // ADD_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { AbisCrud } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { abis, msgs, types } from '@models';
+import { abis, crud, msgs, types } from '@models';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
+import { Address } from '../../types/address';
 import {
   ABIS_DEFAULT_LIST,
   ABIS_ROUTE,
@@ -16,7 +18,6 @@ import {
   getAbisPage,
   getColumns,
   reload,
-  removeAbi,
 } from './';
 
 export const Abis = () => {
@@ -38,8 +39,8 @@ export const Abis = () => {
   const { emitStatus } = useEmitters();
 
   const listKindRef = useRef(listKind);
-  const renderCount = useRef(0);
-  renderCount.current++;
+  const renderCnt = useRef(0);
+  // renderCnt.current++;
 
   useEffect(() => {
     listKindRef.current = listKind;
@@ -106,7 +107,7 @@ export const Abis = () => {
   ]);
 
   // Optimistic delete action with proper type safety
-  const _handleAction = (address: string) => {
+  const _handleAction = (address: Address) => {
     clearError();
     try {
       const original = [...(pageData?.abis || [])];
@@ -121,7 +122,7 @@ export const Abis = () => {
           abis: optimisticValues,
         });
       });
-      removeAbi(address)
+      AbisCrud(crud.Operation.REMOVE, {} as types.Abi, address)
         .then(async () => {
           const result = await getAbisPage(
             listKindRef.current,
@@ -163,7 +164,7 @@ export const Abis = () => {
       <BaseTab
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
-        loading={!!pageData?.isLoading}
+        loading={!!pageData?.isFetching}
         error={error}
         onSubmit={handleSubmit}
         tableKey={tableKey}
@@ -172,7 +173,7 @@ export const Abis = () => {
     [
       currentData,
       currentColumns,
-      pageData?.isLoading,
+      pageData?.isFetching,
       error,
       handleSubmit,
       tableKey,
@@ -214,7 +215,7 @@ export const Abis = () => {
           <p>{error.message}</p>
         </div>
       )}
-      <div>{`renderCnt: ${renderCount.current}`}</div>
+      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
 };

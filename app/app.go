@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
@@ -24,9 +22,10 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/streaming"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -39,49 +38,20 @@ type App struct {
 	Projects    *project.Manager
 	chainList   *utils.ChainList
 	// ADD_ROUTE
-	names types.NamesCollection
+	names names.NamesCollection
 	abis  abis.AbisCollection
 	// ADD_ROUTE
-	meta              *coreTypes.MetaData
-	fileServer        *fileserver.FileServer
-	locked            int32
-	ctx               context.Context
-	apiKeys           map[string]string
-	ensMap            map[string]base.Address
-	Dalle             *dalle.Context
-	cancelMutex       sync.Mutex
-	activeCancelFuncs []context.CancelFunc
-}
-
-func (a *App) RegisterCancel(cancel context.CancelFunc) {
-	a.cancelMutex.Lock()
-	defer a.cancelMutex.Unlock()
-	a.activeCancelFuncs = append(a.activeCancelFuncs, cancel)
-}
-
-func (a *App) UnregisterCancel(cancelToRemove context.CancelFunc) {
-	a.cancelMutex.Lock()
-	defer a.cancelMutex.Unlock()
-	newActiveCancelFuncs := []context.CancelFunc{}
-	candidateToRemoveStr := fmt.Sprintf("%p", cancelToRemove)
-	for _, cf := range a.activeCancelFuncs {
-		if fmt.Sprintf("%p", cf) != candidateToRemoveStr {
-			newActiveCancelFuncs = append(newActiveCancelFuncs, cf)
-		}
-	}
-	a.activeCancelFuncs = newActiveCancelFuncs
-}
-
-func (a *App) RegisterCtx(key string) *output.RenderCtx {
-	return streaming.RegisterCtx(key)
-}
-
-func (a *App) Cancel(key string) (int, bool) {
-	return streaming.Cancel(key)
+	meta       *coreTypes.MetaData
+	fileServer *fileserver.FileServer
+	locked     int32
+	ctx        context.Context
+	apiKeys    map[string]string
+	ensMap     map[string]base.Address
+	Dalle      *dalle.Context
 }
 
 func (a *App) CancelAll() {
-	streaming.CancelAll()
+	sources.CancelAll()
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -97,7 +67,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		ensMap:  make(map[string]base.Address),
 	}
 	// ADD_ROUTE
-	app.names = types.NewNamesCollection()
+	app.names = names.NewNamesCollection()
 	app.abis = abis.NewAbisCollection()
 	// ADD_ROUTE
 
@@ -169,7 +139,7 @@ func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 	if a.IsReady() {
 		// ADD_ROUTE
-		if err := a.names.LoadNames(nil); err != nil {
+		if err := a.names.LoadData(nil); err != nil {
 			msgs.EmitError("Failed to load names database", err)
 		}
 		// ADD_ROUTE
@@ -411,7 +381,6 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 
 func (a *App) Reload() error {
 	a.CancelAll()
-	a.Cancel(base.ZeroAddr.Hex())
 
 	lastView := a.GetAppPreferences().LastView
 	lastTab := a.GetLastTab(lastView)
@@ -422,7 +391,7 @@ func (a *App) Reload() error {
 		a.abis.ClearCache(lastTab)
 		a.abis.LoadData(lastTab)
 	case "/names":
-		a.names = a.names.ReloadNames()
+		a.names = a.names.ClearCache()
 	}
 	// ADD_ROUTE
 
@@ -435,6 +404,8 @@ func (a *App) GetNodeStatus() *coreTypes.MetaData {
 	defer logger.SetLoggerWriter(w)
 	logger.SetLoggerWriter(io.Discard)
 
-	a.meta, _ = sdk.GetMetaData("gnosis")
+	chainName := preferences.GetPreferredChainName()
+	a.meta, _ = sdk.GetMetaData(chainName)
+
 	return a.meta
 }

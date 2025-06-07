@@ -1,14 +1,7 @@
 // ADD_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-  AutonameName,
-  DeleteName,
-  GetNamesPage,
-  RemoveName,
-  UndeleteName,
-  UpdateName,
-} from '@app';
+import { GetNamesPage, NamesCrud } from '@app';
 import {
   Action,
   Chips,
@@ -23,9 +16,10 @@ import {
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useEvent } from '@hooks';
 import { TabView } from '@layout';
-import { msgs, types } from '@models';
+import { crud, msgs, types } from '@models';
 import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { Log, useEmitters } from '@utils';
+import { Address } from 'src/types/address';
 import { useLocation } from 'wouter';
 
 import './Names.css';
@@ -89,6 +83,11 @@ export const Names = () => {
 
   // Single ref for backward compatibility
   const tagsTableRef = useRef<TagsTableHandle>(null);
+
+  // Store the openModal function for each table
+  const openModalRefs = useRef<
+    Record<string, ((data: IndexableName) => void) | null>
+  >({});
 
   const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
 
@@ -354,8 +353,7 @@ export const Names = () => {
     }
     setNames(optimisticNames); // Update UI optimistically
 
-    // 3. Call UpdateName
-    UpdateName(submittedName)
+    NamesCrud(crud.Operation.UPDATE, submittedName, '')
       .then(() => {
         // 4. If UpdateName is successful, call GetNamesPage
         return GetNamesPage(
@@ -392,14 +390,12 @@ export const Names = () => {
   type NameActionType = 'delete' | 'edit' | 'remove' | 'autoname';
 
   const handleAction = (
-    address: string,
+    address: Address,
     isDeleted: boolean,
     actionType: NameActionType = 'delete',
   ) => {
-    const addressStr = address;
-
     // Add address to processing set
-    setProcessingAddresses((prev) => new Set(prev).add(addressStr));
+    setProcessingAddresses((prev) => new Set(prev).add(address));
 
     try {
       // Handle different action types
@@ -415,18 +411,16 @@ export const Names = () => {
               ? name.address
               : String(name.address);
 
-          return nameAddress === addressStr
+          return nameAddress === address
             ? ({ ...name, deleted: !isDeleted } as IndexableName)
             : name;
         });
         setNames(optimisticNames);
 
-        // Determine which API to call based on current state
-        const apiCall = isDeleted
-          ? UndeleteName(addressStr)
-          : DeleteName(addressStr);
-
-        apiCall
+        const operation = isDeleted
+          ? crud.Operation.UNDELETE
+          : crud.Operation.DELETE;
+        NamesCrud(operation, {} as types.Name, address)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
@@ -444,7 +438,7 @@ export const Names = () => {
             setTags(result.tags || []);
 
             const action = isDeleted ? 'undeleted' : 'deleted';
-            emitStatus(`Address ${addressStr} was ${action} successfully`);
+            emitStatus(`Address ${address} was ${action} successfully`);
           })
           .catch((err) => {
             // If there's an error, revert the optimistic update
@@ -455,11 +449,28 @@ export const Names = () => {
       }
       // Add implementations for future action types
       else if (actionType === 'edit') {
-        // For edit, we could open a form or implement inline editing
-        // For now, we'll log that this functionality needs UI implementation
-        emitStatus(
-          `Edit functionality for ${addressStr} needs UI implementation`,
-        );
+        const rowData = names.find((name) => {
+          const nameAddress =
+            typeof name.address === 'string'
+              ? name.address
+              : String(name.address);
+          return nameAddress === address;
+        });
+
+        if (rowData) {
+          // Find the current tab and use its openModal function
+          const currentTabLabel = lastTab['/names'] || 'Custom';
+          const openModalFn = openModalRefs.current[currentTabLabel];
+          if (openModalFn) {
+            openModalFn(rowData);
+          } else {
+            emitError(
+              `Could not find modal function for tab ${currentTabLabel}`,
+            );
+          }
+        } else {
+          emitError(`Could not find name data for address ${address}`);
+        }
       } else if (actionType === 'remove') {
         // Remove can only be performed on deleted items
         if (!isDeleted) {
@@ -477,11 +488,11 @@ export const Names = () => {
             typeof name.address === 'string'
               ? name.address
               : String(name.address);
-          return nameAddress !== addressStr;
+          return nameAddress !== address;
         });
         setNames(optimisticNames);
 
-        RemoveName(addressStr)
+        NamesCrud(crud.Operation.REMOVE, {} as types.Name, address)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
@@ -498,7 +509,7 @@ export const Names = () => {
             setTotalItems(result.total || 0);
             setTags(result.tags || []);
 
-            emitStatus(`Address ${addressStr} was removed successfully`);
+            emitStatus(`Address ${address} was removed successfully`);
           })
           .catch((err) => {
             // If there's an error, revert the optimistic update
@@ -518,13 +529,13 @@ export const Names = () => {
               ? name.address
               : String(name.address);
 
-          return nameAddress === addressStr
+          return nameAddress === address
             ? ({ ...name, name: 'Generating...' } as IndexableName)
             : name;
         });
         setNames(optimisticNames);
 
-        AutonameName(addressStr)
+        NamesCrud(crud.Operation.AUTONAME, {} as types.Name, address)
           .then(() => {
             // If API call is successful, refresh the data to get the definitive state
             return GetNamesPage(
@@ -541,7 +552,7 @@ export const Names = () => {
             setTotalItems(result.total || 0);
             setTags(result.tags || []);
 
-            emitStatus(`Address ${addressStr} was auto-named successfully`);
+            emitStatus(`Address ${address} was auto-named successfully`);
           })
           .catch((err) => {
             // If there's an error, revert the optimistic update
@@ -554,7 +565,7 @@ export const Names = () => {
       // Always clean up the processing state
       setProcessingAddresses((prev) => {
         const newSet = new Set(prev);
-        newSet.delete(addressStr);
+        newSet.delete(address);
         return newSet;
       });
     }
@@ -654,21 +665,21 @@ export const Names = () => {
             <Action
               icon="Edit"
               onClick={() => handleAction(addressStr, isDeleted, 'edit')}
-              disabled={isProcessing}
+              disabled={isProcessing || isDeleted || !row.isCustom}
               title="Edit"
               size="sm"
             />
             <Action
               icon={isDeleted ? 'Undelete' : 'Delete'}
               onClick={() => handleAction(addressStr, isDeleted, 'delete')}
-              disabled={isProcessing}
+              disabled={isProcessing || !row.isCustom}
               title={isDeleted ? 'Undelete' : 'Delete'}
               size="sm"
             />
             <Action
               icon="Remove"
               onClick={() => handleAction(addressStr, isDeleted, 'remove')}
-              disabled={isProcessing || !isDeleted}
+              disabled={isProcessing || !isDeleted || !row.isCustom}
               title="Remove"
               size="sm"
             />
@@ -709,6 +720,9 @@ export const Names = () => {
           tableKey={tableKey}
           onSubmit={handleFormSubmit}
           validate={formValidation}
+          onModalOpen={(openModal) => {
+            openModalRefs.current[tabLabel] = openModal;
+          }}
         />
       </>
     );

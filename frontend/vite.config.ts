@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@app': 'wailsjs/go/app/App',
-      '@names': 'wailsjs/go/types/NamesCollection',
+      '@names': 'wailsjs/go/names/NamesCollection',
       '@hooks': 'src/hooks',
       '@utils': 'src/utils',
       '@contexts': 'src/contexts',

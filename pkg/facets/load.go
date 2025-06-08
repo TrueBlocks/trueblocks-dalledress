@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/source"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
@@ -28,7 +28,7 @@ func (r *BaseFacet[T]) Load() (*StreamingResult, error) {
 	r.mutex.Unlock()
 
 	contextKey := fmt.Sprintf("facet-%s-%s", r.listKind, r.source.GetSourceType())
-	finalPayload, err := sources.ProcessStream(
+	finalPayload, err := source.ProcessStream(
 		contextKey,
 		r.source,
 		r.filterFunc,

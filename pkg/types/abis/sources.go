@@ -6,22 +6,24 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/source"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 // Global shared sources - these are the key to eliminating redundant SDK calls
 var (
-	sharedAbisListSource    sources.Source[coreTypes.Abi]
-	sharedAbisDetailsSource sources.Source[coreTypes.Function]
+	sharedAbisListSource    source.Source[coreTypes.Abi]
+	sharedAbisDetailsSource source.Source[coreTypes.Function]
 )
 
 // GetSharedAbisListSource returns the shared source for ABI list data
 // Both Downloaded and Known facets use this SAME source
-func GetSharedAbisListSource() sources.Source[coreTypes.Abi] {
+func GetSharedAbisListSource() source.Source[coreTypes.Abi] {
 	if sharedAbisListSource == nil {
-		sharedAbisListSource = sources.NewSDKSource(
+		logging.LogBackend("Creating new shared ABI list source")
+		sharedAbisListSource = source.NewSDKSource(
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetPreferredChainName()
 				listOpts := sdk.AbisOptions{
@@ -47,9 +49,10 @@ func GetSharedAbisListSource() sources.Source[coreTypes.Abi] {
 
 // GetSharedAbisDetailsSource returns the shared source for ABI details/functions data
 // Both Functions and Events facets use this SAME source
-func GetSharedAbisDetailsSource() sources.Source[coreTypes.Function] {
+func GetSharedAbisDetailsSource() source.Source[coreTypes.Function] {
 	if sharedAbisDetailsSource == nil {
-		sharedAbisDetailsSource = sources.NewSDKSource(
+		logging.LogBackend("Creating new shared ABI list source")
+		sharedAbisDetailsSource = source.NewSDKSource(
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetPreferredChainName()
 				detailOpts := sdk.AbisOptions{

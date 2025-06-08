@@ -4,7 +4,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sources"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/source"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
@@ -42,7 +42,7 @@ type Facet[T any] interface {
 	IsLoaded() bool
 	GetState() LoadState
 	NeedsUpdate() bool
-	Remove(predicate func(*T) bool) bool
+	FacetCrud(matchFunc func(*T) bool) bool
 	Reset()
 	ExpectedCount() int
 	Count() int
@@ -64,7 +64,7 @@ type PageResult[T any] struct {
 // BaseFacet provides facet functionality using a source for data fetching
 type BaseFacet[T any] struct {
 	state       atomic.Value
-	source      sources.Source[T]
+	source      source.Source[T]
 	data        []T
 	expectedCnt int
 	listKind    types.ListKind
@@ -78,7 +78,7 @@ func NewBaseFacet[T any](
 	listKind types.ListKind,
 	filterFunc FilterFunc[T],
 	isDupFunc func(existing []T, newItem *T) bool,
-	source sources.Source[T],
+	source source.Source[T],
 ) *BaseFacet[T] {
 	facet := &BaseFacet[T]{
 		source:      source,

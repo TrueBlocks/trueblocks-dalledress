@@ -1,4 +1,4 @@
-package sources
+package source
 
 import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"

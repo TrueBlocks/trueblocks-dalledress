@@ -19,11 +19,15 @@ func (a *App) GetAbisPage(
 	return a.abis.GetPage(kind, first, pageSize, sort, filter)
 }
 
-func (a *App) AbisCrud(op crud.Operation, abi *coreTypes.Abi, address string) error {
+func (a *App) AbisCrud(
+	kind types.ListKind,
+	op crud.Operation,
+	abi *coreTypes.Abi,
+	address string) error {
 	if address != "" && (abi == nil || abi.Address.IsZero()) {
 		abi = &coreTypes.Abi{Address: base.HexToAddress(address)}
 	}
-	return a.abis.Crud(op, abi)
+	return a.abis.AbisCrud(kind, op, abi)
 }
 
 // ADD_ROUTE

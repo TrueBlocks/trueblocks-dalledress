@@ -4,34 +4,34 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 )
 
-// Source defines the contract for data sources
-// Sources handle the low-level data fetching and streaming from external systems
-type Source[T any] interface {
+// Store defines the contract for data stores
+// Stores handle the low-level data fetching and streaming from external systems
+type Store[T any] interface {
 	Fetch(ctx *output.RenderCtx, processor func(item *T) bool) error
-	GetSourceType() string
+	GetStoreType() string
 }
 
-// SDKSource implements Source for TrueBlocks SDK-based data fetching
-type SDKSource[T any] struct {
+// SDKStore implements Store for TrueBlocks SDK-based data fetching
+type SDKStore[T any] struct {
 	queryFunc   func(*output.RenderCtx) error // SDK query function
 	processFunc func(interface{}) *T          // Convert raw item to typed item
-	sourceType  string                        // Type identifier for this source
+	storeType   string                        // Type identifier for this store
 }
 
-// NewSDKSource creates a new SDK-based source
-func NewSDKSource[T any](
+// NewSDKStore creates a new SDK-based store
+func NewSDKStore[T any](
 	queryFunc func(*output.RenderCtx) error,
 	processFunc func(interface{}) *T,
-) *SDKSource[T] {
-	return &SDKSource[T]{
+) *SDKStore[T] {
+	return &SDKStore[T]{
 		queryFunc:   queryFunc,
 		processFunc: processFunc,
-		sourceType:  "sdk",
+		storeType:   "sdk",
 	}
 }
 
-// Fetch implements Source.Fetch for SDK sources
-func (s *SDKSource[T]) Fetch(ctx *output.RenderCtx, processor func(item *T) bool) error {
+// Fetch implements Store.Fetch for SDK store
+func (s *SDKStore[T]) Fetch(ctx *output.RenderCtx, processor func(item *T) bool) error {
 	// Set up done channel to coordinate fetching completion
 	done := make(chan struct{})
 	errChan := make(chan error, 1)
@@ -105,7 +105,7 @@ func (s *SDKSource[T]) Fetch(ctx *output.RenderCtx, processor func(item *T) bool
 	return nil
 }
 
-// GetSourceType implements Source.GetSourceType
-func (s *SDKSource[T]) GetSourceType() string {
-	return s.sourceType
+// GetStoreType implements Store.GetStoreType
+func (s *SDKStore[T]) GetStoreType() string {
+	return s.storeType
 }

@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package abis
 
 import (
@@ -164,35 +163,35 @@ func TestAbisCollection_ThreadSafety(t *testing.T) {
 }
 
 func TestAbisFacet(t *testing.T) {
-	sharedAbisListSource := GetSharedAbisListSource()
-	sharedAbisDetailsSource := GetSharedAbisDetailsSource()
+	abisListStore := GetListStore()
+	abisDetailStore := GetDetailStore()
 
 	downloadedFacet := facets.NewBaseFacet(
 		AbisDownloaded,
 		func(abi *coreTypes.Abi) bool { return !abi.IsKnown },
 		nil,
-		sharedAbisListSource,
+		abisListStore,
 	)
 
 	knownFacet := facets.NewBaseFacet(
 		AbisKnown,
 		func(abi *coreTypes.Abi) bool { return abi.IsKnown },
 		nil,
-		sharedAbisListSource,
+		abisListStore,
 	)
 
 	functionsFacet := facets.NewBaseFacet(
 		AbisFunctions,
 		func(fn *coreTypes.Function) bool { return fn.FunctionType != "event" },
-		IsDupFuncByEncoding(),
-		sharedAbisDetailsSource,
+		isEncodingDup(),
+		abisDetailStore,
 	)
 
 	eventsFacet := facets.NewBaseFacet(
 		AbisEvents,
 		func(fn *coreTypes.Function) bool { return fn.FunctionType == "event" },
-		IsDupFuncByEncoding(),
-		sharedAbisDetailsSource,
+		isEncodingDup(),
+		abisDetailStore,
 	)
 
 	if downloadedFacet == nil {
@@ -232,23 +231,22 @@ func TestAbisFacet(t *testing.T) {
 		}
 	}
 
-	if sharedAbisListSource == nil {
-		t.Error("Shared ABI list source should not be nil")
+	if abisListStore == nil {
+		t.Error("Shared ABI list store should not be nil")
 	}
 
-	if sharedAbisDetailsSource == nil {
-		t.Error("Shared ABI details source should not be nil")
+	if abisDetailStore == nil {
+		t.Error("Shared ABI details store should not be nil")
 	}
 
-	if GetSharedAbisListSource() != sharedAbisListSource {
-		t.Error("GetSharedAbisListSource should return the same instance (singleton pattern)")
+	if GetListStore() != abisListStore {
+		t.Error("GetListStore should return the same instance (singleton pattern)")
 	}
 
-	if GetSharedAbisDetailsSource() != sharedAbisDetailsSource {
-		t.Error("GetSharedAbisDetailsSource should return the same instance (singleton pattern)")
+	if GetDetailStore() != abisDetailStore {
+		t.Error("GetDetailStore should return the same instance (singleton pattern)")
 	}
 
-	t.Log("Abis facet test completed successfully - all facets created with shared sources")
+	t.Log("Abis facet test completed successfully - all facets created with shared stores")
 }
 
-// ADD_ROUTE

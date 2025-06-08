@@ -42,7 +42,7 @@ type Facet[T any] interface {
 	IsLoaded() bool
 	GetState() LoadState
 	NeedsUpdate() bool
-	FacetCrud(matchFunc func(*T) bool) bool
+	ForEvery(func(item *T) (error, bool), func(item *T) bool) (int, error)
 	Reset()
 	ExpectedCount() int
 	Count() int
@@ -61,10 +61,10 @@ type PageResult[T any] struct {
 	State      LoadState
 }
 
-// BaseFacet provides facet functionality using a source for data fetching
+// BaseFacet provides facet functionality using a store for data fetching
 type BaseFacet[T any] struct {
 	state       atomic.Value
-	source      store.Source[T]
+	store       store.Store[T]
 	data        []T
 	expectedCnt int
 	listKind    types.ListKind
@@ -73,15 +73,15 @@ type BaseFacet[T any] struct {
 	mutex       sync.RWMutex
 }
 
-// NewBaseFacet creates a new facet that uses a source for data fetching
+// NewBaseFacet creates a new facet that uses a store for data fetching
 func NewBaseFacet[T any](
 	listKind types.ListKind,
 	filterFunc FilterFunc[T],
 	isDupFunc func(existing []T, newItem *T) bool,
-	source store.Source[T],
+	store store.Store[T],
 ) *BaseFacet[T] {
 	facet := &BaseFacet[T]{
-		source:      source,
+		store:       store,
 		data:        make([]T, 0),
 		expectedCnt: 0,
 		listKind:    listKind,

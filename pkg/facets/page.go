@@ -122,16 +122,16 @@ func CreatePageFilter[T any](filter string, searchFields func(T) []string) func(
 	}
 }
 
-// ProcessPage processes the source slice: filters, sorts, and paginates the data
+// ProcessPage processes the store slice: filters, sorts, and paginates the data
 func ProcessPage[T any](
 	typeName string,
-	sourceSlice *[]T,
+	storeSlice *[]T,
 	sortSpec sdk.SortSpec,
 	sortFn func([]T, sdk.SortSpec) error,
 	filterFn func(T) bool,
 	first, pageSize int,
 ) (paginatedItems []T, totalFiltered, totalSource int, err error) {
-	filteredItems := FilterPageSlice(sourceSlice, filterFn)
+	filteredItems := FilterPageSlice(storeSlice, filterFn)
 
 	if err := sortFn(filteredItems, sortSpec); err != nil {
 		return nil, 0, 0, fmt.Errorf("error sorting %s: %w", typeName, err)
@@ -139,5 +139,5 @@ func ProcessPage[T any](
 
 	paginatedItems = PaginateSlice(filteredItems, first, pageSize)
 
-	return paginatedItems, len(filteredItems), len(*sourceSlice), nil
+	return paginatedItems, len(filteredItems), len(*storeSlice), nil
 }

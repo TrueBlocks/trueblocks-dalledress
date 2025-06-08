@@ -1,24 +1,23 @@
 package facets
 
-// Remove deletes items matching the matchFunc from the facet data
-func (r *BaseFacet[T]) FacetCrud(matchFunc func(*T) bool) bool {
+func (r *BaseFacet[T]) ForEvery(actionFunc func(itemMatched *T) (error, bool), matchFunc func(item *T) bool) (int, error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	var removed bool
+	var matchCount int = 0
 	filteredData := make([]T, 0, len(r.data))
 	for _, item := range r.data {
 		if !matchFunc(&item) {
 			filteredData = append(filteredData, item)
 		} else {
-			removed = true
+			matchCount++
 		}
 	}
 
-	if removed {
+	if matchCount > 0 {
 		r.data = filteredData
-		r.expectedCnt = len(r.data) // Update expected count after removal
+		r.expectedCnt = len(r.data)
 	}
 
-	return removed
+	return matchCount, nil
 }

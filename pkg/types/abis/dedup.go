@@ -1,13 +1,11 @@
-// ADD_ROUTE
 package abis
 
 import (
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 )
 
-// IsDupFuncByEncoding returns a deduplication function that uses a hash set
-// for O(1) encoding lookups instead of O(n) linear search.
-func IsDupFuncByEncoding() func(existing []coreTypes.Function, newItem *coreTypes.Function) bool {
+// isEncodingDup returns a function that checks for duplicate encodings
+func isEncodingDup() func(existing []coreTypes.Function, newItem *coreTypes.Function) bool {
 	seen := make(map[string]bool)
 	lastExistingLen := 0
 
@@ -28,5 +26,3 @@ func IsDupFuncByEncoding() func(existing []coreTypes.Function, newItem *coreType
 		return false
 	}
 }
-
-// ADD_ROUTE

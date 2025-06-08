@@ -8,13 +8,13 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-// mockSource is a test implementation of Source[string]
-type mockSource struct {
-	testData   []string
-	sourceType string
+// mockStore is a test implementation of Store[string]
+type mockStore struct {
+	testData  []string
+	storeType string
 }
 
-func (m *mockSource) Fetch(ctx *output.RenderCtx, processor func(item *string) bool) error {
+func (m *mockStore) Fetch(ctx *output.RenderCtx, processor func(item *string) bool) error {
 	for _, data := range m.testData {
 		item := data
 		if !processor(&item) {
@@ -24,8 +24,8 @@ func (m *mockSource) Fetch(ctx *output.RenderCtx, processor func(item *string) b
 	return nil
 }
 
-func (m *mockSource) GetSourceType() string {
-	return m.sourceType
+func (m *mockStore) GetStoreType() string {
+	return m.storeType
 }
 
 func TestFacetPattern(t *testing.T) {
@@ -37,9 +37,9 @@ func TestFacetPattern(t *testing.T) {
 
 	isDupFunc := func(existing []string, newItem *string) bool { return false }
 
-	mockSrc := &mockSource{
-		testData:   testData,
-		sourceType: "mock",
+	mockSrc := &mockStore{
+		testData:  testData,
+		storeType: "mock",
 	}
 
 	facet := facets.NewBaseFacet(

@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package abis
 
 import (
@@ -141,5 +140,3 @@ func (ac *AbisCollection) GetPage(
 	}
 	return AbisPage{}, fmt.Errorf("unknown list kind: %s", listKind)
 }
-
-// ADD_ROUTE

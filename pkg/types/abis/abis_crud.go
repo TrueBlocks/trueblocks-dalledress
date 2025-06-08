@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package abis
 
 import (
@@ -14,31 +13,31 @@ import (
 // Crud performs CRUD operations on ABIs - handles all operation types
 func (ac *AbisCollection) AbisCrud(listKind types.ListKind, op crud.Operation, abi *coreTypes.Abi) error {
 	action := "unknown"
-	result := false
+	nRemoved := 0
 
 	switch op {
 	case crud.Remove:
 		action = "removed"
-		actionFunc := func(addr string) error {
+		actionFunc := func(item *coreTypes.Abi) (error, bool) {
+			addr := item.Address.Hex()
 			opts := sdk.AbisOptions{
 				Addrs:   []string{addr},
 				Globals: sdk.Globals{Decache: true},
 			}
 			if _, _, err := opts.Abis(); err != nil {
-				return err
+				return err, false /* don't remove */ // nolint:nilerr
 			}
-			return nil
+			return nil, true /* remove */
 		}
-		_ = actionFunc(abi.Address.Hex())
 
 		matchFunc := func(existing *coreTypes.Abi) bool {
 			return existing.Address == abi.Address
 		}
 
-		result = ac.downloadedFacet.FacetCrud(matchFunc)
+		nRemoved, _ = ac.downloadedFacet.ForEvery(actionFunc, matchFunc)
 	}
 
-	if result {
+	if nRemoved > 0 {
 		msgs.EmitStatus(fmt.Sprintf("%s ABI for address in %s facet: %s", action, listKind, abi.Address))
 	} else {
 		msgs.EmitStatus(fmt.Sprintf("Address %s not found in %s facet", abi.Address, listKind))
@@ -47,4 +46,3 @@ func (ac *AbisCollection) AbisCrud(listKind types.ListKind, op crud.Operation, a
 	return nil
 }
 
-// ADD_ROUTE

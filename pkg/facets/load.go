@@ -11,7 +11,7 @@ import (
 
 var ErrorAlreadyLoading = errors.New("already loading")
 
-// Load implements loading using a source instead of a queryFunc
+// Load implements loading using a store instead of a queryFunc
 func (r *BaseFacet[T]) Load() (*StreamingResult, error) {
 	if !r.NeedsUpdate() {
 		msgs.EmitStatus(fmt.Sprintf("cached: %d items", len(r.data)))
@@ -27,10 +27,10 @@ func (r *BaseFacet[T]) Load() (*StreamingResult, error) {
 	r.data = r.data[:0]
 	r.mutex.Unlock()
 
-	contextKey := fmt.Sprintf("facet-%s-%s", r.listKind, r.source.GetSourceType())
+	contextKey := fmt.Sprintf("facet-%s-%s", r.listKind, r.store.GetStoreType())
 	finalPayload, err := store.ProcessStream(
 		contextKey,
-		r.source,
+		r.store,
 		r.filterFunc,
 		r.isDupFunc,
 		&r.data,

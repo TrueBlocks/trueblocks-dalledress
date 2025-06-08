@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package abis
 
 import (
@@ -52,4 +51,3 @@ func TestGetPage_InvalidListKind(t *testing.T) {
 	}
 }
 
-// ADD_ROUTE

@@ -273,7 +273,7 @@ func TestCreatePageFilter(t *testing.T) {
 }
 
 func TestProcessPage(t *testing.T) {
-	sourceItems := []TestItem{
+	storeItems := []TestItem{
 		{ID: 1, Name: "Alice", Age: 30},
 		{ID: 2, Name: "Bob", Age: 25},
 		{ID: 3, Name: "Charlie", Age: 35},
@@ -301,7 +301,7 @@ func TestProcessPage(t *testing.T) {
 		sortSpec := sdk.SortSpec{}
 		paginatedItems, totalFiltered, totalSource, err := ProcessPage(
 			"TestItem",
-			&sourceItems,
+			&storeItems,
 			sortSpec,
 			sortFn,
 			filterFn,
@@ -343,7 +343,7 @@ func TestProcessPage(t *testing.T) {
 		sortSpec := sdk.SortSpec{}
 		_, _, _, err := ProcessPage(
 			"TestItem",
-			&sourceItems,
+			&storeItems,
 			sortSpec,
 			sortFn,
 			filterFn,
@@ -361,7 +361,7 @@ func TestProcessPage(t *testing.T) {
 		}
 	})
 
-	t.Run("empty source slice", func(t *testing.T) {
+	t.Run("empty store slice", func(t *testing.T) {
 		emptyItems := []TestItem{}
 		filterFn := func(item TestItem) bool {
 			return true
@@ -411,7 +411,7 @@ func TestProcessPage(t *testing.T) {
 		sortSpec := sdk.SortSpec{}
 		paginatedItems, totalFiltered, totalSource, err := ProcessPage(
 			"TestItem",
-			&sourceItems,
+			&storeItems,
 			sortSpec,
 			sortFn,
 			filterFn,

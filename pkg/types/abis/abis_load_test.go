@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package abis
 
 import (
@@ -11,10 +10,9 @@ import (
 
 // TestLoadData tests the LoadData function from abis_load.go
 func TestLoadData(t *testing.T) {
-	// TODO: Turn this back on: Removed t.Parallel() to prevent concurrent SDK access causing race conditions
+	// TODO: Removed t.Parallel() to prevent concurrent SDK access causing race conditions
 	ac := NewAbisCollection()
 
-	// Verify initial state - all facets should not be loaded
 	if ac.downloadedFacet.IsLoaded() || ac.knownFacet.IsLoaded() || ac.functionsFacet.IsLoaded() || ac.eventsFacet.IsLoaded() {
 		t.Error("NewAbisCollection should not have any loaded facets")
 	}
@@ -22,27 +20,17 @@ func TestLoadData(t *testing.T) {
 		t.Error("NewAbisCollection should not have any fetching facets")
 	}
 
-	// Call LoadData for known ABIs
 	ac.LoadData(AbisKnown)
-
-	// Give the goroutine a moment to start
 	time.Sleep(10 * time.Millisecond)
 
-	// After calling LoadData, the known facet should either be fetching or loaded
-	// Note: Due to the asynchronous nature, we can't easily test completion without
-	// more complex synchronization mechanisms
 	isFetchingOrLoaded := ac.knownFacet.IsFetching() || ac.knownFacet.IsLoaded()
-
 	if !isFetchingOrLoaded {
 		t.Error("After LoadData, known facet should be fetching or loaded")
 	}
 
-	// Test that calling LoadData again doesn't cause issues when already fetching/loaded
 	prevState := ac.knownFacet.IsFetching() || ac.knownFacet.IsLoaded()
 	ac.LoadData(AbisKnown)
-
 	newState := ac.knownFacet.IsFetching() || ac.knownFacet.IsLoaded()
-
 	if !prevState || !newState {
 		t.Error("LoadData should not change state when already fetching/loaded")
 	}
@@ -146,4 +134,3 @@ func TestContextRegistration(t *testing.T) {
 	}
 }
 
-// ADD_ROUTE

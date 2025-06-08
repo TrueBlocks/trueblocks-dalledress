@@ -6,11 +6,11 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-// ProcessStream streams data from a Source with all the existing streaming features:
+// ProcessStream streams data from a Store with all the existing streaming features:
 // filtering, deduplication, progress report, and real-time messaging.
 func ProcessStream[T any](
 	contextKey string,
-	source Source[T],
+	store Store[T],
 	filterFunc func(item *T) bool,
 	isDupFunc func(existing []T, newItem *T) bool, // Returns true if item should be added (not a duplicate)
 	targetSlice *[]T,
@@ -38,7 +38,7 @@ func ProcessStream[T any](
 
 		fetchDone := make(chan error)
 		go func() {
-			err := source.Fetch(renderCtx, func(itemPtr *T) bool {
+			err := store.Fetch(renderCtx, func(itemPtr *T) bool {
 				if filterFunc(itemPtr) {
 					var itemAdded bool
 					var currentTotalCount int

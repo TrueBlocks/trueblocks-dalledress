@@ -12,18 +12,15 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-// Global shared sources - these are the key to eliminating redundant SDK calls
 var (
-	sharedAbisListSource    store.Source[coreTypes.Abi]
-	sharedAbisDetailsSource store.Source[coreTypes.Function]
+	abisListStore   store.Store[coreTypes.Abi]
+	abisDetailStore store.Store[coreTypes.Function]
 )
 
-// GetSharedAbisListSource returns the shared source for ABI list data
-// Both Downloaded and Known facets use this SAME source
-func GetSharedAbisListSource() store.Source[coreTypes.Abi] {
-	if sharedAbisListSource == nil {
+func GetListStore() store.Store[coreTypes.Abi] {
+	if abisListStore == nil {
 		logging.LogBackend("Creating new shared ABI list source")
-		sharedAbisListSource = store.NewSDKSource(
+		abisListStore = store.NewSDKStore(
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetChain()
 				listOpts := sdk.AbisOptions{
@@ -44,15 +41,13 @@ func GetSharedAbisListSource() store.Source[coreTypes.Abi] {
 			},
 		)
 	}
-	return sharedAbisListSource
+	return abisListStore
 }
 
-// GetSharedAbisDetailsSource returns the shared source for ABI details/functions data
-// Both Functions and Events facets use this SAME source
-func GetSharedAbisDetailsSource() store.Source[coreTypes.Function] {
-	if sharedAbisDetailsSource == nil {
+func GetDetailStore() store.Store[coreTypes.Function] {
+	if abisDetailStore == nil {
 		logging.LogBackend("Creating new shared ABI list source")
-		sharedAbisDetailsSource = store.NewSDKSource(
+		abisDetailStore = store.NewSDKStore(
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetChain()
 				detailOpts := sdk.AbisOptions{
@@ -73,5 +68,5 @@ func GetSharedAbisDetailsSource() store.Source[coreTypes.Function] {
 			},
 		)
 	}
-	return sharedAbisDetailsSource
+	return abisDetailStore
 }

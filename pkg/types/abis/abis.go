@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package abis
 
 import (
@@ -7,7 +6,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-// ListKind constants for ABI types
 const (
 	AbisDownloaded types.ListKind = "Downloaded"
 	AbisKnown      types.ListKind = "Known"
@@ -15,6 +13,7 @@ const (
 	AbisEvents     types.ListKind = "Events"
 )
 
+// Register list kinds
 func init() {
 	types.RegisterKind(AbisDownloaded)
 	types.RegisterKind(AbisKnown)
@@ -22,8 +21,6 @@ func init() {
 	types.RegisterKind(AbisEvents)
 }
 
-// AbisCollection orchestrates all ABI facets
-// (Downloaded, Known, Functions, Events)
 type AbisCollection struct {
 	downloadedFacet facets.Facet[coreTypes.Abi]
 	knownFacet      facets.Facet[coreTypes.Abi]
@@ -31,42 +28,36 @@ type AbisCollection struct {
 	eventsFacet     facets.Facet[coreTypes.Function]
 }
 
-// NewAbisCollection demonstrates the new Source → Facet pattern
-// This creates an AbisCollection where multiple facets share the same data sources,
-// eliminating redundant SDK queries:
-// - Downloaded + Known facets share ONE AbisList source
-// - Functions + Events facets share ONE AbisDetails source
-// Total: 2 SDK queries instead of 4!
 func NewAbisCollection() AbisCollection {
-	sharedAbisListSource := GetSharedAbisListSource()
-	sharedAbisDetailsSource := GetSharedAbisDetailsSource()
+	abisListStore := GetListStore()
+	abisDetailStore := GetDetailStore()
 
 	downloadedFacet := facets.NewBaseFacet(
 		AbisDownloaded,
 		func(item *coreTypes.Abi) bool { return !item.IsKnown },
 		nil,
-		sharedAbisListSource,
+		abisListStore,
 	)
 
 	knownFacet := facets.NewBaseFacet(
 		AbisKnown,
 		func(item *coreTypes.Abi) bool { return item.IsKnown },
 		nil,
-		sharedAbisListSource,
+		abisListStore,
 	)
 
 	functionsFacet := facets.NewBaseFacet(
 		AbisFunctions,
 		func(item *coreTypes.Function) bool { return item.FunctionType != "event" },
-		IsDupFuncByEncoding(),
-		sharedAbisDetailsSource,
+		isEncodingDup(),
+		abisDetailStore,
 	)
 
 	eventsFacet := facets.NewBaseFacet(
 		AbisEvents,
 		func(item *coreTypes.Function) bool { return item.FunctionType == "event" },
-		IsDupFuncByEncoding(),
-		sharedAbisDetailsSource,
+		isEncodingDup(),
+		abisDetailStore,
 	)
 
 	return AbisCollection{
@@ -76,5 +67,3 @@ func NewAbisCollection() AbisCollection {
 		eventsFacet:     eventsFacet,
 	}
 }
-
-// ADD_ROUTE

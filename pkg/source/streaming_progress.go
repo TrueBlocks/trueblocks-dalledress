@@ -16,8 +16,8 @@ const (
 	maxWaitTime      = 125 * time.Millisecond
 )
 
-// Progress manages the logic for sending progress updates.
-type Progress struct {
+// progress manages the logic for sending progress updates.
+type progress struct {
 	lastUpdate        time.Time
 	nItemsSinceUpdate int
 	nextThreshold     int
@@ -27,12 +27,12 @@ type Progress struct {
 	firstDataSent     bool
 }
 
-// NewProgress creates and initializes a Progress.
-func NewProgress(
+// newProgress creates and initializes a progress.
+func newProgress(
 	listKindCfg types.ListKind,
 	onFirstDataCallback func(), // Can be nil
-) *Progress {
-	pr := &Progress{
+) *progress {
+	pr := &progress{
 		listKind:        listKindCfg,
 		onFirstDataFunc: onFirstDataCallback,
 	}
@@ -45,7 +45,7 @@ func NewProgress(
 	return pr
 }
 
-func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
+func (pr *progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
 	pr.nItemsSinceUpdate++
 	shouldUpdate := false
 
@@ -68,7 +68,7 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedP
 	}
 	if shouldUpdate {
 		msgs.EmitLoaded("streaming", payload)
-		msgs.EmitStatus(progress(currentTotalCount, pr.listKind, false))
+		msgs.EmitStatus(report(currentTotalCount, pr.listKind, false))
 		pr.nItemsSinceUpdate = 0
 		pr.lastUpdate = time.Now()
 	}
@@ -76,7 +76,7 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedP
 	return payload
 }
 
-func (pr *Progress) HeartbeatUpdate(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
+func (pr *progress) HeartbeatUpdate(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
 	payload := types.DataLoadedPayload{
 		CurrentCount:  currentTotalCount,
 		ExpectedTotal: expectedTotal,
@@ -85,7 +85,7 @@ func (pr *Progress) HeartbeatUpdate(currentTotalCount, expectedTotal int) types.
 
 	if time.Since(pr.lastUpdate) >= maxWaitTime && pr.nItemsSinceUpdate > 0 {
 		msgs.EmitLoaded("partial", payload)
-		msgs.EmitStatus(progress(currentTotalCount, pr.listKind, true))
+		msgs.EmitStatus(report(currentTotalCount, pr.listKind, true))
 
 		pr.nItemsSinceUpdate = 0
 		pr.lastUpdate = time.Now()
@@ -94,7 +94,7 @@ func (pr *Progress) HeartbeatUpdate(currentTotalCount, expectedTotal int) types.
 	return payload
 }
 
-func progress(cnt int, kind types.ListKind, heartbeat bool) string {
+func report(cnt int, kind types.ListKind, heartbeat bool) string {
 	k := strings.Trim(strings.ToLower(string(kind)), " ")
 	if heartbeat {
 		return fmt.Sprintf("Loaded %d %s...", cnt, k)

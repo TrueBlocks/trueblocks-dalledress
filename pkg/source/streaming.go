@@ -7,7 +7,7 @@ import (
 )
 
 // ProcessStream streams data from a Source with all the existing streaming features:
-// filtering, deduplication, progress updates, and real-time messaging.
+// filtering, deduplication, progress report, and real-time messaging.
 func ProcessStream[T any](
 	contextKey string,
 	source Source[T],
@@ -22,7 +22,7 @@ func ProcessStream[T any](
 		RLock()
 		RUnlock()
 	},
-	onFirstDataCallback func(), // Renamed to avoid confusion, passed to Progress
+	onFirstData func(),
 ) (types.DataLoadedPayload, error) {
 	renderCtx := RegisterContext(contextKey)
 	defer UnregisterContext(contextKey)
@@ -30,10 +30,10 @@ func ProcessStream[T any](
 	done := make(chan struct{})
 	streamErr := make(chan error, 1)
 
-	reporter := NewProgress(listKind, onFirstDataCallback)
+	reporter := newProgress(listKind, onFirstData)
 	go func() {
 		defer close(done)
-		ticker := time.NewTicker(maxWaitTime / 2) // expected time 1/2 of maxWaitTime
+		ticker := time.NewTicker(maxWaitTime / 2)
 		defer ticker.Stop()
 
 		fetchDone := make(chan error)
@@ -42,10 +42,9 @@ func ProcessStream[T any](
 				if filterFunc(itemPtr) {
 					var itemAdded bool
 					var currentTotalCount int
-					var currentExpectedCount int // To store dereferenced value of expectedCnt
+					var currentExpectedCount int
 
 					m.Lock()
-					// Check for duplicates and add item if not a duplicate
 					if isDupFunc == nil || !isDupFunc(*targetSlice, itemPtr) {
 						*targetSlice = append(*targetSlice, *itemPtr)
 						itemAdded = true
@@ -79,7 +78,7 @@ func ProcessStream[T any](
 				var currentTotalCount int
 				var currentExpectedCount int
 
-				m.RLock() // Use RLock for reading counts
+				m.RLock()
 				currentTotalCount = len(*targetSlice)
 				if expectedCnt != nil {
 					currentExpectedCount = *expectedCnt
@@ -101,7 +100,7 @@ func ProcessStream[T any](
 		// Don't return immediately - we want to preserve partial data
 	}
 
-	m.RLock() // Use RLock for final count read
+	m.RLock()
 	itemCount := len(*targetSlice)
 	m.RUnlock()
 

@@ -22,7 +22,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/source"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
@@ -52,7 +52,7 @@ type App struct {
 
 func (a *App) CancelFetch(listKind types.ListKind) {
 	contextKey := fmt.Sprintf("facet-%s-%s", listKind, "sdk")
-	source.CancelFetch(contextKey)
+	store.CancelFetch(contextKey)
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -402,7 +402,7 @@ func (a *App) GetNodeStatus() *coreTypes.MetaData {
 	defer logger.SetLoggerWriter(w)
 	logger.SetLoggerWriter(io.Discard)
 
-	chainName := preferences.GetPreferredChainName()
+	chainName := preferences.GetChain()
 	a.meta, _ = sdk.GetMetaData(chainName)
 
 	return a.meta

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/source"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 )
 
 // TestLoadData tests the LoadData function from abis_load.go
@@ -74,11 +74,11 @@ func TestLoadAbis(t *testing.T) {
 // TestReloadCancellation tests that Reload properly cancels ongoing operations
 func TestReloadCancellation(t *testing.T) {
 	abisAddr := base.ZeroAddr.Hex()
-	renderCtx := source.RegisterContext(abisAddr)
+	renderCtx := store.RegisterContext(abisAddr)
 
 	// Verify the context was registered
-	if source.CtxCount(abisAddr) != 1 {
-		t.Errorf("Expected 1 registered context, got %d", source.CtxCount(abisAddr))
+	if store.CtxCount(abisAddr) != 1 {
+		t.Errorf("Expected 1 registered context, got %d", store.CtxCount(abisAddr))
 	}
 
 	// Verify the context is not nil
@@ -87,7 +87,7 @@ func TestReloadCancellation(t *testing.T) {
 	}
 
 	// Simulate a reload operation by cancelling the context
-	cancelled, found := source.UnregisterContext(abisAddr)
+	cancelled, found := store.UnregisterContext(abisAddr)
 	if !found {
 		t.Error("Cancel should find the registered context")
 	}
@@ -96,8 +96,8 @@ func TestReloadCancellation(t *testing.T) {
 	}
 
 	// Verify the context was cancelled and removed
-	if source.CtxCount(abisAddr) != 0 {
-		t.Errorf("Expected 0 registered contexts after reload, got %d", source.CtxCount(abisAddr))
+	if store.CtxCount(abisAddr) != 0 {
+		t.Errorf("Expected 0 registered contexts after reload, got %d", store.CtxCount(abisAddr))
 	}
 
 	// Note: We can't easily test if the context was actually cancelled since
@@ -110,10 +110,10 @@ func TestContextRegistration(t *testing.T) {
 	addr1 := "0x1234567890123456789012345678901234567890"
 	addr2 := "0x2234567890123456789012345678901234567890"
 
-	ctx1 := source.RegisterContext(addr1)
-	ctx2 := source.RegisterContext(addr2)
+	ctx1 := store.RegisterContext(addr1)
+	ctx2 := store.RegisterContext(addr2)
 
-	cnt := source.CtxCount(addr1) + source.CtxCount(addr1)
+	cnt := store.CtxCount(addr1) + store.CtxCount(addr1)
 	if cnt != 2 {
 		t.Errorf("Expected 2 registered contexts, got %d", cnt)
 	}
@@ -123,21 +123,21 @@ func TestContextRegistration(t *testing.T) {
 	}
 
 	// Test Cancel for specific address
-	cancelled, found := source.UnregisterContext(addr1)
+	cancelled, found := store.UnregisterContext(addr1)
 	if !found {
 		t.Error("Cancel should find the registered context")
 	}
 	if cancelled != 1 {
 		t.Errorf("Expected 1 cancelled context, got %d", cancelled)
 	}
-	cnt = source.CtxCount(addr1) + source.CtxCount(addr2)
+	cnt = store.CtxCount(addr1) + store.CtxCount(addr2)
 	if cnt != 1 {
 		t.Errorf("Expected 1 remaining context after cancel, got %d", cnt)
 	}
 
 	// Test Cancel for non-existent address
 	nonExistentAddr := "0x9999999999999999999999999999999999999999"
-	cancelled, found = source.UnregisterContext(nonExistentAddr)
+	cancelled, found = store.UnregisterContext(nonExistentAddr)
 	if found {
 		t.Error("Cancel should not find non-existent context")
 	}

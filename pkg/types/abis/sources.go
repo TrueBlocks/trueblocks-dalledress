@@ -8,24 +8,24 @@ import (
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/source"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 // Global shared sources - these are the key to eliminating redundant SDK calls
 var (
-	sharedAbisListSource    source.Source[coreTypes.Abi]
-	sharedAbisDetailsSource source.Source[coreTypes.Function]
+	sharedAbisListSource    store.Source[coreTypes.Abi]
+	sharedAbisDetailsSource store.Source[coreTypes.Function]
 )
 
 // GetSharedAbisListSource returns the shared source for ABI list data
 // Both Downloaded and Known facets use this SAME source
-func GetSharedAbisListSource() source.Source[coreTypes.Abi] {
+func GetSharedAbisListSource() store.Source[coreTypes.Abi] {
 	if sharedAbisListSource == nil {
 		logging.LogBackend("Creating new shared ABI list source")
-		sharedAbisListSource = source.NewSDKSource(
+		sharedAbisListSource = store.NewSDKSource(
 			func(ctx *output.RenderCtx) error {
-				chainName := preferences.GetPreferredChainName()
+				chainName := preferences.GetChain()
 				listOpts := sdk.AbisOptions{
 					Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
 					RenderCtx: ctx,
@@ -49,12 +49,12 @@ func GetSharedAbisListSource() source.Source[coreTypes.Abi] {
 
 // GetSharedAbisDetailsSource returns the shared source for ABI details/functions data
 // Both Functions and Events facets use this SAME source
-func GetSharedAbisDetailsSource() source.Source[coreTypes.Function] {
+func GetSharedAbisDetailsSource() store.Source[coreTypes.Function] {
 	if sharedAbisDetailsSource == nil {
 		logging.LogBackend("Creating new shared ABI list source")
-		sharedAbisDetailsSource = source.NewSDKSource(
+		sharedAbisDetailsSource = store.NewSDKSource(
 			func(ctx *output.RenderCtx) error {
-				chainName := preferences.GetPreferredChainName()
+				chainName := preferences.GetChain()
 				detailOpts := sdk.AbisOptions{
 					Globals:   sdk.Globals{Cache: true, Chain: chainName},
 					RenderCtx: ctx,

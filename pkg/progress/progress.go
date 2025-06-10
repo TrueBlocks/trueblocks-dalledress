@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
@@ -17,7 +16,7 @@ const (
 	MaxWaitTime      = 125 * time.Millisecond
 )
 
-// progress manages the logic for sending progress updates.
+// Progress manages the logic for sending progress updates.
 type Progress struct {
 	lastUpdate        time.Time
 	nItemsSinceUpdate int
@@ -28,14 +27,14 @@ type Progress struct {
 	firstDataSent     bool
 }
 
-// NewProgress creates and initializes a progress.
+// NewProgress creates and initializes a Progress.
 func NewProgress(
 	listKindCfg types.ListKind,
-	onFirstDataCallback func(), // Can be nil
+	onFirstData func(), // Can be nil
 ) *Progress {
 	pr := &Progress{
 		listKind:        listKindCfg,
-		onFirstDataFunc: onFirstDataCallback,
+		onFirstDataFunc: onFirstData,
 	}
 	// Initialize internal state
 	pr.lastUpdate = time.Now()
@@ -68,9 +67,8 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedP
 		ListKind:      pr.listKind,
 	}
 	if shouldUpdate {
-		logging.LogBackend(fmt.Sprintf("Tick: kind: %s currentCount: %d expectedTotal: %d", pr.listKind, currentTotalCount, expectedTotal))
 		msgs.EmitLoaded("streaming", payload)
-		msgs.EmitStatus(report(currentTotalCount, pr.listKind, false))
+		msgs.EmitStatus(progress(currentTotalCount, pr.listKind, false))
 		pr.nItemsSinceUpdate = 0
 		pr.lastUpdate = time.Now()
 	}
@@ -78,7 +76,7 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedP
 	return payload
 }
 
-func (pr *Progress) HeartbeatUpdate(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
+func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
 	payload := types.DataLoadedPayload{
 		CurrentCount:  currentTotalCount,
 		ExpectedTotal: expectedTotal,
@@ -86,9 +84,8 @@ func (pr *Progress) HeartbeatUpdate(currentTotalCount, expectedTotal int) types.
 	}
 
 	if time.Since(pr.lastUpdate) >= MaxWaitTime && pr.nItemsSinceUpdate > 0 {
-		logging.LogBackend(fmt.Sprintf("Heartbeat: kind: %s currentCount: %d expectedTotal: %d", pr.listKind, currentTotalCount, expectedTotal))
 		msgs.EmitLoaded("partial", payload)
-		msgs.EmitStatus(report(currentTotalCount, pr.listKind, true))
+		msgs.EmitStatus(progress(currentTotalCount, pr.listKind, true))
 
 		pr.nItemsSinceUpdate = 0
 		pr.lastUpdate = time.Now()
@@ -97,7 +94,7 @@ func (pr *Progress) HeartbeatUpdate(currentTotalCount, expectedTotal int) types.
 	return payload
 }
 
-func report(cnt int, kind types.ListKind, heartbeat bool) string {
+func progress(cnt int, kind types.ListKind, heartbeat bool) string {
 	k := strings.Trim(strings.ToLower(string(kind)), " ")
 	if heartbeat {
 		return fmt.Sprintf("Loaded %d %s...", cnt, k)

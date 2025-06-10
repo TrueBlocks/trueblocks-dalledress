@@ -5,7 +5,7 @@ import {crud} from '../models';
 import {base} from '../models';
 import {menu} from '../models';
 import {sdk} from '../models';
-import {enhancedcollection} from '../models';
+import {abis} from '../models';
 import {preferences} from '../models';
 import {utils} from '../models';
 import {context} from '../models';
@@ -41,7 +41,7 @@ export function FileSave(arg1:menu.CallbackData):Promise<void>;
 
 export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
-export function GetAbisPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<enhancedcollection.AbisPage>;
+export function GetAbisPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
 export function GetAppId():Promise<preferences.Id>;
 

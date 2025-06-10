@@ -2,7 +2,6 @@ package logging
 
 import (
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/colors"
@@ -30,9 +29,4 @@ func LogError(msg string, err error, exclude ...error) {
 	}
 
 	log.Println(colors.Red+"ERROR", msg+":", err.Error(), colors.Off)
-}
-
-// LogInfo logs an informational message.
-func LogInfo(format string, args ...interface{}) {
-	log.Println(colors.Cyan+"INFO", fmt.Sprintf(format, args...), colors.Off)
 }

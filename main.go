@@ -5,12 +5,13 @@ import (
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/app"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/enhancedcollection" // Changed import
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
@@ -44,7 +45,8 @@ func main() {
 			&project.Project{},
 			// ADD_ROUTE
 			&names.NamesCollection{},
-			&abis.AbisCollection{},
+			// &abis.AbisCollection{}, // Commented out old collection
+			enhancedcollection.NewEnhancedAbisCollection(), // Added new enhanced collection
 			// ADD_ROUTE
 		},
 		EnumBind: []interface{}{

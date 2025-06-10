@@ -314,7 +314,7 @@ export const useAppHotkeys = (): void => {
       handler: (_e: KeyboardEvent) => {
         CancelFetch(currentTab as types.ListKind)
           .then(() => {
-            emitStatus('Cancellation request sent via Escape key.');
+            emitStatus('Cancellation request processed.');
           })
           .catch((err: Error) => {
             emitError(

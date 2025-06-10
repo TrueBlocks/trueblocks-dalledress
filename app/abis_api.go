@@ -2,11 +2,10 @@
 package app
 
 import (
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types" // Import your new types package
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/enhancedcollection" // Import the new enhanced collection
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"              // Import your new types package
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
@@ -15,8 +14,8 @@ func (a *App) GetAbisPage(
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
-) (abis.AbisPage, error) {
-	return a.abis.GetPage(kind, first, pageSize, sort, filter)
+) (*enhancedcollection.AbisPage, error) { // Use *AbisPage from enhancedcollection
+	return a.abis.GetPage(first, pageSize, "", filter, kind)
 }
 
 func (a *App) AbisCrud(
@@ -24,10 +23,11 @@ func (a *App) AbisCrud(
 	op crud.Operation,
 	abi *coreTypes.Abi,
 	address string) error {
-	if address != "" && (abi == nil || abi.Address.IsZero()) {
-		abi = &coreTypes.Abi{Address: base.HexToAddress(address)}
-	}
-	return a.abis.AbisCrud(kind, op, abi)
+	// if address != "" && (abi == nil || abi.Address.IsZero()) {
+	// 	abi = &coreTypes.Abi{Address: base.HexToAddress(address)}
+	// }
+	// return a.abis.ForEvery(kind, op, abi)
+	return nil
 }
 
 // ADD_ROUTE

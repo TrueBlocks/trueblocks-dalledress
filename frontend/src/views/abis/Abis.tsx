@@ -7,7 +7,7 @@ import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { abis, crud, msgs, types } from '@models';
+import { crud, enhancedcollection, msgs, types } from '@models';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
@@ -22,7 +22,9 @@ import {
 
 export const Abis = () => {
   const { lastTab } = useAppContext();
-  const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
+  const [pageData, setPageData] = useState<enhancedcollection.AbisPage | null>(
+    null,
+  );
 
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[ABIS_ROUTE] || ABIS_DEFAULT_LIST,
@@ -117,7 +119,7 @@ export const Abis = () => {
       });
       setPageData((prev) => {
         if (!prev) return null;
-        return new abis.AbisPage({
+        return new enhancedcollection.AbisPage({
           ...prev,
           abis: optimisticValues,
         });
@@ -143,7 +145,7 @@ export const Abis = () => {
         .catch((err) => {
           setPageData((prev) => {
             if (!prev) return null;
-            return new abis.AbisPage({
+            return new enhancedcollection.AbisPage({
               ...prev,
               abis: original,
             });

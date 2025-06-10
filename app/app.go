@@ -18,13 +18,14 @@ import (
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/enhancedcollection"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/enhancedstore"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
@@ -39,7 +40,7 @@ type App struct {
 	chainList   *utils.ChainList
 	// ADD_ROUTE
 	names names.NamesCollection
-	abis  abis.AbisCollection
+	abis  *enhancedcollection.EnhancedAbisCollection // Use *EnhancedAbisCollection
 	// ADD_ROUTE
 	meta       *coreTypes.MetaData
 	fileServer *fileserver.FileServer
@@ -51,8 +52,20 @@ type App struct {
 }
 
 func (a *App) CancelFetch(listKind types.ListKind) {
-	contextKey := fmt.Sprintf("facet-%s-%s", listKind, "sdk")
-	store.CancelFetch(contextKey)
+	contextKey := ""
+	switch listKind {
+	case enhancedcollection.AbisDownloaded:
+		fallthrough
+	case enhancedcollection.AbisKnown:
+		contextKey = "abis-list"
+	case enhancedcollection.AbisFunctions:
+		fallthrough
+	case enhancedcollection.AbisEvents:
+		contextKey = "abis-detail"
+	default:
+		contextKey = "unknown-list-kind"
+	}
+	enhancedstore.CancelFetch(contextKey)
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -69,7 +82,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	}
 	// ADD_ROUTE
 	app.names = names.NewNamesCollection()
-	app.abis = abis.NewAbisCollection()
+	app.abis = enhancedcollection.NewEnhancedAbisCollection() // Use NewEnhancedAbisCollection
 	// ADD_ROUTE
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
@@ -388,12 +401,22 @@ func (a *App) Reload() error {
 	switch lastView {
 	case "/abis":
 		a.abis.Reset(lastTab)
+		// Explicitly trigger the load for the specific tab/ListKind.
+		// The LoadData method in EnhancedAbisCollection should handle
+		// emitting appropriate "loaded" or progress events.
+		a.abis.LoadData(lastTab)
 	case "/names":
 		a.names = a.names.ClearCache()
+		// If names collection needs a similar explicit LoadData call
+		// to show progress after a cache clear, it should be added here.
+		// For example: a.names.LoadData(types.ListKind("all")) // or appropriate kind
 	}
 	// ADD_ROUTE
 
-	msgs.EmitLoaded(lastView)
+	// msgs.EmitLoaded(lastView) // This was likely too early and too generic.
+	// Let the specific LoadData methods handle emitting their own "loaded" events
+	// which the UI can then use to update views and potentially the status bar
+	// if those events carry enough detail.
 	return nil
 }
 

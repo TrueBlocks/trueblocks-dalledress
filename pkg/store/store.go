@@ -169,22 +169,18 @@ func (s *Store[T]) Count() int {
 	return len(s.data)
 }
 
-// Fetch initiates the data retrieval process from the SDK.
-func (s *Store[T]) Fetch() error { // Removed ctx *output.RenderCtx parameter
+func (s *Store[T]) Fetch() error {
 	fetchGeneration := s.dataGeneration.Load()
 	s.ChangeState(fetchGeneration, StateFetching, "Starting data fetch")
 
-	// Register context with ContextManager
 	renderCtx := RegisterContext(s.contextKey)
-	// Note: Unregistering is handled by Reset or by RegisterContext itself if called again for the same key.
-
 	done := make(chan struct{})
 	errChan := make(chan error, 1)
 	var processingError error
 
 	go func() {
 		defer close(done)
-		err := s.queryFunc(renderCtx) // Use renderCtx from ContextManager
+		err := s.queryFunc(renderCtx)
 		if err != nil {
 			errChan <- err
 			return
@@ -196,7 +192,7 @@ func (s *Store[T]) Fetch() error { // Removed ctx *output.RenderCtx parameter
 
 	for !modelChanClosed || !errorChanClosed {
 		select {
-		case itemIntf, ok := <-renderCtx.ModelChan: // Use renderCtx
+		case itemIntf, ok := <-renderCtx.ModelChan:
 			if !ok {
 				modelChanClosed = true
 				if errorChanClosed && processingError == nil {
@@ -234,7 +230,7 @@ func (s *Store[T]) Fetch() error { // Removed ctx *output.RenderCtx parameter
 				}
 			}
 
-		case streamErr, ok := <-renderCtx.ErrorChan: // Use renderCtx
+		case streamErr, ok := <-renderCtx.ErrorChan:
 			if !ok {
 				errorChanClosed = true
 				if modelChanClosed && processingError == nil {
@@ -250,21 +246,18 @@ func (s *Store[T]) Fetch() error { // Removed ctx *output.RenderCtx parameter
 			s.ChangeState(fetchGeneration, StateError, err.Error())
 
 		case <-done:
-			if modelChanClosed && errorChanClosed && processingError == nil {
-				s.ChangeState(fetchGeneration, StateLoaded, "Data loaded successfully")
-			}
-			return processingError
+			// Don't change state here - let the channel processing handle final state
+			// This ensures we've fully processed both ModelChan and ErrorChan
+			continue
 
-		case <-renderCtx.Ctx.Done(): // Use renderCtx
+		case <-renderCtx.Ctx.Done():
 			s.ChangeState(0, StateCanceled, "User cancelled operation")
 			return renderCtx.Ctx.Err()
 		}
 	}
-	return processingError // Should be unreachable if loop condition is correct
+	return processingError
 }
 
-// AddItem adds an item to the store and notifies observers
-// This is primarily used for testing
 func (s *Store[T]) AddItem(item T, index int) {
 	s.mutex.Lock()
 	s.data = append(s.data, item)
@@ -280,31 +273,28 @@ func (s *Store[T]) AddItem(item T, index int) {
 	}
 }
 
-// GetExpectedTotal returns the expected total number of items.
 func (s *Store[T]) GetExpectedTotal() int {
 	return int(s.expectedTotalItems.Load())
 }
 
-// Reset clears the store's data, cancels any ongoing fetch, and sets the state to Stale.
 func (s *Store[T]) Reset() {
 	s.mutex.Lock()
-	// Cancel and unregister the context using ContextManager
-	// UnregisterContext cancels and removes. If only cancellation is needed without removal,
-	// and RegisterContext handles replacing/cancelling old ones, CancelFetch might be an alternative.
-	// Given the name "Reset", UnregisterContext seems appropriate.
 	UnregisterContext(s.contextKey)
 
-	s.data = s.data[:0] // Clear data
+	s.data = s.data[:0]
 	s.expectedTotalItems.Store(0)
-	s.dataGeneration.Add(1) // Increment generation to invalidate previous fetches
+	s.dataGeneration.Add(1)
 	newState := StateStale
 	reason := "Store reset"
-	s.mutex.Unlock() // Unlock before calling ChangeState to avoid deadlock if observer calls back into store
+	s.mutex.Unlock()
 
 	s.ChangeState(0, newState, reason) // Pass 0 for expectedGeneration as this is a reset
 }
 
-// ExpectedTotalItems returns the expected total number of items.
 func (s *Store[T]) ExpectedTotalItems() int64 {
 	return s.expectedTotalItems.Load()
+}
+
+func (s *Store[T]) GetContextKey() string {
+	return s.contextKey
 }

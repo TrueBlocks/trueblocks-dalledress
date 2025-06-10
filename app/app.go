@@ -51,21 +51,7 @@ type App struct {
 }
 
 func (a *App) CancelFetch(listKind types.ListKind) {
-	// TODO: Clean this up
-	contextKey := ""
-	switch listKind {
-	case abis.AbisDownloaded:
-		fallthrough
-	case abis.AbisKnown:
-		contextKey = "abis-list"
-	case abis.AbisFunctions:
-		fallthrough
-	case abis.AbisEvents:
-		contextKey = "abis-detail"
-	default:
-		contextKey = "unknown-list-kind"
-	}
-	store.CancelFetch(contextKey)
+	store.CancelFetch(abis.GetAbisStoreName(listKind))
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {

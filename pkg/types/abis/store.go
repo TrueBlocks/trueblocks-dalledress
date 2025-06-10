@@ -9,6 +9,7 @@ import (
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
@@ -26,8 +27,7 @@ func GetAbisListStore() *store.Store[coreTypes.Abi] {
 
 	if abisListStore == nil {
 		abisListStore = store.NewStore(
-			// TODO: Must we hard code store names? We know it's view-query
-			"abis-list",
+			GetAbisStoreName(AbisDownloaded),
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetChain()
 				listOpts := sdk.AbisOptions{
@@ -57,8 +57,7 @@ func GetAbisDetailStore() *store.Store[coreTypes.Function] {
 
 	if abisDetailStore == nil {
 		abisDetailStore = store.NewStore(
-			// TODO: Must we hard code store names? We know it's view-query
-			"abis-detail",
+			GetAbisStoreName(AbisFunctions),
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetChain()
 				detailOpts := sdk.AbisOptions{
@@ -80,4 +79,19 @@ func GetAbisDetailStore() *store.Store[coreTypes.Function] {
 		)
 	}
 	return abisDetailStore
+}
+
+func GetAbisStoreName(listKind types.ListKind) string {
+	switch listKind {
+	case AbisDownloaded:
+		fallthrough
+	case AbisKnown:
+		return "abis-list"
+	case AbisFunctions:
+		fallthrough
+	case AbisEvents:
+		return "abis-detail"
+	default:
+		return ""
+	}
 }

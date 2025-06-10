@@ -223,7 +223,6 @@ export function setupContextMocks({
     mockViewContextDefaultValue = newDefaults;
   }
 
-  // TODO: Consider refactoring this vi.mock to be top-level like @components if needed globally
   vi.mock('@contexts', async (importOriginal) => {
     const original = (await importOriginal()) as any;
     return {

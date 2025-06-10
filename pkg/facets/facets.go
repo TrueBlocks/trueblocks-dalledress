@@ -38,16 +38,6 @@ var AllStates = []struct {
 	{StateError, "ERROR"},
 }
 
-type LoadState1 int
-
-const (
-	StateStale1 LoadState1 = iota
-	StateFetching1
-	StateLoaded1
-	StateError1
-	StatePartial1
-)
-
 type FilterFunc[T any] func(item *T) bool
 
 type StreamingResult struct {
@@ -58,7 +48,7 @@ type StreamingResult struct {
 type PageResult[T any] struct {
 	Items      []T
 	TotalItems int
-	State      LoadState1
+	State      LoadState
 }
 
 type Facet[T any] struct {
@@ -89,44 +79,44 @@ func NewFacet[T any](
 		isDupFunc:   isDupFunc,
 		progress:    progress.NewProgress(listKind, nil),
 	}
-	facet.state.Store(StateStale1)
+	facet.state.Store(StateStale)
 	store.RegisterObserver(facet)
 
 	return facet
 }
 
 func (r *Facet[T]) IsLoaded() bool {
-	return r.GetState() == StateLoaded1
+	return r.GetState() == StateLoaded
 }
 
 func (r *Facet[T]) IsFetching() bool {
-	return r.GetState() == StateFetching1
+	return r.GetState() == StateFetching
 }
 
-func (r *Facet[T]) GetState() LoadState1 {
+func (r *Facet[T]) GetState() LoadState {
 	if state := r.state.Load(); state != nil {
-		return state.(LoadState1)
+		return state.(LoadState)
 	}
-	return StateStale1
+	return StateStale
 }
 
 func (r *Facet[T]) NeedsUpdate() bool {
 	state := r.GetState()
-	return state == StateStale1
+	return state == StateStale
 }
 
 func (r *Facet[T]) StartFetching() bool {
 	currentState := r.GetState()
-	if currentState == StateFetching1 {
+	if currentState == StateFetching {
 		return false
 	}
-	r.state.Store(StateFetching1)
+	r.state.Store(StateFetching)
 	return true
 }
 
 func (r *Facet[T]) SetPartial() {
-	if r.GetState() == StateFetching1 {
-		r.state.Store(StatePartial1)
+	if r.GetState() == StateFetching {
+		r.state.Store(StatePartial)
 	}
 }
 
@@ -134,7 +124,7 @@ func (r *Facet[T]) Reset() {
 	r.mutex.Lock()
 	r.view = r.view[:0]
 	r.expectedCnt = 0
-	r.state.Store(StateStale1)
+	r.state.Store(StateStale)
 	storeToReset := r.store
 	r.mutex.Unlock()
 
@@ -156,7 +146,15 @@ func (r *Facet[T]) Count() int {
 var ErrAlreadyLoading = errors.New("already loading")
 
 func (r *Facet[T]) Load() (*StreamingResult, error) {
-	if !r.NeedsUpdate() {
+	currentState := r.GetState()
+
+	// Check if already fetching
+	if currentState == StateFetching {
+		return nil, ErrAlreadyLoading
+	}
+
+	// Check if we need to update (stale state)
+	if currentState != StateStale {
 		cachedPayload := r.getCachedResult()
 		msgs.EmitStatus(fmt.Sprintf("cached: %d items", len(r.view)))
 		return cachedPayload, nil
@@ -253,14 +251,15 @@ func (r *Facet[T]) GetPage(
 		}
 	}
 
-	start := first
-	end := first + pageSize
+	// Normalize pagination parameters
+	start := max(0, first)
+	end := start + max(0, pageSize)
+
+	// Handle out-of-bounds cases
 	if start >= len(filteredData) {
-		start = 0
-		end = 0
-	}
-	if end > len(filteredData) {
-		end = len(filteredData)
+		start, end = 0, 0
+	} else {
+		end = min(end, len(filteredData))
 	}
 
 	var paginatedData []T
@@ -336,15 +335,15 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 	// Map store states to facet states
 	switch state {
 	case store.StateStale:
-		r.state.Store(StateStale1)
+		r.state.Store(StateStale)
 		r.expectedCnt = 0
 		r.mutex.Lock()
 		r.view = r.view[:0]
 		r.mutex.Unlock()
-		msgs.EmitStatus(fmt.Sprintf("Data outdated: %s", reason))
+		msgs.EmitStatus(fmt.Sprintf("data outdated: %s", reason))
 
 	case store.StateFetching:
-		r.state.Store(StateFetching1)
+		r.state.Store(StateFetching)
 		r.expectedCnt = 0
 		r.mutex.Lock()
 		r.view = r.view[:0]
@@ -352,7 +351,7 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 
 	case store.StateLoaded:
 		r.SyncWithStore()
-		r.state.Store(StateLoaded1)
+		r.state.Store(StateLoaded)
 		r.mutex.RLock()
 		currentCount := len(r.view)
 		r.expectedCnt = r.store.GetExpectedTotal()
@@ -365,15 +364,37 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 		currentCount := len(r.view)
 		r.mutex.RUnlock()
 		if hasData {
-			r.state.Store(StatePartial1)
-			msgs.EmitStatus(fmt.Sprintf("Partial load: %d items (error: %s)", currentCount, reason))
+			r.state.Store(StatePartial)
+			msgs.EmitStatus(fmt.Sprintf("partial load: %d items (error: %s)", currentCount, reason))
 		} else {
-			r.state.Store(StateError1)
-			msgs.EmitError(fmt.Sprintf("Load failed: %s", reason), errors.New(reason))
+			r.state.Store(StateError)
+			msgs.EmitError(fmt.Sprintf("load failed: %s", reason), errors.New(reason))
 		}
 
 	case store.StateCanceled:
-		r.state.Store(StateStale1)
-		msgs.EmitStatus("Loading canceled")
+		r.state.Store(StateStale)
+		msgs.EmitStatus("loading canceled")
 	}
+}
+
+func (r *Facet[T]) ForEvery(actionFunc func(itemMatched *T) (error, bool), matchFunc func(item *T) bool) (int, error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	var matchCount int = 0
+	filteredData := make([]*T, 0, len(r.view))
+	for _, itemPtr := range r.view {
+		if !matchFunc(itemPtr) {
+			filteredData = append(filteredData, itemPtr)
+		} else {
+			matchCount++
+		}
+	}
+
+	if matchCount > 0 {
+		r.view = filteredData
+		r.expectedCnt = len(r.view)
+	}
+
+	return matchCount, nil
 }

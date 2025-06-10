@@ -195,7 +195,7 @@ func (ac *AbisCollection) GetPage(
 		items, total, state := ac.GetDownloadedPage(first, pageSize, sortSpec)
 		page.Abis = items
 		page.TotalItems = total
-		page.State = mapLoadState(state)
+		page.State = state
 		page.IsFetching = ac.downloadedFacet.IsFetching()
 		page.ExpectedTotal = ac.downloadedFacet.ExpectedCount()
 
@@ -203,7 +203,7 @@ func (ac *AbisCollection) GetPage(
 		items, total, state := ac.GetKnownPage(first, pageSize, sortSpec)
 		page.Abis = items
 		page.TotalItems = total
-		page.State = mapLoadState(state)
+		page.State = state
 		page.IsFetching = ac.knownFacet.IsFetching()
 		page.ExpectedTotal = ac.knownFacet.ExpectedCount()
 
@@ -211,7 +211,7 @@ func (ac *AbisCollection) GetPage(
 		items, total, state := ac.GetFunctionsPage(first, pageSize, sortSpec)
 		page.Functions = items
 		page.TotalItems = total
-		page.State = mapLoadState(state)
+		page.State = state
 		page.IsFetching = ac.functionsFacet.IsFetching()
 		page.ExpectedTotal = ac.functionsFacet.ExpectedCount()
 
@@ -219,7 +219,7 @@ func (ac *AbisCollection) GetPage(
 		items, total, state := ac.GetEventsPage(first, pageSize, sortSpec)
 		page.Functions = items
 		page.TotalItems = total
-		page.State = mapLoadState(state)
+		page.State = state
 		page.IsFetching = ac.functionsFacet.IsFetching()
 		page.ExpectedTotal = ac.functionsFacet.ExpectedCount()
 
@@ -227,10 +227,12 @@ func (ac *AbisCollection) GetPage(
 		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
 	}
 
+	// TODO: FILTERING IS NOT WORKING
 	if filterString != "" {
 		logging.LogBackend(fmt.Sprintf("GetPage: filterString is present but not yet implemented: %s", filterString))
 	}
 
+	// TODO: SORTING IS NOT WORKING
 	if equals(sortSpec, sdk.SortSpec{}) {
 		logging.LogBackend("GetPage: sortSpec is present but not yet implemented")
 	}
@@ -238,33 +240,33 @@ func (ac *AbisCollection) GetPage(
 	return page, nil
 }
 
-func (ac *AbisCollection) GetDownloadedPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Abi, int, facets.LoadState1) {
+func (ac *AbisCollection) GetDownloadedPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Abi, int, facets.LoadState) {
 	if result, err := ac.downloadedFacet.GetPage(first, pageSize, nil, sortSpec, nil); err != nil {
-		return nil, 0, facets.StateError1
+		return nil, 0, facets.StateError
 	} else {
 		return result.Items, result.TotalItems, result.State
 	}
 }
 
-func (ac *AbisCollection) GetKnownPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Abi, int, facets.LoadState1) {
+func (ac *AbisCollection) GetKnownPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Abi, int, facets.LoadState) {
 	if result, err := ac.knownFacet.GetPage(first, pageSize, nil, sortSpec, nil); err != nil {
-		return nil, 0, facets.StateError1
+		return nil, 0, facets.StateError
 	} else {
 		return result.Items, result.TotalItems, result.State
 	}
 }
 
-func (ac *AbisCollection) GetFunctionsPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Function, int, facets.LoadState1) {
+func (ac *AbisCollection) GetFunctionsPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Function, int, facets.LoadState) {
 	if result, err := ac.functionsFacet.GetPage(first, pageSize, nil, sortSpec, nil); err != nil {
-		return nil, 0, facets.StateError1
+		return nil, 0, facets.StateError
 	} else {
 		return result.Items, result.TotalItems, result.State
 	}
 }
 
-func (ac *AbisCollection) GetEventsPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Function, int, facets.LoadState1) {
+func (ac *AbisCollection) GetEventsPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Function, int, facets.LoadState) {
 	if result, err := ac.eventsFacet.GetPage(first, pageSize, nil, sortSpec, nil); err != nil {
-		return nil, 0, facets.StateError1
+		return nil, 0, facets.StateError
 	} else {
 		return result.Items, result.TotalItems, result.State
 	}
@@ -281,22 +283,4 @@ func equals(s sdk.SortSpec, other sdk.SortSpec) bool {
 		}
 	}
 	return true
-}
-
-// mapLoadState converts facets.LoadState1 to facets.LoadState for compatibility
-func mapLoadState(enhancedState facets.LoadState1) facets.LoadState {
-	switch enhancedState {
-	case facets.StateStale1:
-		return facets.StateStale
-	case facets.StateFetching1:
-		return facets.StateFetching
-	case facets.StateLoaded1:
-		return facets.StateLoaded
-	case facets.StateError1:
-		return facets.StateError
-	case facets.StatePartial1:
-		return facets.StatePartial
-	default:
-		return facets.StateStale
-	}
 }

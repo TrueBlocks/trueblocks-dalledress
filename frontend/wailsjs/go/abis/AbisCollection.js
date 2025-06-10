@@ -6,22 +6,6 @@ export function Crud(arg1, arg2, arg3) {
   return window['go']['abis']['AbisCollection']['Crud'](arg1, arg2, arg3);
 }
 
-export function GetDownloadedPage(arg1, arg2, arg3) {
-  return window['go']['abis']['AbisCollection']['GetDownloadedPage'](arg1, arg2, arg3);
-}
-
-export function GetEventsPage(arg1, arg2, arg3) {
-  return window['go']['abis']['AbisCollection']['GetEventsPage'](arg1, arg2, arg3);
-}
-
-export function GetFunctionsPage(arg1, arg2, arg3) {
-  return window['go']['abis']['AbisCollection']['GetFunctionsPage'](arg1, arg2, arg3);
-}
-
-export function GetKnownPage(arg1, arg2, arg3) {
-  return window['go']['abis']['AbisCollection']['GetKnownPage'](arg1, arg2, arg3);
-}
-
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

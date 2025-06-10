@@ -1,8 +1,10 @@
 package facets
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -338,7 +340,6 @@ func TestFacetPagination(t *testing.T) {
 	}
 
 loaded:
-	// Test first page
 	page1, err := facet.GetPage(0, 2, nil, sdk.SortSpec{}, nil)
 	if err != nil {
 		t.Fatalf("GetPage failed: %v", err)
@@ -467,16 +468,10 @@ func TestFacetSorting(t *testing.T) {
 	}
 
 loaded:
-	// Custom sort function (reverse by value)
 	sortFunc := func(items []TestItem, spec sdk.SortSpec) error {
-		n := len(items)
-		for i := 0; i < n-1; i++ {
-			for j := 0; j < n-i-1; j++ {
-				if items[j].Value < items[j+1].Value {
-					items[j], items[j+1] = items[j+1], items[j]
-				}
-			}
-		}
+		slices.SortFunc(items, func(a, b TestItem) int {
+			return cmp.Compare(b.Value, a.Value)
+		})
 		return nil
 	}
 

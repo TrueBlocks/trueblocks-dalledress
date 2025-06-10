@@ -190,97 +190,56 @@ func (ac *AbisCollection) GetPage(
 	}
 	filterString = strings.ToLower(filterString)
 
+	var listFacet *facets.Facet[coreTypes.Abi]
+	var detailFacet *facets.Facet[coreTypes.Function]
+
 	switch listKind {
 	case AbisDownloaded:
-		items, total, state := ac.GetDownloadedPage(first, pageSize, sortSpec)
-		page.Abis = items
-		page.TotalItems = total
-		page.State = state
-		page.IsFetching = ac.downloadedFacet.IsFetching()
-		page.ExpectedTotal = ac.downloadedFacet.ExpectedCount()
-
+		listFacet = ac.downloadedFacet
 	case AbisKnown:
-		items, total, state := ac.GetKnownPage(first, pageSize, sortSpec)
-		page.Abis = items
-		page.TotalItems = total
-		page.State = state
-		page.IsFetching = ac.knownFacet.IsFetching()
-		page.ExpectedTotal = ac.knownFacet.ExpectedCount()
-
+		listFacet = ac.knownFacet
 	case AbisFunctions:
-		items, total, state := ac.GetFunctionsPage(first, pageSize, sortSpec)
-		page.Functions = items
-		page.TotalItems = total
-		page.State = state
-		page.IsFetching = ac.functionsFacet.IsFetching()
-		page.ExpectedTotal = ac.functionsFacet.ExpectedCount()
-
+		detailFacet = ac.functionsFacet
 	case AbisEvents:
-		items, total, state := ac.GetEventsPage(first, pageSize, sortSpec)
-		page.Functions = items
-		page.TotalItems = total
-		page.State = state
-		page.IsFetching = ac.functionsFacet.IsFetching()
-		page.ExpectedTotal = ac.functionsFacet.ExpectedCount()
-
+		detailFacet = ac.eventsFacet
 	default:
 		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
 	}
 
-	// TODO: FILTERING IS NOT WORKING
-	if filterString != "" {
-		logging.LogBackend(fmt.Sprintf("GetPage: filterString is present but not yet implemented: %s", filterString))
-	}
+	if listFacet != nil {
+		var listFilterFunc = func(item *coreTypes.Abi) bool {
+			return strings.Contains(strings.ToLower(item.Name), filterString)
+		}
+		var listSortFunc = func(items []coreTypes.Abi, sort sdk.SortSpec) error {
+			return sdk.SortAbis(items, sort)
+		}
+		if result, err := listFacet.GetPage(first, pageSize, listFilterFunc, sortSpec, listSortFunc); err != nil {
+			page.Abis, page.TotalItems, page.State = nil, 0, facets.StateError
+		} else {
+			page.Abis, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = listFacet.IsFetching()
+		page.ExpectedTotal = listFacet.ExpectedCount()
 
-	// TODO: SORTING IS NOT WORKING
-	if equals(sortSpec, sdk.SortSpec{}) {
-		logging.LogBackend("GetPage: sortSpec is present but not yet implemented")
+	} else if detailFacet != nil {
+		var detailFilter = func(item *coreTypes.Function) bool {
+			return strings.Contains(strings.ToLower(item.Name), filterString) ||
+				strings.Contains(strings.ToLower(item.Encoding), filterString)
+		}
+		var detailSortFunc = func(items []coreTypes.Function, sort sdk.SortSpec) error {
+			return sdk.SortFunctions(items, sort)
+		}
+		if result, err := detailFacet.GetPage(first, pageSize, detailFilter, sortSpec, detailSortFunc); err != nil {
+			page.Functions, page.TotalItems, page.State = nil, 0, facets.StateError
+		} else {
+			page.Functions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = detailFacet.IsFetching()
+		page.ExpectedTotal = detailFacet.ExpectedCount()
+
+	} else {
+		return nil, fmt.Errorf("GetPage: no facet found for list kind: %v", listKind)
 	}
 
 	return page, nil
-}
-
-func (ac *AbisCollection) GetDownloadedPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Abi, int, facets.LoadState) {
-	if result, err := ac.downloadedFacet.GetPage(first, pageSize, nil, sortSpec, nil); err != nil {
-		return nil, 0, facets.StateError
-	} else {
-		return result.Items, result.TotalItems, result.State
-	}
-}
-
-func (ac *AbisCollection) GetKnownPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Abi, int, facets.LoadState) {
-	if result, err := ac.knownFacet.GetPage(first, pageSize, nil, sortSpec, nil); err != nil {
-		return nil, 0, facets.StateError
-	} else {
-		return result.Items, result.TotalItems, result.State
-	}
-}
-
-func (ac *AbisCollection) GetFunctionsPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Function, int, facets.LoadState) {
-	if result, err := ac.functionsFacet.GetPage(first, pageSize, nil, sortSpec, nil); err != nil {
-		return nil, 0, facets.StateError
-	} else {
-		return result.Items, result.TotalItems, result.State
-	}
-}
-
-func (ac *AbisCollection) GetEventsPage(first, pageSize int, sortSpec sdk.SortSpec) ([]coreTypes.Function, int, facets.LoadState) {
-	if result, err := ac.eventsFacet.GetPage(first, pageSize, nil, sortSpec, nil); err != nil {
-		return nil, 0, facets.StateError
-	} else {
-		return result.Items, result.TotalItems, result.State
-	}
-}
-
-// equals compares two sdk.SortSpecs and returns true if they are equal
-func equals(s sdk.SortSpec, other sdk.SortSpec) bool {
-	if len(s.Fields) != len(other.Fields) || len(s.Order) != len(other.Order) {
-		return false
-	}
-	for i := range s.Fields {
-		if s.Fields[i] != other.Fields[i] || s.Order[i] != other.Order[i] {
-			return false
-		}
-	}
-	return true
 }

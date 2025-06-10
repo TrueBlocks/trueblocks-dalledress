@@ -7,14 +7,6 @@ import {abis} from '../models';
 
 export function Crud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Abi):Promise<void>;
 
-export function GetDownloadedPage(arg1:number,arg2:number,arg3:sdk.SortSpec):Promise<Array<types.Abi>>;
-
-export function GetEventsPage(arg1:number,arg2:number,arg3:sdk.SortSpec):Promise<Array<types.Function>>;
-
-export function GetFunctionsPage(arg1:number,arg2:number,arg3:sdk.SortSpec):Promise<Array<types.Function>>;
-
-export function GetKnownPage(arg1:number,arg2:number,arg3:sdk.SortSpec):Promise<Array<types.Abi>>;
-
 export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
 export function LoadData(arg1:types.ListKind):Promise<void>;

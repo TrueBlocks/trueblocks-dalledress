@@ -1,23 +1,23 @@
 package facets
 
-// func (r *BaseFacet[T]) ForEvery(actionFunc func(itemMatched *T) (error, bool), matchFunc func(item *T) bool) (int, error) {
-// 	r.mutex.Lock()
-// 	defer r.mutex.Unlock()
+func (r *Facet[T]) ForEvery(actionFunc func(itemMatched *T) (error, bool), matchFunc func(item *T) bool) (int, error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
-// 	var matchCount int = 0
-// 	filteredData := make([]*T, 0, len(r.data))
-// 	for _, itemPtr := range r.data {
-// 		if !matchFunc(itemPtr) {
-// 			filteredData = append(filteredData, itemPtr)
-// 		} else {
-// 			matchCount++
-// 		}
-// 	}
+	var matchCount int = 0
+	filteredData := make([]*T, 0, len(r.view))
+	for _, itemPtr := range r.view {
+		if !matchFunc(itemPtr) {
+			filteredData = append(filteredData, itemPtr)
+		} else {
+			matchCount++
+		}
+	}
 
-// 	if matchCount > 0 {
-// 		r.data = filteredData
-// 		r.expectedCnt = len(r.data)
-// 	}
+	if matchCount > 0 {
+		r.view = filteredData
+		r.expectedCnt = len(r.view)
+	}
 
-// 	return matchCount, nil
-// }
+	return matchCount, nil
+}

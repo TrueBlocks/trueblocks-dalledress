@@ -78,7 +78,7 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedP
 	return payload
 }
 
-func (pr *Progress) HeartbeatUpdate(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
+func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
 	payload := types.DataLoadedPayload{
 		CurrentCount:  currentTotalCount,
 		ExpectedTotal: expectedTotal,

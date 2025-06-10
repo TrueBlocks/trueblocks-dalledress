@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/enhancedstore"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
@@ -239,6 +240,7 @@ func (r *BaseFacet[T]) Load(queryArgs ...interface{}) (*StreamingResult, error) 
 		// The store will obtain its RenderCtx from the ContextManager.
 		err := r.store.Fetch(queryArgs...)
 		if err != nil && err != enhancedstore.ErrStaleFetch() { // Check for actual errors, not just stale fetch
+			logging.LogBackend(fmt.Sprintf("Failed to fetch data for facet: %s", err.Error()))
 			// If Fetch returns an error, the store should have already set its state to StateError.
 			// The facet's OnStateChanged will handle updating the facet's state.
 			// We might log it here or let OnStateChanged handle all user-facing messages.
@@ -279,7 +281,7 @@ func (r *BaseFacet[T]) GetPage(first, pageSize int, filter FilterFunc[T],
 		go func() {
 			// Pass queryArgs to Load if this facet type requires them for its store.
 			// This is crucial for facets that use stores needing specific arguments (e.g., address for detail store).
-			r.Load(queryArgs...) // Pass queryArgs here
+			_, _ = r.Load(queryArgs...) // Pass queryArgs here
 		}()
 	}
 
@@ -298,7 +300,7 @@ func (r *BaseFacet[T]) GetPage(first, pageSize int, filter FilterFunc[T],
 
 	// Apply sorting if needed
 	if sortFunc != nil && len(filteredData) > 0 {
-		sortFunc(filteredData, sortSpec)
+		_ = sortFunc(filteredData, sortSpec)
 	}
 
 	// Apply pagination

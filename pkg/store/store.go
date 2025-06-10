@@ -8,7 +8,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 )
 
-// StoreState represents the current state of a store
 type StoreState int
 
 const (
@@ -19,7 +18,6 @@ const (
 	StateCanceled                   // User canceled
 )
 
-// FacetObserver defines the interface for objects that observe store changes
 type FacetObserver[T any] interface {
 	OnNewItem(item *T, index int)
 	OnStateChanged(state StoreState, reason string)
@@ -31,7 +29,6 @@ type Store[T any] struct {
 	observers          []FacetObserver[T]
 	queryFunc          func(*output.RenderCtx) error
 	processFunc        func(interface{}) *T
-	storeType          string
 	contextKey         string // Key for ContextManager
 	state              StoreState
 	stateReason        string
@@ -42,7 +39,6 @@ type Store[T any] struct {
 
 var errStaleFetch = errors.New("stale fetch: store was reset")
 
-// ErrStaleFetch returns the error indicating a stale fetch attempt.
 func ErrStaleFetch() error {
 	return errStaleFetch
 }
@@ -58,7 +54,6 @@ func NewStore[T any](
 		observers:   make([]FacetObserver[T], 0),
 		queryFunc:   queryFunc,
 		processFunc: processFunc,
-		storeType:   "sdk",
 		contextKey:  contextKey,
 		state:       StateStale,
 	}
@@ -67,24 +62,16 @@ func NewStore[T any](
 	return s
 }
 
-// GetStoreType returns the store's type
-func (s *Store[T]) GetStoreType() string {
-	return s.storeType
-}
-
-// RegisterObserver registers a facet as an observer of this store
 func (s *Store[T]) RegisterObserver(observer FacetObserver[T]) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	// Check if observer is already registered
 	for _, obs := range s.observers {
 		if obs == observer {
-			return // Already registered
+			return
 		}
 	}
 
-	// Initialize observers slice if nil
 	if s.observers == nil {
 		s.observers = make([]FacetObserver[T], 0)
 	}
@@ -92,7 +79,6 @@ func (s *Store[T]) RegisterObserver(observer FacetObserver[T]) {
 	s.observers = append(s.observers, observer)
 }
 
-// UnregisterObserver removes a facet as an observer
 func (s *Store[T]) UnregisterObserver(observer FacetObserver[T]) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()

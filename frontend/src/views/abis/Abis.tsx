@@ -243,7 +243,6 @@ export const Abis = () => {
         const abi = row as unknown as types.Abi;
         const addressStr = getAddressString(abi.address);
         const isProcessing = processingAddresses.has(addressStr);
-        // Enable remove only for Downloaded facet, disable for Known/Functions/Events facets
         const canRemove = pageData?.kind === types.ListKind.DOWNLOADED;
 
         return (

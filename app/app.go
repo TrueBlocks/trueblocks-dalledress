@@ -37,10 +37,10 @@ type App struct {
 	Preferences *preferences.Preferences
 	Projects    *project.Manager
 	chainList   *utils.ChainList
-	// ADD_ROUTE
-	names names.NamesCollection
-	abis  *abis.AbisCollection
-	// ADD_ROUTE
+	names       names.NamesCollection
+	// ABIS_ROUTE
+	abis *abis.AbisCollection
+	// ABIS_ROUTE
 	meta       *coreTypes.MetaData
 	fileServer *fileserver.FileServer
 	locked     int32
@@ -66,10 +66,10 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		apiKeys: make(map[string]string),
 		ensMap:  make(map[string]base.Address),
 	}
-	// ADD_ROUTE
 	app.names = names.NewNamesCollection()
+	// ABIS_ROUTE
 	app.abis = abis.NewAbisCollection()
-	// ADD_ROUTE
+	// ABIS_ROUTE
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
@@ -138,11 +138,9 @@ func (a *App) Startup(ctx context.Context) {
 func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 	if a.IsReady() {
-		// ADD_ROUTE
 		if err := a.names.LoadData(nil); err != nil {
 			msgs.EmitError("Failed to load names database", err)
 		}
-		// ADD_ROUTE
 
 		if !a.Preferences.App.Bounds.IsValid() {
 			// Sometimes, during development, the window size is corrupted
@@ -383,15 +381,15 @@ func (a *App) Reload() error {
 	lastView := a.GetAppPreferences().LastView
 	lastTab := a.GetLastTab(lastView)
 
-	// ADD_ROUTE
 	switch lastView {
+	// ABIS_ROUTE
 	case "/abis":
 		a.abis.Reset(lastTab)
 		a.abis.LoadData(lastTab)
+	// ABIS_ROUTE
 	case "/names":
 		a.names = a.names.ClearCache()
 	}
-	// ADD_ROUTE
 
 	return nil
 }

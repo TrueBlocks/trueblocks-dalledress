@@ -1,4 +1,4 @@
-// ADD_ROUTE
+// ABIS_ROUTE
 package abis
 
 import (
@@ -44,4 +44,4 @@ func (ac *AbisCollection) Crud(listKind types.ListKind, op crud.Operation, abi *
 	}
 }
 
-// ADD_ROUTE
+// ABIS_ROUTE

@@ -100,10 +100,10 @@ export type IconSet = {
   Settings: IconType;
   Wizard: IconType;
 
-  // ADD_ROUTE
   Names: IconType;
+  // ABIS_ROUTE
   ABIs: IconType;
-  // ADD_ROUTE
+  // ABIS_ROUTE
 
   // File operations
   Switch: IconType;
@@ -144,10 +144,10 @@ const faIcons: IconSet = {
   Settings: FaCog,
   Wizard: FaHatWizard,
 
-  // ADD_ROUTE
   Names: FaUser,
+  // ABIS_ROUTE
   ABIs: FaListAlt,
-  // ADD_ROUTE
+  // ABIS_ROUTE
 
   Switch: FaRandom,
   File: FaFile,
@@ -182,10 +182,10 @@ const biIcons: IconSet = {
   Settings: BiCog,
   Wizard: BiCog,
 
-  // ADD_ROUTE
   Names: BiUser,
+  // ABIS_ROUTE
   ABIs: BiListUl,
-  // ADD_ROUTE
+  // ABIS_ROUTE
 
   Switch: BiTransfer,
   File: BiFile,

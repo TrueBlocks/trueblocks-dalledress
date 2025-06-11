@@ -1,4 +1,3 @@
-// ADD_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud } from '@app';
@@ -789,4 +788,3 @@ const getListTypeFromLabel = (label: string): ListType => {
 };
 
 export type ListType = 'all' | 'custom' | 'prefund' | 'regular' | 'baddress';
-// ADD_ROUTE

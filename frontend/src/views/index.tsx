@@ -5,7 +5,7 @@ export { Home } from './Home';
 export { Khedra } from './Khedra';
 
 export * from './settings';
-// ADD_ROUTE
 export * from './names';
+// ABIS_ROUTE
 export * from './abis';
-// ADD_ROUTE
+// ABIS_ROUTE

@@ -1,4 +1,4 @@
-// ADD_ROUTE
+// ABIS_ROUTE
 package app
 
 import (
@@ -31,4 +31,4 @@ func (a *App) AbisCrud(
 	return a.abis.Crud(kind, op, abi)
 }
 
-// ADD_ROUTE
+// ABIS_ROUTE

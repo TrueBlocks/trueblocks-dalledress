@@ -1,4 +1,3 @@
-/* ADD_ROUTE */
 /* Parent container for the dual-table layout */
 .dual-table-layout {
   display: flex;
@@ -36,4 +35,3 @@
     margin-bottom: 20px;
   }
 }
-/* ADD_ROUTE */

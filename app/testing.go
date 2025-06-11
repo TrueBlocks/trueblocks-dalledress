@@ -15,10 +15,10 @@ func setupTestApp() *App {
 		},
 	}
 
-	// ADD_ROUTE
 	app.names = names.NewNamesCollection()
+	// ABIS_ROUTE
 	app.abis = abis.NewAbisCollection()
-	// ADD_ROUTE
+	// ABIS_ROUTE
 
 	_ = app.Reload()
 	return app

@@ -1,4 +1,4 @@
-// ADD_ROUTE
+// ABIS_ROUTE
 import { GetAbisPage, Reload } from '@app';
 import { abis, sdk, types } from '@models';
 
@@ -12,4 +12,4 @@ export const getAbisPage = (
 
 export const reload = (): Promise<void> => Reload();
 
-// ADD_ROUTE
+// ABIS_ROUTE

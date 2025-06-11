@@ -1,3 +1,4 @@
+// ABIS_ROUTE
 package abis
 
 import (
@@ -957,3 +958,4 @@ func TestEnhancedAbisCollection(t *testing.T) {
 // 		t.Error("Expected error for invalid list kind, got nil")
 // 	}
 // }
+// ABIS_ROUTE

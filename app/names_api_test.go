@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package app
 
 import (
@@ -109,5 +108,3 @@ func TestNamesCrud(t *testing.T) {
 		assert.False(t, found)
 	})
 }
-
-// ADD_ROUTE

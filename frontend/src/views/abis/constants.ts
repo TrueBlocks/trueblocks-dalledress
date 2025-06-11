@@ -1,4 +1,4 @@
-// ADD_ROUTE
+// ABIS_ROUTE
 import { types } from '@models';
 
 export const ABIS_ROUTE = '/abis';
@@ -12,4 +12,4 @@ export const ACTION_MESSAGES = {
     `Failed to delete address ${address}: ${error}`,
 } as const;
 
-// ADD_ROUTE
+// ABIS_ROUTE

@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package app
 
 import (
@@ -53,5 +52,3 @@ func (a *App) PublishNames(tabName string) error {
 	// }
 	return nil
 }
-
-// ADD_ROUTE

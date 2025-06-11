@@ -1,10 +1,10 @@
 import { SetInitialized } from '@app';
 import { About, DalleDress, History, Home, Khedra, Settings } from '@views';
 import {
-  // ADD_ROUTE
+  // ABIS_ROUTE
   Abis,
+  // ABIS_ROUTE
   Names,
-  // ADD_ROUTE
 } from '@views';
 import { Wizard } from '@wizards';
 
@@ -65,7 +65,7 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+6',
     type: 'navigation',
   },
-  // ADD_ROUTE
+  // ABIS_ROUTE
   {
     label: 'ABIs',
     path: '/abis',
@@ -75,6 +75,7 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+7',
     type: 'navigation',
   },
+  // ABIS_ROUTE
   {
     label: 'Names',
     path: '/names',
@@ -84,7 +85,6 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+5',
     type: 'navigation',
   },
-  // ADD_ROUTE
   {
     label: 'Settings',
     path: '/settings',

@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package names
 
 import (
@@ -118,5 +117,3 @@ func extractTagsFromNames(namesList []*types.Name) []string {
 
 	return uniqueTags
 }
-
-// ADD_ROUTE

@@ -24,12 +24,20 @@ func (ac *AbisCollection) Crud(listKind types.ListKind, op crud.Operation, abi *
 			return err
 		}
 
-		// TODO: MAKE THIS WORK
-		removed := false // ac.downloadedFacet.Remove(func(existing *coreTypes.Abi) bool {
-		// 	return existing.Address == abi.Address
-		// })
+		// Remove the ABI from the in-memory facet using ForEvery method
+		actionFunc := func(itemMatched *coreTypes.Abi) (error, bool) {
+			return nil, true // Action function - we just want to remove matched items
+		}
+		matchFunc := func(existing *coreTypes.Abi) bool {
+			return existing.Address == abi.Address // Match function - true for items to remove
+		}
+		removedCount, err := ac.downloadedFacet.ForEvery(actionFunc, matchFunc)
 
-		if removed {
+		if err != nil {
+			return fmt.Errorf("failed to remove ABI from facet: %w", err)
+		}
+
+		if removedCount > 0 {
 			msgs.EmitStatus(fmt.Sprintf("deleted ABI for address: %s", abi.Address))
 		} else {
 			msgs.EmitStatus(fmt.Sprintf("ABI for address %s was not found in cache", abi.Address))

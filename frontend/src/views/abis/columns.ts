@@ -51,10 +51,11 @@ const getColumnsForAbi = (): FormField[] => [
     type: 'number',
   },
   {
-    key: 'nErrors',
-    header: 'Errors',
-    sortable: true,
-    type: 'number',
+    key: 'actions',
+    header: 'Actions',
+    sortable: false,
+    type: 'text',
+    width: '120px',
   },
 ];
 

@@ -2,13 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { MonitorsCrud } from '@app';
-import {
-  Action,
-  FormField,
-  Table,
-  TableProvider,
-  usePagination,
-} from '@components';
+import { Action, BaseTab, FormField, usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useEvent } from '@hooks';
 import { TabView } from '@layout';
@@ -466,24 +460,22 @@ export const Monitors = () => {
 
   const perTabTable = useMemo(
     () => (
-      <TableProvider>
-        <Table
-          key={`monitors-table-${listKind}`}
-          columns={currentColumns}
-          data={currentData as unknown as Record<string, unknown>[]}
-          loading={!!pageData?.isFetching}
-          tableKey={tableKey}
-          onSubmit={handleSubmit}
-        />
-      </TableProvider>
+      <BaseTab
+        data={currentData as unknown as Record<string, unknown>[]}
+        columns={currentColumns}
+        loading={!!pageData?.isFetching}
+        error={error}
+        onSubmit={handleSubmit}
+        tableKey={tableKey}
+      />
     ),
     [
       currentData,
       currentColumns,
       pageData?.isFetching,
+      error,
       handleSubmit,
       tableKey,
-      listKind,
     ],
   );
 

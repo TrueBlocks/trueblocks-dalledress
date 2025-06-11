@@ -3,9 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetNamesPage, NamesCrud } from '@app';
 import {
   Action,
+  BaseTab,
   Chips,
   FormField,
-  Table,
   TableProvider,
   TagsTable,
   TagsTableHandle,
@@ -570,7 +570,7 @@ export const Names = () => {
     }
   };
 
-  const formValidation = {
+  const _formValidation = {
     name: (value: unknown) => {
       if (!value || String(value).trim() === '') {
         return 'Name is required';
@@ -611,7 +611,7 @@ export const Names = () => {
     );
   };
 
-  const dataTable = (tabLabel: string) => {
+  const dataTable = (_tabLabel: string) => {
     // Column override configurations
     const autonameOverride: Partial<FormField<IndexableName>> = {
       width: '40px',
@@ -711,17 +711,13 @@ export const Names = () => {
 
     return (
       <>
-        <Table
-          key={`data-table-${tabLabel}`}
-          columns={nameColumns}
+        <BaseTab
           data={names}
+          columns={nameColumns}
           loading={loading}
-          tableKey={tableKey}
+          error={null}
           onSubmit={handleFormSubmit}
-          validate={formValidation}
-          onModalOpen={(openModal) => {
-            openModalRefs.current[tabLabel] = openModal;
-          }}
+          tableKey={tableKey}
         />
       </>
     );

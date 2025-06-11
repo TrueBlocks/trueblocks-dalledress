@@ -43,7 +43,9 @@ func main() {
 		Bind: []interface{}{
 			a,
 			&project.Project{},
+			// NAMES_ROUTE
 			&names.NamesCollection{},
+			// NAMES_ROUTE
 			// ABIS_ROUTE
 			&abis.AbisCollection{},
 			// ABIS_ROUTE

@@ -303,11 +303,6 @@ export namespace names {
 	    prefund: types.Name[];
 	    regular: types.Name[];
 	    baddress: types.Name[];
-	    listTags: string[];
-	    customTags: string[];
-	    prefundTags: string[];
-	    regularTags: string[];
-	    baddressTags: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new NamesCollection(source);
@@ -321,11 +316,6 @@ export namespace names {
 	        this.prefund = this.convertValues(source["prefund"], types.Name);
 	        this.regular = this.convertValues(source["regular"], types.Name);
 	        this.baddress = this.convertValues(source["baddress"], types.Name);
-	        this.listTags = source["listTags"];
-	        this.customTags = source["customTags"];
-	        this.prefundTags = source["prefundTags"];
-	        this.regularTags = source["regularTags"];
-	        this.baddressTags = source["baddressTags"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -349,7 +339,6 @@ export namespace names {
 	export class NamesPage {
 	    names: types.Name[];
 	    total: number;
-	    tags: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new NamesPage(source);
@@ -359,7 +348,6 @@ export namespace names {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.names = this.convertValues(source["names"], types.Name);
 	        this.total = source["total"];
-	        this.tags = source["tags"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

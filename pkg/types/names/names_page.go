@@ -1,3 +1,4 @@
+// NAMES_ROUTE
 package names
 
 import (
@@ -18,7 +19,7 @@ func (n *NamesCollection) GetPage(
 ) (NamesPage, error) {
 	if len(n.List) == 0 {
 		if err := n.LoadData(nil); err != nil {
-			return NamesPage{Names: nil, Total: 0, Tags: []string{}}, err
+			return NamesPage{Names: nil, Total: 0}, err
 		}
 	}
 
@@ -42,10 +43,6 @@ func (n *NamesCollection) GetPage(
 	var filters []string
 	if filter != "" {
 		filters = append(filters, filter)
-	}
-
-	if selectedTag := n.GetSelectedTag(listKind); selectedTag != "" {
-		filters = append(filters, selectedTag)
 	}
 
 	if len(filters) > 0 {
@@ -88,20 +85,7 @@ func (n *NamesCollection) GetPage(
 
 	total := len(list)
 	if total == 0 || first >= total {
-		var tags []string
-		switch listKind {
-		case "custom":
-			tags = n.CustomTags
-		case "prefund":
-			tags = n.PrefundTags
-		case "regular":
-			tags = n.RegularTags
-		case "baddress":
-			tags = n.BaddressTags
-		default:
-			tags = n.ListTags
-		}
-		return NamesPage{Names: nil, Total: total, Tags: tags}, nil
+		return NamesPage{Names: nil, Total: total}, nil
 	}
 
 	// Sorting
@@ -127,24 +111,11 @@ func (n *NamesCollection) GetPage(
 		})
 	}
 
-	var tags []string
-	switch listKind {
-	case "custom":
-		tags = n.CustomTags
-	case "prefund":
-		tags = n.PrefundTags
-	case "regular":
-		tags = n.RegularTags
-	case "baddress":
-		tags = n.BaddressTags
-	default:
-		tags = n.ListTags
-	}
-
 	last := min(total, first+pageSize)
 	return NamesPage{
 		Names: list[first:last],
 		Total: total,
-		Tags:  tags,
 	}, nil
 }
+
+// NAMES_ROUTE

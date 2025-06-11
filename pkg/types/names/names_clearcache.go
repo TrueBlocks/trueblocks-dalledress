@@ -1,7 +1,10 @@
+// NAMES_ROUTE
 package names
 
 func (n *NamesCollection) ClearCache() NamesCollection {
-	ret := NamesCollection{selectedTags: n.selectedTags}
+	ret := NamesCollection{}
 	_ = ret.LoadData(nil)
 	return ret
 }
+
+// NAMES_ROUTE

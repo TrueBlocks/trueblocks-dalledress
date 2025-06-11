@@ -6,8 +6,6 @@ import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
 import { MenuItems } from 'src/Menu';
 import { useLocation } from 'wouter';
 
-import { FocusSider } from '../views/names/Names';
-
 interface BaseHotkey {
   type: 'navigation' | 'dev' | 'toggle';
   hotkey: string;
@@ -130,24 +128,6 @@ export const useAppHotkeys = (): void => {
             action: () => {
               Reload().then(() => {
                 // do nothing
-              });
-            },
-          },
-          e,
-        ),
-      options: { preventDefault: true, enableOnFormTags: true },
-    },
-    {
-      key: 'mod+shift+e',
-      handler: (e: KeyboardEvent) =>
-        handleHotkey(
-          {
-            type: 'toggle',
-            hotkey: 'mod+shift+e',
-            label: 'Focus tags sider',
-            action: () => {
-              emitEvent(FocusSider, 'Focus tags table', {
-                activeTab: currentLocation,
               });
             },
           },

@@ -15,7 +15,9 @@ func setupTestApp() *App {
 		},
 	}
 
+	// NAMES_ROUTE
 	app.names = names.NewNamesCollection()
+	// NAMES_ROUTE
 	// ABIS_ROUTE
 	app.abis = abis.NewAbisCollection()
 	// ABIS_ROUTE

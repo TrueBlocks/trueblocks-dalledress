@@ -1,3 +1,4 @@
+// NAMES_ROUTE
 package names
 
 import (
@@ -35,3 +36,5 @@ func (n *NamesCollection) Crud(operation crud.Operation, nameToModify *coreTypes
 	*n = n.ClearCache()
 	return nil
 }
+
+// NAMES_ROUTE

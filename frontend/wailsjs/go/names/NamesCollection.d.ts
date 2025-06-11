@@ -8,14 +8,8 @@ import {sync} from '../models';
 
 export function ClearCache():Promise<names.NamesCollection>;
 
-export function ClearSelectedTag(arg1:string):Promise<void>;
-
 export function Crud(arg1:crud.Operation,arg2:types.Name):Promise<void>;
 
 export function GetPage(arg1:string,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
-export function GetSelectedTag(arg1:string):Promise<string>;
-
 export function LoadData(arg1:sync.WaitGroup):Promise<void>;
-
-export function SetSelectedTag(arg1:string,arg2:string):Promise<void>;

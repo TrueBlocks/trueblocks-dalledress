@@ -39,8 +39,10 @@ export const useIcons = (
     const Wizard: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Wizard, { size, ...props });
 
+    // NAMES_ROUTE
     const Names: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Names, { size, ...props });
+    // NAMES_ROUTE
     // ABIS_ROUTE
     const ABIs: FC<IconProps> = (props = {}) =>
       createElement(iconSet.ABIs, { size, ...props });
@@ -99,7 +101,9 @@ export const useIcons = (
       Settings,
       Wizard,
 
+      // NAMES_ROUTE
       Names,
+      // NAMES_ROUTE
       // ABIS_ROUTE
       ABIs,
       // ABIS_ROUTE

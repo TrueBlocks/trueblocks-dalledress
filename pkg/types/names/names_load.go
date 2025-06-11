@@ -1,3 +1,4 @@
+// NAMES_ROUTE
 package names
 
 import (
@@ -74,12 +75,8 @@ func (n *NamesCollection) LoadData(wg *sync.WaitGroup) error {
 			}
 		}
 
-		n.ListTags = extractTagsFromNames(n.List)
-		n.CustomTags = extractTagsFromNames(n.Custom)
-		n.PrefundTags = extractTagsFromNames(n.Prefund)
-		n.RegularTags = extractTagsFromNames(n.Regular)
-		n.BaddressTags = extractTagsFromNames(n.Baddress)
-
 		return nil
 	}
 }
+
+// NAMES_ROUTE

@@ -38,7 +38,9 @@ type App struct {
 	Preferences *preferences.Preferences
 	Projects    *project.Manager
 	chainList   *utils.ChainList
-	names       names.NamesCollection
+	// NAMES_ROUTE
+	names names.NamesCollection
+	// NAMES_ROUTE
 	// ABIS_ROUTE
 	abis *abis.AbisCollection
 	// ABIS_ROUTE
@@ -70,7 +72,9 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		apiKeys: make(map[string]string),
 		ensMap:  make(map[string]base.Address),
 	}
+	// NAMES_ROUTE
 	app.names = names.NewNamesCollection()
+	// NAMES_ROUTE
 	// ABIS_ROUTE
 	app.abis = abis.NewAbisCollection()
 	// ABIS_ROUTE
@@ -389,13 +393,20 @@ func (a *App) Reload() error {
 	lastTab := a.GetLastTab(lastView)
 
 	switch lastView {
-	// ABIS_ROUTE
+	case "/names":
+		// NAMES_ROUTE
+		a.names = a.names.ClearCache()
+		// NAMES_ROUTE
 	case "/abis":
+		// ABIS_ROUTE
 		a.abis.Reset(lastTab)
 		a.abis.LoadData(lastTab)
-	// ABIS_ROUTE
-	case "/names":
-		a.names = a.names.ClearCache()
+		// ABIS_ROUTE
+	case "/monitors":
+		// MONITORS_ROUTE
+		a.monitors.Reset(lastTab)
+		a.monitors.LoadData(lastTab)
+		// MONITORS_ROUTE
 	}
 
 	return nil

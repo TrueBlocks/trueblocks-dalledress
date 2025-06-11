@@ -1,3 +1,4 @@
+// NAMES_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud } from '@app';
@@ -7,8 +8,6 @@ import {
   Chips,
   FormField,
   TableProvider,
-  TagsTable,
-  TagsTableHandle,
   mapNameToChips,
   usePagination,
 } from '@components';
@@ -16,7 +15,6 @@ import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { crud, msgs, types } from '@models';
-import { ClearSelectedTag, GetSelectedTag, SetSelectedTag } from '@names';
 import { Log, useEmitters } from '@utils';
 import { Address } from 'src/types/address';
 import { useLocation } from 'wouter';
@@ -24,7 +22,6 @@ import { useLocation } from 'wouter';
 import './Names.css';
 
 type IndexableName = types.Name & { [key: string]: unknown };
-export const FocusSider = 'focus-tags-table';
 
 // Helper function to remove undefined properties from an object
 function removeUndefinedProps(
@@ -51,18 +48,9 @@ export const Names = () => {
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
-  const [tags, setTags] = useState<string[]>([]);
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [listKind, setListKind] = useState<ListType>(
     getListTypeFromLabel(lastTab['/names'] || ''),
   );
-  const [showTagsView, setShowTagsView] = useState<Record<string, boolean>>({
-    All: false,
-    Custom: false,
-    Prefund: false,
-    Regular: false,
-    Baddress: false,
-  });
   const { emitStatus, emitError } = useEmitters();
 
   const tableKey = useMemo<TableKey>(
@@ -75,13 +63,6 @@ export const Names = () => {
 
   const { sort } = useSorting(tableKey);
   const { filter, setFiltering } = useFiltering(tableKey);
-
-  // References for each tab's TagsTable to support targeting specific instances
-  const tagsTableRefs = useRef<Record<string, TagsTableHandle | null>>({});
-  const mainTableRef = useRef<HTMLDivElement>(null);
-
-  // Single ref for backward compatibility
-  const tagsTableRef = useRef<TagsTableHandle>(null);
 
   // Store the openModal function for each table
   const openModalRefs = useRef<
@@ -98,21 +79,6 @@ export const Names = () => {
     }
   };
 
-  // Load the selected tag when the list type changes
-  useEffect(() => {
-    const fetchSelectedTag = async () => {
-      try {
-        GetSelectedTag(listKind).then((tag) => {
-          setSelectedTag(tag || null);
-        });
-      } catch (err) {
-        Log(`Error fetching selected tag: ${err}`);
-        setSelectedTag(null);
-      }
-    };
-    fetchSelectedTag();
-  }, [listKind]);
-
   const loadNames = useCallback(async () => {
     setLoading(true);
     GetNamesPage(
@@ -125,12 +91,10 @@ export const Names = () => {
       .then((result) => {
         setNames((result.names || []) as IndexableName[]);
         setTotalItems(result.total || 0);
-        setTags(result.tags || []);
       })
       .catch((err) => {
         emitError(err);
         setNames([]);
-        setTags([]);
       })
       .finally(() => {
         setLoading(false);
@@ -152,172 +116,6 @@ export const Names = () => {
   useEffect(() => {
     loadNames();
   }, [loadNames]);
-
-  useEffect(() => {
-    const currentTabLabel = lastTab['/names'] || '';
-    const newListType = getListTypeFromLabel(currentTabLabel);
-    setListKind(newListType);
-
-    // Fetch the selected tag for the new list type when changing tabs
-    const fetchSelectedTag = async () => {
-      try {
-        GetSelectedTag(newListType).then((tag) => {
-          setSelectedTag(tag || null);
-        });
-      } catch (err) {
-        Log(`Error fetching selected tag: ${err}`);
-        setSelectedTag(null);
-      }
-    };
-    fetchSelectedTag();
-  }, [lastTab]);
-
-  // Handle cmd+shift+e to open/focus tags table
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd+Shift+E (Mac) or Ctrl+Shift+E (Win/Linux)
-      const isCmdShiftE =
-        (e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'e';
-      if (isCmdShiftE) {
-        e.preventDefault();
-        const currentTabLabel = lastTab['/names'] || 'Custom';
-        if (!showTagsView[currentTabLabel]) {
-          setShowTagsView((prev) => ({
-            ...prev,
-            [currentTabLabel]: true,
-          }));
-        } else {
-          // Focus the tags table for the current tab
-          if (tagsTableRefs.current[currentTabLabel]) {
-            tagsTableRefs.current[currentTabLabel].focus();
-          } else if (tagsTableRef.current) {
-            tagsTableRef.current.focus();
-          }
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lastTab, showTagsView]);
-
-  // Handle Escape to close tags table if focused
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        const currentTabLabel = lastTab['/names'] || 'Custom';
-        if (showTagsView[currentTabLabel]) {
-          // Check if the tags table for this tab is focused using DOM API
-          const ref =
-            tagsTableRefs.current[currentTabLabel] || tagsTableRef.current;
-          // Try to get the root element of the tags table
-          let tagsTableEl: HTMLElement | null = null;
-          // Use a safer check for 'root' property without using 'any'
-          const maybeRoot =
-            ref && typeof ref === 'object' && ref !== null && 'root' in ref
-              ? (ref as { root?: unknown }).root
-              : undefined;
-          if (
-            maybeRoot &&
-            typeof maybeRoot === 'object' &&
-            maybeRoot !== null &&
-            'contains' in maybeRoot
-          ) {
-            tagsTableEl = maybeRoot as HTMLElement;
-          } else if (ref && 'focus' in ref && typeof ref.focus === 'function') {
-            // fallback: try to find by class
-            tagsTableEl = document.querySelector(
-              '.tags-table',
-            ) as HTMLElement | null;
-          }
-          if (
-            tagsTableEl &&
-            document.activeElement &&
-            tagsTableEl.contains(document.activeElement)
-          ) {
-            setShowTagsView((prev) => ({
-              ...prev,
-              [currentTabLabel]: false,
-            }));
-            e.preventDefault();
-          }
-        }
-      }
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [lastTab, showTagsView]);
-
-  // Setup event listener for focusing the tags table
-  useEvent(
-    FocusSider,
-    (_message: string, _data: { activeTab?: string } = {}) => {
-      // First try to derive tab from current location
-      const currentTabLabel = lastTab['/names'] || 'Custom';
-
-      // Try to focus the TagsTable for the current tab first
-      if (currentTabLabel && tagsTableRefs.current[currentTabLabel]) {
-        tagsTableRefs.current[currentTabLabel].focus();
-        return;
-      }
-
-      // If we couldn't focus the current tab's TagsTable, iterate through all available refs
-      const availableTabs = Object.keys(tagsTableRefs.current);
-      if (availableTabs.length > 0) {
-        // Try to find any tab that has a valid ref
-        for (const tabName of availableTabs) {
-          if (tagsTableRefs.current[tabName]) {
-            tagsTableRefs.current[tabName].focus();
-            return;
-          }
-        }
-      }
-
-      // Fall back to legacy ref as a last resort
-      if (tagsTableRef.current) {
-        tagsTableRef.current.focus();
-      }
-    },
-  );
-
-  // Handle tag selection
-  const handleTagSelect = async (
-    tag: string | null,
-    focusMainTable: boolean = false,
-  ) => {
-    try {
-      if (tag) {
-        try {
-          SetSelectedTag(listKind, tag).then(() => {});
-        } catch (e) {
-          Log(`Error in SetSelectedTag: ${e}`);
-        }
-      } else {
-        try {
-          ClearSelectedTag(listKind).then(() => {});
-        } catch (e) {
-          Log(`Error in ClearSelectedTag: ${e}`);
-        }
-      }
-      setSelectedTag(tag);
-    } catch (err) {
-      console.error(`Error setting selected tag: ${err}`);
-    }
-
-    // Reset to first page when selecting a tag
-    if (pagination.currentPage !== 0) {
-      goToPage(0);
-    }
-
-    // Focus the main table only if explicitly requested (via Enter key)
-    if (focusMainTable && mainTableRef.current) {
-      setTimeout(() => {
-        const tableElement = mainTableRef.current?.querySelector('.data-table');
-        if (tableElement) {
-          (tableElement as HTMLElement).focus();
-        }
-      }, 0);
-    }
-  };
 
   const handleFormSubmit = (data: Record<string, unknown>) => {
     if (!data.source || data.source === '') {
@@ -367,7 +165,6 @@ export const Names = () => {
         // 5. Update UI with definitive result from GetNamesPage
         setNames((result.names || []) as IndexableName[]);
         setTotalItems(result.total || 0);
-        setTags(result.tags || []);
 
         // Ensure address is stringified for the status message if it's not already a string.
         const addressStr =
@@ -434,7 +231,6 @@ export const Names = () => {
             // Update UI with definitive result from GetNamesPage
             setNames((result.names || []) as IndexableName[]);
             setTotalItems(result.total || 0);
-            setTags(result.tags || []);
 
             const action = isDeleted ? 'undeleted' : 'deleted';
             emitStatus(`Address ${address} was ${action} successfully`);
@@ -506,7 +302,6 @@ export const Names = () => {
             // Update UI with definitive result from GetNamesPage
             setNames((result.names || []) as IndexableName[]);
             setTotalItems(result.total || 0);
-            setTags(result.tags || []);
 
             emitStatus(`Address ${address} was removed successfully`);
           })
@@ -549,7 +344,6 @@ export const Names = () => {
             // Update UI with definitive result from GetNamesPage
             setNames((result.names || []) as IndexableName[]);
             setTotalItems(result.total || 0);
-            setTags(result.tags || []);
 
             emitStatus(`Address ${address} was auto-named successfully`);
           })
@@ -589,26 +383,6 @@ export const Names = () => {
 
       return null;
     },
-  };
-
-  const tagsTable = (tabLabel: string) => {
-    return (
-      <TagsTable
-        key={`tags-table-${tabLabel}`}
-        tags={tags}
-        onTagSelect={handleTagSelect}
-        selectedTag={selectedTag}
-        visible={true}
-        ref={(ref) => {
-          if (ref) {
-            tagsTableRefs.current[tabLabel] = ref;
-          }
-          if (tabLabel === 'Custom' && ref) {
-            tagsTableRef.current = ref;
-          }
-        }}
-      />
-    );
   };
 
   const dataTable = (_tabLabel: string) => {
@@ -724,19 +498,9 @@ export const Names = () => {
   };
 
   const createTableContent = (tabLabel: string) => {
-    const tagsVisible = !!showTagsView[tabLabel];
     return (
       <TableProvider key={`table-provider-${tabLabel}`}>
-        {tagsVisible ? (
-          <div className="dual-table-layout">
-            {tagsTable(tabLabel)}
-            <div className="table-wrapper" ref={mainTableRef}>
-              {dataTable(tabLabel)}
-            </div>
-          </div>
-        ) : (
-          dataTable(tabLabel)
-        )}
+        dataTable(tabLabel)
       </TableProvider>
     );
   };
@@ -784,3 +548,4 @@ const getListTypeFromLabel = (label: string): ListType => {
 };
 
 export type ListType = 'all' | 'custom' | 'prefund' | 'regular' | 'baddress';
+// NAMES_ROUTE

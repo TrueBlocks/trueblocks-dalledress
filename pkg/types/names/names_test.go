@@ -1,3 +1,4 @@
+// NAMES_ROUTE
 package names
 
 import (
@@ -178,3 +179,5 @@ func TestGetNames_Filtering(t *testing.T) {
 		t.Errorf("expected all names, got %+v", page.Names)
 	}
 }
+
+// NAMES_ROUTE

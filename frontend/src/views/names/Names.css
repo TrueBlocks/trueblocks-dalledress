@@ -1,3 +1,4 @@
+/* NAMES_ROUTE */
 /* Parent container for the dual-table layout */
 .dual-table-layout {
   display: flex;
@@ -26,12 +27,5 @@
   .dual-table-layout {
     flex-direction: column;
   }
-
-  .tags-table-container {
-    min-width: 100%;
-    max-width: 100%;
-    max-height: 200px;
-    margin-right: 0;
-    margin-bottom: 20px;
-  }
 }
+/* NAMES_ROUTE */

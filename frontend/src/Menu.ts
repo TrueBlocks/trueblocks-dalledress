@@ -7,7 +7,9 @@ import {
   // MONITORS_ROUTE
   Monitors,
   // MONITORS_ROUTE
+  // NAMES_ROUTE
   Names,
+  // NAMES_ROUTE
 } from '@views';
 import { Wizard } from '@wizards';
 
@@ -90,6 +92,7 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   // MONITORS_ROUTE
+  // NAMES_ROUTE
   {
     label: 'Names',
     path: '/names',
@@ -99,6 +102,7 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+8',
     type: 'navigation',
   },
+  // NAMES_ROUTE
   {
     label: 'Settings',
     path: '/settings',

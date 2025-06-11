@@ -45,6 +45,10 @@ export const useIcons = (
     const ABIs: FC<IconProps> = (props = {}) =>
       createElement(iconSet.ABIs, { size, ...props });
     // ABIS_ROUTE
+    // MONITORS_ROUTE
+    const Monitors: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Monitors, { size, ...props });
+    // MONITORS_ROUTE
 
     const Switch: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Switch, { size, ...props });
@@ -99,6 +103,9 @@ export const useIcons = (
       // ABIS_ROUTE
       ABIs,
       // ABIS_ROUTE
+      // MONITORS_ROUTE
+      Monitors,
+      // MONITORS_ROUTE
 
       Switch,
       File,

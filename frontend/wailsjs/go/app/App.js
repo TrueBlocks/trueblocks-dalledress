@@ -94,6 +94,10 @@ export function GetMarkdown(arg1, arg2, arg3) {
   return window['go']['app']['App']['GetMarkdown'](arg1, arg2, arg3);
 }
 
+export function GetMonitorsPage(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['app']['App']['GetMonitorsPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -140,6 +144,14 @@ export function LogBackend(arg1) {
 
 export function LogFrontend(arg1) {
   return window['go']['app']['App']['LogFrontend'](arg1);
+}
+
+export function MonitorsClean(arg1) {
+  return window['go']['app']['App']['MonitorsClean'](arg1);
+}
+
+export function MonitorsCrud(arg1, arg2, arg3, arg4) {
+  return window['go']['app']['App']['MonitorsCrud'](arg1, arg2, arg3, arg4);
 }
 
 export function NamesCrud(arg1, arg2, arg3) {

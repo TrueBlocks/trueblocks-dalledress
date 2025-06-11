@@ -4,6 +4,9 @@ import {
   // ABIS_ROUTE
   Abis,
   // ABIS_ROUTE
+  // MONITORS_ROUTE
+  Monitors,
+  // MONITORS_ROUTE
   Names,
 } from '@views';
 import { Wizard } from '@wizards';
@@ -61,8 +64,8 @@ export const MenuItems: MenuItem[] = [
     path: '/dalledress',
     position: 'top',
     component: DalleDress,
-    hotkey: 'mod+6',
-    altHotkey: 'alt+6',
+    hotkey: 'mod+5',
+    altHotkey: 'alt+5',
     type: 'navigation',
   },
   // ABIS_ROUTE
@@ -71,18 +74,29 @@ export const MenuItems: MenuItem[] = [
     path: '/abis',
     position: 'top',
     component: Abis,
+    hotkey: 'mod+6',
+    altHotkey: 'alt+6',
+    type: 'navigation',
+  },
+  // ABIS_ROUTE
+  // MONITORS_ROUTE
+  {
+    label: 'Monitors',
+    path: '/monitors',
+    position: 'top',
+    component: Monitors,
     hotkey: 'mod+7',
     altHotkey: 'alt+7',
     type: 'navigation',
   },
-  // ABIS_ROUTE
+  // MONITORS_ROUTE
   {
     label: 'Names',
     path: '/names',
     position: 'top',
     component: Names,
-    hotkey: 'mod+5',
-    altHotkey: 'alt+5',
+    hotkey: 'mod+8',
+    altHotkey: 'alt+8',
     type: 'navigation',
   },
   {
@@ -90,8 +104,8 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+8',
-    altHotkey: 'alt+8',
+    hotkey: 'mod+9',
+    altHotkey: 'alt+9',
     type: 'navigation',
   },
   {

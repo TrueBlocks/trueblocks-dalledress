@@ -11,6 +11,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
@@ -46,6 +47,9 @@ func main() {
 			// ABIS_ROUTE
 			&abis.AbisCollection{},
 			// ABIS_ROUTE
+			// MONITORS_ROUTE
+			&monitors.MonitorsCollection{},
+			// MONITORS_ROUTE
 		},
 		EnumBind: []interface{}{
 			msgs.AllMessages,

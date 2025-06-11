@@ -38,6 +38,7 @@ import {
   BiChevronsRight,
   BiChevronsUp,
   BiCog,
+  BiDesktop,
   BiEnvelope,
   BiFile,
   BiGlobe,
@@ -65,6 +66,7 @@ import {
   FaAngleDoubleRight,
   FaAngleDoubleUp,
   FaCog,
+  FaDesktop,
   FaEdit,
   FaEnvelope,
   FaEraser,
@@ -104,6 +106,9 @@ export type IconSet = {
   // ABIS_ROUTE
   ABIs: IconType;
   // ABIS_ROUTE
+  // MONITORS_ROUTE
+  Monitors: IconType;
+  // MONITORS_ROUTE
 
   // File operations
   Switch: IconType;
@@ -148,6 +153,9 @@ const faIcons: IconSet = {
   // ABIS_ROUTE
   ABIs: FaListAlt,
   // ABIS_ROUTE
+  // MONITORS_ROUTE
+  Monitors: FaDesktop,
+  // MONITORS_ROUTE
 
   Switch: FaRandom,
   File: FaFile,
@@ -186,6 +194,9 @@ const biIcons: IconSet = {
   // ABIS_ROUTE
   ABIs: BiListUl,
   // ABIS_ROUTE
+  // MONITORS_ROUTE
+  Monitors: BiDesktop,
+  // MONITORS_ROUTE
 
   Switch: BiTransfer,
   File: BiFile,

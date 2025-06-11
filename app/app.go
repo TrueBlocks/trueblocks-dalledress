@@ -25,6 +25,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
@@ -41,6 +42,9 @@ type App struct {
 	// ABIS_ROUTE
 	abis *abis.AbisCollection
 	// ABIS_ROUTE
+	// MONITORS_ROUTE
+	monitors *monitors.MonitorsCollection
+	// MONITORS_ROUTE
 	meta       *coreTypes.MetaData
 	fileServer *fileserver.FileServer
 	locked     int32
@@ -70,6 +74,9 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	// ABIS_ROUTE
 	app.abis = abis.NewAbisCollection()
 	// ABIS_ROUTE
+	// MONITORS_ROUTE
+	app.monitors = monitors.NewMonitorsCollection()
+	// MONITORS_ROUTE
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 

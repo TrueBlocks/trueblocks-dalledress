@@ -10,6 +10,7 @@ import {preferences} from '../models';
 import {utils} from '../models';
 import {context} from '../models';
 import {project} from '../models';
+import {monitors} from '../models';
 import {names} from '../models';
 import {app} from '../models';
 
@@ -59,6 +60,8 @@ export function GetLastTab(arg1:string):Promise<types.ListKind>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
+export function GetMonitorsPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
+
 export function GetNamesPage(arg1:string,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
 export function GetNodeStatus():Promise<types.MetaData>;
@@ -82,6 +85,10 @@ export function IsReady():Promise<boolean>;
 export function LogBackend(arg1:string):Promise<void>;
 
 export function LogFrontend(arg1:string):Promise<void>;
+
+export function MonitorsClean(arg1:Array<string>):Promise<void>;
+
+export function MonitorsCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Monitor,arg4:string):Promise<void>;
 
 export function NamesCrud(arg1:crud.Operation,arg2:types.Name,arg3:string):Promise<void>;
 

@@ -236,6 +236,51 @@ export namespace menu {
 
 }
 
+export namespace monitors {
+	
+	export class MonitorsPage {
+	    kind: types.ListKind;
+	    monitors?: types.Monitor[];
+	    totalItems: number;
+	    expectedTotal: number;
+	    isFetching: boolean;
+	    state: facets.LoadState;
+	
+	    static createFrom(source: any = {}) {
+	        return new MonitorsPage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.kind = source["kind"];
+	        this.monitors = this.convertValues(source["monitors"], types.Monitor);
+	        this.totalItems = source["totalItems"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isFetching = source["isFetching"];
+	        this.state = source["state"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
 export namespace msgs {
 	
 	export enum EventType {
@@ -604,6 +649,7 @@ export namespace types {
 	    KNOWN = "Known",
 	    FUNCTIONS = "Functions",
 	    EVENTS = "Events",
+	    MONITORS = "Monitors",
 	}
 	export class Parameter {
 	    components?: Parameter[];
@@ -789,6 +835,50 @@ export namespace types {
 	        this.networkId = source["networkId"];
 	        this.chain = source["chain"];
 	    }
+	}
+	export class Monitor {
+	    address: base.Address;
+	    deleted: boolean;
+	    fileSize: number;
+	    isEmpty: boolean;
+	    isStaged: boolean;
+	    lastScanned: number;
+	    nRecords: number;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Monitor(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.address = this.convertValues(source["address"], base.Address);
+	        this.deleted = source["deleted"];
+	        this.fileSize = source["fileSize"];
+	        this.isEmpty = source["isEmpty"];
+	        this.isStaged = source["isStaged"];
+	        this.lastScanned = source["lastScanned"];
+	        this.nRecords = source["nRecords"];
+	        this.name = source["name"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class Name {
 	    address: base.Address;

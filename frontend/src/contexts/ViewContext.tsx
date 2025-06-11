@@ -21,6 +21,34 @@ export interface PaginationState {
   totalItems: number;
 }
 
+// Navigation context for calculating post-deletion targets
+export interface NavigationContext {
+  currentPage: number;
+  pageSize: number;
+  totalItems: number;
+  deletingRowIndex: number;
+  deletingRowId: string;
+  currentPageData: Record<string, unknown>[];
+  // Performance hints
+  isOnlyRowOnPage: boolean;
+  isFirstRowOnPage: boolean;
+  isLastRowOnPage: boolean;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+// Navigation target for post-action positioning
+export interface NavigationTarget {
+  type: 'page' | 'row' | 'none';
+  page?: number;
+  rowId?: string;
+}
+
+// Navigation strategy function type
+export type NavigationStrategy = (
+  context: NavigationContext,
+) => NavigationTarget | null;
+
 export interface ViewSortState {
   [key: string]: sdk.SortSpec | null;
 }

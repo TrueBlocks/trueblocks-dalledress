@@ -37,7 +37,7 @@ export const Abis = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(tableKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
   const { sort } = useSorting(tableKey);
   const { filter } = useFiltering(tableKey);
   const { emitStatus } = useEmitters();
@@ -119,16 +119,21 @@ export const Abis = () => {
     ],
   ]);
 
-  // Optimistic delete action with proper type safety
+  // Optimistic delete action with simple last-record navigation
   const handleAction = useCallback(
     (address: Address) => {
       clearError();
       try {
         const original = [...(pageData?.abis || [])];
+
+        // Check if we're removing the only row on the current page
+        const isOnlyRowOnPage = original.length === 1;
+
         const optimisticValues = original.filter((abi) => {
           const abiAddress = getAddressString(abi.address);
           return abiAddress !== address;
         });
+
         // Apply optimistic update immediately without setting loading state
         setPageData((prev) => {
           if (!prev) return null;
@@ -159,6 +164,38 @@ export const Abis = () => {
             setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
+
+            // If we removed the only row on the page, navigate to the last available record
+            if (isOnlyRowOnPage && result.totalItems > 0) {
+              const newTotalPages = Math.ceil(
+                result.totalItems / pagination.pageSize,
+              );
+              const lastPageIndex = Math.max(0, newTotalPages - 1);
+
+              // Navigate to the last page if we're not already there
+              if (lastPageIndex !== pagination.currentPage) {
+                goToPage(lastPageIndex);
+
+                // After navigation, simulate pressing End key to select last row
+                // This mimics the logic from useTableKeys.ts line 85
+                setTimeout(() => {
+                  // Simulate End key: setSelectedRowIndex(itemCount - 1)
+                  // We need to send a custom event to the table to select the last row
+                  const endKeyEvent = new KeyboardEvent('keydown', {
+                    key: 'End',
+                    bubbles: true,
+                    cancelable: true,
+                  });
+
+                  // Find the table element and dispatch the End key event
+                  const tableElement = document.querySelector('.data-table');
+                  if (tableElement) {
+                    tableElement.dispatchEvent(endKeyEvent);
+                  }
+                }, 200); // Give time for page navigation and data loading
+              }
+            }
+
             emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
           })
           .catch((err) => {
@@ -187,6 +224,7 @@ export const Abis = () => {
       setTotalItems,
       pagination.currentPage,
       pagination.pageSize,
+      goToPage,
       sort,
       filter,
       setState,

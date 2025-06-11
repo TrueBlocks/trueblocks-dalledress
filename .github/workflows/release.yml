@@ -6,7 +6,8 @@ on:
 permissions:
   contents: write
 env:
-  GO_VERSION: '1.23.1'
+  # GoLang version
+  GO_VERSION: '1.23.8'
   NODE_VERSION: '20'
 jobs:
   create_release:

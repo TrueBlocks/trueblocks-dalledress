@@ -15,7 +15,7 @@ interface EntityConfig {
   displayName: string;
   singularName: string;
   pluralName: string;
-  useAddress: boolean; // whether to show "for address" in messages
+  useAddress: boolean;
 }
 
 const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
@@ -47,46 +47,25 @@ export const useActionMsgs = (entityType: EntityType) => {
     action: ActionType,
     identifier?: string | number,
   ): string => {
-    switch (action) {
-      case 'create':
-        return `${config.displayName} '${identifier}' was created successfully`;
-
-      case 'update':
-        return `${config.displayName} '${identifier}' was updated successfully`;
-
-      case 'delete':
-        if (config.useAddress && entityType === 'names') {
-          return `${config.displayName} for address ${identifier} was deleted successfully`;
-        }
-        return `${config.displayName} ${identifier} was deleted successfully`;
-
-      case 'undelete':
-        if (config.useAddress && entityType === 'names') {
-          return `${config.displayName} for address ${identifier} was undeleted successfully`;
-        }
-        return `${config.displayName} ${identifier} was undeleted successfully`;
-
-      case 'remove':
-        if (config.useAddress && entityType === 'names') {
-          return `${config.displayName} for address ${identifier} was removed successfully`;
-        }
-        return `${config.displayName} ${identifier} was removed successfully`;
-
-      case 'autoname':
-        return `Address ${identifier} was auto-named successfully`;
-
-      case 'clean':
-        if (typeof identifier === 'number') {
-          return `Cleaned ${identifier} ${config.singularName}(s) successfully`;
-        }
-        return `${config.displayName}s data cleaned successfully`;
-
-      case 'reload':
-        return `Reloaded ${config.singularName} data. Fetching fresh data...`;
-
-      default:
-        return `${config.displayName} ${action} completed successfully`;
+    if (action === 'autoname') {
+      return `Address ${identifier} was auto-named successfully`;
     }
+    if (action === 'clean') {
+      return `${config.displayName}s data cleaned successfully`;
+    }
+    if (action === 'reload') {
+      return `Reloaded ${config.singularName} data. Fetching fresh data...`;
+    }
+
+    const entityName = ['create', 'update'].includes(action)
+      ? config.displayName
+      : `${config.displayName}${config.useAddress ? ' for address' : ''}`;
+
+    const identifierText = ['create', 'update'].includes(action)
+      ? `'${identifier}'`
+      : identifier;
+
+    return `${entityName} ${identifierText} was ${action}d successfully`;
   };
 
   const generateFailureMessage = (
@@ -94,40 +73,24 @@ export const useActionMsgs = (entityType: EntityType) => {
     identifier?: string,
     error?: string,
   ): string => {
-    switch (action) {
-      case 'create':
-        return `Failed to create ${config.singularName}: ${error}`;
-
-      case 'update':
-        return `Failed to update ${config.singularName}: ${error}`;
-
-      case 'delete':
-        if (config.useAddress && entityType === 'names') {
-          return `Failed to delete ${config.singularName} for address ${identifier}: ${error}`;
-        }
-        return `Failed to delete ${config.singularName} ${identifier}: ${error}`;
-
-      case 'undelete':
-        if (config.useAddress && entityType === 'names') {
-          return `Failed to undelete ${config.singularName} for address ${identifier}: ${error}`;
-        }
-        return `Failed to undelete ${config.singularName} ${identifier}: ${error}`;
-
-      case 'remove':
-        if (config.useAddress && entityType === 'names') {
-          return `Failed to remove ${config.singularName} for address ${identifier}: ${error}`;
-        }
-        return `Failed to remove ${config.singularName} ${identifier}: ${error}`;
-
-      case 'autoname':
-        return `Failed to auto-name address ${identifier}: ${error}`;
-
-      case 'clean':
-        return `Failed to clean ${config.pluralName}: ${error}`;
-
-      default:
-        return `Failed to ${action} ${config.singularName}: ${error}`;
+    // Special cases that don't follow the standard pattern
+    if (action === 'autoname') {
+      return `Failed to auto-name address ${identifier}: ${error}`;
     }
+    if (action === 'clean') {
+      return `Failed to clean ${config.pluralName}: ${error}`;
+    }
+
+    // Standard pattern for most actions
+    const entityName = ['create', 'update'].includes(action)
+      ? config.singularName
+      : `${config.singularName}${config.useAddress ? ' for address' : ''}`;
+
+    const identifierText = ['create', 'update'].includes(action)
+      ? ''
+      : ` ${identifier}`;
+
+    return `Failed to ${action} ${entityName}${identifierText}: ${error}`;
   };
 
   return {

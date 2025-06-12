@@ -119,42 +119,44 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 		return
 	}
 
+	var facetAbi *facets.Facet[coreTypes.Abi]
+	var facetFunction *facets.Facet[coreTypes.Function]
+	var facetName string
+
 	switch listKind {
 	case AbisDownloaded:
-		go func() {
-			if result, err := ac.downloadedFacet.Load(); err != nil {
-				logging.LogError("LoadData.AbisDownloaded from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("downloaded", result.Payload)
-			}
-		}()
+		facetAbi = ac.downloadedFacet
+		facetName = "downloaded"
 	case AbisKnown:
-		go func() {
-			if result, err := ac.knownFacet.Load(); err != nil {
-				logging.LogError("LoadData.AbisKnown from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("known", result.Payload)
-			}
-		}()
+		facetAbi = ac.knownFacet
+		facetName = "known"
 	case AbisFunctions:
-		go func() {
-			if result, err := ac.functionsFacet.Load(); err != nil {
-				logging.LogError("LoadData.AbisFunctions from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("functions", result.Payload)
-			}
-		}()
+		facetFunction = ac.functionsFacet
+		facetName = "functions"
 	case AbisEvents:
-		go func() {
-			if result, err := ac.eventsFacet.Load(); err != nil {
-				logging.LogError("LoadData.AbisEvents from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("events", result.Payload)
-			}
-		}()
+		facetFunction = ac.eventsFacet
+		facetName = "events"
 	default:
 		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		return
 	}
+
+	// Single goroutine implementation for all facets
+	go func() {
+		if facetAbi != nil {
+			if result, err := facetAbi.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(facetName, result.Payload)
+			}
+		} else if facetFunction != nil {
+			if result, err := facetFunction.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(facetName, result.Payload)
+			}
+		}
+	}()
 }
 
 func (ac *AbisCollection) Reset(listKind types.ListKind) {
@@ -163,20 +165,34 @@ func (ac *AbisCollection) Reset(listKind types.ListKind) {
 		abisListStore.Reset()
 	case AbisFunctions, AbisEvents:
 		abisDetailStore.Reset()
+	default:
+		return
 	}
 }
 
 func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
+	var facetAbi *facets.Facet[coreTypes.Abi]
+	var facetFunction *facets.Facet[coreTypes.Function]
+
 	switch listKind {
 	case AbisDownloaded:
-		return ac.downloadedFacet.NeedsUpdate()
+		facetAbi = ac.downloadedFacet
 	case AbisKnown:
-		return ac.knownFacet.NeedsUpdate()
+		facetAbi = ac.knownFacet
 	case AbisFunctions:
-		return ac.functionsFacet.NeedsUpdate()
+		facetFunction = ac.functionsFacet
 	case AbisEvents:
-		return ac.eventsFacet.NeedsUpdate()
+		facetFunction = ac.eventsFacet
+	default:
+		return false
 	}
+
+	if facetAbi != nil {
+		return facetAbi.NeedsUpdate()
+	} else if facetFunction != nil {
+		return facetFunction.NeedsUpdate()
+	}
+
 	return false
 }
 

@@ -99,73 +99,68 @@ func (nc *NamesCollection) LoadData(listKind types.ListKind) {
 		return
 	}
 
+	var facet *facets.Facet[coreTypes.Name]
+	var facetName string
+
 	switch listKind {
 	case NamesAll:
-		go func() {
-			if result, err := nc.allFacet.Load(); err != nil {
-				logging.LogError("LoadData.NamesAll from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("all", result.Payload)
-			}
-		}()
+		facet = nc.allFacet
+		facetName = "all"
 	case NamesCustom:
-		go func() {
-			if result, err := nc.customFacet.Load(); err != nil {
-				logging.LogError("LoadData.NamesCustom from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("custom", result.Payload)
-			}
-		}()
+		facet = nc.customFacet
+		facetName = "custom"
 	case NamesPrefund:
-		go func() {
-			if result, err := nc.prefundFacet.Load(); err != nil {
-				logging.LogError("LoadData.NamesPrefund from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("prefund", result.Payload)
-			}
-		}()
+		facet = nc.prefundFacet
+		facetName = "prefund"
 	case NamesRegular:
-		go func() {
-			if result, err := nc.regularFacet.Load(); err != nil {
-				logging.LogError("LoadData.NamesRegular from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("regular", result.Payload)
-			}
-		}()
+		facet = nc.regularFacet
+		facetName = "regular"
 	case NamesBaddress:
-		go func() {
-			if result, err := nc.baddressFacet.Load(); err != nil {
-				logging.LogError("LoadData.NamesBaddress from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("baddress", result.Payload)
-			}
-		}()
+		facet = nc.baddressFacet
+		facetName = "baddress"
 	default:
 		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		return
 	}
+
+	// Single goroutine implementation for all facets
+	go func() {
+		if result, err := facet.Load(); err != nil {
+			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+		} else {
+			msgs.EmitLoaded(facetName, result.Payload)
+		}
+	}()
 }
 
 func (nc *NamesCollection) Reset(listKind types.ListKind) {
 	switch listKind {
 	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
 		namesStore.Reset()
+	default:
+		return
 	}
 }
 
 func (nc *NamesCollection) NeedsUpdate(listKind types.ListKind) bool {
+	var facet *facets.Facet[coreTypes.Name]
+
 	switch listKind {
 	case NamesAll:
-		return nc.allFacet.NeedsUpdate()
+		facet = nc.allFacet
 	case NamesCustom:
-		return nc.customFacet.NeedsUpdate()
+		facet = nc.customFacet
 	case NamesPrefund:
-		return nc.prefundFacet.NeedsUpdate()
+		facet = nc.prefundFacet
 	case NamesRegular:
-		return nc.regularFacet.NeedsUpdate()
+		facet = nc.regularFacet
 	case NamesBaddress:
-		return nc.baddressFacet.NeedsUpdate()
+		facet = nc.baddressFacet
+	default:
+		return false
 	}
-	return false
+
+	return facet.NeedsUpdate()
 }
 
 func (nc *NamesCollection) getExpectedTotal(listKind types.ListKind) int {

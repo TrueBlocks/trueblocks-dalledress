@@ -54,16 +54,26 @@ func (mc *MonitorsCollection) LoadData(listKind types.ListKind) {
 		return
 	}
 
+	var facet *facets.Facet[coreTypes.Monitor]
+	var facetName string
+
 	switch listKind {
 	case MonitorsList:
-		go func() {
-			if result, err := mc.monitorsFacet.Load(); err != nil {
-				logging.LogError("LoadData.MonitorsList from store: %v", err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded("monitors", result.Payload)
-			}
-		}()
+		facet = mc.monitorsFacet
+		facetName = "monitors"
+	default:
+		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		return
 	}
+
+	// Single goroutine implementation for all facets
+	go func() {
+		if result, err := facet.Load(); err != nil {
+			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+		} else {
+			msgs.EmitLoaded(facetName, result.Payload)
+		}
+	}()
 }
 
 func (mc *MonitorsCollection) GetPage(
@@ -116,15 +126,22 @@ func (mc *MonitorsCollection) Reset(listKind types.ListKind) {
 	switch listKind {
 	case MonitorsList:
 		monitorsStore.Reset()
+	default:
+		return
 	}
 }
 
 func (mc *MonitorsCollection) NeedsUpdate(listKind types.ListKind) bool {
+	var facet *facets.Facet[coreTypes.Monitor]
+
 	switch listKind {
 	case MonitorsList:
-		return mc.monitorsFacet.NeedsUpdate()
+		facet = mc.monitorsFacet
+	default:
+		return false
 	}
-	return false
+
+	return facet.NeedsUpdate()
 }
 
 func (mc *MonitorsCollection) getExpectedTotal() int {

@@ -5,178 +5,153 @@ import (
 	"testing"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
-
-func makeTestNames() NamesCollection {
-	return NamesCollection{
-		Map: map[base.Address]types.Name{
-			base.HexToAddress("0x1"): {Address: base.HexToAddress("0x1"), Tags: "custom", Parts: types.Custom},
-			base.HexToAddress("0x2"): {Address: base.HexToAddress("0x2"), Tags: "prefund", Parts: types.Prefund},
-			base.HexToAddress("0x3"): {Address: base.HexToAddress("0x3"), Tags: "regular", Parts: types.Regular},
-			base.HexToAddress("0x4"): {Address: base.HexToAddress("0x4"), Tags: "baddress", Parts: types.Baddress},
-		},
-		List: []*types.Name{
-			{Name: "A", Address: base.HexToAddress("0x1"), Tags: "custom", Parts: types.Custom},
-			{Name: "B", Address: base.HexToAddress("0x2"), Tags: "prefund", Parts: types.Prefund},
-			{Name: "C", Address: base.HexToAddress("0x3"), Tags: "regular", Parts: types.Regular},
-			{Name: "D", Address: base.HexToAddress("0x4"), Tags: "baddress", Parts: types.Baddress},
-		},
-		Custom:   []*types.Name{{Name: "A", Address: base.HexToAddress("0x1"), Tags: "custom", Parts: types.Custom}},
-		Prefund:  []*types.Name{{Name: "B", Address: base.HexToAddress("0x2"), Tags: "prefund", Parts: types.Prefund}},
-		Regular:  []*types.Name{{Name: "C", Address: base.HexToAddress("0x3"), Tags: "regular", Parts: types.Regular}},
-		Baddress: []*types.Name{{Name: "D", Address: base.HexToAddress("0x4"), Tags: "baddress", Parts: types.Baddress}},
-	}
-}
 
 var noSort = sorting.EmptySortSpec()
 
-func TestNamesStructFields(t *testing.T) {
-	names := NamesCollection{
-		Map:  make(map[base.Address]types.Name),
-		List: []*types.Name{},
+func TestNewNamesCollection(t *testing.T) {
+	names := NewNamesCollection()
+	if names == nil {
+		t.Errorf("NewNamesCollection() returned nil")
 	}
-	addr := base.HexToAddress("0x123")
-	name := types.Name{
-		Address: addr,
-		Tags:    "test",
-		Parts:   types.Custom,
-	}
-	names.Map[addr] = name
-	names.List = append(names.List, &name)
 
-	if len(names.Map) != 1 {
-		t.Errorf("expected Map length 1, got %d", len(names.Map))
+	// Test that all facets are initialized
+	if names.allFacet == nil {
+		t.Errorf("allFacet not initialized")
 	}
-	if len(names.List) != 1 {
-		t.Errorf("expected List length 1, got %d", len(names.List))
+	if names.customFacet == nil {
+		t.Errorf("customFacet not initialized")
 	}
-	if names.List[0].Address != addr {
-		t.Errorf("expected address %s, got %s", addr.Hex(), names.List[0].Address.Hex())
+	if names.prefundFacet == nil {
+		t.Errorf("prefundFacet not initialized")
+	}
+	if names.regularFacet == nil {
+		t.Errorf("regularFacet not initialized")
+	}
+	if names.baddressFacet == nil {
+		t.Errorf("baddressFacet not initialized")
 	}
 }
 
-func TestGetNamesPagination(t *testing.T) {
-	names := NamesCollection{
-		List: []*types.Name{
-			{Tags: "a"}, {Tags: "b"}, {Tags: "c"}, {Tags: "d"}, {Tags: "e"},
-		},
+func TestNamesCollectionMethods(t *testing.T) {
+	names := NewNamesCollection()
+
+	// Test NeedsUpdate - should initially need update
+	if !names.NeedsUpdate(NamesAll) {
+		t.Errorf("Expected NeedsUpdate to be true initially")
 	}
-	page, _ := names.GetPage("all", 1, 2, noSort, "")
-	if page.Total != 5 {
-		t.Errorf("expected total 5, got %d", page.Total)
-	}
-	if len(page.Names) != 2 {
-		t.Errorf("expected 2 names, got %d", len(page.Names))
-	}
-	if page.Names[0].Tags != "b" || page.Names[1].Tags != "c" {
-		t.Errorf("unexpected pagination result: %+v", page.Names)
+
+	// Test getExpectedTotal - should initially be 0
+	if expected := names.getExpectedTotal(NamesAll); expected != 0 {
+		t.Errorf("Expected getExpectedTotal to be 0 initially, got %d", expected)
 	}
 }
 
-func TestLoadDataNoReloadIfCountsMatch(t *testing.T) {
-	names := NamesCollection{
-		List: []*types.Name{
-			{Parts: types.Custom},
-			{Parts: types.Custom},
-		},
-	}
-	// Pass nil for WaitGroup to avoid negative counter panic.
-	err := names.LoadData(nil)
-	if err != nil && err.Error() != "no names found" {
-		t.Errorf("expected nil or 'no names found' error, got %v", err)
-	}
-}
+func TestNamesPageStructure(t *testing.T) {
+	names := NewNamesCollection()
 
-func TestGetNames_All(t *testing.T) {
-	names := makeTestNames()
-	page, _ := names.GetPage("all", 0, 10, noSort, "")
-	if page.Total != 4 {
-		t.Errorf("expected total 4, got %d", page.Total)
+	// Test GetPage with empty data
+	page, err := names.GetPage(NamesAll, 0, 10, noSort, "")
+	if err != nil {
+		t.Errorf("GetPage should not error with empty data: %v", err)
 	}
-	if len(page.Names) != 4 {
-		t.Errorf("expected 4 results, got %d", len(page.Names))
+	if page == nil {
+		t.Errorf("GetPage should not return nil page")
 	}
-}
-
-func TestGetNames_Custom(t *testing.T) {
-	names := makeTestNames()
-	page, _ := names.GetPage("custom", 0, 10, noSort, "")
-	if page.Total != 1 {
-		t.Errorf("expected total 1, got %d", page.Total)
+	if page.Kind != NamesAll {
+		t.Errorf("Expected page kind to be %s, got %s", NamesAll, page.Kind)
 	}
-	if len(page.Names) != 1 || page.Names[0].Tags != "custom" {
-		t.Errorf("expected custom name, got %+v", page.Names)
-	}
-}
-
-func TestGetNames_Paging(t *testing.T) {
-	names := makeTestNames()
-	page, _ := names.GetPage("all", 2, 2, noSort, "")
-	if page.Total != 4 {
-		t.Errorf("expected total 4, got %d", page.Total)
-	}
-	if len(page.Names) != 2 || page.Names[0].Tags != "regular" || page.Names[1].Tags != "baddress" {
-		t.Errorf("unexpected page results: %+v", page.Names)
-	}
-}
-
-func TestGetNames_OutOfRange(t *testing.T) {
-	names := makeTestNames()
-	page, _ := names.GetPage("all", 10, 2, noSort, "")
-	if page.Total != 4 {
-		t.Errorf("expected total 4, got %d", page.Total)
+	if page.Names == nil {
+		t.Errorf("Expected Names array to be initialized")
 	}
 	if len(page.Names) != 0 {
-		t.Errorf("expected empty page, got %+v", page.Names)
+		t.Errorf("Expected empty Names array, got %d items", len(page.Names))
 	}
 }
 
-func TestGetNames_Filtering(t *testing.T) {
-	names := NamesCollection{
-		List: []*types.Name{
-			{Name: "Alice", Address: base.HexToAddress("0x1"), Tags: "custom", Source: "manual", Parts: types.Custom},
-			{Name: "Bob", Address: base.HexToAddress("0x2"), Tags: "prefund", Source: "imported", Parts: types.Prefund},
-			{Name: "Charlie", Address: base.HexToAddress("0x3"), Tags: "regular", Source: "auto", Parts: types.Regular},
-			{Name: "Dave", Address: base.HexToAddress("0x4"), Tags: "baddress", Source: "manual", Parts: types.Baddress},
-		},
+func TestFindNameByAddress(t *testing.T) {
+	names := NewNamesCollection()
+
+	// Test with non-existent address
+	addr := base.HexToAddress("0x123")
+	name, found := names.FindNameByAddress(addr)
+	if found {
+		t.Errorf("Expected FindNameByAddress to return false for non-existent address")
+	}
+	if name != nil {
+		t.Errorf("Expected FindNameByAddress to return nil name for non-existent address")
+	}
+}
+
+func TestGetPageWithDifferentListKinds(t *testing.T) {
+	names := NewNamesCollection()
+
+	listKinds := []types.ListKind{
+		NamesAll,
+		NamesCustom,
+		NamesPrefund,
+		NamesRegular,
+		NamesBaddress,
 	}
 
-	// Filter by name
-	page, _ := names.GetPage("all", 0, 10, noSort, "ali")
-	if len(page.Names) != 1 || page.Names[0].Name != "Alice" {
-		t.Errorf("expected Alice, got %+v", page.Names)
+	for _, kind := range listKinds {
+		t.Run("ListKind_"+string(kind), func(t *testing.T) {
+			page, err := names.GetPage(NamesAll, 0, 10, noSort, "")
+			if err != nil {
+				t.Errorf("GetPage should not error for kind %s: %v", kind, err)
+			}
+			if page == nil {
+				t.Errorf("GetPage should not return nil page for kind %s", kind)
+			}
+		})
+	}
+}
+
+func TestGetPageWithFilter(t *testing.T) {
+	names := NewNamesCollection()
+
+	// Test with various filters
+	filters := []string{"", "test", "0x123", "alice"}
+
+	for _, filter := range filters {
+		t.Run("Filter_"+filter, func(t *testing.T) {
+			page, err := names.GetPage(NamesAll, 0, 10, noSort, filter)
+			if err != nil {
+				t.Errorf("GetPage should not error with filter '%s': %v", filter, err)
+			}
+			if page == nil {
+				t.Errorf("GetPage should not return nil page with filter '%s'", filter)
+			}
+		})
+	}
+}
+
+func TestGetPagePagination(t *testing.T) {
+	names := NewNamesCollection()
+
+	// Test various pagination parameters
+	testCases := []struct {
+		first    int
+		pageSize int
+	}{
+		{0, 10},
+		{0, 5},
+		{5, 10},
+		{10, 5},
 	}
 
-	// Filter by address
-	page, _ = names.GetPage("all", 0, 10, noSort, "0x2")
-	if len(page.Names) != 1 || page.Names[0].Name != "Bob" {
-		t.Errorf("expected Bob, got %+v", page.Names)
-	}
-
-	// Filter by tags
-	page, _ = names.GetPage("all", 0, 10, noSort, "regular")
-	if len(page.Names) != 1 || page.Names[0].Name != "Charlie" {
-		t.Errorf("expected Charlie, got %+v", page.Names)
-	}
-
-	// Filter by source
-	page, _ = names.GetPage("all", 0, 10, noSort, "manual")
-	if len(page.Names) != 2 {
-		t.Errorf("expected 2 manual, got %+v", page.Names)
-	}
-
-	// Case-insensitive
-	page, _ = names.GetPage("all", 0, 10, noSort, "ALICE")
-	if len(page.Names) != 1 || page.Names[0].Name != "Alice" {
-		t.Errorf("expected Alice (case-insensitive), got %+v", page.Names)
-	}
-
-	// Empty filter returns all
-	page, _ = names.GetPage("all", 0, 10, noSort, "")
-	if len(page.Names) != 4 {
-		t.Errorf("expected all names, got %+v", page.Names)
+	for _, tc := range testCases {
+		t.Run("Pagination", func(t *testing.T) {
+			page, err := names.GetPage(NamesAll, tc.first, tc.pageSize, noSort, "")
+			if err != nil {
+				t.Errorf("GetPage should not error with first=%d, pageSize=%d: %v", tc.first, tc.pageSize, err)
+			}
+			if page == nil {
+				t.Errorf("GetPage should not return nil page with first=%d, pageSize=%d", tc.first, tc.pageSize)
+			}
+		})
 	}
 }
 

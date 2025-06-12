@@ -296,49 +296,13 @@ export namespace msgs {
 
 export namespace names {
 	
-	export class NamesCollection {
-	    map: Record<string, types.Name>;
-	    list: types.Name[];
-	    custom: types.Name[];
-	    prefund: types.Name[];
-	    regular: types.Name[];
-	    baddress: types.Name[];
-	
-	    static createFrom(source: any = {}) {
-	        return new NamesCollection(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.map = this.convertValues(source["map"], types.Name, true);
-	        this.list = this.convertValues(source["list"], types.Name);
-	        this.custom = this.convertValues(source["custom"], types.Name);
-	        this.prefund = this.convertValues(source["prefund"], types.Name);
-	        this.regular = this.convertValues(source["regular"], types.Name);
-	        this.baddress = this.convertValues(source["baddress"], types.Name);
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
 	export class NamesPage {
+	    kind: types.ListKind;
 	    names: types.Name[];
-	    total: number;
+	    totalItems: number;
+	    expectedTotal: number;
+	    isFetching: boolean;
+	    state: facets.LoadState;
 	
 	    static createFrom(source: any = {}) {
 	        return new NamesPage(source);
@@ -346,8 +310,12 @@ export namespace names {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.kind = source["kind"];
 	        this.names = this.convertValues(source["names"], types.Name);
-	        this.total = source["total"];
+	        this.totalItems = source["totalItems"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isFetching = source["isFetching"];
+	        this.state = source["state"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -613,23 +581,6 @@ export namespace sdk {
 
 }
 
-export namespace sync {
-	
-	export class WaitGroup {
-	
-	
-	    static createFrom(source: any = {}) {
-	        return new WaitGroup(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	
-	    }
-	}
-
-}
-
 export namespace types {
 	
 	export enum ListKind {
@@ -638,6 +589,11 @@ export namespace types {
 	    FUNCTIONS = "Functions",
 	    EVENTS = "Events",
 	    MONITORS = "Monitors",
+	    ALL = "All",
+	    CUSTOM = "Custom",
+	    PREFUND = "Prefund",
+	    REGULAR = "Regular",
+	    BADDRESS = "Baddress",
 	}
 	export class Parameter {
 	    components?: Parameter[];

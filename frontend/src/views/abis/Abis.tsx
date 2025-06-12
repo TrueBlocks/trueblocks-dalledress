@@ -1,27 +1,21 @@
 // ABIS_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { AbisCrud } from '@app';
+import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
-import { useEvent } from '@hooks';
+import { useActionMsgs, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, crud, facets, msgs, types } from '@models';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
-import {
-  ABIS_DEFAULT_LIST,
-  ABIS_ROUTE,
-  ACTION_MESSAGES,
-  getAbisPage,
-  getColumns,
-  reload,
-} from './';
+import { getColumns } from './';
 
 export const Abis = () => {
   const { lastTab } = useAppContext();
+  const { emitSuccess } = useActionMsgs('abis');
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
   const [state, setState] = useState<facets.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
@@ -53,7 +47,7 @@ export const Abis = () => {
   const fetchData = useCallback(async () => {
     clearError();
     try {
-      const result = await getAbisPage(
+      const result = await GetAbisPage(
         listKindRef.current,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
@@ -112,7 +106,7 @@ export const Abis = () => {
     [
       'mod+r',
       () => {
-        reload().then(() => {
+        Reload(listKind).then(() => {
           fetchData();
         });
       },
@@ -154,7 +148,7 @@ export const Abis = () => {
         )
           .then(async () => {
             // Fetch fresh data to confirm the removal after successful backend operation
-            const result = await getAbisPage(
+            const result = await GetAbisPage(
               listKindRef.current,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -196,7 +190,7 @@ export const Abis = () => {
               }
             }
 
-            emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
+            emitSuccess('delete', address);
           })
           .catch((err) => {
             // Revert optimistic update on error
@@ -363,5 +357,8 @@ export const Abis = () => {
     </div>
   );
 };
+
+const ABIS_DEFAULT_LIST = types.ListKind.DOWNLOADED;
+const ABIS_ROUTE = '/abis';
 
 // ABIS_ROUTE

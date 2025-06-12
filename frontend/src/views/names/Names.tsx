@@ -1,459 +1,505 @@
 // NAMES_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { GetNamesPage, NamesCrud } from '@app';
+import { GetNamesPage, NamesCrud, Reload } from '@app';
 import {
   Action,
   BaseTab,
   Chips,
   FormField,
-  TableProvider,
   mapNameToChips,
   usePagination,
 } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
-import { useEvent } from '@hooks';
+import { useActionMsgs, useEvent } from '@hooks';
 import { TabView } from '@layout';
-import { crud, msgs, types } from '@models';
-import { Log, useEmitters } from '@utils';
-import { Address } from 'src/types/address';
-import { useLocation } from 'wouter';
+import { useHotkeys } from '@mantine/hooks';
+import { crud, facets, msgs, names, types } from '@models';
+import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
-import './Names.css';
+import { Address } from '../../types/address';
+import { getColumns } from './columns';
 
-type IndexableName = types.Name & { [key: string]: unknown };
+type IndexableName = types.Name & Record<string, unknown>;
 
 // Helper function to remove undefined properties from an object
 function removeUndefinedProps(
   obj: Record<string, unknown>,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
-  for (const key in obj) {
-    if (
-      Object.prototype.hasOwnProperty.call(obj, key) &&
-      obj[key] !== undefined
-    ) {
-      result[key] = obj[key];
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      result[key] = value;
     }
   }
   return result;
 }
 
 export const Names = () => {
-  const { lastTab, setSelectedAddress } = useAppContext();
-  const [, setLocation] = useLocation();
-
-  const [names, setNames] = useState<IndexableName[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { lastTab } = useAppContext();
+  const [pageData, setPageData] = useState<names.NamesPage | null>(null);
+  const [state, setState] = useState<facets.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
-  const [listKind, setListKind] = useState<ListType>(
-    getListTypeFromLabel(lastTab['/names'] || ''),
-  );
-  const { emitStatus, emitError } = useEmitters();
 
-  const tableKey = useMemo<TableKey>(
-    () => ({
-      viewName: '/names',
-      tabName: listKind,
-    }),
+  const [listKind, setListKind] = useState<types.ListKind>(
+    lastTab[NAMES_ROUTE] || NAMES_DEFAULT_LIST,
+  );
+  const tableKey = useMemo(
+    (): TableKey => ({ viewName: NAMES_ROUTE, tabName: listKind }),
     [listKind],
   );
 
+  const { error, handleError, clearError } = useErrorHandler();
+  const { pagination, setTotalItems } = usePagination(tableKey);
   const { sort } = useSorting(tableKey);
   const { filter, setFiltering } = useFiltering(tableKey);
+  const { emitStatus } = useEmitters();
+  const { emitSuccess, failure } = useActionMsgs('names');
 
-  // Store the openModal function for each table
-  const openModalRefs = useRef<
-    Record<string, ((data: IndexableName) => void) | null>
-  >({});
+  const listKindRef = useRef(listKind);
+  const renderCnt = useRef(0);
 
-  const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
+  useEffect(() => {
+    listKindRef.current = listKind;
+  }, [listKind]);
 
-  const handleChipClick = (value: string) => {
-    if (filter === value) {
-      setFiltering('');
-    } else {
-      setFiltering(value);
+  const fetchData = useCallback(async () => {
+    clearError();
+    try {
+      const result = await GetNamesPage(
+        listKindRef.current,
+        pagination.currentPage * pagination.pageSize,
+        pagination.pageSize,
+        sort,
+        filter ?? '',
+      );
+      setState(result.state);
+      setPageData(result);
+      setTotalItems(result.totalItems || 0);
+
+      // Emit status message after successful data load
+      emitStatus(`Loaded ${result.totalItems || 0} names successfully`);
+    } catch (err: unknown) {
+      handleError(err, `Failed to fetch ${listKindRef.current}`);
     }
-  };
-
-  const loadNames = useCallback(async () => {
-    setLoading(true);
-    GetNamesPage(
-      listKind,
-      pagination.currentPage * pagination.pageSize,
-      pagination.pageSize,
-      sort,
-      filter ?? '',
-    )
-      .then((result) => {
-        setNames((result.names || []) as IndexableName[]);
-        setTotalItems(result.total || 0);
-      })
-      .catch((err) => {
-        emitError(err);
-        setNames([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
   }, [
-    listKind,
+    clearError,
     pagination.currentPage,
     pagination.pageSize,
     sort,
     filter,
     setTotalItems,
-    emitError,
+    handleError,
+    emitStatus,
   ]);
 
-  useEvent(msgs.EventType.DATA_LOADED, (_message?: string) => {
-    loadNames();
-  });
+  const currentData = useMemo(() => {
+    return pageData?.names || [];
+  }, [pageData?.names]);
 
   useEffect(() => {
-    loadNames();
-  }, [loadNames]);
-
-  const handleFormSubmit = (data: Record<string, unknown>) => {
-    if (!data.source || data.source === '') {
-      data.source = 'TrueBlocks';
+    const currentTab = lastTab[NAMES_ROUTE];
+    if (currentTab && currentTab !== listKind) {
+      setListKind(currentTab);
     }
+  }, [lastTab, listKind]);
 
-    // Cast the form data to IndexableName. This assumes that the data from the form,
-    // combined with any defaults, is intended to be treated as an IndexableName for
-    // the optimistic update and for the UpdateName API call.
-    const submittedName = data as IndexableName;
+  useEvent(
+    msgs.EventType.DATA_LOADED,
+    (_message: string, payload?: types.DataLoadedPayload) => {
+      if (payload?.listKind === listKindRef.current) {
+        fetchData();
+      }
+    },
+  );
 
-    const originalNames = [...names]; // 1. Save current names state
+  useEffect(() => {
+    fetchData();
+  }, [fetchData, listKind]);
 
-    // 2. Optimistic UI Update
-    let optimisticNames: IndexableName[];
-    const existingNameIndex = originalNames.findIndex(
-      // Compare addresses. Assumes 'address' property is comparable and of the same type.
-      (n) => n.address === submittedName.address,
-    );
-
-    if (existingNameIndex !== -1) {
-      // Update existing name
-      optimisticNames = originalNames.map((n, index) =>
-        index === existingNameIndex
-          ? ({ ...n, ...removeUndefinedProps(submittedName) } as IndexableName) // Use helper
-          : n,
-      );
-    } else {
-      // Add new name: Prepend submittedName to the list for immediate visibility.
-      // The subsequent GetNamesPage call will provide the correctly sorted/paginated list.
-      optimisticNames = [submittedName, ...originalNames];
-    }
-    setNames(optimisticNames); // Update UI optimistically
-
-    NamesCrud(crud.Operation.UPDATE, submittedName, '')
-      .then(() => {
-        // 4. If UpdateName is successful, call GetNamesPage
-        return GetNamesPage(
-          listKind,
-          pagination.currentPage * pagination.pageSize,
-          pagination.pageSize,
-          sort,
-          filter ?? '',
-        );
-      })
-      .then((result) => {
-        // 5. Update UI with definitive result from GetNamesPage
-        setNames((result.names || []) as IndexableName[]);
-        setTotalItems(result.total || 0);
-
-        // Ensure address is stringified for the status message if it's not already a string.
-        const addressStr =
-          typeof submittedName.address === 'string'
-            ? submittedName.address
-            : String(submittedName.address); // Fallback to String() conversion
-        emitStatus(
-          `Name updated successfully: ${submittedName.name} ${addressStr}`,
-        );
-      })
-      .catch((err) => {
-        // 6. If there's an error anywhere in the chain, undo the optimistic setNames
-        setNames(originalNames); // Revert to the original names
-        emitError(err);
-      });
-  };
-
-  // Action types for name operations
-  type NameActionType = 'delete' | 'edit' | 'remove' | 'autoname';
-
-  const handleAction = (
-    address: Address,
-    isDeleted: boolean,
-    actionType: NameActionType = 'delete',
-  ) => {
-    // Add address to processing set
-    setProcessingAddresses((prev) => new Set(prev).add(address));
-
-    try {
-      // Handle different action types
-      if (actionType === 'delete') {
-        // Existing delete/undelete functionality
-        const originalNames = [...names]; // Save current names state
-
-        // Optimistic UI Update - toggle deleted state
-        const optimisticNames = originalNames.map((name) => {
-          // Convert address to string for comparison
-          const nameAddress =
-            typeof name.address === 'string'
-              ? name.address
-              : String(name.address);
-
-          return nameAddress === address
-            ? ({ ...name, deleted: !isDeleted } as IndexableName)
-            : name;
+  useHotkeys([
+    [
+      'mod+r',
+      () => {
+        Reload(listKind).then(() => {
+          fetchData();
         });
-        setNames(optimisticNames);
+      },
+    ],
+  ]);
 
-        const operation = isDeleted
-          ? crud.Operation.UNDELETE
-          : crud.Operation.DELETE;
-        NamesCrud(operation, {} as types.Name, address)
-          .then(() => {
-            // If API call is successful, refresh the data to get the definitive state
-            return GetNamesPage(
-              listKind,
+  // Handle CRUD actions for names
+  const handleDelete = useCallback(
+    (address: Address) => {
+      clearError();
+      try {
+        const original = [...(pageData?.names || [])];
+        const optimisticValues = original.map((name) => {
+          const nameAddress = getAddressString(name.address);
+          if (nameAddress === address) {
+            return { ...name, deleted: true };
+          }
+          return name;
+        });
+        setState(facets.LoadState.PENDING);
+        setPageData((prev) => {
+          if (!prev) return null;
+          return new names.NamesPage({
+            ...prev,
+            names: optimisticValues,
+          });
+        });
+        NamesCrud(
+          listKindRef.current,
+          crud.Operation.DELETE,
+          {} as types.Name,
+          address,
+        )
+          .then(async () => {
+            const result = await GetNamesPage(
+              listKindRef.current,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
               filter ?? '',
             );
-          })
-          .then((result) => {
-            // Update UI with definitive result from GetNamesPage
-            setNames((result.names || []) as IndexableName[]);
-            setTotalItems(result.total || 0);
-
-            const action = isDeleted ? 'undeleted' : 'deleted';
-            emitStatus(`Address ${address} was ${action} successfully`);
+            setState(result.state);
+            setPageData(result);
+            setTotalItems(result.totalItems || 0);
+            emitSuccess('delete', address);
           })
           .catch((err) => {
-            // If there's an error, revert the optimistic update
-            setNames(originalNames);
-            emitError(err);
-            Log(`Error in handleAction: ${err}`);
+            setState(facets.LoadState.ERROR);
+            setPageData((prev) => {
+              if (!prev) return null;
+              return new names.NamesPage({
+                ...prev,
+                names: original,
+              });
+            });
+            handleError(err, failure('delete', address, err.message));
           });
+      } catch (err: unknown) {
+        handleError(err, `Failed to delete name ${address}`);
       }
-      // Add implementations for future action types
-      else if (actionType === 'edit') {
-        const rowData = names.find((name) => {
-          const nameAddress =
-            typeof name.address === 'string'
-              ? name.address
-              : String(name.address);
-          return nameAddress === address;
-        });
+    },
+    [
+      clearError,
+      pageData?.names,
+      handleError,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setTotalItems,
+      emitSuccess,
+      failure,
+    ],
+  );
 
-        if (rowData) {
-          // Find the current tab and use its openModal function
-          const currentTabLabel = lastTab['/names'] || 'Custom';
-          const openModalFn = openModalRefs.current[currentTabLabel];
-          if (openModalFn) {
-            openModalFn(rowData);
-          } else {
-            emitError(
-              `Could not find modal function for tab ${currentTabLabel}`,
-            );
+  const handleUndelete = useCallback(
+    (address: Address) => {
+      clearError();
+      try {
+        const original = [...(pageData?.names || [])];
+        const optimisticValues = original.map((name) => {
+          const nameAddress = getAddressString(name.address);
+          if (nameAddress === address) {
+            return { ...name, deleted: false };
           }
-        } else {
-          emitError(`Could not find name data for address ${address}`);
-        }
-      } else if (actionType === 'remove') {
-        // Remove can only be performed on deleted items
-        if (!isDeleted) {
-          emitError(
-            'Cannot remove a name that is not deleted. Delete it first.',
-          );
-          return;
-        }
+          return name;
+        });
+        setState(facets.LoadState.PENDING);
+        setPageData((prev) => {
+          if (!prev) return null;
+          return new names.NamesPage({
+            ...prev,
+            names: optimisticValues,
+          });
+        });
+        NamesCrud(
+          listKindRef.current,
+          crud.Operation.UNDELETE,
+          {} as types.Name,
+          address,
+        )
+          .then(async () => {
+            const result = await GetNamesPage(
+              listKindRef.current,
+              pagination.currentPage * pagination.pageSize,
+              pagination.pageSize,
+              sort,
+              filter ?? '',
+            );
+            setState(result.state);
+            setPageData(result);
+            setTotalItems(result.totalItems || 0);
+            emitSuccess('undelete', address);
+          })
+          .catch((err) => {
+            setState(facets.LoadState.ERROR);
+            setPageData((prev) => {
+              if (!prev) return null;
+              return new names.NamesPage({
+                ...prev,
+                names: original,
+              });
+            });
+            handleError(err, failure('undelete', address, err.message));
+          });
+      } catch (err: unknown) {
+        handleError(err, `Failed to undelete name ${address}`);
+      }
+    },
+    [
+      clearError,
+      pageData?.names,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setTotalItems,
+      emitSuccess,
+      handleError,
+      failure,
+    ],
+  );
 
-        const originalNames = [...names]; // Save current names state
-
-        // Optimistic UI Update - remove the item from the list
-        const optimisticNames = originalNames.filter((name) => {
-          const nameAddress =
-            typeof name.address === 'string'
-              ? name.address
-              : String(name.address);
+  const handleRemove = useCallback(
+    (address: Address) => {
+      clearError();
+      try {
+        const original = [...(pageData?.names || [])];
+        const optimisticValues = original.filter((name) => {
+          const nameAddress = getAddressString(name.address);
           return nameAddress !== address;
         });
-        setNames(optimisticNames);
-
-        NamesCrud(crud.Operation.REMOVE, {} as types.Name, address)
-          .then(() => {
-            // If API call is successful, refresh the data to get the definitive state
-            return GetNamesPage(
-              listKind,
-              pagination.currentPage * pagination.pageSize,
-              pagination.pageSize,
-              sort,
-              filter ?? '',
-            );
-          })
-          .then((result) => {
-            // Update UI with definitive result from GetNamesPage
-            setNames((result.names || []) as IndexableName[]);
-            setTotalItems(result.total || 0);
-
-            emitStatus(`Address ${address} was removed successfully`);
-          })
-          .catch((err) => {
-            // If there's an error, revert the optimistic update
-            setNames(originalNames);
-            emitError(err);
-            Log(`Error in handleAction (remove): ${err}`);
+        setState(facets.LoadState.PENDING);
+        setPageData((prev) => {
+          if (!prev) return null;
+          return new names.NamesPage({
+            ...prev,
+            names: optimisticValues,
           });
-      } else if (actionType === 'autoname') {
-        const originalNames = [...names]; // Save current names state
-
-        // TODO: If the user tries to autoname an address and it's not a contract but it is marked as isContract, unset isContract.
-
-        // Optimistic UI Update - update the name to show it's being processed
-        const optimisticNames = originalNames.map((name) => {
-          const nameAddress =
-            typeof name.address === 'string'
-              ? name.address
-              : String(name.address);
-
-          return nameAddress === address
-            ? ({ ...name, name: 'Generating...' } as IndexableName)
-            : name;
         });
-        setNames(optimisticNames);
-
-        NamesCrud(crud.Operation.AUTONAME, {} as types.Name, address)
-          .then(() => {
-            // If API call is successful, refresh the data to get the definitive state
-            return GetNamesPage(
-              listKind,
+        NamesCrud(
+          listKindRef.current,
+          crud.Operation.REMOVE,
+          {} as types.Name,
+          address,
+        )
+          .then(async () => {
+            const result = await GetNamesPage(
+              listKindRef.current,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
               filter ?? '',
             );
-          })
-          .then((result) => {
-            // Update UI with definitive result from GetNamesPage
-            setNames((result.names || []) as IndexableName[]);
-            setTotalItems(result.total || 0);
-
-            emitStatus(`Address ${address} was auto-named successfully`);
+            setState(result.state);
+            setPageData(result);
+            setTotalItems(result.totalItems || 0);
+            emitSuccess('remove', address);
           })
           .catch((err) => {
-            // If there's an error, revert the optimistic update
-            setNames(originalNames);
-            emitError(err);
-            Log(`Error in handleAction (autoname): ${err}`);
+            setState(facets.LoadState.ERROR);
+            setPageData((prev) => {
+              if (!prev) return null;
+              return new names.NamesPage({
+                ...prev,
+                names: original,
+              });
+            });
+            handleError(err, failure('remove', address, err.message));
           });
+      } catch (err: unknown) {
+        handleError(err, `Failed to remove name ${address}`);
       }
-    } finally {
-      // Always clean up the processing state
-      setProcessingAddresses((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(address);
-        return newSet;
+    },
+    [
+      clearError,
+      pageData?.names,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setTotalItems,
+      emitSuccess,
+      handleError,
+      failure,
+    ],
+  );
+
+  const handleAutoname = useCallback(
+    (address: Address) => {
+      clearError();
+      try {
+        const original = [...(pageData?.names || [])];
+        const optimisticValues = original.map((name) => {
+          const nameAddress = getAddressString(name.address);
+          if (nameAddress === address) {
+            return { ...name, name: 'Generating...' };
+          }
+          return name;
+        });
+        setState(facets.LoadState.PENDING);
+        setPageData((prev) => {
+          if (!prev) return null;
+          return new names.NamesPage({
+            ...prev,
+            names: optimisticValues,
+          });
+        });
+        NamesCrud(
+          listKindRef.current,
+          crud.Operation.AUTONAME,
+          {} as types.Name,
+          address,
+        )
+          .then(async () => {
+            const result = await GetNamesPage(
+              listKindRef.current,
+              pagination.currentPage * pagination.pageSize,
+              pagination.pageSize,
+              sort,
+              filter ?? '',
+            );
+            setState(result.state);
+            setPageData(result);
+            setTotalItems(result.totalItems || 0);
+            emitSuccess('autoname', address);
+          })
+          .catch((err) => {
+            setState(facets.LoadState.ERROR);
+            setPageData((prev) => {
+              if (!prev) return null;
+              return new names.NamesPage({
+                ...prev,
+                names: original,
+              });
+            });
+            handleError(err, failure('autoname', address, err.message));
+          });
+      } catch (err: unknown) {
+        handleError(err, `Failed to autoname address ${address}`);
+      }
+    },
+    [
+      clearError,
+      pageData?.names,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setTotalItems,
+      emitSuccess,
+      handleError,
+      failure,
+    ],
+  );
+
+  // Combined action handler for names
+  const handleNameAction = useCallback(
+    (
+      address: Address,
+      isDeleted: boolean,
+      actionType: 'delete' | 'undelete' | 'remove' | 'autoname',
+    ) => {
+      // Add address to processing set
+      setProcessingAddresses((prev) => new Set(prev).add(address));
+
+      try {
+        switch (actionType) {
+          case 'delete':
+            handleDelete(address);
+            break;
+          case 'undelete':
+            handleUndelete(address);
+            break;
+          case 'remove':
+            handleRemove(address);
+            break;
+          case 'autoname':
+            handleAutoname(address);
+            break;
+        }
+      } finally {
+        // Clean up processing state after a delay to allow for optimistic updates
+        setTimeout(() => {
+          setProcessingAddresses((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(address);
+            return newSet;
+          });
+        }, 100);
+      }
+    },
+    [handleDelete, handleUndelete, handleRemove, handleAutoname],
+  );
+
+  const currentColumns = useMemo(() => {
+    const handleChipClick = (chip: string) => {
+      setFiltering(chip);
+      Reload(listKind).then(() => {
+        fetchData();
       });
-    }
-  };
-
-  const _formValidation = {
-    name: (value: unknown) => {
-      if (!value || String(value).trim() === '') {
-        return 'Name is required';
-      }
-      return null;
-    },
-    address: (value: unknown) => {
-      if (!value || String(value).trim() === '') {
-        return 'Address is required';
-      }
-
-      const addressRegex = /^0x[a-fA-F0-9]{40}$/;
-      if (!addressRegex.test(String(value))) {
-        return 'Invalid Ethereum address format';
-      }
-
-      return null;
-    },
-  };
-
-  const dataTable = (_tabLabel: string) => {
-    // Column override configurations
-    const autonameOverride: Partial<FormField<IndexableName>> = {
-      width: '40px',
-      sortable: false,
-      editable: false,
-      visible: true,
-      render: (row: IndexableName) => {
-        const isDeleted = Boolean(row.deleted);
-        const addressStr =
-          typeof row.address === 'string' ? row.address : String(row.address);
-        const isProcessing = processingAddresses.has(addressStr);
-        const isContract = Boolean(row.isContract);
-
-        return (
-          <div className="action-buttons-container">
-            <Action
-              icon="Autoname"
-              onClick={() => handleAction(addressStr, isDeleted, 'autoname')}
-              disabled={isProcessing}
-              isSubdued={!isContract && !isProcessing}
-              title="Auto-Update"
-              size="sm"
-            />
-          </div>
-        );
-      },
     };
 
-    const actionsOverride: Partial<FormField<IndexableName>> = {
+    const baseColumns = getColumns(listKind).map((col) =>
+      col.key === 'chips'
+        ? {
+            ...col,
+            render: (row: Record<string, unknown>, _rowIndex: number) => {
+              const nameObject = row as unknown as types.Name;
+              const chipItems = mapNameToChips(nameObject);
+              return <Chips items={chipItems} onChipClick={handleChipClick} />;
+            },
+          }
+        : col,
+    );
+
+    // Add action buttons render function to the actions column
+    const actionsOverride: Partial<FormField> = {
       sortable: false,
       editable: false,
       visible: true,
-      render: (row: IndexableName) => {
-        const isDeleted = Boolean(row.deleted);
-        const addressStr =
-          typeof row.address === 'string' ? row.address : String(row.address);
+      render: (row: Record<string, unknown>, _rowIndex: number) => {
+        const name = row as unknown as types.Name;
+        const isDeleted = Boolean(name.deleted);
+        const addressStr = getAddressString(name.address);
         const isProcessing = processingAddresses.has(addressStr);
+
         return (
           <div className="action-buttons-container">
             <Action
-              icon="History"
-              onClick={() => {
-                setSelectedAddress(addressStr);
-                setLocation(`/history/${addressStr}`);
-              }}
-              disabled={isProcessing}
-              title="View History"
-              size="sm"
-            />
-            <Action
-              icon="Edit"
-              onClick={() => handleAction(addressStr, isDeleted, 'edit')}
-              disabled={isProcessing || isDeleted || !row.isCustom}
-              title="Edit"
-              size="sm"
-            />
-            <Action
               icon={isDeleted ? 'Undelete' : 'Delete'}
-              onClick={() => handleAction(addressStr, isDeleted, 'delete')}
-              disabled={isProcessing || !row.isCustom}
+              onClick={() =>
+                handleNameAction(
+                  addressStr,
+                  isDeleted,
+                  isDeleted ? 'undelete' : 'delete',
+                )
+              }
+              disabled={isProcessing}
               title={isDeleted ? 'Undelete' : 'Delete'}
               size="sm"
             />
             <Action
               icon="Remove"
-              onClick={() => handleAction(addressStr, isDeleted, 'remove')}
-              disabled={isProcessing || !isDeleted || !row.isCustom}
+              onClick={() => handleNameAction(addressStr, isDeleted, 'remove')}
+              disabled={isProcessing || !isDeleted}
               title="Remove"
+              size="sm"
+            />
+            <Action
+              icon="Autoname"
+              onClick={() =>
+                handleNameAction(addressStr, isDeleted, 'autoname')
+              }
+              disabled={isProcessing}
+              title="Auto-generate name"
               size="sm"
             />
           </div>
@@ -461,91 +507,173 @@ export const Names = () => {
       },
     };
 
-    const chipsOverride: Partial<FormField<IndexableName>> = {
-      sortable: false,
-      editable: false,
-      visible: true,
-      width: '180px',
-      render: (row: IndexableName) => {
-        const nameObject = row as unknown as types.Name;
-        const chipItems = mapNameToChips(nameObject);
-        return <Chips items={chipItems} onChipClick={handleChipClick} />;
+    return baseColumns.map((col) =>
+      col.key === 'actions' ? { ...col, ...actionsOverride } : col,
+    );
+  }, [
+    listKind,
+    setFiltering,
+    fetchData,
+    processingAddresses,
+    handleNameAction,
+  ]);
+
+  const handleSubmit = useCallback(
+    (data: Record<string, unknown>) => {
+      const submittedName = data as IndexableName;
+      const addressStr = getAddressString(submittedName.address);
+
+      // Set default source if not provided
+      if (!submittedName.source || submittedName.source === '') {
+        submittedName.source = 'TrueBlocks';
+      }
+
+      const originalNames = [...(pageData?.names || [])];
+
+      // Optimistic UI Update
+      let optimisticNames: IndexableName[];
+      const existingNameIndex = originalNames.findIndex(
+        (n) => getAddressString(n.address) === addressStr,
+      );
+
+      if (existingNameIndex !== -1) {
+        // Update existing name
+        optimisticNames = originalNames.map((n, index) =>
+          index === existingNameIndex
+            ? ({
+                ...n,
+                ...removeUndefinedProps(submittedName),
+              } as IndexableName)
+            : (n as IndexableName),
+        );
+      } else {
+        // Add new name
+        optimisticNames = [
+          submittedName as IndexableName,
+          ...(originalNames as IndexableName[]),
+        ];
+      }
+      setPageData((prev) => {
+        if (!prev) return null;
+        return new names.NamesPage({
+          ...prev,
+          names: optimisticNames,
+        });
+      });
+
+      NamesCrud(
+        listKindRef.current,
+        crud.Operation.UPDATE,
+        submittedName as types.Name,
+        '',
+      )
+        .then(async () => {
+          const result = await GetNamesPage(
+            listKindRef.current,
+            pagination.currentPage * pagination.pageSize,
+            pagination.pageSize,
+            sort,
+            filter ?? '',
+          );
+          setPageData(result);
+          setTotalItems(result.totalItems || 0);
+
+          const displayName = submittedName.name || addressStr;
+          emitSuccess('update', displayName);
+        })
+        .catch((err) => {
+          // Revert optimistic update on error
+          setPageData((prev) => {
+            if (!prev) return null;
+            return new names.NamesPage({
+              ...prev,
+              names: originalNames,
+            });
+          });
+          handleError(err, failure('update', '', err.message));
+        });
+    },
+    [
+      pageData?.names,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setTotalItems,
+      emitSuccess,
+      handleError,
+      failure,
+    ],
+  );
+
+  const perTabTable = useMemo(
+    () => (
+      <BaseTab
+        data={currentData as unknown as Record<string, unknown>[]}
+        columns={currentColumns}
+        loading={!!pageData?.isFetching}
+        error={error}
+        onSubmit={handleSubmit}
+        tableKey={tableKey}
+      />
+    ),
+    [
+      currentData,
+      currentColumns,
+      pageData?.isFetching,
+      error,
+      handleSubmit,
+      tableKey,
+    ],
+  );
+
+  const tabs = useMemo(
+    () => [
+      {
+        label: 'All',
+        value: types.ListKind.ALL,
+        content: perTabTable,
       },
-    };
-
-    const nameColumns: FormField<IndexableName>[] = [
-      createColumn('name'),
-      createColumn('', autonameOverride),
-      createColumn('address', { readOnly: true, width: '350px' }),
-      createColumn('source', { sameLine: true }),
-      createColumn('tags'),
-      createColumn('chips', chipsOverride),
-      createColumn('actions', actionsOverride),
-    ];
-
-    return (
-      <>
-        <BaseTab
-          data={names}
-          columns={nameColumns}
-          loading={loading}
-          error={null}
-          onSubmit={handleFormSubmit}
-          tableKey={tableKey}
-        />
-      </>
-    );
-  };
-
-  const createTableContent = (tabLabel: string) => {
-    return (
-      <TableProvider key={`table-provider-${tabLabel}`}>
-        dataTable(tabLabel)
-      </TableProvider>
-    );
-  };
-
-  const tabs = [
-    { label: 'All', content: createTableContent('All') },
-    { label: 'Custom', content: createTableContent('Custom') },
-    { label: 'Prefund', content: createTableContent('Prefund') },
-    { label: 'Regular', content: createTableContent('Regular') },
-    { label: 'Baddress', content: createTableContent('Baddress') },
-  ];
+      {
+        label: 'Custom',
+        value: types.ListKind.CUSTOM,
+        content: perTabTable,
+      },
+      {
+        label: 'Prefund',
+        value: types.ListKind.PREFUND,
+        content: perTabTable,
+      },
+      {
+        label: 'Regular',
+        value: types.ListKind.REGULAR,
+        content: perTabTable,
+      },
+      {
+        label: 'Baddress',
+        value: types.ListKind.BADDRESS,
+        content: perTabTable,
+      },
+    ],
+    [perTabTable],
+  );
 
   return (
     <div className="mainView">
-      <TabView tabs={tabs} route="/names" />
+      {(state as string) === '' && <div>{`state: ${state}`}</div>}
+      <TabView tabs={tabs} route={NAMES_ROUTE} />
+      {error && (
+        <div>
+          <h3>{`Error fetching ${listKind}`}</h3>
+          <p>{error.message}</p>
+        </div>
+      )}
+      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
 };
 
-const createColumn = (
-  baseName: string,
-  overrides: Partial<FormField<IndexableName>> = {},
-): FormField<IndexableName> => {
-  const capitalizedBase = baseName.charAt(0).toUpperCase() + baseName.slice(1);
-  return {
-    name: baseName.toLowerCase(),
-    key: baseName.toLowerCase(),
-    header: capitalizedBase,
-    label: capitalizedBase,
-    type: 'text',
-    sortable: true,
-    ...overrides,
-  };
-};
+const NAMES_DEFAULT_LIST = types.ListKind.ALL;
+const NAMES_ROUTE = '/names';
 
-const getListTypeFromLabel = (label: string): ListType => {
-  const tabToListType: Record<string, ListType> = {
-    All: 'all',
-    Custom: 'custom',
-    Prefund: 'prefund',
-    Regular: 'regular',
-    Baddress: 'baddress',
-  };
-  return tabToListType[label] || 'all';
-};
-
-export type ListType = 'all' | 'custom' | 'prefund' | 'regular' | 'baddress';
 // NAMES_ROUTE

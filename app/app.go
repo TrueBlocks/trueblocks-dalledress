@@ -39,7 +39,7 @@ type App struct {
 	Projects    *project.Manager
 	chainList   *utils.ChainList
 	// NAMES_ROUTE
-	names names.NamesCollection
+	names *names.NamesCollection
 	// NAMES_ROUTE
 	// ABIS_ROUTE
 	abis *abis.AbisCollection
@@ -54,10 +54,6 @@ type App struct {
 	apiKeys    map[string]string
 	ensMap     map[string]base.Address
 	Dalle      *dalle.Context
-}
-
-func (a *App) CancelFetch(listKind types.ListKind) {
-	store.CancelFetch(abis.GetAbisStoreName(listKind))
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -149,9 +145,11 @@ func (a *App) Startup(ctx context.Context) {
 func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 	if a.IsReady() {
-		if err := a.names.LoadData(nil); err != nil {
-			msgs.EmitError("Failed to load names database", err)
-		}
+		// NAMES_ROUTE
+		// if err := a.names.LoadData(types.ListKind(names.NamesAll)); err != nil {
+		// 	msgs.EmitError("Failed to load names database", err)
+		// }
+		// NAMES_ROUTE
 
 		if !a.Preferences.App.Bounds.IsValid() {
 			// Sometimes, during development, the window size is corrupted
@@ -388,28 +386,51 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 	}, nil
 }
 
-func (a *App) Reload() error {
+func (a *App) Reload(listKind types.ListKind) error {
 	lastView := a.GetAppPreferences().LastView
-	lastTab := a.GetLastTab(lastView)
 
 	switch lastView {
 	case "/names":
 		// NAMES_ROUTE
-		a.names = a.names.ClearCache()
+		a.names.Reset(listKind)
+		a.names.LoadData(listKind)
 		// NAMES_ROUTE
 	case "/abis":
 		// ABIS_ROUTE
-		a.abis.Reset(lastTab)
-		a.abis.LoadData(lastTab)
+		a.abis.Reset(listKind)
+		a.abis.LoadData(listKind)
 		// ABIS_ROUTE
 	case "/monitors":
 		// MONITORS_ROUTE
-		a.monitors.Reset(lastTab)
-		a.monitors.LoadData(lastTab)
+		a.monitors.Reset(listKind)
+		a.monitors.LoadData(listKind)
 		// MONITORS_ROUTE
 	}
 
 	return nil
+}
+
+func (a *App) CancelFetch(listKind types.ListKind) {
+	lastView := a.GetAppPreferences().LastView
+
+	storeName := ""
+	switch lastView {
+	case "/names":
+		// NAMES_ROUTE
+		storeName = names.GetStoreName(listKind)
+		// NAMES_ROUTE
+	case "/abis":
+		// ABIS_ROUTE
+		storeName = abis.GetStoreName(listKind)
+		// ABIS_ROUTE
+	case "/monitors":
+		// MONITORS_ROUTE
+		storeName = monitors.GetStoreName(listKind)
+		// MONITORS_ROUTE
+	}
+	if storeName != "" {
+		store.CancelFetch(storeName)
+	}
 }
 
 func (a *App) GetNodeStatus() *coreTypes.MetaData {

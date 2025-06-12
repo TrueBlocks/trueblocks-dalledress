@@ -2,52 +2,318 @@
 package names
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-type namesMap map[base.Address]types.Name
-type NamesCollection struct {
-	Map      namesMap      `json:"map"`
-	List     []*types.Name `json:"list"`
-	Custom   []*types.Name `json:"custom"`
-	Prefund  []*types.Name `json:"prefund"`
-	Regular  []*types.Name `json:"regular"`
-	Baddress []*types.Name `json:"baddress"`
-}
+const (
+	NamesAll      types.ListKind = "All"
+	NamesCustom   types.ListKind = "Custom"
+	NamesPrefund  types.ListKind = "Prefund"
+	NamesRegular  types.ListKind = "Regular"
+	NamesBaddress types.ListKind = "Baddress"
+)
 
-func NewNamesCollection() NamesCollection {
-	return NamesCollection{
-		Map:      make(namesMap),
-		List:     make([]*types.Name, 0),
-		Custom:   make([]*types.Name, 0),
-		Prefund:  make([]*types.Name, 0),
-		Regular:  make([]*types.Name, 0),
-		Baddress: make([]*types.Name, 0),
-	}
+func init() {
+	types.RegisterKind(NamesAll)
+	types.RegisterKind(NamesCustom)
+	types.RegisterKind(NamesPrefund)
+	types.RegisterKind(NamesRegular)
+	types.RegisterKind(NamesBaddress)
 }
 
 type NamesPage struct {
-	Names []*types.Name `json:"names"`
-	Total int           `json:"total"`
+	Kind          types.ListKind    `json:"kind"`
+	Names         []*coreTypes.Name `json:"names"`
+	TotalItems    int               `json:"totalItems"`
+	ExpectedTotal int               `json:"expectedTotal"`
+	IsFetching    bool              `json:"isFetching"`
+	State         facets.LoadState  `json:"state"`
 }
 
-func compare(nameI, nameJ types.Name) bool {
-	ti := nameI.Parts
-	if ti == types.Regular {
-		ti = 7
+type NamesCollection struct {
+	allFacet      *facets.Facet[coreTypes.Name]
+	customFacet   *facets.Facet[coreTypes.Name]
+	prefundFacet  *facets.Facet[coreTypes.Name]
+	regularFacet  *facets.Facet[coreTypes.Name]
+	baddressFacet *facets.Facet[coreTypes.Name]
+}
+
+func NewNamesCollection() *NamesCollection {
+	namesStore := GetNamesStore()
+
+	allFacet := facets.NewFacet(
+		NamesAll,
+		nil, // No filter - all names
+		nil,
+		namesStore,
+	)
+
+	customFacet := facets.NewFacet(
+		NamesCustom,
+		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Custom != 0 },
+		nil,
+		namesStore,
+	)
+
+	prefundFacet := facets.NewFacet(
+		NamesPrefund,
+		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Prefund != 0 },
+		nil,
+		namesStore,
+	)
+
+	regularFacet := facets.NewFacet(
+		NamesRegular,
+		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Regular != 0 },
+		nil,
+		namesStore,
+	)
+
+	baddressFacet := facets.NewFacet(
+		NamesBaddress,
+		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Baddress != 0 },
+		nil,
+		namesStore,
+	)
+
+	return &NamesCollection{
+		allFacet:      allFacet,
+		customFacet:   customFacet,
+		prefundFacet:  prefundFacet,
+		regularFacet:  regularFacet,
+		baddressFacet: baddressFacet,
 	}
-	tj := nameJ.Parts
-	if tj == types.Regular {
-		tj = 7
+}
+
+func (nc *NamesCollection) LoadData(listKind types.ListKind) {
+	if !nc.NeedsUpdate(listKind) {
+		return
 	}
-	if ti == tj {
-		if nameI.Tags == nameJ.Tags {
-			return nameI.Address.Hex() < nameJ.Address.Hex()
+
+	switch listKind {
+	case NamesAll:
+		go func() {
+			if result, err := nc.allFacet.Load(); err != nil {
+				logging.LogError("LoadData.NamesAll from store: %v", err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded("all", result.Payload)
+			}
+		}()
+	case NamesCustom:
+		go func() {
+			if result, err := nc.customFacet.Load(); err != nil {
+				logging.LogError("LoadData.NamesCustom from store: %v", err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded("custom", result.Payload)
+			}
+		}()
+	case NamesPrefund:
+		go func() {
+			if result, err := nc.prefundFacet.Load(); err != nil {
+				logging.LogError("LoadData.NamesPrefund from store: %v", err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded("prefund", result.Payload)
+			}
+		}()
+	case NamesRegular:
+		go func() {
+			if result, err := nc.regularFacet.Load(); err != nil {
+				logging.LogError("LoadData.NamesRegular from store: %v", err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded("regular", result.Payload)
+			}
+		}()
+	case NamesBaddress:
+		go func() {
+			if result, err := nc.baddressFacet.Load(); err != nil {
+				logging.LogError("LoadData.NamesBaddress from store: %v", err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded("baddress", result.Payload)
+			}
+		}()
+	default:
+		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+	}
+}
+
+func (nc *NamesCollection) Reset(listKind types.ListKind) {
+	switch listKind {
+	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
+		namesStore.Reset()
+	}
+}
+
+func (nc *NamesCollection) NeedsUpdate(listKind types.ListKind) bool {
+	switch listKind {
+	case NamesAll:
+		return nc.allFacet.NeedsUpdate()
+	case NamesCustom:
+		return nc.customFacet.NeedsUpdate()
+	case NamesPrefund:
+		return nc.prefundFacet.NeedsUpdate()
+	case NamesRegular:
+		return nc.regularFacet.NeedsUpdate()
+	case NamesBaddress:
+		return nc.baddressFacet.NeedsUpdate()
+	}
+	return false
+}
+
+func (nc *NamesCollection) getExpectedTotal(listKind types.ListKind) int {
+	switch listKind {
+	case NamesAll:
+		return nc.allFacet.ExpectedCount()
+	case NamesCustom:
+		return nc.customFacet.ExpectedCount()
+	case NamesPrefund:
+		return nc.prefundFacet.ExpectedCount()
+	case NamesRegular:
+		return nc.regularFacet.ExpectedCount()
+	case NamesBaddress:
+		return nc.baddressFacet.ExpectedCount()
+	}
+	return 0
+}
+
+func (nc *NamesCollection) GetPage(
+	listKind types.ListKind,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (*NamesPage, error) {
+	var facet *facets.Facet[coreTypes.Name]
+
+	switch listKind {
+	case NamesAll:
+		facet = nc.allFacet
+	case NamesCustom:
+		facet = nc.customFacet
+	case NamesPrefund:
+		facet = nc.prefundFacet
+	case NamesRegular:
+		facet = nc.regularFacet
+	case NamesBaddress:
+		facet = nc.baddressFacet
+	default:
+		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
+	}
+
+	// Create filter function for names
+	var filterFunc func(*coreTypes.Name) bool
+	if filter != "" {
+		filterFunc = func(name *coreTypes.Name) bool {
+			return nc.matchesFilter(name, filter)
 		}
-		return nameI.Tags < nameJ.Tags
 	}
-	return ti < tj
+
+	// Create sort function for names
+	var sortFunc func([]coreTypes.Name, sdk.SortSpec) error
+	sortFunc = func(items []coreTypes.Name, sort sdk.SortSpec) error {
+		return sdk.SortNames(items, sort)
+	}
+
+	pageResult, err := facet.GetPage(
+		first,
+		pageSize,
+		filterFunc,
+		sortSpec,
+		sortFunc,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert value types to pointer types for API compatibility
+	names := make([]*coreTypes.Name, 0, len(pageResult.Items))
+	for i := range pageResult.Items {
+		names = append(names, &pageResult.Items[i])
+	}
+
+	return &NamesPage{
+		Kind:          listKind,
+		Names:         names,
+		TotalItems:    pageResult.TotalItems,
+		ExpectedTotal: nc.getExpectedTotal(listKind),
+		IsFetching:    facet.IsFetching(),
+		State:         pageResult.State,
+	}, nil
+}
+
+// matchesFilter checks if a name matches the given filter string
+func (nc *NamesCollection) matchesFilter(name *coreTypes.Name, filter string) bool {
+	filterLower := strings.ToLower(filter)
+
+	// Check address (with and without 0x prefix)
+	addressHex := strings.ToLower(name.Address.Hex())
+	addressNoPrefix := strings.TrimPrefix(addressHex, "0x")
+	addressNoLeadingZeros := strings.TrimLeft(addressNoPrefix, "0")
+
+	if strings.Contains(addressHex, filterLower) ||
+		strings.Contains(addressNoPrefix, filterLower) ||
+		strings.Contains(addressNoLeadingZeros, filterLower) {
+		return true
+	}
+
+	// Check name if available
+	if strings.Contains(strings.ToLower(name.Name), filterLower) {
+		return true
+	}
+
+	// Check tags if available
+	if strings.Contains(strings.ToLower(name.Tags), filterLower) {
+		return true
+	}
+
+	// Check source if available
+	if strings.Contains(strings.ToLower(name.Source), filterLower) {
+		return true
+	}
+
+	// Extra: if filter starts with 0x, try matching without 0x and leading zeros
+	if strings.HasPrefix(filterLower, "0x") {
+		fNoPrefix := strings.TrimPrefix(filterLower, "0x")
+		if strings.Contains(addressNoPrefix, fNoPrefix) || strings.Contains(addressNoLeadingZeros, fNoPrefix) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// FindNameByAddress searches for a name by address across all facets
+func (nc *NamesCollection) FindNameByAddress(addr base.Address) (*coreTypes.Name, bool) {
+	// Try the allFacet first since it should contain all names
+	if nc.allFacet != nil {
+		found := false
+		var result *coreTypes.Name
+
+		// Use ForEvery to search through the facet's data
+		_, _ = nc.allFacet.ForEvery(
+			func(name *coreTypes.Name) (error, bool) {
+				result = name
+				found = true
+				return nil, true // Stop iteration
+			},
+			func(name *coreTypes.Name) bool {
+				return name.Address == addr
+			},
+		)
+
+		if found {
+			return result, true
+		}
+	}
+
+	return nil, false
 }
 
 // NAMES_ROUTE

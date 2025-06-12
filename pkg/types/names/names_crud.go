@@ -7,33 +7,38 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 var namesLock atomic.Int32
 
 // Crud performs CRUD operations on names (moved from App)
-func (n *NamesCollection) Crud(operation crud.Operation, nameToModify *coreTypes.Name) error {
+func (nc *NamesCollection) Crud(
+	listKind types.ListKind,
+	op crud.Operation,
+	name *coreTypes.Name,
+) error {
 	if !namesLock.CompareAndSwap(0, 1) {
 		return nil
 	}
 	defer namesLock.Store(0)
 
-	nameToModify.IsCustom = true
+	name.IsCustom = true
 
-	cd := crud.CrudFromName(*nameToModify)
+	cd := crud.CrudFromName(*name)
 	opts := sdk.NamesOptions{
 		Globals: sdk.Globals{
 			Chain: "mainnet", // namesChain
 		},
 	}
 
-	if _, _, err := opts.ModifyName(operation, cd); err != nil {
+	if _, _, err := opts.ModifyName(op, cd); err != nil {
 		msgs.EmitError("Crud", err)
 		return err
 	}
 
-	*n = n.ClearCache()
+	nc.Reset(listKind)
 	return nil
 }
 

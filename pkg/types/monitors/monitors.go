@@ -67,12 +67,12 @@ func (mc *MonitorsCollection) LoadData(listKind types.ListKind) {
 }
 
 func (mc *MonitorsCollection) GetPage(
-	kind types.ListKind,
+	listKind types.ListKind,
 	first, pageSize int,
-	sort sdk.SortSpec,
+	sortSpec sdk.SortSpec,
 	filter string,
 ) (*MonitorsPage, error) {
-	switch kind {
+	switch listKind {
 	case MonitorsList:
 		// Create filter function for monitors
 		var filterFunc func(*coreTypes.Monitor) bool
@@ -92,7 +92,7 @@ func (mc *MonitorsCollection) GetPage(
 			first,
 			pageSize,
 			filterFunc,
-			sort,
+			sortSpec,
 			sortFunc,
 		)
 		if err != nil {
@@ -100,7 +100,7 @@ func (mc *MonitorsCollection) GetPage(
 		}
 
 		return &MonitorsPage{
-			Kind:          kind,
+			Kind:          listKind,
 			Monitors:      pageResult.Items,
 			TotalItems:    pageResult.TotalItems,
 			ExpectedTotal: mc.getExpectedTotal(),
@@ -108,7 +108,7 @@ func (mc *MonitorsCollection) GetPage(
 			State:         pageResult.State,
 		}, nil
 	default:
-		return nil, fmt.Errorf("unsupported list kind: %s", kind)
+		return nil, fmt.Errorf("unsupported list kind: %s", listKind)
 	}
 }
 

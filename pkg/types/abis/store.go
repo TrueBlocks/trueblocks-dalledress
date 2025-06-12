@@ -28,7 +28,7 @@ func GetAbisListStore() *store.Store[coreTypes.Abi] {
 
 	if abisListStore == nil {
 		abisListStore = store.NewStore(
-			GetAbisStoreName(AbisDownloaded),
+			GetStoreName(AbisDownloaded),
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetChain()
 				listOpts := sdk.AbisOptions{
@@ -58,7 +58,7 @@ func GetAbisDetailStore() *store.Store[coreTypes.Function] {
 
 	if abisDetailStore == nil {
 		abisDetailStore = store.NewStore(
-			GetAbisStoreName(AbisFunctions),
+			GetStoreName(AbisFunctions),
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetChain()
 				detailOpts := sdk.AbisOptions{
@@ -82,7 +82,7 @@ func GetAbisDetailStore() *store.Store[coreTypes.Function] {
 	return abisDetailStore
 }
 
-func GetAbisStoreName(listKind types.ListKind) string {
+func GetStoreName(listKind types.ListKind) string {
 	switch listKind {
 	case AbisDownloaded:
 		fallthrough

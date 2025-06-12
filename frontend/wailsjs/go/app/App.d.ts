@@ -62,7 +62,7 @@ export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>
 
 export function GetMonitorsPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
 
-export function GetNamesPage(arg1:string,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
+export function GetNamesPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
 export function GetNodeStatus():Promise<types.MetaData>;
 
@@ -90,11 +90,11 @@ export function MonitorsClean(arg1:Array<string>):Promise<void>;
 
 export function MonitorsCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Monitor,arg4:string):Promise<void>;
 
-export function NamesCrud(arg1:crud.Operation,arg2:types.Name,arg3:string):Promise<void>;
+export function NamesCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Name,arg4:string):Promise<void>;
 
 export function PublishNames(arg1:string):Promise<void>;
 
-export function Reload():Promise<void>;
+export function Reload(arg1:types.ListKind):Promise<void>;
 
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 

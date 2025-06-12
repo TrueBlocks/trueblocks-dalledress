@@ -5,25 +5,31 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 func (a *App) GetNamesPage(
-	listKind string,
+	listKind types.ListKind,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
-) (names.NamesPage, error) {
+) (*names.NamesPage, error) {
 	return a.names.GetPage(listKind, first, pageSize, sortSpec, filter)
 }
 
-func (a *App) NamesCrud(op crud.Operation, name *coreTypes.Name, address string) error {
+func (a *App) NamesCrud(
+	listKind types.ListKind,
+	op crud.Operation,
+	name *coreTypes.Name,
+	address string,
+) error {
 	if address != "" && (name == nil || name.Address.IsZero()) {
 		name = &coreTypes.Name{Address: base.HexToAddress(address)}
 	}
 
-	return a.names.Crud(op, name)
+	return a.names.Crud(listKind, op, name)
 }
 
 func (a *App) CleanNames(tabName string) error {

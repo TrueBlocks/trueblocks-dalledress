@@ -1,28 +1,22 @@
 // MONITORS_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { MonitorsCrud } from '@app';
+import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
 import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
-import { useEvent } from '@hooks';
+import { useActionMsgs, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, facets, monitors, msgs, types } from '@models';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
-import {
-  ACTION_MESSAGES,
-  MONITORS_DEFAULT_LIST,
-  MONITORS_ROUTE,
-  cleanMonitors,
-  getColumns,
-  getMonitorsPage,
-  reload,
-} from './';
+import { getColumns } from './';
 
 export const Monitors = () => {
   const { lastTab } = useAppContext();
+  const { emitSuccess, emitCleaningStatus, failure } =
+    useActionMsgs('monitors');
   const [pageData, setPageData] = useState<monitors.MonitorsPage | null>(null);
   const [state, setState] = useState<facets.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
@@ -53,7 +47,7 @@ export const Monitors = () => {
   const fetchData = useCallback(async () => {
     clearError();
     try {
-      const result = await getMonitorsPage(
+      const result = await GetMonitorsPage(
         listKindRef.current,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
@@ -108,7 +102,7 @@ export const Monitors = () => {
     [
       'mod+r',
       () => {
-        reload().then(() => {
+        Reload(listKind).then(() => {
           fetchData();
         });
       },
@@ -149,7 +143,7 @@ export const Monitors = () => {
           address,
         )
           .then(async () => {
-            const result = await getMonitorsPage(
+            const result = await GetMonitorsPage(
               listKindRef.current,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -159,7 +153,7 @@ export const Monitors = () => {
             setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
-            emitStatus(ACTION_MESSAGES.DELETE_SUCCESS(address));
+            emitSuccess('delete', address);
           })
           .catch((err) => {
             setState(facets.LoadState.ERROR);
@@ -170,10 +164,7 @@ export const Monitors = () => {
                 monitors: original,
               });
             });
-            handleError(
-              err,
-              ACTION_MESSAGES.DELETE_FAILURE(address, err.message),
-            );
+            handleError(err, failure('delete', address, err.message));
           });
       } catch (err: unknown) {
         handleError(err, `Failed to delete monitor ${address}`);
@@ -182,13 +173,14 @@ export const Monitors = () => {
     [
       clearError,
       pageData?.monitors,
-      handleError,
       pagination.currentPage,
       pagination.pageSize,
       sort,
       filter,
       setTotalItems,
-      emitStatus,
+      emitSuccess,
+      handleError,
+      failure,
     ],
   );
 
@@ -219,7 +211,7 @@ export const Monitors = () => {
           address,
         )
           .then(async () => {
-            const result = await getMonitorsPage(
+            const result = await GetMonitorsPage(
               listKindRef.current,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -229,7 +221,7 @@ export const Monitors = () => {
             setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
-            emitStatus(ACTION_MESSAGES.UNDELETE_SUCCESS(address));
+            emitSuccess('undelete', address);
           })
           .catch((err) => {
             setState(facets.LoadState.ERROR);
@@ -240,10 +232,7 @@ export const Monitors = () => {
                 monitors: original,
               });
             });
-            handleError(
-              err,
-              ACTION_MESSAGES.UNDELETE_FAILURE(address, err.message),
-            );
+            handleError(err, failure('undelete', address, err.message));
           });
       } catch (err: unknown) {
         handleError(err, `Failed to undelete monitor ${address}`);
@@ -258,7 +247,8 @@ export const Monitors = () => {
       sort,
       filter,
       setTotalItems,
-      emitStatus,
+      emitSuccess,
+      failure,
     ],
   );
 
@@ -286,7 +276,7 @@ export const Monitors = () => {
           address,
         )
           .then(async () => {
-            const result = await getMonitorsPage(
+            const result = await GetMonitorsPage(
               listKindRef.current,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -296,7 +286,7 @@ export const Monitors = () => {
             setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
-            emitStatus(ACTION_MESSAGES.REMOVE_SUCCESS(address));
+            emitSuccess('remove', address);
           })
           .catch((err) => {
             setState(facets.LoadState.ERROR);
@@ -307,10 +297,7 @@ export const Monitors = () => {
                 monitors: original,
               });
             });
-            handleError(
-              err,
-              ACTION_MESSAGES.REMOVE_FAILURE(address, err.message),
-            );
+            handleError(err, failure('remove', address, err.message));
           });
       } catch (err: unknown) {
         handleError(err, `Failed to remove monitor ${address}`);
@@ -325,7 +312,8 @@ export const Monitors = () => {
       sort,
       filter,
       setTotalItems,
-      emitStatus,
+      emitSuccess,
+      failure,
     ],
   );
 
@@ -369,31 +357,45 @@ export const Monitors = () => {
   const handleCleanAll = useCallback(async () => {
     clearError();
     try {
-      emitStatus('Cleaning all monitors...');
-      await cleanMonitors([]);
+      emitCleaningStatus();
+      await MonitorsClean([]);
       await fetchData();
-      emitStatus(ACTION_MESSAGES.CLEAN_SUCCESS(0));
+      emitSuccess('clean', 0);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
-      handleError(err, ACTION_MESSAGES.CLEAN_FAILURE(errorMessage));
+      handleError(err, failure('clean', undefined, errorMessage));
     }
-  }, [clearError, fetchData, emitStatus, handleError]);
+  }, [
+    clearError,
+    fetchData,
+    emitCleaningStatus,
+    emitSuccess,
+    failure,
+    handleError,
+  ]);
 
   // Handle clean selected monitors
   const _handleCleanSelected = useCallback(
     async (addresses: string[]) => {
       clearError();
       try {
-        emitStatus(`Cleaning ${addresses.length} monitor(s)...`);
-        await cleanMonitors(addresses);
+        emitCleaningStatus(addresses.length);
+        await MonitorsClean(addresses);
         await fetchData();
-        emitStatus(ACTION_MESSAGES.CLEAN_SUCCESS(addresses.length));
+        emitSuccess('clean', addresses.length);
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : String(err);
-        handleError(err, ACTION_MESSAGES.CLEAN_FAILURE(errorMessage));
+        handleError(err, failure('clean', undefined, errorMessage));
       }
     },
-    [clearError, fetchData, emitStatus, handleError],
+    [
+      clearError,
+      fetchData,
+      emitCleaningStatus,
+      emitSuccess,
+      failure,
+      handleError,
+    ],
   );
 
   const currentColumns = useMemo(() => {
@@ -504,5 +506,8 @@ export const Monitors = () => {
     </div>
   );
 };
+
+const MONITORS_DEFAULT_LIST = types.ListKind.MONITORS;
+const MONITORS_ROUTE = '/monitors';
 
 // MONITORS_ROUTE

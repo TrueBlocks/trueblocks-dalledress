@@ -25,7 +25,7 @@ func GetMonitorsStore() *store.Store[coreTypes.Monitor] {
 
 	if monitorsStore == nil {
 		monitorsStore = store.NewStore(
-			GetMonitorsStoreName(MonitorsList),
+			GetStoreName(MonitorsList),
 			func(ctx *output.RenderCtx) error {
 				chainName := preferences.GetChain()
 				listOpts := sdk.MonitorsOptions{
@@ -49,7 +49,7 @@ func GetMonitorsStore() *store.Store[coreTypes.Monitor] {
 	return monitorsStore
 }
 
-func GetMonitorsStoreName(listKind types.ListKind) string {
+func GetStoreName(listKind types.ListKind) string {
 	switch listKind {
 	case MonitorsList:
 		return "monitors-list"

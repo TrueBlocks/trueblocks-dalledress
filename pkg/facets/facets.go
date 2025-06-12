@@ -217,8 +217,8 @@ func (r *Facet[T]) GetPage(
 	first, pageSize int,
 	filter FilterFunc[T],
 	sortSpec sdk.SortSpec,
-	sortFunc func([]T, sdk.SortSpec) error) (*PageResult[T], error,
-) {
+	sortFunc func([]T, sdk.SortSpec) error,
+) (*PageResult[T], error) {
 	r.mutex.RLock()
 	data := make([]T, len(r.view))
 	for i, ptr := range r.view {

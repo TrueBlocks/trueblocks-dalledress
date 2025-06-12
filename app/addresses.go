@@ -45,7 +45,7 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 }
 
 func (a *App) AddrToName(addr base.Address) string {
-	if name, exists := a.names.Map[addr]; exists {
+	if name, exists := a.names.FindNameByAddress(addr); exists {
 		return name.Name
 	}
 	return addr.Hex()

@@ -126,7 +126,7 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+r',
             label: 'Reload',
             action: () => {
-              Reload().then(() => {
+              Reload(currentTab as types.ListKind).then(() => {
                 // do nothing
               });
             },

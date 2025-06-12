@@ -13,7 +13,11 @@ import (
 )
 
 // Crud performs CRUD operations on ABIs - handles all operation types
-func (ac *AbisCollection) Crud(listKind types.ListKind, op crud.Operation, abi *coreTypes.Abi) error {
+func (ac *AbisCollection) Crud(
+	listKind types.ListKind,
+	op crud.Operation,
+	abi *coreTypes.Abi,
+) error {
 	switch op {
 	case crud.Remove:
 		opts := sdk.AbisOptions{

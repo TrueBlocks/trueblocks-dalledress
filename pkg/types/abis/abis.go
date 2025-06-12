@@ -184,12 +184,12 @@ func (ac *AbisCollection) GetPage(
 	listKind types.ListKind,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
-	filterString string,
+	filter string,
 ) (*AbisPage, error) {
 	page := &AbisPage{
 		Kind: listKind,
 	}
-	filterString = strings.ToLower(filterString)
+	filter = strings.ToLower(filter)
 
 	var listFacet *facets.Facet[coreTypes.Abi]
 	var detailFacet *facets.Facet[coreTypes.Function]
@@ -209,7 +209,7 @@ func (ac *AbisCollection) GetPage(
 
 	if listFacet != nil {
 		var listFilterFunc = func(item *coreTypes.Abi) bool {
-			return strings.Contains(strings.ToLower(item.Name), filterString)
+			return strings.Contains(strings.ToLower(item.Name), filter)
 		}
 		var listSortFunc = func(items []coreTypes.Abi, sort sdk.SortSpec) error {
 			return sdk.SortAbis(items, sort)
@@ -224,8 +224,8 @@ func (ac *AbisCollection) GetPage(
 
 	} else if detailFacet != nil {
 		var detailFilter = func(item *coreTypes.Function) bool {
-			return strings.Contains(strings.ToLower(item.Name), filterString) ||
-				strings.Contains(strings.ToLower(item.Encoding), filterString)
+			return strings.Contains(strings.ToLower(item.Name), filter) ||
+				strings.Contains(strings.ToLower(item.Encoding), filter)
 		}
 		var detailSortFunc = func(items []coreTypes.Function, sort sdk.SortSpec) error {
 			return sdk.SortFunctions(items, sort)

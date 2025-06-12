@@ -14,10 +14,31 @@ import (
 )
 
 // Crud performs CRUD operations on Monitors - handles all operation types
-func (mc *MonitorsCollection) Crud(listKind types.ListKind, op crud.Operation, monitor *coreTypes.Monitor) error {
+func (c *MonitorsCollection) Crud(
+	listKind types.ListKind,
+	op crud.Operation,
+	monitor *coreTypes.Monitor,
+) error {
 	chainName := preferences.GetChain()
 
 	switch op {
+	case crud.Remove:
+		opts := sdk.MonitorsOptions{
+			Addrs:   []string{monitor.Address.Hex()},
+			Remove:  true,
+			Globals: sdk.Globals{Chain: chainName},
+		}
+		if _, _, err := opts.Monitors(); err != nil {
+			return err
+		}
+
+		msgs.EmitStatus(fmt.Sprintf("removed monitor for address: %s", monitor.Address))
+		logging.LogBackend(fmt.Sprintf("Removed monitor for address: %s", monitor.Address))
+
+		// Refresh the data after successful operation
+		c.Reset(MonitorsList)
+		return nil
+
 	case crud.Delete:
 		opts := sdk.MonitorsOptions{
 			Addrs:   []string{monitor.Address.Hex()},
@@ -32,7 +53,7 @@ func (mc *MonitorsCollection) Crud(listKind types.ListKind, op crud.Operation, m
 		logging.LogBackend(fmt.Sprintf("Deleted monitor for address: %s", monitor.Address))
 
 		// Refresh the data after successful operation
-		mc.Reset(MonitorsList)
+		c.Reset(MonitorsList)
 		return nil
 
 	case crud.Undelete:
@@ -49,24 +70,7 @@ func (mc *MonitorsCollection) Crud(listKind types.ListKind, op crud.Operation, m
 		logging.LogBackend(fmt.Sprintf("Undeleted monitor for address: %s", monitor.Address))
 
 		// Refresh the data after successful operation
-		mc.Reset(MonitorsList)
-		return nil
-
-	case crud.Remove:
-		opts := sdk.MonitorsOptions{
-			Addrs:   []string{monitor.Address.Hex()},
-			Remove:  true,
-			Globals: sdk.Globals{Cache: true, Chain: chainName},
-		}
-		if _, _, err := opts.Monitors(); err != nil {
-			return err
-		}
-
-		msgs.EmitStatus(fmt.Sprintf("removed monitor for address: %s", monitor.Address))
-		logging.LogBackend(fmt.Sprintf("Removed monitor for address: %s", monitor.Address))
-
-		// Refresh the data after successful operation
-		mc.Reset(MonitorsList)
+		c.Reset(MonitorsList)
 		return nil
 
 	default:
@@ -77,7 +81,7 @@ func (mc *MonitorsCollection) Crud(listKind types.ListKind, op crud.Operation, m
 }
 
 // Clean performs maintenance operations on monitors - can clean all or specific addresses
-func (mc *MonitorsCollection) Clean(addresses []string) error {
+func (c *MonitorsCollection) Clean(addresses []string) error {
 	chainName := preferences.GetChain()
 
 	opts := sdk.MonitorsOptions{
@@ -103,7 +107,7 @@ func (mc *MonitorsCollection) Clean(addresses []string) error {
 	}
 
 	// Refresh the data after successful operation
-	mc.Reset(MonitorsList)
+	c.Reset(MonitorsList)
 	return nil
 }
 

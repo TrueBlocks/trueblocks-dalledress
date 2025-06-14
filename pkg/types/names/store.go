@@ -46,8 +46,15 @@ func GetNamesStore() *store.Store[coreTypes.Name] {
 			return nil
 		}
 
+		mappingFunc := func(item *coreTypes.Name) (key interface{}, includeInMap bool) {
+			if item == nil || item.Address.IsZero() {
+				return nil, false
+			}
+			return item.Address, true
+		}
+
 		storeName := GetStoreName(NamesAll)
-		namesStore = store.NewStore(storeName, queryFunc, processFunc, nil)
+		namesStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 	}
 
 	return namesStore
@@ -63,7 +70,7 @@ func GetStoreName(listKind types.ListKind) string {
 }
 
 func (nc *NamesCollection) NameFromAddress(address base.Address) (*coreTypes.Name, error) {
-	return namesStore.GetItemFromMap(address.Hex()), nil
+	return namesStore.GetItemFromMap(address), nil
 }
 
 // NAMES_ROUTE

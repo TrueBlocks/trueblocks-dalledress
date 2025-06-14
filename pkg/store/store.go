@@ -2,10 +2,12 @@ package store
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 )
 
 type StoreState int
@@ -23,12 +25,16 @@ type FacetObserver[T any] interface {
 	OnStateChanged(state StoreState, reason string)
 }
 
+type MappingFunc[T any] func(item *T) (key interface{}, includeInMap bool)
+
 // Store handle the low-level data fetching and streaming from external systems
 type Store[T any] struct {
-	data               []T
+	data               []*T
 	observers          []FacetObserver[T]
 	queryFunc          func(*output.RenderCtx) error
 	processFunc        func(interface{}) *T
+	mappingFunc        MappingFunc[T]
+	dataMap            *map[interface{}]*T
 	contextKey         string // Key for ContextManager
 	state              StoreState
 	stateReason        string
@@ -48,14 +54,20 @@ func NewStore[T any](
 	contextKey string,
 	queryFunc func(*output.RenderCtx) error,
 	processFunc func(interface{}) *T,
+	mappingFunc MappingFunc[T],
 ) *Store[T] {
 	s := &Store[T]{
-		data:        make([]T, 0),
+		data:        make([]*T, 0),
 		observers:   make([]FacetObserver[T], 0),
 		queryFunc:   queryFunc,
 		processFunc: processFunc,
+		mappingFunc: mappingFunc,
 		contextKey:  contextKey,
 		state:       StateStale,
+	}
+	if mappingFunc != nil {
+		tempMap := make(map[interface{}]*T)
+		s.dataMap = &tempMap
 	}
 	s.expectedTotalItems.Store(0)
 	s.dataGeneration.Store(0)
@@ -146,7 +158,7 @@ func (s *Store[T]) GetItem(index int) *T {
 		return nil
 	}
 
-	return &s.data[index]
+	return s.data[index]
 }
 
 // GetItems returns all items in the store
@@ -155,10 +167,7 @@ func (s *Store[T]) GetItems() []*T {
 	defer s.mutex.RUnlock()
 
 	result := make([]*T, len(s.data))
-	for i := range s.data {
-		result[i] = &s.data[i]
-	}
-
+	copy(result, s.data)
 	return result
 }
 
@@ -211,8 +220,22 @@ func (s *Store[T]) Fetch() error {
 				s.mutex.Unlock()
 				return errStaleFetch
 			}
-			var newItem T = *itemPtr
-			s.data = append(s.data, newItem)
+
+			if s.mappingFunc != nil {
+				key, includeInMap := s.mappingFunc(itemPtr)
+				if includeInMap {
+					if s.dataMap == nil {
+						tempMap := make(map[interface{}]*T)
+						s.dataMap = &tempMap
+					}
+					if existingItem, ok := (*s.dataMap)[key]; ok {
+						logging.LogBackend(fmt.Sprintf("Store.Fetch: Overwriting item in dataMap for key key %s existing_item %v new_item %v", key, existingItem, itemPtr))
+					}
+					(*s.dataMap)[key] = itemPtr
+				}
+			}
+
+			s.data = append(s.data, itemPtr)
 			s.expectedTotalItems.Store(int64(len(s.data)))
 			index := len(s.data) - 1
 			currentObservers := make([]FacetObserver[T], len(s.observers))
@@ -222,7 +245,7 @@ func (s *Store[T]) Fetch() error {
 			for _, obs := range currentObservers {
 				s.mutex.RLock()
 				if index < len(s.data) {
-					itemToSend := &s.data[index]
+					itemToSend := s.data[index]
 					s.mutex.RUnlock()
 					obs.OnNewItem(itemToSend, index)
 				} else {
@@ -258,11 +281,11 @@ func (s *Store[T]) Fetch() error {
 	return processingError
 }
 
-func (s *Store[T]) AddItem(item T, index int) {
+func (s *Store[T]) AddItem(item *T, index int) {
 	s.mutex.Lock()
 	s.data = append(s.data, item)
 	newIndex := len(s.data) - 1
-	itemPtr := &s.data[newIndex]
+	itemPtr := s.data[newIndex]
 
 	observers := make([]FacetObserver[T], len(s.observers))
 	copy(observers, s.observers)
@@ -281,7 +304,11 @@ func (s *Store[T]) Reset() {
 	s.mutex.Lock()
 	UnregisterContext(s.contextKey)
 
-	s.data = s.data[:0]
+	s.data = make([]*T, 0)
+	if s.dataMap != nil {
+		newMap := make(map[interface{}]*T)
+		s.dataMap = &newMap
+	}
 	s.expectedTotalItems.Store(0)
 	s.dataGeneration.Add(1)
 	newState := StateStale
@@ -297,4 +324,20 @@ func (s *Store[T]) ExpectedTotalItems() int64 {
 
 func (s *Store[T]) GetContextKey() string {
 	return s.contextKey
+}
+
+// GetItemFromMap returns an item from the store's map by its key.
+func (s *Store[T]) GetItemFromMap(key interface{}) *T {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+
+	if s.dataMap == nil {
+		return nil
+	}
+
+	item, ok := (*s.dataMap)[key]
+	if !ok {
+		return nil
+	}
+	return item
 }

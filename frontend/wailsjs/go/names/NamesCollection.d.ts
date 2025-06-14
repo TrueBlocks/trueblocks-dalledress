@@ -14,6 +14,8 @@ export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.Sor
 
 export function LoadData(arg1:types.ListKind):Promise<void>;
 
+export function NameFromAddress(arg1:base.Address):Promise<types.Name>;
+
 export function NeedsUpdate(arg1:types.ListKind):Promise<boolean>;
 
 export function Reset(arg1:types.ListKind):Promise<void>;

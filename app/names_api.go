@@ -60,4 +60,8 @@ func (a *App) PublishNames(tabName string) error {
 	return nil
 }
 
+func (a *App) NameFromAddress(address string) (*coreTypes.Name, error) {
+	return a.names.NameFromAddress(base.HexToAddress(address))
+}
+
 // NAMES_ROUTE

@@ -16,36 +16,38 @@ import (
 
 var (
 	monitorsStore *store.Store[coreTypes.Monitor]
-	storeMu       sync.Mutex
+	monitorsMu    sync.Mutex
 )
 
 func GetMonitorsStore() *store.Store[coreTypes.Monitor] {
-	storeMu.Lock()
-	defer storeMu.Unlock()
+	monitorsMu.Lock()
+	defer monitorsMu.Unlock()
 
 	if monitorsStore == nil {
-		monitorsStore = store.NewStore(
-			GetStoreName(MonitorsList),
-			func(ctx *output.RenderCtx) error {
-				chainName := preferences.GetChain()
-				listOpts := sdk.MonitorsOptions{
-					Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
-					RenderCtx: ctx,
-				}
-				if _, _, err := listOpts.MonitorsList(); err != nil {
-					logger.Error(fmt.Sprintf("Shared MonitorsList source query error: %v", err))
-					return err
-				}
-				return nil
-			},
-			func(itemIntf interface{}) *coreTypes.Monitor {
-				if monitor, ok := itemIntf.(*coreTypes.Monitor); ok {
-					return monitor
-				}
-				return nil
-			},
-		)
+		queryFunc := func(ctx *output.RenderCtx) error {
+			chainName := preferences.GetChain()
+			listOpts := sdk.MonitorsOptions{
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
+				RenderCtx: ctx,
+			}
+			if _, _, err := listOpts.MonitorsList(); err != nil {
+				logger.Error(fmt.Sprintf("Shared MonitorsList source query error: %v", err))
+				return err
+			}
+			return nil
+		}
+
+		processFunc := func(itemIntf interface{}) *coreTypes.Monitor {
+			if monitor, ok := itemIntf.(*coreTypes.Monitor); ok {
+				return monitor
+			}
+			return nil
+		}
+
+		storeName := GetStoreName(MonitorsList)
+		monitorsStore = store.NewStore(storeName, queryFunc, processFunc, nil)
 	}
+
 	return monitorsStore
 }
 

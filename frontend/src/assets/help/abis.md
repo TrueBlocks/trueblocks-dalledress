@@ -1,4 +1,5 @@
-// ADD_ROUTE
+<!-- ABIS_ROUTE -->
+
 Welcome to the **Abis** view! This section provides information about managing abis in your application.
 
 ## Tabs Overview
@@ -9,4 +10,5 @@ Welcome to the **Abis** view! This section provides information about managing a
 4. **Events**: A list of all the events found in all abis.
 
 For further assistance, please contact support.
-// ADD_ROUTE
+
+<!-- ABIS_ROUTE -->

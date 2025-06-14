@@ -154,6 +154,10 @@ export function MonitorsCrud(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['MonitorsCrud'](arg1, arg2, arg3, arg4);
 }
 
+export function NameFromAddress(arg1) {
+  return window['go']['app']['App']['NameFromAddress'](arg1);
+}
+
 export function NamesCrud(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['NamesCrud'](arg1, arg2, arg3, arg4);
 }

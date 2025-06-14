@@ -81,6 +81,7 @@ func createTestStore() *store.Store[TestItem] {
 			}
 			return nil
 		},
+		nil,
 	)
 }
 
@@ -647,8 +648,8 @@ func TestFacetSyncWithStore(t *testing.T) {
 	facet := createTestFacet(testStore)
 
 	// Manually add items to store
-	testStore.AddItem(TestItem{ID: 1, Name: "Direct1", Value: 111}, 0)
-	testStore.AddItem(TestItem{ID: 2, Name: "Direct2", Value: 222}, 1)
+	testStore.AddItem(&TestItem{ID: 1, Name: "Direct1", Value: 111}, 0)
+	testStore.AddItem(&TestItem{ID: 2, Name: "Direct2", Value: 222}, 1)
 
 	// Sync facet with store
 	facet.SyncWithStore()
@@ -817,6 +818,7 @@ func TestStoreDirectly(t *testing.T) {
 			fmt.Println("Direct test: Failed to process item")
 			return nil
 		},
+		nil,
 	)
 
 	fmt.Println("Direct test: Initial store state:", testStore.GetState())
@@ -885,6 +887,7 @@ func TestSimpleStoreLoad(t *testing.T) {
 			fmt.Println("Process function failed to convert item")
 			return nil
 		},
+		nil,
 	)
 
 	facet := NewFacet(

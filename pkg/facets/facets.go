@@ -148,12 +148,10 @@ var ErrAlreadyLoading = errors.New("already loading")
 func (r *Facet[T]) Load() (*StreamingResult, error) {
 	currentState := r.GetState()
 
-	// Check if already fetching
 	if currentState == StateFetching {
 		return nil, ErrAlreadyLoading
 	}
 
-	// Check if we need to update (stale state)
 	if currentState != StateStale {
 		cachedPayload := r.getCachedResult()
 		msgs.EmitStatus(fmt.Sprintf("cached: %d items", len(r.view)))

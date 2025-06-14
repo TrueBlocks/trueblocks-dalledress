@@ -27,28 +27,30 @@ func GetAbisListStore() *store.Store[coreTypes.Abi] {
 	defer listStoreMu.Unlock()
 
 	if abisListStore == nil {
-		abisListStore = store.NewStore(
-			GetStoreName(AbisDownloaded),
-			func(ctx *output.RenderCtx) error {
-				chainName := preferences.GetChain()
-				listOpts := sdk.AbisOptions{
-					Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
-					RenderCtx: ctx,
-				}
-				if _, _, err := listOpts.AbisList(); err != nil {
-					logger.Error(fmt.Sprintf("Shared AbisList source query error: %v", err))
-					return err
-				}
-				return nil
-			},
-			func(itemIntf interface{}) *coreTypes.Abi {
-				if abi, ok := itemIntf.(*coreTypes.Abi); ok {
-					return abi
-				}
-				return nil
-			},
-		)
+		queryFunc := func(ctx *output.RenderCtx) error {
+			chainName := preferences.GetChain()
+			listOpts := sdk.AbisOptions{
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
+				RenderCtx: ctx,
+			}
+			if _, _, err := listOpts.AbisList(); err != nil {
+				logger.Error(fmt.Sprintf("Shared AbisList source query error: %v", err))
+				return err
+			}
+			return nil
+		}
+
+		processFunc := func(itemIntf interface{}) *coreTypes.Abi {
+			if abi, ok := itemIntf.(*coreTypes.Abi); ok {
+				return abi
+			}
+			return nil
+		}
+
+		storeName := GetStoreName(AbisDownloaded)
+		abisListStore = store.NewStore(storeName, queryFunc, processFunc, nil)
 	}
+
 	return abisListStore
 }
 
@@ -57,28 +59,30 @@ func GetAbisDetailStore() *store.Store[coreTypes.Function] {
 	defer detailStoreMu.Unlock()
 
 	if abisDetailStore == nil {
-		abisDetailStore = store.NewStore(
-			GetStoreName(AbisFunctions),
-			func(ctx *output.RenderCtx) error {
-				chainName := preferences.GetChain()
-				detailOpts := sdk.AbisOptions{
-					Globals:   sdk.Globals{Cache: true, Chain: chainName},
-					RenderCtx: ctx,
-				}
-				if _, _, err := detailOpts.AbisDetails(); err != nil {
-					logger.Error(fmt.Sprintf("Shared AbisDetails source query error: %v", err))
-					return err
-				}
-				return nil
-			},
-			func(itemIntf interface{}) *coreTypes.Function {
-				if fn, ok := itemIntf.(*coreTypes.Function); ok {
-					return fn
-				}
-				return nil
-			},
-		)
+		queryFunc := func(ctx *output.RenderCtx) error {
+			chainName := preferences.GetChain()
+			detailOpts := sdk.AbisOptions{
+				Globals:   sdk.Globals{Cache: true, Chain: chainName},
+				RenderCtx: ctx,
+			}
+			if _, _, err := detailOpts.AbisDetails(); err != nil {
+				logger.Error(fmt.Sprintf("Shared AbisDetails source query error: %v", err))
+				return err
+			}
+			return nil
+		}
+
+		processFunc := func(itemIntf interface{}) *coreTypes.Function {
+			if fn, ok := itemIntf.(*coreTypes.Function); ok {
+				return fn
+			}
+			return nil
+		}
+
+		storeName := GetStoreName(AbisFunctions)
+		abisDetailStore = store.NewStore(storeName, queryFunc, processFunc, nil)
 	}
+
 	return abisDetailStore
 }
 

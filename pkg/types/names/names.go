@@ -10,6 +10,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -164,19 +165,11 @@ func (nc *NamesCollection) NeedsUpdate(listKind types.ListKind) bool {
 }
 
 func (nc *NamesCollection) getExpectedTotal(listKind types.ListKind) int {
-	switch listKind {
-	case NamesAll:
-		return nc.allFacet.ExpectedCount()
-	case NamesCustom:
-		return nc.customFacet.ExpectedCount()
-	case NamesPrefund:
-		return nc.prefundFacet.ExpectedCount()
-	case NamesRegular:
-		return nc.regularFacet.ExpectedCount()
-	case NamesBaddress:
-		return nc.baddressFacet.ExpectedCount()
+	_ = listKind // delinter
+	if count, err := GetNamesCount(); err == nil && count > 0 {
+		return count
 	}
-	return 0
+	return nc.allFacet.ExpectedCount()
 }
 
 func (nc *NamesCollection) GetPage(
@@ -211,8 +204,7 @@ func (nc *NamesCollection) GetPage(
 	}
 
 	// Create sort function for names
-	var sortFunc func([]coreTypes.Name, sdk.SortSpec) error
-	sortFunc = func(items []coreTypes.Name, sort sdk.SortSpec) error {
+	sortFunc := func(items []coreTypes.Name, sort sdk.SortSpec) error {
 		return sdk.SortNames(items, sort)
 	}
 
@@ -309,6 +301,19 @@ func (nc *NamesCollection) FindNameByAddress(addr base.Address) (*coreTypes.Name
 	}
 
 	return nil, false
+}
+
+func GetNamesCount() (int, error) {
+	chainName := preferences.GetChain()
+	countOpts := sdk.NamesOptions{
+		Globals: sdk.Globals{Cache: true, Chain: chainName},
+	}
+	if countResult, _, err := countOpts.NamesCount(); err != nil {
+		return 0, fmt.Errorf("NamesCount query error: %v", err)
+	} else if len(countResult) > 0 {
+		return int(countResult[0].Count), nil
+	}
+	return 0, nil
 }
 
 // NAMES_ROUTE

@@ -1,3 +1,5 @@
+<!-- NAMES_ROUTE -->
+
 # Names Management
 
 Welcome to the **Names** view! This section allows you to manage address names and their associated metadata in the TrueBlocks system.
@@ -57,3 +59,5 @@ Use the action buttons to manage names:
 - The source field indicates where the name data originated
 
 For further assistance, please contact support.
+
+<!-- NAMES_ROUTE -->

@@ -90,6 +90,8 @@ export function MonitorsClean(arg1:Array<string>):Promise<void>;
 
 export function MonitorsCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Monitor,arg4:string):Promise<void>;
 
+export function NameFromAddress(arg1:string):Promise<types.Name>;
+
 export function NamesCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Name,arg4:string):Promise<void>;
 
 export function PublishNames(arg1:string):Promise<void>;

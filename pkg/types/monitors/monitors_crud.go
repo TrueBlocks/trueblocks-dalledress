@@ -36,6 +36,7 @@ func (c *MonitorsCollection) Crud(
 		logging.LogBackend(fmt.Sprintf("Removed monitor for address: %s", monitor.Address))
 
 		// Refresh the data after successful operation
+		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 		c.Reset(MonitorsList)
 		return nil
 
@@ -53,6 +54,7 @@ func (c *MonitorsCollection) Crud(
 		logging.LogBackend(fmt.Sprintf("Deleted monitor for address: %s", monitor.Address))
 
 		// Refresh the data after successful operation
+		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 		c.Reset(MonitorsList)
 		return nil
 
@@ -70,6 +72,7 @@ func (c *MonitorsCollection) Crud(
 		logging.LogBackend(fmt.Sprintf("Undeleted monitor for address: %s", monitor.Address))
 
 		// Refresh the data after successful operation
+		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 		c.Reset(MonitorsList)
 		return nil
 
@@ -107,6 +110,7 @@ func (c *MonitorsCollection) Clean(addresses []string) error {
 	}
 
 	// Refresh the data after successful operation
+	// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 	c.Reset(MonitorsList)
 	return nil
 }

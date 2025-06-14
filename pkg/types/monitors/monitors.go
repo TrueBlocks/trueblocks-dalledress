@@ -113,7 +113,7 @@ func (mc *MonitorsCollection) GetPage(
 			Kind:          listKind,
 			Monitors:      pageResult.Items,
 			TotalItems:    pageResult.TotalItems,
-			ExpectedTotal: mc.getExpectedTotal(),
+			ExpectedTotal: mc.getExpectedTotal(listKind),
 			IsFetching:    mc.monitorsFacet.IsFetching(),
 			State:         pageResult.State,
 		}, nil
@@ -144,12 +144,11 @@ func (mc *MonitorsCollection) NeedsUpdate(listKind types.ListKind) bool {
 	return facet.NeedsUpdate()
 }
 
-func (mc *MonitorsCollection) getExpectedTotal() int {
-	// Try to get accurate count from MonitorsCount, fallback to facet count
+func (mc *MonitorsCollection) getExpectedTotal(listKind types.ListKind) int {
+	_ = listKind // delinter
 	if count, err := GetMonitorsCount(); err == nil && count > 0 {
 		return count
 	}
-	// Fallback to current facet expected count
 	return mc.monitorsFacet.ExpectedCount()
 }
 

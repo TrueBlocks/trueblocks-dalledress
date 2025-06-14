@@ -15,6 +15,7 @@ func TestNewNamesCollection(t *testing.T) {
 	names := NewNamesCollection()
 	if names == nil {
 		t.Errorf("NewNamesCollection() returned nil")
+		return
 	}
 
 	// Test that all facets are initialized
@@ -51,14 +52,18 @@ func TestNamesCollectionMethods(t *testing.T) {
 
 func TestNamesPageStructure(t *testing.T) {
 	names := NewNamesCollection()
+	if names == nil {
+		t.Errorf("NewNamesCollection() returned nil")
+		return
+	}
 
 	// Test GetPage with empty data
 	page, err := names.GetPage(NamesAll, 0, 10, noSort, "")
 	if err != nil {
 		t.Errorf("GetPage should not error with empty data: %v", err)
-	}
-	if page == nil {
+	} else if page == nil {
 		t.Errorf("GetPage should not return nil page")
+		return
 	}
 	if page.Kind != NamesAll {
 		t.Errorf("Expected page kind to be %s, got %s", NamesAll, page.Kind)

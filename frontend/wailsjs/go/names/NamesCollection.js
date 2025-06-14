@@ -18,6 +18,10 @@ export function LoadData(arg1) {
   return window['go']['names']['NamesCollection']['LoadData'](arg1);
 }
 
+export function NameFromAddress(arg1) {
+  return window['go']['names']['NamesCollection']['NameFromAddress'](arg1);
+}
+
 export function NeedsUpdate(arg1) {
   return window['go']['names']['NamesCollection']['NeedsUpdate'](arg1);
 }

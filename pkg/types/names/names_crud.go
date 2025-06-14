@@ -38,8 +38,11 @@ func (nc *NamesCollection) Crud(
 		return err
 	}
 
+	// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 	nc.Reset(listKind)
 	return nil
 }
+
+// TODO: Consider adding batch operations for Names, similar to MonitorsCollection.Clean (e.g., batch delete).
 
 // NAMES_ROUTE

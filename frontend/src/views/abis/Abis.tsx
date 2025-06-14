@@ -8,7 +8,7 @@ import { useActionMsgs, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, crud, facets, msgs, types } from '@models';
-import { getAddressString, useEmitters, useErrorHandler } from '@utils';
+import { getAddressString, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
 import { getColumns } from './';
@@ -34,7 +34,6 @@ export const Abis = () => {
   const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
   const { sort } = useSorting(tableKey);
   const { filter } = useFiltering(tableKey);
-  const { emitStatus } = useEmitters();
 
   const listKindRef = useRef(listKind);
   const renderCnt = useRef(0);

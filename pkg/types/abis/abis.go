@@ -141,7 +141,6 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 		return
 	}
 
-	// Single goroutine implementation for all facets
 	go func() {
 		if facetAbi != nil {
 			if result, err := facetAbi.Load(); err != nil {

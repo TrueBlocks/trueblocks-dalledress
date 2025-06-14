@@ -13,7 +13,6 @@ import (
 
 var namesLock atomic.Int32
 
-// Crud performs CRUD operations on names (moved from App)
 func (nc *NamesCollection) Crud(
 	listKind types.ListKind,
 	op crud.Operation,

@@ -18,7 +18,6 @@ func TestNewNamesCollection(t *testing.T) {
 		return
 	}
 
-	// Test that all facets are initialized
 	if names.allFacet == nil {
 		t.Errorf("allFacet not initialized")
 	}
@@ -39,12 +38,10 @@ func TestNewNamesCollection(t *testing.T) {
 func TestNamesCollectionMethods(t *testing.T) {
 	names := NewNamesCollection()
 
-	// Test NeedsUpdate - should initially need update
 	if !names.NeedsUpdate(NamesAll) {
 		t.Errorf("Expected NeedsUpdate to be true initially")
 	}
 
-	// Test getExpectedTotal - should initially be 0
 	if expected := names.getExpectedTotal(NamesAll); expected != 0 {
 		t.Errorf("Expected getExpectedTotal to be 0 initially, got %d", expected)
 	}
@@ -57,7 +54,6 @@ func TestNamesPageStructure(t *testing.T) {
 		return
 	}
 
-	// Test GetPage with empty data
 	page, err := names.GetPage(NamesAll, 0, 10, noSort, "")
 	if err != nil {
 		t.Errorf("GetPage should not error with empty data: %v", err)
@@ -79,7 +75,6 @@ func TestNamesPageStructure(t *testing.T) {
 func TestFindNameByAddress(t *testing.T) {
 	names := NewNamesCollection()
 
-	// Test with non-existent address
 	addr := base.HexToAddress("0x123")
 	name, found := names.FindNameByAddress(addr)
 	if found {
@@ -117,7 +112,6 @@ func TestGetPageWithDifferentListKinds(t *testing.T) {
 func TestGetPageWithFilter(t *testing.T) {
 	names := NewNamesCollection()
 
-	// Test with various filters
 	filters := []string{"", "test", "0x123", "alice"}
 
 	for _, filter := range filters {
@@ -136,7 +130,6 @@ func TestGetPageWithFilter(t *testing.T) {
 func TestGetPagePagination(t *testing.T) {
 	names := NewNamesCollection()
 
-	// Test various pagination parameters
 	testCases := []struct {
 		first    int
 		pageSize int

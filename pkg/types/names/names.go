@@ -53,7 +53,7 @@ func NewNamesCollection() *NamesCollection {
 
 	allFacet := facets.NewFacet(
 		NamesAll,
-		nil, // No filter - all names
+		nil,
 		nil,
 		namesStore,
 	)
@@ -195,7 +195,6 @@ func (nc *NamesCollection) GetPage(
 		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
 	}
 
-	// Create filter function for names
 	var filterFunc func(*coreTypes.Name) bool
 	if filter != "" {
 		filterFunc = func(name *coreTypes.Name) bool {
@@ -203,7 +202,6 @@ func (nc *NamesCollection) GetPage(
 		}
 	}
 
-	// Create sort function for names
 	sortFunc := func(items []coreTypes.Name, sort sdk.SortSpec) error {
 		return sdk.SortNames(items, sort)
 	}
@@ -219,7 +217,6 @@ func (nc *NamesCollection) GetPage(
 		return nil, err
 	}
 
-	// Convert value types to pointer types for API compatibility
 	names := make([]*coreTypes.Name, 0, len(pageResult.Items))
 	for i := range pageResult.Items {
 		names = append(names, &pageResult.Items[i])
@@ -235,11 +232,9 @@ func (nc *NamesCollection) GetPage(
 	}, nil
 }
 
-// matchesFilter checks if a name matches the given filter string
 func (nc *NamesCollection) matchesFilter(name *coreTypes.Name, filter string) bool {
 	filterLower := strings.ToLower(filter)
 
-	// Check address (with and without 0x prefix)
 	addressHex := strings.ToLower(name.Address.Hex())
 	addressNoPrefix := strings.TrimPrefix(addressHex, "0x")
 	addressNoLeadingZeros := strings.TrimLeft(addressNoPrefix, "0")
@@ -250,22 +245,18 @@ func (nc *NamesCollection) matchesFilter(name *coreTypes.Name, filter string) bo
 		return true
 	}
 
-	// Check name if available
 	if strings.Contains(strings.ToLower(name.Name), filterLower) {
 		return true
 	}
 
-	// Check tags if available
 	if strings.Contains(strings.ToLower(name.Tags), filterLower) {
 		return true
 	}
 
-	// Check source if available
 	if strings.Contains(strings.ToLower(name.Source), filterLower) {
 		return true
 	}
 
-	// Extra: if filter starts with 0x, try matching without 0x and leading zeros
 	if strings.HasPrefix(filterLower, "0x") {
 		fNoPrefix := strings.TrimPrefix(filterLower, "0x")
 		if strings.Contains(addressNoPrefix, fNoPrefix) || strings.Contains(addressNoLeadingZeros, fNoPrefix) {
@@ -276,19 +267,16 @@ func (nc *NamesCollection) matchesFilter(name *coreTypes.Name, filter string) bo
 	return false
 }
 
-// FindNameByAddress searches for a name by address across all facets
 func (nc *NamesCollection) FindNameByAddress(addr base.Address) (*coreTypes.Name, bool) {
-	// Try the allFacet first since it should contain all names
 	if nc.allFacet != nil {
 		found := false
 		var result *coreTypes.Name
 
-		// Use ForEvery to search through the facet's data
 		_, _ = nc.allFacet.ForEvery(
 			func(name *coreTypes.Name) (error, bool) {
 				result = name
 				found = true
-				return nil, true // Stop iteration
+				return nil, true
 			},
 			func(name *coreTypes.Name) bool {
 				return name.Address == addr

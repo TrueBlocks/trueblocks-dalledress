@@ -15,7 +15,7 @@ import { useActionMsgs, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, facets, msgs, names, types } from '@models';
-import { getAddressString, useEmitters, useErrorHandler } from '@utils';
+import { getAddressString, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
 import { getColumns } from './columns';
@@ -55,11 +55,11 @@ export const Names = () => {
   const { pagination, setTotalItems } = usePagination(tableKey);
   const { sort } = useSorting(tableKey);
   const { filter, setFiltering } = useFiltering(tableKey);
-  const { emitStatus } = useEmitters();
   const { emitSuccess, failure } = useActionMsgs('names');
 
   const listKindRef = useRef(listKind);
   const renderCnt = useRef(0);
+  // renderCnt.current++;
 
   useEffect(() => {
     listKindRef.current = listKind;
@@ -78,9 +78,6 @@ export const Names = () => {
       setState(result.state);
       setPageData(result);
       setTotalItems(result.totalItems || 0);
-
-      // Emit status message after successful data load
-      emitStatus(`Loaded ${result.totalItems || 0} names successfully`);
     } catch (err: unknown) {
       handleError(err, `Failed to fetch ${listKindRef.current}`);
     }
@@ -92,7 +89,6 @@ export const Names = () => {
     filter,
     setTotalItems,
     handleError,
-    emitStatus,
   ]);
 
   const currentData = useMemo(() => {
@@ -400,7 +396,6 @@ export const Names = () => {
     ],
   );
 
-  // Combined action handler for names
   const handleNameAction = useCallback(
     (
       address: Address,
@@ -426,7 +421,6 @@ export const Names = () => {
             break;
         }
       } finally {
-        // Clean up processing state after a delay to allow for optimistic updates
         setTimeout(() => {
           setProcessingAddresses((prev) => {
             const newSet = new Set(prev);
@@ -451,7 +445,7 @@ export const Names = () => {
       col.key === 'chips'
         ? {
             ...col,
-            render: (row: Record<string, unknown>, _rowIndex: number) => {
+            render: (row: Record<string, unknown>) => {
               const nameObject = row as unknown as types.Name;
               const chipItems = mapNameToChips(nameObject);
               return <Chips items={chipItems} onChipClick={handleChipClick} />;
@@ -465,11 +459,11 @@ export const Names = () => {
       sortable: false,
       editable: false,
       visible: true,
-      render: (row: Record<string, unknown>, _rowIndex: number) => {
+      render: (row: Record<string, unknown>) => {
         const name = row as unknown as types.Name;
-        const isDeleted = Boolean(name.deleted);
         const addressStr = getAddressString(name.address);
         const isProcessing = processingAddresses.has(addressStr);
+        const isDeleted = Boolean(name.deleted);
 
         return (
           <div className="action-buttons-container">
@@ -630,27 +624,27 @@ export const Names = () => {
   const tabs = useMemo(
     () => [
       {
-        label: 'All',
+        label: types.ListKind.ALL,
         value: types.ListKind.ALL,
         content: perTabTable,
       },
       {
-        label: 'Custom',
+        label: types.ListKind.CUSTOM,
         value: types.ListKind.CUSTOM,
         content: perTabTable,
       },
       {
-        label: 'Prefund',
+        label: types.ListKind.PREFUND,
         value: types.ListKind.PREFUND,
         content: perTabTable,
       },
       {
-        label: 'Regular',
+        label: types.ListKind.REGULAR,
         value: types.ListKind.REGULAR,
         content: perTabTable,
       },
       {
-        label: 'Baddress',
+        label: types.ListKind.BADDRESS,
         value: types.ListKind.BADDRESS,
         content: perTabTable,
       },

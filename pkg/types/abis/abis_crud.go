@@ -12,7 +12,6 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-// Crud performs CRUD operations on ABIs - handles all operation types
 func (ac *AbisCollection) Crud(
 	listKind types.ListKind,
 	op crud.Operation,
@@ -28,12 +27,11 @@ func (ac *AbisCollection) Crud(
 			return err
 		}
 
-		// Remove the ABI from the in-memory facet using ForEvery method
 		actionFunc := func(itemMatched *coreTypes.Abi) (error, bool) {
-			return nil, true // Action function - we just want to remove matched items
+			return nil, true
 		}
 		matchFunc := func(existing *coreTypes.Abi) bool {
-			return existing.Address == abi.Address // Match function - true for items to remove
+			return existing.Address == abi.Address
 		}
 		removedCount, err := ac.downloadedFacet.ForEvery(actionFunc, matchFunc)
 
@@ -50,7 +48,6 @@ func (ac *AbisCollection) Crud(
 		return nil
 
 	default:
-		// All other operations are not implemented
 		logging.LogBackend(fmt.Sprintf("ABI operation %s not implemented for address: %s", op, abi.Address))
 		return fmt.Errorf("operation %s not yet implemented for ABIs", op)
 	}

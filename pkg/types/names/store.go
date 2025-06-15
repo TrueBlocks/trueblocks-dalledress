@@ -36,7 +36,7 @@ func GetNamesStore() *store.Store[coreTypes.Name] {
 				logging.LogBackend(fmt.Sprintf("Shared Names source query error: %v", err))
 				return err
 			}
-			logging.LogBackend(fmt.Sprintf("The query function returned without an error."))
+			logging.LogBackend("The query function returned without an error.")
 			return nil
 		}
 

@@ -1,4 +1,3 @@
-// ABIS_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AbisCrud, GetAbisPage, Reload } from '@app';
@@ -357,5 +356,3 @@ export const Abis = () => {
 
 const ABIS_DEFAULT_LIST = types.ListKind.DOWNLOADED;
 const ABIS_ROUTE = '/abis';
-
-// ABIS_ROUTE

@@ -1,4 +1,3 @@
-// MONITORS_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
@@ -509,5 +508,3 @@ export const Monitors = () => {
 
 const MONITORS_DEFAULT_LIST = types.ListKind.MONITORS;
 const MONITORS_ROUTE = '/monitors';
-
-// MONITORS_ROUTE

@@ -1,4 +1,3 @@
-// NAMES_ROUTE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
@@ -669,5 +668,3 @@ export const Names = () => {
 
 const NAMES_DEFAULT_LIST = types.ListKind.ALL;
 const NAMES_ROUTE = '/names';
-
-// NAMES_ROUTE

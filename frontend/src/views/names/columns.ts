@@ -1,4 +1,3 @@
-// NAMES_ROUTE
 import { FormField } from '@components';
 import { types } from '@models';
 
@@ -97,5 +96,3 @@ const getColumnsForName = (): FormField[] => [
     width: '200px',
   },
 ];
-
-// NAMES_ROUTE

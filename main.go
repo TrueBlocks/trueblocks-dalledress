@@ -43,15 +43,11 @@ func main() {
 		Bind: []interface{}{
 			a,
 			&project.Project{},
-			// NAMES_ROUTE
+			// ADD_ROUTE
 			&names.NamesCollection{},
-			// NAMES_ROUTE
-			// ABIS_ROUTE
 			&abis.AbisCollection{},
-			// ABIS_ROUTE
-			// MONITORS_ROUTE
 			&monitors.MonitorsCollection{},
-			// MONITORS_ROUTE
+			// ADD_ROUTE
 		},
 		EnumBind: []interface{}{
 			msgs.AllMessages,

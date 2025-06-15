@@ -1,4 +1,4 @@
-// MONITORS_ROUTE
+// ADD_ROUTE
 package app
 
 import (
@@ -35,4 +35,4 @@ func (a *App) MonitorsClean(addresses []string) error {
 	return a.monitors.Clean(addresses)
 }
 
-// MONITORS_ROUTE
+// ADD_ROUTE

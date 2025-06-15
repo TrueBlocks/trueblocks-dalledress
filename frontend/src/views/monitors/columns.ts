@@ -1,4 +1,3 @@
-// MONITORS_ROUTE
 import { FormField } from '@components';
 import { types } from '@models';
 
@@ -78,5 +77,3 @@ const getColumnsForMonitor = (): FormField[] => [
     width: '120px',
   },
 ];
-
-// MONITORS_ROUTE

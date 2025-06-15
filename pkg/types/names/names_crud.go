@@ -1,4 +1,3 @@
-// NAMES_ROUTE
 package names
 
 import (
@@ -33,7 +32,7 @@ func (nc *NamesCollection) Crud(
 	cd := crud.CrudFromName(*name)
 	opts := sdk.NamesOptions{
 		Globals: sdk.Globals{
-			Chain: "mainnet", // namesChain
+			Chain: "mainnet",
 		},
 	}
 
@@ -48,5 +47,3 @@ func (nc *NamesCollection) Crud(
 }
 
 // TODO: Consider adding batch operations for Names, similar to MonitorsCollection.Clean (e.g., batch delete).
-
-// NAMES_ROUTE

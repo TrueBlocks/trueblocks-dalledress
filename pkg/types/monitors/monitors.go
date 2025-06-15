@@ -1,4 +1,3 @@
-// MONITORS_ROUTE
 package monitors
 
 import (
@@ -66,7 +65,6 @@ func (mc *MonitorsCollection) LoadData(listKind types.ListKind) {
 		return
 	}
 
-	// Single goroutine implementation for all facets
 	go func() {
 		if result, err := facet.Load(); err != nil {
 			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
@@ -84,7 +82,6 @@ func (mc *MonitorsCollection) GetPage(
 ) (*MonitorsPage, error) {
 	switch listKind {
 	case MonitorsList:
-		// Create filter function for monitors
 		var filterFunc func(*coreTypes.Monitor) bool
 		if filter != "" {
 			filterFunc = func(monitor *coreTypes.Monitor) bool {
@@ -92,7 +89,6 @@ func (mc *MonitorsCollection) GetPage(
 			}
 		}
 
-		// Create sort function for monitors
 		var sortFunc func([]coreTypes.Monitor, sdk.SortSpec) error
 		sortFunc = func(items []coreTypes.Monitor, sort sdk.SortSpec) error {
 			return sdk.SortMonitors(items, sort)
@@ -145,14 +141,13 @@ func (mc *MonitorsCollection) NeedsUpdate(listKind types.ListKind) bool {
 }
 
 func (mc *MonitorsCollection) getExpectedTotal(listKind types.ListKind) int {
-	_ = listKind // delinter
+	_ = listKind
 	if count, err := GetMonitorsCount(); err == nil && count > 0 {
 		return count
 	}
 	return mc.monitorsFacet.ExpectedCount()
 }
 
-// matchesFilter checks if a monitor matches the given filter string
 func (mc *MonitorsCollection) matchesFilter(monitor *coreTypes.Monitor, filter string) bool {
 	if filter == "" {
 		return true
@@ -160,7 +155,6 @@ func (mc *MonitorsCollection) matchesFilter(monitor *coreTypes.Monitor, filter s
 
 	filterLower := strings.ToLower(filter)
 
-	// Check address (with and without 0x prefix)
 	addressHex := strings.ToLower(monitor.Address.Hex())
 	addressNoPrefix := strings.TrimPrefix(addressHex, "0x")
 	addressNoLeadingZeros := strings.TrimLeft(addressNoPrefix, "0")
@@ -171,19 +165,16 @@ func (mc *MonitorsCollection) matchesFilter(monitor *coreTypes.Monitor, filter s
 		return true
 	}
 
-	// Check name if available
 	if strings.Contains(strings.ToLower(monitor.Name), filterLower) {
 		return true
 	}
 
-	// Check numeric fields as strings
 	if strings.Contains(fmt.Sprintf("%d", monitor.NRecords), filterLower) ||
 		strings.Contains(fmt.Sprintf("%d", monitor.FileSize), filterLower) ||
 		strings.Contains(fmt.Sprintf("%d", monitor.LastScanned), filterLower) {
 		return true
 	}
 
-	// Check boolean fields
 	if monitor.IsEmpty && strings.Contains("empty", filterLower) {
 		return true
 	}
@@ -196,5 +187,3 @@ func (mc *MonitorsCollection) matchesFilter(monitor *coreTypes.Monitor, filter s
 
 	return false
 }
-
-// MONITORS_ROUTE

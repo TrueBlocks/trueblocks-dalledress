@@ -1,4 +1,3 @@
-// ABIS_ROUTE
 package abis
 
 import (
@@ -100,5 +99,3 @@ func GetStoreName(listKind types.ListKind) string {
 		return ""
 	}
 }
-
-// ABIS_ROUTE

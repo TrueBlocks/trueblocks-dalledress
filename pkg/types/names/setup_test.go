@@ -1,22 +1,22 @@
-package monitors
+package names
 
 import (
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	testingPkg "github.com/TrueBlocks/trueblocks-dalledress/pkg/testing"
 )
 
-type MockSDKMonitor struct {
-	*testingPkg.MockSDKBase[coreTypes.Monitor]
+type MockSDKName struct {
+	*testingPkg.MockSDKBase[coreTypes.Name]
 }
 
-func NewMockSDKMonitor() *MockSDKMonitor {
-	return &MockSDKMonitor{
-		MockSDKBase: testingPkg.NewMockSDKBase(testingPkg.CreateTestMonitors()),
+func NewMockSDKName() *MockSDKName {
+	return &MockSDKName{
+		MockSDKBase: testingPkg.NewMockSDKBase(testingPkg.CreateTestNames()),
 	}
 }
 
-func (m *MockSDKMonitor) SetMonitors(monitors []coreTypes.Monitor) {
-	m.SetItems(monitors)
+func (m *MockSDKName) SetNames(names []coreTypes.Name) {
+	m.SetItems(names)
 }
 
 type MessageCapture = testingPkg.MessageCapture

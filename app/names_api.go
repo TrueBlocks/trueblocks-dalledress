@@ -1,4 +1,4 @@
-// NAMES_ROUTE
+// ADD_ROUTE
 package app
 
 import (
@@ -60,4 +60,4 @@ func (a *App) NameFromAddress(address string) (*coreTypes.Name, bool) {
 	return a.names.NameFromAddress(base.HexToAddress(address))
 }
 
-// NAMES_ROUTE
+// ADD_ROUTE

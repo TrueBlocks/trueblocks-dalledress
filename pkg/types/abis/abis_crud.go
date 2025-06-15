@@ -1,4 +1,3 @@
-// ABIS_ROUTE
 package abis
 
 import (
@@ -54,4 +53,3 @@ func (ac *AbisCollection) Crud(
 }
 
 // TODO: Consider adding batch operations for Abis, similar to MonitorsCollection.Clean (e.g., batch remove).
-// ABIS_ROUTE

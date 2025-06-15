@@ -1,4 +1,3 @@
-// NAMES_ROUTE
 package names
 
 import (
@@ -73,5 +72,3 @@ func GetStoreName(listKind types.ListKind) string {
 func (nc *NamesCollection) NameFromAddress(address base.Address) (*coreTypes.Name, bool) {
 	return namesStore.GetItemFromMap(address)
 }
-
-// NAMES_ROUTE

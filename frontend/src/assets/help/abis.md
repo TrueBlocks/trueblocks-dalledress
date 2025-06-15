@@ -1,4 +1,4 @@
-<!-- ABIS_ROUTE -->
+<!-- ADD_ROUTE -->
 
 Welcome to the **Abis** view! This section provides information about managing abis in your application.
 
@@ -11,4 +11,4 @@ Welcome to the **Abis** view! This section provides information about managing a
 
 For further assistance, please contact support.
 
-<!-- ABIS_ROUTE -->
+<!-- ADD_ROUTE -->

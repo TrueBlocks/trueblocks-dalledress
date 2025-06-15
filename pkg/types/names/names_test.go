@@ -1,113 +1,230 @@
-// NAMES_ROUTE
 package names
 
-// func setupTest(t *testing.T) *NamesCollection {
-// 	t.Helper()
+import (
+	"testing"
 
-// 	th := msgs.NewTestHelpers()
-// 	defer th.Cleanup()
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	"github.com/stretchr/testify/assert"
+)
 
-// 	collection := NewNamesCollection()
-// 	assert.NotNil(t, collection, "NewNamesCollection should return a non-nil collection")
+func TestNewNamesCollection(t *testing.T) {
+	assert.NotPanics(t, func() {
+		collection := NewNamesCollection()
+		assert.NotNil(t, collection)
+	}, "NewNamesCollection should not panic")
+}
 
-// 	loadedCh := make(chan bool)
-// 	msgs.On(msgs.EventDataLoaded, func(optionalData ...interface{}) {
-// 		var payload types.DataLoadedPayload
-// 		isRelevantEvent := false
-// 		if len(optionalData) >= 1 {
-// 			if p, ok := optionalData[len(optionalData)-1].(types.DataLoadedPayload); ok {
-// 				payload = p
-// 				if payload.ListKind == NamesAll {
-// 					isRelevantEvent = true
-// 				}
-// 			}
-// 		}
+func TestNamesMatchesFilter(t *testing.T) {
+	collection := NewNamesCollection()
+	testName := &coreTypes.Name{
+		Address:    base.HexToAddress("0x1234567890123456789012345678901234567890"),
+		Name:       "Test Name",
+		Tags:       "testing,example",
+		Source:     "test",
+		Symbol:     "TEST",
+		Decimals:   18,
+		IsCustom:   true,
+		IsPrefund:  false,
+		IsContract: true,
+		IsErc20:    true,
+		IsErc721:   false,
+		Parts:      coreTypes.Custom,
+	}
 
-// 		if isRelevantEvent {
-// 			if collection.allFacet.GetState() == facets.StateLoaded && payload.CurrentCount == payload.ExpectedTotal && payload.ExpectedTotal > 0 {
-// 				select {
-// 				case <-loadedCh:
-// 					// Already closed
-// 				default:
-// 					close(loadedCh)
-// 				}
-// 			}
-// 		}
-// 	})
+	t.Run("AddressMatch", func(t *testing.T) {
+		assert.True(t, collection.matchesFilter(testName, "1234"))
+		assert.True(t, collection.matchesFilter(testName, "0x1234"))
+	})
 
-// 	collection.LoadData(NamesAll)
+	t.Run("NameMatch", func(t *testing.T) {
+		assert.True(t, collection.matchesFilter(testName, "test"))
+		assert.True(t, collection.matchesFilter(testName, "Name"))
+	})
 
-// 	select {
-// 	case <-loadedCh:
-// 		assert.Equal(t, facets.StateLoaded, collection.allFacet.GetState(), "allFacet should be in StateLoaded after event")
-// 		assert.Greater(t, collection.allFacet.Count(), 0, "allFacet should have items after load")
-// 		assert.True(t, collection.allFacet.IsLoaded(), "allFacet.IsLoaded() should be true")
-// 	case <-time.After(15 * time.Second): // Increased timeout for CI or slower environments
-// 		t.Fatalf("Timeout waiting for NamesCollection (%s) to load. Current state of allFacet: %s. Facet count: %d. Expected total in facet (from progress): %d. IsLoaded: %v",
-// 			NamesAll, collection.allFacet.GetState(), collection.allFacet.Count(), collection.allFacet.ExpectedCount(), collection.allFacet.IsLoaded())
-// 	}
+	t.Run("TagsMatch", func(t *testing.T) {
+		assert.True(t, collection.matchesFilter(testName, "testing"))
+		assert.True(t, collection.matchesFilter(testName, "example"))
+	})
 
-// 	return collection
-// }
+	t.Run("SourceMatch", func(t *testing.T) {
+		assert.True(t, collection.matchesFilter(testName, "test"))
+	})
 
-// func TestNamesCollection_SimpleAccessors(t *testing.T) {
-// 	collection := setupTest(t)
+	t.Run("EmptyFilter", func(t *testing.T) {
+		result := collection.matchesFilter(testName, "")
+		assert.True(t, result)
+	})
 
-// 	t.Run("TestAllFacet_InitialLoad", func(t *testing.T) {
-// 		// Access the NamesAll facet directly from the collection
-// 		allFacet := collection.allFacet // Assuming 'allFacet' is the correct field name for the 'All' names facet
-// 		assert.NotNil(t, allFacet, "allFacet should not be nil")
+	t.Run("NoMatch", func(t *testing.T) {
+		assert.False(t, collection.matchesFilter(testName, "nonexistent"))
+	})
+}
 
-// 		// Check if the facet is loaded (assuming setupTest ensures this)
-// 		assert.True(t, allFacet.IsLoaded(), "allFacet should be loaded")
+func TestNamesCollectionStateManagement(t *testing.T) {
+	collection := NewNamesCollection()
 
-// 		// Check that the count of items is non-negative
-// 		// In a real scenario, after initial load, this might be expected to be > 0
-// 		// if there's default data.
-// 		count := allFacet.Count()
-// 		assert.True(t, count >= 0, "allFacet count should be non-negative")
+	t.Run("NeedsUpdate", func(t *testing.T) {
+		needsUpdate := collection.NeedsUpdate(NamesAll)
+		assert.True(t, needsUpdate, "New collection should need update for NamesAll")
 
-// 		// To get actual items, you would use GetPage.
-// 		// For this initial test, checking IsLoaded and Count should suffice to confirm initialization.
-// 		// Example of getting items (though not strictly needed for this specific subtest's goal):
-// 		// pageResult, err := allFacet.GetPage(0, 10, nil, sdk.SortSpec{}, nil) // Get first 10 items
-// 		// assert.NoError(t, err)
-// 		// assert.NotNil(t, pageResult)
-// 		// assert.NotNil(t, pageResult.Items)
-// 	})
-// }
+		needsUpdate = collection.NeedsUpdate(NamesCustom)
+		assert.True(t, needsUpdate, "New collection should need update for NamesCustom")
 
-// Test cases 1:
-// - Ensure that the names collection is properly initialized and can handle CRUD operations
-// - Ensure that the names collection can handle pagination and sorting correctly
-// - Ensure that the names collection can handle custom names, prefund names, and regular names correctly
-// - Ensure that the names collection can handle baddress names correctly
-// - Ensure that the names collection can handle all names correctly
-// - Ensure that the names collection can handle names with different properties (e.g., custom, prefund, regular, baddress)
-// - Ensure that the names collection can handle names with different tags and sources
-// - Ensure that the names collection can handle names with different decimals
-// - Ensure that the names collection can handle names with different pre-fund amounts
-// - Ensure that the names collection can handle names with different parts
-// - Ensure that the names collection can handle names with different isCustom flags
-// - Ensure that the names collection can handle names with different deleted flags
-// - Ensure that the names collection can handle names with different isContract flags
-// - Ensure that the names collection can handle names with different isErc20 flags
-// - Ensure that the names collection can handle names with different isErc721 flags
-// - Ensure that the names collection can handle names with different isPrefund flags
-// - Ensure that the names collection can handle names with different addresses
-// - Ensure that the names collection can handle names with different name strings
-// - Ensure that the names collection can handle names with different tags
-// - Ensure that the names collection can handle names with different sources
+		needsUpdate = collection.NeedsUpdate(NamesPrefund)
+		assert.True(t, needsUpdate, "New collection should need update for NamesPrefund")
 
-// Test cases 2:
-// - Add a new name
-// - Autoname an existing name
-// - Edit an existing name
-// - Delete an existing name
-// - Undelete a deleted name
-// - Remove a name (should fail if not deleted)
-// - Delete a name and then remove it
-// - Remove a name that has been deleted
-// - Ensure removed names are not found in any search method
-// - Ensure names can be added, edited, deleted, and removed correctly
-// - Ensure that the CRUD operations work as expected with the new facet-based architecture
+		needsUpdate = collection.NeedsUpdate(NamesRegular)
+		assert.True(t, needsUpdate, "New collection should need update for NamesRegular")
+
+		needsUpdate = collection.NeedsUpdate(NamesBaddress)
+		assert.True(t, needsUpdate, "New collection should need update for NamesBaddress")
+
+		needsUpdate = collection.NeedsUpdate("invalid-kind")
+		assert.False(t, needsUpdate, "Invalid list kind should return false")
+	})
+
+	t.Run("Reset", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			collection.Reset(NamesAll)
+		}, "Reset with NamesAll should not panic")
+
+		assert.NotPanics(t, func() {
+			collection.Reset(NamesCustom)
+		}, "Reset with NamesCustom should not panic")
+
+		assert.NotPanics(t, func() {
+			collection.Reset(NamesPrefund)
+		}, "Reset with NamesPrefund should not panic")
+
+		assert.NotPanics(t, func() {
+			collection.Reset(NamesRegular)
+		}, "Reset with NamesRegular should not panic")
+
+		assert.NotPanics(t, func() {
+			collection.Reset(NamesBaddress)
+		}, "Reset with NamesBaddress should not panic")
+
+		needsUpdate := collection.NeedsUpdate(NamesAll)
+		assert.True(t, needsUpdate, "After reset, collection should need update")
+
+		assert.NotPanics(t, func() {
+			collection.Reset("invalid-kind")
+		}, "Reset with invalid list kind should not panic")
+	})
+}
+
+func TestNamesCollectionLoadData(t *testing.T) {
+	collection := NewNamesCollection()
+
+	t.Run("LoadDataValidKinds", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			collection.LoadData(NamesAll)
+		}, "LoadData with NamesAll should not panic")
+
+		assert.NotPanics(t, func() {
+			collection.LoadData(NamesCustom)
+		}, "LoadData with NamesCustom should not panic")
+
+		assert.NotPanics(t, func() {
+			collection.LoadData(NamesPrefund)
+		}, "LoadData with NamesPrefund should not panic")
+
+		assert.NotPanics(t, func() {
+			collection.LoadData(NamesRegular)
+		}, "LoadData with NamesRegular should not panic")
+
+		assert.NotPanics(t, func() {
+			collection.LoadData(NamesBaddress)
+		}, "LoadData with NamesBaddress should not panic")
+	})
+
+	t.Run("LoadDataInvalidKind", func(t *testing.T) {
+		assert.NotPanics(t, func() {
+			collection.LoadData("invalid-kind")
+		}, "LoadData with invalid list kind should not panic")
+	})
+}
+
+func TestNamesCollectionGetPage(t *testing.T) {
+	collection := NewNamesCollection()
+
+	t.Run("BasicGetPageNamesAll", func(t *testing.T) {
+		page, err := collection.GetPage(NamesAll, 0, 10, sdk.SortSpec{}, "")
+
+		if err == nil && page != nil {
+			assert.Equal(t, NamesAll, page.Kind)
+			assert.GreaterOrEqual(t, page.TotalItems, 0)
+			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+		}
+	})
+
+	t.Run("BasicGetPageNamesCustom", func(t *testing.T) {
+		page, err := collection.GetPage(NamesCustom, 0, 10, sdk.SortSpec{}, "")
+
+		if err == nil && page != nil {
+			assert.Equal(t, NamesCustom, page.Kind)
+			assert.GreaterOrEqual(t, page.TotalItems, 0)
+			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+		}
+	})
+
+	t.Run("BasicGetPageNamesPrefund", func(t *testing.T) {
+		page, err := collection.GetPage(NamesPrefund, 0, 10, sdk.SortSpec{}, "")
+
+		if err == nil && page != nil {
+			assert.Equal(t, NamesPrefund, page.Kind)
+			assert.GreaterOrEqual(t, page.TotalItems, 0)
+			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+		}
+	})
+
+	t.Run("BasicGetPageNamesRegular", func(t *testing.T) {
+		page, err := collection.GetPage(NamesRegular, 0, 10, sdk.SortSpec{}, "")
+
+		if err == nil && page != nil {
+			assert.Equal(t, NamesRegular, page.Kind)
+			assert.GreaterOrEqual(t, page.TotalItems, 0)
+			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+		}
+	})
+
+	t.Run("BasicGetPageNamesBaddress", func(t *testing.T) {
+		page, err := collection.GetPage(NamesBaddress, 0, 10, sdk.SortSpec{}, "")
+
+		if err == nil && page != nil {
+			assert.Equal(t, NamesBaddress, page.Kind)
+			assert.GreaterOrEqual(t, page.TotalItems, 0)
+			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+		}
+	})
+
+	t.Run("GetPageWithFilter", func(t *testing.T) {
+		page, err := collection.GetPage(NamesAll, 0, 10, sdk.SortSpec{}, "test")
+
+		if err == nil && page != nil {
+			assert.Equal(t, NamesAll, page.Kind)
+			assert.GreaterOrEqual(t, page.TotalItems, 0)
+		}
+	})
+
+	t.Run("InvalidListKind", func(t *testing.T) {
+		_, err := collection.GetPage("invalid-kind", 0, 10, sdk.SortSpec{}, "")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "unexpected list kind")
+	})
+
+	t.Run("ZeroPageSize", func(t *testing.T) {
+		page, err := collection.GetPage(NamesAll, 0, 0, sdk.SortSpec{}, "")
+		if err == nil && page != nil {
+			assert.Equal(t, NamesAll, page.Kind)
+			assert.Len(t, page.Names, 0, "Zero page size should return no items")
+		}
+	})
+}

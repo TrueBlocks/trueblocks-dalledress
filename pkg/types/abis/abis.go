@@ -1,4 +1,3 @@
-// ABIS_ROUTE
 package abis
 
 import (
@@ -259,5 +258,3 @@ func (ac *AbisCollection) GetPage(
 
 	return page, nil
 }
-
-// ABIS_ROUTE

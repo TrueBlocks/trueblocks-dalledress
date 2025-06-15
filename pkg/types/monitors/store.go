@@ -1,4 +1,3 @@
-// MONITORS_ROUTE
 package monitors
 
 import (
@@ -72,5 +71,3 @@ func GetMonitorsCount() (int, error) {
 	}
 	return 0, nil
 }
-
-// MONITORS_ROUTE

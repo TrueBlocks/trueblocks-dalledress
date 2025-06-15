@@ -1,4 +1,4 @@
-<!-- NAMES_ROUTE -->
+<!-- ADD_ROUTE -->
 
 # Names Management
 
@@ -60,4 +60,4 @@ Use the action buttons to manage names:
 
 For further assistance, please contact support.
 
-<!-- NAMES_ROUTE -->
+<!-- ADD_ROUTE -->

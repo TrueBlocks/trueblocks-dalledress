@@ -1,4 +1,3 @@
-// MONITORS_ROUTE
 package monitors
 
 import (
@@ -13,7 +12,6 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-// Crud performs CRUD operations on Monitors - handles all operation types
 func (c *MonitorsCollection) Crud(
 	listKind types.ListKind,
 	op crud.Operation,
@@ -35,7 +33,6 @@ func (c *MonitorsCollection) Crud(
 		msgs.EmitStatus(fmt.Sprintf("removed monitor for address: %s", monitor.Address))
 		logging.LogBackend(fmt.Sprintf("Removed monitor for address: %s", monitor.Address))
 
-		// Refresh the data after successful operation
 		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 		c.Reset(MonitorsList)
 		return nil
@@ -53,7 +50,6 @@ func (c *MonitorsCollection) Crud(
 		msgs.EmitStatus(fmt.Sprintf("deleted monitor for address: %s", monitor.Address))
 		logging.LogBackend(fmt.Sprintf("Deleted monitor for address: %s", monitor.Address))
 
-		// Refresh the data after successful operation
 		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 		c.Reset(MonitorsList)
 		return nil
@@ -71,19 +67,16 @@ func (c *MonitorsCollection) Crud(
 		msgs.EmitStatus(fmt.Sprintf("undeleted monitor for address: %s", monitor.Address))
 		logging.LogBackend(fmt.Sprintf("Undeleted monitor for address: %s", monitor.Address))
 
-		// Refresh the data after successful operation
 		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 		c.Reset(MonitorsList)
 		return nil
 
 	default:
-		// Other operations are not implemented for monitors
 		logging.LogBackend(fmt.Sprintf("Monitor operation %s not implemented for address: %s", op, monitor.Address))
 		return fmt.Errorf("operation %s not yet implemented for Monitors", op)
 	}
 }
 
-// Clean performs maintenance operations on monitors - can clean all or specific addresses
 func (c *MonitorsCollection) Clean(addresses []string) error {
 	chainName := preferences.GetChain()
 
@@ -91,7 +84,6 @@ func (c *MonitorsCollection) Clean(addresses []string) error {
 		Globals: sdk.Globals{Cache: true, Chain: chainName},
 	}
 
-	// If addresses provided, clean only those
 	if len(addresses) > 0 {
 		opts.Addrs = addresses
 	}
@@ -109,10 +101,7 @@ func (c *MonitorsCollection) Clean(addresses []string) error {
 		logging.LogBackend("Cleaned all monitors")
 	}
 
-	// Refresh the data after successful operation
 	// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
 	c.Reset(MonitorsList)
 	return nil
 }
-
-// MONITORS_ROUTE

@@ -1,4 +1,3 @@
-// NAMES_ROUTE
 package names
 
 import (
@@ -123,7 +122,6 @@ func (nc *NamesCollection) LoadData(listKind types.ListKind) {
 		return
 	}
 
-	// Single goroutine implementation for all facets
 	go func() {
 		if result, err := facet.Load(); err != nil {
 			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
@@ -164,7 +162,7 @@ func (nc *NamesCollection) NeedsUpdate(listKind types.ListKind) bool {
 }
 
 func (nc *NamesCollection) getExpectedTotal(listKind types.ListKind) int {
-	_ = listKind // delinter
+	_ = listKind
 	if count, err := GetNamesCount(); err == nil && count > 0 {
 		return count
 	}
@@ -278,5 +276,3 @@ func GetNamesCount() (int, error) {
 	}
 	return 0, nil
 }
-
-// NAMES_ROUTE

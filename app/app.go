@@ -38,15 +38,11 @@ type App struct {
 	Preferences *preferences.Preferences
 	Projects    *project.Manager
 	chainList   *utils.ChainList
-	// NAMES_ROUTE
-	names *names.NamesCollection
-	// NAMES_ROUTE
-	// ABIS_ROUTE
-	abis *abis.AbisCollection
-	// ABIS_ROUTE
-	// MONITORS_ROUTE
+	// ADD_ROUTE
+	names    *names.NamesCollection
+	abis     *abis.AbisCollection
 	monitors *monitors.MonitorsCollection
-	// MONITORS_ROUTE
+	// ADD_ROUTE
 	meta       *coreTypes.MetaData
 	fileServer *fileserver.FileServer
 	locked     int32
@@ -68,15 +64,11 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		apiKeys: make(map[string]string),
 		ensMap:  make(map[string]base.Address),
 	}
-	// NAMES_ROUTE
+	// ADD_ROUTE
 	app.names = names.NewNamesCollection()
-	// NAMES_ROUTE
-	// ABIS_ROUTE
 	app.abis = abis.NewAbisCollection()
-	// ABIS_ROUTE
-	// MONITORS_ROUTE
 	app.monitors = monitors.NewMonitorsCollection()
-	// MONITORS_ROUTE
+	// ADD_ROUTE
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
@@ -145,12 +137,6 @@ func (a *App) Startup(ctx context.Context) {
 func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 	if a.IsReady() {
-		// NAMES_ROUTE
-		// if err := a.names.LoadData(types.ListKind(names.NamesAll)); err != nil {
-		// 	msgs.EmitError("Failed to load names database", err)
-		// }
-		// NAMES_ROUTE
-
 		if !a.Preferences.App.Bounds.IsValid() {
 			// Sometimes, during development, the window size is corrupted
 			// and we need to reset it to a default value. Should really
@@ -389,23 +375,19 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 func (a *App) Reload(listKind types.ListKind) error {
 	lastView := a.GetAppPreferences().LastView
 
+	// ADD_ROUTE
 	switch lastView {
 	case "/names":
-		// NAMES_ROUTE
 		a.names.Reset(listKind)
 		a.names.LoadData(listKind)
-		// NAMES_ROUTE
 	case "/abis":
-		// ABIS_ROUTE
 		a.abis.Reset(listKind)
 		a.abis.LoadData(listKind)
-		// ABIS_ROUTE
 	case "/monitors":
-		// MONITORS_ROUTE
 		a.monitors.Reset(listKind)
 		a.monitors.LoadData(listKind)
-		// MONITORS_ROUTE
 	}
+	// ADD_ROUTE
 
 	return nil
 }
@@ -414,20 +396,18 @@ func (a *App) CancelFetch(listKind types.ListKind) {
 	lastView := a.GetAppPreferences().LastView
 
 	storeName := ""
+
+	// ADD_ROUTE
 	switch lastView {
 	case "/names":
-		// NAMES_ROUTE
 		storeName = names.GetStoreName(listKind)
-		// NAMES_ROUTE
 	case "/abis":
-		// ABIS_ROUTE
 		storeName = abis.GetStoreName(listKind)
-		// ABIS_ROUTE
 	case "/monitors":
-		// MONITORS_ROUTE
 		storeName = monitors.GetStoreName(listKind)
-		// MONITORS_ROUTE
 	}
+	// ADD_ROUTE
+
 	if storeName != "" {
 		store.CancelFetch(storeName)
 	}

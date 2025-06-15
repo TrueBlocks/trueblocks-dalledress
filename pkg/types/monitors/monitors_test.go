@@ -354,7 +354,7 @@ func TestMonitorsCollectionLoadDataAsync(t *testing.T) {
 		// Check that we can still call other methods without issues
 		assert.NotPanics(t, func() {
 			collection.NeedsUpdate(MonitorsList)
-			collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
+			_, _ = collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
 		}, "Other methods should work during async loading")
 	})
 
@@ -448,7 +448,7 @@ func TestMonitorsCollectionLoadDataAsync(t *testing.T) {
 		// Collection should still be functional
 		assert.NotPanics(t, func() {
 			collection.NeedsUpdate(MonitorsList)
-			collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
+			_, _ = collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
 		}, "Collection should remain functional after concurrent access")
 	})
 
@@ -532,7 +532,7 @@ func TestMonitorsCollectionLoadDataAsync(t *testing.T) {
 				// After each scenario, basic operations should still work
 				assert.NotPanics(t, func() {
 					collection.NeedsUpdate(MonitorsList)
-					collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
+					_, _ = collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
 				}, "Basic operations should work after %s", scenario.name)
 			})
 		}

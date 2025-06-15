@@ -677,7 +677,7 @@ func TestMonitorsCollectionAdvancedAsync(t *testing.T) {
 		// Verify collection is still functional
 		assert.NotPanics(t, func() {
 			collection.NeedsUpdate(MonitorsList)
-			collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
+			_, _ = collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
 		}, "Collection should remain functional after concurrent access")
 	})
 
@@ -783,7 +783,7 @@ func TestMonitorsCollectionAdvancedAsync(t *testing.T) {
 				// Verify basic functionality after scenario
 				assert.NotPanics(t, func() {
 					collection.NeedsUpdate(MonitorsList)
-					collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
+					_, _ = collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
 				}, "Basic functionality should work after %s", scenario.name)
 			})
 		}
@@ -908,7 +908,7 @@ func TestMonitorsCollectionPerformanceAndEdgeCases(t *testing.T) {
 			collection.NeedsUpdate(MonitorsList)
 			if i%10 == 0 {
 				// Occasionally trigger other operations
-				collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
+				_, _ = collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
 			}
 		}
 

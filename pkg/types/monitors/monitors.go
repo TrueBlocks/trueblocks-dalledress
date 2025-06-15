@@ -154,6 +154,10 @@ func (mc *MonitorsCollection) getExpectedTotal(listKind types.ListKind) int {
 
 // matchesFilter checks if a monitor matches the given filter string
 func (mc *MonitorsCollection) matchesFilter(monitor *coreTypes.Monitor, filter string) bool {
+	if filter == "" {
+		return true
+	}
+
 	filterLower := strings.ToLower(filter)
 
 	// Check address (with and without 0x prefix)

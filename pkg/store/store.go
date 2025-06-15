@@ -270,6 +270,7 @@ func (s *Store[T]) Fetch() error {
 		case err := <-errChan:
 			processingError = err
 			s.ChangeState(fetchGeneration, StateError, err.Error())
+			return processingError
 
 		case <-done:
 			// Don't change state here - let the channel processing handle final state

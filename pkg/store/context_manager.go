@@ -82,3 +82,10 @@ func ctxCount(key string) int {
 	}
 	return 0
 }
+
+func ctxCountTotal() int {
+	cm := GetContextManager()
+	cm.renderCtxsMutex.Lock()
+	defer cm.renderCtxsMutex.Unlock()
+	return len(cm.renderCtxs)
+}

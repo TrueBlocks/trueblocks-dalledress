@@ -11,6 +11,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kbinani/screenshot v0.0.0-20250118074034-a3924b7bbc8c
+	github.com/stretchr/testify v1.10.0
 	github.com/wailsapp/wails/v2 v2.10.1
 	golang.org/x/text v0.24.0
 )
@@ -30,6 +31,7 @@ require (
 	github.com/crackcomm/go-gitignore v0.0.0-20241020182519-7843d2ba8fdf // indirect
 	github.com/crate-crypto/go-ipa v0.0.0-20240724233137-53bbb0ceb27a // indirect
 	github.com/crate-crypto/go-kzg-4844 v1.1.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/deckarep/golang-set/v2 v2.8.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -108,6 +110,7 @@ require (
 	golang.org/x/term v0.31.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.4.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )

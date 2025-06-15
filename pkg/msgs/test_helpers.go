@@ -1,7 +1,5 @@
 package msgs
 
-import "fmt"
-
 type TestHelpers struct{}
 
 func NewTestHelpers() *TestHelpers {
@@ -18,20 +16,32 @@ func (t *TestHelpers) Cleanup() {
 	SetTestMode(false)
 }
 
-func (t *TestHelpers) SimulateLoaded(listKind string, currentCount, expectedTotal int) {
-	payload := map[string]interface{}{
-		"listKind":      listKind,
-		"currentCount":  currentCount,
-		"expectedTotal": expectedTotal,
-	}
-
-	EmitLoaded("test", payload)
+func SetTestMode(enabled bool) {
+	testModeLock.Lock()
+	defer testModeLock.Unlock()
+	testMode = enabled
 }
 
-func (t *TestHelpers) SimulateError(message string) {
-	EmitError(message, fmt.Errorf("test error"))
+func IsTestMode() bool {
+	testModeLock.RLock()
+	defer testModeLock.RUnlock()
+	return testMode
 }
 
-func (t *TestHelpers) SimulateStatus(message string) {
-	EmitStatus(message)
-}
+// func (t *TestHelpers) SimulateLoaded(listKind string, currentCount, expectedTotal int) {
+// 	payload := map[string]interface{}{
+// 		"listKind":      listKind,
+// 		"currentCount":  currentCount,
+// 		"expectedTotal": expectedTotal,
+// 	}
+
+// 	EmitLoaded("test", payload)
+// }
+
+// func (t *TestHelpers) SimulateError(message string) {
+// 	EmitError(message, fmt.Errorf("test error"))
+// }
+
+// func (t *TestHelpers) SimulateStatus(message string) {
+// 	EmitStatus(message)
+// }

@@ -31,8 +31,8 @@ type MappingFunc[T any] func(item *T) (key interface{}, includeInMap bool)
 type Store[T any] struct {
 	data               []*T
 	observers          []FacetObserver[T]
-	queryFunc          func(*output.RenderCtx) error
-	processFunc        func(interface{}) *T
+	queryFunc          func(renderCtx *output.RenderCtx) error
+	processFunc        func(rawItem interface{}) *T
 	mappingFunc        MappingFunc[T]
 	dataMap            *map[interface{}]*T
 	contextKey         string // Key for ContextManager
@@ -95,10 +95,8 @@ func (s *Store[T]) UnregisterObserver(observer FacetObserver[T]) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	// Find and remove the observer
 	for i, obs := range s.observers {
 		if obs == observer {
-			// Remove by swapping with last element and truncating
 			lastIndex := len(s.observers) - 1
 			s.observers[i] = s.observers[lastIndex]
 			s.observers = s.observers[:lastIndex]
@@ -107,16 +105,11 @@ func (s *Store[T]) UnregisterObserver(observer FacetObserver[T]) {
 	}
 }
 
-// ChangeState updates the store state and notifies all observers
-// expectedGeneration is used to ensure state changes for Loaded/Error are not for stale fetches.
-// For other states, or if expectedGeneration is 0, the check is skipped.
 func (s *Store[T]) ChangeState(expectedGeneration uint64, newState StoreState, reason string) {
 	s.mutex.Lock()
 	if expectedGeneration != 0 && (newState == StateLoaded || newState == StateError) {
 		if s.dataGeneration.Load() != expectedGeneration {
 			s.mutex.Unlock()
-			// Do not change state or notify if the generation is stale for these terminal states.
-			// The fetch operation should detect this and return an error or handle it.
 			return
 		}
 	}
@@ -135,43 +128,53 @@ func (s *Store[T]) ChangeState(expectedGeneration uint64, newState StoreState, r
 	}
 }
 
-// GetState returns the current state of the store
 func (s *Store[T]) GetState() StoreState {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	return s.state
 }
 
-// MarkStale marks the store as stale (needs refresh)
-// This is typically called externally, not tied to a specific fetch generation.
 func (s *Store[T]) MarkStale(reason string) {
-	// Pass 0 for expectedGeneration as this is a direct state change not tied to a fetch op generation.
 	s.ChangeState(0, StateStale, reason)
 }
 
-// GetItem returns an item at the specified index
 func (s *Store[T]) GetItem(index int) *T {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-
 	if index < 0 || index >= len(s.data) {
 		return nil
 	}
-
 	return s.data[index]
 }
 
-// GetItems returns all items in the store
-func (s *Store[T]) GetItems() []*T {
+func (s *Store[T]) ExpectedTotalItems() int64 {
+	return s.expectedTotalItems.Load()
+}
+
+func (s *Store[T]) GetContextKey() string {
+	return s.contextKey
+}
+
+func (s *Store[T]) GetItemFromMap(key interface{}) (*T, bool) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 
+	if s.dataMap == nil {
+		return nil, false
+	}
+
+	item, found := (*s.dataMap)[key]
+	return item, found
+}
+
+func (s *Store[T]) GetItems() []*T {
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 	result := make([]*T, len(s.data))
 	copy(result, s.data)
 	return result
 }
 
-// Count returns the number of items in the store
 func (s *Store[T]) Count() int {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
@@ -287,6 +290,16 @@ func (s *Store[T]) AddItem(item *T, index int) {
 	newIndex := len(s.data) - 1
 	itemPtr := s.data[newIndex]
 
+	if s.mappingFunc != nil {
+		if key, include := s.mappingFunc(itemPtr); include {
+			if s.dataMap == nil {
+				tempMap := make(map[interface{}]*T)
+				s.dataMap = &tempMap
+			}
+			(*s.dataMap)[key] = itemPtr
+		}
+	}
+
 	observers := make([]FacetObserver[T], len(s.observers))
 	copy(observers, s.observers)
 	s.mutex.Unlock()
@@ -315,29 +328,5 @@ func (s *Store[T]) Reset() {
 	reason := "Store reset"
 	s.mutex.Unlock()
 
-	s.ChangeState(0, newState, reason) // Pass 0 for expectedGeneration as this is a reset
-}
-
-func (s *Store[T]) ExpectedTotalItems() int64 {
-	return s.expectedTotalItems.Load()
-}
-
-func (s *Store[T]) GetContextKey() string {
-	return s.contextKey
-}
-
-// GetItemFromMap returns an item from the store's map by its key.
-func (s *Store[T]) GetItemFromMap(key interface{}) *T {
-	s.mutex.RLock()
-	defer s.mutex.RUnlock()
-
-	if s.dataMap == nil {
-		return nil
-	}
-
-	item, ok := (*s.dataMap)[key]
-	if !ok {
-		return nil
-	}
-	return item
+	s.ChangeState(0, newState, reason)
 }

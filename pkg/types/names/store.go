@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -33,9 +33,10 @@ func GetNamesStore() *store.Store[coreTypes.Name] {
 				All:       true,
 			}
 			if _, _, err := listOpts.Names(); err != nil {
-				logger.Error(fmt.Sprintf("Shared Names source query error: %v", err))
+				logging.LogBackend(fmt.Sprintf("Shared Names source query error: %v", err))
 				return err
 			}
+			logging.LogBackend(fmt.Sprintf("The query function returned without an error."))
 			return nil
 		}
 
@@ -69,8 +70,8 @@ func GetStoreName(listKind types.ListKind) string {
 	}
 }
 
-func (nc *NamesCollection) NameFromAddress(address base.Address) (*coreTypes.Name, error) {
-	return namesStore.GetItemFromMap(address), nil
+func (nc *NamesCollection) NameFromAddress(address base.Address) (*coreTypes.Name, bool) {
+	return namesStore.GetItemFromMap(address)
 }
 
 // NAMES_ROUTE

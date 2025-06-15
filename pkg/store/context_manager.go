@@ -71,3 +71,14 @@ func CancelFetch(contextKey string) {
 		}
 	}
 }
+
+func ctxCount(key string) int {
+	cm := GetContextManager()
+	cm.renderCtxsMutex.Lock()
+	defer cm.renderCtxsMutex.Unlock()
+
+	if ctx, exists := cm.renderCtxs[key]; exists && ctx != nil {
+		return 1
+	}
+	return 0
+}

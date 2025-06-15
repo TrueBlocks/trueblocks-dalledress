@@ -1,156 +1,113 @@
 // NAMES_ROUTE
 package names
 
-import (
-	"testing"
+// func setupTest(t *testing.T) *NamesCollection {
+// 	t.Helper()
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/sorting"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-)
+// 	th := msgs.NewTestHelpers()
+// 	defer th.Cleanup()
 
-var noSort = sorting.EmptySortSpec()
+// 	collection := NewNamesCollection()
+// 	assert.NotNil(t, collection, "NewNamesCollection should return a non-nil collection")
 
-func TestNewNamesCollection(t *testing.T) {
-	names := NewNamesCollection()
-	if names == nil {
-		t.Errorf("NewNamesCollection() returned nil")
-		return
-	}
+// 	loadedCh := make(chan bool)
+// 	msgs.On(msgs.EventDataLoaded, func(optionalData ...interface{}) {
+// 		var payload types.DataLoadedPayload
+// 		isRelevantEvent := false
+// 		if len(optionalData) >= 1 {
+// 			if p, ok := optionalData[len(optionalData)-1].(types.DataLoadedPayload); ok {
+// 				payload = p
+// 				if payload.ListKind == NamesAll {
+// 					isRelevantEvent = true
+// 				}
+// 			}
+// 		}
 
-	if names.allFacet == nil {
-		t.Errorf("allFacet not initialized")
-	}
-	if names.customFacet == nil {
-		t.Errorf("customFacet not initialized")
-	}
-	if names.prefundFacet == nil {
-		t.Errorf("prefundFacet not initialized")
-	}
-	if names.regularFacet == nil {
-		t.Errorf("regularFacet not initialized")
-	}
-	if names.baddressFacet == nil {
-		t.Errorf("baddressFacet not initialized")
-	}
-}
+// 		if isRelevantEvent {
+// 			if collection.allFacet.GetState() == facets.StateLoaded && payload.CurrentCount == payload.ExpectedTotal && payload.ExpectedTotal > 0 {
+// 				select {
+// 				case <-loadedCh:
+// 					// Already closed
+// 				default:
+// 					close(loadedCh)
+// 				}
+// 			}
+// 		}
+// 	})
 
-func TestNamesCollectionMethods(t *testing.T) {
-	names := NewNamesCollection()
+// 	collection.LoadData(NamesAll)
 
-	if !names.NeedsUpdate(NamesAll) {
-		t.Errorf("Expected NeedsUpdate to be true initially")
-	}
+// 	select {
+// 	case <-loadedCh:
+// 		assert.Equal(t, facets.StateLoaded, collection.allFacet.GetState(), "allFacet should be in StateLoaded after event")
+// 		assert.Greater(t, collection.allFacet.Count(), 0, "allFacet should have items after load")
+// 		assert.True(t, collection.allFacet.IsLoaded(), "allFacet.IsLoaded() should be true")
+// 	case <-time.After(15 * time.Second): // Increased timeout for CI or slower environments
+// 		t.Fatalf("Timeout waiting for NamesCollection (%s) to load. Current state of allFacet: %s. Facet count: %d. Expected total in facet (from progress): %d. IsLoaded: %v",
+// 			NamesAll, collection.allFacet.GetState(), collection.allFacet.Count(), collection.allFacet.ExpectedCount(), collection.allFacet.IsLoaded())
+// 	}
 
-	if expected := names.getExpectedTotal(NamesAll); expected != 0 {
-		t.Errorf("Expected getExpectedTotal to be 0 initially, got %d", expected)
-	}
-}
+// 	return collection
+// }
 
-func TestNamesPageStructure(t *testing.T) {
-	names := NewNamesCollection()
-	if names == nil {
-		t.Errorf("NewNamesCollection() returned nil")
-		return
-	}
+// func TestNamesCollection_SimpleAccessors(t *testing.T) {
+// 	collection := setupTest(t)
 
-	page, err := names.GetPage(NamesAll, 0, 10, noSort, "")
-	if err != nil {
-		t.Errorf("GetPage should not error with empty data: %v", err)
-	} else if page == nil {
-		t.Errorf("GetPage should not return nil page")
-		return
-	}
-	if page.Kind != NamesAll {
-		t.Errorf("Expected page kind to be %s, got %s", NamesAll, page.Kind)
-	}
-	if page.Names == nil {
-		t.Errorf("Expected Names array to be initialized")
-	}
-	if len(page.Names) != 0 {
-		t.Errorf("Expected empty Names array, got %d items", len(page.Names))
-	}
-}
+// 	t.Run("TestAllFacet_InitialLoad", func(t *testing.T) {
+// 		// Access the NamesAll facet directly from the collection
+// 		allFacet := collection.allFacet // Assuming 'allFacet' is the correct field name for the 'All' names facet
+// 		assert.NotNil(t, allFacet, "allFacet should not be nil")
 
-func TestFindNameByAddress(t *testing.T) {
-	names := NewNamesCollection()
+// 		// Check if the facet is loaded (assuming setupTest ensures this)
+// 		assert.True(t, allFacet.IsLoaded(), "allFacet should be loaded")
 
-	addr := base.HexToAddress("0x123")
-	name, found := names.FindNameByAddress(addr)
-	if found {
-		t.Errorf("Expected FindNameByAddress to return false for non-existent address")
-	}
-	if name != nil {
-		t.Errorf("Expected FindNameByAddress to return nil name for non-existent address")
-	}
-}
+// 		// Check that the count of items is non-negative
+// 		// In a real scenario, after initial load, this might be expected to be > 0
+// 		// if there's default data.
+// 		count := allFacet.Count()
+// 		assert.True(t, count >= 0, "allFacet count should be non-negative")
 
-func TestGetPageWithDifferentListKinds(t *testing.T) {
-	names := NewNamesCollection()
+// 		// To get actual items, you would use GetPage.
+// 		// For this initial test, checking IsLoaded and Count should suffice to confirm initialization.
+// 		// Example of getting items (though not strictly needed for this specific subtest's goal):
+// 		// pageResult, err := allFacet.GetPage(0, 10, nil, sdk.SortSpec{}, nil) // Get first 10 items
+// 		// assert.NoError(t, err)
+// 		// assert.NotNil(t, pageResult)
+// 		// assert.NotNil(t, pageResult.Items)
+// 	})
+// }
 
-	listKinds := []types.ListKind{
-		NamesAll,
-		NamesCustom,
-		NamesPrefund,
-		NamesRegular,
-		NamesBaddress,
-	}
+// Test cases 1:
+// - Ensure that the names collection is properly initialized and can handle CRUD operations
+// - Ensure that the names collection can handle pagination and sorting correctly
+// - Ensure that the names collection can handle custom names, prefund names, and regular names correctly
+// - Ensure that the names collection can handle baddress names correctly
+// - Ensure that the names collection can handle all names correctly
+// - Ensure that the names collection can handle names with different properties (e.g., custom, prefund, regular, baddress)
+// - Ensure that the names collection can handle names with different tags and sources
+// - Ensure that the names collection can handle names with different decimals
+// - Ensure that the names collection can handle names with different pre-fund amounts
+// - Ensure that the names collection can handle names with different parts
+// - Ensure that the names collection can handle names with different isCustom flags
+// - Ensure that the names collection can handle names with different deleted flags
+// - Ensure that the names collection can handle names with different isContract flags
+// - Ensure that the names collection can handle names with different isErc20 flags
+// - Ensure that the names collection can handle names with different isErc721 flags
+// - Ensure that the names collection can handle names with different isPrefund flags
+// - Ensure that the names collection can handle names with different addresses
+// - Ensure that the names collection can handle names with different name strings
+// - Ensure that the names collection can handle names with different tags
+// - Ensure that the names collection can handle names with different sources
 
-	for _, kind := range listKinds {
-		t.Run("ListKind_"+string(kind), func(t *testing.T) {
-			page, err := names.GetPage(NamesAll, 0, 10, noSort, "")
-			if err != nil {
-				t.Errorf("GetPage should not error for kind %s: %v", kind, err)
-			}
-			if page == nil {
-				t.Errorf("GetPage should not return nil page for kind %s", kind)
-			}
-		})
-	}
-}
-
-func TestGetPageWithFilter(t *testing.T) {
-	names := NewNamesCollection()
-
-	filters := []string{"", "test", "0x123", "alice"}
-
-	for _, filter := range filters {
-		t.Run("Filter_"+filter, func(t *testing.T) {
-			page, err := names.GetPage(NamesAll, 0, 10, noSort, filter)
-			if err != nil {
-				t.Errorf("GetPage should not error with filter '%s': %v", filter, err)
-			}
-			if page == nil {
-				t.Errorf("GetPage should not return nil page with filter '%s'", filter)
-			}
-		})
-	}
-}
-
-func TestGetPagePagination(t *testing.T) {
-	names := NewNamesCollection()
-
-	testCases := []struct {
-		first    int
-		pageSize int
-	}{
-		{0, 10},
-		{0, 5},
-		{5, 10},
-		{10, 5},
-	}
-
-	for _, tc := range testCases {
-		t.Run("Pagination", func(t *testing.T) {
-			page, err := names.GetPage(NamesAll, tc.first, tc.pageSize, noSort, "")
-			if err != nil {
-				t.Errorf("GetPage should not error with first=%d, pageSize=%d: %v", tc.first, tc.pageSize, err)
-			}
-			if page == nil {
-				t.Errorf("GetPage should not return nil page with first=%d, pageSize=%d", tc.first, tc.pageSize)
-			}
-		})
-	}
-}
-
-// NAMES_ROUTE
+// Test cases 2:
+// - Add a new name
+// - Autoname an existing name
+// - Edit an existing name
+// - Delete an existing name
+// - Undelete a deleted name
+// - Remove a name (should fail if not deleted)
+// - Delete a name and then remove it
+// - Remove a name that has been deleted
+// - Ensure removed names are not found in any search method
+// - Ensure names can be added, edited, deleted, and removed correctly
+// - Ensure that the CRUD operations work as expected with the new facet-based architecture

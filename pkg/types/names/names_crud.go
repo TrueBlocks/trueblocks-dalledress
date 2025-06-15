@@ -2,6 +2,7 @@
 package names
 
 import (
+	"fmt"
 	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
@@ -18,6 +19,10 @@ func (nc *NamesCollection) Crud(
 	op crud.Operation,
 	name *coreTypes.Name,
 ) error {
+	if name == nil || name.Address.IsZero() {
+		return fmt.Errorf("Crud operation requires a valid name with a non-zero address")
+	}
+
 	if !namesLock.CompareAndSwap(0, 1) {
 		return nil
 	}

@@ -14,6 +14,7 @@ const (
 	initialIncrement = 10
 	incrementGrowth  = 10
 	MaxWaitTime      = 125 * time.Millisecond
+	MinTickTime      = 75 * time.Millisecond
 )
 
 // Progress manages the logic for sending progress updates.
@@ -39,8 +40,8 @@ func NewProgress(
 	// Initialize internal state
 	pr.lastUpdate = time.Now()
 	pr.nItemsSinceUpdate = 0
-	pr.nextThreshold = firstPageCount + initialIncrement
 	pr.currentIncrement = initialIncrement
+	pr.nextThreshold = firstPageCount + pr.currentIncrement
 	pr.firstDataSent = false
 	return pr
 }
@@ -48,15 +49,33 @@ func NewProgress(
 func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
 	pr.nItemsSinceUpdate++
 	shouldUpdate := false
+	isFirstPageEvent := false
 
-	if !pr.firstDataSent && currentTotalCount == firstPageCount {
+	now := time.Now()
+
+	if !pr.firstDataSent && currentTotalCount >= firstPageCount {
 		shouldUpdate = true
-		if pr.onFirstDataFunc != nil {
-			go pr.onFirstDataFunc()
+		isFirstPageEvent = true
+	} else if pr.firstDataSent && currentTotalCount >= pr.nextThreshold {
+		shouldUpdate = true
+	}
+
+	sendUpdateThisTick := false
+	if shouldUpdate {
+		if isFirstPageEvent {
+			sendUpdateThisTick = true
+			if pr.onFirstDataFunc != nil {
+				go pr.onFirstDataFunc()
+			}
+			pr.firstDataSent = true
+		} else {
+			if now.Sub(pr.lastUpdate) >= MinTickTime {
+				sendUpdateThisTick = true
+			}
 		}
-		pr.firstDataSent = true
-	} else if currentTotalCount >= pr.nextThreshold && currentTotalCount > firstPageCount {
-		shouldUpdate = true
+	}
+
+	if pr.firstDataSent && !isFirstPageEvent && currentTotalCount >= pr.nextThreshold {
 		pr.currentIncrement += incrementGrowth
 		pr.nextThreshold = currentTotalCount + pr.currentIncrement
 	}
@@ -66,11 +85,16 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedP
 		ExpectedTotal: expectedTotal,
 		ListKind:      pr.listKind,
 	}
-	if shouldUpdate {
+
+	if sendUpdateThisTick {
 		msgs.EmitLoaded("streaming", payload)
 		msgs.EmitStatus(progress(currentTotalCount, pr.listKind, false))
 		pr.nItemsSinceUpdate = 0
-		pr.lastUpdate = time.Now()
+		pr.lastUpdate = now
+		if isFirstPageEvent && currentTotalCount >= pr.nextThreshold {
+			pr.currentIncrement += incrementGrowth
+			pr.nextThreshold = currentTotalCount + pr.currentIncrement
+		}
 	}
 
 	return payload
@@ -83,12 +107,13 @@ func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) types.DataLo
 		ListKind:      pr.listKind,
 	}
 
-	if time.Since(pr.lastUpdate) >= MaxWaitTime && pr.nItemsSinceUpdate > 0 {
+	now := time.Now()
+	if now.Sub(pr.lastUpdate) >= MaxWaitTime && pr.nItemsSinceUpdate > 0 {
 		msgs.EmitLoaded("partial", payload)
 		msgs.EmitStatus(progress(currentTotalCount, pr.listKind, true))
 
 		pr.nItemsSinceUpdate = 0
-		pr.lastUpdate = time.Now()
+		pr.lastUpdate = now
 	}
 
 	return payload
@@ -99,5 +124,5 @@ func progress(cnt int, kind types.ListKind, heartbeat bool) string {
 	if heartbeat {
 		return fmt.Sprintf("Loaded %d %s...", cnt, k)
 	}
-	return fmt.Sprintf("Loaded %d %s", cnt, k)
+	return fmt.Sprintf("Loaded %d %s.", cnt, k)
 }

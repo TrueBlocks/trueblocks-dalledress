@@ -25,10 +25,6 @@ func (a *App) NamesCrud(
 	name *coreTypes.Name,
 	address string,
 ) error {
-	if address != "" && (name == nil || name.Address.IsZero()) {
-		name = &coreTypes.Name{Address: base.HexToAddress(address)}
-	}
-
 	return a.names.Crud(listKind, op, name)
 }
 
@@ -60,7 +56,7 @@ func (a *App) PublishNames(tabName string) error {
 	return nil
 }
 
-func (a *App) NameFromAddress(address string) (*coreTypes.Name, error) {
+func (a *App) NameFromAddress(address string) (*coreTypes.Name, bool) {
 	return a.names.NameFromAddress(base.HexToAddress(address))
 }
 

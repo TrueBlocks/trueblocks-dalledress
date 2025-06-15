@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
@@ -101,24 +100,24 @@ func (nc *NamesCollection) LoadData(listKind types.ListKind) {
 	}
 
 	var facet *facets.Facet[coreTypes.Name]
-	var facetName string
+	var facetName types.ListKind
 
 	switch listKind {
 	case NamesAll:
 		facet = nc.allFacet
-		facetName = "all"
+		facetName = NamesAll
 	case NamesCustom:
 		facet = nc.customFacet
-		facetName = "custom"
+		facetName = NamesCustom
 	case NamesPrefund:
 		facet = nc.prefundFacet
-		facetName = "prefund"
+		facetName = NamesPrefund
 	case NamesRegular:
 		facet = nc.regularFacet
-		facetName = "regular"
+		facetName = NamesRegular
 	case NamesBaddress:
 		facet = nc.baddressFacet
-		facetName = "baddress"
+		facetName = NamesBaddress
 	default:
 		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
 		return
@@ -129,7 +128,7 @@ func (nc *NamesCollection) LoadData(listKind types.ListKind) {
 		if result, err := facet.Load(); err != nil {
 			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
 		} else {
-			msgs.EmitLoaded(facetName, result.Payload)
+			msgs.EmitLoaded(string(facetName), result.Payload)
 		}
 	}()
 }
@@ -265,30 +264,6 @@ func (nc *NamesCollection) matchesFilter(name *coreTypes.Name, filter string) bo
 	}
 
 	return false
-}
-
-func (nc *NamesCollection) FindNameByAddress(addr base.Address) (*coreTypes.Name, bool) {
-	if nc.allFacet != nil {
-		found := false
-		var result *coreTypes.Name
-
-		_, _ = nc.allFacet.ForEvery(
-			func(name *coreTypes.Name) (error, bool) {
-				result = name
-				found = true
-				return nil, true
-			},
-			func(name *coreTypes.Name) bool {
-				return name.Address == addr
-			},
-		)
-
-		if found {
-			return result, true
-		}
-	}
-
-	return nil, false
 }
 
 func GetNamesCount() (int, error) {

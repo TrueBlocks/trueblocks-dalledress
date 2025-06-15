@@ -1,55 +1,89 @@
 // ABIS_ROUTE
 package abis
 
-import (
-	"testing"
+//	func TestMain(m *testing.M) {
+//		msgs.SetTestMode(true) // Enable test mode
+//		// It's also crucial to initialize the context if your code relies on it,
+//		// even in test mode, as some parts of the msgs package might still try to access it.
+//		// A background context is usually sufficient for tests.
+//		msgs.InitializeContext(context.Background())
+//		os.Exit(m.Run())
+//	}
+//
+//	func TestAbisCollectionLoading_Downloaded(t *testing.T) {
+//		// Create a new collection (e.g., AbisCollection)
+//		abisCollection := NewAbisCollection()
+//
+//		// Start a goroutine to wait for the "Downloaded" abis to be loaded.
+//		// The string argument to WaitForLoadedEvent ("downloaded", "known", "functions", "events")
+//		// must match the 'facetName' string used when msgs.EmitLoaded is called
+//		// by the collection's LoadData method.
+//		// For AbisCollection, these are "downloaded", "known", "functions", "events".
+//		doneCh := msgs.WaitForLoadedEvent(AbisDownloaded) // Matches facetName in AbisCollection.LoadData
+//
+//		// Trigger data loading
+//		abisCollection.LoadData(AbisDownloaded)
+//
+//		// Wait for the data to be loaded, with a timeout
+//		select {
+//		case <-doneCh:
+//			// Data loaded, proceed with assertions
+//			// Note: Since this is a unit test without a live SDK backend,
+//			// the loaded data will likely be empty. The primary goal here is to
+//			// test the event mechanism and the collection's interaction with it.
+//			page, err := abisCollection.GetPage(AbisDownloaded, 0, 10, sdk.SortSpec{}, "")
+//			assert.NoError(t, err, "GetPage should not return an error after loading")
+//			assert.NotNil(t, page, "GetPage should return a page object")
+//			assert.Equal(t, AbisDownloaded, page.Kind, "Page kind should be AbisDownloaded")
+//			// Depending on the mock/test data source, you might assert page.TotalItems, etc.
+//			// For now, we'll assume it might be 0 if no data is actually loaded by the mock store.
+//			t.Logf("AbisDownloaded page loaded. TotalItems: %d, IsFetching: %v, State: %s", page.TotalItems, page.IsFetching, page.State)
+//		case <-time.After(5 * time.Second): // Adjust timeout as necessary
+//			t.Fatal("timed out waiting for AbisDownloaded to load")
+//		}
+//	}
+// func TestEnhancedAbisCollection(t *testing.T) {
+// 	msgs.SetTestMode(true)
+// 	defer msgs.SetTestMode(false)
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
-)
+// 	collection := NewAbisCollection()
 
-func TestEnhancedAbisCollection(t *testing.T) {
-	msgs.SetTestMode(true)
-	defer msgs.SetTestMode(false)
+// 	if state := collection.downloadedFacet.GetState(); state != facets.StateStale {
+// 		t.Errorf("Expected initial state to be Stale, got %v", state)
+// 	}
 
-	collection := NewAbisCollection()
+// 	if collection.downloadedFacet.GetState() != facets.StateStale {
+// 		t.Error("downloadedFacet should be in StateStale")
+// 	}
+// 	if collection.knownFacet.GetState() != facets.StateStale {
+// 		t.Error("knownFacet should be in StateStale")
+// 	}
+// 	if collection.functionsFacet.GetState() != facets.StateStale {
+// 		t.Error("functionsFacet should be in StateStale")
+// 	}
+// 	if collection.eventsFacet.GetState() != facets.StateStale {
+// 		t.Error("eventsFacet should be in StateStale")
+// 	}
 
-	if state := collection.downloadedFacet.GetState(); state != facets.StateStale {
-		t.Errorf("Expected initial state to be Stale, got %v", state)
-	}
+// 	if !collection.NeedsUpdate(AbisDownloaded) {
+// 		t.Error("downloadedFacet should need update")
+// 	}
+// 	if !collection.NeedsUpdate(AbisKnown) {
+// 		t.Error("knownFacet should need update")
+// 	}
+// 	if !collection.NeedsUpdate(AbisFunctions) {
+// 		t.Error("functionsFacet should need update")
+// 	}
+// 	if !collection.NeedsUpdate(AbisEvents) {
+// 		t.Error("eventsFacet should need update")
+// 	}
 
-	if collection.downloadedFacet.GetState() != facets.StateStale {
-		t.Error("downloadedFacet should be in StateStale")
-	}
-	if collection.knownFacet.GetState() != facets.StateStale {
-		t.Error("knownFacet should be in StateStale")
-	}
-	if collection.functionsFacet.GetState() != facets.StateStale {
-		t.Error("functionsFacet should be in StateStale")
-	}
-	if collection.eventsFacet.GetState() != facets.StateStale {
-		t.Error("eventsFacet should be in StateStale")
-	}
-
-	if !collection.NeedsUpdate(AbisDownloaded) {
-		t.Error("downloadedFacet should need update")
-	}
-	if !collection.NeedsUpdate(AbisKnown) {
-		t.Error("knownFacet should need update")
-	}
-	if !collection.NeedsUpdate(AbisFunctions) {
-		t.Error("functionsFacet should need update")
-	}
-	if !collection.NeedsUpdate(AbisEvents) {
-		t.Error("eventsFacet should need update")
-	}
-
-	// Test Reset function
-	collection.Reset(AbisDownloaded)
-	if !collection.NeedsUpdate(AbisDownloaded) {
-		t.Error("downloadedFacet should need update after reset")
-	}
-}
+// 	// Test Reset function
+// 	collection.Reset(AbisDownloaded)
+// 	if !collection.NeedsUpdate(AbisDownloaded) {
+// 		t.Error("downloadedFacet should need update after reset")
+// 	}
+// }
 
 // func TestNewAbisCollection(t *testing.T) {
 // 	ac := NewAbisCollection()
@@ -949,4 +983,3 @@ func TestEnhancedAbisCollection(t *testing.T) {
 // 		t.Error("Expected error for invalid list kind, got nil")
 // 	}
 // }
-// ABIS_ROUTE

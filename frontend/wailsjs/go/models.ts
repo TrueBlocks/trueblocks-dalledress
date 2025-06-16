@@ -78,6 +78,69 @@ export namespace base {
 	        this.address = source["address"];
 	    }
 	}
+	export class Hash {
+	    hash: number[];
+	
+	    static createFrom(source: any = {}) {
+	        return new Hash(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hash = source["hash"];
+	    }
+	}
+
+}
+
+export namespace chunks {
+	
+	export class ChunksPage {
+	    kind: types.ListKind;
+	    chunksStats?: types.ChunkStats[];
+	    chunksIndex?: types.ChunkIndex[];
+	    chunksBlooms?: types.ChunkBloom[];
+	    chunksManifest?: types.Manifest[];
+	    totalItems: number;
+	    expectedTotal: number;
+	    isFetching: boolean;
+	    state: types.LoadState;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunksPage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.kind = source["kind"];
+	        this.chunksStats = this.convertValues(source["chunksStats"], types.ChunkStats);
+	        this.chunksIndex = this.convertValues(source["chunksIndex"], types.ChunkIndex);
+	        this.chunksBlooms = this.convertValues(source["chunksBlooms"], types.ChunkBloom);
+	        this.chunksManifest = this.convertValues(source["chunksManifest"], types.Manifest);
+	        this.totalItems = source["totalItems"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isFetching = source["isFetching"];
+	        this.state = source["state"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 
 }
 
@@ -575,6 +638,10 @@ export namespace types {
 	    KNOWN = "Known",
 	    FUNCTIONS = "Functions",
 	    EVENTS = "Events",
+	    STATS = "Stats",
+	    INDEX = "Index",
+	    BLOOMS = "Blooms",
+	    MANIFEST = "Manifest",
 	    MONITORS = "Monitors",
 	    ALL = "All",
 	    CUSTOM = "Custom",
@@ -732,6 +799,204 @@ export namespace types {
 		    return a;
 		}
 	}
+	export class RangeDates {
+	    firstDate?: string;
+	    firstTs?: number;
+	    lastDate?: string;
+	    lastTs?: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new RangeDates(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.firstDate = source["firstDate"];
+	        this.firstTs = source["firstTs"];
+	        this.lastDate = source["lastDate"];
+	        this.lastTs = source["lastTs"];
+	    }
+	}
+	export class ChunkBloom {
+	    byteWidth: number;
+	    hash: base.Hash;
+	    magic: string;
+	    nBlooms: number;
+	    nInserted: number;
+	    range: string;
+	    rangeDates?: RangeDates;
+	    size: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunkBloom(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.byteWidth = source["byteWidth"];
+	        this.hash = this.convertValues(source["hash"], base.Hash);
+	        this.magic = source["magic"];
+	        this.nBlooms = source["nBlooms"];
+	        this.nInserted = source["nInserted"];
+	        this.range = source["range"];
+	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
+	        this.size = source["size"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChunkIndex {
+	    hash: base.Hash;
+	    magic: string;
+	    nAddresses: number;
+	    nAppearances: number;
+	    range: string;
+	    rangeDates?: RangeDates;
+	    size: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunkIndex(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hash = this.convertValues(source["hash"], base.Hash);
+	        this.magic = source["magic"];
+	        this.nAddresses = source["nAddresses"];
+	        this.nAppearances = source["nAppearances"];
+	        this.range = source["range"];
+	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
+	        this.size = source["size"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChunkRecord {
+	    bloomHash: string;
+	    bloomSize: number;
+	    indexHash: string;
+	    indexSize: number;
+	    range: string;
+	    rangeDates?: RangeDates;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunkRecord(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.bloomHash = source["bloomHash"];
+	        this.bloomSize = source["bloomSize"];
+	        this.indexHash = source["indexHash"];
+	        this.indexSize = source["indexSize"];
+	        this.range = source["range"];
+	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChunkStats {
+	    addrsPerBlock: number;
+	    appsPerAddr: number;
+	    appsPerBlock: number;
+	    bloomSz: number;
+	    chunkSz: number;
+	    nAddrs: number;
+	    nApps: number;
+	    nBlocks: number;
+	    nBlooms: number;
+	    range: string;
+	    rangeDates?: RangeDates;
+	    ratio: number;
+	    recWid: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunkStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.addrsPerBlock = source["addrsPerBlock"];
+	        this.appsPerAddr = source["appsPerAddr"];
+	        this.appsPerBlock = source["appsPerBlock"];
+	        this.bloomSz = source["bloomSz"];
+	        this.chunkSz = source["chunkSz"];
+	        this.nAddrs = source["nAddrs"];
+	        this.nApps = source["nApps"];
+	        this.nBlocks = source["nBlocks"];
+	        this.nBlooms = source["nBlooms"];
+	        this.range = source["range"];
+	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
+	        this.ratio = source["ratio"];
+	        this.recWid = source["recWid"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class DataLoadedPayload {
 	    currentCount: number;
 	    expectedTotal: number;
@@ -749,6 +1014,42 @@ export namespace types {
 	    }
 	}
 	
+	export class Manifest {
+	    chain: string;
+	    chunks: ChunkRecord[];
+	    specification: string;
+	    version: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Manifest(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.chain = source["chain"];
+	        this.chunks = this.convertValues(source["chunks"], ChunkRecord);
+	        this.specification = source["specification"];
+	        this.version = source["version"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class MetaData {
 	    client: number;
 	    finalized: number;
@@ -876,6 +1177,7 @@ export namespace types {
 		    return a;
 		}
 	}
+	
 
 }
 

@@ -25,6 +25,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -42,6 +43,7 @@ type App struct {
 	names    *names.NamesCollection
 	abis     *abis.AbisCollection
 	monitors *monitors.MonitorsCollection
+	chunks   *chunks.ChunksCollection
 	// ADD_ROUTE
 	collections []types.Collection
 	meta        *coreTypes.MetaData
@@ -69,12 +71,14 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	app.names = names.NewNamesCollection()
 	app.abis = abis.NewAbisCollection()
 	app.monitors = monitors.NewMonitorsCollection()
+	app.chunks = chunks.NewChunksCollection()
 	// ADD_ROUTE
 
-	app.collections = make([]types.Collection, 0, 3)
+	app.collections = make([]types.Collection, 0, 4)
 	app.RegisterCollection(app.names)
 	app.RegisterCollection(app.abis)
 	app.RegisterCollection(app.monitors)
+	app.RegisterCollection(app.chunks)
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
@@ -392,6 +396,9 @@ func (a *App) Reload(listKind types.ListKind) error {
 	case "/monitors":
 		a.monitors.Reset(listKind)
 		a.monitors.LoadData(listKind)
+	case "/chunks":
+		a.chunks.Reset(listKind)
+		a.chunks.LoadData(listKind)
 	}
 	// ADD_ROUTE
 

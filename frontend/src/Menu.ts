@@ -3,6 +3,7 @@ import { About, DalleDress, History, Home, Khedra, Settings } from '@views';
 import {
   // ADD_ROUTE
   Abis,
+  Chunks,
   Monitors,
   Names,
   // ADD_ROUTE
@@ -94,14 +95,23 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+8',
     type: 'navigation',
   },
+  {
+    label: 'Chunks',
+    path: '/chunks',
+    position: 'top',
+    component: Chunks,
+    hotkey: 'mod+9',
+    altHotkey: 'alt+9',
+    type: 'navigation',
+  },
   // ADD_ROUTE
   {
     label: 'Settings',
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+9',
-    altHotkey: 'alt+9',
+    hotkey: 'mod+0',
+    altHotkey: 'alt+0',
     type: 'navigation',
   },
   {

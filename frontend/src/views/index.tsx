@@ -8,6 +8,7 @@ export * from './settings';
 
 // ADD_ROUTE
 export { Abis } from './abis';
+export { Chunks } from './chunks';
 export { Monitors } from './monitors';
 export { Names } from './names';
 // ADD_ROUTE

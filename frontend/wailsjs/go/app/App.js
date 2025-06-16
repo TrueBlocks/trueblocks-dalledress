@@ -26,6 +26,10 @@ export function CheckRPCStatus() {
   return window['go']['app']['App']['CheckRPCStatus']();
 }
 
+export function ChunksCrud(arg1, arg2, arg3) {
+  return window['go']['app']['App']['ChunksCrud'](arg1, arg2, arg3);
+}
+
 export function CleanNames(arg1) {
   return window['go']['app']['App']['CleanNames'](arg1);
 }
@@ -72,6 +76,10 @@ export function GetAppPreferences() {
 
 export function GetChainList() {
   return window['go']['app']['App']['GetChainList']();
+}
+
+export function GetChunksPage(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['app']['App']['GetChunksPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetContext() {

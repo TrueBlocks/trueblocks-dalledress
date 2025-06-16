@@ -46,6 +46,8 @@ export const useIcons = (
       createElement(iconSet.ABIs, { size, ...props });
     const Monitors: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Monitors, { size, ...props });
+    const Chunks: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Chunks, { size, ...props });
     // ADD_ROUTE
 
     const Switch: FC<IconProps> = (props = {}) =>
@@ -101,6 +103,7 @@ export const useIcons = (
       Names,
       ABIs,
       Monitors,
+      Chunks,
       // ADD_ROUTE
 
       Switch,

@@ -8,6 +8,7 @@ import {sdk} from '../models';
 import {abis} from '../models';
 import {preferences} from '../models';
 import {utils} from '../models';
+import {chunks} from '../models';
 import {context} from '../models';
 import {project} from '../models';
 import {monitors} from '../models';
@@ -25,6 +26,8 @@ export function CancelFetch(arg1:types.ListKind):Promise<void>;
 export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 
 export function CheckRPCStatus():Promise<string>;
+
+export function ChunksCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function CleanNames(arg1:string):Promise<void>;
 
@@ -49,6 +52,8 @@ export function GetAppId():Promise<preferences.Id>;
 export function GetAppPreferences():Promise<preferences.AppPreferences>;
 
 export function GetChainList():Promise<utils.ChainList>;
+
+export function GetChunksPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
 
 export function GetContext():Promise<context.Context>;
 

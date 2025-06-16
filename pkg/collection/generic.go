@@ -205,7 +205,7 @@ func (gc *GenericCollection) LoadData(kind types.ListKind) {
 	gc.mutex.RUnlock()
 
 	if exists {
-		handler.LoadData()
+		_ = handler.LoadData()
 	}
 }
 

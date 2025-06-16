@@ -6,11 +6,17 @@ import {sdk} from '../models';
 import {names} from '../models';
 import {base} from '../models';
 
-export function Crud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Name):Promise<void>;
+export function Crud(arg1:types.ListKind,arg2:crud.Operation,arg3:any):Promise<void>;
+
+export function GetCollectionName():Promise<string>;
 
 export function GetNamesPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
 export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
+
+export function GetStoreForKind(arg1:types.ListKind):Promise<string>;
+
+export function GetSupportedKinds():Promise<Array<types.ListKind>>;
 
 export function LoadData(arg1:types.ListKind):Promise<void>;
 

@@ -226,3 +226,20 @@ func (mc *MonitorsCollection) GetMonitorsPage(
 
 	return monitorsPage, nil
 }
+
+func (mc *MonitorsCollection) GetSupportedKinds() []types.ListKind {
+	return []types.ListKind{MonitorsList}
+}
+
+func (mc *MonitorsCollection) GetStoreForKind(kind types.ListKind) string {
+	switch kind {
+	case MonitorsList:
+		return "monitors"
+	default:
+		return ""
+	}
+}
+
+func (mc *MonitorsCollection) GetCollectionName() string {
+	return "monitors"
+}

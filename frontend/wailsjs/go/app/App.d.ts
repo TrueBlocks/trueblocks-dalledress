@@ -96,7 +96,11 @@ export function NamesCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Nam
 
 export function PublishNames(arg1:string):Promise<void>;
 
+export function RegisterCollection(arg1:types.Collection):Promise<void>;
+
 export function Reload(arg1:types.ListKind):Promise<void>;
+
+export function ResetStore(arg1:string):Promise<void>;
 
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 

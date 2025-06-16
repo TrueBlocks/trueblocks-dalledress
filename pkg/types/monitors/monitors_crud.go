@@ -13,10 +13,20 @@ import (
 )
 
 func (c *MonitorsCollection) Crud(
-	listKind types.ListKind,
+	kind types.ListKind,
 	op crud.Operation,
-	monitor *coreTypes.Monitor,
+	item interface{},
 ) error {
+	if kind != MonitorsList {
+		return fmt.Errorf("unsupported list kind: %s", kind)
+	}
+
+	// Type assertion to convert interface{} to the expected type
+	monitor, ok := item.(*coreTypes.Monitor)
+	if !ok {
+		return fmt.Errorf("invalid type for monitor operation: expected *coreTypes.Monitor, got %T", item)
+	}
+
 	chainName := preferences.GetChain()
 
 	switch op {

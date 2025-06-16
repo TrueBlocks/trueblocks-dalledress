@@ -16,8 +16,14 @@ var namesLock atomic.Int32
 func (nc *NamesCollection) Crud(
 	listKind types.ListKind,
 	op crud.Operation,
-	name *coreTypes.Name,
+	item interface{},
 ) error {
+	// Type assertion to convert interface{} to the expected type
+	name, ok := item.(*coreTypes.Name)
+	if !ok {
+		return fmt.Errorf("invalid type for name operation: expected *coreTypes.Name, got %T", item)
+	}
+
 	if name == nil || name.Address.IsZero() {
 		return fmt.Errorf("Crud operation requires a valid name with a non-zero address")
 	}

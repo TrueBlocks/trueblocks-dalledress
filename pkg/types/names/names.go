@@ -315,3 +315,26 @@ func (nc *NamesCollection) GetNamesPage(
 
 	return namesPage, nil
 }
+
+func (nc *NamesCollection) GetSupportedKinds() []types.ListKind {
+	return []types.ListKind{
+		NamesAll,
+		NamesCustom,
+		NamesPrefund,
+		NamesRegular,
+		NamesBaddress,
+	}
+}
+
+func (nc *NamesCollection) GetStoreForKind(kind types.ListKind) string {
+	switch kind {
+	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
+		return "names"
+	default:
+		return ""
+	}
+}
+
+func (nc *NamesCollection) GetCollectionName() string {
+	return "names"
+}

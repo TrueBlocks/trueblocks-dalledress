@@ -5,11 +5,17 @@ import {crud} from '../models';
 import {sdk} from '../models';
 import {abis} from '../models';
 
-export function Crud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Abi):Promise<void>;
+export function Crud(arg1:types.ListKind,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function GetAbisPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
+export function GetCollectionName():Promise<string>;
+
 export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
+
+export function GetStoreForKind(arg1:types.ListKind):Promise<string>;
+
+export function GetSupportedKinds():Promise<Array<types.ListKind>>;
 
 export function LoadData(arg1:types.ListKind):Promise<void>;
 

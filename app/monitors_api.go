@@ -16,7 +16,7 @@ func (a *App) GetMonitorsPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*monitors.MonitorsPage, error) {
-	return a.monitors.GetMonitorsPage(kind, first, pageSize, sort, filter)
+	return getCollectionPage[*monitors.MonitorsPage](a.monitors, kind, first, pageSize, sort, filter)
 }
 
 func (a *App) MonitorsCrud(

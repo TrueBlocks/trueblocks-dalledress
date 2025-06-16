@@ -10,8 +10,20 @@ export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetAbisPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function GetCollectionName() {
+  return window['go']['abis']['AbisCollection']['GetCollectionName']();
+}
+
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function GetStoreForKind(arg1) {
+  return window['go']['abis']['AbisCollection']['GetStoreForKind'](arg1);
+}
+
+export function GetSupportedKinds() {
+  return window['go']['abis']['AbisCollection']['GetSupportedKinds']();
 }
 
 export function LoadData(arg1) {

@@ -6,12 +6,24 @@ export function Crud(arg1, arg2, arg3) {
   return window['go']['names']['NamesCollection']['Crud'](arg1, arg2, arg3);
 }
 
+export function GetCollectionName() {
+  return window['go']['names']['NamesCollection']['GetCollectionName']();
+}
+
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['names']['NamesCollection']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['names']['NamesCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function GetStoreForKind(arg1) {
+  return window['go']['names']['NamesCollection']['GetStoreForKind'](arg1);
+}
+
+export function GetSupportedKinds() {
+  return window['go']['names']['NamesCollection']['GetSupportedKinds']();
 }
 
 export function LoadData(arg1) {

@@ -166,8 +166,16 @@ export function PublishNames(arg1) {
   return window['go']['app']['App']['PublishNames'](arg1);
 }
 
+export function RegisterCollection(arg1) {
+  return window['go']['app']['App']['RegisterCollection'](arg1);
+}
+
 export function Reload(arg1) {
   return window['go']['app']['App']['Reload'](arg1);
+}
+
+export function ResetStore(arg1) {
+  return window['go']['app']['App']['ResetStore'](arg1);
 }
 
 export function SaveBounds(arg1, arg2, arg3, arg4) {

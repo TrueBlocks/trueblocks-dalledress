@@ -43,13 +43,14 @@ type App struct {
 	abis     *abis.AbisCollection
 	monitors *monitors.MonitorsCollection
 	// ADD_ROUTE
-	meta       *coreTypes.MetaData
-	fileServer *fileserver.FileServer
-	locked     int32
-	ctx        context.Context
-	apiKeys    map[string]string
-	ensMap     map[string]base.Address
-	Dalle      *dalle.Context
+	collections []types.Collection
+	meta        *coreTypes.MetaData
+	fileServer  *fileserver.FileServer
+	locked      int32
+	ctx         context.Context
+	apiKeys     map[string]string
+	ensMap      map[string]base.Address
+	Dalle       *dalle.Context
 }
 
 func NewApp(assets embed.FS) (*App, *menu.Menu) {
@@ -69,6 +70,11 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	app.abis = abis.NewAbisCollection()
 	app.monitors = monitors.NewMonitorsCollection()
 	// ADD_ROUTE
+
+	app.collections = make([]types.Collection, 0, 3)
+	app.RegisterCollection(app.names)
+	app.RegisterCollection(app.abis)
+	app.RegisterCollection(app.monitors)
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
@@ -393,20 +399,19 @@ func (a *App) Reload(listKind types.ListKind) error {
 }
 
 func (a *App) CancelFetch(listKind types.ListKind) {
-	lastView := a.GetAppPreferences().LastView
-
 	storeName := ""
 
-	// ADD_ROUTE
-	switch lastView {
-	case "/names":
-		storeName = names.GetStoreName(listKind)
-	case "/abis":
-		storeName = abis.GetStoreName(listKind)
-	case "/monitors":
-		storeName = monitors.GetStoreName(listKind)
+	for _, collection := range a.collections {
+		for _, kind := range collection.GetSupportedKinds() {
+			if kind == listKind {
+				storeName = collection.GetStoreForKind(kind)
+				break
+			}
+		}
+		if storeName != "" {
+			break
+		}
 	}
-	// ADD_ROUTE
 
 	if storeName != "" {
 		store.CancelFetch(storeName)
@@ -422,4 +427,42 @@ func (a *App) GetNodeStatus() *coreTypes.MetaData {
 	a.meta, _ = sdk.GetMetaData(chainName)
 
 	return a.meta
+}
+
+func (a *App) RegisterCollection(collection types.Collection) {
+	a.collections = append(a.collections, collection)
+}
+
+func getCollectionPage[T any](
+	collection interface {
+		GetPage(types.ListKind, int, int, sdk.SortSpec, string) (types.Page, error)
+	},
+	kind types.ListKind,
+	first, pageSize int,
+	sort sdk.SortSpec,
+	filter string,
+) (T, error) {
+	var zero T
+
+	page, err := collection.GetPage(kind, first, pageSize, sort, filter)
+	if err != nil {
+		return zero, err
+	}
+
+	typedPage, ok := page.(T)
+	if !ok {
+		return zero, fmt.Errorf("internal error: GetPage returned unexpected type %T, expected %T", page, zero)
+	}
+
+	return typedPage, nil
+}
+
+func (a *App) ResetStore(storeName string) {
+	for _, collection := range a.collections {
+		for _, kind := range collection.GetSupportedKinds() {
+			if collection.GetStoreForKind(kind) == storeName {
+				collection.Reset(kind)
+			}
+		}
+	}
 }

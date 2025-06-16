@@ -10,12 +10,24 @@ export function Crud(arg1, arg2, arg3) {
   return window['go']['monitors']['MonitorsCollection']['Crud'](arg1, arg2, arg3);
 }
 
+export function GetCollectionName() {
+  return window['go']['monitors']['MonitorsCollection']['GetCollectionName']();
+}
+
 export function GetMonitorsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['monitors']['MonitorsCollection']['GetMonitorsPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['monitors']['MonitorsCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function GetStoreForKind(arg1) {
+  return window['go']['monitors']['MonitorsCollection']['GetStoreForKind'](arg1);
+}
+
+export function GetSupportedKinds() {
+  return window['go']['monitors']['MonitorsCollection']['GetSupportedKinds']();
 }
 
 export function LoadData(arg1) {

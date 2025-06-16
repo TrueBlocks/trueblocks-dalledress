@@ -14,8 +14,13 @@ import (
 func (ac *AbisCollection) Crud(
 	listKind types.ListKind,
 	op crud.Operation,
-	abi *coreTypes.Abi,
+	item interface{},
 ) error {
+	// Type assertion to convert interface{} to the expected type
+	abi, ok := item.(*coreTypes.Abi)
+	if !ok {
+		return fmt.Errorf("invalid type for abi operation: expected *coreTypes.Abi, got %T", item)
+	}
 	switch op {
 	case crud.Remove:
 		opts := sdk.AbisOptions{

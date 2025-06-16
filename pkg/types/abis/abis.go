@@ -297,3 +297,27 @@ func (ac *AbisCollection) GetAbisPage(
 
 	return abisPage, nil
 }
+
+func (ac *AbisCollection) GetSupportedKinds() []types.ListKind {
+	return []types.ListKind{
+		AbisDownloaded,
+		AbisKnown,
+		AbisFunctions,
+		AbisEvents,
+	}
+}
+
+func (ac *AbisCollection) GetStoreForKind(kind types.ListKind) string {
+	switch kind {
+	case AbisDownloaded, AbisKnown:
+		return "abis-list"
+	case AbisFunctions, AbisEvents:
+		return "abis-detail"
+	default:
+		return ""
+	}
+}
+
+func (ac *AbisCollection) GetCollectionName() string {
+	return "abis"
+}

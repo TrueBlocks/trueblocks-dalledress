@@ -7,7 +7,7 @@ export namespace abis {
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
-	    state: facets.LoadState;
+	    state: types.LoadState;
 	
 	    static createFrom(source: any = {}) {
 	        return new AbisPage(source);
@@ -90,19 +90,6 @@ export namespace crud {
 	    UNDELETE = "undelete",
 	    REMOVE = "remove",
 	    AUTONAME = "autoname",
-	}
-
-}
-
-export namespace facets {
-	
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
 	}
 
 }
@@ -244,7 +231,7 @@ export namespace monitors {
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
-	    state: facets.LoadState;
+	    state: types.LoadState;
 	
 	    static createFrom(source: any = {}) {
 	        return new MonitorsPage(source);
@@ -302,7 +289,7 @@ export namespace names {
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
-	    state: facets.LoadState;
+	    state: types.LoadState;
 	
 	    static createFrom(source: any = {}) {
 	        return new NamesPage(source);
@@ -594,6 +581,14 @@ export namespace types {
 	    PREFUND = "Prefund",
 	    REGULAR = "Regular",
 	    BADDRESS = "Baddress",
+	}
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];

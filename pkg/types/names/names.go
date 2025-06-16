@@ -35,7 +35,27 @@ type NamesPage struct {
 	TotalItems    int               `json:"totalItems"`
 	ExpectedTotal int               `json:"expectedTotal"`
 	IsFetching    bool              `json:"isFetching"`
-	State         facets.LoadState  `json:"state"`
+	State         types.LoadState   `json:"state"`
+}
+
+func (np *NamesPage) GetKind() types.ListKind {
+	return np.Kind
+}
+
+func (np *NamesPage) GetTotalItems() int {
+	return np.TotalItems
+}
+
+func (np *NamesPage) GetExpectedTotal() int {
+	return np.ExpectedTotal
+}
+
+func (np *NamesPage) GetIsFetching() bool {
+	return np.IsFetching
+}
+
+func (np *NamesPage) GetState() types.LoadState {
+	return np.State
 }
 
 type NamesCollection struct {
@@ -174,7 +194,7 @@ func (nc *NamesCollection) GetPage(
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
-) (*NamesPage, error) {
+) (types.Page, error) {
 	var facet *facets.Facet[coreTypes.Name]
 
 	switch listKind {
@@ -275,4 +295,23 @@ func GetNamesCount() (int, error) {
 		return int(countResult[0].Count), nil
 	}
 	return 0, nil
+}
+
+func (nc *NamesCollection) GetNamesPage(
+	listKind types.ListKind,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (*NamesPage, error) {
+	page, err := nc.GetPage(listKind, first, pageSize, sortSpec, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	namesPage, ok := page.(*NamesPage)
+	if !ok {
+		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
+	}
+
+	return namesPage, nil
 }

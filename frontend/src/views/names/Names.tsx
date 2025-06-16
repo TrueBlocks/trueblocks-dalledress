@@ -13,7 +13,7 @@ import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useActionMsgs, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { crud, facets, msgs, names, types } from '@models';
+import { crud, msgs, names, types } from '@models';
 import { getAddressString, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
@@ -37,7 +37,7 @@ function removeUndefinedProps(
 export const Names = () => {
   const { lastTab } = useAppContext();
   const [pageData, setPageData] = useState<names.NamesPage | null>(null);
-  const [state, setState] = useState<facets.LoadState>();
+  const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
@@ -138,7 +138,7 @@ export const Names = () => {
           }
           return name;
         });
-        setState(facets.LoadState.PENDING);
+        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new names.NamesPage({
@@ -166,7 +166,7 @@ export const Names = () => {
             emitSuccess('delete', address);
           })
           .catch((err) => {
-            setState(facets.LoadState.ERROR);
+            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new names.NamesPage({
@@ -206,7 +206,7 @@ export const Names = () => {
           }
           return name;
         });
-        setState(facets.LoadState.PENDING);
+        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new names.NamesPage({
@@ -234,7 +234,7 @@ export const Names = () => {
             emitSuccess('undelete', address);
           })
           .catch((err) => {
-            setState(facets.LoadState.ERROR);
+            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new names.NamesPage({
@@ -271,7 +271,7 @@ export const Names = () => {
           const nameAddress = getAddressString(name.address);
           return nameAddress !== address;
         });
-        setState(facets.LoadState.PENDING);
+        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new names.NamesPage({
@@ -299,7 +299,7 @@ export const Names = () => {
             emitSuccess('remove', address);
           })
           .catch((err) => {
-            setState(facets.LoadState.ERROR);
+            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new names.NamesPage({
@@ -339,7 +339,7 @@ export const Names = () => {
           }
           return name;
         });
-        setState(facets.LoadState.PENDING);
+        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new names.NamesPage({
@@ -367,7 +367,7 @@ export const Names = () => {
             emitSuccess('autoname', address);
           })
           .catch((err) => {
-            setState(facets.LoadState.ERROR);
+            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new names.NamesPage({

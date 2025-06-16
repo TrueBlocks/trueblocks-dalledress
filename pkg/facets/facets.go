@@ -15,29 +15,6 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-type LoadState string
-
-const (
-	StateStale    LoadState = "stale"
-	StateFetching LoadState = "fetching"
-	StatePartial  LoadState = "partial"
-	StateLoaded   LoadState = "loaded"
-	StatePending  LoadState = "pending"
-	StateError    LoadState = "error"
-)
-
-var AllStates = []struct {
-	Value  LoadState `json:"value"`
-	TSName string    `json:"tsname"`
-}{
-	{StateStale, "STALE"},
-	{StateFetching, "FETCHING"},
-	{StatePartial, "PARTIAL"},
-	{StateLoaded, "LOADED"},
-	{StatePending, "PENDING"},
-	{StateError, "ERROR"},
-}
-
 type FilterFunc[T any] func(item *T) bool
 
 type StreamingResult struct {
@@ -48,7 +25,7 @@ type StreamingResult struct {
 type PageResult[T any] struct {
 	Items      []T
 	TotalItems int
-	State      LoadState
+	State      types.LoadState
 }
 
 type Facet[T any] struct {
@@ -79,44 +56,44 @@ func NewFacet[T any](
 		isDupFunc:   isDupFunc,
 		progress:    progress.NewProgress(listKind, nil),
 	}
-	facet.state.Store(StateStale)
+	facet.state.Store(types.StateStale)
 	store.RegisterObserver(facet)
 
 	return facet
 }
 
 func (r *Facet[T]) IsLoaded() bool {
-	return r.GetState() == StateLoaded
+	return r.GetState() == types.StateLoaded
 }
 
 func (r *Facet[T]) IsFetching() bool {
-	return r.GetState() == StateFetching
+	return r.GetState() == types.StateFetching
 }
 
-func (r *Facet[T]) GetState() LoadState {
+func (r *Facet[T]) GetState() types.LoadState {
 	if state := r.state.Load(); state != nil {
-		return state.(LoadState)
+		return state.(types.LoadState)
 	}
-	return StateStale
+	return types.StateStale
 }
 
 func (r *Facet[T]) NeedsUpdate() bool {
 	state := r.GetState()
-	return state == StateStale
+	return state == types.StateStale
 }
 
 func (r *Facet[T]) StartFetching() bool {
 	currentState := r.GetState()
-	if currentState == StateFetching {
+	if currentState == types.StateFetching {
 		return false
 	}
-	r.state.Store(StateFetching)
+	r.state.Store(types.StateFetching)
 	return true
 }
 
 func (r *Facet[T]) SetPartial() {
-	if r.GetState() == StateFetching {
-		r.state.Store(StatePartial)
+	if r.GetState() == types.StateFetching {
+		r.state.Store(types.StatePartial)
 	}
 }
 
@@ -124,7 +101,7 @@ func (r *Facet[T]) Reset() {
 	r.mutex.Lock()
 	r.view = r.view[:0]
 	r.expectedCnt = 0
-	r.state.Store(StateStale)
+	r.state.Store(types.StateStale)
 	storeToReset := r.store
 	r.mutex.Unlock()
 
@@ -148,11 +125,11 @@ var ErrAlreadyLoading = errors.New("already loading")
 func (r *Facet[T]) Load() (*StreamingResult, error) {
 	currentState := r.GetState()
 
-	if currentState == StateFetching {
+	if currentState == types.StateFetching {
 		return nil, ErrAlreadyLoading
 	}
 
-	if currentState != StateStale {
+	if currentState != types.StateStale {
 		cachedPayload := r.getCachedResult()
 		msgs.EmitStatus(fmt.Sprintf("cached: %d items", len(r.view)))
 		return cachedPayload, nil
@@ -333,7 +310,7 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 	// Map store states to facet states
 	switch state {
 	case store.StateStale:
-		r.state.Store(StateStale)
+		r.state.Store(types.StateStale)
 		r.expectedCnt = 0
 		r.mutex.Lock()
 		r.view = r.view[:0]
@@ -341,7 +318,7 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 		msgs.EmitStatus(fmt.Sprintf("data outdated: %s", reason))
 
 	case store.StateFetching:
-		r.state.Store(StateFetching)
+		r.state.Store(types.StateFetching)
 		r.expectedCnt = 0
 		r.mutex.Lock()
 		r.view = r.view[:0]
@@ -349,7 +326,7 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 
 	case store.StateLoaded:
 		r.SyncWithStore()
-		r.state.Store(StateLoaded)
+		r.state.Store(types.StateLoaded)
 		r.mutex.RLock()
 		currentCount := len(r.view)
 		r.expectedCnt = r.store.GetExpectedTotal()
@@ -362,15 +339,15 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 		currentCount := len(r.view)
 		r.mutex.RUnlock()
 		if hasData {
-			r.state.Store(StatePartial)
+			r.state.Store(types.StatePartial)
 			msgs.EmitStatus(fmt.Sprintf("partial load: %d items (error: %s)", currentCount, reason))
 		} else {
-			r.state.Store(StateError)
+			r.state.Store(types.StateError)
 			msgs.EmitError(fmt.Sprintf("load failed: %s", reason), errors.New(reason))
 		}
 
 	case store.StateCanceled:
-		r.state.Store(StateStale)
+		r.state.Store(types.StateStale)
 		msgs.EmitStatus("loading canceled")
 	}
 }

@@ -9,7 +9,9 @@ export function Clean(arg1:Array<string>):Promise<void>;
 
 export function Crud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Monitor):Promise<void>;
 
-export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
+export function GetMonitorsPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
+
+export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
 
 export function LoadData(arg1:types.ListKind):Promise<void>;
 

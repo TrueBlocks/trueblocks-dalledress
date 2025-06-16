@@ -33,7 +33,27 @@ type AbisPage struct {
 	TotalItems    int                  `json:"totalItems"`
 	ExpectedTotal int                  `json:"expectedTotal"`
 	IsFetching    bool                 `json:"isFetching"`
-	State         facets.LoadState     `json:"state"`
+	State         types.LoadState      `json:"state"`
+}
+
+func (ap *AbisPage) GetKind() types.ListKind {
+	return ap.Kind
+}
+
+func (ap *AbisPage) GetTotalItems() int {
+	return ap.TotalItems
+}
+
+func (ap *AbisPage) GetExpectedTotal() int {
+	return ap.ExpectedTotal
+}
+
+func (ap *AbisPage) GetIsFetching() bool {
+	return ap.IsFetching
+}
+
+func (ap *AbisPage) GetState() types.LoadState {
+	return ap.State
 }
 
 type AbisCollection struct {
@@ -199,7 +219,7 @@ func (ac *AbisCollection) GetPage(
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
-) (*AbisPage, error) {
+) (types.Page, error) {
 	page := &AbisPage{
 		Kind: listKind,
 	}
@@ -229,7 +249,7 @@ func (ac *AbisCollection) GetPage(
 			return sdk.SortAbis(items, sort)
 		}
 		if result, err := listFacet.GetPage(first, pageSize, listFilterFunc, sortSpec, listSortFunc); err != nil {
-			page.Abis, page.TotalItems, page.State = nil, 0, facets.StateError
+			page.Abis, page.TotalItems, page.State = nil, 0, types.StateError
 		} else {
 			page.Abis, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
@@ -245,7 +265,7 @@ func (ac *AbisCollection) GetPage(
 			return sdk.SortFunctions(items, sort)
 		}
 		if result, err := detailFacet.GetPage(first, pageSize, detailFilter, sortSpec, detailSortFunc); err != nil {
-			page.Functions, page.TotalItems, page.State = nil, 0, facets.StateError
+			page.Functions, page.TotalItems, page.State = nil, 0, types.StateError
 		} else {
 			page.Functions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
@@ -257,4 +277,23 @@ func (ac *AbisCollection) GetPage(
 	}
 
 	return page, nil
+}
+
+func (ac *AbisCollection) GetAbisPage(
+	listKind types.ListKind,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (*AbisPage, error) {
+	page, err := ac.GetPage(listKind, first, pageSize, sortSpec, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	abisPage, ok := page.(*AbisPage)
+	if !ok {
+		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
+	}
+
+	return abisPage, nil
 }

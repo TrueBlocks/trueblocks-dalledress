@@ -6,7 +6,7 @@ import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useActionMsgs, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { crud, facets, monitors, msgs, types } from '@models';
+import { crud, monitors, msgs, types } from '@models';
 import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
@@ -17,7 +17,7 @@ export const Monitors = () => {
   const { emitSuccess, emitCleaningStatus, failure } =
     useActionMsgs('monitors');
   const [pageData, setPageData] = useState<monitors.MonitorsPage | null>(null);
-  const [state, setState] = useState<facets.LoadState>();
+  const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
@@ -127,7 +127,7 @@ export const Monitors = () => {
           }
           return monitor;
         });
-        setState(facets.LoadState.PENDING);
+        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new monitors.MonitorsPage({
@@ -155,7 +155,7 @@ export const Monitors = () => {
             emitSuccess('delete', address);
           })
           .catch((err) => {
-            setState(facets.LoadState.ERROR);
+            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new monitors.MonitorsPage({
@@ -195,7 +195,7 @@ export const Monitors = () => {
           }
           return monitor;
         });
-        setState(facets.LoadState.PENDING);
+        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new monitors.MonitorsPage({
@@ -223,7 +223,7 @@ export const Monitors = () => {
             emitSuccess('undelete', address);
           })
           .catch((err) => {
-            setState(facets.LoadState.ERROR);
+            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new monitors.MonitorsPage({
@@ -260,7 +260,7 @@ export const Monitors = () => {
           const monitorAddress = getAddressString(monitor.address);
           return monitorAddress !== address;
         });
-        setState(facets.LoadState.PENDING);
+        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new monitors.MonitorsPage({
@@ -288,7 +288,7 @@ export const Monitors = () => {
             emitSuccess('remove', address);
           })
           .catch((err) => {
-            setState(facets.LoadState.ERROR);
+            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new monitors.MonitorsPage({

@@ -26,7 +26,27 @@ type MonitorsPage struct {
 	TotalItems    int                 `json:"totalItems"`
 	ExpectedTotal int                 `json:"expectedTotal"`
 	IsFetching    bool                `json:"isFetching"`
-	State         facets.LoadState    `json:"state"`
+	State         types.LoadState     `json:"state"`
+}
+
+func (mp *MonitorsPage) GetKind() types.ListKind {
+	return mp.Kind
+}
+
+func (mp *MonitorsPage) GetTotalItems() int {
+	return mp.TotalItems
+}
+
+func (mp *MonitorsPage) GetExpectedTotal() int {
+	return mp.ExpectedTotal
+}
+
+func (mp *MonitorsPage) GetIsFetching() bool {
+	return mp.IsFetching
+}
+
+func (mp *MonitorsPage) GetState() types.LoadState {
+	return mp.State
 }
 
 type MonitorsCollection struct {
@@ -79,7 +99,7 @@ func (mc *MonitorsCollection) GetPage(
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
-) (*MonitorsPage, error) {
+) (types.Page, error) {
 	switch listKind {
 	case MonitorsList:
 		var filterFunc func(*coreTypes.Monitor) bool
@@ -186,4 +206,23 @@ func (mc *MonitorsCollection) matchesFilter(monitor *coreTypes.Monitor, filter s
 	}
 
 	return false
+}
+
+func (mc *MonitorsCollection) GetMonitorsPage(
+	listKind types.ListKind,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (*MonitorsPage, error) {
+	page, err := mc.GetPage(listKind, first, pageSize, sortSpec, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	monitorsPage, ok := page.(*MonitorsPage)
+	if !ok {
+		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
+	}
+
+	return monitorsPage, nil
 }

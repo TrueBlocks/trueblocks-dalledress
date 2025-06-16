@@ -6,9 +6,22 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/stretchr/testify/assert"
 )
+
+func assertAbisPage(t *testing.T, page types.Page) *AbisPage {
+	t.Helper()
+	if page == nil {
+		t.Fatal("page is nil")
+	}
+	abisPage, ok := page.(*AbisPage)
+	if !ok {
+		t.Fatalf("expected *AbisPage, got %T", page)
+	}
+	return abisPage
+}
 
 func TestNewAbisCollection(t *testing.T) {
 	assert.NotPanics(t, func() {
@@ -181,10 +194,11 @@ func TestAbisCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(AbisDownloaded, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, AbisDownloaded, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Abis), 10, "Returned items should not exceed page size")
+			abisPage := assertAbisPage(t, page)
+			assert.Equal(t, AbisDownloaded, abisPage.Kind)
+			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, abisPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(abisPage.Abis), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -192,10 +206,11 @@ func TestAbisCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(AbisKnown, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, AbisKnown, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Abis), 10, "Returned items should not exceed page size")
+			abisPage := assertAbisPage(t, page)
+			assert.Equal(t, AbisKnown, abisPage.Kind)
+			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, abisPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(abisPage.Abis), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -203,10 +218,11 @@ func TestAbisCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(AbisFunctions, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, AbisFunctions, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Functions), 10, "Returned items should not exceed page size")
+			abisPage := assertAbisPage(t, page)
+			assert.Equal(t, AbisFunctions, abisPage.Kind)
+			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, abisPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(abisPage.Functions), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -214,10 +230,11 @@ func TestAbisCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(AbisEvents, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, AbisEvents, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Functions), 10, "Returned items should not exceed page size")
+			abisPage := assertAbisPage(t, page)
+			assert.Equal(t, AbisEvents, abisPage.Kind)
+			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, abisPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(abisPage.Functions), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -225,8 +242,9 @@ func TestAbisCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(AbisDownloaded, 0, 10, sdk.SortSpec{}, "test")
 
 		if err == nil && page != nil {
-			assert.Equal(t, AbisDownloaded, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
+			abisPage := assertAbisPage(t, page)
+			assert.Equal(t, AbisDownloaded, abisPage.Kind)
+			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
 		}
 	})
 
@@ -239,8 +257,9 @@ func TestAbisCollectionGetPage(t *testing.T) {
 	t.Run("ZeroPageSize", func(t *testing.T) {
 		page, err := collection.GetPage(AbisDownloaded, 0, 0, sdk.SortSpec{}, "")
 		if err == nil && page != nil {
-			assert.Equal(t, AbisDownloaded, page.Kind)
-			assert.Len(t, page.Abis, 0, "Zero page size should return no items")
+			abisPage := assertAbisPage(t, page)
+			assert.Equal(t, AbisDownloaded, abisPage.Kind)
+			assert.Len(t, abisPage.Abis, 0, "Zero page size should return no items")
 		}
 	})
 }

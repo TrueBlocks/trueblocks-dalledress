@@ -6,7 +6,7 @@ import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
 import { useActionMsgs, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { abis, crud, facets, msgs, types } from '@models';
+import { abis, crud, msgs, types } from '@models';
 import { getAddressString, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
@@ -16,7 +16,7 @@ export const Abis = () => {
   const { lastTab } = useAppContext();
   const { emitSuccess } = useActionMsgs('abis');
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
-  const [state, setState] = useState<facets.LoadState>();
+  const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
@@ -192,7 +192,7 @@ export const Abis = () => {
           })
           .catch((err) => {
             // Revert optimistic update on error
-            setState(facets.LoadState.ERROR);
+            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new abis.AbisPage({

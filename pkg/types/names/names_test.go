@@ -5,9 +5,22 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/stretchr/testify/assert"
 )
+
+func assertNamesPage(t *testing.T, page types.Page) *NamesPage {
+	t.Helper()
+	if page == nil {
+		t.Fatal("page is nil")
+	}
+	namesPage, ok := page.(*NamesPage)
+	if !ok {
+		t.Fatalf("expected *NamesPage, got %T", page)
+	}
+	return namesPage
+}
 
 func TestNewNamesCollection(t *testing.T) {
 	assert.NotPanics(t, func() {
@@ -154,10 +167,11 @@ func TestNamesCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(NamesAll, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, NamesAll, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+			namesPage := assertNamesPage(t, page)
+			assert.Equal(t, NamesAll, namesPage.Kind)
+			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -165,10 +179,11 @@ func TestNamesCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(NamesCustom, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, NamesCustom, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+			namesPage := assertNamesPage(t, page)
+			assert.Equal(t, NamesCustom, namesPage.Kind)
+			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -176,10 +191,11 @@ func TestNamesCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(NamesPrefund, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, NamesPrefund, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+			namesPage := assertNamesPage(t, page)
+			assert.Equal(t, NamesPrefund, namesPage.Kind)
+			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -187,10 +203,11 @@ func TestNamesCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(NamesRegular, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, NamesRegular, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+			namesPage := assertNamesPage(t, page)
+			assert.Equal(t, NamesRegular, namesPage.Kind)
+			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -198,10 +215,11 @@ func TestNamesCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(NamesBaddress, 0, 10, sdk.SortSpec{}, "")
 
 		if err == nil && page != nil {
-			assert.Equal(t, NamesBaddress, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
-			assert.GreaterOrEqual(t, page.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(page.Names), 10, "Returned items should not exceed page size")
+			namesPage := assertNamesPage(t, page)
+			assert.Equal(t, NamesBaddress, namesPage.Kind)
+			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
+			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
+			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
 		}
 	})
 
@@ -209,8 +227,9 @@ func TestNamesCollectionGetPage(t *testing.T) {
 		page, err := collection.GetPage(NamesAll, 0, 10, sdk.SortSpec{}, "test")
 
 		if err == nil && page != nil {
-			assert.Equal(t, NamesAll, page.Kind)
-			assert.GreaterOrEqual(t, page.TotalItems, 0)
+			namesPage := assertNamesPage(t, page)
+			assert.Equal(t, NamesAll, namesPage.Kind)
+			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
 		}
 	})
 
@@ -223,8 +242,9 @@ func TestNamesCollectionGetPage(t *testing.T) {
 	t.Run("ZeroPageSize", func(t *testing.T) {
 		page, err := collection.GetPage(NamesAll, 0, 0, sdk.SortSpec{}, "")
 		if err == nil && page != nil {
-			assert.Equal(t, NamesAll, page.Kind)
-			assert.Len(t, page.Names, 0, "Zero page size should return no items")
+			namesPage := assertNamesPage(t, page)
+			assert.Equal(t, NamesAll, namesPage.Kind)
+			assert.Len(t, namesPage.Names, 0, "Zero page size should return no items")
 		}
 	})
 }

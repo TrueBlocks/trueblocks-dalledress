@@ -8,7 +8,9 @@ import {base} from '../models';
 
 export function Crud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Name):Promise<void>;
 
-export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
+export function GetNamesPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
+
+export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
 
 export function LoadData(arg1:types.ListKind):Promise<void>;
 

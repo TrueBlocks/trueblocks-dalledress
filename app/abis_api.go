@@ -16,7 +16,7 @@ func (a *App) GetAbisPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*abis.AbisPage, error) {
-	return a.abis.GetPage(kind, first, pageSize, sort, filter)
+	return a.abis.GetAbisPage(kind, first, pageSize, sort, filter)
 }
 
 func (a *App) AbisCrud(

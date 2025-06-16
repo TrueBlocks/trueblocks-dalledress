@@ -16,7 +16,7 @@ func (a *App) GetNamesPage(
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (*names.NamesPage, error) {
-	return a.names.GetPage(listKind, first, pageSize, sortSpec, filter)
+	return a.names.GetNamesPage(listKind, first, pageSize, sortSpec, filter)
 }
 
 func (a *App) NamesCrud(

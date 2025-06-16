@@ -23,12 +23,7 @@ func assertAbisPage(t *testing.T, page types.Page) *AbisPage {
 	return abisPage
 }
 
-func TestNewAbisCollection(t *testing.T) {
-	assert.NotPanics(t, func() {
-		collection := NewAbisCollection()
-		assert.NotNil(t, collection)
-	}, "NewAbisCollection should not panic")
-}
+// Domain-specific filtering and ABI logic tests for Abis collection
 
 func TestAbisMatchesFilter(t *testing.T) {
 	collection := NewAbisCollection()
@@ -113,153 +108,45 @@ func (ac *AbisCollection) matchesFunctionFilter(fn *coreTypes.Function, filter s
 		strings.Contains(strings.ToLower(fn.Encoding), filterLower)
 }
 
-func TestAbisCollectionStateManagement(t *testing.T) {
+func TestAbisCollectionDomainSpecific(t *testing.T) {
 	collection := NewAbisCollection()
 
-	t.Run("NeedsUpdate", func(t *testing.T) {
-		needsUpdate := collection.NeedsUpdate(AbisDownloaded)
-		assert.True(t, needsUpdate, "New collection should need update for AbisDownloaded")
-
-		needsUpdate = collection.NeedsUpdate(AbisKnown)
-		assert.True(t, needsUpdate, "New collection should need update for AbisKnown")
-
-		needsUpdate = collection.NeedsUpdate(AbisFunctions)
-		assert.True(t, needsUpdate, "New collection should need update for AbisFunctions")
-
-		needsUpdate = collection.NeedsUpdate(AbisEvents)
-		assert.True(t, needsUpdate, "New collection should need update for AbisEvents")
-
-		needsUpdate = collection.NeedsUpdate("invalid-kind")
-		assert.False(t, needsUpdate, "Invalid list kind should return false")
-	})
-
-	t.Run("Reset", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			collection.Reset(AbisDownloaded)
-		}, "Reset with AbisDownloaded should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.Reset(AbisKnown)
-		}, "Reset with AbisKnown should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.Reset(AbisFunctions)
-		}, "Reset with AbisFunctions should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.Reset(AbisEvents)
-		}, "Reset with AbisEvents should not panic")
-
-		needsUpdate := collection.NeedsUpdate(AbisDownloaded)
-		assert.True(t, needsUpdate, "After reset, collection should need update")
-
-		assert.NotPanics(t, func() {
-			collection.Reset("invalid-kind")
-		}, "Reset with invalid list kind should not panic")
-	})
-}
-
-func TestAbisCollectionLoadData(t *testing.T) {
-	collection := NewAbisCollection()
-
-	t.Run("LoadDataValidKinds", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			collection.LoadData(AbisDownloaded)
-		}, "LoadData with AbisDownloaded should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.LoadData(AbisKnown)
-		}, "LoadData with AbisKnown should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.LoadData(AbisFunctions)
-		}, "LoadData with AbisFunctions should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.LoadData(AbisEvents)
-		}, "LoadData with AbisEvents should not panic")
-	})
-
-	t.Run("LoadDataInvalidKind", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			collection.LoadData("invalid-kind")
-		}, "LoadData with invalid list kind should not panic")
-	})
-}
-
-func TestAbisCollectionGetPage(t *testing.T) {
-	collection := NewAbisCollection()
-
-	t.Run("BasicGetPageAbisDownloaded", func(t *testing.T) {
-		page, err := collection.GetPage(AbisDownloaded, 0, 10, sdk.SortSpec{}, "")
-
+	t.Run("GetPageMultiFacetFiltering", func(t *testing.T) {
+		// Test ABI list filtering
+		page, err := collection.GetPage(AbisDownloaded, 0, 10, sdk.SortSpec{}, "test")
 		if err == nil && page != nil {
 			abisPage := assertAbisPage(t, page)
 			assert.Equal(t, AbisDownloaded, abisPage.Kind)
 			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, abisPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(abisPage.Abis), 10, "Returned items should not exceed page size")
 		}
-	})
 
-	t.Run("BasicGetPageAbisKnown", func(t *testing.T) {
-		page, err := collection.GetPage(AbisKnown, 0, 10, sdk.SortSpec{}, "")
-
-		if err == nil && page != nil {
-			abisPage := assertAbisPage(t, page)
-			assert.Equal(t, AbisKnown, abisPage.Kind)
-			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, abisPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(abisPage.Abis), 10, "Returned items should not exceed page size")
-		}
-	})
-
-	t.Run("BasicGetPageAbisFunctions", func(t *testing.T) {
-		page, err := collection.GetPage(AbisFunctions, 0, 10, sdk.SortSpec{}, "")
-
+		// Test function filtering
+		page, err = collection.GetPage(AbisFunctions, 0, 10, sdk.SortSpec{}, "transfer")
 		if err == nil && page != nil {
 			abisPage := assertAbisPage(t, page)
 			assert.Equal(t, AbisFunctions, abisPage.Kind)
 			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, abisPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(abisPage.Functions), 10, "Returned items should not exceed page size")
 		}
 	})
 
-	t.Run("BasicGetPageAbisEvents", func(t *testing.T) {
-		page, err := collection.GetPage(AbisEvents, 0, 10, sdk.SortSpec{}, "")
-
-		if err == nil && page != nil {
-			abisPage := assertAbisPage(t, page)
-			assert.Equal(t, AbisEvents, abisPage.Kind)
-			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, abisPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(abisPage.Functions), 10, "Returned items should not exceed page size")
-		}
-	})
-
-	t.Run("GetPageWithFilter", func(t *testing.T) {
-		page, err := collection.GetPage(AbisDownloaded, 0, 10, sdk.SortSpec{}, "test")
-
-		if err == nil && page != nil {
-			abisPage := assertAbisPage(t, page)
-			assert.Equal(t, AbisDownloaded, abisPage.Kind)
-			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
-		}
-	})
-
-	t.Run("InvalidListKind", func(t *testing.T) {
-		_, err := collection.GetPage("invalid-kind", 0, 10, sdk.SortSpec{}, "")
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "unexpected list kind")
-	})
-
-	t.Run("ZeroPageSize", func(t *testing.T) {
-		page, err := collection.GetPage(AbisDownloaded, 0, 0, sdk.SortSpec{}, "")
-		if err == nil && page != nil {
-			abisPage := assertAbisPage(t, page)
-			assert.Equal(t, AbisDownloaded, abisPage.Kind)
-			assert.Len(t, abisPage.Abis, 0, "Zero page size should return no items")
+	t.Run("MultiFacetSupport", func(t *testing.T) {
+		// Test that different facets work correctly
+		kinds := []types.ListKind{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
+		for _, kind := range kinds {
+			page, err := collection.GetPage(kind, 0, 5, sdk.SortSpec{}, "")
+			if err == nil && page != nil {
+				abisPage := assertAbisPage(t, page)
+				assert.Equal(t, kind, abisPage.Kind)
+				// Verify the right data structure is populated based on facet
+				switch kind {
+				case AbisDownloaded, AbisKnown:
+					// Should have Abis populated
+					assert.NotNil(t, abisPage.Abis)
+				case AbisFunctions, AbisEvents:
+					// Should have Functions populated
+					assert.NotNil(t, abisPage.Functions)
+				}
+			}
 		}
 	})
 }

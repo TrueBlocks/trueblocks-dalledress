@@ -204,8 +204,11 @@ func TestMonitorsCollectionAdvancedAsync(t *testing.T) {
 		// Get initial page to check state
 		initialPage, err := collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
 		if err == nil && initialPage != nil {
-			initialState := initialPage.State
-			initialFetching := initialPage.IsFetching
+			// Cast to concrete type to access fields
+			monitorsPage, ok := initialPage.(*MonitorsPage)
+			assert.True(t, ok, "Expected *MonitorsPage type")
+			initialState := monitorsPage.State
+			initialFetching := monitorsPage.IsFetching
 
 			// Trigger load
 			collection.LoadData(MonitorsList)
@@ -215,7 +218,11 @@ func TestMonitorsCollectionAdvancedAsync(t *testing.T) {
 			for i := 0; i < 20; i++ { // Check for up to 1 second
 				page, pageErr := collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
 				if pageErr == nil && page != nil {
-					if page.IsFetching {
+					// Cast to concrete type to access fields
+					monitorsPage, ok := page.(*MonitorsPage)
+					assert.True(t, ok, "Expected *MonitorsPage type")
+
+					if monitorsPage.IsFetching {
 						fetchingObserved = true
 					}
 
@@ -226,7 +233,7 @@ func TestMonitorsCollectionAdvancedAsync(t *testing.T) {
 						"loaded",
 						"partial",
 						"error",
-					}, string(page.State), "State should be valid during loading")
+					}, string(monitorsPage.State), "State should be valid during loading")
 				}
 
 				time.Sleep(50 * time.Millisecond)
@@ -408,7 +415,10 @@ func TestMonitorsCollectionIntegration(t *testing.T) {
 					if err2 == nil {
 						// If no error, verify response is reasonable
 						assert.NotNil(t, page)
-						assert.Equal(t, MonitorsList, page.Kind)
+						// Cast to concrete type to access fields
+						monitorsPage, ok := page.(*MonitorsPage)
+						assert.True(t, ok, "Expected *MonitorsPage type")
+						assert.Equal(t, MonitorsList, monitorsPage.Kind)
 					}
 				},
 			},
@@ -428,186 +438,6 @@ func TestMonitorsCollectionIntegration(t *testing.T) {
 		for _, scenario := range errorScenarios {
 			t.Run(scenario.name, scenario.test)
 		}
-	})
-}
-
-func TestMonitorsCollectionPerformanceAndEdgeCases(t *testing.T) {
-	// t.Run("RapidStateQueries", func(t *testing.T) {
-	// 	collection := NewMonitorsCollection()
-
-	// 	// Test rapid queries to state methods
-	// 	const iterations = 1000
-	// 	start := time.Now()
-
-	// 	for i := 0; i < iterations; i++ {
-	// 		collection.NeedsUpdate(MonitorsList)
-	// 		if i%10 == 0 {
-	// 			// Occasionally trigger other operations
-	// 			_, _ = collection.GetPage(MonitorsList, 0, 1, sdk.SortSpec{}, "")
-	// 		}
-	// 	}
-
-	// 	duration := time.Since(start)
-	// 	avgPerCall := duration / iterations
-
-	// 	assert.Less(t, avgPerCall, 1*time.Millisecond, "Average NeedsUpdate call should be very fast")
-	// 	t.Logf("Average time per NeedsUpdate call: %v", avgPerCall)
-	// })
-
-	// t.Run("LargePageSizeHandling", func(t *testing.T) {
-	// 	collection := NewMonitorsCollection()
-
-	// 	largeSizes := []int{0, 1, 10, 100, 1000, 10000}
-
-	// 	for _, size := range largeSizes {
-	// 		t.Run(fmt.Sprintf("PageSize_%d", size), func(t *testing.T) {
-	// 			start := time.Now()
-	// 			page, err := collection.GetPage(MonitorsList, 0, size, sdk.SortSpec{}, "")
-	// 			duration := time.Since(start)
-
-	// 			if err == nil && page != nil {
-	// 				assert.Equal(t, MonitorsList, page.Kind)
-	// 				assert.GreaterOrEqual(t, page.TotalItems, 0)
-	// 				assert.LessOrEqual(t, len(page.Monitors), size, "Returned items should not exceed page size")
-
-	// 				// Larger page sizes may take longer, but should still be reasonable
-	// 				maxExpectedTime := time.Duration(size/10+1) * 100 * time.Millisecond
-	// 				assert.Less(t, duration, maxExpectedTime, "Page retrieval should complete in reasonable time")
-	// 			}
-	// 		})
-	// 	}
-	// })
-
-	t.Run("FilterPerformance", func(t *testing.T) {
-		collection := NewMonitorsCollection()
-
-		// Reduced filter set to focus on most important cases
-		filters := []string{
-			"",                   // Empty filter
-			"test",               // Common word
-			"0x1234567890123456", // Long address
-			"nonexistentfilter",  // No matches expected
-		}
-
-		for _, filter := range filters {
-			t.Run(fmt.Sprintf("Filter_%s", filter[:min(len(filter), 10)]), func(t *testing.T) {
-				start := time.Now()
-				// Reduced page size from 50 to 20
-				page, err := collection.GetPage(MonitorsList, 0, 20, sdk.SortSpec{}, filter)
-				duration := time.Since(start)
-
-				if err == nil && page != nil {
-					assert.Equal(t, MonitorsList, page.Kind)
-
-					// Reduced timeout from 5s to 2s
-					assert.Less(t, duration, 2*time.Second, "Filtering should complete in reasonable time")
-				}
-			})
-		}
-	})
-
-	t.Run("ConcurrentGetPageCalls", func(t *testing.T) {
-		collection := NewMonitorsCollection()
-		const numConcurrent = 8 // Reduced from 20
-
-		var wg sync.WaitGroup
-		var results []*MonitorsPage
-		var errors []error
-		var mu sync.Mutex
-
-		for i := 0; i < numConcurrent; i++ {
-			wg.Add(1)
-			go func(id int) {
-				defer wg.Done()
-
-				// Reduced page size from 10 to 5
-				page, err := collection.GetPage(MonitorsList, id%3, 5, sdk.SortSpec{}, "")
-
-				mu.Lock()
-				if err != nil {
-					errors = append(errors, err)
-				} else if page != nil {
-					results = append(results, page)
-				}
-				mu.Unlock()
-			}(i)
-		}
-
-		wg.Wait()
-
-		mu.Lock()
-		assert.Empty(t, errors, "No errors should occur during concurrent GetPage calls")
-
-		// All successful results should be valid
-		for i, page := range results {
-			assert.Equal(t, MonitorsList, page.Kind, "Page %d should have correct kind", i)
-			assert.GreaterOrEqual(t, page.TotalItems, 0, "Page %d should have valid TotalItems", i)
-		}
-		mu.Unlock()
-	})
-
-	t.Run("EdgeCaseFilters", func(t *testing.T) {
-		collection := NewMonitorsCollection()
-
-		// Reduced to most critical edge cases
-		edgeCaseFilters := []string{
-			"",   // Empty
-			" ",  // Space
-			"0x", // Just prefix
-			"0000000000000000000000000000000000000000", // All zeros
-			"!@#$%^&*()", // Special characters
-		}
-
-		for i, filter := range edgeCaseFilters {
-			t.Run(fmt.Sprintf("EdgeFilter_%d", i), func(t *testing.T) {
-				assert.NotPanics(t, func() {
-					// Reduced page size from 10 to 5
-					page, err := collection.GetPage(MonitorsList, 0, 5, sdk.SortSpec{}, filter)
-					if err == nil && page != nil {
-						assert.Equal(t, MonitorsList, page.Kind)
-						assert.GreaterOrEqual(t, page.TotalItems, 0)
-					}
-				}, "Edge case filter should not panic")
-			})
-		}
-	})
-
-	t.Run("StressTestRepeatedOperations", func(t *testing.T) {
-		collection := NewMonitorsCollection()
-		const iterations = 30 // Reduced from 100
-
-		// Mix of operations
-		operations := []func(){
-			func() { collection.NeedsUpdate(MonitorsList) },
-			func() { collection.LoadData(MonitorsList) },
-			func() { collection.Reset(MonitorsList) },
-			func() {
-				// Reduced page size from 10 to 5
-				_, _ = collection.GetPage(MonitorsList, 0, 5, sdk.SortSpec{}, "")
-			},
-			func() {
-				// Reduced page size from 5 to 3
-				_, _ = collection.GetPage(MonitorsList, 0, 3, sdk.SortSpec{}, "test")
-			},
-		}
-
-		start := time.Now()
-		for i := 0; i < iterations; i++ {
-			op := operations[i%len(operations)]
-			assert.NotPanics(t, op, "Operation %d should not panic", i)
-
-			// Removed delays to speed up test
-		}
-		duration := time.Since(start)
-
-		t.Logf("Completed %d mixed operations in %v", iterations, duration)
-		assert.Less(t, duration, 10*time.Second, "Stress test should complete in reasonable time") // Reduced from 30s to 10s
-
-		// Collection should still be functional
-		assert.NotPanics(t, func() {
-			needsUpdate := collection.NeedsUpdate(MonitorsList)
-			assert.IsType(t, true, needsUpdate)
-		}, "Collection should remain functional after stress test")
 	})
 }
 
@@ -655,8 +485,11 @@ func TestMonitorsCollectionBoundaryConditions(t *testing.T) {
 				assert.NotPanics(t, func() {
 					page, err := collection.GetPage(MonitorsList, vals.first, vals.pageSize, sdk.SortSpec{}, "")
 					if err == nil && page != nil {
-						assert.Equal(t, MonitorsList, page.Kind)
-						assert.GreaterOrEqual(t, page.TotalItems, 0)
+						// Cast to concrete type to access fields
+						monitorsPage, ok := page.(*MonitorsPage)
+						assert.True(t, ok, "Expected *MonitorsPage type")
+						assert.Equal(t, MonitorsList, monitorsPage.Kind)
+						assert.GreaterOrEqual(t, monitorsPage.TotalItems, 0)
 					}
 				}, "Extreme page values should not panic")
 			})

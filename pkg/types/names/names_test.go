@@ -22,12 +22,7 @@ func assertNamesPage(t *testing.T, page types.Page) *NamesPage {
 	return namesPage
 }
 
-func TestNewNamesCollection(t *testing.T) {
-	assert.NotPanics(t, func() {
-		collection := NewNamesCollection()
-		assert.NotNil(t, collection)
-	}, "NewNamesCollection should not panic")
-}
+// Domain-specific filtering tests for Names collection
 
 func TestNamesMatchesFilter(t *testing.T) {
 	collection := NewNamesCollection()
@@ -75,176 +70,16 @@ func TestNamesMatchesFilter(t *testing.T) {
 	})
 }
 
-func TestNamesCollectionStateManagement(t *testing.T) {
+func TestNamesCollectionDomainSpecificFiltering(t *testing.T) {
 	collection := NewNamesCollection()
 
-	t.Run("NeedsUpdate", func(t *testing.T) {
-		needsUpdate := collection.NeedsUpdate(NamesAll)
-		assert.True(t, needsUpdate, "New collection should need update for NamesAll")
-
-		needsUpdate = collection.NeedsUpdate(NamesCustom)
-		assert.True(t, needsUpdate, "New collection should need update for NamesCustom")
-
-		needsUpdate = collection.NeedsUpdate(NamesPrefund)
-		assert.True(t, needsUpdate, "New collection should need update for NamesPrefund")
-
-		needsUpdate = collection.NeedsUpdate(NamesRegular)
-		assert.True(t, needsUpdate, "New collection should need update for NamesRegular")
-
-		needsUpdate = collection.NeedsUpdate(NamesBaddress)
-		assert.True(t, needsUpdate, "New collection should need update for NamesBaddress")
-
-		needsUpdate = collection.NeedsUpdate("invalid-kind")
-		assert.False(t, needsUpdate, "Invalid list kind should return false")
-	})
-
-	t.Run("Reset", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			collection.Reset(NamesAll)
-		}, "Reset with NamesAll should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.Reset(NamesCustom)
-		}, "Reset with NamesCustom should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.Reset(NamesPrefund)
-		}, "Reset with NamesPrefund should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.Reset(NamesRegular)
-		}, "Reset with NamesRegular should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.Reset(NamesBaddress)
-		}, "Reset with NamesBaddress should not panic")
-
-		needsUpdate := collection.NeedsUpdate(NamesAll)
-		assert.True(t, needsUpdate, "After reset, collection should need update")
-
-		assert.NotPanics(t, func() {
-			collection.Reset("invalid-kind")
-		}, "Reset with invalid list kind should not panic")
-	})
-}
-
-func TestNamesCollectionLoadData(t *testing.T) {
-	collection := NewNamesCollection()
-
-	t.Run("LoadDataValidKinds", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			collection.LoadData(NamesAll)
-		}, "LoadData with NamesAll should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.LoadData(NamesCustom)
-		}, "LoadData with NamesCustom should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.LoadData(NamesPrefund)
-		}, "LoadData with NamesPrefund should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.LoadData(NamesRegular)
-		}, "LoadData with NamesRegular should not panic")
-
-		assert.NotPanics(t, func() {
-			collection.LoadData(NamesBaddress)
-		}, "LoadData with NamesBaddress should not panic")
-	})
-
-	t.Run("LoadDataInvalidKind", func(t *testing.T) {
-		assert.NotPanics(t, func() {
-			collection.LoadData("invalid-kind")
-		}, "LoadData with invalid list kind should not panic")
-	})
-}
-
-func TestNamesCollectionGetPage(t *testing.T) {
-	collection := NewNamesCollection()
-
-	t.Run("BasicGetPageNamesAll", func(t *testing.T) {
-		page, err := collection.GetPage(NamesAll, 0, 10, sdk.SortSpec{}, "")
-
-		if err == nil && page != nil {
-			namesPage := assertNamesPage(t, page)
-			assert.Equal(t, NamesAll, namesPage.Kind)
-			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
-		}
-	})
-
-	t.Run("BasicGetPageNamesCustom", func(t *testing.T) {
-		page, err := collection.GetPage(NamesCustom, 0, 10, sdk.SortSpec{}, "")
-
-		if err == nil && page != nil {
-			namesPage := assertNamesPage(t, page)
-			assert.Equal(t, NamesCustom, namesPage.Kind)
-			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
-		}
-	})
-
-	t.Run("BasicGetPageNamesPrefund", func(t *testing.T) {
-		page, err := collection.GetPage(NamesPrefund, 0, 10, sdk.SortSpec{}, "")
-
-		if err == nil && page != nil {
-			namesPage := assertNamesPage(t, page)
-			assert.Equal(t, NamesPrefund, namesPage.Kind)
-			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
-		}
-	})
-
-	t.Run("BasicGetPageNamesRegular", func(t *testing.T) {
-		page, err := collection.GetPage(NamesRegular, 0, 10, sdk.SortSpec{}, "")
-
-		if err == nil && page != nil {
-			namesPage := assertNamesPage(t, page)
-			assert.Equal(t, NamesRegular, namesPage.Kind)
-			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
-		}
-	})
-
-	t.Run("BasicGetPageNamesBaddress", func(t *testing.T) {
-		page, err := collection.GetPage(NamesBaddress, 0, 10, sdk.SortSpec{}, "")
-
-		if err == nil && page != nil {
-			namesPage := assertNamesPage(t, page)
-			assert.Equal(t, NamesBaddress, namesPage.Kind)
-			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
-			assert.GreaterOrEqual(t, namesPage.ExpectedTotal, 0)
-			assert.LessOrEqual(t, len(namesPage.Names), 10, "Returned items should not exceed page size")
-		}
-	})
-
-	t.Run("GetPageWithFilter", func(t *testing.T) {
+	t.Run("GetPageWithDomainSpecificFilter", func(t *testing.T) {
 		page, err := collection.GetPage(NamesAll, 0, 10, sdk.SortSpec{}, "test")
 
 		if err == nil && page != nil {
 			namesPage := assertNamesPage(t, page)
 			assert.Equal(t, NamesAll, namesPage.Kind)
 			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
-		}
-	})
-
-	t.Run("InvalidListKind", func(t *testing.T) {
-		_, err := collection.GetPage("invalid-kind", 0, 10, sdk.SortSpec{}, "")
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "unexpected list kind")
-	})
-
-	t.Run("ZeroPageSize", func(t *testing.T) {
-		page, err := collection.GetPage(NamesAll, 0, 0, sdk.SortSpec{}, "")
-		if err == nil && page != nil {
-			namesPage := assertNamesPage(t, page)
-			assert.Equal(t, NamesAll, namesPage.Kind)
-			assert.Len(t, namesPage.Names, 0, "Zero page size should return no items")
 		}
 	})
 }

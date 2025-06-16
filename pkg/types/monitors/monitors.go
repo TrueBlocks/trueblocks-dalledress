@@ -122,7 +122,8 @@ func (mc *MonitorsCollection) GetPage(
 			sortFunc,
 		)
 		if err != nil {
-			return nil, err
+			// This is likely an SDK or store error, not a validation error
+			return nil, types.NewStoreError("monitors", listKind, "GetPage", err)
 		}
 
 		return &MonitorsPage{
@@ -134,7 +135,9 @@ func (mc *MonitorsCollection) GetPage(
 			State:         pageResult.State,
 		}, nil
 	default:
-		return nil, fmt.Errorf("unsupported list kind: %s", listKind)
+		// This is truly a validation error - invalid ListKind for this collection
+		return nil, types.NewValidationError("monitors", listKind, "GetPage",
+			fmt.Errorf("unsupported list kind: %s", listKind))
 	}
 }
 

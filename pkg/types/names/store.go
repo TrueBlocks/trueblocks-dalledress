@@ -32,10 +32,12 @@ func GetNamesStore() *store.Store[coreTypes.Name] {
 				All:       true,
 			}
 			if _, _, err := listOpts.Names(); err != nil {
-				logging.LogBackend(fmt.Sprintf("Shared Names source query error: %v", err))
-				return err
+				// Create structured error with proper context
+				wrappedErr := types.NewSDKError("names", types.ListKind("NamesAll"), "fetch", err)
+				logging.LogBackend(fmt.Sprintf("Names SDK query error: %v", wrappedErr))
+				return wrappedErr
 			}
-			logging.LogBackend("The query function returned without an error.")
+			logging.LogBackend("The names query function returned without an error.")
 			return nil
 		}
 

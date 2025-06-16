@@ -10,6 +10,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
@@ -42,8 +43,10 @@ func GetChunksStatsStore() *store.Store[coreTypes.ChunkStats] {
 			}
 
 			if _, _, err := opts.ChunksStats(); err != nil {
-				logging.LogBackend(fmt.Sprintf("ChunksStatsStore query error: %v", err))
-				return err
+				// Create structured error with proper context
+				wrappedErr := types.NewSDKError("chunks", ChunksStats, "fetch", err)
+				logging.LogBackend(fmt.Sprintf("Chunks stats SDK query error: %v", wrappedErr))
+				return wrappedErr
 			}
 
 			return nil
@@ -87,8 +90,10 @@ func GetChunksIndexStore() *store.Store[coreTypes.ChunkIndex] {
 			}
 
 			if _, _, err := opts.ChunksIndex(); err != nil {
-				logging.LogBackend(fmt.Sprintf("ChunksIndexStore query error: %v", err))
-				return err
+				// Create structured error with proper context
+				wrappedErr := types.NewSDKError("chunks", ChunksIndex, "fetch", err)
+				logging.LogBackend(fmt.Sprintf("Chunks index SDK query error: %v", wrappedErr))
+				return wrappedErr
 			}
 
 			return nil
@@ -132,8 +137,10 @@ func GetChunksBloomsStore() *store.Store[coreTypes.ChunkBloom] {
 			}
 
 			if _, _, err := opts.ChunksBlooms(); err != nil {
-				logging.LogBackend(fmt.Sprintf("ChunksBloomsStore query error: %v", err))
-				return err
+				// Create structured error with proper context
+				wrappedErr := types.NewSDKError("chunks", ChunksBlooms, "fetch", err)
+				logging.LogBackend(fmt.Sprintf("Chunks blooms SDK query error: %v", wrappedErr))
+				return wrappedErr
 			}
 
 			return nil
@@ -177,8 +184,10 @@ func GetChunksManifestStore() *store.Store[coreTypes.ChunkManifest] {
 			}
 
 			if _, _, err := opts.ChunksManifest(); err != nil {
-				logging.LogBackend(fmt.Sprintf("ChunksManifestStore query error: %v", err))
-				return err
+				// Create structured error with proper context
+				wrappedErr := types.NewSDKError("chunks", ChunksManifest, "fetch", err)
+				logging.LogBackend(fmt.Sprintf("Chunks manifest SDK query error: %v", wrappedErr))
+				return wrappedErr
 			}
 
 			return nil

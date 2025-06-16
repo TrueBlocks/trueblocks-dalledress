@@ -30,8 +30,10 @@ func GetMonitorsStore() *store.Store[coreTypes.Monitor] {
 				RenderCtx: ctx,
 			}
 			if _, _, err := listOpts.MonitorsList(); err != nil {
-				logger.Error(fmt.Sprintf("Shared MonitorsList source query error: %v", err))
-				return err
+				// Create structured error with proper context
+				wrappedErr := types.NewSDKError("monitors", MonitorsList, "fetch", err)
+				logger.Error(fmt.Sprintf("Monitors SDK query error: %v", wrappedErr))
+				return wrappedErr
 			}
 			return nil
 		}

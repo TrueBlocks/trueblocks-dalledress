@@ -238,7 +238,9 @@ func (ac *AbisCollection) GetPage(
 	case AbisEvents:
 		detailFacet = ac.eventsFacet
 	default:
-		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
+		// This is truly a validation error - invalid ListKind for this collection
+		return nil, types.NewValidationError("abis", listKind, "GetPage",
+			fmt.Errorf("unsupported list kind: %v", listKind))
 	}
 
 	if listFacet != nil {
@@ -249,7 +251,8 @@ func (ac *AbisCollection) GetPage(
 			return sdk.SortAbis(items, sort)
 		}
 		if result, err := listFacet.GetPage(first, pageSize, listFilterFunc, sortSpec, listSortFunc); err != nil {
-			page.Abis, page.TotalItems, page.State = nil, 0, types.StateError
+			// This is likely an SDK or store error, not a validation error
+			return nil, types.NewStoreError("abis", listKind, "GetPage", err)
 		} else {
 			page.Abis, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
@@ -265,7 +268,8 @@ func (ac *AbisCollection) GetPage(
 			return sdk.SortFunctions(items, sort)
 		}
 		if result, err := detailFacet.GetPage(first, pageSize, detailFilter, sortSpec, detailSortFunc); err != nil {
-			page.Functions, page.TotalItems, page.State = nil, 0, types.StateError
+			// This is likely an SDK or store error, not a validation error
+			return nil, types.NewStoreError("abis", listKind, "GetPage", err)
 		} else {
 			page.Functions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
@@ -273,7 +277,9 @@ func (ac *AbisCollection) GetPage(
 		page.ExpectedTotal = detailFacet.ExpectedCount()
 
 	} else {
-		return nil, fmt.Errorf("GetPage: no facet found for list kind: %v", listKind)
+		// This should not happen since we validated listKind above
+		return nil, types.NewValidationError("abis", listKind, "GetPage",
+			fmt.Errorf("no facet found for list kind: %v", listKind))
 	}
 
 	return page, nil

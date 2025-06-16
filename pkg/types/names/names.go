@@ -209,7 +209,9 @@ func (nc *NamesCollection) GetPage(
 	case NamesBaddress:
 		facet = nc.baddressFacet
 	default:
-		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
+		// This is truly a validation error - invalid ListKind for this collection
+		return nil, types.NewValidationError("names", listKind, "GetPage",
+			fmt.Errorf("unsupported list kind: %v", listKind))
 	}
 
 	var filterFunc func(*coreTypes.Name) bool
@@ -231,7 +233,8 @@ func (nc *NamesCollection) GetPage(
 		sortFunc,
 	)
 	if err != nil {
-		return nil, err
+		// This is likely an SDK or store error, not a validation error
+		return nil, types.NewStoreError("names", listKind, "GetPage", err)
 	}
 
 	names := make([]*coreTypes.Name, 0, len(pageResult.Items))

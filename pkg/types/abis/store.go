@@ -33,8 +33,10 @@ func GetAbisListStore() *store.Store[coreTypes.Abi] {
 				RenderCtx: ctx,
 			}
 			if _, _, err := listOpts.AbisList(); err != nil {
-				logger.Error(fmt.Sprintf("Shared AbisList source query error: %v", err))
-				return err
+				// Create structured error with proper context
+				wrappedErr := types.NewSDKError("abis", AbisDownloaded, "fetch", err)
+				logger.Error(fmt.Sprintf("Abis SDK query error: %v", wrappedErr))
+				return wrappedErr
 			}
 			return nil
 		}
@@ -65,8 +67,10 @@ func GetAbisDetailStore() *store.Store[coreTypes.Function] {
 				RenderCtx: ctx,
 			}
 			if _, _, err := detailOpts.AbisDetails(); err != nil {
-				logger.Error(fmt.Sprintf("Shared AbisDetails source query error: %v", err))
-				return err
+				// Create structured error with proper context
+				wrappedErr := types.NewSDKError("abis", AbisFunctions, "fetch", err)
+				logger.Error(fmt.Sprintf("Abis detail SDK query error: %v", wrappedErr))
+				return wrappedErr
 			}
 			return nil
 		}

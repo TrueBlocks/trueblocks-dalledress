@@ -453,12 +453,15 @@ func getCollectionPage[T any](
 
 	page, err := collection.GetPage(kind, first, pageSize, sort, filter)
 	if err != nil {
+		// Preserve the original error context - don't wrap with type assertion errors
 		return zero, err
 	}
 
 	typedPage, ok := page.(T)
 	if !ok {
-		return zero, fmt.Errorf("internal error: GetPage returned unexpected type %T, expected %T", page, zero)
+		// This is a true internal error - different from SDK/store errors
+		return zero, types.NewValidationError("app", kind, "getCollectionPage",
+			fmt.Errorf("GetPage returned unexpected type %T, expected %T", page, zero))
 	}
 
 	return typedPage, nil

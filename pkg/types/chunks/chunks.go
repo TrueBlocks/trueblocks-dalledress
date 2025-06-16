@@ -258,7 +258,8 @@ func (cc *ChunksCollection) GetPage(
 		}
 
 		if result, err := cc.statsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			page.ChunksStats, page.TotalItems, page.State = nil, 0, types.StateError
+			// This is likely an SDK or store error, not a validation error
+			return nil, types.NewStoreError("chunks", listKind, "GetPage", err)
 		} else {
 			chunksStats := make([]*coreTypes.ChunkStats, 0, len(result.Items))
 			for i := range result.Items {
@@ -283,7 +284,8 @@ func (cc *ChunksCollection) GetPage(
 		}
 
 		if result, err := cc.indexFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			page.ChunksIndex, page.TotalItems, page.State = nil, 0, types.StateError
+			// This is likely an SDK or store error, not a validation error
+			return nil, types.NewStoreError("chunks", listKind, "GetPage", err)
 		} else {
 			chunksIndex := make([]*coreTypes.ChunkIndex, 0, len(result.Items))
 			for i := range result.Items {
@@ -308,7 +310,8 @@ func (cc *ChunksCollection) GetPage(
 		}
 
 		if result, err := cc.bloomsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			page.ChunksBlooms, page.TotalItems, page.State = nil, 0, types.StateError
+			// This is likely an SDK or store error, not a validation error
+			return nil, types.NewStoreError("chunks", listKind, "GetPage", err)
 		} else {
 			chunksBlooms := make([]*coreTypes.ChunkBloom, 0, len(result.Items))
 			for i := range result.Items {
@@ -333,7 +336,8 @@ func (cc *ChunksCollection) GetPage(
 		}
 
 		if result, err := cc.manifestFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			page.ChunksManifest, page.TotalItems, page.State = nil, 0, types.StateError
+			// This is likely an SDK or store error, not a validation error
+			return nil, types.NewStoreError("chunks", listKind, "GetPage", err)
 		} else {
 			chunksManifest := make([]*coreTypes.ChunkManifest, 0, len(result.Items))
 			for i := range result.Items {
@@ -345,7 +349,9 @@ func (cc *ChunksCollection) GetPage(
 		page.ExpectedTotal = cc.manifestFacet.ExpectedCount()
 
 	default:
-		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
+		// This is truly a validation error - invalid ListKind for this collection
+		return nil, types.NewValidationError("chunks", listKind, "GetPage",
+			fmt.Errorf("unsupported list kind: %v", listKind))
 	}
 
 	return page, nil

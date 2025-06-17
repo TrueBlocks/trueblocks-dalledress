@@ -130,7 +130,7 @@ func GetChunksBloomsStore() *store.Store[coreTypes.ChunkBloom] {
 			chainName := preferences.GetChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
-					Verbose: true,
+					Verbose: false, // Set to false to avoid weird output issues
 					Chain:   chainName,
 				},
 				RenderCtx: ctx,

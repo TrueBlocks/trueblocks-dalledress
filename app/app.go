@@ -26,6 +26,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -44,6 +45,7 @@ type App struct {
 	abis     *abis.AbisCollection
 	monitors *monitors.MonitorsCollection
 	chunks   *chunks.ChunksCollection
+	exports  *exports.ExportsCollection
 	// ADD_ROUTE
 	collections []types.Collection
 	meta        *coreTypes.MetaData
@@ -72,6 +74,8 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	app.abis = abis.NewAbisCollection()
 	app.monitors = monitors.NewMonitorsCollection()
 	app.chunks = chunks.NewChunksCollection()
+	// Note: exports created on-demand per chain/address when needed
+	app.exports = nil
 	// ADD_ROUTE
 
 	app.collections = make([]types.Collection, 0, 4)
@@ -79,6 +83,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	app.RegisterCollection(app.abis)
 	app.RegisterCollection(app.monitors)
 	app.RegisterCollection(app.chunks)
+	// Note: exports created on-demand per chain/address when needed
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 

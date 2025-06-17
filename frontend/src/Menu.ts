@@ -4,6 +4,7 @@ import {
   // ADD_ROUTE
   Abis,
   Chunks,
+  Exports,
   Monitors,
   Names,
   // ADD_ROUTE
@@ -84,6 +85,15 @@ export const MenuItems: MenuItem[] = [
     component: Chunks,
     hotkey: 'mod+7',
     altHotkey: 'alt+7',
+    type: 'navigation',
+  },
+  {
+    label: 'Exports',
+    path: '/exports',
+    position: 'top',
+    component: Exports,
+    hotkey: 'mod+8',
+    altHotkey: 'alt+8',
     type: 'navigation',
   },
   // ADD_ROUTE

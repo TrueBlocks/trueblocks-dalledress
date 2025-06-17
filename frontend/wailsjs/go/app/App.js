@@ -42,6 +42,14 @@ export function ConvertToAddress(arg1) {
   return window['go']['app']['App']['ConvertToAddress'](arg1);
 }
 
+export function ExportsCrud(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['app']['App']['ExportsCrud'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function ExportsNeedsUpdate(arg1, arg2, arg3) {
+  return window['go']['app']['App']['ExportsNeedsUpdate'](arg1, arg2, arg3);
+}
+
 export function FileNew(arg1) {
   return window['go']['app']['App']['FileNew'](arg1);
 }
@@ -84,6 +92,14 @@ export function GetChunksPage(arg1, arg2, arg3, arg4, arg5) {
 
 export function GetContext() {
   return window['go']['app']['App']['GetContext']();
+}
+
+export function GetExportsCount(arg1, arg2, arg3) {
+  return window['go']['app']['App']['GetExportsCount'](arg1, arg2, arg3);
+}
+
+export function GetExportsPage(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+  return window['go']['app']['App']['GetExportsPage'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }
 
 export function GetFilename() {
@@ -146,6 +162,10 @@ export function IsReady() {
   return window['go']['app']['App']['IsReady']();
 }
 
+export function LoadExportsData(arg1, arg2, arg3) {
+  return window['go']['app']['App']['LoadExportsData'](arg1, arg2, arg3);
+}
+
 export function LogBackend(arg1) {
   return window['go']['app']['App']['LogBackend'](arg1);
 }
@@ -180,6 +200,10 @@ export function RegisterCollection(arg1) {
 
 export function Reload(arg1) {
   return window['go']['app']['App']['Reload'](arg1);
+}
+
+export function ResetExportsData(arg1, arg2, arg3) {
+  return window['go']['app']['App']['ResetExportsData'](arg1, arg2, arg3);
 }
 
 export function ResetStore(arg1) {

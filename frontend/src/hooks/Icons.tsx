@@ -42,6 +42,7 @@ import {
   BiEnvelope,
   BiFile,
   BiGlobe,
+  BiHistory,
   BiHome,
   BiListUl,
   BiLogoGithub,
@@ -72,6 +73,7 @@ import {
   FaGithub,
   FaGlobe,
   FaHatWizard,
+  FaHistory,
   FaHome,
   FaIndustry,
   FaListAlt,
@@ -101,6 +103,7 @@ export type IconSet = {
   ABIs: IconType;
   Monitors: IconType;
   Chunks: IconType;
+  Exports: IconType;
   // ADD_ROUTE
 
   // File operations
@@ -145,6 +148,7 @@ const faIcons: IconSet = {
   ABIs: FaListAlt,
   Monitors: FaDesktop,
   Chunks: FaIndustry,
+  Exports: FaHistory,
   // ADD_ROUTE
 
   Switch: FaRandom,
@@ -183,6 +187,7 @@ const biIcons: IconSet = {
   ABIs: BiListUl,
   Monitors: BiDesktop,
   Chunks: BiBuildings,
+  Exports: BiHistory,
   // ADD_ROUTE
 
   Switch: BiTransfer,

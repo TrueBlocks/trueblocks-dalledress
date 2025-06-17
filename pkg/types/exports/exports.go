@@ -1,0 +1,349 @@
+package exports
+
+import (
+	"fmt"
+	"strings"
+	"sync"
+
+	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+)
+
+const (
+	ExportsTransactions types.ListKind = "Transactions"
+	ExportsStatements   types.ListKind = "Statements"
+	ExportsTransfers    types.ListKind = "Transfers"
+	ExportsBalances     types.ListKind = "Balances"
+)
+
+func init() {
+	types.RegisterKind(ExportsTransactions)
+	types.RegisterKind(ExportsStatements)
+	types.RegisterKind(ExportsTransfers)
+	types.RegisterKind(ExportsBalances)
+}
+
+type ExportsPage struct {
+	Kind          types.ListKind          `json:"kind"`
+	Transactions  []coreTypes.Transaction `json:"transactions,omitempty"`
+	Statements    []coreTypes.Statement   `json:"statements,omitempty"`
+	Transfers     []coreTypes.Transfer    `json:"transfers,omitempty"`
+	Balances      []coreTypes.State       `json:"balances,omitempty"`
+	TotalItems    int                     `json:"totalItems"`
+	ExpectedTotal int                     `json:"expectedTotal"`
+	IsFetching    bool                    `json:"isFetching"`
+	State         types.LoadState         `json:"state"`
+}
+
+func (ep *ExportsPage) GetKind() types.ListKind   { return ep.Kind }
+func (ep *ExportsPage) GetTotalItems() int        { return ep.TotalItems }
+func (ep *ExportsPage) GetExpectedTotal() int     { return ep.ExpectedTotal }
+func (ep *ExportsPage) GetIsFetching() bool       { return ep.IsFetching }
+func (ep *ExportsPage) GetState() types.LoadState { return ep.State }
+
+type ExportsCollection struct {
+	chain             string
+	address           string
+	transactionsFacet *facets.Facet[coreTypes.Transaction]
+	statementsFacet   *facets.Facet[coreTypes.Statement]
+	transfersFacet    *facets.Facet[coreTypes.Transfer]
+	balancesFacet     *facets.Facet[coreTypes.State]
+}
+
+func NewExportsCollection(chain, address string) *ExportsCollection {
+	instance := &ExportsCollection{
+		chain:   chain,
+		address: address,
+	}
+	instance.initializeFacets()
+	return instance
+}
+
+func (ec *ExportsCollection) initializeFacets() {
+	ec.transactionsFacet = facets.NewFacet(
+		ExportsTransactions,
+		nil, // No filter function for now
+		nil, // No deduplication function for now
+		GetExportsTransactionsStore(ec.chain, ec.address),
+	)
+	ec.statementsFacet = facets.NewFacet(
+		ExportsStatements,
+		nil,
+		nil,
+		GetExportsStatementsStore(ec.chain, ec.address),
+	)
+	ec.transfersFacet = facets.NewFacet(
+		ExportsTransfers,
+		nil,
+		nil,
+		GetExportsTransfersStore(ec.chain, ec.address),
+	)
+	ec.balancesFacet = facets.NewFacet(
+		ExportsBalances,
+		nil,
+		nil,
+		GetExportsBalancesStore(ec.chain, ec.address),
+	)
+}
+
+func (ec *ExportsCollection) GetPage(
+	listKind types.ListKind,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (types.Page, error) {
+	switch listKind {
+	case ExportsTransactions:
+		return ec.getTransactionsPage(first, pageSize, sortSpec, filter)
+	case ExportsStatements:
+		return ec.getStatementsPage(first, pageSize, sortSpec, filter)
+	case ExportsTransfers:
+		return ec.getTransfersPage(first, pageSize, sortSpec, filter)
+	case ExportsBalances:
+		return ec.getBalancesPage(first, pageSize, sortSpec, filter)
+	default:
+		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
+	}
+}
+
+func (ec *ExportsCollection) getTransactionsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
+	page := &ExportsPage{
+		Kind: ExportsTransactions,
+	}
+	filter = strings.ToLower(filter)
+
+	var filterFunc = func(item *coreTypes.Transaction) bool {
+		if filter == "" {
+			return true
+		}
+		// TODO: Implement proper filtering based on transaction fields
+		return strings.Contains(strings.ToLower(item.Hash.Hex()), filter)
+	}
+
+	var sortFunc = func(items []coreTypes.Transaction, sort sdk.SortSpec) error {
+		// TODO: Implement proper sorting when SDK methods are available
+		return nil
+	}
+
+	if result, err := ec.transactionsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+		return nil, types.NewStoreError("exports", ExportsTransactions, "GetPage", err)
+	} else {
+		page.Transactions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+	}
+
+	page.IsFetching = ec.transactionsFacet.IsFetching()
+	page.ExpectedTotal = ec.transactionsFacet.ExpectedCount()
+	return page, nil
+}
+
+func (ec *ExportsCollection) getStatementsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
+	page := &ExportsPage{
+		Kind: ExportsStatements,
+	}
+	filter = strings.ToLower(filter)
+
+	var filterFunc = func(item *coreTypes.Statement) bool {
+		if filter == "" {
+			return true
+		}
+		// Filter based on statement fields
+		return strings.Contains(strings.ToLower(item.AccountedFor.Hex()), filter) ||
+			strings.Contains(strings.ToLower(item.Asset.Hex()), filter)
+	}
+
+	var sortFunc = func(items []coreTypes.Statement, sort sdk.SortSpec) error {
+		// TODO: Implement proper sorting when SDK methods are available
+		return nil
+	}
+
+	if result, err := ec.statementsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+		return nil, types.NewStoreError("exports", ExportsStatements, "GetPage", err)
+	} else {
+		page.Statements, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+	}
+
+	page.IsFetching = ec.statementsFacet.IsFetching()
+	page.ExpectedTotal = ec.statementsFacet.ExpectedCount()
+	return page, nil
+}
+
+func (ec *ExportsCollection) getTransfersPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
+	page := &ExportsPage{
+		Kind: ExportsTransfers,
+	}
+	filter = strings.ToLower(filter)
+
+	var filterFunc = func(item *coreTypes.Transfer) bool {
+		if filter == "" {
+			return true
+		}
+		// Filter based on transfer fields
+		return strings.Contains(strings.ToLower(item.Asset.Hex()), filter) ||
+			strings.Contains(strings.ToLower(item.Sender.Hex()), filter) ||
+			strings.Contains(strings.ToLower(item.Recipient.Hex()), filter)
+	}
+
+	var sortFunc = func(items []coreTypes.Transfer, sort sdk.SortSpec) error {
+		// TODO: Implement proper sorting when SDK methods are available
+		return nil
+	}
+
+	if result, err := ec.transfersFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+		return nil, types.NewStoreError("exports", ExportsTransfers, "GetPage", err)
+	} else {
+		page.Transfers, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+	}
+
+	page.IsFetching = ec.transfersFacet.IsFetching()
+	page.ExpectedTotal = ec.transfersFacet.ExpectedCount()
+	return page, nil
+}
+
+func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
+	page := &ExportsPage{
+		Kind: ExportsBalances,
+	}
+	filter = strings.ToLower(filter)
+
+	var filterFunc = func(item *coreTypes.State) bool {
+		if filter == "" {
+			return true
+		}
+		// Filter based on balance/state fields
+		return strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
+			strings.Contains(strings.ToLower(item.AccountType), filter)
+	}
+
+	var sortFunc = func(items []coreTypes.State, sort sdk.SortSpec) error {
+		// TODO: Implement proper sorting when SDK methods are available
+		return nil
+	}
+
+	if result, err := ec.balancesFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+		return nil, types.NewStoreError("exports", ExportsBalances, "GetPage", err)
+	} else {
+		page.Balances, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+	}
+
+	page.IsFetching = ec.balancesFacet.IsFetching()
+	page.ExpectedTotal = ec.balancesFacet.ExpectedCount()
+	return page, nil
+}
+
+func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
+	switch listKind {
+	case ExportsTransactions:
+		ec.transactionsFacet.Load()
+	case ExportsStatements:
+		ec.statementsFacet.Load()
+	case ExportsTransfers:
+		ec.transfersFacet.Load()
+	case ExportsBalances:
+		ec.balancesFacet.Load()
+	}
+}
+
+func (ec *ExportsCollection) Reset(listKind types.ListKind) {
+	switch listKind {
+	case ExportsTransactions:
+		ResetExportsStore(ec.chain, ec.address, ExportsTransactions)
+		ec.transactionsFacet.Reset()
+	case ExportsStatements:
+		ResetExportsStore(ec.chain, ec.address, ExportsStatements)
+		ec.statementsFacet.Reset()
+	case ExportsTransfers:
+		ResetExportsStore(ec.chain, ec.address, ExportsTransfers)
+		ec.transfersFacet.Reset()
+	case ExportsBalances:
+		ResetExportsStore(ec.chain, ec.address, ExportsBalances)
+		ec.balancesFacet.Reset()
+	}
+}
+
+func (ec *ExportsCollection) NeedsUpdate(listKind types.ListKind) bool {
+	switch listKind {
+	case ExportsTransactions:
+		return ec.transactionsFacet.NeedsUpdate()
+	case ExportsStatements:
+		return ec.statementsFacet.NeedsUpdate()
+	case ExportsTransfers:
+		return ec.transfersFacet.NeedsUpdate()
+	case ExportsBalances:
+		return ec.balancesFacet.NeedsUpdate()
+	default:
+		return false
+	}
+}
+
+func (ec *ExportsCollection) GetSupportedKinds() []types.ListKind {
+	return []types.ListKind{
+		ExportsTransactions,
+		ExportsStatements,
+		ExportsTransfers,
+		ExportsBalances,
+	}
+}
+
+func (ec *ExportsCollection) GetStoreForKind(kind types.ListKind) string {
+	switch kind {
+	case ExportsTransactions:
+		return "exports-transactions"
+	case ExportsStatements:
+		return "exports-statements"
+	case ExportsTransfers:
+		return "exports-transfers"
+	case ExportsBalances:
+		return "exports-balances"
+	default:
+		return ""
+	}
+}
+
+func (ec *ExportsCollection) GetCollectionName() string {
+	return "exports"
+}
+
+var (
+	// Collection cache per (chain, address) combination
+	collections   = make(map[string]*ExportsCollection)
+	collectionsMu sync.Mutex
+)
+
+// getCollectionKey creates a unique key for caching collections per (chain, address)
+func getCollectionKey(chain, address string) string {
+	return fmt.Sprintf("%s_%s", chain, address)
+}
+
+// GetExportsCollection returns a singleton collection for the given chain and address
+func GetExportsCollection(chain, address string) *ExportsCollection {
+	collectionsMu.Lock()
+	defer collectionsMu.Unlock()
+
+	key := getCollectionKey(chain, address)
+	if collection, exists := collections[key]; exists {
+		return collection
+	}
+
+	collection := NewExportsCollection(chain, address)
+	collections[key] = collection
+	return collection
+}
+
+// ClearExportsCollection removes a cached collection for the given chain and address
+func ClearExportsCollection(chain, address string) {
+	collectionsMu.Lock()
+	defer collectionsMu.Unlock()
+
+	key := getCollectionKey(chain, address)
+	delete(collections, key)
+}
+
+// ClearAllExportsCollections removes all cached collections
+func ClearAllExportsCollections() {
+	collectionsMu.Lock()
+	defer collectionsMu.Unlock()
+
+	collections = make(map[string]*ExportsCollection)
+}

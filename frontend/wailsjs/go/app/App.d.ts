@@ -10,6 +10,7 @@ import {preferences} from '../models';
 import {utils} from '../models';
 import {chunks} from '../models';
 import {context} from '../models';
+import {exports} from '../models';
 import {project} from '../models';
 import {monitors} from '../models';
 import {names} from '../models';
@@ -35,6 +36,10 @@ export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
 
+export function ExportsCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:any,arg4:string,arg5:string):Promise<void>;
+
+export function ExportsNeedsUpdate(arg1:types.ListKind,arg2:string,arg3:string):Promise<boolean>;
+
 export function FileNew(arg1:menu.CallbackData):Promise<void>;
 
 export function FileOpen(arg1:menu.CallbackData):Promise<void>;
@@ -56,6 +61,10 @@ export function GetChainList():Promise<utils.ChainList>;
 export function GetChunksPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
 
 export function GetContext():Promise<context.Context>;
+
+export function GetExportsCount(arg1:types.ListKind,arg2:string,arg3:string):Promise<number>;
+
+export function GetExportsPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string,arg6:string,arg7:string):Promise<exports.ExportsPage>;
 
 export function GetFilename():Promise<project.Project>;
 
@@ -87,6 +96,8 @@ export function IsInitialized():Promise<boolean>;
 
 export function IsReady():Promise<boolean>;
 
+export function LoadExportsData(arg1:types.ListKind,arg2:string,arg3:string):Promise<void>;
+
 export function LogBackend(arg1:string):Promise<void>;
 
 export function LogFrontend(arg1:string):Promise<void>;
@@ -104,6 +115,8 @@ export function PublishNames(arg1:string):Promise<void>;
 export function RegisterCollection(arg1:types.Collection):Promise<void>;
 
 export function Reload(arg1:types.ListKind):Promise<void>;
+
+export function ResetExportsData(arg1:types.ListKind,arg2:string,arg3:string):Promise<void>;
 
 export function ResetStore(arg1:string):Promise<void>;
 

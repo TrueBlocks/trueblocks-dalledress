@@ -4,7 +4,7 @@ module github.com/TrueBlocks/trueblocks-dalledress
 go 1.23.8
 
 require (
-	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250613002914-541217b09bce
+	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250617150238-b3dcb4cc3f9e
 	github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250504164335-8b49b03dddef
 	github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250613002712-0f9b628c8954
 	github.com/fsnotify/fsnotify v1.9.0

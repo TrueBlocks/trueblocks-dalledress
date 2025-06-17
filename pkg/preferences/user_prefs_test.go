@@ -17,9 +17,6 @@ func TestGetUserPreferences(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Expected no error, got %v", err)
 		}
-		if userPrefs.Theme != "dark" {
-			t.Errorf("Expected default theme 'dark', got %q", userPrefs.Theme)
-		}
 		if len(userPrefs.Chains) != 0 {
 			t.Errorf("Expected empty chains array, got %d chains", len(userPrefs.Chains))
 		}
@@ -31,9 +28,7 @@ func TestGetUserPreferences(t *testing.T) {
 
 		path := getUserPrefsPath()
 		expected := UserPreferences{
-			Version:  "1.0",
-			Theme:    "light",
-			Language: "fr",
+			Version: "1.0",
 			Chains: []Chain{
 				{
 					Chain:          "mainnet",

@@ -45,6 +45,8 @@ type AppPreferences struct {
 	LastViewNoWizard string            `json:"lastViewNoWizard,omitempty"`
 	MenuCollapsed    bool              `json:"menuCollapsed,omitempty"`
 	HelpCollapsed    bool              `json:"helpCollapsed,omitempty"`
+	Theme            string            `json:"theme,omitempty"`
+	Language         string            `json:"language,omitempty"`
 }
 
 func (p *AppPreferences) String() string {
@@ -63,6 +65,8 @@ func NewAppPreferences() *AppPreferences {
 		LastTab:          make(map[string]string),
 		MenuCollapsed:    false,
 		HelpCollapsed:    false,
+		Theme:            "dark",
+		Language:         "en",
 	}
 }
 

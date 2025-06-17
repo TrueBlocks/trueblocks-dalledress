@@ -7,20 +7,16 @@ import (
 )
 
 type UserPreferences struct {
-	Version  string  `json:"version,omitempty"`
-	Theme    string  `json:"theme,omitempty"`
-	Language string  `json:"language,omitempty"`
-	Name     string  `json:"name,omitempty"`
-	Email    string  `json:"email,omitempty"`
-	Chains   []Chain `json:"chains,omitempty"`
+	Version string  `json:"version,omitempty"`
+	Name    string  `json:"name,omitempty"`
+	Email   string  `json:"email,omitempty"`
+	Chains  []Chain `json:"chains,omitempty"`
 }
 
 func NewUserPreferences() *UserPreferences {
 	return &UserPreferences{
-		Version:  "1.0",
-		Theme:    "dark",
-		Language: "en",
-		Chains:   []Chain{},
+		Version: "1.0",
+		Chains:  []Chain{},
 	}
 }
 

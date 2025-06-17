@@ -2,6 +2,7 @@ import { ChangeEvent, forwardRef } from 'react';
 
 import { FormField } from '@components';
 import { Fieldset, Stack, Text, TextInput } from '@mantine/core';
+import { formatWeiToEther, formatWeiToGigawei } from '@utils';
 
 export interface FieldRendererProps {
   field: FormField<Record<string, unknown>>;
@@ -40,13 +41,48 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
     }
 
     if (mode === 'display') {
+      let displayValue;
+      if (field.type === 'ether' && field.value) {
+        displayValue = formatWeiToEther(field.value as string);
+      } else if (field.type === 'gas' && field.value) {
+        displayValue = formatWeiToGigawei(field.value as string);
+      } else {
+        displayValue = field.value || 'N/A';
+      }
+
       return (
         <div key={keyProp}>
-          <Text size="sm" fw={500}>
-            {field.label}: {field.value || 'N/A'}
+          <Text
+            size="sm"
+            fw={500}
+          >
+            {field.label}: {displayValue}
           </Text>
         </div>
       );
+    }
+
+    const isEtherField = field.type === 'ether';
+    const isGasField = field.type === 'gas';
+
+    let placeHolder;
+    if (isEtherField) {
+      placeHolder =
+        field.placeholder || 'Wei value (e.g., 1000000000000000000 for 1 ETH)';
+    } else if (isGasField) {
+      placeHolder =
+        field.placeholder || 'Wei value (e.g., 21000000000000 for 21 Gwei)';
+    } else {
+      placeHolder = field.placeholder;
+    }
+
+    let hint;
+    if (isEtherField) {
+      hint = field.hint || 'Enter value in Wei (smallest unit of Ether)';
+    } else if (isGasField) {
+      hint = field.hint || 'Enter value in Wei (will display as Gigawei)';
+    } else {
+      hint = field.hint;
     }
 
     return (
@@ -54,7 +90,7 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
         <TextInput
           ref={ref}
           label={field.label}
-          placeholder={field.placeholder}
+          placeholder={placeHolder}
           withAsterisk={field.required}
           value={field.value as string}
           onChange={(e) => {
@@ -101,9 +137,9 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
           tabIndex={field.readOnly ? -1 : 0}
           autoFocus={autoFocus}
         />
-        {field.hint && (
+        {hint && (
           <Text size="sm" c="dimmed">
-            {field.hint}
+            {hint}
           </Text>
         )}
       </div>

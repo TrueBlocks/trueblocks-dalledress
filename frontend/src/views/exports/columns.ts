@@ -1,7 +1,7 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
-// import { formatWeiToEther, formatWeiToGigawei } from '../../utils/ether';
+import { formatWeiToEther, formatWeiToGigawei } from '../../utils/ether';
 
 export const getColumnsForExports = (
   listKind: types.ListKind | string,
@@ -63,30 +63,36 @@ const getTransactionColumns = (): FormField[] => [
   {
     key: 'value',
     header: 'Value',
-    type: 'text',
+    type: 'ether',
     sortable: true,
     width: 'col-value',
   },
   {
     key: 'gas',
     header: 'Gas',
-    type: 'text',
+    type: 'gas',
     sortable: true,
     width: 'col-gas',
   },
   {
     key: 'gasPrice',
     header: 'Gas Price',
-    type: 'text',
+    type: 'ether',
     sortable: true,
     width: 'col-gas-price',
   },
   {
     key: 'gasCost',
     header: 'Gas Cost',
-    type: 'text',
+    type: 'gas',
     sortable: true,
     width: 'col-gas-price',
+    render: (row) => {
+      const gas = BigInt((row.gas as string) || '0');
+      const gasPrice = BigInt((row.gasPrice as string) || '0');
+      const gasCost = gas * gasPrice;
+      return formatWeiToGigawei(gasCost.toString());
+    },
   },
   {
     key: 'actions',
@@ -122,35 +128,41 @@ const getStatementColumns = (): FormField[] => [
   {
     key: 'accountedFor',
     header: 'Account',
-    type: 'text',
+    type: 'address',
     sortable: true,
     width: 'col-address',
   },
   {
     key: 'asset',
     header: 'Asset',
-    type: 'text',
+    type: 'address',
     sortable: true,
     width: 'col-address',
   },
   {
     key: 'prevBal',
     header: 'Prev Balance',
-    type: 'text',
+    type: 'ether',
     sortable: true,
     width: 'col-balance',
   },
   {
     key: 'amountNet',
     header: 'Net Amount',
-    type: 'text',
+    type: 'ether',
     sortable: true,
     width: 'col-amount',
+    render: (row) => {
+      const amountIn = BigInt((row.amountIn as string) || '0');
+      const amountOut = BigInt((row.amountOut as string) || '0');
+      const netAmount = amountIn + amountOut;
+      return formatWeiToEther(netAmount.toString());
+    },
   },
   {
     key: 'endBal',
     header: 'End Balance',
-    type: 'text',
+    type: 'ether',
     sortable: true,
     width: 'col-balance',
   },
@@ -188,21 +200,21 @@ const getTransferColumns = (): FormField[] => [
   {
     key: 'sender',
     header: 'Sender',
-    type: 'text',
+    type: 'address',
     sortable: true,
     width: 'col-address',
   },
   {
     key: 'recipient',
     header: 'Recipient',
-    type: 'text',
+    type: 'address',
     sortable: true,
     width: 'col-address',
   },
   {
     key: 'asset',
     header: 'Asset',
-    type: 'text',
+    type: 'address',
     sortable: true,
     width: 'col-address',
   },
@@ -216,7 +228,7 @@ const getTransferColumns = (): FormField[] => [
   {
     key: 'amount',
     header: 'Amount',
-    type: 'text',
+    type: 'ether',
     sortable: true,
     width: 'col-amount',
   },
@@ -275,14 +287,14 @@ const getBalanceColumns = (): FormField[] => [
   {
     key: 'balance',
     header: 'Balance',
-    type: 'text',
+    type: 'ether',
     sortable: true,
     width: 'col-balance',
   },
   {
     key: 'diff',
     header: 'Difference',
-    type: 'text',
+    type: 'ether',
     sortable: true,
     width: 'col-amount',
   },

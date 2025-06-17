@@ -8,23 +8,15 @@ import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { exports, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
-import { useRoute } from 'wouter';
 
 import { getColumnsForExports } from './columns';
 
 export const Exports = () => {
   const { lastTab } = useAppContext();
-  const { selectedAddress } = useAppContext();
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
   const [state, setState] = useState<types.LoadState>();
 
-  const [, params] = useRoute('/exports/:address');
-  const addressFromUrl = params?.address;
-
-  const displayAddress =
-    selectedAddress ||
-    addressFromUrl ||
-    '0xf503017d7baf7fbc0fff7492b751025c6a78179b'; // Fallback to default
+  const displayAddress = '0xf503017d7baf7fbc0fff7492b751025c6a78179b';
 
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[EXPORTS_ROUTE] || EXPORTS_DEFAULT_LIST_KIND,

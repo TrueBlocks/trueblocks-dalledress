@@ -27,8 +27,6 @@ interface AppContextType {
   setHelpCollapsed: (collapsed: boolean) => void;
   lastTab: Record<string, types.ListKind>;
   setLastTab: (route: string, tab: types.ListKind) => void;
-  selectedAddress: string | null;
-  setSelectedAddress: (address: string | null) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -42,9 +40,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [helpCollapsed, setHelpCollapsed] = useState(true);
   const [lastTab, setLastTabState] = useState<Record<string, types.ListKind>>(
     {},
-  );
-  const [selectedAddress, setSelectedAddressState] = useState<string | null>(
-    null,
   );
   const hasRedirected = useRef(false);
 
@@ -63,10 +58,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       });
       return updatedState;
     });
-  }, []);
-
-  const setSelectedAddress = useCallback((address: string | null) => {
-    setSelectedAddressState(address);
   }, []);
 
   const isWizard = location.startsWith('/wizard');
@@ -124,8 +115,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       setHelpCollapsed,
       lastTab,
       setLastTab,
-      selectedAddress,
-      setSelectedAddress,
     }),
     [
       isDarkMode,
@@ -140,8 +129,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       setHelpCollapsed,
       lastTab,
       setLastTab,
-      selectedAddress,
-      setSelectedAddress,
     ],
   );
 

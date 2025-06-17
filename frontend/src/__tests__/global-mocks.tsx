@@ -41,11 +41,33 @@ vi.mock('@hooks', async (importOriginal) => {
             Khedra Icon
           </div>
         ),
+        // ADD_ROUTE
+        Abis: (props: any) => (
+          <div data-testid="abis-icon" {...props}>
+            Abis Icon
+          </div>
+        ),
+        Monitors: (props: any) => (
+          <div data-testid="monitors-icon" {...props}>
+            Monitors Icon
+          </div>
+        ),
+        Chunks: (props: any) => (
+          <div data-testid="chunks-icon" {...props}>
+            Chunks Icon
+          </div>
+        ),
+        Export: (props: any) => (
+          <div data-testid="export-icon" {...props}>
+            Export Icon
+          </div>
+        ),
         Names: (props: any) => (
           <div data-testid="names-icon" {...props}>
             Names Icon
           </div>
         ),
+        // ADD_ROUTE
         DalleDress: (props: any) => (
           <div data-testid="dalledress-icon" {...props}>
             DalleDress Icon

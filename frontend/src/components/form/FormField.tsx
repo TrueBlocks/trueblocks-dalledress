@@ -51,7 +51,10 @@ export interface FormField<T = Record<string, unknown>> {
     | 'radio'
     | 'button'
     | 'textarea'
-    | 'select';
+    | 'select'
+    | 'ether'
+    | 'address'
+    | 'gas';
   fields?: FormField<T>[];
   isButtonGroup?: boolean;
   buttonAlignment?: 'left' | 'center' | 'right';

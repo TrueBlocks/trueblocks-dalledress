@@ -445,13 +445,13 @@ func (cc *ChunksCollection) matchesManifestFilter(manifest *coreTypes.ChunkManif
 func (cc *ChunksCollection) LoadData(listKind types.ListKind) {
 	switch listKind {
 	case ChunksStats:
-		cc.statsFacet.Load()
+		_, _ = cc.statsFacet.Load()
 	case ChunksIndex:
-		cc.indexFacet.Load()
+		_, _ = cc.indexFacet.Load()
 	case ChunksBlooms:
-		cc.bloomsFacet.Load()
+		_, _ = cc.bloomsFacet.Load()
 	case ChunksManifest:
-		cc.manifestFacet.Load()
+		_, _ = cc.manifestFacet.Load()
 	}
 }
 

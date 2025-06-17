@@ -81,18 +81,18 @@ func GetAppPreferences() (AppPreferences, error) {
 	contents := file.AsciiFileToString(path)
 	if err := json.Unmarshal([]byte(contents), &appPrefs); err != nil {
 		// Log the corruption issue for debugging
-		logging.LogBackend(fmt.Sprintf("Warning: App preferences file corrupted (%v), creating new defaults\n", err))
-		logging.LogBackend(fmt.Sprintf("Corrupted content: %s\n", contents))
+		logging.LogBackend(fmt.Sprintf("Warning: App preferences file corrupted (%v), creating new defaults", err))
+		logging.LogBackend(fmt.Sprintf("Corrupted content: %s", contents))
 		backupPath := path + ".corrupted"
 		if backupErr := os.WriteFile(backupPath, []byte(contents), 0644); backupErr == nil {
-			logging.LogBackend(fmt.Sprintf("Corrupted file backed up to: %s\n", backupPath))
+			logging.LogBackend(fmt.Sprintf("Corrupted file backed up to: %s", backupPath))
 		}
 
 		appPrefs = *NewAppPreferences()
 		if err = SetAppPreferences(&appPrefs); err != nil {
 			return AppPreferences{}, fmt.Errorf("failed to save repaired preferences: %w", err)
 		}
-		logging.LogBackend(fmt.Sprintf("App preferences reset to defaults and saved\n"))
+		logging.LogBackend("App preferences reset to defaults and saved")
 	}
 
 	var needsSave bool
@@ -118,9 +118,9 @@ func GetAppPreferences() (AppPreferences, error) {
 	}
 
 	if needsSave {
-		logging.LogBackend(fmt.Sprintf("App preferences had missing fields, saving corrected version\n"))
+		logging.LogBackend("App preferences had missing fields, saving corrected version")
 		if err := SetAppPreferences(&appPrefs); err != nil {
-			logging.LogBackend(fmt.Sprintf("Warning: Could not save corrected app preferences: %v\n", err))
+			logging.LogBackend(fmt.Sprintf("Warning: Could not save corrected app preferences: %v", err))
 		}
 	}
 

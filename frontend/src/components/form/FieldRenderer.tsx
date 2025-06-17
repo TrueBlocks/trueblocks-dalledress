@@ -52,10 +52,7 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
 
       return (
         <div key={keyProp}>
-          <Text
-            size="sm"
-            fw={500}
-          >
+          <Text size="sm" fw={500}>
             {field.label}: {displayValue}
           </Text>
         </div>

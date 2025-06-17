@@ -235,13 +235,13 @@ func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.S
 func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
 	switch listKind {
 	case ExportsTransactions:
-		ec.transactionsFacet.Load()
+		_, _ = ec.transactionsFacet.Load()
 	case ExportsStatements:
-		ec.statementsFacet.Load()
+		_, _ = ec.statementsFacet.Load()
 	case ExportsTransfers:
-		ec.transfersFacet.Load()
+		_, _ = ec.transfersFacet.Load()
 	case ExportsBalances:
-		ec.balancesFacet.Load()
+		_, _ = ec.balancesFacet.Load()
 	}
 }
 

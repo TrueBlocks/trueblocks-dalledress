@@ -415,7 +415,7 @@ export namespace preferences {
 	    bounds?: Bounds;
 	    recentProjects?: string[];
 	    lastView?: string;
-	    lastTab?: Record<string, string>;
+	    lastTab: Record<string, string>;
 	    lastViewNoWizard?: string;
 	    menuCollapsed?: boolean;
 	    helpCollapsed?: boolean;
@@ -633,6 +633,14 @@ export namespace sdk {
 
 export namespace types {
 	
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
+	}
 	export enum ListKind {
 	    DOWNLOADED = "Downloaded",
 	    KNOWN = "Known",
@@ -648,14 +656,6 @@ export namespace types {
 	    PREFUND = "Prefund",
 	    REGULAR = "Regular",
 	    BADDRESS = "Baddress",
-	}
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];

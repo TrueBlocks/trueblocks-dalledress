@@ -1,5 +1,5 @@
 import { SetInitialized } from '@app';
-import { About, DalleDress, History, Home, Khedra, Settings } from '@views';
+import { DalleDress, Home, Khedra, Settings } from '@views';
 import {
   // ADD_ROUTE
   Abis,
@@ -32,30 +32,12 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    label: 'About',
-    path: '/about',
-    position: 'top',
-    component: About,
-    hotkey: 'mod+2',
-    altHotkey: 'alt+2',
-    type: 'navigation',
-  },
-  {
-    label: 'History',
-    path: '/history/:address',
-    position: 'top',
-    component: History,
-    hotkey: 'mod+3',
-    altHotkey: 'alt+3',
-    type: 'navigation',
-  },
-  {
     label: 'Khedra',
     path: '/khedra',
     position: 'top',
     component: Khedra,
-    hotkey: 'mod+4',
-    altHotkey: 'alt+4',
+    hotkey: 'mod+2',
+    altHotkey: 'alt+2',
     type: 'navigation',
   },
   {
@@ -63,8 +45,8 @@ export const MenuItems: MenuItem[] = [
     path: '/dalledress',
     position: 'top',
     component: DalleDress,
-    hotkey: 'mod+5',
-    altHotkey: 'alt+5',
+    hotkey: 'mod+3',
+    altHotkey: 'alt+3',
     type: 'navigation',
   },
   // ADD_ROUTE
@@ -73,8 +55,8 @@ export const MenuItems: MenuItem[] = [
     path: '/abis',
     position: 'top',
     component: Abis,
-    hotkey: 'mod+6',
-    altHotkey: 'alt+6',
+    hotkey: 'mod+4',
+    altHotkey: 'alt+4',
     type: 'navigation',
   },
   {
@@ -82,8 +64,8 @@ export const MenuItems: MenuItem[] = [
     path: '/monitors',
     position: 'top',
     component: Monitors,
-    hotkey: 'mod+7',
-    altHotkey: 'alt+7',
+    hotkey: 'mod+5',
+    altHotkey: 'alt+5',
     type: 'navigation',
   },
   {
@@ -91,8 +73,8 @@ export const MenuItems: MenuItem[] = [
     path: '/names',
     position: 'top',
     component: Names,
-    hotkey: 'mod+8',
-    altHotkey: 'alt+8',
+    hotkey: 'mod+6',
+    altHotkey: 'alt+6',
     type: 'navigation',
   },
   {
@@ -100,8 +82,8 @@ export const MenuItems: MenuItem[] = [
     path: '/chunks',
     position: 'top',
     component: Chunks,
-    hotkey: 'mod+9',
-    altHotkey: 'alt+9',
+    hotkey: 'mod+7',
+    altHotkey: 'alt+7',
     type: 'navigation',
   },
   // ADD_ROUTE
@@ -110,8 +92,8 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+0',
-    altHotkey: 'alt+0',
+    hotkey: 'mod+9',
+    altHotkey: 'alt+9',
     type: 'navigation',
   },
   {

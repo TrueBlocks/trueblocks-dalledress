@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/kbinani/screenshot"
 )
 
@@ -40,7 +41,7 @@ type AppPreferences struct {
 	Bounds           Bounds            `json:"bounds,omitempty"`
 	RecentProjects   []string          `json:"recentProjects,omitempty"`
 	LastView         string            `json:"lastView,omitempty"`
-	LastTab          map[string]string `json:"lastTab,omitempty"`
+	LastTab          map[string]string `json:"lastTab"`
 	LastViewNoWizard string            `json:"lastViewNoWizard,omitempty"`
 	MenuCollapsed    bool              `json:"menuCollapsed,omitempty"`
 	HelpCollapsed    bool              `json:"helpCollapsed,omitempty"`
@@ -79,15 +80,48 @@ func GetAppPreferences() (AppPreferences, error) {
 	var appPrefs AppPreferences
 	contents := file.AsciiFileToString(path)
 	if err := json.Unmarshal([]byte(contents), &appPrefs); err != nil {
+		// Log the corruption issue for debugging
+		logging.LogBackend(fmt.Sprintf("Warning: App preferences file corrupted (%v), creating new defaults\n", err))
+		logging.LogBackend(fmt.Sprintf("Corrupted content: %s\n", contents))
+		backupPath := path + ".corrupted"
+		if backupErr := os.WriteFile(backupPath, []byte(contents), 0644); backupErr == nil {
+			logging.LogBackend(fmt.Sprintf("Corrupted file backed up to: %s\n", backupPath))
+		}
+
 		appPrefs = *NewAppPreferences()
 		if err = SetAppPreferences(&appPrefs); err != nil {
 			return AppPreferences{}, fmt.Errorf("failed to save repaired preferences: %w", err)
 		}
+		logging.LogBackend(fmt.Sprintf("App preferences reset to defaults and saved\n"))
 	}
 
-	// Initialize LastTab if nil
+	var needsSave bool
 	if appPrefs.LastTab == nil {
 		appPrefs.LastTab = make(map[string]string)
+		needsSave = true
+	}
+	if appPrefs.RecentProjects == nil {
+		appPrefs.RecentProjects = []string{}
+		needsSave = true
+	}
+	if appPrefs.Version == "" {
+		appPrefs.Version = "1.0"
+		needsSave = true
+	}
+	if appPrefs.LastView == "" {
+		appPrefs.LastView = "/"
+		needsSave = true
+	}
+	if appPrefs.LastViewNoWizard == "" {
+		appPrefs.LastViewNoWizard = "/"
+		needsSave = true
+	}
+
+	if needsSave {
+		logging.LogBackend(fmt.Sprintf("App preferences had missing fields, saving corrected version\n"))
+		if err := SetAppPreferences(&appPrefs); err != nil {
+			logging.LogBackend(fmt.Sprintf("Warning: Could not save corrected app preferences: %v\n", err))
+		}
 	}
 
 	return appPrefs, nil

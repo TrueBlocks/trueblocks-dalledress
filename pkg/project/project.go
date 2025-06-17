@@ -59,7 +59,20 @@ func Load(path string) (*Project, error) {
 
 	var project Project
 	if err := json.Unmarshal(data, &project); err != nil {
-		return nil, fmt.Errorf("failed to parse project file: %w", err)
+		project = Project{
+			Version:     "1.0",
+			Name:        "Recovered Project",
+			LastOpened:  "",
+			Preferences: make(map[string]string),
+			Dirty:       true, // Mark as dirty so user knows it was recovered
+			Data:        make(map[string]interface{}),
+			Address:     base.ZeroAddr,
+		}
+		project.Path = path
+		if saveErr := project.Save(); saveErr != nil {
+			return nil, fmt.Errorf("failed to parse project file and could not save recovered version: %w (original error: %v)", saveErr, err)
+		}
+		return &project, nil
 	}
 
 	// Set in-memory fields

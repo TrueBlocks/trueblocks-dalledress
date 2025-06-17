@@ -36,16 +36,6 @@ vi.mock('@hooks', async (importOriginal) => {
             Home Icon
           </div>
         ),
-        About: (props: any) => (
-          <div data-testid="about-icon" {...props}>
-            About Icon
-          </div>
-        ),
-        History: (props: any) => (
-          <div data-testid="history-icon" {...props}>
-            History Icon
-          </div>
-        ),
         Khedra: (props: any) => (
           <div data-testid="khedra-icon" {...props}>
             Khedra Icon
@@ -170,16 +160,6 @@ vi.mock('@hooks', async (importOriginal) => {
         Home: (props: any) => (
           <div data-testid="home-icon" {...props}>
             Home Icon
-          </div>
-        ),
-        About: (props: any) => (
-          <div data-testid="about-icon" {...props}>
-            About Icon
-          </div>
-        ),
-        History: (props: any) => (
-          <div data-testid="history-icon" {...props}>
-            History Icon
           </div>
         ),
         Khedra: (props: any) => (

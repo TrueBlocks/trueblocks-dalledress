@@ -82,7 +82,9 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
           setLastView(prefs.lastView || '/');
           setMenuCollapsed(prefs.menuCollapsed as boolean);
           setHelpCollapsed(prefs.helpCollapsed as boolean);
-          setLastTabState(prefs.lastTab as Record<string, types.ListKind>);
+          setLastTabState(
+            (prefs.lastTab || {}) as Record<string, types.ListKind>,
+          );
           setReady(true);
           return;
         }

@@ -95,10 +95,14 @@ vi.mock('@hooks', () => ({
   },
   useIcons: () => ({
     Home: () => null,
-    About: () => null,
-    History: () => null,
     Khedra: () => null,
+    // ADD_ROUTE
+    Abis: () => null,
+    Chuncks: () => null,
+    Export: () => null,
+    Monitors: () => null,
     Names: () => null,
+    // ADD_ROUTE
     DalleDress: () => null,
     Settings: () => null,
     Wizard: () => null,

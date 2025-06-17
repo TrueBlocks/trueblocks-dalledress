@@ -26,10 +26,6 @@ export const useIcons = (
     // This properly types the components as React components that can be used in JSX
     const Home: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Home, { size, ...props });
-    const About: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.About, { size, ...props });
-    const History: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.History, { size, ...props });
     const Khedra: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Khedra, { size, ...props });
     const DalleDress: FC<IconProps> = (props = {}) =>
@@ -92,8 +88,6 @@ export const useIcons = (
 
     return {
       Home,
-      About,
-      History,
       Khedra,
       DalleDress,
       Settings,

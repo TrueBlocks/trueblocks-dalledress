@@ -42,9 +42,7 @@ import {
   BiEnvelope,
   BiFile,
   BiGlobe,
-  BiHistory,
   BiHome,
-  BiInfoCircle,
   BiListUl,
   BiLogoGithub,
   BiLogoTwitter,
@@ -74,7 +72,6 @@ import {
   FaGithub,
   FaGlobe,
   FaHatWizard,
-  FaHistory,
   FaHome,
   FaIndustry,
   FaListAlt,
@@ -82,7 +79,6 @@ import {
   FaMoon,
   FaPalette,
   FaPlus,
-  FaQuestion,
   FaRandom,
   FaSun,
   FaTimes,
@@ -95,8 +91,6 @@ import {
 export type IconSet = {
   // Menu options
   Home: IconType;
-  About: IconType;
-  History: IconType;
   Khedra: IconType;
   DalleDress: IconType;
   Settings: IconType;
@@ -141,8 +135,6 @@ export type IconSet = {
 // An IconSet using icons from fa react to represent Home, Settings, and Khedra
 const faIcons: IconSet = {
   Home: FaHome,
-  About: FaQuestion,
-  History: FaHistory,
   Khedra: FaIndustry,
   DalleDress: FaPalette,
   Settings: FaCog,
@@ -181,8 +173,6 @@ const faIcons: IconSet = {
 // An IconSet using icons from bi react to represent Home, Settings, and Khedra
 const biIcons: IconSet = {
   Home: BiHome,
-  About: BiInfoCircle,
-  History: BiHistory,
   Khedra: BiBuildings,
   DalleDress: BiPalette,
   Settings: BiCog,

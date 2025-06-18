@@ -5,6 +5,7 @@ export * from './Chips';
 export * from './NodeStatus';
 export * from './ProjectsList';
 export * from './Socials';
+export * from './ThemeProvider';
 
 export * from './form';
 export * from './table';

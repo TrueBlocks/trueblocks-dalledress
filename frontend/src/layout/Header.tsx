@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
+import { useActiveProject } from '@hooks';
 import { useIcons } from '@hooks';
 import {
   ActionIcon,
@@ -12,7 +13,8 @@ import {
 
 export const Header = () => {
   const [appName, setAppName] = useState('AppName');
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const { toggleDarkMode, isDarkMode } = useActiveProject();
   const { Light, Dark } = useIcons();
 
   useEffect(() => {
@@ -20,6 +22,14 @@ export const Header = () => {
       setAppName(id.appName);
     });
   }, []);
+
+  useEffect(() => {
+    setColorScheme(isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode, setColorScheme]);
+
+  const handleToggleTheme = async () => {
+    await toggleDarkMode();
+  };
 
   return (
     <AppShell.Header>
@@ -31,7 +41,7 @@ export const Header = () => {
           <ActionIcon
             variant="default"
             color={colorScheme === 'dark' ? 'yellow' : 'blue'}
-            onClick={() => toggleColorScheme()}
+            onClick={handleToggleTheme}
             title="Toggle color scheme"
           >
             {colorScheme === 'dark' ? <Light size={18} /> : <Dark size={18} />}

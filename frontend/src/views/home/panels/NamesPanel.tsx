@@ -1,19 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { GetNamesPage } from '@app';
+import { GetNamesSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIcons } from '@hooks';
 import { Badge, Button, Group, Stack } from '@mantine/core';
 import { msgs, types } from '@models';
 import { Log } from '@utils';
-
-interface NamesSummary {
-  total: number;
-  custom: number;
-  prefund: number;
-  regular: number;
-  baddress: number;
-}
 
 interface NamesPanelProps {
   onViewAll?: () => void;
@@ -21,12 +13,16 @@ interface NamesPanelProps {
 }
 
 export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
-  const [summary, setSummary] = useState<NamesSummary>({
-    total: 0,
-    custom: 0,
-    prefund: 0,
-    regular: 0,
-    baddress: 0,
+  const [summary, setSummary] = useState<types.Summary>({
+    totalCount: 0,
+    facetCounts: {},
+    customData: {
+      customCount: 0,
+      prefundCount: 0,
+      regularCount: 0,
+      baddressCount: 0,
+    },
+    lastUpdated: Date.now(),
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,28 +31,12 @@ export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
   const fetchNamesSummary = async (showLoading = true) => {
     try {
       if (showLoading) setLoading(true);
-      const allNames = await GetNamesPage(
-        types.ListKind.ALL,
-        0,
-        200000,
-        { fields: ['address'], orders: [true] },
-        '',
-      );
 
-      if (allNames?.names) {
-        const summary = allNames.names.reduce(
-          (acc, name) => {
-            acc.total++;
-            if (name.isCustom || name.tags?.includes('Custom')) acc.custom++;
-            else if (name.isPrefund || name.tags?.includes('Prefund'))
-              acc.prefund++;
-            else if (name.tags?.includes('Baddress')) acc.baddress++;
-            else acc.regular++;
-            return acc;
-          },
-          { total: 0, custom: 0, prefund: 0, regular: 0, baddress: 0 },
-        );
-        setSummary(summary);
+      // Use the new GetNamesSummary API that returns pre-computed summaries
+      const summaryData = await GetNamesSummary();
+
+      if (summaryData) {
+        setSummary(summaryData);
       }
       setError(null);
     } catch (err) {
@@ -71,19 +51,29 @@ export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
     fetchNamesSummary();
   }, []);
 
-  // Listen for data changes and refresh silently (no loading state)
+  // Listen for the new consolidated collection state changes
   useEvent(
     msgs.EventType.DATA_LOADED,
-    (_message: string, payload?: types.DataLoadedPayload) => {
-      // Update when any name-related data is loaded
-      if (
-        payload?.listKind === types.ListKind.ALL ||
-        payload?.listKind === types.ListKind.CUSTOM ||
-        payload?.listKind === types.ListKind.PREFUND ||
-        payload?.listKind === types.ListKind.REGULAR ||
-        payload?.listKind === types.ListKind.BADDRESS
-      ) {
-        fetchNamesSummary(false);
+    (_message: string, payload?: Record<string, unknown>) => {
+      // Update when names collection data changes
+      if (payload?.collection === 'names') {
+        // Extract summary directly from the event payload - no API call needed!
+        const summary = payload.summary as types.Summary | undefined;
+        if (summary) {
+          setSummary(summary);
+        }
+
+        // Update loading state based on collection state
+        const state = payload.state as types.LoadState | undefined;
+        setLoading(state === types.LoadState.FETCHING);
+
+        // Handle errors
+        const error = payload.error as string | undefined;
+        if (error) {
+          setError(error);
+        } else {
+          setError(null);
+        }
       }
     },
   );
@@ -91,7 +81,7 @@ export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
   return (
     <DashboardCard
       title="Names"
-      subtitle={`${summary.total} addresses`}
+      subtitle={`${summary.totalCount} addresses`}
       icon={<Names size={20} />}
       loading={loading}
       error={error}
@@ -100,32 +90,32 @@ export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
       <Stack gap="sm">
         <div>
           <StatusIndicator
-            status={summary.total > 0 ? 'healthy' : 'inactive'}
+            status={summary.totalCount > 0 ? 'healthy' : 'inactive'}
             label="Name Database"
-            count={summary.total}
+            count={summary.totalCount}
             size="xs"
           />
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-          {summary.custom > 0 && (
+          {summary.customData?.customCount > 0 && (
             <Badge size="sm" variant="light" color="blue">
-              Custom: {summary.custom}
+              Custom: {summary.customData?.customCount}
             </Badge>
           )}
-          {summary.regular > 0 && (
+          {summary.customData?.regularCount > 0 && (
             <Badge size="sm" variant="light" color="green">
-              Regular: {summary.regular}
+              Regular: {summary.customData?.regularCount}
             </Badge>
           )}
-          {summary.prefund > 0 && (
+          {summary.customData?.prefundCount > 0 && (
             <Badge size="sm" variant="light" color="orange">
-              Prefund: {summary.prefund}
+              Prefund: {summary.customData?.prefundCount}
             </Badge>
           )}
-          {summary.baddress > 0 && (
+          {summary.customData?.baddressCount > 0 && (
             <Badge size="sm" variant="light" color="red">
-              Bad: {summary.baddress}
+              Bad: {summary.customData?.baddressCount}
             </Badge>
           )}
         </div>

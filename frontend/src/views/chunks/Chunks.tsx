@@ -101,9 +101,14 @@ export const Chunks = () => {
     }
   }, [listKind, fetchData, handleError]);
 
-  useEvent(msgs.EventType.DATA_LOADED, () => {
-    fetchData();
-  });
+  useEvent(
+    msgs.EventType.DATA_LOADED,
+    (_message: string, payload?: Record<string, unknown>) => {
+      if (payload?.collection === 'chunks') {
+        fetchData();
+      }
+    },
+  );
 
   useHotkeys([['mod+r', handleReload]]);
 

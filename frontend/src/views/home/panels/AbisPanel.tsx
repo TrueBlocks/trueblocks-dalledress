@@ -1,17 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { GetAbisPage } from '@app';
+import { GetAbisSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
-import { useIcons } from '@hooks';
+import { useEvent, useIcons } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
-import { types } from '@models';
+import { msgs, types } from '@models';
 import { Log } from '@utils';
-
-interface AbisSummary {
-  totalAbis: number;
-  totalFunctions: number;
-  recentlyAdded: number;
-}
 
 interface AbisPanelProps {
   onViewAll?: () => void;
@@ -19,66 +13,76 @@ interface AbisPanelProps {
 }
 
 export const AbisPanel = ({ onViewAll, onAddAbi }: AbisPanelProps) => {
-  const [summary, setSummary] = useState<AbisSummary>({
-    totalAbis: 0,
-    totalFunctions: 0,
-    recentlyAdded: 0,
+  const [summary, setSummary] = useState<types.Summary>({
+    totalCount: 0,
+    facetCounts: {},
+    customData: {
+      functionsCount: 0,
+      eventsCount: 0,
+      knownCount: 0,
+      downloadedCount: 0,
+    },
+    lastUpdated: Date.now(),
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { ABIs } = useIcons();
 
-  useEffect(() => {
-    const fetchAbisSummary = async () => {
-      try {
-        setLoading(true);
-        const abisData = await GetAbisPage(
-          types.ListKind.DOWNLOADED,
-          0,
-          1000,
-          { fields: ['address'], orders: [true] },
-          '',
-        );
+  const fetchAbisSummary = async (showLoading = true) => {
+    try {
+      if (showLoading) setLoading(true);
 
-        if (abisData?.abis) {
-          setSummary({
-            totalAbis: abisData.abis.length,
-            totalFunctions: 0,
-            recentlyAdded: 0,
-          });
-        }
+      // Use the new GetAbisSummary API that returns pre-computed summaries
+      const summaryData = await GetAbisSummary();
 
-        const functionsData = await GetAbisPage(
-          types.ListKind.FUNCTIONS,
-          0,
-          1000,
-          { fields: ['name'], orders: [true] },
-          '',
-        );
-
-        if (functionsData?.functions) {
-          setSummary((prev) => ({
-            ...prev,
-            totalFunctions: functionsData.functions?.length || 0,
-          }));
-        }
-
-        setError(null);
-      } catch (err) {
-        Log(`Error fetching ABIs summary: ${err}`);
-        setError('Failed to load ABIs');
-      } finally {
-        setLoading(false);
+      if (summaryData) {
+        // Use the backend Summary structure directly
+        setSummary(summaryData);
       }
-    };
+      setError(null);
+    } catch (err) {
+      Log(`Error fetching ABIs summary: ${err}`);
+      setError('Failed to load ABIs');
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchAbisSummary();
   }, []);
+
+  // Listen for the new consolidated collection state changes
+  useEvent(
+    msgs.EventType.DATA_LOADED,
+    (_message: string, payload?: Record<string, unknown>) => {
+      // Update when abis collection data changes
+      if (payload?.collection === 'abis') {
+        // Extract summary directly from the event payload - no API call needed!
+        const summary = payload.summary as types.Summary | undefined;
+        if (summary) {
+          setSummary(summary);
+        }
+
+        // Update loading state based on collection state
+        const state = payload.state as types.LoadState | undefined;
+        setLoading(state === types.LoadState.FETCHING);
+
+        // Handle errors
+        const error = payload.error as string | undefined;
+        if (error) {
+          setError(error);
+        } else {
+          setError(null);
+        }
+      }
+    },
+  );
 
   return (
     <DashboardCard
       title="ABIs"
-      subtitle={`${summary.totalAbis} contracts`}
+      subtitle={`${summary.totalCount} contracts`}
       icon={<ABIs size={20} />}
       loading={loading}
       error={error}
@@ -87,20 +91,28 @@ export const AbisPanel = ({ onViewAll, onAddAbi }: AbisPanelProps) => {
       <Stack gap="sm">
         <div>
           <StatusIndicator
-            status={summary.totalAbis > 0 ? 'healthy' : 'inactive'}
+            status={summary.totalCount > 0 ? 'healthy' : 'inactive'}
             label="ABI Database"
-            count={summary.totalAbis}
+            count={summary.totalCount}
             size="xs"
           />
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           <Badge size="sm" variant="light" color="blue">
-            Functions: {summary.totalFunctions}
+            Functions: {(summary.customData?.functionsCount as number) || 0}
           </Badge>
-          {summary.recentlyAdded > 0 && (
+          <Badge size="sm" variant="light" color="purple">
+            Events: {(summary.customData?.eventsCount as number) || 0}
+          </Badge>
+          {(summary.customData?.knownCount as number) > 0 && (
             <Badge size="sm" variant="light" color="green">
-              Recent: {summary.recentlyAdded}
+              Known: {summary.customData?.knownCount}
+            </Badge>
+          )}
+          {(summary.customData?.downloadedCount as number) > 0 && (
+            <Badge size="sm" variant="light" color="orange">
+              Downloaded: {summary.customData?.downloadedCount}
             </Badge>
           )}
         </div>

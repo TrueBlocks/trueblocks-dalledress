@@ -92,9 +92,12 @@ export const Exports = () => {
 
   useEvent(
     msgs.EventType.DATA_LOADED,
-    (_message: string, payload?: types.DataLoadedPayload) => {
-      if (payload?.listKind === listKindRef.current) {
-        fetchData();
+    (_message: string, payload?: Record<string, unknown>) => {
+      if (payload?.collection === 'exports') {
+        const eventListKind = payload.listKind as types.ListKind | undefined;
+        if (eventListKind === listKindRef.current) {
+          fetchData();
+        }
       }
     },
   );

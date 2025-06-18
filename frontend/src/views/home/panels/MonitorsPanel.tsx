@@ -1,19 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { GetMonitorsPage } from '@app';
+import { GetMonitorsSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIcons } from '@hooks';
 import { Badge, Button, Group, Stack } from '@mantine/core';
 import { msgs, types } from '@models';
 import { Log } from '@utils';
-
-interface MonitorsSummary {
-  total: number;
-  active: number;
-  staged: number;
-  deleted: number;
-  empty: number;
-}
 
 interface MonitorsPanelProps {
   onViewAll?: () => void;
@@ -24,12 +16,16 @@ export const MonitorsPanel = ({
   onViewAll,
   onAddMonitor,
 }: MonitorsPanelProps) => {
-  const [summary, setSummary] = useState<MonitorsSummary>({
-    total: 0,
-    active: 0,
-    staged: 0,
-    deleted: 0,
-    empty: 0,
+  const [summary, setSummary] = useState<types.Summary>({
+    totalCount: 0,
+    facetCounts: {},
+    customData: {
+      activeCount: 0,
+      stagedCount: 0,
+      deletedCount: 0,
+      emptyCount: 0,
+    },
+    lastUpdated: Date.now(),
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,28 +34,13 @@ export const MonitorsPanel = ({
   const fetchMonitorsSummary = async (showLoading = true) => {
     try {
       if (showLoading) setLoading(true);
-      const monitorsData = await GetMonitorsPage(
-        types.ListKind.MONITORS,
-        0,
-        1000,
-        { fields: ['address'], orders: [true] },
-        '',
-      );
 
-      if (monitorsData?.monitors) {
-        const summary = monitorsData.monitors.reduce(
-          (acc, monitor) => {
-            acc.total++;
-            if (monitor.deleted) acc.deleted++;
-            else if (monitor.isStaged) acc.staged++;
-            else acc.active++;
+      // Use the new GetMonitorsSummary API that returns pre-computed summaries
+      const summaryData = await GetMonitorsSummary();
 
-            if (monitor.isEmpty) acc.empty++;
-            return acc;
-          },
-          { total: 0, active: 0, staged: 0, deleted: 0, empty: 0 },
-        );
-        setSummary(summary);
+      if (summaryData) {
+        // Use the backend Summary structure directly
+        setSummary(summaryData);
       }
       setError(null);
     } catch (err) {
@@ -74,26 +55,45 @@ export const MonitorsPanel = ({
     fetchMonitorsSummary();
   }, []);
 
-  // Listen for data changes and refresh silently (no loading state)
+  // Listen for the new consolidated collection state changes
   useEvent(
     msgs.EventType.DATA_LOADED,
-    (_message: string, payload?: types.DataLoadedPayload) => {
-      if (payload?.listKind === types.ListKind.MONITORS) {
-        fetchMonitorsSummary(false);
+    (_message: string, payload?: Record<string, unknown>) => {
+      // Update when monitors collection data changes
+      if (payload?.collection === 'monitors') {
+        // Extract summary directly from the event payload - no API call needed!
+        const summary = payload.summary as types.Summary | undefined;
+        if (summary) {
+          setSummary(summary);
+        }
+
+        // Update loading state based on collection state
+        const state = payload.state as types.LoadState | undefined;
+        setLoading(state === types.LoadState.FETCHING);
+
+        // Handle errors
+        const error = payload.error as string | undefined;
+        if (error) {
+          setError(error);
+        } else {
+          setError(null);
+        }
       }
     },
   );
 
   const getHealthStatus = () => {
-    if (summary.total === 0) return 'inactive';
-    if (summary.deleted > summary.active) return 'warning';
+    if (summary.totalCount === 0) return 'inactive';
+    const deletedCount = (summary.customData?.deletedCount as number) || 0;
+    const activeCount = (summary.customData?.activeCount as number) || 0;
+    if (deletedCount > activeCount) return 'warning';
     return 'healthy';
   };
 
   return (
     <DashboardCard
       title="Monitors"
-      subtitle={`${summary.total} addresses`}
+      subtitle={`${summary.totalCount} addresses`}
       icon={<Monitors size={20} />}
       loading={loading}
       error={error}
@@ -104,30 +104,30 @@ export const MonitorsPanel = ({
           <StatusIndicator
             status={getHealthStatus()}
             label="Monitor Health"
-            count={summary.active}
+            count={(summary.customData?.activeCount as number) || 0}
             size="xs"
           />
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-          {summary.active > 0 && (
+          {(summary.customData?.activeCount as number) > 0 && (
             <Badge size="sm" variant="light" color="green">
-              Active: {summary.active}
+              Active: {summary.customData?.activeCount}
             </Badge>
           )}
-          {summary.staged > 0 && (
+          {(summary.customData?.stagedCount as number) > 0 && (
             <Badge size="sm" variant="light" color="blue">
-              Staged: {summary.staged}
+              Staged: {summary.customData?.stagedCount}
             </Badge>
           )}
-          {summary.deleted > 0 && (
+          {(summary.customData?.deletedCount as number) > 0 && (
             <Badge size="sm" variant="light" color="red">
-              Deleted: {summary.deleted}
+              Deleted: {summary.customData?.deletedCount}
             </Badge>
           )}
-          {summary.empty > 0 && (
+          {(summary.customData?.emptyCount as number) > 0 && (
             <Badge size="sm" variant="light" color="gray">
-              Empty: {summary.empty}
+              Empty: {summary.customData?.emptyCount}
             </Badge>
           )}
         </div>

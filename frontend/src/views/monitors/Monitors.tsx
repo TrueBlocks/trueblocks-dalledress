@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
-import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
-import { useActionMsgs, useEvent } from '@hooks';
+import { TableKey, useFiltering, useSorting } from '@contexts';
+import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, monitors, msgs, types } from '@models';
@@ -13,7 +13,7 @@ import { Address } from '../../types/address';
 import { getColumns } from './';
 
 export const Monitors = () => {
-  const { lastTab } = useAppContext();
+  const { lastTab } = useActiveProject();
   const { emitSuccess, emitCleaningStatus, failure } =
     useActionMsgs('monitors');
   const [pageData, setPageData] = useState<monitors.MonitorsPage | null>(null);

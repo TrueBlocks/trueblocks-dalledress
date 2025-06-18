@@ -461,15 +461,20 @@ export namespace preferences {
 	    }
 	}
 	export class AppPreferences {
-	    version?: string;
-	    name?: string;
 	    bounds?: Bounds;
-	    recentProjects?: string[];
-	    lastView?: string;
+	    helpCollapsed?: boolean;
+	    lastAddress?: string;
+	    lastChain?: string;
+	    lastLanguage?: string;
+	    lastProject?: string;
 	    lastTab: Record<string, string>;
+	    lastTheme?: string;
+	    lastView?: string;
 	    lastViewNoWizard?: string;
 	    menuCollapsed?: boolean;
-	    helpCollapsed?: boolean;
+	    name?: string;
+	    recentProjects?: string[];
+	    version?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppPreferences(source);
@@ -477,15 +482,20 @@ export namespace preferences {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.version = source["version"];
-	        this.name = source["name"];
 	        this.bounds = this.convertValues(source["bounds"], Bounds);
-	        this.recentProjects = source["recentProjects"];
-	        this.lastView = source["lastView"];
+	        this.helpCollapsed = source["helpCollapsed"];
+	        this.lastAddress = source["lastAddress"];
+	        this.lastChain = source["lastChain"];
+	        this.lastLanguage = source["lastLanguage"];
+	        this.lastProject = source["lastProject"];
 	        this.lastTab = source["lastTab"];
+	        this.lastTheme = source["lastTheme"];
+	        this.lastView = source["lastView"];
 	        this.lastViewNoWizard = source["lastViewNoWizard"];
 	        this.menuCollapsed = source["menuCollapsed"];
-	        this.helpCollapsed = source["helpCollapsed"];
+	        this.name = source["name"];
+	        this.recentProjects = source["recentProjects"];
+	        this.version = source["version"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -575,8 +585,6 @@ export namespace preferences {
 	}
 	export class UserPreferences {
 	    version?: string;
-	    theme?: string;
-	    language?: string;
 	    name?: string;
 	    email?: string;
 	    chains?: Chain[];
@@ -588,8 +596,6 @@ export namespace preferences {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.version = source["version"];
-	        this.theme = source["theme"];
-	        this.language = source["language"];
 	        this.name = source["name"];
 	        this.email = source["email"];
 	        this.chains = this.convertValues(source["chains"], Chain);

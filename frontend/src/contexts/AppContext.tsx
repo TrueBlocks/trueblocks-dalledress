@@ -1,7 +1,6 @@
 import {
   ReactNode,
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -9,56 +8,23 @@ import {
   useState,
 } from 'react';
 
-import { GetAppPreferences, IsReady, SetLastTab, SetLastView } from '@app';
-import { types } from '@models';
-import { Log } from '@utils';
+import { GetAppPreferences, IsReady } from '@app';
 import { useLocation } from 'wouter';
 
 interface AppContextType {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
   currentLocation: string;
   navigate: (to: string) => void;
   isWizard: boolean;
   ready: boolean;
-  menuCollapsed: boolean;
-  setMenuCollapsed: (collapsed: boolean) => void;
-  helpCollapsed: boolean;
-  setHelpCollapsed: (collapsed: boolean) => void;
-  lastTab: Record<string, types.ListKind>;
-  setLastTab: (route: string, tab: types.ListKind) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [location, navigate] = useLocation();
   const [lastView, setLastView] = useState('/');
   const [ready, setReady] = useState(false);
-  const [menuCollapsed, setMenuCollapsed] = useState(true);
-  const [helpCollapsed, setHelpCollapsed] = useState(true);
-  const [lastTab, setLastTabState] = useState<Record<string, types.ListKind>>(
-    {},
-  );
   const hasRedirected = useRef(false);
-
-  const toggleDarkMode = useCallback(() => {
-    setIsDarkMode((prev) => !prev);
-  }, []);
-
-  const setLastTab = useCallback((route: string, tab: types.ListKind) => {
-    setLastTabState((prev) => {
-      const updatedState = {
-        ...prev,
-        [route]: tab,
-      };
-      SetLastTab(route, tab).catch((error) => {
-        Log(`Failed to update lastTab in backend: ${error}`);
-      });
-      return updatedState;
-    });
-  }, []);
 
   const isWizard = location.startsWith('/wizard');
 
@@ -71,11 +37,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         if (isReady) {
           const prefs = await GetAppPreferences();
           setLastView(prefs.lastView || '/');
-          setMenuCollapsed(prefs.menuCollapsed as boolean);
-          setHelpCollapsed(prefs.helpCollapsed as boolean);
-          setLastTabState(
-            (prefs.lastTab || {}) as Record<string, types.ListKind>,
-          );
           setReady(true);
           return;
         }
@@ -94,42 +55,14 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [ready, location, lastView, navigate]);
 
-  useEffect(() => {
-    if (ready) {
-      SetLastView(location);
-      setLastView(location);
-    }
-  }, [location, ready]);
-
   const contextValue = useMemo(
     () => ({
-      isDarkMode,
-      toggleDarkMode,
       currentLocation: location,
       navigate,
       isWizard,
       ready,
-      menuCollapsed,
-      setMenuCollapsed,
-      helpCollapsed,
-      setHelpCollapsed,
-      lastTab,
-      setLastTab,
     }),
-    [
-      isDarkMode,
-      toggleDarkMode,
-      location,
-      navigate,
-      isWizard,
-      ready,
-      menuCollapsed,
-      setMenuCollapsed,
-      helpCollapsed,
-      setHelpCollapsed,
-      lastTab,
-      setLastTab,
-    ],
+    [location, navigate, isWizard, ready],
   );
 
   return (

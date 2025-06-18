@@ -110,6 +110,18 @@ export function GetImageURL(arg1) {
   return window['go']['app']['App']['GetImageURL'](arg1);
 }
 
+export function GetLanguage() {
+  return window['go']['app']['App']['GetLanguage']();
+}
+
+export function GetLastAddress() {
+  return window['go']['app']['App']['GetLastAddress']();
+}
+
+export function GetLastChain() {
+  return window['go']['app']['App']['GetLastChain']();
+}
+
 export function GetLastTab(arg1) {
   return window['go']['app']['App']['GetLastTab'](arg1);
 }
@@ -140,6 +152,10 @@ export function GetOrgPreferences() {
 
 export function GetProjectAddress() {
   return window['go']['app']['App']['GetProjectAddress']();
+}
+
+export function GetTheme() {
+  return window['go']['app']['App']['GetTheme']();
 }
 
 export function GetUserInfoStatus() {
@@ -230,6 +246,18 @@ export function SetInitialized(arg1) {
   return window['go']['app']['App']['SetInitialized'](arg1);
 }
 
+export function SetLanguage(arg1) {
+  return window['go']['app']['App']['SetLanguage'](arg1);
+}
+
+export function SetLastAddress(arg1) {
+  return window['go']['app']['App']['SetLastAddress'](arg1);
+}
+
+export function SetLastChain(arg1) {
+  return window['go']['app']['App']['SetLastChain'](arg1);
+}
+
 export function SetLastTab(arg1, arg2) {
   return window['go']['app']['App']['SetLastTab'](arg1, arg2);
 }
@@ -248,6 +276,10 @@ export function SetOrgPreferences(arg1) {
 
 export function SetProjectAddress(arg1) {
   return window['go']['app']['App']['SetProjectAddress'](arg1);
+}
+
+export function SetTheme(arg1) {
+  return window['go']['app']['App']['SetTheme'](arg1);
 }
 
 export function SetUserInfo(arg1, arg2) {

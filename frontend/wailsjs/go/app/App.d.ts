@@ -70,6 +70,12 @@ export function GetFilename():Promise<project.Project>;
 
 export function GetImageURL(arg1:string):Promise<string>;
 
+export function GetLanguage():Promise<string>;
+
+export function GetLastAddress():Promise<string>;
+
+export function GetLastChain():Promise<string>;
+
 export function GetLastTab(arg1:string):Promise<types.ListKind>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
@@ -85,6 +91,8 @@ export function GetOpenProjects():Promise<Array<Record<string, any>>>;
 export function GetOrgPreferences():Promise<preferences.OrgPreferences>;
 
 export function GetProjectAddress():Promise<base.Address>;
+
+export function GetTheme():Promise<string>;
 
 export function GetUserInfoStatus():Promise<app.UserInfoStatus>;
 
@@ -130,6 +138,12 @@ export function SetHelpCollapsed(arg1:boolean):Promise<void>;
 
 export function SetInitialized(arg1:boolean):Promise<void>;
 
+export function SetLanguage(arg1:string):Promise<void>;
+
+export function SetLastAddress(arg1:string):Promise<void>;
+
+export function SetLastChain(arg1:string):Promise<void>;
+
 export function SetLastTab(arg1:string,arg2:types.ListKind):Promise<void>;
 
 export function SetLastView(arg1:string):Promise<void>;
@@ -139,6 +153,8 @@ export function SetMenuCollapsed(arg1:boolean):Promise<void>;
 export function SetOrgPreferences(arg1:preferences.OrgPreferences):Promise<void>;
 
 export function SetProjectAddress(arg1:base.Address):Promise<void>;
+
+export function SetTheme(arg1:string):Promise<void>;
 
 export function SetUserInfo(arg1:string,arg2:string):Promise<void>;
 

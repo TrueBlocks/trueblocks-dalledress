@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
-import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
-import { useActionMsgs, useEvent } from '@hooks';
+import { TableKey, useFiltering, useSorting } from '@contexts';
+import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, crud, msgs, types } from '@models';
@@ -13,7 +13,7 @@ import { Address } from '../../types/address';
 import { getColumns } from './';
 
 export const Abis = () => {
-  const { lastTab } = useAppContext();
+  const { lastTab } = useActiveProject();
   const { emitSuccess } = useActionMsgs('abis');
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
   const [state, setState] = useState<types.LoadState>();

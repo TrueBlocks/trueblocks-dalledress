@@ -1,8 +1,10 @@
 import { useAppContext } from '@contexts';
+import { useActiveProject } from '@hooks';
 import { Anchor, Breadcrumbs, Text } from '@mantine/core';
 
 export const Breadcrumb = () => {
-  const { currentLocation, navigate, isWizard, lastTab } = useAppContext();
+  const { currentLocation, navigate, isWizard } = useAppContext();
+  const { lastTab } = useActiveProject();
   const currentTab = lastTab[currentLocation];
 
   const pathnames = currentLocation.split('/').filter((x) => x);

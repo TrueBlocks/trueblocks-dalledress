@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react';
 
-import { GetMarkdown, SetHelpCollapsed } from '@app';
+import { GetMarkdown } from '@app';
 import { ChevronButton } from '@components';
 import { useAppContext } from '@contexts';
+import { useActiveProject } from '@hooks';
 import { AppShell, Stack, Text } from '@mantine/core';
 import Markdown from 'markdown-to-jsx';
 
 export const HelpBar = () => {
   const [markdown, setMarkdown] = useState<string>('Loading...');
-  const { currentLocation, lastTab } = useAppContext();
-  const { helpCollapsed, setHelpCollapsed } = useAppContext();
-
-  const toggleHelp = (open: boolean) => {
-    setHelpCollapsed(open);
-    SetHelpCollapsed(open);
-  };
+  const { currentLocation } = useAppContext();
+  const { helpCollapsed, setHelpCollapsed, lastTab } = useActiveProject();
 
   useEffect(() => {
     var headerText = currentLocation.startsWith('/')
@@ -47,7 +43,7 @@ export const HelpBar = () => {
     <AppShell.Aside p="md" style={{ transition: 'width 0.2s ease' }}>
       <ChevronButton
         collapsed={helpCollapsed}
-        onToggle={() => toggleHelp(!helpCollapsed)}
+        onToggle={() => setHelpCollapsed(!helpCollapsed)}
         direction="right"
       />
       {helpCollapsed ? (

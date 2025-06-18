@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { useAppContext } from '@contexts';
-import { useEvent } from '@hooks';
+import { useActiveProject, useEvent } from '@hooks';
 import { Tabs } from '@mantine/core';
 import { msgs, types } from '@models';
 
@@ -19,7 +18,7 @@ interface TabViewProps {
 }
 
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
-  const { lastTab, setLastTab } = useAppContext();
+  const { lastTab, setLastTab } = useActiveProject();
   const [activeTab, setActiveTab] = useState<types.ListKind>(
     lastTab[route] || ('' as types.ListKind),
   );

@@ -36,17 +36,20 @@ func (b *Bounds) IsValid() bool {
 }
 
 type AppPreferences struct {
-	Version          string            `json:"version,omitempty"`
-	Name             string            `json:"name,omitempty"`
 	Bounds           Bounds            `json:"bounds,omitempty"`
-	RecentProjects   []string          `json:"recentProjects,omitempty"`
-	LastView         string            `json:"lastView,omitempty"`
+	HelpCollapsed    bool              `json:"helpCollapsed,omitempty"`
+	LastAddress      string            `json:"lastAddress,omitempty"`
+	LastChain        string            `json:"lastChain,omitempty"`
+	LastLanguage     string            `json:"lastLanguage,omitempty"`
+	LastProject      string            `json:"lastProject,omitempty"`
 	LastTab          map[string]string `json:"lastTab"`
+	LastTheme        string            `json:"lastTheme,omitempty"`
+	LastView         string            `json:"lastView,omitempty"`
 	LastViewNoWizard string            `json:"lastViewNoWizard,omitempty"`
 	MenuCollapsed    bool              `json:"menuCollapsed,omitempty"`
-	HelpCollapsed    bool              `json:"helpCollapsed,omitempty"`
-	Theme            string            `json:"theme,omitempty"`
-	Language         string            `json:"language,omitempty"`
+	Name             string            `json:"name,omitempty"`
+	RecentProjects   []string          `json:"recentProjects,omitempty"`
+	Version          string            `json:"version,omitempty"`
 }
 
 func (p *AppPreferences) String() string {
@@ -57,16 +60,16 @@ func (p *AppPreferences) String() string {
 // NewAppPreferences creates a new AppPreferences instance with default values
 func NewAppPreferences() *AppPreferences {
 	return &AppPreferences{
-		Version:          "1.0",
-		RecentProjects:   []string{},
+		Bounds:           NewBounds(),
+		HelpCollapsed:    false,
+		LastLanguage:     "en",
+		LastTab:          make(map[string]string),
+		LastTheme:        "dark",
 		LastView:         "/",
 		LastViewNoWizard: "/",
-		Bounds:           NewBounds(),
-		LastTab:          make(map[string]string),
 		MenuCollapsed:    false,
-		HelpCollapsed:    false,
-		Theme:            "dark",
-		Language:         "en",
+		RecentProjects:   []string{},
+		Version:          "1.0",
 	}
 }
 

@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"sync/atomic"
+	"sync"
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
@@ -50,7 +50,7 @@ type App struct {
 	collections []types.Collection
 	meta        *coreTypes.MetaData
 	fileServer  *fileserver.FileServer
-	locked      int32
+	prefsMu     sync.RWMutex
 	ctx         context.Context
 	apiKeys     map[string]string
 	ensMap      map[string]base.Address
@@ -237,33 +237,6 @@ func (a *App) SetInitialized(isInit bool) error {
 	}
 }
 
-func (a *App) SetAppPreferences(appPrefs *preferences.AppPreferences) error {
-	a.Preferences.App = *appPrefs
-	return preferences.SetAppPreferences(appPrefs)
-}
-
-func (a *App) GetAppPreferences() *preferences.AppPreferences {
-	return &a.Preferences.App
-}
-
-func (a *App) SetMenuCollapsed(collapse bool) {
-	a.Preferences.App.MenuCollapsed = collapse
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) SetHelpCollapsed(collapse bool) {
-	a.Preferences.App.HelpCollapsed = collapse
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) SetLastView(view string) {
-	a.Preferences.App.LastView = view
-	if view != "/wizard" {
-		a.Preferences.App.LastViewNoWizard = view
-	}
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
 func (a *App) GetWizardReturn() string {
 	if a.Preferences.App.LastViewNoWizard == "" {
 		return "/"
@@ -273,20 +246,6 @@ func (a *App) GetWizardReturn() string {
 
 func (a *App) GetAppId() preferences.Id {
 	return preferences.GetAppId()
-}
-
-func (a *App) SetLastTab(route string, tab types.ListKind) {
-	if !atomic.CompareAndSwapInt32(&a.locked, 0, 1) {
-		return
-	}
-	defer atomic.StoreInt32(&a.locked, 0)
-
-	a.Preferences.App.LastTab[route] = string(tab)
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) GetLastTab(route string) types.ListKind {
-	return types.ListKind(a.Preferences.App.LastTab[route])
 }
 
 func (a *App) GetOpenProjects() []map[string]interface{} {

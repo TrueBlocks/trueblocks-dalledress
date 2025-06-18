@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 
 import { GetFilename, GetOrgPreferences } from '@app';
 import { Socials, getBarWidth } from '@components';
-import { useAppContext } from '@contexts';
-import { useEvent } from '@hooks';
+import { useActiveProject, useEvent } from '@hooks';
 import { AppShell, Flex, Text } from '@mantine/core';
 import { msgs, preferences, project } from '@models';
 
 export const Footer = () => {
   var [org, setOrg] = useState<preferences.OrgPreferences>({});
-  const { menuCollapsed } = useAppContext();
+  const { menuCollapsed } = useActiveProject();
 
   useEffect(() => {
     const fetchOrgName = async () => {

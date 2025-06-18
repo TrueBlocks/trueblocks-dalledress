@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
-import { useEvent } from '@hooks';
+import { TableKey, useFiltering, useSorting } from '@contexts';
+import { useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { chunks, msgs, types } from '@models';
@@ -15,7 +15,7 @@ const CHUNKS_ROUTE = '/chunks';
 const CHUNKS_DEFAULT_LIST = types.ListKind.STATS;
 
 export const Chunks = () => {
-  const { lastTab } = useAppContext();
+  const { lastTab } = useActiveProject();
   const [pageData, setPageData] = useState<chunks.ChunksPage | null>(null);
   const [_state, setState] = useState<types.LoadState>();
 

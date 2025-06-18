@@ -1,7 +1,6 @@
-import { SetMenuCollapsed } from '@app';
 import { ChevronButton, getBarWidth } from '@components';
 import { useAppContext } from '@contexts';
-import { useIcons } from '@hooks';
+import { useActiveProject, useIcons } from '@hooks';
 import { AppShell, Button, Stack } from '@mantine/core';
 import { MenuItem, MenuItems } from 'src/Menu';
 
@@ -11,12 +10,7 @@ interface MenuBarProps {
 
 export const MenuBar = ({ disabled = false }: MenuBarProps) => {
   const { currentLocation, navigate } = useAppContext();
-  const { menuCollapsed, setMenuCollapsed } = useAppContext();
-
-  const toggleMenu = (open: boolean) => {
-    setMenuCollapsed(open);
-    SetMenuCollapsed(open).then(() => {});
-  };
+  const { menuCollapsed, setMenuCollapsed } = useActiveProject();
 
   const topMenuItems = MenuItems.filter((item) => item.position === 'top');
   const botMenuItems = MenuItems.filter((item) => item.position === 'bottom');
@@ -62,7 +56,7 @@ export const MenuBar = ({ disabled = false }: MenuBarProps) => {
         <Stack gap="sm">
           <ChevronButton
             collapsed={menuCollapsed}
-            onToggle={() => toggleMenu(!menuCollapsed)}
+            onToggle={() => setMenuCollapsed(!menuCollapsed)}
             direction="left"
           />
           {topMenuItems.map(renderMenuItem)}

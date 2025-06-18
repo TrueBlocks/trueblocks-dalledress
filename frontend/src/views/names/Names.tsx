@@ -9,8 +9,8 @@ import {
   mapNameToChips,
   usePagination,
 } from '@components';
-import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
-import { useActionMsgs, useEvent } from '@hooks';
+import { TableKey, useFiltering, useSorting } from '@contexts';
+import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, msgs, names, types } from '@models';
@@ -35,7 +35,7 @@ function removeUndefinedProps(
 }
 
 export const Names = () => {
-  const { lastTab } = useAppContext();
+  const { lastTab } = useActiveProject();
   const [pageData, setPageData] = useState<names.NamesPage | null>(null);
   const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(

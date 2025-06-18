@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetExportsPage, LoadExportsData, ResetExportsData } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { TableKey, useAppContext, useFiltering, useSorting } from '@contexts';
-import { useEvent } from '@hooks';
+import { TableKey, useFiltering, useSorting } from '@contexts';
+import { useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { exports, msgs, types } from '@models';
@@ -12,11 +12,9 @@ import { useErrorHandler } from '@utils';
 import { getColumnsForExports } from './columns';
 
 export const Exports = () => {
-  const { lastTab } = useAppContext();
+  const { lastTab, effectiveAddress, effectiveChain } = useActiveProject();
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
   const [state, setState] = useState<types.LoadState>();
-
-  const displayAddress = '0xf503017d7baf7fbc0fff7492b751025c6a78179b';
 
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[EXPORTS_ROUTE] || EXPORTS_DEFAULT_LIST_KIND,
@@ -47,8 +45,8 @@ export const Exports = () => {
         pagination.pageSize,
         sort,
         filter,
-        'mainnet', // Default chain
-        displayAddress,
+        effectiveChain,
+        effectiveAddress,
       );
       setState(result.state);
       setPageData(result);
@@ -64,7 +62,8 @@ export const Exports = () => {
     filter,
     setTotalItems,
     handleError,
-    displayAddress,
+    effectiveChain,
+    effectiveAddress,
   ]);
 
   const currentData = useMemo(() => {
@@ -106,24 +105,18 @@ export const Exports = () => {
 
   // Load data when component mounts or listKind changes
   useEffect(() => {
-    LoadExportsData(
-      listKind,
-      'mainnet', // Default chain
-      displayAddress,
-    );
-  }, [listKind, displayAddress]);
+    LoadExportsData(listKind, effectiveChain, effectiveAddress);
+  }, [listKind, effectiveChain, effectiveAddress]);
 
   useHotkeys([
     [
       'mod+r',
       () => {
-        ResetExportsData(
-          listKind,
-          'mainnet', // Default chain
-          displayAddress,
-        ).then(() => {
-          fetchData();
-        });
+        ResetExportsData(listKind, effectiveChain, effectiveAddress).then(
+          () => {
+            fetchData();
+          },
+        );
       },
     ],
   ]);

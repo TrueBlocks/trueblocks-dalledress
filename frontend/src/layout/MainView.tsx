@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 
-import { useAppContext } from '@contexts';
 import { StatusBar } from '@layout';
 import { AppShell } from '@mantine/core';
 import { MenuItem, MenuItems } from 'src/Menu';
-import { Route } from 'wouter';
+import { Route, useLocation } from 'wouter';
 
 import './MainView.css';
 
@@ -15,7 +14,7 @@ function isComponentMenuItem(
 }
 
 export const MainView = () => {
-  const { currentLocation } = useAppContext();
+  const [currentLocation] = useLocation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

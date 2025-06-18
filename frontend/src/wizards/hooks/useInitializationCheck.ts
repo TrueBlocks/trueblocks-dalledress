@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
 
 import { GetUserInfoStatus } from '@app';
-import { useAppContext } from '@contexts';
+import { useAppNavigation } from '@hooks';
 import { Log, checkAndNavigateToWizard } from '@utils';
 
 import { WizardState } from '..';
@@ -10,7 +10,7 @@ export const useInitializationCheck = (
   state: WizardState,
   loadInitialData: () => Promise<void>,
 ) => {
-  const { navigate, isWizard } = useAppContext();
+  const { navigate, isWizard } = useAppNavigation();
 
   useEffect(() => {
     loadInitialData();

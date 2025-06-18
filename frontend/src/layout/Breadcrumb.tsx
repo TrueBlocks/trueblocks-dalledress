@@ -1,16 +1,17 @@
-import { useAppContext } from '@contexts';
 import { useActiveProject } from '@hooks';
 import { Anchor, Breadcrumbs, Text } from '@mantine/core';
+import { useLocation } from 'wouter';
 
 export const Breadcrumb = () => {
-  const { currentLocation, navigate, isWizard } = useAppContext();
+  const [currentLocation, navigate] = useLocation();
+  const isWizard = currentLocation.startsWith('/wizard');
   const { lastTab } = useActiveProject();
   const currentTab = lastTab[currentLocation];
 
-  const pathnames = currentLocation.split('/').filter((x) => x);
+  const pathnames = currentLocation.split('/').filter((x: string) => x);
   const breadcrumbItems = [
     { title: 'Home', path: '/' },
-    ...pathnames.map((value, index) => {
+    ...pathnames.map((value: string, index: number) => {
       const path = `/${pathnames.slice(0, index + 1).join('/')}`;
       return { title: value.charAt(0).toUpperCase() + value.slice(1), path };
     }),

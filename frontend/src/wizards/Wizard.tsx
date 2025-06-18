@@ -1,9 +1,9 @@
 import { FormEvent, useEffect, useState } from 'react';
 
 import { GetAppId, GetWizardReturn } from '@app';
-import { useAppContext } from '@contexts';
 import { Card, Container, Stepper, Text } from '@mantine/core';
 import { checkAndNavigateToWizard } from '@utils';
+import { useLocation } from 'wouter';
 
 import { StepChainInfo, StepCompleted, StepUserInfo } from '.';
 import {
@@ -14,7 +14,8 @@ import {
 
 export const Wizard = () => {
   const [appName, setAppName] = useState('Your App');
-  const { navigate, isWizard } = useAppContext();
+  const [location, navigate] = useLocation();
+  const isWizard = location.startsWith('/wizard');
 
   useEffect(() => {
     GetAppId().then((id) => {

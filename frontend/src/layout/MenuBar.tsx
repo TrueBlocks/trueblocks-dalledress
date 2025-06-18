@@ -1,15 +1,15 @@
 import { ChevronButton, getBarWidth } from '@components';
-import { useAppContext } from '@contexts';
 import { useActiveProject, useIcons } from '@hooks';
 import { AppShell, Button, Stack } from '@mantine/core';
 import { MenuItem, MenuItems } from 'src/Menu';
+import { useLocation } from 'wouter';
 
 interface MenuBarProps {
   disabled?: boolean;
 }
 
 export const MenuBar = ({ disabled = false }: MenuBarProps) => {
-  const { currentLocation, navigate } = useAppContext();
+  const [currentLocation, navigate] = useLocation();
   const { menuCollapsed, setMenuCollapsed } = useActiveProject();
 
   const topMenuItems = MenuItems.filter((item) => item.position === 'top');

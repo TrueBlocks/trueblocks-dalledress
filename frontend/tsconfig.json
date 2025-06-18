@@ -30,6 +30,7 @@
       "@views": ["src/views"],
       "@wizards": ["src/wizards"],
       "@utils": ["src/utils"],
+      "@stores": ["src/stores"],
       "@runtime": ["wailsjs/runtime"],
       "@app": ["wailsjs/go/app/App"],
       "@names": ["wailsjs/go/names/NamesCollection"],

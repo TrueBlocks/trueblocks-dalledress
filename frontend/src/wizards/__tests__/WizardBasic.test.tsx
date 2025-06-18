@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 
-import { AppContextProvider } from '@contexts';
 import { MantineProvider } from '@mantine/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
@@ -21,17 +20,10 @@ vi.mock('@app', () => ({
 const mockNavigate = vi.fn();
 const mockCompleteWizard = vi.fn().mockResolvedValue(undefined);
 
-// Simple mock for AppContext
-vi.mock('@contexts', async (importOriginal) => {
-  const actual = (await importOriginal()) as Record<string, unknown>;
-  return Object.assign({}, actual, {
-    useAppContext: () => ({
-      navigate: mockNavigate,
-      isWizard: true,
-    }),
-    AppContextProvider: actual.AppContextProvider,
-  });
-});
+// Mock wouter for navigation
+vi.mock('wouter', () => ({
+  useLocation: () => ['/wizard', mockNavigate],
+}));
 
 // We need to make the step navigation actually work in our test
 let activeStep = 0;
@@ -135,11 +127,9 @@ describe('Wizard', () => {
 
   test('renders first step with user info form', async () => {
     render(
-      <AppContextProvider>
-        <MantineProvider>
-          <Wizard />
-        </MantineProvider>
-      </AppContextProvider>,
+      <MantineProvider>
+        <Wizard />
+      </MantineProvider>,
     );
 
     // Wait for initial step to be visible and inputs to appear
@@ -157,11 +147,9 @@ describe('Wizard', () => {
 
   test('can navigate to next step when fields are filled', async () => {
     render(
-      <AppContextProvider>
-        <MantineProvider>
-          <Wizard />
-        </MantineProvider>
-      </AppContextProvider>,
+      <MantineProvider>
+        <Wizard />
+      </MantineProvider>,
     );
 
     // Fill in required fields using more robust selectors

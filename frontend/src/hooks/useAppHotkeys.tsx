@@ -1,5 +1,4 @@
 import { CancelFetch, Reload } from '@app';
-import { useAppContext } from '@contexts';
 import { useActiveProject } from '@hooks';
 import { msgs, types } from '@models';
 import { Log, emitEvent, registerHotkeys, useEmitters } from '@utils';
@@ -32,7 +31,7 @@ interface ToggleHotkey extends BaseHotkey {
 type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
 
 export const useAppHotkeys = (): void => {
-  const { currentLocation } = useAppContext();
+  const [currentLocation] = useLocation();
   const {
     lastTab,
     menuCollapsed,

@@ -1,8 +1,13 @@
 import { useEffect } from 'react';
 
 import { NodeStatus, getBarWidth } from '@components';
-import { ViewContextProvider, useAppContext } from '@contexts';
-import { useActiveProject, useAppHealth, useAppHotkeys } from '@hooks';
+import { ViewContextProvider } from '@contexts';
+import {
+  useActiveProject,
+  useAppHealth,
+  useAppHotkeys,
+  useAppNavigation,
+} from '@hooks';
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
 import { Router } from 'wouter';
@@ -46,7 +51,7 @@ export const App = () => {
     };
   }, []);
 
-  const { ready, isWizard } = useAppContext();
+  const { ready, isWizard } = useAppNavigation();
   const { menuCollapsed, helpCollapsed } = useActiveProject();
 
   useAppHotkeys();

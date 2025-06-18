@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 
 import { GetMarkdown } from '@app';
 import { ChevronButton } from '@components';
-import { useAppContext } from '@contexts';
 import { useActiveProject } from '@hooks';
 import { AppShell, Stack, Text } from '@mantine/core';
 import Markdown from 'markdown-to-jsx';
+import { useLocation } from 'wouter';
 
 export const HelpBar = () => {
   const [markdown, setMarkdown] = useState<string>('Loading...');
-  const { currentLocation } = useAppContext();
+  const [currentLocation] = useLocation();
   const { helpCollapsed, setHelpCollapsed, lastTab } = useActiveProject();
 
   useEffect(() => {

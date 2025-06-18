@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 
-import { useAppContext } from '@contexts';
 import { checkAndNavigateToWizard } from '@utils';
 
+import { useAppNavigation } from './useAppNavigation';
+
 export const useAppHealth = () => {
-  const { ready, isWizard, navigate } = useAppContext();
+  const { ready, isWizard, navigate } = useAppNavigation();
 
   useEffect(() => {
     if (!ready) return;

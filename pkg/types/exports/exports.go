@@ -7,6 +7,8 @@ import (
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -233,16 +235,55 @@ func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.S
 }
 
 func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
+	if !ec.NeedsUpdate(listKind) {
+		return
+	}
+
+	var facetName string
+
 	switch listKind {
 	case ExportsTransactions:
-		_, _ = ec.transactionsFacet.Load()
+		facetName = string(ExportsTransactions)
 	case ExportsStatements:
-		_, _ = ec.statementsFacet.Load()
+		facetName = string(ExportsStatements)
 	case ExportsTransfers:
-		_, _ = ec.transfersFacet.Load()
+		facetName = string(ExportsTransfers)
 	case ExportsBalances:
-		_, _ = ec.balancesFacet.Load()
+		facetName = string(ExportsBalances)
+	default:
+		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		return
 	}
+
+	go func() {
+		// Handle each facet type specifically since they're different types
+		switch listKind {
+		case ExportsTransactions:
+			if result, err := ec.transactionsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(facetName, result.Payload)
+			}
+		case ExportsStatements:
+			if result, err := ec.statementsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(facetName, result.Payload)
+			}
+		case ExportsTransfers:
+			if result, err := ec.transfersFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(facetName, result.Payload)
+			}
+		case ExportsBalances:
+			if result, err := ec.balancesFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+			} else {
+				msgs.EmitLoaded(facetName, result.Payload)
+			}
+		}
+	}()
 }
 
 func (ec *ExportsCollection) Reset(listKind types.ListKind) {

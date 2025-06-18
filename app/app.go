@@ -389,6 +389,10 @@ func (a *App) CancelFetch(listKind types.ListKind) {
 	}
 }
 
+func (a *App) CancelAllFetches() int {
+	return store.CancelAllFetches()
+}
+
 func (a *App) GetNodeStatus() *coreTypes.MetaData {
 	w := logger.GetLoggerWriter()
 	defer logger.SetLoggerWriter(w)

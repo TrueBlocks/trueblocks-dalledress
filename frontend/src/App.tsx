@@ -12,6 +12,8 @@ import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
 import { Router } from 'wouter';
 
+import { useGlobalEscape } from './hooks/useGlobalEscape';
+
 // Add at the top level, outside the component
 function globalNavKeySquelcher(e: KeyboardEvent) {
   const navKeys = [
@@ -56,6 +58,7 @@ export const App = () => {
 
   useAppHotkeys();
   useAppHealth();
+  useGlobalEscape();
 
   if (!ready) return <div>Not ready</div>;
 

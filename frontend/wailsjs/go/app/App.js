@@ -14,6 +14,10 @@ export function BuildDalleDressForProject() {
   return window['go']['app']['App']['BuildDalleDressForProject']();
 }
 
+export function CancelAllFetches() {
+  return window['go']['app']['App']['CancelAllFetches']();
+}
+
 export function CancelFetch(arg1) {
   return window['go']['app']['App']['CancelFetch'](arg1);
 }

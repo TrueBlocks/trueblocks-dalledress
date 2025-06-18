@@ -24,7 +24,7 @@ interface AppPreferencesState {
 const initialState: AppPreferencesState = {
   lastProject: '',
   lastChain: '',
-  lastAddress: '',
+  lastAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
   lastTheme: 'dark',
   lastLanguage: 'en',
   lastView: '/',
@@ -110,7 +110,8 @@ class AppPreferencesStore {
       this.setState({
         lastProject: prefs.lastProject || '',
         lastChain: prefs.lastChain || '',
-        lastAddress: prefs.lastAddress || '',
+        lastAddress:
+          prefs.lastAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
         lastTheme: prefs.lastTheme || 'dark',
         lastLanguage: prefs.lastLanguage || 'en',
         lastView: prefs.lastView || '/',
@@ -197,7 +198,9 @@ class AppPreferencesStore {
   }
 
   get effectiveAddress(): string {
-    return this.state.lastAddress || '';
+    return (
+      this.state.lastAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b'
+    );
   }
 
   get effectiveChain(): string {

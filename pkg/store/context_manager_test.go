@@ -338,8 +338,66 @@ func TestContextRegistration(t *testing.T) {
 	assert.Equal(t, 0, cancelled, "Expected 0 cancelled contexts for non-existent address")
 }
 
+func TestCancelAllFetches(t *testing.T) {
+	key1 := "testKey1_cancelall"
+	key2 := "testKey2_cancelall"
+	key3 := "testKey3_cancelall"
+
+	t.Run("CancelAllFetchesWithMultipleKeys", func(t *testing.T) {
+		tearDown()
+
+		RegisterContext(key1)
+		RegisterContext(key2)
+		RegisterContext(key3)
+
+		assert.Equal(t, 3, ctxCountTotal(), "Should have 3 contexts before CancelAllFetches")
+
+		cancelledCount := CancelAllFetches()
+
+		assert.Equal(t, 3, cancelledCount, "CancelAllFetches should report 3 cancelled contexts")
+		assert.Equal(t, 0, ctxCountTotal(), "Total contexts should be 0 after CancelAllFetches")
+	})
+
+	t.Run("CancelAllFetchesOnEmptyManager", func(t *testing.T) {
+		tearDown()
+
+		cancelledCount := CancelAllFetches()
+
+		assert.Equal(t, 0, cancelledCount, "CancelAllFetches on empty manager should report 0 cancelled")
+		assert.Equal(t, 0, ctxCountTotal(), "Total contexts should remain 0")
+	})
+
+	t.Run("CancelAllFetchesIdempotent", func(t *testing.T) {
+		tearDown()
+
+		RegisterContext(key1)
+		assert.Equal(t, 1, ctxCountTotal(), "Should have 1 context before first CancelAllFetches")
+
+		cancelledCount1 := CancelAllFetches()
+		assert.Equal(t, 1, cancelledCount1, "First CancelAllFetches should report 1 cancelled")
+		assert.Equal(t, 0, ctxCountTotal(), "Total contexts should be 0 after first CancelAllFetches")
+
+		cancelledCount2 := CancelAllFetches()
+		assert.Equal(t, 0, cancelledCount2, "Second CancelAllFetches should report 0 cancelled")
+		assert.Equal(t, 0, ctxCountTotal(), "Total contexts should remain 0")
+	})
+}
+
 func resetContextManagerState(t *testing.T) {
 	t.Helper()
+	cm := GetContextManager()
+	cm.renderCtxsMutex.Lock()
+	defer cm.renderCtxsMutex.Unlock()
+
+	for _, ctx := range cm.renderCtxs {
+		if ctx != nil {
+			ctx.Cancel()
+		}
+	}
+	cm.renderCtxs = make(map[string]*output.RenderCtx)
+}
+
+func tearDown() {
 	cm := GetContextManager()
 	cm.renderCtxsMutex.Lock()
 	defer cm.renderCtxsMutex.Unlock()

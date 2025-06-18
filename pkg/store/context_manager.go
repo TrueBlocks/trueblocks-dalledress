@@ -72,6 +72,22 @@ func CancelFetch(contextKey string) {
 	}
 }
 
+func CancelAllFetches() int {
+	cm := GetContextManager()
+	cm.renderCtxsMutex.Lock()
+	defer cm.renderCtxsMutex.Unlock()
+
+	cancelledCount := 0
+	for key, ctx := range cm.renderCtxs {
+		if ctx != nil {
+			ctx.Cancel()
+			cancelledCount++
+		}
+		delete(cm.renderCtxs, key)
+	}
+	return cancelledCount
+}
+
 func ctxCount(key string) int {
 	cm := GetContextManager()
 	cm.renderCtxsMutex.Lock()

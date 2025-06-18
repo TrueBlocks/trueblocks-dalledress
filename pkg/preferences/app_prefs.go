@@ -62,6 +62,7 @@ func NewAppPreferences() *AppPreferences {
 	return &AppPreferences{
 		Bounds:           NewBounds(),
 		HelpCollapsed:    false,
+		LastAddress:      "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
 		LastLanguage:     "en",
 		LastTab:          make(map[string]string),
 		LastTheme:        "dark",

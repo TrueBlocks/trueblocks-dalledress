@@ -78,6 +78,10 @@ export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetAbisPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function GetAbisSummary() {
+  return window['go']['app']['App']['GetAbisSummary']();
+}
+
 export function GetAppId() {
   return window['go']['app']['App']['GetAppId']();
 }
@@ -94,6 +98,10 @@ export function GetChunksPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetChunksPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function GetChunksSummary() {
+  return window['go']['app']['App']['GetChunksSummary']();
+}
+
 export function GetContext() {
   return window['go']['app']['App']['GetContext']();
 }
@@ -104,6 +112,10 @@ export function GetExportsCount(arg1, arg2, arg3) {
 
 export function GetExportsPage(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
   return window['go']['app']['App']['GetExportsPage'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+}
+
+export function GetExportsSummary(arg1, arg2) {
+  return window['go']['app']['App']['GetExportsSummary'](arg1, arg2);
 }
 
 export function GetFilename() {
@@ -138,8 +150,16 @@ export function GetMonitorsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetMonitorsPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
+export function GetMonitorsSummary() {
+  return window['go']['app']['App']['GetMonitorsSummary']();
+}
+
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function GetNamesSummary() {
+  return window['go']['app']['App']['GetNamesSummary']();
 }
 
 export function GetNodeStatus() {
@@ -296,8 +316,4 @@ export function SetUserPreferences(arg1) {
 
 export function SwitchToProject(arg1) {
   return window['go']['app']['App']['SwitchToProject'](arg1);
-}
-
-export function WailsExports() {
-  return window['go']['app']['App']['WailsExports']();
 }

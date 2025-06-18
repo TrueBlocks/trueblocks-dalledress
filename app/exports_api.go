@@ -66,4 +66,9 @@ func (a *App) ExportsNeedsUpdate(
 	return collection.NeedsUpdate(kind)
 }
 
+func (a *App) GetExportsSummary(chain string, address string) types.Summary {
+	collection := exports.GetExportsCollection(chain, address)
+	return collection.GetSummary()
+}
+
 // ADD_ROUTE

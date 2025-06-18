@@ -25,4 +25,8 @@ func (a *App) ChunksCrud(
 	return a.chunks.Crud(listKind, op, item)
 }
 
+func (a *App) GetChunksSummary() types.Summary {
+	return a.chunks.GetSummary()
+}
+
 // ADD_ROUTE

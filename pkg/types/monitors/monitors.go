@@ -3,11 +3,11 @@ package monitors
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -51,21 +51,33 @@ func (mp *MonitorsPage) GetState() types.LoadState {
 
 type MonitorsCollection struct {
 	monitorsFacet *facets.Facet[coreTypes.Monitor]
+	summary       types.Summary
+	summaryMutex  sync.RWMutex
 }
 
 func NewMonitorsCollection() *MonitorsCollection {
 	monitorsStore := GetMonitorsStore()
 
-	monitorsFacet := facets.NewFacet(
+	mc := &MonitorsCollection{
+		summary: types.Summary{
+			TotalCount:  0,
+			FacetCounts: make(map[types.ListKind]int),
+			CustomData:  make(map[string]interface{}),
+		},
+	}
+
+	monitorsFacet := facets.NewFacetWithSummary(
 		MonitorsList,
 		nil,
 		nil,
 		monitorsStore,
+		"monitors",
+		mc,
 	)
 
-	return &MonitorsCollection{
-		monitorsFacet: monitorsFacet,
-	}
+	mc.monitorsFacet = monitorsFacet
+
+	return mc
 }
 
 func (mc *MonitorsCollection) LoadData(listKind types.ListKind) {
@@ -86,10 +98,8 @@ func (mc *MonitorsCollection) LoadData(listKind types.ListKind) {
 	}
 
 	go func() {
-		if result, err := facet.Load(); err != nil {
+		if err := facet.Load(); err != nil {
 			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-		} else {
-			msgs.EmitLoaded(facetName, result.Payload)
 		}
 	}()
 }
@@ -245,4 +255,85 @@ func (mc *MonitorsCollection) GetStoreForKind(kind types.ListKind) string {
 
 func (mc *MonitorsCollection) GetCollectionName() string {
 	return "monitors"
+}
+
+func (mc *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	monitor, ok := item.(*coreTypes.Monitor)
+	if !ok {
+		return
+	}
+
+	mc.summaryMutex.Lock()
+	defer mc.summaryMutex.Unlock()
+
+	summary.TotalCount++
+
+	if summary.FacetCounts == nil {
+		summary.FacetCounts = make(map[types.ListKind]int)
+	}
+
+	summary.FacetCounts[MonitorsList]++
+	if summary.CustomData == nil {
+		summary.CustomData = make(map[string]interface{})
+	}
+
+	emptyCount, _ := summary.CustomData["emptyCount"].(int)
+	stagedCount, _ := summary.CustomData["stagedCount"].(int)
+	deletedCount, _ := summary.CustomData["deletedCount"].(int)
+	totalRecords, _ := summary.CustomData["totalRecords"].(int)
+	totalFileSize, _ := summary.CustomData["totalFileSize"].(int64)
+
+	if monitor.IsEmpty {
+		emptyCount++
+	}
+	if monitor.IsStaged {
+		stagedCount++
+	}
+	if monitor.Deleted {
+		deletedCount++
+	}
+
+	totalRecords += int(monitor.NRecords)
+	totalFileSize += int64(monitor.FileSize)
+
+	summary.CustomData["emptyCount"] = emptyCount
+	summary.CustomData["stagedCount"] = stagedCount
+	summary.CustomData["deletedCount"] = deletedCount
+	summary.CustomData["totalRecords"] = totalRecords
+	summary.CustomData["totalFileSize"] = totalFileSize
+}
+
+func (mc *MonitorsCollection) GetCurrentSummary() types.Summary {
+	mc.summaryMutex.RLock()
+	defer mc.summaryMutex.RUnlock()
+
+	summary := mc.summary
+	summary.FacetCounts = make(map[types.ListKind]int)
+	for k, v := range mc.summary.FacetCounts {
+		summary.FacetCounts[k] = v
+	}
+
+	if mc.summary.CustomData != nil {
+		summary.CustomData = make(map[string]interface{})
+		for k, v := range mc.summary.CustomData {
+			summary.CustomData[k] = v
+		}
+	}
+
+	return summary
+}
+
+func (mc *MonitorsCollection) ResetSummary() {
+	mc.summaryMutex.Lock()
+	defer mc.summaryMutex.Unlock()
+	mc.summary = types.Summary{
+		TotalCount:  0,
+		FacetCounts: make(map[types.ListKind]int),
+		CustomData:  make(map[string]interface{}),
+		LastUpdated: 0,
+	}
+}
+
+func (mc *MonitorsCollection) GetSummary() types.Summary {
+	return mc.GetCurrentSummary()
 }

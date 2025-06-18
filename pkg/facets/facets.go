@@ -17,11 +17,6 @@ import (
 
 type FilterFunc[T any] func(item *T) bool
 
-type StreamingResult struct {
-	Payload types.DataLoadedPayload
-	Error   error
-}
-
 type PageResult[T any] struct {
 	Items      []T
 	TotalItems int
@@ -29,15 +24,17 @@ type PageResult[T any] struct {
 }
 
 type Facet[T any] struct {
-	state       atomic.Value
-	store       *store.Store[T]
-	view        []*T
-	expectedCnt int
-	listKind    types.ListKind
-	filterFunc  FilterFunc[T]
-	isDupFunc   func(existing []*T, newItem *T) bool
-	mutex       sync.RWMutex
-	progress    *progress.Progress
+	state           atomic.Value
+	store           *store.Store[T]
+	view            []*T
+	expectedCnt     int
+	listKind        types.ListKind
+	filterFunc      FilterFunc[T]
+	isDupFunc       func(existing []*T, newItem *T) bool
+	mutex           sync.RWMutex
+	progress        *progress.Progress
+	summaryProvider types.SummaryAccumulator
+	collectionName  string
 }
 
 // NewFacet creates a new facet that uses a store for data fetching
@@ -55,6 +52,31 @@ func NewFacet[T any](
 		filterFunc:  filterFunc,
 		isDupFunc:   isDupFunc,
 		progress:    progress.NewProgress(listKind, nil),
+	}
+	facet.state.Store(types.StateStale)
+	store.RegisterObserver(facet)
+
+	return facet
+}
+
+func NewFacetWithSummary[T any](
+	listKind types.ListKind,
+	filterFunc FilterFunc[T],
+	isDupFunc func(existing []*T, newItem *T) bool,
+	store *store.Store[T],
+	collectionName string,
+	summaryProvider types.SummaryAccumulator,
+) *Facet[T] {
+	facet := &Facet[T]{
+		store:           store,
+		view:            make([]*T, 0),
+		expectedCnt:     0,
+		listKind:        listKind,
+		filterFunc:      filterFunc,
+		isDupFunc:       isDupFunc,
+		summaryProvider: summaryProvider,
+		collectionName:  collectionName,
+		progress:        progress.NewProgressWithSummary(listKind, collectionName, summaryProvider, nil),
 	}
 	facet.state.Store(types.StateStale)
 	store.RegisterObserver(facet)
@@ -122,21 +144,20 @@ func (r *Facet[T]) Count() int {
 
 var ErrAlreadyLoading = errors.New("already loading")
 
-func (r *Facet[T]) Load() (*StreamingResult, error) {
+func (r *Facet[T]) Load() error {
 	currentState := r.GetState()
 
 	if currentState == types.StateFetching {
-		return nil, ErrAlreadyLoading
+		return ErrAlreadyLoading
 	}
 
 	if currentState != types.StateStale {
-		cachedPayload := r.getCachedResult()
 		msgs.EmitStatus(fmt.Sprintf("cached: %d items", len(r.view)))
-		return cachedPayload, nil
+		return nil
 	}
 
 	if !r.StartFetching() {
-		return nil, ErrAlreadyLoading
+		return ErrAlreadyLoading
 	}
 
 	go func() {
@@ -169,23 +190,7 @@ func (r *Facet[T]) Load() (*StreamingResult, error) {
 		}
 	}()
 
-	return &StreamingResult{
-		Payload: types.DataLoadedPayload{
-			ListKind: r.listKind,
-		},
-	}, nil
-}
-
-func (r *Facet[T]) getCachedResult() *StreamingResult {
-	r.mutex.RLock()
-	defer r.mutex.RUnlock()
-	return &StreamingResult{
-		Payload: types.DataLoadedPayload{
-			CurrentCount:  len(r.view),
-			ExpectedTotal: len(r.view),
-			ListKind:      r.listKind,
-		},
-	}
+	return nil
 }
 
 func (r *Facet[T]) GetPage(
@@ -204,7 +209,7 @@ func (r *Facet[T]) GetPage(
 
 	if len(data) == 0 && r.NeedsUpdate() {
 		go func() {
-			_, _ = r.Load()
+			_ = r.Load()
 		}()
 	}
 
@@ -293,6 +298,10 @@ func (r *Facet[T]) OnNewItem(item *T, index int) {
 		}
 	}
 
+	if r.summaryProvider != nil {
+		r.summaryProvider.AccumulateItem(item, &types.Summary{})
+	}
+
 	// Add to view
 	r.mutex.Lock()
 	r.view = append(r.view, item)
@@ -300,8 +309,8 @@ func (r *Facet[T]) OnNewItem(item *T, index int) {
 	expectedTotal := r.store.GetExpectedTotal()
 	r.mutex.Unlock()
 
-	payload := r.progress.Tick(currentCount, expectedTotal)
-	if payload.CurrentCount > 0 {
+	r.progress.Tick(currentCount, expectedTotal)
+	if currentCount > 0 {
 		r.SetPartial()
 	}
 }
@@ -315,6 +324,11 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 		r.mutex.Lock()
 		r.view = r.view[:0]
 		r.mutex.Unlock()
+
+		if r.summaryProvider != nil {
+			r.summaryProvider.ResetSummary()
+		}
+
 		msgs.EmitStatus(fmt.Sprintf("data outdated: %s", reason))
 
 	case store.StateFetching:
@@ -324,6 +338,10 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 		r.view = r.view[:0]
 		r.mutex.Unlock()
 
+		if r.summaryProvider != nil {
+			r.summaryProvider.ResetSummary()
+		}
+
 	case store.StateLoaded:
 		r.SyncWithStore()
 		r.state.Store(types.StateLoaded)
@@ -331,7 +349,21 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 		currentCount := len(r.view)
 		r.expectedCnt = r.store.GetExpectedTotal()
 		r.mutex.RUnlock()
-		_ = r.progress.Tick(currentCount, currentCount)
+		r.progress.Tick(currentCount, currentCount)
+
+		if r.summaryProvider != nil {
+			collectionPayload := types.DataLoadedPayload{
+				Collection:    r.collectionName,
+				ListKind:      r.listKind,
+				CurrentCount:  currentCount,
+				ExpectedTotal: currentCount,
+				State:         types.StateLoaded,
+				Summary:       r.summaryProvider.GetCurrentSummary(),
+				Timestamp:     time.Now().Unix(),
+				EventPhase:    "complete",
+			}
+			msgs.EmitLoaded(collectionPayload)
+		}
 
 	case store.StateError:
 		r.mutex.RLock()

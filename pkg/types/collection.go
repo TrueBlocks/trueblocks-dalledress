@@ -22,4 +22,6 @@ type Collection interface {
 	GetSupportedKinds() []ListKind
 	GetStoreForKind(kind ListKind) string
 	GetCollectionName() string
+	GetSummary() Summary
+	SummaryAccumulator
 }

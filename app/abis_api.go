@@ -31,4 +31,8 @@ func (a *App) AbisCrud(
 	return a.abis.Crud(kind, op, abi)
 }
 
+func (a *App) GetAbisSummary() types.Summary {
+	return a.abis.GetSummary()
+}
+
 // ADD_ROUTE

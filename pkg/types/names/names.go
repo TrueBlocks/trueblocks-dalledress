@@ -3,11 +3,12 @@ package names
 import (
 	"fmt"
 	"strings"
+	"sync"
+	"time"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -64,53 +65,68 @@ type NamesCollection struct {
 	prefundFacet  *facets.Facet[coreTypes.Name]
 	regularFacet  *facets.Facet[coreTypes.Name]
 	baddressFacet *facets.Facet[coreTypes.Name]
+	summary       types.Summary
+	summaryMutex  sync.RWMutex
 }
 
 func NewNamesCollection() *NamesCollection {
 	namesStore := GetNamesStore()
 
-	allFacet := facets.NewFacet(
+	nc := &NamesCollection{}
+	nc.ResetSummary()
+
+	allFacet := facets.NewFacetWithSummary(
 		NamesAll,
 		nil,
 		nil,
 		namesStore,
+		"names",
+		nc,
 	)
 
-	customFacet := facets.NewFacet(
+	customFacet := facets.NewFacetWithSummary(
 		NamesCustom,
 		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Custom != 0 },
 		nil,
 		namesStore,
+		"names",
+		nc,
 	)
 
-	prefundFacet := facets.NewFacet(
+	prefundFacet := facets.NewFacetWithSummary(
 		NamesPrefund,
 		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Prefund != 0 },
 		nil,
 		namesStore,
+		"names",
+		nc,
 	)
 
-	regularFacet := facets.NewFacet(
+	regularFacet := facets.NewFacetWithSummary(
 		NamesRegular,
 		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Regular != 0 },
 		nil,
 		namesStore,
+		"names",
+		nc,
 	)
 
-	baddressFacet := facets.NewFacet(
+	baddressFacet := facets.NewFacetWithSummary(
 		NamesBaddress,
 		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Baddress != 0 },
 		nil,
 		namesStore,
+		"names",
+		nc,
 	)
 
-	return &NamesCollection{
-		allFacet:      allFacet,
-		customFacet:   customFacet,
-		prefundFacet:  prefundFacet,
-		regularFacet:  regularFacet,
-		baddressFacet: baddressFacet,
-	}
+	nc.allFacet = allFacet
+	nc.customFacet = customFacet
+	nc.prefundFacet = prefundFacet
+	nc.regularFacet = regularFacet
+	nc.baddressFacet = baddressFacet
+
+	return nc
 }
 
 func (nc *NamesCollection) LoadData(listKind types.ListKind) {
@@ -143,10 +159,8 @@ func (nc *NamesCollection) LoadData(listKind types.ListKind) {
 	}
 
 	go func() {
-		if result, err := facet.Load(); err != nil {
+		if err := facet.Load(); err != nil {
 			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-		} else {
-			msgs.EmitLoaded(string(facetName), result.Payload)
 		}
 	}()
 }
@@ -340,4 +354,50 @@ func (nc *NamesCollection) GetStoreForKind(kind types.ListKind) string {
 
 func (nc *NamesCollection) GetCollectionName() string {
 	return "names"
+}
+
+func (nc *NamesCollection) GetCurrentSummary() types.Summary {
+	nc.summaryMutex.RLock()
+	defer nc.summaryMutex.RUnlock()
+	return nc.summary
+}
+
+func (nc *NamesCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	if name, ok := item.(*coreTypes.Name); ok {
+		nc.summaryMutex.Lock()
+		defer nc.summaryMutex.Unlock()
+
+		nc.summary.TotalCount++
+		if nc.summary.FacetCounts == nil {
+			nc.summary.FacetCounts = make(map[types.ListKind]int)
+		}
+		if name.Parts&coreTypes.Custom != 0 {
+			nc.summary.FacetCounts[NamesCustom]++
+		}
+		if name.Parts&coreTypes.Prefund != 0 {
+			nc.summary.FacetCounts[NamesPrefund]++
+		}
+		if name.Parts&coreTypes.Regular != 0 {
+			nc.summary.FacetCounts[NamesRegular]++
+		}
+		if name.Parts&coreTypes.Baddress != 0 {
+			nc.summary.FacetCounts[NamesBaddress]++
+		}
+		nc.summary.LastUpdated = time.Now().Unix()
+	}
+}
+
+func (nc *NamesCollection) ResetSummary() {
+	nc.summaryMutex.Lock()
+	defer nc.summaryMutex.Unlock()
+	nc.summary = types.Summary{
+		TotalCount:  0,
+		FacetCounts: make(map[types.ListKind]int),
+		CustomData:  make(map[string]interface{}),
+		LastUpdated: time.Now().Unix(),
+	}
+}
+
+func (nc *NamesCollection) GetSummary() types.Summary {
+	return nc.GetCurrentSummary()
 }

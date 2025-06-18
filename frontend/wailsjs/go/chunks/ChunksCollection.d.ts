@@ -4,13 +4,19 @@ import {types} from '../models';
 import {crud} from '../models';
 import {sdk} from '../models';
 
+export function AccumulateItem(arg1:any,arg2:types.Summary):Promise<void>;
+
 export function Crud(arg1:types.ListKind,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function GetCollectionName():Promise<string>;
 
+export function GetCurrentSummary():Promise<types.Summary>;
+
 export function GetPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
 
 export function GetStoreForKind(arg1:types.ListKind):Promise<string>;
+
+export function GetSummary():Promise<types.Summary>;
 
 export function GetSupportedKinds():Promise<Array<types.ListKind>>;
 
@@ -19,3 +25,5 @@ export function LoadData(arg1:types.ListKind):Promise<void>;
 export function NeedsUpdate(arg1:types.ListKind):Promise<boolean>;
 
 export function Reset(arg1:types.ListKind):Promise<void>;
+
+export function ResetSummary():Promise<void>;

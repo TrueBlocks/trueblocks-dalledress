@@ -3,11 +3,10 @@ package msgs
 type EventType string
 
 const (
-	EventStatus     EventType = "statusbar:status"
-	EventError      EventType = "statusbar:error"
-	EventManager    EventType = "manager:change"
-	EventDataLoaded EventType = "data:loaded"
-	// Frontend events
+	EventStatus        EventType = "statusbar:status"
+	EventError         EventType = "statusbar:error"
+	EventManager       EventType = "manager:change"
+	EventDataLoaded    EventType = "data:loaded"
 	EventTabCycle      EventType = "hotkey:tab-cycle"
 	EventImagesChanged EventType = "images:changed"
 )
@@ -20,7 +19,6 @@ var AllMessages = []struct {
 	{EventError, "ERROR"},
 	{EventManager, "MANAGER"},
 	{EventDataLoaded, "DATA_LOADED"},
-	// Frontend events
 	{EventTabCycle, "TAB_CYCLE"},
 	{EventImagesChanged, "IMAGES_CHANGED"},
 }

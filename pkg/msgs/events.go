@@ -128,11 +128,8 @@ func emitMessage(messageType EventType, msgText string, payload ...interface{}) 
 
 // Sugar
 
-// EmitLoaded signals that data for a specific list or component has been loaded.
-// The msgText often corresponds to a types.ListKind or a specific identifier for the loaded data.
-// The payload can contain additional information about the loaded data.
-func EmitLoaded(msgText string, payload ...interface{}) {
-	emitMessage(EventDataLoaded, msgText, payload...)
+func EmitLoaded(payload types.DataLoadedPayload) {
+	emitMessage(EventDataLoaded, payload.Collection, payload)
 }
 
 // EmitStatus sends a general status update.
@@ -184,35 +181,6 @@ func WaitForEvent(eventType EventType) <-chan bool {
 			close(ch)
 		default:
 			// Channel already closed or full
-		}
-	})
-
-	go func() {
-		<-ch
-		unsub()
-	}()
-
-	return ch
-}
-
-// WaitForLoadedEvent is a specialized version of WaitForEvent that waits for an EventDataLoaded event
-// where the payload indicates a specific 'listKind' has been loaded.
-// This is particularly useful for testing data loading in collections.
-// The listKind parameter should match the string used in the EmitLoaded call (e.g., "Downloaded", "Monitors").
-func WaitForLoadedEvent(listKind types.ListKind) <-chan bool {
-	ch := make(chan bool, 1)
-	unsub := On(EventDataLoaded, func(optionalData ...interface{}) {
-		if len(optionalData) > 1 {
-			if payload, ok := optionalData[1].(map[string]interface{}); ok {
-				if kind, exists := payload["listKind"]; exists && kind == listKind {
-					select {
-					case ch <- true:
-						close(ch)
-					default:
-						// Channel already closed or full
-					}
-				}
-			}
 		}
 	})
 

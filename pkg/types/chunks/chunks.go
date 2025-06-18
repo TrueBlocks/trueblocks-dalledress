@@ -9,6 +9,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -131,6 +132,8 @@ type ChunksCollection struct {
 	indexFacet    *facets.Facet[coreTypes.ChunkIndex]
 	bloomsFacet   *facets.Facet[coreTypes.ChunkBloom]
 	manifestFacet *facets.Facet[coreTypes.ChunkManifest]
+	summary       types.Summary
+	summaryMutex  sync.RWMutex
 }
 
 var chunksInstance *ChunksCollection
@@ -152,40 +155,56 @@ func NewChunksCollection() *ChunksCollection {
 	bloomsStore := GetChunksBloomsStore()
 	manifestStore := GetChunksManifestStore()
 
-	statsFacet := facets.NewFacet(
+	cc := &ChunksCollection{
+		summary: types.Summary{
+			TotalCount:  0,
+			FacetCounts: make(map[types.ListKind]int),
+			CustomData:  make(map[string]interface{}),
+		},
+	}
+
+	statsFacet := facets.NewFacetWithSummary(
 		ChunksStats,
 		nil,
 		nil,
 		statsStore,
+		"chunks",
+		cc,
 	)
 
-	indexFacet := facets.NewFacet(
+	indexFacet := facets.NewFacetWithSummary(
 		ChunksIndex,
 		nil,
 		nil,
 		indexStore,
+		"chunks",
+		cc,
 	)
 
-	bloomsFacet := facets.NewFacet(
+	bloomsFacet := facets.NewFacetWithSummary(
 		ChunksBlooms,
 		nil,
 		nil,
 		bloomsStore,
+		"chunks",
+		cc,
 	)
 
-	manifestFacet := facets.NewFacet(
+	manifestFacet := facets.NewFacetWithSummary(
 		ChunksManifest,
 		nil,
 		nil,
 		manifestStore,
+		"chunks",
+		cc,
 	)
 
-	return &ChunksCollection{
-		statsFacet:    statsFacet,
-		indexFacet:    indexFacet,
-		bloomsFacet:   bloomsFacet,
-		manifestFacet: manifestFacet,
-	}
+	cc.statsFacet = statsFacet
+	cc.indexFacet = indexFacet
+	cc.bloomsFacet = bloomsFacet
+	cc.manifestFacet = manifestFacet
+
+	return cc
 }
 
 // Initialize facets with appropriate filters
@@ -443,16 +462,38 @@ func (cc *ChunksCollection) matchesManifestFilter(manifest *coreTypes.ChunkManif
 
 // Implement Collection interface methods
 func (cc *ChunksCollection) LoadData(listKind types.ListKind) {
+	if !cc.NeedsUpdate(listKind) {
+		return
+	}
+
+	var facet interface {
+		Load() error
+	}
+	var facetName string
+
 	switch listKind {
 	case ChunksStats:
-		_, _ = cc.statsFacet.Load()
+		facet = cc.statsFacet
+		facetName = "chunks.stats"
 	case ChunksIndex:
-		_, _ = cc.indexFacet.Load()
+		facet = cc.indexFacet
+		facetName = "chunks.index"
 	case ChunksBlooms:
-		_, _ = cc.bloomsFacet.Load()
+		facet = cc.bloomsFacet
+		facetName = "chunks.blooms"
 	case ChunksManifest:
-		_, _ = cc.manifestFacet.Load()
+		facet = cc.manifestFacet
+		facetName = "chunks.manifest"
+	default:
+		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		return
 	}
+
+	go func() {
+		if err := facet.Load(); err != nil {
+			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+		}
+	}()
 }
 
 func (cc *ChunksCollection) Reset(listKind types.ListKind) {
@@ -516,4 +557,95 @@ func (cc *ChunksCollection) Crud(kind types.ListKind, op crud.Operation, item in
 	return nil
 }
 
-// CHUNKS_ROUTE
+func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	cc.summaryMutex.Lock()
+	defer cc.summaryMutex.Unlock()
+
+	if summary.FacetCounts == nil {
+		summary.FacetCounts = make(map[types.ListKind]int)
+	}
+
+	switch item.(type) {
+	case *coreTypes.ChunkStats:
+		summary.TotalCount++
+		summary.FacetCounts[ChunksStats]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		statsCount, _ := summary.CustomData["statsCount"].(int)
+		totalBytes, _ := summary.CustomData["totalBytes"].(int64)
+
+		statsCount++
+		summary.CustomData["statsCount"] = statsCount
+		summary.CustomData["totalBytes"] = totalBytes
+
+	case *coreTypes.ChunkIndex:
+		summary.TotalCount++
+		summary.FacetCounts[ChunksIndex]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		indexCount, _ := summary.CustomData["indexCount"].(int)
+		indexCount++
+		summary.CustomData["indexCount"] = indexCount
+
+	case *coreTypes.ChunkBloom:
+		summary.TotalCount++
+		summary.FacetCounts[ChunksBlooms]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		bloomsCount, _ := summary.CustomData["bloomsCount"].(int)
+		bloomsCount++
+		summary.CustomData["bloomsCount"] = bloomsCount
+
+	case *coreTypes.ChunkManifest:
+		summary.TotalCount++
+		summary.FacetCounts[ChunksManifest]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		manifestCount, _ := summary.CustomData["manifestCount"].(int)
+		manifestCount++
+		summary.CustomData["manifestCount"] = manifestCount
+	}
+}
+
+func (cc *ChunksCollection) GetCurrentSummary() types.Summary {
+	cc.summaryMutex.RLock()
+	defer cc.summaryMutex.RUnlock()
+
+	summary := cc.summary
+	summary.FacetCounts = make(map[types.ListKind]int)
+	for k, v := range cc.summary.FacetCounts {
+		summary.FacetCounts[k] = v
+	}
+
+	if cc.summary.CustomData != nil {
+		summary.CustomData = make(map[string]interface{})
+		for k, v := range cc.summary.CustomData {
+			summary.CustomData[k] = v
+		}
+	}
+
+	return summary
+}
+
+func (cc *ChunksCollection) ResetSummary() {
+	cc.summaryMutex.Lock()
+	defer cc.summaryMutex.Unlock()
+	cc.summary = types.Summary{
+		TotalCount:  0,
+		FacetCounts: make(map[types.ListKind]int),
+		CustomData:  make(map[string]interface{}),
+		LastUpdated: 0,
+	}
+}
+
+func (cc *ChunksCollection) GetSummary() types.Summary {
+	return cc.GetCurrentSummary()
+}

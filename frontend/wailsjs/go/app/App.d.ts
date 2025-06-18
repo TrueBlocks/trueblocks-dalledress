@@ -54,6 +54,8 @@ export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
 export function GetAbisPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
+export function GetAbisSummary():Promise<types.Summary>;
+
 export function GetAppId():Promise<preferences.Id>;
 
 export function GetAppPreferences():Promise<preferences.AppPreferences>;
@@ -62,11 +64,15 @@ export function GetChainList():Promise<utils.ChainList>;
 
 export function GetChunksPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
 
+export function GetChunksSummary():Promise<types.Summary>;
+
 export function GetContext():Promise<context.Context>;
 
 export function GetExportsCount(arg1:types.ListKind,arg2:string,arg3:string):Promise<number>;
 
 export function GetExportsPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string,arg6:string,arg7:string):Promise<exports.ExportsPage>;
+
+export function GetExportsSummary(arg1:string,arg2:string):Promise<types.Summary>;
 
 export function GetFilename():Promise<project.Project>;
 
@@ -84,7 +90,11 @@ export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>
 
 export function GetMonitorsPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
 
+export function GetMonitorsSummary():Promise<types.Summary>;
+
 export function GetNamesPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
+
+export function GetNamesSummary():Promise<types.Summary>;
 
 export function GetNodeStatus():Promise<types.MetaData>;
 
@@ -163,5 +173,3 @@ export function SetUserInfo(arg1:string,arg2:string):Promise<void>;
 export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<void>;
 
 export function SwitchToProject(arg1:string):Promise<void>;
-
-export function WailsExports():Promise<types.DataLoadedPayload>;

@@ -27,21 +27,3 @@ func IsTestMode() bool {
 	defer testModeLock.RUnlock()
 	return testMode
 }
-
-// func (t *TestHelpers) SimulateLoaded(listKind string, currentCount, expectedTotal int) {
-// 	payload := map[string]interface{}{
-// 		"listKind":      listKind,
-// 		"currentCount":  currentCount,
-// 		"expectedTotal": expectedTotal,
-// 	}
-
-// 	EmitLoaded("test", payload)
-// }
-
-// func (t *TestHelpers) SimulateError(message string) {
-// 	EmitError(message, fmt.Errorf("test error"))
-// }
-
-// func (t *TestHelpers) SimulateStatus(message string) {
-// 	EmitStatus(message)
-// }

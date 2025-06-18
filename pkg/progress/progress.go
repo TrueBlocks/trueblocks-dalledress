@@ -26,6 +26,8 @@ type Progress struct {
 	listKind          types.ListKind
 	onFirstDataFunc   func()
 	firstDataSent     bool
+	collectionName    string
+	summaryProvider   types.SummaryAccumulator
 }
 
 // NewProgress creates and initializes a Progress.
@@ -46,7 +48,19 @@ func NewProgress(
 	return pr
 }
 
-func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
+func NewProgressWithSummary(
+	listKindCfg types.ListKind,
+	collectionName string,
+	summaryProvider types.SummaryAccumulator,
+	onFirstData func(),
+) *Progress {
+	pr := NewProgress(listKindCfg, onFirstData)
+	pr.collectionName = collectionName
+	pr.summaryProvider = summaryProvider
+	return pr
+}
+
+func (pr *Progress) Tick(currentTotalCount, expectedTotal int) {
 	pr.nItemsSinceUpdate++
 	shouldUpdate := false
 	isFirstPageEvent := false
@@ -80,15 +94,23 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedP
 		pr.nextThreshold = currentTotalCount + pr.currentIncrement
 	}
 
-	payload := types.DataLoadedPayload{
-		CurrentCount:  currentTotalCount,
-		ExpectedTotal: expectedTotal,
-		ListKind:      pr.listKind,
-	}
-
 	if sendUpdateThisTick {
-		msgs.EmitLoaded("streaming", payload)
-		msgs.EmitStatus(progress(currentTotalCount, pr.listKind, false))
+		if pr.collectionName != "" && pr.summaryProvider != nil {
+			collectionPayload := types.DataLoadedPayload{
+				Collection:    pr.collectionName,
+				ListKind:      pr.listKind,
+				CurrentCount:  currentTotalCount,
+				ExpectedTotal: expectedTotal,
+				State:         types.StateFetching,
+				Summary:       pr.summaryProvider.GetCurrentSummary(),
+				Timestamp:     time.Now().Unix(),
+				EventPhase:    "streaming",
+			}
+			msgs.EmitLoaded(collectionPayload)
+		}
+
+		msgs.EmitStatus(progressStr(currentTotalCount, pr.listKind, false))
+
 		pr.nItemsSinceUpdate = 0
 		pr.lastUpdate = now
 		if isFirstPageEvent && currentTotalCount >= pr.nextThreshold {
@@ -96,30 +118,33 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) types.DataLoadedP
 			pr.nextThreshold = currentTotalCount + pr.currentIncrement
 		}
 	}
-
-	return payload
 }
 
-func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) types.DataLoadedPayload {
-	payload := types.DataLoadedPayload{
-		CurrentCount:  currentTotalCount,
-		ExpectedTotal: expectedTotal,
-		ListKind:      pr.listKind,
-	}
-
+func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) {
 	now := time.Now()
 	if now.Sub(pr.lastUpdate) >= MaxWaitTime && pr.nItemsSinceUpdate > 0 {
-		msgs.EmitLoaded("partial", payload)
-		msgs.EmitStatus(progress(currentTotalCount, pr.listKind, true))
+		if pr.collectionName != "" && pr.summaryProvider != nil {
+			collectionPayload := types.DataLoadedPayload{
+				Collection:    pr.collectionName,
+				ListKind:      pr.listKind,
+				CurrentCount:  currentTotalCount,
+				ExpectedTotal: expectedTotal,
+				State:         types.StateFetching,
+				Summary:       pr.summaryProvider.GetCurrentSummary(),
+				Timestamp:     time.Now().Unix(),
+				EventPhase:    "streaming",
+			}
+			msgs.EmitLoaded(collectionPayload)
+		}
+
+		msgs.EmitStatus(progressStr(currentTotalCount, pr.listKind, true))
 
 		pr.nItemsSinceUpdate = 0
 		pr.lastUpdate = now
 	}
-
-	return payload
 }
 
-func progress(cnt int, kind types.ListKind, heartbeat bool) string {
+func progressStr(cnt int, kind types.ListKind, heartbeat bool) string {
 	k := strings.Trim(strings.ToLower(string(kind)), " ")
 	if heartbeat {
 		return fmt.Sprintf("Loaded %d %s...", cnt, k)

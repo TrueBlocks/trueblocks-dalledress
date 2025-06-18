@@ -60,4 +60,8 @@ func (a *App) NameFromAddress(address string) (*coreTypes.Name, bool) {
 	return a.names.NameFromAddress(base.HexToAddress(address))
 }
 
+func (a *App) GetNamesSummary() types.Summary {
+	return a.names.GetSummary()
+}
+
 // ADD_ROUTE

@@ -79,8 +79,7 @@ func NewTypedHandler[T any](
 // Implement HandlerInterface for TypedHandler
 func (th *TypedHandler[T]) LoadData() error {
 	// Use the facet's Load method which returns a streaming result
-	_, err := th.facet.Load()
-	return err
+	return th.facet.Load()
 }
 
 func (th *TypedHandler[T]) Reset() {

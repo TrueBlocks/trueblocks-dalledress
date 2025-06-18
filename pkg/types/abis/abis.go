@@ -3,11 +3,11 @@ package abis
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -61,46 +61,64 @@ type AbisCollection struct {
 	knownFacet      *facets.Facet[coreTypes.Abi]
 	functionsFacet  *facets.Facet[coreTypes.Function]
 	eventsFacet     *facets.Facet[coreTypes.Function]
+	summary         types.Summary
+	summaryMutex    sync.RWMutex
 }
 
 func NewAbisCollection() *AbisCollection {
 	abisListStore := GetAbisListStore()
 	abisDetailStore := GetAbisDetailStore()
 
-	downloadedFacet := facets.NewFacet(
+	ac := &AbisCollection{
+		summary: types.Summary{
+			TotalCount:  0,
+			FacetCounts: make(map[types.ListKind]int),
+			CustomData:  make(map[string]interface{}),
+		},
+	}
+
+	downloadedFacet := facets.NewFacetWithSummary(
 		AbisDownloaded,
 		isDownload,
 		nil,
 		abisListStore,
+		"abis",
+		ac,
 	)
 
-	knownFacet := facets.NewFacet(
+	knownFacet := facets.NewFacetWithSummary(
 		AbisKnown,
 		isKnown,
 		nil,
 		abisListStore,
+		"abis",
+		ac,
 	)
 
-	functionsFacet := facets.NewFacet(
+	functionsFacet := facets.NewFacetWithSummary(
 		AbisFunctions,
 		func(fn *coreTypes.Function) bool { return fn.FunctionType != "event" },
 		isDupEncoding(),
 		abisDetailStore,
+		"abis",
+		ac,
 	)
 
-	eventsFacet := facets.NewFacet(
+	eventsFacet := facets.NewFacetWithSummary(
 		AbisEvents,
 		func(fn *coreTypes.Function) bool { return fn.FunctionType == "event" },
 		isDupEncoding(),
 		abisDetailStore,
+		"abis",
+		ac,
 	)
 
-	return &AbisCollection{
-		downloadedFacet: downloadedFacet,
-		knownFacet:      knownFacet,
-		functionsFacet:  functionsFacet,
-		eventsFacet:     eventsFacet,
-	}
+	ac.downloadedFacet = downloadedFacet
+	ac.knownFacet = knownFacet
+	ac.functionsFacet = functionsFacet
+	ac.eventsFacet = eventsFacet
+
+	return ac
 }
 
 func isDownload(abi *coreTypes.Abi) bool {
@@ -162,16 +180,12 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 
 	go func() {
 		if facetAbi != nil {
-			if result, err := facetAbi.Load(); err != nil {
+			if err := facetAbi.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded(facetName, result.Payload)
 			}
 		} else if facetFunction != nil {
-			if result, err := facetFunction.Load(); err != nil {
+			if err := facetFunction.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded(facetName, result.Payload)
 			}
 		}
 	}()
@@ -326,4 +340,100 @@ func (ac *AbisCollection) GetStoreForKind(kind types.ListKind) string {
 
 func (ac *AbisCollection) GetCollectionName() string {
 	return "abis"
+}
+
+func (ac *AbisCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	ac.summaryMutex.Lock()
+	defer ac.summaryMutex.Unlock()
+
+	if summary.FacetCounts == nil {
+		summary.FacetCounts = make(map[types.ListKind]int)
+	}
+
+	switch v := item.(type) {
+	case *coreTypes.Abi:
+		summary.TotalCount++
+
+		if v.IsKnown {
+			summary.FacetCounts[AbisKnown]++
+		} else {
+			summary.FacetCounts[AbisDownloaded]++
+		}
+
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		knownCount, _ := summary.CustomData["knownCount"].(int)
+		downloadedCount, _ := summary.CustomData["downloadedCount"].(int)
+
+		if v.IsKnown {
+			knownCount++
+		} else {
+			downloadedCount++
+		}
+
+		summary.CustomData["knownCount"] = knownCount
+		summary.CustomData["downloadedCount"] = downloadedCount
+
+	case *coreTypes.Function:
+		summary.TotalCount++
+
+		if v.FunctionType == "event" {
+			summary.FacetCounts[AbisEvents]++
+		} else {
+			summary.FacetCounts[AbisFunctions]++
+		}
+
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		functionsCount, _ := summary.CustomData["functionsCount"].(int)
+		eventsCount, _ := summary.CustomData["eventsCount"].(int)
+
+		if v.FunctionType == "event" {
+			eventsCount++
+		} else {
+			functionsCount++
+		}
+
+		summary.CustomData["functionsCount"] = functionsCount
+		summary.CustomData["eventsCount"] = eventsCount
+	}
+}
+
+func (ac *AbisCollection) GetCurrentSummary() types.Summary {
+	ac.summaryMutex.RLock()
+	defer ac.summaryMutex.RUnlock()
+
+	summary := ac.summary
+	summary.FacetCounts = make(map[types.ListKind]int)
+	for k, v := range ac.summary.FacetCounts {
+		summary.FacetCounts[k] = v
+	}
+
+	if ac.summary.CustomData != nil {
+		summary.CustomData = make(map[string]interface{})
+		for k, v := range ac.summary.CustomData {
+			summary.CustomData[k] = v
+		}
+	}
+
+	return summary
+}
+
+func (ac *AbisCollection) ResetSummary() {
+	ac.summaryMutex.Lock()
+	defer ac.summaryMutex.Unlock()
+	ac.summary = types.Summary{
+		TotalCount:  0,
+		FacetCounts: make(map[types.ListKind]int),
+		CustomData:  make(map[string]interface{}),
+		LastUpdated: 0,
+	}
+}
+
+func (ac *AbisCollection) GetSummary() types.Summary {
+	return ac.GetCurrentSummary()
 }

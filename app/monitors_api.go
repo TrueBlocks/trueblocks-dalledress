@@ -35,4 +35,8 @@ func (a *App) MonitorsClean(addresses []string) error {
 	return a.monitors.Clean(addresses)
 }
 
+func (a *App) GetMonitorsSummary() types.Summary {
+	return a.monitors.GetSummary()
+}
+
 // ADD_ROUTE

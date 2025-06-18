@@ -1058,22 +1058,6 @@ export namespace types {
 		    return a;
 		}
 	}
-	export class DataLoadedPayload {
-	    currentCount: number;
-	    expectedTotal: number;
-	    listKind?: ListKind;
-	
-	    static createFrom(source: any = {}) {
-	        return new DataLoadedPayload(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.currentCount = source["currentCount"];
-	        this.expectedTotal = source["expectedTotal"];
-	        this.listKind = source["listKind"];
-	    }
-	}
 	
 	export class Log {
 	    address: base.Address;
@@ -1556,6 +1540,24 @@ export namespace types {
 		    }
 		    return a;
 		}
+	}
+	export class Summary {
+	    totalCount: number;
+	    facetCounts: Record<string, number>;
+	    customData?: Record<string, any>;
+	    lastUpdated: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Summary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.totalCount = source["totalCount"];
+	        this.facetCounts = source["facetCounts"];
+	        this.customData = source["customData"];
+	        this.lastUpdated = source["lastUpdated"];
+	    }
 	}
 	export class TraceResult {
 	    address?: base.Address;

@@ -8,7 +8,6 @@ import (
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -52,41 +51,56 @@ type ExportsCollection struct {
 	statementsFacet   *facets.Facet[coreTypes.Statement]
 	transfersFacet    *facets.Facet[coreTypes.Transfer]
 	balancesFacet     *facets.Facet[coreTypes.State]
+	summary           types.Summary
+	summaryMutex      sync.RWMutex
 }
 
 func NewExportsCollection(chain, address string) *ExportsCollection {
 	instance := &ExportsCollection{
 		chain:   chain,
 		address: address,
+		summary: types.Summary{
+			TotalCount:  0,
+			FacetCounts: make(map[types.ListKind]int),
+			CustomData:  make(map[string]interface{}),
+		},
 	}
 	instance.initializeFacets()
 	return instance
 }
 
 func (ec *ExportsCollection) initializeFacets() {
-	ec.transactionsFacet = facets.NewFacet(
+	ec.transactionsFacet = facets.NewFacetWithSummary(
 		ExportsTransactions,
 		nil, // No filter function for now
 		nil, // No deduplication function for now
 		GetExportsTransactionsStore(ec.chain, ec.address),
+		"exports",
+		ec,
 	)
-	ec.statementsFacet = facets.NewFacet(
+	ec.statementsFacet = facets.NewFacetWithSummary(
 		ExportsStatements,
 		nil,
 		nil,
 		GetExportsStatementsStore(ec.chain, ec.address),
+		"exports",
+		ec,
 	)
-	ec.transfersFacet = facets.NewFacet(
+	ec.transfersFacet = facets.NewFacetWithSummary(
 		ExportsTransfers,
 		nil,
 		nil,
 		GetExportsTransfersStore(ec.chain, ec.address),
+		"exports",
+		ec,
 	)
-	ec.balancesFacet = facets.NewFacet(
+	ec.balancesFacet = facets.NewFacetWithSummary(
 		ExportsBalances,
 		nil,
 		nil,
 		GetExportsBalancesStore(ec.chain, ec.address),
+		"exports",
+		ec,
 	)
 }
 
@@ -259,28 +273,20 @@ func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
 		// Handle each facet type specifically since they're different types
 		switch listKind {
 		case ExportsTransactions:
-			if result, err := ec.transactionsFacet.Load(); err != nil {
+			if err := ec.transactionsFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded(facetName, result.Payload)
 			}
 		case ExportsStatements:
-			if result, err := ec.statementsFacet.Load(); err != nil {
+			if err := ec.statementsFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded(facetName, result.Payload)
 			}
 		case ExportsTransfers:
-			if result, err := ec.transfersFacet.Load(); err != nil {
+			if err := ec.transfersFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded(facetName, result.Payload)
 			}
 		case ExportsBalances:
-			if result, err := ec.balancesFacet.Load(); err != nil {
+			if err := ec.balancesFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-			} else {
-				msgs.EmitLoaded(facetName, result.Payload)
 			}
 		}
 	}()
@@ -387,4 +393,102 @@ func ClearAllExportsCollections() {
 	defer collectionsMu.Unlock()
 
 	collections = make(map[string]*ExportsCollection)
+}
+
+func (ec *ExportsCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	ec.summaryMutex.Lock()
+	defer ec.summaryMutex.Unlock()
+
+	if summary.FacetCounts == nil {
+		summary.FacetCounts = make(map[types.ListKind]int)
+	}
+
+	switch v := item.(type) {
+	case *coreTypes.Transaction:
+		summary.TotalCount++
+		summary.FacetCounts[ExportsTransactions]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		txCount, _ := summary.CustomData["transactionsCount"].(int)
+		totalValue, _ := summary.CustomData["totalValue"].(int64)
+		totalGasUsed, _ := summary.CustomData["totalGasUsed"].(int64)
+
+		txCount++
+		totalValue += int64(v.Value.Uint64())
+		totalGasUsed += int64(v.Receipt.GasUsed)
+
+		summary.CustomData["transactionsCount"] = txCount
+		summary.CustomData["totalValue"] = totalValue
+		summary.CustomData["totalGasUsed"] = totalGasUsed
+
+	case *coreTypes.Statement:
+		summary.TotalCount++
+		summary.FacetCounts[ExportsStatements]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		stmtCount, _ := summary.CustomData["statementsCount"].(int)
+		stmtCount++
+		summary.CustomData["statementsCount"] = stmtCount
+
+	case *coreTypes.Transfer:
+		summary.TotalCount++
+		summary.FacetCounts[ExportsTransfers]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		transferCount, _ := summary.CustomData["transfersCount"].(int)
+		transferCount++
+		summary.CustomData["transfersCount"] = transferCount
+
+	case *coreTypes.State:
+		summary.TotalCount++
+		summary.FacetCounts[ExportsBalances]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		balanceCount, _ := summary.CustomData["balancesCount"].(int)
+		balanceCount++
+		summary.CustomData["balancesCount"] = balanceCount
+	}
+}
+
+func (ec *ExportsCollection) GetCurrentSummary() types.Summary {
+	ec.summaryMutex.RLock()
+	defer ec.summaryMutex.RUnlock()
+
+	summary := ec.summary
+	summary.FacetCounts = make(map[types.ListKind]int)
+	for k, v := range ec.summary.FacetCounts {
+		summary.FacetCounts[k] = v
+	}
+
+	if ec.summary.CustomData != nil {
+		summary.CustomData = make(map[string]interface{})
+		for k, v := range ec.summary.CustomData {
+			summary.CustomData[k] = v
+		}
+	}
+
+	return summary
+}
+
+func (ec *ExportsCollection) ResetSummary() {
+	ec.summaryMutex.Lock()
+	defer ec.summaryMutex.Unlock()
+	ec.summary = types.Summary{
+		TotalCount:  0,
+		FacetCounts: make(map[types.ListKind]int),
+		CustomData:  make(map[string]interface{}),
+		LastUpdated: 0,
+	}
+}
+
+func (ec *ExportsCollection) GetSummary() types.Summary {
+	return ec.GetCurrentSummary()
 }

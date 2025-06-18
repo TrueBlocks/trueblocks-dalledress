@@ -1,6 +1,7 @@
 import { ChangeEvent, forwardRef } from 'react';
 
 import { FormField } from '@components';
+import { useActiveProject } from '@hooks';
 import { Fieldset, Stack, Text, TextInput } from '@mantine/core';
 import { formatWeiToEther, formatWeiToGigawei } from '@utils';
 
@@ -16,6 +17,8 @@ export interface FieldRendererProps {
 
 export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
   ({ field, mode, onChange, onBlur, loading, keyProp, autoFocus }, ref) => {
+    const { effectiveAddress } = useActiveProject();
+
     if (field.fields && field.fields.length > 0) {
       return (
         <Fieldset key={keyProp}>
@@ -40,6 +43,14 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
       return <div key={keyProp}>{field.customRender}</div>;
     }
 
+    const isEtherField = field.type === 'ether';
+    const isGasField = field.type === 'gas';
+    const isAddressField = field.type === 'address';
+    const isHighlighted =
+      isAddressField &&
+      field.value &&
+      field.value.toString().toLowerCase() === effectiveAddress.toLowerCase();
+
     if (mode === 'display') {
       let displayValue;
       if (field.type === 'ether' && field.value) {
@@ -52,15 +63,26 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
 
       return (
         <div key={keyProp}>
-          <Text size="sm" fw={500}>
+          <Text
+            size="sm"
+            fw={500}
+            style={{
+              ...(isHighlighted
+                ? {
+                    backgroundColor: 'var(--mantine-color-blue-1)',
+                    color: 'var(--mantine-color-blue-9)',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    border: '1px solid var(--mantine-color-blue-3)',
+                  }
+                : {}),
+            }}
+          >
             {field.label}: {displayValue}
           </Text>
         </div>
       );
     }
-
-    const isEtherField = field.type === 'ether';
-    const isGasField = field.type === 'gas';
 
     let placeHolder;
     if (isEtherField) {
@@ -120,6 +142,13 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
                 ? {
                     color: 'var(--mantine-color-text)', // Use Mantine's text color variable for theme adaptability
                     opacity: 0.6, // Slightly reduce opacity to differentiate but keep readable
+                  }
+                : {}),
+              ...(isHighlightedAddress
+                ? {
+                    backgroundColor: 'var(--mantine-color-blue-1)',
+                    borderColor: 'var(--mantine-color-blue-4)',
+                    color: 'var(--mantine-color-blue-9)',
                   }
                 : {}),
             },

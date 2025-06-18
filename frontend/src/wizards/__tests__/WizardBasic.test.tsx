@@ -116,6 +116,36 @@ vi.mock('@hooks', () => ({
     Light: () => null,
     Dark: () => null,
   }),
+  useActiveProject: () => ({
+    // State
+    lastProject: '',
+    lastChain: 'mainnet',
+    lastAddress: '0x1234567890abcdef1234567890abcdef12345678',
+    lastTheme: 'light',
+    lastLanguage: 'en',
+    lastView: 'home',
+    menuCollapsed: false,
+    helpCollapsed: false,
+    lastTab: {},
+    loading: false,
+    // Actions
+    setActiveAddress: vi.fn(),
+    setActiveChain: vi.fn(),
+    switchProject: vi.fn(),
+    toggleTheme: vi.fn(),
+    changeLanguage: vi.fn(),
+    setMenuCollapsed: vi.fn(),
+    setHelpCollapsed: vi.fn(),
+    setLastTab: vi.fn(),
+    setLastView: vi.fn(),
+    toggleDarkMode: vi.fn(),
+    // Computed values
+    isDarkMode: false,
+    hasActiveProject: true,
+    canExport: true,
+    effectiveAddress: '0x1234567890abcdef1234567890abcdef12345678',
+    effectiveChain: 'mainnet',
+  }),
 }));
 
 describe('Wizard', () => {

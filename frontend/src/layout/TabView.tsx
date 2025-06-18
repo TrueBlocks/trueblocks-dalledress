@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useActiveProject, useEvent } from '@hooks';
 import { Tabs } from '@mantine/core';
@@ -19,9 +19,29 @@ interface TabViewProps {
 
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   const { lastTab, setLastTab } = useActiveProject();
-  const [activeTab, setActiveTab] = useState<types.ListKind>(
-    lastTab[route] || ('' as types.ListKind),
-  );
+
+  // Auto-select first tab if no lastTab is set for this route
+  const getInitialTab = (): types.ListKind => {
+    const savedTab = lastTab[route];
+    if (savedTab) {
+      return savedTab;
+    }
+    // If no saved tab, use the first tab's label as default
+    return (tabs[0]?.label as types.ListKind) || ('' as types.ListKind);
+  };
+
+  const [activeTab, setActiveTab] = useState<types.ListKind>(getInitialTab());
+
+  // If we auto-selected the first tab and there was no saved tab,
+  // we should save it and trigger onTabChange
+  useEffect(() => {
+    if (activeTab && !lastTab[route]) {
+      setLastTab(route, activeTab);
+      if (onTabChange) {
+        onTabChange(activeTab);
+      }
+    }
+  }, [activeTab, lastTab, route, setLastTab, onTabChange]);
 
   const nextTab = useCallback((): string => {
     const currentIndex = tabs.findIndex((tab) => tab.label === activeTab);

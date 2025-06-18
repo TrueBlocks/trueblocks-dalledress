@@ -13,11 +13,11 @@ import {
   LazyMonitorsPanel,
   LazyNamesPanel,
   LazyProjectsPanel,
-} from './home/LazyPanels';
-import { QuickActions } from './home/QuickActions';
-import { RecentActivity } from './home/RecentActivity';
-import { SampleImageSection } from './home/SampleImageSection';
-import { useUploadAddressesDialog } from './home/UploadAddressesDialog';
+} from './LazyPanels';
+import { QuickActions } from './QuickActions';
+import { RecentActivity } from './RecentActivity';
+import { SampleImageSection } from './SampleImageSection';
+import { useUploadAddressesDialog } from './UploadAddressesDialog';
 
 export const Home = () => {
   const [_, setAppName] = useState('Your App');

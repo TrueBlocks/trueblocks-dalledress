@@ -61,7 +61,7 @@ func TestFacetLoad(t *testing.T) {
 		assert.Equal(t, 5, facet.Count(), "Expected count to be 5 after load")
 		assert.Equal(t, types.StateLoaded, facet.GetState(), "Expected state to be StateLoaded")
 
-		err := facet.Load()
+		err = facet.Load()
 		assert.NoError(t, err, "Second load should not return error")
 
 		facet.Reset()

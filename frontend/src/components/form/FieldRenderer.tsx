@@ -144,7 +144,7 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
                     opacity: 0.6, // Slightly reduce opacity to differentiate but keep readable
                   }
                 : {}),
-              ...(isHighlightedAddress
+              ...(isHighlighted
                 ? {
                     backgroundColor: 'var(--mantine-color-blue-1)',
                     borderColor: 'var(--mantine-color-blue-4)',

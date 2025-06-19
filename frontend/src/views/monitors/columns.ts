@@ -37,6 +37,7 @@ const getColumnsForMonitor = (): FormField[] => [
     sortable: true,
     type: 'number',
     width: '100px',
+    textAlign: 'right',
   },
   {
     key: 'fileSize',
@@ -46,6 +47,7 @@ const getColumnsForMonitor = (): FormField[] => [
     sortable: true,
     type: 'number',
     width: '120px',
+    textAlign: 'right',
   },
   {
     key: 'isEmpty',

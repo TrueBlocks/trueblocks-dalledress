@@ -16,11 +16,10 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
     totalCount: 0,
     facetCounts: {},
     customData: {
-      transactionsCount: 0,
       statementsCount: 0,
       transfersCount: 0,
       balancesCount: 0,
-      availableTypes: ['Transactions', 'Statements', 'Transfers', 'Balances'],
+      transactionsCount: 0,
     },
     lastUpdated: Date.now(),
   });
@@ -36,16 +35,10 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
           totalCount: 0,
           facetCounts: {},
           customData: {
-            transactionsCount: 0,
             statementsCount: 0,
             transfersCount: 0,
             balancesCount: 0,
-            availableTypes: [
-              'Transactions',
-              'Statements',
-              'Transfers',
-              'Balances',
-            ],
+            transactionsCount: 0,
           },
           lastUpdated: Date.now(),
         });
@@ -91,7 +84,7 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
   return (
     <DashboardCard
       title="Exports"
-      subtitle={`${((summary.customData?.availableTypes as string[]) || []).length} types available`}
+      subtitle={`history of current account`}
       icon={<Exports size={20} />}
       loading={loading}
       error={error}
@@ -109,9 +102,6 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
             gap: '4px',
           }}
         >
-          <Badge size="xs" variant="light" color="blue">
-            Txns: {(summary.customData?.transactionsCount as number) || 0}
-          </Badge>
           <Badge size="xs" variant="light" color="green">
             Stmts: {(summary.customData?.statementsCount as number) || 0}
           </Badge>
@@ -120,6 +110,9 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
           </Badge>
           <Badge size="xs" variant="light" color="orange">
             Bals: {(summary.customData?.balancesCount as number) || 0}
+          </Badge>
+          <Badge size="xs" variant="light" color="blue">
+            Txns: {(summary.customData?.transactionsCount as number) || 0}
           </Badge>
         </div>
 

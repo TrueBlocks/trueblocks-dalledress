@@ -36,18 +36,21 @@ const getColumnsForAbi = (): FormField[] => [
     header: 'File Size',
     sortable: true,
     type: 'number',
+    textAlign: 'right',
   },
   {
     key: 'nFunctions',
     header: 'Functions',
     sortable: true,
     type: 'number',
+    textAlign: 'right',
   },
   {
     key: 'nEvents',
     header: 'Events',
     sortable: true,
     type: 'number',
+    textAlign: 'right',
   },
   {
     key: 'actions',

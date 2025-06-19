@@ -13,10 +13,14 @@ export interface FieldRendererProps {
   loading?: boolean;
   keyProp?: string | number;
   autoFocus?: boolean;
+  tableCell?: boolean;
 }
 
 export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
-  ({ field, mode, onChange, onBlur, loading, keyProp, autoFocus }, ref) => {
+  (
+    { field, mode, onChange, onBlur, loading, keyProp, autoFocus, tableCell },
+    ref,
+  ) => {
     const { effectiveAddress } = useActiveProject();
 
     if (field.fields && field.fields.length > 0) {
@@ -59,6 +63,10 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
         displayValue = formatWeiToGigawei(field.value as string);
       } else {
         displayValue = field.value || 'N/A';
+      }
+
+      if (tableCell) {
+        return <>{displayValue}</>;
       }
 
       return (

@@ -70,14 +70,14 @@ export const Exports = () => {
     if (!pageData) return [];
 
     switch (listKind) {
-      case types.ListKind.TRANSACTIONS:
-        return pageData.transactions || [];
       case types.ListKind.STATEMENTS:
         return pageData.statements || [];
       case types.ListKind.TRANSFERS:
         return pageData.transfers || [];
       case types.ListKind.BALANCES:
         return pageData.balances || [];
+      case types.ListKind.TRANSACTIONS:
+        return pageData.transactions || [];
       default:
         return pageData.transactions || [];
     }
@@ -161,11 +161,6 @@ export const Exports = () => {
   const tabs = useMemo(
     () => [
       {
-        label: types.ListKind.TRANSACTIONS,
-        value: types.ListKind.TRANSACTIONS,
-        content: perTabTable,
-      },
-      {
         label: types.ListKind.STATEMENTS,
         value: types.ListKind.STATEMENTS,
         content: perTabTable,
@@ -178,6 +173,11 @@ export const Exports = () => {
       {
         label: types.ListKind.BALANCES,
         value: types.ListKind.BALANCES,
+        content: perTabTable,
+      },
+      {
+        label: types.ListKind.TRANSACTIONS,
+        value: types.ListKind.TRANSACTIONS,
         content: perTabTable,
       },
     ],

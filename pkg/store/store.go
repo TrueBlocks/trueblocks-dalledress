@@ -6,6 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 )
@@ -192,6 +193,7 @@ func (s *Store[T]) Fetch() error {
 
 	go func() {
 		defer close(done)
+		defer silenceLogger()()
 		if s.queryFunc != nil {
 			err := s.queryFunc(renderCtx)
 			if err != nil {
@@ -332,4 +334,12 @@ func (s *Store[T]) Reset() {
 	s.mutex.Unlock()
 
 	s.ChangeState(0, newState, reason)
+}
+
+func silenceLogger() func() {
+	original := logger.GetLoggerWriter()
+	logger.SetLoggerWriter(nil)
+	return func() {
+		logger.SetLoggerWriter(original) // Restore original state
+	}
 }

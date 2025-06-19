@@ -37,6 +37,7 @@ const getColumnsForChunkStats = (): FormField[] => [
     type: 'number',
     width: '120px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'nApps',
@@ -47,6 +48,7 @@ const getColumnsForChunkStats = (): FormField[] => [
     type: 'number',
     width: '100px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'nBlocks',
@@ -57,6 +59,7 @@ const getColumnsForChunkStats = (): FormField[] => [
     type: 'number',
     width: '120px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'nBloomsHit',
@@ -67,6 +70,7 @@ const getColumnsForChunkStats = (): FormField[] => [
     type: 'number',
     width: '120px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'nBloomsMiss',
@@ -77,6 +81,7 @@ const getColumnsForChunkStats = (): FormField[] => [
     type: 'number',
     width: '120px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'ratio',
@@ -87,6 +92,7 @@ const getColumnsForChunkStats = (): FormField[] => [
     type: 'number',
     width: '100px',
     readOnly: true,
+    textAlign: 'right',
   },
 ];
 
@@ -131,6 +137,7 @@ const getColumnsForChunkIndex = (): FormField[] => [
     type: 'number',
     width: '120px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'nAppearances',
@@ -141,6 +148,7 @@ const getColumnsForChunkIndex = (): FormField[] => [
     type: 'number',
     width: '130px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'size',
@@ -151,6 +159,7 @@ const getColumnsForChunkIndex = (): FormField[] => [
     type: 'number',
     width: '100px',
     readOnly: true,
+    textAlign: 'right',
   },
 ];
 
@@ -195,6 +204,7 @@ const getColumnsForChunkBloom = (): FormField[] => [
     type: 'number',
     width: '100px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'nInserted',
@@ -205,6 +215,7 @@ const getColumnsForChunkBloom = (): FormField[] => [
     type: 'number',
     width: '100px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'size',
@@ -215,6 +226,7 @@ const getColumnsForChunkBloom = (): FormField[] => [
     type: 'number',
     width: '100px',
     readOnly: true,
+    textAlign: 'right',
   },
   {
     key: 'byteWidth',
@@ -225,6 +237,7 @@ const getColumnsForChunkBloom = (): FormField[] => [
     type: 'number',
     width: '110px',
     readOnly: true,
+    textAlign: 'right',
   },
 ];
 

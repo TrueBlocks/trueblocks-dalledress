@@ -13,25 +13,25 @@ import (
 )
 
 const (
-	ExportsTransactions types.ListKind = "Transactions"
 	ExportsStatements   types.ListKind = "Statements"
 	ExportsTransfers    types.ListKind = "Transfers"
 	ExportsBalances     types.ListKind = "Balances"
+	ExportsTransactions types.ListKind = "Transactions"
 )
 
 func init() {
-	types.RegisterKind(ExportsTransactions)
 	types.RegisterKind(ExportsStatements)
 	types.RegisterKind(ExportsTransfers)
 	types.RegisterKind(ExportsBalances)
+	types.RegisterKind(ExportsTransactions)
 }
 
 type ExportsPage struct {
 	Kind          types.ListKind          `json:"kind"`
-	Transactions  []coreTypes.Transaction `json:"transactions,omitempty"`
 	Statements    []coreTypes.Statement   `json:"statements,omitempty"`
 	Transfers     []coreTypes.Transfer    `json:"transfers,omitempty"`
-	Balances      []coreTypes.State       `json:"balances,omitempty"`
+	Balances      []coreTypes.Token       `json:"balances,omitempty"`
+	Transactions  []coreTypes.Transaction `json:"transactions,omitempty"`
 	TotalItems    int                     `json:"totalItems"`
 	ExpectedTotal int                     `json:"expectedTotal"`
 	IsFetching    bool                    `json:"isFetching"`
@@ -47,10 +47,10 @@ func (ep *ExportsPage) GetState() types.LoadState { return ep.State }
 type ExportsCollection struct {
 	chain             string
 	address           string
-	transactionsFacet *facets.Facet[coreTypes.Transaction]
 	statementsFacet   *facets.Facet[coreTypes.Statement]
 	transfersFacet    *facets.Facet[coreTypes.Transfer]
-	balancesFacet     *facets.Facet[coreTypes.State]
+	balancesFacet     *facets.Facet[coreTypes.Token]
+	transactionsFacet *facets.Facet[coreTypes.Transaction]
 	summary           types.Summary
 	summaryMutex      sync.RWMutex
 }
@@ -70,14 +70,6 @@ func NewExportsCollection(chain, address string) *ExportsCollection {
 }
 
 func (ec *ExportsCollection) initializeFacets() {
-	ec.transactionsFacet = facets.NewFacetWithSummary(
-		ExportsTransactions,
-		nil, // No filter function for now
-		nil, // No deduplication function for now
-		GetExportsTransactionsStore(ec.chain, ec.address),
-		"exports",
-		ec,
-	)
 	ec.statementsFacet = facets.NewFacetWithSummary(
 		ExportsStatements,
 		nil,
@@ -102,6 +94,14 @@ func (ec *ExportsCollection) initializeFacets() {
 		"exports",
 		ec,
 	)
+	ec.transactionsFacet = facets.NewFacetWithSummary(
+		ExportsTransactions,
+		nil, // No filter function for now
+		nil, // No deduplication function for now
+		GetExportsTransactionsStore(ec.chain, ec.address),
+		"exports",
+		ec,
+	)
 }
 
 func (ec *ExportsCollection) GetPage(
@@ -111,47 +111,17 @@ func (ec *ExportsCollection) GetPage(
 	filter string,
 ) (types.Page, error) {
 	switch listKind {
-	case ExportsTransactions:
-		return ec.getTransactionsPage(first, pageSize, sortSpec, filter)
 	case ExportsStatements:
 		return ec.getStatementsPage(first, pageSize, sortSpec, filter)
 	case ExportsTransfers:
 		return ec.getTransfersPage(first, pageSize, sortSpec, filter)
 	case ExportsBalances:
 		return ec.getBalancesPage(first, pageSize, sortSpec, filter)
+	case ExportsTransactions:
+		return ec.getTransactionsPage(first, pageSize, sortSpec, filter)
 	default:
 		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
 	}
-}
-
-func (ec *ExportsCollection) getTransactionsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
-	page := &ExportsPage{
-		Kind: ExportsTransactions,
-	}
-	filter = strings.ToLower(filter)
-
-	var filterFunc = func(item *coreTypes.Transaction) bool {
-		if filter == "" {
-			return true
-		}
-		// TODO: Implement proper filtering based on transaction fields
-		return strings.Contains(strings.ToLower(item.Hash.Hex()), filter)
-	}
-
-	var sortFunc = func(items []coreTypes.Transaction, sort sdk.SortSpec) error {
-		// TODO: Implement proper sorting when SDK methods are available
-		return nil
-	}
-
-	if result, err := ec.transactionsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-		return nil, types.NewStoreError("exports", ExportsTransactions, "GetPage", err)
-	} else {
-		page.Transactions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-	}
-
-	page.IsFetching = ec.transactionsFacet.IsFetching()
-	page.ExpectedTotal = ec.transactionsFacet.ExpectedCount()
-	return page, nil
 }
 
 func (ec *ExportsCollection) getStatementsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
@@ -223,16 +193,15 @@ func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.S
 	}
 	filter = strings.ToLower(filter)
 
-	var filterFunc = func(item *coreTypes.State) bool {
+	var filterFunc = func(item *coreTypes.Token) bool {
 		if filter == "" {
 			return true
 		}
 		// Filter based on balance/state fields
-		return strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
-			strings.Contains(strings.ToLower(item.AccountType), filter)
+		return strings.Contains(strings.ToLower(item.Address.Hex()), filter)
 	}
 
-	var sortFunc = func(items []coreTypes.State, sort sdk.SortSpec) error {
+	var sortFunc = func(items []coreTypes.Token, sort sdk.SortSpec) error {
 		// TODO: Implement proper sorting when SDK methods are available
 		return nil
 	}
@@ -248,6 +217,36 @@ func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.S
 	return page, nil
 }
 
+func (ec *ExportsCollection) getTransactionsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
+	page := &ExportsPage{
+		Kind: ExportsTransactions,
+	}
+	filter = strings.ToLower(filter)
+
+	var filterFunc = func(item *coreTypes.Transaction) bool {
+		if filter == "" {
+			return true
+		}
+		// TODO: Implement proper filtering based on transaction fields
+		return strings.Contains(strings.ToLower(item.Hash.Hex()), filter)
+	}
+
+	var sortFunc = func(items []coreTypes.Transaction, sort sdk.SortSpec) error {
+		// TODO: Implement proper sorting when SDK methods are available
+		return nil
+	}
+
+	if result, err := ec.transactionsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+		return nil, types.NewStoreError("exports", ExportsTransactions, "GetPage", err)
+	} else {
+		page.Transactions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+	}
+
+	page.IsFetching = ec.transactionsFacet.IsFetching()
+	page.ExpectedTotal = ec.transactionsFacet.ExpectedCount()
+	return page, nil
+}
+
 func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
 	if !ec.NeedsUpdate(listKind) {
 		return
@@ -256,14 +255,14 @@ func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
 	var facetName string
 
 	switch listKind {
-	case ExportsTransactions:
-		facetName = string(ExportsTransactions)
 	case ExportsStatements:
 		facetName = string(ExportsStatements)
 	case ExportsTransfers:
 		facetName = string(ExportsTransfers)
 	case ExportsBalances:
 		facetName = string(ExportsBalances)
+	case ExportsTransactions:
+		facetName = string(ExportsTransactions)
 	default:
 		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
 		return
@@ -272,10 +271,6 @@ func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
 	go func() {
 		// Handle each facet type specifically since they're different types
 		switch listKind {
-		case ExportsTransactions:
-			if err := ec.transactionsFacet.Load(); err != nil {
-				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
-			}
 		case ExportsStatements:
 			if err := ec.statementsFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
@@ -288,15 +283,16 @@ func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
 			if err := ec.balancesFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
 			}
+		case ExportsTransactions:
+			if err := ec.transactionsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+			}
 		}
 	}()
 }
 
 func (ec *ExportsCollection) Reset(listKind types.ListKind) {
 	switch listKind {
-	case ExportsTransactions:
-		ResetExportsStore(ec.chain, ec.address, ExportsTransactions)
-		ec.transactionsFacet.Reset()
 	case ExportsStatements:
 		ResetExportsStore(ec.chain, ec.address, ExportsStatements)
 		ec.statementsFacet.Reset()
@@ -306,19 +302,22 @@ func (ec *ExportsCollection) Reset(listKind types.ListKind) {
 	case ExportsBalances:
 		ResetExportsStore(ec.chain, ec.address, ExportsBalances)
 		ec.balancesFacet.Reset()
+	case ExportsTransactions:
+		ResetExportsStore(ec.chain, ec.address, ExportsTransactions)
+		ec.transactionsFacet.Reset()
 	}
 }
 
 func (ec *ExportsCollection) NeedsUpdate(listKind types.ListKind) bool {
 	switch listKind {
-	case ExportsTransactions:
-		return ec.transactionsFacet.NeedsUpdate()
 	case ExportsStatements:
 		return ec.statementsFacet.NeedsUpdate()
 	case ExportsTransfers:
 		return ec.transfersFacet.NeedsUpdate()
 	case ExportsBalances:
 		return ec.balancesFacet.NeedsUpdate()
+	case ExportsTransactions:
+		return ec.transactionsFacet.NeedsUpdate()
 	default:
 		return false
 	}
@@ -326,23 +325,23 @@ func (ec *ExportsCollection) NeedsUpdate(listKind types.ListKind) bool {
 
 func (ec *ExportsCollection) GetSupportedKinds() []types.ListKind {
 	return []types.ListKind{
-		ExportsTransactions,
 		ExportsStatements,
 		ExportsTransfers,
 		ExportsBalances,
+		ExportsTransactions,
 	}
 }
 
 func (ec *ExportsCollection) GetStoreForKind(kind types.ListKind) string {
 	switch kind {
-	case ExportsTransactions:
-		return "exports-transactions"
 	case ExportsStatements:
 		return "exports-statements"
 	case ExportsTransfers:
 		return "exports-transfers"
 	case ExportsBalances:
 		return "exports-balances"
+	case ExportsTransactions:
+		return "exports-transactions"
 	default:
 		return ""
 	}
@@ -404,25 +403,6 @@ func (ec *ExportsCollection) AccumulateItem(item interface{}, summary *types.Sum
 	}
 
 	switch v := item.(type) {
-	case *coreTypes.Transaction:
-		summary.TotalCount++
-		summary.FacetCounts[ExportsTransactions]++
-		if summary.CustomData == nil {
-			summary.CustomData = make(map[string]interface{})
-		}
-
-		txCount, _ := summary.CustomData["transactionsCount"].(int)
-		totalValue, _ := summary.CustomData["totalValue"].(int64)
-		totalGasUsed, _ := summary.CustomData["totalGasUsed"].(int64)
-
-		txCount++
-		totalValue += int64(v.Value.Uint64())
-		totalGasUsed += int64(v.Receipt.GasUsed)
-
-		summary.CustomData["transactionsCount"] = txCount
-		summary.CustomData["totalValue"] = totalValue
-		summary.CustomData["totalGasUsed"] = totalGasUsed
-
 	case *coreTypes.Statement:
 		summary.TotalCount++
 		summary.FacetCounts[ExportsStatements]++
@@ -445,7 +425,7 @@ func (ec *ExportsCollection) AccumulateItem(item interface{}, summary *types.Sum
 		transferCount++
 		summary.CustomData["transfersCount"] = transferCount
 
-	case *coreTypes.State:
+	case *coreTypes.Token:
 		summary.TotalCount++
 		summary.FacetCounts[ExportsBalances]++
 		if summary.CustomData == nil {
@@ -455,6 +435,26 @@ func (ec *ExportsCollection) AccumulateItem(item interface{}, summary *types.Sum
 		balanceCount, _ := summary.CustomData["balancesCount"].(int)
 		balanceCount++
 		summary.CustomData["balancesCount"] = balanceCount
+
+	case *coreTypes.Transaction:
+		summary.TotalCount++
+		summary.FacetCounts[ExportsTransactions]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		txCount, _ := summary.CustomData["transactionsCount"].(int)
+		totalValue, _ := summary.CustomData["totalValue"].(int64)
+		totalGasUsed, _ := summary.CustomData["totalGasUsed"].(int64)
+
+		txCount++
+		totalValue += int64(v.Value.Uint64())
+		totalGasUsed += int64(v.Receipt.GasUsed)
+
+		summary.CustomData["transactionsCount"] = txCount
+		summary.CustomData["totalValue"] = totalValue
+		summary.CustomData["totalGasUsed"] = totalGasUsed
+
 	}
 }
 

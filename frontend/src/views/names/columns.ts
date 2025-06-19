@@ -74,6 +74,7 @@ const getColumnsForName = (): FormField[] => [
     sortable: true,
     type: 'number',
     width: '100px',
+    textAlign: 'right',
   },
   {
     key: 'chips',

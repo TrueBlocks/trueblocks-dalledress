@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 
-import { FormField } from '@components';
+import { FieldRenderer, FormField } from '@components';
 
 import './Body.css';
 
@@ -57,10 +57,11 @@ export const Body = <T extends Record<string, unknown>>({
                   style={
                     typeof col.width === 'string' &&
                     col.width.startsWith('col-')
-                      ? undefined
-                      : col.width
-                        ? { width: col.width }
-                        : undefined
+                      ? { textAlign: col.textAlign || 'left' }
+                      : {
+                          ...(col.width ? { width: col.width } : undefined),
+                          textAlign: col.textAlign || 'left',
+                        }
                   }
                 >
                   {col.render
@@ -68,7 +69,21 @@ export const Body = <T extends Record<string, unknown>>({
                     : col.accessor
                       ? (col.accessor(row) as React.ReactNode)
                       : col.key !== undefined
-                        ? (row[col.key as keyof T] as React.ReactNode)
+                        ? (() => {
+                            const value = row[col.key as keyof T];
+                            return (
+                              <FieldRenderer
+                                field={
+                                  {
+                                    type: col.type || 'text',
+                                    value: value as string,
+                                  } as FormField<Record<string, unknown>>
+                                }
+                                mode="display"
+                                tableCell={true}
+                              />
+                            );
+                          })()
                         : null}
                 </td>
               );

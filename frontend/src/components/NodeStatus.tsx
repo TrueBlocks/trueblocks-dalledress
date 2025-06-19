@@ -22,7 +22,7 @@ export const NodeStatus = () => {
           const formattedDist = formatter.format(dist);
           const frame = spinnerFrames[spinnerIndex % spinnerFrames.length];
           setSpinnerIndex((prevIndex) => prevIndex + 1);
-          const statusMessage = `${meta.chain}: ${formattedClient}, ${formattedUnripe} (${dist < 6 ? 'caught up' : formattedDist + ' dist'}) ${frame}`;
+          const statusMessage = `${meta.chain}: ${frame} ${formattedClient} / ${formattedUnripe} / ${dist < 6 ? 'caught up' : formattedDist} `;
           setStatus(statusMessage);
         });
       } catch (error) {
@@ -57,14 +57,14 @@ export const NodeStatus = () => {
       onClick={handleClick}
       style={{
         position: 'absolute',
-        bottom: 5,
-        right: 10,
-        padding: '0px 5px',
+        bottom: 0,
+        right: 0,
+        padding: '0px 10px',
         whiteSpace: 'nowrap',
         textAlign: 'right',
         zIndex: 9999,
         cursor: 'pointer',
-        backgroundColor: 'rgba(100, 100, 220, 0.9)',
+        backgroundColor: 'rgba(100, 100, 220, 0.2)',
       }}
     >
       {status}

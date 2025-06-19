@@ -161,10 +161,10 @@ export namespace exports {
 	
 	export class ExportsPage {
 	    kind: types.ListKind;
-	    transactions?: types.Transaction[];
 	    statements?: types.Statement[];
 	    transfers?: types.Transfer[];
-	    balances?: types.State[];
+	    balances?: types.Token[];
+	    transactions?: types.Transaction[];
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
@@ -177,10 +177,10 @@ export namespace exports {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.kind = source["kind"];
-	        this.transactions = this.convertValues(source["transactions"], types.Transaction);
 	        this.statements = this.convertValues(source["statements"], types.Statement);
 	        this.transfers = this.convertValues(source["transfers"], types.Transfer);
-	        this.balances = this.convertValues(source["balances"], types.State);
+	        this.balances = this.convertValues(source["balances"], types.Token);
+	        this.transactions = this.convertValues(source["transactions"], types.Transaction);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];
@@ -690,14 +690,6 @@ export namespace sdk {
 
 export namespace types {
 	
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
-	}
 	export enum ListKind {
 	    DOWNLOADED = "Downloaded",
 	    KNOWN = "Known",
@@ -707,16 +699,24 @@ export namespace types {
 	    INDEX = "Index",
 	    BLOOMS = "Blooms",
 	    MANIFEST = "Manifest",
-	    TRANSACTIONS = "Transactions",
 	    STATEMENTS = "Statements",
 	    TRANSFERS = "Transfers",
 	    BALANCES = "Balances",
+	    TRANSACTIONS = "Transactions",
 	    MONITORS = "Monitors",
 	    ALL = "All",
 	    CUSTOM = "Custom",
 	    PREFUND = "Prefund",
 	    REGULAR = "Regular",
 	    BADDRESS = "Baddress",
+	}
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];
@@ -1366,55 +1366,6 @@ export namespace types {
 		    return a;
 		}
 	}
-	export class State {
-	    accountType: string;
-	    address: base.Address;
-	    // Go type: base
-	    balance: any;
-	    blockNumber: number;
-	    code: string;
-	    deployed: number;
-	    nonce: number;
-	    parts: number;
-	    proxy: base.Address;
-	    timestamp: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new State(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.accountType = source["accountType"];
-	        this.address = this.convertValues(source["address"], base.Address);
-	        this.balance = this.convertValues(source["balance"], null);
-	        this.blockNumber = source["blockNumber"];
-	        this.code = source["code"];
-	        this.deployed = source["deployed"];
-	        this.nonce = source["nonce"];
-	        this.parts = source["parts"];
-	        this.proxy = this.convertValues(source["proxy"], base.Address);
-	        this.timestamp = source["timestamp"];
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
 	export class Statement {
 	    accountedFor: base.Address;
 	    // Go type: base
@@ -1558,6 +1509,61 @@ export namespace types {
 	        this.customData = source["customData"];
 	        this.lastUpdated = source["lastUpdated"];
 	    }
+	}
+	export class Token {
+	    address: base.Address;
+	    // Go type: base
+	    balance: any;
+	    blockNumber: number;
+	    decimals: number;
+	    holder: base.Address;
+	    name: string;
+	    // Go type: base
+	    priorBalance?: any;
+	    symbol: string;
+	    timestamp: number;
+	    // Go type: base
+	    totalSupply: any;
+	    transactionIndex?: number;
+	    type: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Token(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.address = this.convertValues(source["address"], base.Address);
+	        this.balance = this.convertValues(source["balance"], null);
+	        this.blockNumber = source["blockNumber"];
+	        this.decimals = source["decimals"];
+	        this.holder = this.convertValues(source["holder"], base.Address);
+	        this.name = source["name"];
+	        this.priorBalance = this.convertValues(source["priorBalance"], null);
+	        this.symbol = source["symbol"];
+	        this.timestamp = source["timestamp"];
+	        this.totalSupply = this.convertValues(source["totalSupply"], null);
+	        this.transactionIndex = source["transactionIndex"];
+	        this.type = source["type"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class TraceResult {
 	    address?: base.Address;

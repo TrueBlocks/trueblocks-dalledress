@@ -74,13 +74,15 @@ export const Header = <T extends Record<string, unknown>>({
           return (
             <th
               key={col.key}
-              style={
-                typeof col.width === 'string' && col.width.startsWith('col-')
+              style={{
+                ...(typeof col.width === 'string' &&
+                col.width.startsWith('col-')
                   ? undefined
                   : col.width
                     ? { width: col.width }
-                    : undefined
-              }
+                    : undefined),
+                textAlign: 'center',
+              }}
               className={classNames}
               onClick={col.sortable ? () => handleClick(col) : undefined}
               tabIndex={col.sortable ? 0 : undefined}

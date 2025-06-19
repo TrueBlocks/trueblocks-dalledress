@@ -7,18 +7,14 @@ export const getColumnsForExports = (
   listKind: types.ListKind | string,
 ): FormField[] => {
   switch (listKind) {
-    case types.ListKind.TRANSACTIONS:
-    case 'Transactions':
-      return getTransactionColumns();
     case types.ListKind.STATEMENTS:
-    case 'Statements':
       return getStatementColumns();
     case types.ListKind.TRANSFERS:
-    case 'Transfers':
       return getTransferColumns();
     case types.ListKind.BALANCES:
-    case 'Balances':
       return getBalanceColumns();
+    case types.ListKind.TRANSACTIONS:
+      return getTransactionColumns();
     default:
       return getTransactionColumns();
   }
@@ -38,6 +34,7 @@ const getTransactionColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-block',
+    textAlign: 'right',
   },
   {
     key: 'transactionIndex',
@@ -45,6 +42,7 @@ const getTransactionColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-index',
+    textAlign: 'right',
   },
   {
     key: 'from',
@@ -66,6 +64,7 @@ const getTransactionColumns = (): FormField[] => [
     type: 'ether',
     sortable: true,
     width: 'col-value',
+    textAlign: 'right',
   },
   {
     key: 'gas',
@@ -73,6 +72,7 @@ const getTransactionColumns = (): FormField[] => [
     type: 'gas',
     sortable: true,
     width: 'col-gas',
+    textAlign: 'right',
   },
   {
     key: 'gasPrice',
@@ -80,6 +80,7 @@ const getTransactionColumns = (): FormField[] => [
     type: 'ether',
     sortable: true,
     width: 'col-gas-price',
+    textAlign: 'right',
   },
   {
     key: 'gasCost',
@@ -87,6 +88,7 @@ const getTransactionColumns = (): FormField[] => [
     type: 'gas',
     sortable: true,
     width: 'col-gas-price',
+    textAlign: 'right',
     render: (row) => {
       const gas = BigInt((row.gas as string) || '0');
       const gasPrice = BigInt((row.gasPrice as string) || '0');
@@ -110,6 +112,7 @@ const getStatementColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-block',
+    textAlign: 'right',
   },
   {
     key: 'transactionIndex',
@@ -117,6 +120,7 @@ const getStatementColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-index',
+    textAlign: 'right',
   },
   {
     key: 'logIndex',
@@ -124,6 +128,14 @@ const getStatementColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    type: 'text',
+    sortable: true,
+    width: 'col-timestamp',
   },
   {
     key: 'accountedFor',
@@ -145,6 +157,7 @@ const getStatementColumns = (): FormField[] => [
     type: 'ether',
     sortable: true,
     width: 'col-balance',
+    textAlign: 'right',
   },
   {
     key: 'amountNet',
@@ -152,6 +165,7 @@ const getStatementColumns = (): FormField[] => [
     type: 'ether',
     sortable: true,
     width: 'col-amount',
+    textAlign: 'right',
     render: (row) => {
       const amountIn = BigInt((row.amountIn as string) || '0');
       const amountOut = BigInt((row.amountOut as string) || '0');
@@ -165,6 +179,7 @@ const getStatementColumns = (): FormField[] => [
     type: 'ether',
     sortable: true,
     width: 'col-balance',
+    textAlign: 'right',
   },
   {
     key: 'actions',
@@ -182,6 +197,7 @@ const getTransferColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-block',
+    textAlign: 'right',
   },
   {
     key: 'transactionIndex',
@@ -189,6 +205,7 @@ const getTransferColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-index',
+    textAlign: 'right',
   },
   {
     key: 'logIndex',
@@ -196,6 +213,7 @@ const getTransferColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-index',
+    textAlign: 'right',
   },
   {
     key: 'sender',
@@ -231,6 +249,7 @@ const getTransferColumns = (): FormField[] => [
     type: 'ether',
     sortable: true,
     width: 'col-amount',
+    textAlign: 'right',
   },
   {
     key: 'actions',
@@ -248,6 +267,7 @@ const getBalanceColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-block',
+    textAlign: 'right',
   },
   {
     key: 'transactionIndex',
@@ -255,34 +275,35 @@ const getBalanceColumns = (): FormField[] => [
     type: 'number',
     sortable: true,
     width: 'col-index',
+    textAlign: 'right',
   },
   {
-    key: 'logIndex',
-    header: 'Log Index',
-    type: 'number',
+    key: 'holder',
+    header: 'Holder',
+    type: 'address',
     sortable: true,
-    width: 'col-index',
+    width: 'col-address',
   },
   {
     key: 'address',
-    header: 'Address',
-    type: 'text',
+    header: 'Token Address',
+    type: 'address',
     sortable: true,
     width: 'col-address',
   },
   {
-    key: 'assetAddr',
-    header: 'Asset',
-    type: 'text',
-    sortable: true,
-    width: 'col-address',
-  },
-  {
-    key: 'assetSymbol',
+    key: 'symbol',
     header: 'Symbol',
     type: 'text',
     sortable: true,
     width: 'col-symbol',
+  },
+  {
+    key: 'name',
+    header: 'Token Name',
+    type: 'text',
+    sortable: true,
+    width: 'col-name',
   },
   {
     key: 'balance',
@@ -290,13 +311,27 @@ const getBalanceColumns = (): FormField[] => [
     type: 'ether',
     sortable: true,
     width: 'col-balance',
+    textAlign: 'right',
   },
   {
-    key: 'diff',
-    header: 'Difference',
+    key: 'priorBalance',
+    header: 'Prior Balance',
     type: 'ether',
     sortable: true,
-    width: 'col-amount',
+    width: 'col-balance',
+    textAlign: 'right',
+    render: (row) => {
+      const balance = (row.priorBalance as string) || '0';
+      return formatWeiToEther(balance);
+    },
+  },
+  {
+    key: 'decimals',
+    header: 'Decimals',
+    type: 'number',
+    sortable: true,
+    width: 'col-decimals',
+    textAlign: 'right',
   },
   {
     key: 'actions',

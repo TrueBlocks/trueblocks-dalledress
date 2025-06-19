@@ -100,8 +100,8 @@ export const App = () => {
           <div
             style={{
               position: 'absolute',
-              bottom: '40px',
-              right: `${getBarWidth(helpCollapsed, 2)}px`,
+              top: '84px',
+              right: `${getBarWidth(helpCollapsed, 2) + 0}px`,
               zIndex: 1000,
             }}
           >

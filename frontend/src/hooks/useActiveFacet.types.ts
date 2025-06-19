@@ -10,7 +10,6 @@ export type DataFacet =
   | 'transfers'
   | 'balances'
   | 'transactions'
-  | 'receipts'
   // Chunks view facets
   | 'stats'
   | 'index'

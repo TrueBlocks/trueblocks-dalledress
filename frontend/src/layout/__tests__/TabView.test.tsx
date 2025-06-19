@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { msgs, types } from '@models';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

@@ -1,5 +1,5 @@
 import { FormField, Table, TableProps } from '@components';
-import { TableKey } from '@contexts';
+import { ViewStateKey } from '@contexts';
 import { MantineProvider } from '@mantine/core';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -30,13 +30,16 @@ const mockData = [
   { id: 3, name: 'Item 3', description: 'Third item' },
 ];
 
-const tableKey: TableKey = { viewName: 'test-view', tabName: 'test-tab' };
+const viewStateKey: ViewStateKey = {
+  viewName: 'test-view',
+  tabName: 'test-tab',
+};
 
 const defaultProps: TableProps<TestRow> = {
   columns: mockColumns,
   data: mockData,
   loading: false,
-  tableKey,
+  viewStateKey,
   onSubmit: vi.fn(),
 };
 
@@ -97,9 +100,9 @@ describe('Table', () => {
     });
   });
 
-  // Group 3: TableKey integration tests
-  describe('TableKey integration', () => {
-    it('includes tableKey prop in rendered table', () => {
+  // Group 3: ViewStateKey integration tests
+  describe('ViewStateKey integration', () => {
+    it('includes viewStateKey prop in rendered table', () => {
       expect(() => setupTest()).not.toThrow();
     });
   });
@@ -122,7 +125,10 @@ describe('Table', () => {
         description: `Description ${i + 1}`,
       }));
 
-      setupTest({ data: largeDataset.slice(0, 10), tableKey: tableKey });
+      setupTest({
+        data: largeDataset.slice(0, 10),
+        viewStateKey: viewStateKey,
+      });
 
       const rows = screen.getAllByRole('row');
       expect(rows.length).toBe(11);

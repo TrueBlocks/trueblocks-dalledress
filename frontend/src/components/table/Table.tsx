@@ -2,8 +2,9 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import { useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
-import { TableKey, useFiltering } from '@contexts';
+import { useFiltering } from '@contexts';
 import { Modal } from '@mantine/core';
+import { ViewStateKey } from 'src/contexts/ViewStateKey';
 
 import { Body, Header, Pagination, PerPage, Stats, usePagination } from '.';
 import { SearchBox } from './SearchBox';
@@ -14,7 +15,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   columns: FormField<T>[];
   data: T[];
   loading: boolean;
-  tableKey: TableKey;
+  viewStateKey: ViewStateKey;
   onSubmit: (data: Record<string, unknown>) => void;
   validate?: Record<
     string,
@@ -27,13 +28,13 @@ export const Table = <T extends Record<string, unknown>>({
   columns,
   data,
   loading,
-  tableKey,
+  viewStateKey,
   onSubmit,
   validate,
   onModalOpen,
 }: TableProps<T>) => {
-  const { pagination } = usePagination(tableKey);
-  const { filter, setFiltering } = useFiltering(tableKey);
+  const { pagination } = usePagination(viewStateKey);
+  const { filter, setFiltering } = useFiltering(viewStateKey);
   const { currentPage, pageSize, totalItems } = pagination;
   const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -69,7 +70,7 @@ export const Table = <T extends Record<string, unknown>>({
     itemCount: data.length,
     currentPage,
     totalPages,
-    tableKey,
+    viewStateKey,
     onEnter: () => {
       if (selectedRowIndex >= 0 && selectedRowIndex < data.length) {
         const rowData = data[selectedRowIndex] || null;
@@ -181,7 +182,7 @@ export const Table = <T extends Record<string, unknown>>({
       <div className="top-pagination-container">
         <SearchBox value={filter} onChange={setFiltering} />
         <PerPage
-          tableKey={tableKey}
+          viewStateKey={viewStateKey}
           pageSize={pageSize}
           focusTable={focusTable}
           focusControls={focusControls}
@@ -189,7 +190,7 @@ export const Table = <T extends Record<string, unknown>>({
         <Pagination
           totalPages={totalPages}
           currentPage={currentPage}
-          tableKey={tableKey}
+          viewStateKey={viewStateKey}
           focusControls={focusControls}
         />
       </div>
@@ -199,7 +200,7 @@ export const Table = <T extends Record<string, unknown>>({
           className="data-table"
           style={{ width: '100%', tableLayout: 'fixed' }}
         >
-          <Header columns={columns} tableKey={tableKey} />
+          <Header columns={columns} viewStateKey={viewStateKey} />
         </table>
       </div>
 
@@ -260,7 +261,7 @@ export const Table = <T extends Record<string, unknown>>({
       </div>
 
       <div className="table-footer">
-        <Stats namesLength={data.length} tableKey={tableKey} />
+        <Stats namesLength={data.length} viewStateKey={viewStateKey} />
       </div>
 
       <Modal
@@ -288,9 +289,9 @@ export const Table = <T extends Record<string, unknown>>({
       >
         <div onKeyDown={handleFormKeyDown}>
           <Form
-            title={`Edit ${tableKey.tabName.replace(/\b\w/g, (char) =>
+            title={`Edit ${viewStateKey.tabName.replace(/\b\w/g, (char) =>
               char.toUpperCase(),
-            )} ${tableKey.viewName
+            )} ${viewStateKey.viewName
               .replace(/^\//, '')
               .replace(/\b\w/g, (char) => char.toUpperCase())}`}
             fields={columns.map((col) => {

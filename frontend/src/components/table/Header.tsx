@@ -1,19 +1,20 @@
 import React from 'react';
 
 import { FormField } from '@components';
-import { TableKey, useSorting } from '@contexts';
+import { useSorting } from '@contexts';
+import { ViewStateKey } from 'src/contexts/ViewStateKey';
 
 import { SortSpecManager } from '../../utils/sortSpec';
 import './Header.css';
 
 export const Header = <T extends Record<string, unknown>>({
   columns,
-  tableKey,
+  viewStateKey,
 }: {
   columns: FormField<T>[];
-  tableKey: TableKey;
+  viewStateKey: ViewStateKey;
 }) => {
-  const { sort, setSorting } = useSorting(tableKey);
+  const { sort, setSorting } = useSorting(viewStateKey);
   const handleClick = (col: FormField<T>) => {
     if (!col.sortable || typeof col.key !== 'string') return;
 

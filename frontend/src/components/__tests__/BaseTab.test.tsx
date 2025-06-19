@@ -16,7 +16,7 @@ const mockData = [
   { id: '2', name: 'Item 2' },
 ];
 
-const mockTableKey = { viewName: 'test', tabName: 'test' };
+const mockViewStateKey = { viewName: 'test', tabName: 'test' };
 
 describe('BaseTab', () => {
   it('renders table with data', () => {
@@ -26,7 +26,7 @@ describe('BaseTab', () => {
         columns={mockColumns}
         loading={false}
         error={null}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
       />,
     );
 
@@ -41,7 +41,7 @@ describe('BaseTab', () => {
         columns={mockColumns}
         loading={true}
         error={null}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
       />,
     );
 
@@ -56,7 +56,7 @@ describe('BaseTab', () => {
         columns={mockColumns}
         loading={false}
         error={null}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
       />,
     );
 

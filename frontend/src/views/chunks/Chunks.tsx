@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { TableKey, useFiltering, useSorting } from '@contexts';
+import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -22,15 +22,15 @@ export const Chunks = () => {
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[CHUNKS_ROUTE] || CHUNKS_DEFAULT_LIST,
   );
-  const tableKey = useMemo(
-    (): TableKey => ({ viewName: CHUNKS_ROUTE, tabName: listKind }),
+  const viewStateKey = useMemo(
+    (): ViewStateKey => ({ viewName: CHUNKS_ROUTE, tabName: listKind }),
     [listKind],
   );
 
   const { handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(tableKey);
-  const { sort } = useSorting(tableKey);
-  const { filter } = useFiltering(tableKey);
+  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { sort } = useSorting(viewStateKey);
+  const { filter } = useFiltering(viewStateKey);
 
   const listKindRef = useRef(listKind);
 
@@ -122,10 +122,10 @@ export const Chunks = () => {
         loading={!!pageData?.isFetching}
         error={null} // Chunks are read-only, no edit errors
         onSubmit={() => {}} // No-op since chunks are read-only
-        tableKey={tableKey}
+        viewStateKey={viewStateKey}
       />
     ),
-    [currentData, columns, pageData?.isFetching, tableKey],
+    [currentData, columns, pageData?.isFetching, viewStateKey],
   );
 
   const tabs = useMemo(

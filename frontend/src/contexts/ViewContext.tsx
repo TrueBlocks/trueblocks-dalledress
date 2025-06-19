@@ -9,7 +9,7 @@ import {
 
 import { sdk } from '@models';
 
-import { TableKey, tableKeyToString } from '.';
+import { ViewStateKey, viewStateKeyToString } from '.';
 import { createEmptySortSpec } from '../utils/sortSpec';
 
 const EMPTY_SORT = createEmptySortSpec();
@@ -71,15 +71,18 @@ export const initialPaginationState: PaginationState = Object.freeze({
 interface ViewContextType {
   currentView: string;
   setCurrentView: (view: string) => void;
-  getPagination: (tableKey: TableKey) => PaginationState;
+  getPagination: (viewStateKey: ViewStateKey) => PaginationState;
   updatePagination: (
-    tableKey: TableKey,
+    viewStateKey: ViewStateKey,
     changes: Partial<PaginationState>,
   ) => void;
-  getSorting: (tableKey: TableKey) => sdk.SortSpec | null;
-  updateSorting: (tableKey: TableKey, sort: sdk.SortSpec | null) => void;
-  getFiltering: (tableKey: TableKey) => string;
-  updateFiltering: (tableKey: TableKey, filter: string) => void;
+  getSorting: (viewStateKey: ViewStateKey) => sdk.SortSpec | null;
+  updateSorting: (
+    viewStateKey: ViewStateKey,
+    sort: sdk.SortSpec | null,
+  ) => void;
+  getFiltering: (viewStateKey: ViewStateKey) => string;
+  updateFiltering: (viewStateKey: ViewStateKey, filter: string) => void;
 }
 
 export const ViewContext = createContext<ViewContextType>({
@@ -100,17 +103,17 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   const [viewFiltering, setViewFiltering] = useState<ViewFilterState>({});
 
   const getPagination = useCallback(
-    (tableKey: TableKey) => {
-      const key = tableKeyToString(tableKey);
+    (viewStateKey: ViewStateKey) => {
+      const key = viewStateKeyToString(viewStateKey);
       return viewPagination[key] || initialPaginationState;
     },
     [viewPagination],
   );
 
   const updatePagination = useCallback(
-    (tableKey: TableKey, changes: Partial<PaginationState>) => {
+    (viewStateKey: ViewStateKey, changes: Partial<PaginationState>) => {
       setViewPagination((prev) => {
-        const key = tableKeyToString(tableKey);
+        const key = viewStateKeyToString(viewStateKey);
         const currentPagination = prev[key] || { ...initialPaginationState };
         return {
           ...prev,
@@ -125,17 +128,17 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const getSorting = useCallback(
-    (tableKey: TableKey) => {
-      const key = tableKeyToString(tableKey);
+    (viewStateKey: ViewStateKey) => {
+      const key = viewStateKeyToString(viewStateKey);
       return viewSorting[key] || null;
     },
     [viewSorting],
   );
 
   const updateSorting = useCallback(
-    (tableKey: TableKey, sort: sdk.SortSpec | null) => {
+    (viewStateKey: ViewStateKey, sort: sdk.SortSpec | null) => {
       setViewSorting((prev) => {
-        const key = tableKeyToString(tableKey);
+        const key = viewStateKeyToString(viewStateKey);
         return {
           ...prev,
           [key]: sort,
@@ -146,18 +149,21 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const getFiltering = useCallback(
-    (tableKey: TableKey) => {
-      return viewFiltering[tableKey.viewName] || '';
+    (viewStateKey: ViewStateKey) => {
+      return viewFiltering[viewStateKey.viewName] || '';
     },
     [viewFiltering],
   );
 
-  const updateFiltering = useCallback((tableKey: TableKey, filter: string) => {
-    setViewFiltering((prev) => ({
-      ...prev,
-      [tableKey.viewName]: filter,
-    }));
-  }, []);
+  const updateFiltering = useCallback(
+    (viewStateKey: ViewStateKey, filter: string) => {
+      setViewFiltering((prev) => ({
+        ...prev,
+        [viewStateKey.viewName]: filter,
+      }));
+    },
+    [],
+  );
 
   const contextValue = useMemo(
     () => ({
@@ -195,35 +201,38 @@ export const useViewContext = () => {
   return context;
 };
 
-export const useSorting = (tableKey: TableKey) => {
+// Hook for sorting state (per-facet)
+// Uses full ViewStateKey (viewName + tabName) to scope sorting per facet
+export const useSorting = (viewStateKey: ViewStateKey) => {
   const { getSorting, updateSorting } = useViewContext();
 
   const setSorting = useCallback(
     (sort: sdk.SortSpec | null) => {
-      updateSorting(tableKey, sort);
+      updateSorting(viewStateKey, sort);
     },
-    [tableKey, updateSorting],
+    [viewStateKey, updateSorting],
   );
 
   // Get the sort value, but never return null - instead return a default empty SortSpec
-  const sortValue = getSorting(tableKey);
+  const sortValue = getSorting(viewStateKey);
   const sort = sortValue || EMPTY_SORT;
 
   return useMemo(() => ({ sort, setSorting }), [sort, setSorting]);
 };
 
 // Hook for filtering state (per-view)
-export const useFiltering = (tableKey: TableKey) => {
+// Uses only viewName from ViewStateKey to scope filtering per view
+export const useFiltering = (viewStateKey: ViewStateKey) => {
   const { getFiltering, updateFiltering } = useViewContext();
 
   const setFiltering = useCallback(
     (filter: string) => {
-      updateFiltering(tableKey, filter);
+      updateFiltering(viewStateKey, filter);
     },
-    [tableKey, updateFiltering],
+    [viewStateKey, updateFiltering],
   );
 
-  const filter = getFiltering(tableKey);
+  const filter = getFiltering(viewStateKey);
 
   return useMemo(() => ({ filter, setFiltering }), [filter, setFiltering]);
 };

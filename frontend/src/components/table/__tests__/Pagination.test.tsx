@@ -1,5 +1,5 @@
 import { Pagination } from '@components';
-import { TableKey } from '@contexts';
+import { ViewStateKey } from '@contexts';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -13,7 +13,10 @@ vi.mock('../usePagination', () => ({
 }));
 
 describe('Pagination', () => {
-  const mockTableKey: TableKey = { viewName: 'test-view', tabName: 'test-tab' };
+  const mockViewStateKey: ViewStateKey = {
+    viewName: 'test-view',
+    tabName: 'test-tab',
+  };
   const mockFocusControls = vi.fn();
 
   beforeEach(() => {
@@ -25,7 +28,7 @@ describe('Pagination', () => {
       <Pagination
         totalPages={10}
         currentPage={0}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
         focusControls={mockFocusControls}
       />,
     );
@@ -48,7 +51,7 @@ describe('Pagination', () => {
       <Pagination
         totalPages={10}
         currentPage={2}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
         focusControls={mockFocusControls}
       />,
     );
@@ -72,7 +75,7 @@ describe('Pagination', () => {
       <Pagination
         totalPages={10}
         currentPage={5}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
         focusControls={mockFocusControls}
       />,
     );
@@ -119,7 +122,7 @@ describe('Pagination', () => {
       <Pagination
         totalPages={10}
         currentPage={0}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
         focusControls={mockFocusControls}
       />,
     );
@@ -140,7 +143,7 @@ describe('Pagination', () => {
       <Pagination
         totalPages={10}
         currentPage={9}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
         focusControls={mockFocusControls}
       />,
     );
@@ -161,7 +164,7 @@ describe('Pagination', () => {
       <Pagination
         totalPages={10}
         currentPage={5}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
         focusControls={mockFocusControls}
       />,
     );
@@ -180,7 +183,7 @@ describe('Pagination', () => {
       <Pagination
         totalPages={1}
         currentPage={0}
-        tableKey={mockTableKey}
+        viewStateKey={mockViewStateKey}
         focusControls={mockFocusControls}
       />,
     );

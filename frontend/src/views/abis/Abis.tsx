@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
-import { TableKey, useFiltering, useSorting } from '@contexts';
+import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -24,15 +24,15 @@ export const Abis = () => {
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[ABIS_ROUTE] || ABIS_DEFAULT_LIST,
   );
-  const tableKey = useMemo(
-    (): TableKey => ({ viewName: ABIS_ROUTE, tabName: listKind }),
+  const viewStateKey = useMemo(
+    (): ViewStateKey => ({ viewName: ABIS_ROUTE, tabName: listKind }),
     [listKind],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems, goToPage } = usePagination(tableKey);
-  const { sort } = useSorting(tableKey);
-  const { filter } = useFiltering(tableKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
+  const { sort } = useSorting(viewStateKey);
+  const { filter } = useFiltering(viewStateKey);
 
   const listKindRef = useRef(listKind);
   const renderCnt = useRef(0);
@@ -303,7 +303,7 @@ export const Abis = () => {
         loading={!!pageData?.isFetching}
         error={error}
         onSubmit={handleSubmit}
-        tableKey={tableKey}
+        viewStateKey={viewStateKey}
       />
     ),
     [
@@ -312,7 +312,7 @@ export const Abis = () => {
       pageData?.isFetching,
       error,
       handleSubmit,
-      tableKey,
+      viewStateKey,
     ],
   );
 

@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { FormField, Table, TableProvider } from '@components';
+import { ViewStateKey } from '@contexts';
 
 import './BaseTab.css';
 
 interface BaseTabProps<T extends Record<string, unknown>> {
   data: T[];
   columns: FormField<T>[];
-  tableKey: { viewName: string; tabName: string };
+  viewStateKey: ViewStateKey;
   loading: boolean;
   error: Error | null;
   onSubmit?: (formData: Record<string, unknown>) => void;
@@ -21,7 +22,7 @@ export function BaseTab<T extends Record<string, unknown>>({
   error: _error,
   onSubmit,
   onAction: _onAction,
-  tableKey,
+  viewStateKey,
 }: BaseTabProps<T>) {
   // Always render table structure - let Table component handle all states
   return (
@@ -30,7 +31,7 @@ export function BaseTab<T extends Record<string, unknown>>({
         <Table
           data={data as Record<string, unknown>[]}
           columns={columns as FormField<Record<string, unknown>>[]}
-          tableKey={tableKey}
+          viewStateKey={viewStateKey}
           loading={loading}
           onSubmit={onSubmit || (() => {})}
         />

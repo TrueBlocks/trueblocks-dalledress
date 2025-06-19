@@ -1,36 +1,36 @@
 import { useCallback, useMemo } from 'react';
 
-import { NavigationTarget, TableKey, useViewContext } from '@contexts';
+import { NavigationTarget, ViewStateKey, useViewContext } from '@contexts';
 
 import { calculateNavigationTarget } from './navigationUtils';
 
 // usePagination is a custom hook that manages pagination state and handlers for a table view/tab.
-export const usePagination = (tableKey: TableKey) => {
+export const usePagination = (viewStateKey: ViewStateKey) => {
   const { getPagination, updatePagination } = useViewContext();
-  const pagination = getPagination(tableKey);
+  const pagination = getPagination(viewStateKey);
 
   const goToPage = useCallback(
     (page: number) => {
-      updatePagination(tableKey, { currentPage: page });
+      updatePagination(viewStateKey, { currentPage: page });
     },
-    [tableKey, updatePagination],
+    [viewStateKey, updatePagination],
   );
 
   const changePageSize = useCallback(
     (size: number) => {
-      updatePagination(tableKey, {
+      updatePagination(viewStateKey, {
         currentPage: 0,
         pageSize: size,
       });
     },
-    [tableKey, updatePagination],
+    [viewStateKey, updatePagination],
   );
 
   const setTotalItems = useCallback(
     (total: number) => {
-      updatePagination(tableKey, { totalItems: total });
+      updatePagination(viewStateKey, { totalItems: total });
     },
-    [tableKey, updatePagination],
+    [viewStateKey, updatePagination],
   );
 
   // Calculate navigation target for post-deletion positioning
@@ -58,7 +58,7 @@ export const usePagination = (tableKey: TableKey) => {
       switch (target.type) {
         case 'page':
           if (target.page !== undefined) {
-            updatePagination(tableKey, {
+            updatePagination(viewStateKey, {
               currentPage: target.page,
             });
           }
@@ -72,7 +72,7 @@ export const usePagination = (tableKey: TableKey) => {
           break;
       }
     },
-    [tableKey, updatePagination],
+    [viewStateKey, updatePagination],
   );
 
   return useMemo(

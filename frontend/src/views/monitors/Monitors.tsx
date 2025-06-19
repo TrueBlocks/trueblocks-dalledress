@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
-import { TableKey, useFiltering, useSorting } from '@contexts';
+import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -25,15 +25,15 @@ export const Monitors = () => {
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[MONITORS_ROUTE] || MONITORS_DEFAULT_LIST,
   );
-  const tableKey = useMemo(
-    (): TableKey => ({ viewName: MONITORS_ROUTE, tabName: listKind }),
+  const viewStateKey = useMemo(
+    (): ViewStateKey => ({ viewName: MONITORS_ROUTE, tabName: listKind }),
     [listKind],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(tableKey);
-  const { sort } = useSorting(tableKey);
-  const { filter } = useFiltering(tableKey);
+  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { sort } = useSorting(viewStateKey);
+  const { filter } = useFiltering(viewStateKey);
   const { emitStatus } = useEmitters();
 
   const listKindRef = useRef(listKind);
@@ -470,7 +470,7 @@ export const Monitors = () => {
         loading={!!pageData?.isFetching}
         error={error}
         onSubmit={handleSubmit}
-        tableKey={tableKey}
+        viewStateKey={viewStateKey}
       />
     ),
     [
@@ -479,7 +479,7 @@ export const Monitors = () => {
       pageData?.isFetching,
       error,
       handleSubmit,
-      tableKey,
+      viewStateKey,
     ],
   );
 

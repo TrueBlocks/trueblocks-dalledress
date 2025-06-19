@@ -1,5 +1,5 @@
 import { useTableContext } from '@components';
-import { TableKey } from '@contexts';
+import { ViewStateKey } from '@contexts';
 import { act, renderHook } from '@testing-library/react';
 import { Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -52,7 +52,10 @@ describe('useTableKeys', () => {
   });
 
   const mockGoToPage = vi.fn();
-  const tableKey: TableKey = { viewName: 'test-view', tabName: 'test-tab' };
+  const viewStateKey: ViewStateKey = {
+    viewName: 'test-view',
+    tabName: 'test-tab',
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -76,7 +79,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -97,7 +100,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -120,7 +123,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -141,7 +144,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -162,7 +165,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -183,7 +186,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -208,7 +211,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1, // Already on last page
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -233,7 +236,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0, // Already on first page
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -260,7 +263,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -284,7 +287,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -308,7 +311,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0, // Already on first page
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -332,7 +335,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1, // Already on last page
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -358,7 +361,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -383,7 +386,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -408,7 +411,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -433,7 +436,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -458,7 +461,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -483,7 +486,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -508,7 +511,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -533,7 +536,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 1,
           totalPages: 2,
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -560,7 +563,7 @@ describe('useTableKeys', () => {
           itemCount: 0,
           currentPage: 0,
           totalPages: 1, // Or 0, depending on calculation for empty set
-          tableKey,
+          viewStateKey,
         }),
       );
 
@@ -585,7 +588,7 @@ describe('useTableKeys', () => {
           itemCount: 5,
           currentPage: 0,
           totalPages: 1,
-          tableKey,
+          viewStateKey,
         }),
       );
 

@@ -8,7 +8,7 @@ vi.mock('@contexts', () => ({
   useSorting: () => ({ sort: mockSort, setSorting: mockSetSorting }),
 }));
 
-const mockTableKey = { viewName: 'test', tabName: 'test' };
+const mockViewStateKey = { viewName: 'test', tabName: 'test' };
 describe('Header', () => {
   beforeEach(() => {
     mockSort = { fields: [], orders: [] };
@@ -24,7 +24,7 @@ describe('Header', () => {
     ];
     render(
       <table>
-        <Header columns={columns} tableKey={mockTableKey} />
+        <Header columns={columns} viewStateKey={mockViewStateKey} />
       </table>,
     );
     expect(screen.getByText('Name')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('Header', () => {
     mockSort = { fields: ['name'], orders: [true] };
     render(
       <table>
-        <Header columns={columns} tableKey={mockTableKey} />
+        <Header columns={columns} viewStateKey={mockViewStateKey} />
       </table>,
     );
     expect(screen.getByText(/↑/)).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe('Header', () => {
     mockSort = { fields: [], orders: [] };
     render(
       <table>
-        <Header columns={columns} tableKey={mockTableKey} />
+        <Header columns={columns} viewStateKey={mockViewStateKey} />
       </table>,
     );
     // Use Testing Library's fireEvent on the header cell directly

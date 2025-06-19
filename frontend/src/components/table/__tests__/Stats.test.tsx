@@ -1,4 +1,4 @@
-import { TableKey } from '@contexts';
+import { ViewStateKey } from '@contexts';
 import { render, screen } from '@testing-library/react';
 import { Stats } from 'src/components/table/Stats';
 import { describe, expect, it, vi } from 'vitest';
@@ -45,8 +45,11 @@ vi.mock('../usePagination', () => ({
 
 describe('Stats', () => {
   it('renders the correct range and total', () => {
-    const tableKey: TableKey = { viewName: 'test-view', tabName: 'page1' };
-    render(<Stats namesLength={10} tableKey={tableKey} />);
+    const viewStateKey: ViewStateKey = {
+      viewName: 'test-view',
+      tabName: 'page1',
+    };
+    render(<Stats namesLength={10} viewStateKey={viewStateKey} />);
 
     expect(
       screen.getByText(/Showing 11 to 20 of 35 entries/),
@@ -54,15 +57,21 @@ describe('Stats', () => {
   });
 
   it('shows 1 to totalItems when on first page and less than pageSize', () => {
-    const tableKey: TableKey = { viewName: 'test-view', tabName: 'first-page' };
-    render(<Stats namesLength={5} tableKey={tableKey} />);
+    const viewStateKey: ViewStateKey = {
+      viewName: 'test-view',
+      tabName: 'first-page',
+    };
+    render(<Stats namesLength={5} viewStateKey={viewStateKey} />);
 
     expect(screen.getByText(/Showing 1 to 5 of 5 entries/)).toBeInTheDocument();
   });
 
   it('shows correct range when on last page with partial page', () => {
-    const tableKey: TableKey = { viewName: 'test-view', tabName: 'last-page' };
-    render(<Stats namesLength={5} tableKey={tableKey} />);
+    const viewStateKey: ViewStateKey = {
+      viewName: 'test-view',
+      tabName: 'last-page',
+    };
+    render(<Stats namesLength={5} viewStateKey={viewStateKey} />);
 
     expect(
       screen.getByText(/Showing 31 to 35 of 35 entries/),
@@ -70,8 +79,11 @@ describe('Stats', () => {
   });
 
   it('shows 0 results correctly', () => {
-    const tableKey: TableKey = { viewName: 'test-view', tabName: 'empty' };
-    render(<Stats namesLength={0} tableKey={tableKey} />);
+    const viewStateKey: ViewStateKey = {
+      viewName: 'test-view',
+      tabName: 'empty',
+    };
+    render(<Stats namesLength={0} viewStateKey={viewStateKey} />);
 
     expect(screen.getByText(/Showing 0 to 0 of 0 entries/)).toBeInTheDocument();
   });

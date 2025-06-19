@@ -1,4 +1,4 @@
-import { TableKey } from '@contexts';
+import { ViewStateKey } from '@contexts';
 import { usePagination } from 'src/components/table/usePagination';
 
 import './PerPage.css';
@@ -6,7 +6,7 @@ import './PerPage.css';
 // PerPageProps defines the props for the PerPage component.
 interface PerPageProps {
   pageSize: number;
-  tableKey: TableKey;
+  viewStateKey: ViewStateKey;
   focusTable: () => void;
   focusControls: () => void;
 }
@@ -14,11 +14,11 @@ interface PerPageProps {
 // PerPage renders a page size selector for the table, allowing the user to change the number of rows displayed per page.
 export const PerPage = ({
   pageSize,
-  tableKey,
+  viewStateKey,
   focusTable,
   focusControls,
 }: PerPageProps) => {
-  const { changePageSize } = usePagination(tableKey);
+  const { changePageSize } = usePagination(viewStateKey);
   return (
     <div className="page-size-selector">
       <select

@@ -1,5 +1,5 @@
 import { PerPage } from '@components';
-import { TableKey } from '@contexts';
+import { ViewStateKey } from '@contexts';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -15,13 +15,16 @@ vi.mock('../usePagination', () => ({
 }));
 
 describe('PerPage', () => {
-  const mockTableKey: TableKey = { viewName: 'test-view', tabName: 'test-tab' };
+  const mockViewStateKey: ViewStateKey = {
+    viewName: 'test-view',
+    tabName: 'test-tab',
+  };
   const mockedFocusTable = vi.fn();
   const mockedFocusControls = vi.fn();
 
   const defaultProps = {
     pageSize: 25,
-    tableKey: mockTableKey,
+    viewStateKey: mockViewStateKey,
     focusTable: mockedFocusTable,
     focusControls: mockedFocusControls,
   };

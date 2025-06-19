@@ -9,7 +9,7 @@ import {
   mapNameToChips,
   usePagination,
 } from '@components';
-import { TableKey, useFiltering, useSorting } from '@contexts';
+import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -45,15 +45,15 @@ export const Names = () => {
   const [listKind, setListKind] = useState<types.ListKind>(
     lastTab[NAMES_ROUTE] || NAMES_DEFAULT_LIST,
   );
-  const tableKey = useMemo(
-    (): TableKey => ({ viewName: NAMES_ROUTE, tabName: listKind }),
+  const viewStateKey = useMemo(
+    (): ViewStateKey => ({ viewName: NAMES_ROUTE, tabName: listKind }),
     [listKind],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(tableKey);
-  const { sort } = useSorting(tableKey);
-  const { filter, setFiltering } = useFiltering(tableKey);
+  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { sort } = useSorting(viewStateKey);
+  const { filter, setFiltering } = useFiltering(viewStateKey);
   const { emitSuccess, failure } = useActionMsgs('names');
 
   const listKindRef = useRef(listKind);
@@ -610,7 +610,7 @@ export const Names = () => {
         loading={!!pageData?.isFetching}
         error={error}
         onSubmit={handleSubmit}
-        tableKey={tableKey}
+        viewStateKey={viewStateKey}
       />
     ),
     [
@@ -619,7 +619,7 @@ export const Names = () => {
       pageData?.isFetching,
       error,
       handleSubmit,
-      tableKey,
+      viewStateKey,
     ],
   );
 

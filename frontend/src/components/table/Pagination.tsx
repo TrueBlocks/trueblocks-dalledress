@@ -1,5 +1,5 @@
 import { useTableContext } from '@components';
-import { TableKey } from '@contexts';
+import { ViewStateKey } from '@contexts';
 
 import './Pagination.css';
 import { usePagination } from './usePagination';
@@ -8,7 +8,7 @@ import { usePagination } from './usePagination';
 interface PaginationProps {
   totalPages: number;
   currentPage: number;
-  tableKey: TableKey;
+  viewStateKey: ViewStateKey;
   focusControls: () => void;
 }
 
@@ -16,10 +16,10 @@ interface PaginationProps {
 export const Pagination = ({
   totalPages,
   currentPage,
-  tableKey,
+  viewStateKey,
   focusControls,
 }: PaginationProps) => {
-  const { goToPage } = usePagination(tableKey);
+  const { goToPage } = usePagination(viewStateKey);
   const { setSelectedRowIndex } = useTableContext();
 
   const handlePageChange = (page: number) => {

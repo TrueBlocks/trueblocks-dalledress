@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { useTableContext } from '@components';
-import { TableKey } from '@contexts';
+import { ViewStateKey } from '@contexts';
 
 import { usePagination } from './usePagination';
 
@@ -10,7 +10,7 @@ interface UseTableKeysProps {
   itemCount: number;
   currentPage: number;
   totalPages: number;
-  tableKey: TableKey;
+  viewStateKey: ViewStateKey;
   onEnter?: () => void;
   onEscape?: () => void;
 }
@@ -20,13 +20,13 @@ export const useTableKeys = ({
   itemCount,
   currentPage,
   totalPages,
-  tableKey,
+  viewStateKey,
   onEnter,
   onEscape,
 }: UseTableKeysProps) => {
   const { focusState, selectedRowIndex, setSelectedRowIndex, focusTable } =
     useTableContext();
-  const { goToPage } = usePagination(tableKey);
+  const { goToPage } = usePagination(viewStateKey);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {

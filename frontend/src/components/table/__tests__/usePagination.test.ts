@@ -27,8 +27,8 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const tableKey = { viewName: 'view', tabName: 'tab' };
-    const { result } = renderHook(() => usePagination(tableKey));
+    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const { result } = renderHook(() => usePagination(viewStateKey));
     expect(result.current.pagination).toEqual({
       currentPage: 2,
       pageSize: 25,
@@ -50,12 +50,12 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const tableKey = { viewName: 'view', tabName: 'tab' };
-    const { result } = renderHook(() => usePagination(tableKey));
+    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
       result.current.goToPage(3);
     });
-    expect(updatePagination).toHaveBeenCalledWith(tableKey, {
+    expect(updatePagination).toHaveBeenCalledWith(viewStateKey, {
       currentPage: 3,
     });
   });
@@ -71,8 +71,8 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const tableKey = { viewName: 'view', tabName: 'tab' };
-    const { result } = renderHook(() => usePagination(tableKey));
+    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
       result.current.changePageSize(50);
     });
@@ -93,8 +93,8 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const tableKey = { viewName: 'view', tabName: 'tab' };
-    const { result } = renderHook(() => usePagination(tableKey));
+    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
       result.current.setTotalItems(123);
     });
@@ -115,8 +115,8 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const tableKey = { viewName: 'view', tabName: 'tab' };
-    const { result, rerender } = renderHook(() => usePagination(tableKey));
+    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const { result, rerender } = renderHook(() => usePagination(viewStateKey));
 
     const initialGoToPage = result.current.goToPage;
     const initialChangePageSize = result.current.changePageSize;

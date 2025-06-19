@@ -56,8 +56,6 @@ type MonitorsCollection struct {
 }
 
 func NewMonitorsCollection() *MonitorsCollection {
-	monitorsStore := GetMonitorsStore()
-
 	mc := &MonitorsCollection{
 		summary: types.Summary{
 			TotalCount:  0,
@@ -65,6 +63,14 @@ func NewMonitorsCollection() *MonitorsCollection {
 			CustomData:  make(map[string]interface{}),
 		},
 	}
+
+	mc.initializeFacets()
+
+	return mc
+}
+
+func (mc *MonitorsCollection) initializeFacets() {
+	monitorsStore := GetMonitorsStore()
 
 	monitorsFacet := facets.NewFacetWithSummary(
 		MonitorsList,
@@ -76,8 +82,6 @@ func NewMonitorsCollection() *MonitorsCollection {
 	)
 
 	mc.monitorsFacet = monitorsFacet
-
-	return mc
 }
 
 func (mc *MonitorsCollection) LoadData(listKind types.ListKind) {

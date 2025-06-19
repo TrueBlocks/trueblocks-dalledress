@@ -690,6 +690,14 @@ export namespace sdk {
 
 export namespace types {
 	
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
+	}
 	export enum ListKind {
 	    DOWNLOADED = "Downloaded",
 	    KNOWN = "Known",
@@ -709,14 +717,6 @@ export namespace types {
 	    PREFUND = "Prefund",
 	    REGULAR = "Regular",
 	    BADDRESS = "Baddress",
-	}
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];

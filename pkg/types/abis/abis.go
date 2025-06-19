@@ -66,9 +66,6 @@ type AbisCollection struct {
 }
 
 func NewAbisCollection() *AbisCollection {
-	abisListStore := GetAbisListStore()
-	abisDetailStore := GetAbisDetailStore()
-
 	ac := &AbisCollection{
 		summary: types.Summary{
 			TotalCount:  0,
@@ -76,6 +73,14 @@ func NewAbisCollection() *AbisCollection {
 			CustomData:  make(map[string]interface{}),
 		},
 	}
+
+	ac.initializeFacets()
+	return ac
+}
+
+func (ac *AbisCollection) initializeFacets() {
+	abisListStore := GetAbisListStore()
+	abisDetailStore := GetAbisDetailStore()
 
 	downloadedFacet := facets.NewFacetWithSummary(
 		AbisDownloaded,
@@ -117,8 +122,6 @@ func NewAbisCollection() *AbisCollection {
 	ac.knownFacet = knownFacet
 	ac.functionsFacet = functionsFacet
 	ac.eventsFacet = eventsFacet
-
-	return ac
 }
 
 func isDownload(abi *coreTypes.Abi) bool {

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetMonitorsSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIcons } from '@hooks';
-import { Badge, Button, Group, Stack } from '@mantine/core';
+import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
 import { Log } from '@utils';
 
@@ -110,27 +110,23 @@ export const MonitorsPanel = ({
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-          {(summary.customData?.activeCount as number) > 0 && (
-            <Badge size="sm" variant="light" color="green">
-              Active: {summary.customData?.activeCount}
-            </Badge>
-          )}
-          {(summary.customData?.stagedCount as number) > 0 && (
-            <Badge size="sm" variant="light" color="blue">
-              Staged: {summary.customData?.stagedCount}
-            </Badge>
-          )}
-          {(summary.customData?.deletedCount as number) > 0 && (
-            <Badge size="sm" variant="light" color="red">
-              Deleted: {summary.customData?.deletedCount}
-            </Badge>
-          )}
-          {(summary.customData?.emptyCount as number) > 0 && (
-            <Badge size="sm" variant="light" color="gray">
-              Empty: {summary.customData?.emptyCount}
-            </Badge>
-          )}
+          <Badge size="sm" variant="light" color="green">
+            Active: {(summary.customData?.activeCount as number) || 0}
+          </Badge>
+          <Badge size="sm" variant="light" color="blue">
+            Staged: {(summary.customData?.stagedCount as number) || 0}
+          </Badge>
+          <Badge size="sm" variant="light" color="red">
+            Deleted: {(summary.customData?.deletedCount as number) || 0}
+          </Badge>
+          <Badge size="sm" variant="light" color="gray">
+            Empty: {(summary.customData?.emptyCount as number) || 0}
+          </Badge>
         </div>
+
+        <Text size="xs" c="dimmed">
+          Track and manage Ethereum address monitoring
+        </Text>
 
         <Group gap="xs" mt="auto">
           <Button size="xs" variant="light" onClick={onAddMonitor}>

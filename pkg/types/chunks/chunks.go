@@ -136,25 +136,8 @@ type ChunksCollection struct {
 	summaryMutex  sync.RWMutex
 }
 
-var chunksInstance *ChunksCollection
-var chunksOnce sync.Once
-
-// GetChunksCollection returns singleton instance
-func GetChunksCollection() *ChunksCollection {
-	chunksOnce.Do(func() {
-		chunksInstance = &ChunksCollection{}
-		chunksInstance.initializeFacets()
-	})
-	return chunksInstance
-}
-
 // NewChunksCollection constructor function to initialize the chunks collection with all its facets
 func NewChunksCollection() *ChunksCollection {
-	statsStore := GetChunksStatsStore()
-	indexStore := GetChunksIndexStore()
-	bloomsStore := GetChunksBloomsStore()
-	manifestStore := GetChunksManifestStore()
-
 	cc := &ChunksCollection{
 		summary: types.Summary{
 			TotalCount:  0,
@@ -163,90 +146,50 @@ func NewChunksCollection() *ChunksCollection {
 		},
 	}
 
-	statsFacet := facets.NewFacetWithSummary(
-		ChunksStats,
-		nil,
-		nil,
-		statsStore,
-		"chunks",
-		cc,
-	)
-
-	indexFacet := facets.NewFacetWithSummary(
-		ChunksIndex,
-		nil,
-		nil,
-		indexStore,
-		"chunks",
-		cc,
-	)
-
-	bloomsFacet := facets.NewFacetWithSummary(
-		ChunksBlooms,
-		nil,
-		nil,
-		bloomsStore,
-		"chunks",
-		cc,
-	)
-
-	manifestFacet := facets.NewFacetWithSummary(
-		ChunksManifest,
-		nil,
-		nil,
-		manifestStore,
-		"chunks",
-		cc,
-	)
-
-	cc.statsFacet = statsFacet
-	cc.indexFacet = indexFacet
-	cc.bloomsFacet = bloomsFacet
-	cc.manifestFacet = manifestFacet
-
+	cc.initializeFacets()
 	return cc
 }
 
 // Initialize facets with appropriate filters
 func (cc *ChunksCollection) initializeFacets() {
 	// Stats facet - shows chunk statistics
-	cc.statsFacet = facets.NewFacet(
+	cc.statsFacet = facets.NewFacetWithSummary(
 		ChunksStats,
-		func(stat *coreTypes.ChunkStats) bool {
-			return true // Show all stats
-		},
-		nil, // No deduplication needed
+		nil,
+		nil,
 		GetChunksStatsStore(),
+		"chunks",
+		cc,
 	)
 
 	// Index facet - shows index chunk information
-	cc.indexFacet = facets.NewFacet(
+	cc.indexFacet = facets.NewFacetWithSummary(
 		ChunksIndex,
-		func(index *coreTypes.ChunkIndex) bool {
-			return true // Show all index chunks
-		},
-		nil, // No deduplication needed
+		nil,
+		nil,
 		GetChunksIndexStore(),
+		"chunks",
+		cc,
 	)
 
 	// Blooms facet - shows bloom filter information
-	cc.bloomsFacet = facets.NewFacet(
+	cc.bloomsFacet = facets.NewFacetWithSummary(
 		ChunksBlooms,
-		func(bloom *coreTypes.ChunkBloom) bool {
-			return true // Show all bloom filters
-		},
-		nil, // No deduplication needed
+		nil,
+		nil,
 		GetChunksBloomsStore(),
+		"chunks",
+		cc,
 	)
 
 	// Manifest facet - shows manifest information
-	cc.manifestFacet = facets.NewFacet(
+	cc.manifestFacet = facets.NewFacetWithSummary(
 		ChunksManifest,
-		func(manifest *coreTypes.ChunkManifest) bool {
-			return true // Show all manifest entries
-		},
-		nil, // No deduplication needed
+		nil,
+		nil,
 		GetChunksManifestStore(),
+		"chunks",
+		cc,
 	)
 }
 

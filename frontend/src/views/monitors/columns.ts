@@ -62,7 +62,7 @@ const getColumnsForMonitor = (): FormField[] => [
     header: 'Last Scanned',
     label: 'Last Scanned',
     sortable: true,
-    type: 'number',
+    type: 'timestamp',
     width: '140px',
   },
   {

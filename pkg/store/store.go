@@ -192,10 +192,12 @@ func (s *Store[T]) Fetch() error {
 
 	go func() {
 		defer close(done)
-		err := s.queryFunc(renderCtx)
-		if err != nil {
-			errChan <- err
-			return
+		if s.queryFunc != nil {
+			err := s.queryFunc(renderCtx)
+			if err != nil {
+				errChan <- err
+				return
+			}
 		}
 	}()
 

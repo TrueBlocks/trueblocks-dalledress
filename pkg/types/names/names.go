@@ -70,10 +70,14 @@ type NamesCollection struct {
 }
 
 func NewNamesCollection() *NamesCollection {
-	namesStore := GetNamesStore()
-
 	nc := &NamesCollection{}
 	nc.ResetSummary()
+	nc.initializeFacets()
+	return nc
+}
+
+func (nc *NamesCollection) initializeFacets() {
+	namesStore := GetNamesStore()
 
 	allFacet := facets.NewFacetWithSummary(
 		NamesAll,
@@ -125,8 +129,6 @@ func NewNamesCollection() *NamesCollection {
 	nc.prefundFacet = prefundFacet
 	nc.regularFacet = regularFacet
 	nc.baddressFacet = baddressFacet
-
-	return nc
 }
 
 func (nc *NamesCollection) LoadData(listKind types.ListKind) {

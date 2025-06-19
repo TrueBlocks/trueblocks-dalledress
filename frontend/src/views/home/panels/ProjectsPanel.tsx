@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetOpenProjects } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIcons } from '@hooks';
-import { Button, Group, List, Text, ThemeIcon } from '@mantine/core';
+import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs } from '@models';
 import { Log } from '@utils';
 
@@ -73,41 +73,53 @@ export const ProjectsPanel = ({
       error={error}
       onClick={onViewAll}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {activeProject && (
-          <div>
-            <StatusIndicator status="healthy" label="Active" size="xs" />
-            <Text size="sm" fw={500} mt={4}>
-              {activeProject.name}
+      <Stack gap="sm">
+        <div>
+          <StatusIndicator
+            status={
+              activeProject
+                ? 'healthy'
+                : projects.length > 0
+                  ? 'warning'
+                  : 'inactive'
+            }
+            label={activeProject ? 'Active Project' : 'Project Status'}
+            size="xs"
+          />
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+          <Badge size="sm" variant="light" color="blue">
+            Total: {projects.length}
+          </Badge>
+          <Badge size="sm" variant="light" color="green">
+            Active: {activeProject ? 1 : 0}
+          </Badge>
+          <Badge size="sm" variant="light" color="orange">
+            Recent: {recentProjects.length}
+          </Badge>
+          <Badge size="sm" variant="light" color="purple">
+            Dirty: {projects.filter((p) => p.isDirty).length}
+          </Badge>
+        </div>
+
+        <div>
+          {activeProject ? (
+            <Text size="xs" c="dimmed">
+              Active: {activeProject.name}
               {activeProject.isDirty && ' *'}
             </Text>
-          </div>
-        )}
-
-        {recentProjects.length > 0 && (
-          <div>
-            <Text size="xs" c="dimmed" mb={4}>
-              Recent
+          ) : recentProjects.length > 0 ? (
+            <Text size="xs" c="dimmed">
+              Most recent: {recentProjects[0]?.name}
+              {recentProjects[0]?.isDirty && ' *'}
             </Text>
-            <List size="sm" spacing={2}>
-              {recentProjects.map((project) => (
-                <List.Item
-                  key={project.id}
-                  icon={
-                    <ThemeIcon size={16} radius="xl" color="gray">
-                      <File size={10} />
-                    </ThemeIcon>
-                  }
-                >
-                  <Text size="xs">
-                    {project.name}
-                    {project.isDirty && ' *'}
-                  </Text>
-                </List.Item>
-              ))}
-            </List>
-          </div>
-        )}
+          ) : (
+            <Text size="xs" c="dimmed">
+              Manage TrueBlocks configuration projects
+            </Text>
+          )}
+        </div>
 
         <Group gap="xs" mt="auto">
           <Button size="xs" variant="light" onClick={onNewProject}>
@@ -119,7 +131,7 @@ export const ProjectsPanel = ({
             </Button>
           )}
         </Group>
-      </div>
+      </Stack>
     </DashboardCard>
   );
 };

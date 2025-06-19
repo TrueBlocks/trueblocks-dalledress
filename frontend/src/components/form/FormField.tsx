@@ -54,6 +54,7 @@ export interface FormField<T = Record<string, unknown>> {
     | 'select'
     | 'ether'
     | 'address'
+    | 'timestamp'
     | 'gas';
   fields?: FormField<T>[];
   isButtonGroup?: boolean;

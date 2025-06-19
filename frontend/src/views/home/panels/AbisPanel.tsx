@@ -105,16 +105,12 @@ export const AbisPanel = ({ onViewAll, onAddAbi }: AbisPanelProps) => {
           <Badge size="sm" variant="light" color="purple">
             Events: {(summary.customData?.eventsCount as number) || 0}
           </Badge>
-          {(summary.customData?.knownCount as number) > 0 && (
-            <Badge size="sm" variant="light" color="green">
-              Known: {summary.customData?.knownCount}
-            </Badge>
-          )}
-          {(summary.customData?.downloadedCount as number) > 0 && (
-            <Badge size="sm" variant="light" color="orange">
-              Downloaded: {summary.customData?.downloadedCount}
-            </Badge>
-          )}
+          <Badge size="sm" variant="light" color="green">
+            Known: {(summary.customData?.knownCount as number) || 0}
+          </Badge>
+          <Badge size="sm" variant="light" color="orange">
+            Downloaded: {(summary.customData?.downloadedCount as number) || 0}
+          </Badge>
         </div>
 
         <Text size="xs" c="dimmed">

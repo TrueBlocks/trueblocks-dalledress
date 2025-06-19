@@ -102,52 +102,30 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
           <StatusIndicator status="healthy" label="Export System" size="xs" />
         </div>
 
-        <div>
-          <Text size="xs" c="dimmed" mb={4}>
-            Available Types
-          </Text>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {((summary.customData?.availableTypes as string[]) || []).map(
-              (type: string) => (
-                <Badge key={type} size="xs" variant="outline">
-                  {type}
-                </Badge>
-              ),
-            )}
-          </div>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '4px',
+          }}
+        >
+          <Badge size="xs" variant="light" color="blue">
+            Txns: {(summary.customData?.transactionsCount as number) || 0}
+          </Badge>
+          <Badge size="xs" variant="light" color="green">
+            Stmts: {(summary.customData?.statementsCount as number) || 0}
+          </Badge>
+          <Badge size="xs" variant="light" color="purple">
+            Xfers: {(summary.customData?.transfersCount as number) || 0}
+          </Badge>
+          <Badge size="xs" variant="light" color="orange">
+            Bals: {(summary.customData?.balancesCount as number) || 0}
+          </Badge>
         </div>
 
-        {summary.totalCount > 0 && (
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '4px',
-              marginTop: '8px',
-            }}
-          >
-            {(summary.customData?.transactionsCount as number) > 0 && (
-              <Badge size="xs" variant="light" color="blue">
-                Txns: {summary.customData?.transactionsCount}
-              </Badge>
-            )}
-            {(summary.customData?.statementsCount as number) > 0 && (
-              <Badge size="xs" variant="light" color="green">
-                Stmts: {summary.customData?.statementsCount}
-              </Badge>
-            )}
-            {(summary.customData?.transfersCount as number) > 0 && (
-              <Badge size="xs" variant="light" color="purple">
-                Xfers: {summary.customData?.transfersCount}
-              </Badge>
-            )}
-            {(summary.customData?.balancesCount as number) > 0 && (
-              <Badge size="xs" variant="light" color="orange">
-                Bals: {summary.customData?.balancesCount}
-              </Badge>
-            )}
-          </div>
-        )}
+        <Text size="xs" c="dimmed">
+          Export blockchain data in various formats
+        </Text>
 
         <Group gap="xs" mt="auto">
           <Button size="xs" variant="light" onClick={onNewExport}>

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetNamesSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIcons } from '@hooks';
-import { Badge, Button, Group, Stack } from '@mantine/core';
+import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
 import { Log } from '@utils';
 
@@ -98,27 +98,23 @@ export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-          {summary.customData?.customCount > 0 && (
-            <Badge size="sm" variant="light" color="blue">
-              Custom: {summary.customData?.customCount}
-            </Badge>
-          )}
-          {summary.customData?.regularCount > 0 && (
-            <Badge size="sm" variant="light" color="green">
-              Regular: {summary.customData?.regularCount}
-            </Badge>
-          )}
-          {summary.customData?.prefundCount > 0 && (
-            <Badge size="sm" variant="light" color="orange">
-              Prefund: {summary.customData?.prefundCount}
-            </Badge>
-          )}
-          {summary.customData?.baddressCount > 0 && (
-            <Badge size="sm" variant="light" color="red">
-              Bad: {summary.customData?.baddressCount}
-            </Badge>
-          )}
+          <Badge size="sm" variant="light" color="blue">
+            Custom: {(summary.customData?.customCount as number) || 0}
+          </Badge>
+          <Badge size="sm" variant="light" color="green">
+            Regular: {(summary.customData?.regularCount as number) || 0}
+          </Badge>
+          <Badge size="sm" variant="light" color="orange">
+            Prefund: {(summary.customData?.prefundCount as number) || 0}
+          </Badge>
+          <Badge size="sm" variant="light" color="red">
+            Bad: {(summary.customData?.baddressCount as number) || 0}
+          </Badge>
         </div>
+
+        <Text size="xs" c="dimmed">
+          Named Ethereum addresses and contract labels
+        </Text>
 
         <Group gap="xs" mt="auto">
           <Button size="xs" variant="light" onClick={onAddName}>

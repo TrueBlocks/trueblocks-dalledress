@@ -3,25 +3,37 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetExportsPage, LoadExportsData, ResetExportsData } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActiveProject, useEvent } from '@hooks';
+import { useActiveFacet, useActiveProject, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { exports, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
 
+import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
 import { getColumnsForExports } from './columns';
+import {
+  EXPORTS_DEFAULT_FACET,
+  EXPORTS_ROUTE as ROUTE,
+  exportsFacets,
+} from './exportsFacets';
 
 export const Exports = () => {
-  const { lastTab, effectiveAddress, effectiveChain } = useActiveProject();
+  const { effectiveAddress, effectiveChain } = useActiveProject();
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
   const [state, setState] = useState<types.LoadState>();
 
-  const [listKind, setListKind] = useState<types.ListKind>(
-    lastTab[EXPORTS_ROUTE] || EXPORTS_DEFAULT_LIST_KIND,
-  );
+  const activeFacetHook = useActiveFacet({
+    facets: exportsFacets,
+    defaultFacet: EXPORTS_DEFAULT_FACET,
+    viewRoute: ROUTE,
+  });
+
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({ viewName: EXPORTS_ROUTE, tabName: listKind }),
-    [listKind],
+    (): ViewStateKey => ({
+      viewName: ROUTE,
+      tabName: activeFacetHook.getCurrentListKind(),
+    }),
+    [activeFacetHook],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
@@ -29,18 +41,18 @@ export const Exports = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  const listKindRef = useRef(listKind);
+  const listKindRef = useRef(activeFacetHook.getCurrentListKind());
   const renderCnt = useRef(0);
 
   useEffect(() => {
-    listKindRef.current = listKind;
-  }, [listKind]);
+    listKindRef.current = activeFacetHook.getCurrentListKind();
+  }, [activeFacetHook]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetExportsPage(
-        listKindRef.current,
+        listKindRef.current as types.ListKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -69,7 +81,9 @@ export const Exports = () => {
   const currentData = useMemo(() => {
     if (!pageData) return [];
 
-    switch (listKind) {
+    const currentListKind =
+      activeFacetHook.getCurrentListKind() as types.ListKind;
+    switch (currentListKind) {
       case types.ListKind.STATEMENTS:
         return pageData.statements || [];
       case types.ListKind.TRANSFERS:
@@ -81,14 +95,7 @@ export const Exports = () => {
       default:
         return pageData.transactions || [];
     }
-  }, [pageData, listKind]);
-
-  useEffect(() => {
-    const currentTab = lastTab[EXPORTS_ROUTE];
-    if (currentTab && currentTab !== listKindRef.current) {
-      setListKind(currentTab);
-    }
-  }, [lastTab]);
+  }, [pageData, activeFacetHook]);
 
   useEvent(
     msgs.EventType.DATA_LOADED,
@@ -104,22 +111,28 @@ export const Exports = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, listKind]);
+  }, [fetchData, activeFacetHook.activeFacet]);
 
-  // Load data when component mounts or listKind changes
+  // Load data when component mounts or facet changes
   useEffect(() => {
-    LoadExportsData(listKind, effectiveChain, effectiveAddress);
-  }, [listKind, effectiveChain, effectiveAddress]);
+    const currentListKind =
+      activeFacetHook.getCurrentListKind() as types.ListKind;
+    LoadExportsData(currentListKind, effectiveChain, effectiveAddress);
+  }, [activeFacetHook, effectiveChain, effectiveAddress]);
 
   useHotkeys([
     [
       'mod+r',
       () => {
-        ResetExportsData(listKind, effectiveChain, effectiveAddress).then(
-          () => {
-            fetchData();
-          },
-        );
+        const currentListKind =
+          activeFacetHook.getCurrentListKind() as types.ListKind;
+        ResetExportsData(
+          currentListKind,
+          effectiveChain,
+          effectiveAddress,
+        ).then(() => {
+          fetchData();
+        });
       },
     ],
   ]);
@@ -130,12 +143,12 @@ export const Exports = () => {
 
   const currentColumns = useMemo(() => {
     const baseColumns = getColumnsForExports(
-      pageData?.kind || EXPORTS_DEFAULT_LIST_KIND,
+      pageData?.kind || activeFacetHook.getCurrentListKind(),
     );
 
     // Exports are read-only, so we filter out any actions column
     return baseColumns.filter((col) => col.key !== 'actions');
-  }, [pageData?.kind]);
+  }, [pageData?.kind, activeFacetHook]);
 
   const perTabTable = useMemo(
     () => (
@@ -159,38 +172,22 @@ export const Exports = () => {
   );
 
   const tabs = useMemo(
-    () => [
-      {
-        label: types.ListKind.STATEMENTS,
-        value: types.ListKind.STATEMENTS,
+    () =>
+      activeFacetHook.availableFacets.map((facetConfig: DataFacetConfig) => ({
+        label: facetConfig.label,
+        value: facetConfig.id,
         content: perTabTable,
-      },
-      {
-        label: types.ListKind.TRANSFERS,
-        value: types.ListKind.TRANSFERS,
-        content: perTabTable,
-      },
-      {
-        label: types.ListKind.BALANCES,
-        value: types.ListKind.BALANCES,
-        content: perTabTable,
-      },
-      {
-        label: types.ListKind.TRANSACTIONS,
-        value: types.ListKind.TRANSACTIONS,
-        content: perTabTable,
-      },
-    ],
-    [perTabTable],
+      })),
+    [activeFacetHook.availableFacets, perTabTable],
   );
 
   return (
     <div className="mainView">
       {(state as string) === '' && <div>{`state: ${state}`}</div>}
-      <TabView tabs={tabs} route={EXPORTS_ROUTE} />
+      <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${listKind}`}</h3>
+          <h3>{`Error fetching ${activeFacetHook.getCurrentListKind()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}
@@ -198,6 +195,3 @@ export const Exports = () => {
     </div>
   );
 };
-
-const EXPORTS_DEFAULT_LIST_KIND = types.ListKind.TRANSACTIONS;
-const EXPORTS_ROUTE = '/exports';

@@ -1,7 +1,7 @@
 import { msgs, types } from '@models';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { fireEvent, render, screen } from '../../__tests__/mocks';
+import { act, fireEvent, render, screen } from '../../__tests__/mocks';
 import { TabView } from '../TabView';
 
 vi.mock('@hooks', () => ({
@@ -215,7 +215,10 @@ describe('TabView', () => {
       );
 
       const handler = (TabView as any)._tabCycleHandler;
-      handler('', { route: mockRoute, key: 'tab' });
+
+      act(() => {
+        handler('', { route: mockRoute, key: 'tab' });
+      });
 
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
@@ -234,7 +237,10 @@ describe('TabView', () => {
       );
 
       const handler = (TabView as any)._tabCycleHandler;
-      handler('', { route: mockRoute, key: 'alt+tab' });
+
+      act(() => {
+        handler('', { route: mockRoute, key: 'alt+tab' });
+      });
 
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
@@ -473,7 +479,10 @@ describe('TabView', () => {
 
       const handler = (TabView as any)._tabCycleHandler;
 
-      handler('', { route: mockRoute, key: 'tab' });
+      act(() => {
+        handler('', { route: mockRoute, key: 'tab' });
+      });
+
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
         types.ListKind.TRANSACTIONS,

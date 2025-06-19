@@ -8,3 +8,4 @@ export * from './useEvent';
 export * from './useAppHotkeys';
 export * from './useIcons';
 export * from './useStaggeredLoading';
+export * from './useActiveFacet';

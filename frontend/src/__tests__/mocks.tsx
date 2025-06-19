@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import { MantineProvider } from '@mantine/core';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import type { RenderOptions } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -188,7 +188,7 @@ function customRender(
 }
 
 export * from '@testing-library/react';
-export { customRender as render, screen, fireEvent };
+export { customRender as render };
 // --- End Rendering Utilities --- //
 
 // --- Context Mocking --- //

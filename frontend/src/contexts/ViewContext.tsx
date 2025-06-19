@@ -64,7 +64,7 @@ export interface ViewPaginationState {
 // Create stable reference for initial state to prevent new object creation
 export const initialPaginationState: PaginationState = Object.freeze({
   currentPage: 0,
-  pageSize: 10,
+  pageSize: 15,
   totalItems: 0,
 });
 

@@ -36,13 +36,13 @@ describe('PerPage', () => {
 
     const select = screen.getByLabelText('Items per page');
     expect(select).toBeInTheDocument();
-    expect(select).toHaveValue('25');
+    expect(select).toHaveValue('15');
 
     // The visible text for each option is the number only
     expect(
-      screen.getByRole('option', { name: '10 per page' }),
+      screen.getByRole('option', { name: '15 per page' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: '25' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: '30' })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: '50' })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: '100' })).toBeInTheDocument();
   });

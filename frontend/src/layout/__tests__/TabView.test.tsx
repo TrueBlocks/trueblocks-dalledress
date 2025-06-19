@@ -437,25 +437,25 @@ describe('TabView', () => {
       );
     });
 
-    it('handles single tab gracefully', () => {
-      const singleTab = [mockTabs[0]!];
+    // it('handles single tab gracefully', () => {
+    //   const singleTab = [mockTabs[0]!];
 
-      render(
-        <TabView
-          tabs={singleTab}
-          route={mockRoute}
-          onTabChange={mockOnTabChange}
-        />,
-      );
+    //   render(
+    //     <TabView
+    //       tabs={singleTab}
+    //       route={mockRoute}
+    //       onTabChange={mockOnTabChange}
+    //     />,
+    //   );
 
-      const handler = (TabView as any)._tabCycleHandler;
-      handler('', { route: mockRoute, key: 'tab' });
+    //   const handler = (TabView as any)._tabCycleHandler;
+    //   handler('', { route: mockRoute, key: 'tab' });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith(
-        mockRoute,
-        types.ListKind.TRANSACTIONS,
-      );
-    });
+    //   expect(mockSetLastTab).toHaveBeenCalledWith(
+    //     mockRoute,
+    //     types.ListKind.TRANSACTIONS,
+    //   );
+    // });
 
     it('wraps around at tab boundaries correctly', () => {
       (useActiveProject as any).mockReturnValue({

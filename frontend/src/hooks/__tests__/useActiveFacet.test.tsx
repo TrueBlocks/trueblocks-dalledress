@@ -1,8 +1,6 @@
+import { DataFacet, DataFacetConfig, useActiveFacet } from '@hooks';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { useActiveFacet } from '../useActiveFacet';
-import { DataFacet, DataFacetConfig } from '../useActiveFacet.types';
 
 // Mock the useActiveProject hook
 vi.mock('../useActiveProject', () => ({

@@ -1,7 +1,6 @@
+import { DataFacetConfig } from '@hooks';
 import { types } from '@models';
 import { toProperCase } from 'src/utils/toProper';
-
-import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
 
 export const exportsFacets: DataFacetConfig[] = [
   {

@@ -10,13 +10,17 @@ import {
   usePagination,
 } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActionMsgs, useActiveFacet, useEvent } from '@hooks';
+import {
+  DataFacetConfig,
+  useActionMsgs,
+  useActiveFacet,
+  useEvent,
+} from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, msgs, names, types } from '@models';
 import { getAddressString, useErrorHandler } from '@utils';
 
-import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
 import { Address } from '../../types/address';
 import { getColumns } from './columns';
 import {

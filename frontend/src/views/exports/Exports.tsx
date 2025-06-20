@@ -3,13 +3,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetExportsPage, LoadExportsData, ResetExportsData } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActiveFacet, useActiveProject, useEvent } from '@hooks';
+import {
+  DataFacetConfig,
+  useActiveFacet,
+  useActiveProject,
+  useEvent,
+} from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { exports, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
 
-import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
 import { getColumnsForExports } from './columns';
 import {
   EXPORTS_DEFAULT_FACET,

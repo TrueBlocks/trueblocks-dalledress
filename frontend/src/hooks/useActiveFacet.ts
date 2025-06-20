@@ -2,13 +2,31 @@ import { useCallback, useMemo } from 'react';
 
 import { types } from '@models';
 
-import {
-  DataFacet,
-  DataFacetConfig,
-  UseActiveFacetParams,
-  UseActiveFacetReturn,
-} from './useActiveFacet.types';
 import { useActiveProject } from './useActiveProject';
+
+export type DataFacet = types.DataFacet;
+
+export interface DataFacetConfig {
+  id: DataFacet;
+  label: string;
+  isDefault?: boolean;
+}
+
+export interface UseActiveFacetReturn {
+  activeFacet: DataFacet;
+  setActiveFacet: (facet: DataFacet) => void;
+  availableFacets: DataFacetConfig[];
+  getFacetConfig: (facet: DataFacet) => DataFacetConfig | undefined;
+  isFacetActive: (facet: DataFacet) => boolean;
+  getDefaultFacet: () => DataFacet;
+  getCurrentDataFacet: () => types.DataFacet | string;
+}
+
+export interface UseActiveFacetParams {
+  viewRoute: string;
+  facets: DataFacetConfig[];
+  defaultFacet?: DataFacet;
+}
 
 /**
  * Hook for managing active data facets in views
@@ -81,7 +99,7 @@ export const useActiveFacet = (
     return computedDefaultFacet;
   }, [computedDefaultFacet]);
 
-  const getCurrentDataFacet = useCallback(() => {
+  const getCurrentDataFacet = useCallback((): DataFacet => {
     return activeFacet;
   }, [activeFacet]);
 

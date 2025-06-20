@@ -690,26 +690,6 @@ export namespace sdk {
 
 export namespace types {
 	
-	export enum ListKind {
-	    DOWNLOADED = "Downloaded",
-	    KNOWN = "Known",
-	    FUNCTIONS = "Functions",
-	    EVENTS = "Events",
-	    STATS = "Stats",
-	    INDEX = "Index",
-	    BLOOMS = "Blooms",
-	    MANIFEST = "Manifest",
-	    STATEMENTS = "Statements",
-	    TRANSFERS = "Transfers",
-	    BALANCES = "Balances",
-	    TRANSACTIONS = "Transactions",
-	    MONITORS = "Monitors",
-	    ALL = "All",
-	    CUSTOM = "Custom",
-	    PREFUND = "Prefund",
-	    REGULAR = "Regular",
-	    BADDRESS = "Baddress",
-	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -737,6 +717,26 @@ export namespace types {
 	    LOADED = "loaded",
 	    PENDING = "pending",
 	    ERROR = "error",
+	}
+	export enum ListKind {
+	    DOWNLOADED = "downloaded",
+	    KNOWN = "known",
+	    FUNCTIONS = "functions",
+	    EVENTS = "events",
+	    STATS = "stats",
+	    INDEX = "index",
+	    BLOOMS = "blooms",
+	    MANIFEST = "manifest",
+	    STATEMENTS = "statements",
+	    TRANSFERS = "transfers",
+	    BALANCES = "balances",
+	    TRANSACTIONS = "transactions",
+	    MONITORS = "monitors",
+	    ALL = "all",
+	    CUSTOM = "custom",
+	    PREFUND = "prefund",
+	    REGULAR = "regular",
+	    BADDRESS = "baddress",
 	}
 	export class Parameter {
 	    components?: Parameter[];

@@ -3,7 +3,7 @@ import { types } from '@models';
 
 export const getColumns = (listKind: types.ListKind): FormField[] => {
   switch (listKind) {
-    case 'Monitors':
+    case types.ListKind.MONITORS:
     default:
       return getColumnsForMonitor();
   }

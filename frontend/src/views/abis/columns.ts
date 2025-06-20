@@ -3,15 +3,15 @@ import { types } from '@models';
 
 export const getColumns = (listKind: types.ListKind): FormField[] => {
   switch (listKind) {
-    case 'Functions':
-    case 'Events':
+    case types.ListKind.FUNCTIONS:
+    case types.ListKind.EVENTS:
       return getColumnsForFunction();
-    case 'Known':
+    case types.ListKind.KNOWN:
       return getColumnsForAbi().filter((col) => {
         const skip = col.key !== 'address';
         return skip;
       });
-    case 'Downloaded':
+    case types.ListKind.DOWNLOADED:
     // fallthrough intended
     default:
       return getColumnsForAbi();

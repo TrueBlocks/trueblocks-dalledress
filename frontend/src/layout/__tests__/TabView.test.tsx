@@ -2,6 +2,7 @@ import { msgs, types } from '@models';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { act, fireEvent, render, screen } from '../../__tests__/mocks';
+import { exportsFacets } from '../../views/exports/exportsFacets';
 import { TabView } from '../TabView';
 
 vi.mock('@hooks', () => ({
@@ -12,25 +13,20 @@ vi.mock('@hooks', () => ({
 const { useActiveProject, useEvent } = await import('@hooks');
 
 describe('TabView', () => {
-  const mockTabs = [
-    {
-      label: types.ListKind.TRANSACTIONS,
-      value: types.ListKind.TRANSACTIONS,
-      content: (
-        <div data-testid="transactions-content">Transactions Content</div>
-      ),
-    },
-    {
-      label: types.ListKind.BALANCES,
-      value: types.ListKind.BALANCES,
-      content: <div data-testid="balances-content">Balances Content</div>,
-    },
-    {
-      label: types.ListKind.STATEMENTS,
-      value: types.ListKind.STATEMENTS,
-      content: <div data-testid="statements-content">Statements Content</div>,
-    },
+  // Use real facet configurations but reorder to have transactions first for test expectations
+  const reorderedFacets = [
+    exportsFacets.find(f => f.id === types.DataFacet.TRANSACTIONS)!,
+    exportsFacets.find(f => f.id === types.DataFacet.BALANCES)!,
+    exportsFacets.find(f => f.id === types.DataFacet.STATEMENTS)!,
   ];
+  
+  const mockTabs = reorderedFacets.map((facet) => ({
+    label: facet.label,
+    value: facet.listKind || facet.id,
+    content: (
+      <div data-testid={`${facet.id}-content`}>{facet.label} Content</div>
+    ),
+  }));
 
   const mockRoute = '/exports';
   const mockSetLastTab = vi.fn();

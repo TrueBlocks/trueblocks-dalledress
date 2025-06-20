@@ -9,23 +9,23 @@ import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
  */
 export const abisFacets: DataFacetConfig[] = [
   {
-    id: 'downloaded',
+    id: types.DataFacet.DOWNLOADED,
     label: 'Downloaded',
     listKind: types.ListKind.DOWNLOADED,
     isDefault: true,
   },
   {
-    id: 'known',
+    id: types.DataFacet.KNOWN,
     label: 'Known',
     listKind: types.ListKind.KNOWN,
   },
   {
-    id: 'functions',
+    id: types.DataFacet.FUNCTIONS,
     label: 'Functions',
     listKind: types.ListKind.FUNCTIONS,
   },
   {
-    id: 'events',
+    id: types.DataFacet.EVENTS,
     label: 'Events',
     listKind: types.ListKind.EVENTS,
   },
@@ -34,7 +34,7 @@ export const abisFacets: DataFacetConfig[] = [
 /**
  * The default facet for the Abis view
  */
-export const ABIS_DEFAULT_FACET = 'downloaded' as const;
+export const ABIS_DEFAULT_FACET = types.DataFacet.DOWNLOADED;
 
 /**
  * Route identifier for the Abis view

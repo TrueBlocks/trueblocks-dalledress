@@ -9,22 +9,22 @@ import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
  */
 export const exportsFacets: DataFacetConfig[] = [
   {
-    id: 'statements',
+    id: types.DataFacet.STATEMENTS,
     label: 'Statements',
     listKind: types.ListKind.STATEMENTS,
   },
   {
-    id: 'transfers',
+    id: types.DataFacet.TRANSFERS,
     label: 'Transfers',
     listKind: types.ListKind.TRANSFERS,
   },
   {
-    id: 'balances',
+    id: types.DataFacet.BALANCES,
     label: 'Balances',
     listKind: types.ListKind.BALANCES,
   },
   {
-    id: 'transactions',
+    id: types.DataFacet.TRANSACTIONS,
     label: 'Transactions',
     listKind: types.ListKind.TRANSACTIONS,
     isDefault: true,
@@ -34,7 +34,7 @@ export const exportsFacets: DataFacetConfig[] = [
 /**
  * The default facet for the Exports view
  */
-export const EXPORTS_DEFAULT_FACET = 'transactions' as const;
+export const EXPORTS_DEFAULT_FACET = types.DataFacet.TRANSACTIONS;
 
 /**
  * Route identifier for the Exports view

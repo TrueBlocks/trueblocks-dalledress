@@ -9,23 +9,23 @@ import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
  */
 export const chunksFacets: DataFacetConfig[] = [
   {
-    id: 'stats',
+    id: types.DataFacet.STATS,
     label: 'Stats',
     listKind: types.ListKind.STATS,
     isDefault: true,
   },
   {
-    id: 'index',
+    id: types.DataFacet.INDEX,
     label: 'Index',
     listKind: types.ListKind.INDEX,
   },
   {
-    id: 'blooms',
+    id: types.DataFacet.BLOOMS,
     label: 'Blooms',
     listKind: types.ListKind.BLOOMS,
   },
   {
-    id: 'manifest',
+    id: types.DataFacet.MANIFEST,
     label: 'Manifest',
     listKind: types.ListKind.MANIFEST,
   },
@@ -34,7 +34,7 @@ export const chunksFacets: DataFacetConfig[] = [
 /**
  * The default facet for the Chunks view
  */
-export const CHUNKS_DEFAULT_FACET = 'stats' as const;
+export const CHUNKS_DEFAULT_FACET = types.DataFacet.STATS;
 
 /**
  * Route identifier for the Chunks view

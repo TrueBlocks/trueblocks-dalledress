@@ -19,11 +19,23 @@ const (
 	AbisEvents     types.ListKind = "Events"
 )
 
+const (
+	DataFacetDownloaded types.DataFacet = "downloaded"
+	DataFacetKnown      types.DataFacet = "known"
+	DataFacetFunctions  types.DataFacet = "functions"
+	DataFacetEvents     types.DataFacet = "events"
+)
+
 func init() {
 	types.RegisterKind(AbisDownloaded)
 	types.RegisterKind(AbisKnown)
 	types.RegisterKind(AbisFunctions)
 	types.RegisterKind(AbisEvents)
+
+	types.RegisterDataFacet(DataFacetDownloaded)
+	types.RegisterDataFacet(DataFacetKnown)
+	types.RegisterDataFacet(DataFacetFunctions)
+	types.RegisterDataFacet(DataFacetEvents)
 }
 
 type AbisPage struct {

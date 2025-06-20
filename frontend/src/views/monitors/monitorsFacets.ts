@@ -9,7 +9,7 @@ import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
  */
 export const monitorsFacets: DataFacetConfig[] = [
   {
-    id: 'monitors',
+    id: types.DataFacet.MONITORS,
     label: 'Monitors',
     listKind: types.ListKind.MONITORS,
     isDefault: true,
@@ -19,7 +19,7 @@ export const monitorsFacets: DataFacetConfig[] = [
 /**
  * The default facet for the Monitors view
  */
-export const MONITORS_DEFAULT_FACET = 'monitors' as const;
+export const MONITORS_DEFAULT_FACET = types.DataFacet.MONITORS;
 
 /**
  * Route identifier for the Monitors view

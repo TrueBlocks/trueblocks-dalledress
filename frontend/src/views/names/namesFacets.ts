@@ -9,28 +9,28 @@ import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
  */
 export const namesFacets: DataFacetConfig[] = [
   {
-    id: 'all',
+    id: types.DataFacet.ALL,
     label: 'All',
     listKind: types.ListKind.ALL,
     isDefault: true,
   },
   {
-    id: 'custom',
+    id: types.DataFacet.CUSTOM,
     label: 'Custom',
     listKind: types.ListKind.CUSTOM,
   },
   {
-    id: 'prefund',
+    id: types.DataFacet.PREFUND,
     label: 'Prefund',
     listKind: types.ListKind.PREFUND,
   },
   {
-    id: 'regular',
+    id: types.DataFacet.REGULAR,
     label: 'Regular',
     listKind: types.ListKind.REGULAR,
   },
   {
-    id: 'baddress',
+    id: types.DataFacet.BADDRESS,
     label: 'Baddress',
     listKind: types.ListKind.BADDRESS,
   },
@@ -39,7 +39,7 @@ export const namesFacets: DataFacetConfig[] = [
 /**
  * The default facet for the Names view
  */
-export const NAMES_DEFAULT_FACET = 'all' as const;
+export const NAMES_DEFAULT_FACET = types.DataFacet.ALL;
 
 /**
  * Route identifier for the Names view

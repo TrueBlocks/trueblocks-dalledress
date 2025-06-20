@@ -151,6 +151,7 @@ export const DalleDress = () => {
   const tabs = [
     {
       label: 'Template1',
+      value: 'template1',
       content: (
         <Stack>
           <AddressEntry
@@ -164,7 +165,7 @@ export const DalleDress = () => {
         </Stack>
       ),
     },
-    // { label: 'Template2', content: <div>Template 2 content</div> },
+    // { label: 'Template2', value: 'template2', content: <div>Template 2 content</div> },
     // ...add more templates as needed
   ];
 

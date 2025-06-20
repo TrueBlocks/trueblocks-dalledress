@@ -16,8 +16,13 @@ const (
 	MonitorsList types.ListKind = "Monitors"
 )
 
+const (
+	DataFacetMonitors types.DataFacet = "monitors"
+)
+
 func init() {
 	types.RegisterKind(MonitorsList)
+	types.RegisterDataFacet(DataFacetMonitors)
 }
 
 type MonitorsPage struct {

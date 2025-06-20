@@ -1,33 +1,10 @@
 import { types } from '@models';
 
 /**
- * Data facet types for the new tab/facet selection architecture
+ * Re-export the generated DataFacet enum from the backend
  * This replaces direct ListKind usage in frontend components
  */
-export type DataFacet =
-  // Exports view facets
-  | 'statements'
-  | 'transfers'
-  | 'balances'
-  | 'transactions'
-  // Chunks view facets
-  | 'stats'
-  | 'index'
-  | 'blooms'
-  | 'manifest'
-  // Names view facets
-  | 'all'
-  | 'custom'
-  | 'prefund'
-  | 'regular'
-  | 'baddress'
-  // Monitors view facets
-  | 'monitors'
-  // ABIs view facets
-  | 'downloaded'
-  | 'known'
-  | 'functions'
-  | 'events';
+export type DataFacet = types.DataFacet;
 
 /**
  * Configuration for a data facet

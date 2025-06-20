@@ -4,7 +4,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -14,11 +13,11 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/config"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
@@ -394,9 +393,7 @@ func (a *App) CancelAllFetches() int {
 }
 
 func (a *App) GetNodeStatus() *coreTypes.MetaData {
-	w := logger.GetLoggerWriter()
-	defer logger.SetLoggerWriter(w)
-	logger.SetLoggerWriter(io.Discard)
+	defer logging.Silence()()
 
 	chainName := preferences.GetChain()
 	a.meta, _ = sdk.GetMetaData(chainName)

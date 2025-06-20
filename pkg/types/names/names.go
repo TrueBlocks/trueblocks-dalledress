@@ -22,12 +22,26 @@ const (
 	NamesBaddress types.ListKind = "Baddress"
 )
 
+const (
+	DataFacetAll      types.DataFacet = "all"
+	DataFacetCustom   types.DataFacet = "custom"
+	DataFacetPrefund  types.DataFacet = "prefund"
+	DataFacetRegular  types.DataFacet = "regular"
+	DataFacetBaddress types.DataFacet = "baddress"
+)
+
 func init() {
 	types.RegisterKind(NamesAll)
 	types.RegisterKind(NamesCustom)
 	types.RegisterKind(NamesPrefund)
 	types.RegisterKind(NamesRegular)
 	types.RegisterKind(NamesBaddress)
+
+	types.RegisterDataFacet(DataFacetAll)
+	types.RegisterDataFacet(DataFacetCustom)
+	types.RegisterDataFacet(DataFacetPrefund)
+	types.RegisterDataFacet(DataFacetRegular)
+	types.RegisterDataFacet(DataFacetBaddress)
 }
 
 type NamesPage struct {

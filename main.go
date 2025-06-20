@@ -53,6 +53,7 @@ func main() {
 		EnumBind: []interface{}{
 			msgs.AllMessages,
 			types.AllListKinds,
+			types.AllDataFacets,
 			types.AllCruds,
 			types.AllStates,
 		},

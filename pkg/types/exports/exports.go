@@ -19,11 +19,23 @@ const (
 	ExportsTransactions types.ListKind = "Transactions"
 )
 
+const (
+	DataFacetStatements   types.DataFacet = "statements"
+	DataFacetTransfers    types.DataFacet = "transfers"
+	DataFacetBalances     types.DataFacet = "balances"
+	DataFacetTransactions types.DataFacet = "transactions"
+)
+
 func init() {
 	types.RegisterKind(ExportsStatements)
 	types.RegisterKind(ExportsTransfers)
 	types.RegisterKind(ExportsBalances)
 	types.RegisterKind(ExportsTransactions)
+
+	types.RegisterDataFacet(DataFacetStatements)
+	types.RegisterDataFacet(DataFacetTransfers)
+	types.RegisterDataFacet(DataFacetBalances)
+	types.RegisterDataFacet(DataFacetTransactions)
 }
 
 type ExportsPage struct {

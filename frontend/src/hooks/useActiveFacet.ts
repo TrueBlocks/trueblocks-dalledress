@@ -36,7 +36,7 @@ export const useActiveFacet = (
     if (defaultConfig) return defaultConfig.id;
 
     // Fallback to first facet
-    return facets[0]?.id || 'transactions';
+    return facets[0]?.id || types.DataFacet.TRANSACTIONS;
   }, [defaultFacet, facets]);
 
   // Get the currently active facet from preferences or default
@@ -44,14 +44,14 @@ export const useActiveFacet = (
     const saved = lastTab[viewRoute];
 
     if (saved) {
-      // First try to find facet by ID
-      if (facets.some((f) => f.id === saved)) {
-        return saved as DataFacet;
-      }
-      // Then try to find by ListKind
+      // Try to find facet by ListKind (what's actually saved in preferences)
       const facetByListKind = facets.find((f) => f.listKind === saved);
       if (facetByListKind) {
         return facetByListKind.id;
+      }
+      // Fallback: try to find by ID (in case preferences were updated)
+      if (facets.some((f) => f.id === (saved as unknown as DataFacet))) {
+        return saved as unknown as DataFacet;
       }
     }
     return computedDefaultFacet;
@@ -62,7 +62,8 @@ export const useActiveFacet = (
     (facet: DataFacet): void => {
       // Find the corresponding ListKind for this facet
       const config = facets.find((f) => f.id === facet);
-      const listKindValue = config?.listKind || (facet as types.ListKind);
+      const listKindValue =
+        config?.listKind || (facet as unknown as types.ListKind);
       setLastTab(viewRoute, listKindValue);
     },
     [setLastTab, viewRoute, facets],

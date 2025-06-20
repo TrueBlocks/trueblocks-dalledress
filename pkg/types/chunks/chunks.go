@@ -22,12 +22,25 @@ const (
 	ChunksManifest types.ListKind = "Manifest"
 )
 
+// Define DataFacet constants for frontend UI
+const (
+	DataFacetStats    types.DataFacet = "stats"
+	DataFacetIndex    types.DataFacet = "index"
+	DataFacetBlooms   types.DataFacet = "blooms"
+	DataFacetManifest types.DataFacet = "manifest"
+)
+
 // REQUIRED: Register kinds for validation
 func init() {
 	types.RegisterKind(ChunksStats)
 	types.RegisterKind(ChunksIndex)
 	types.RegisterKind(ChunksBlooms)
 	types.RegisterKind(ChunksManifest)
+
+	types.RegisterDataFacet(DataFacetStats)
+	types.RegisterDataFacet(DataFacetIndex)
+	types.RegisterDataFacet(DataFacetBlooms)
+	types.RegisterDataFacet(DataFacetManifest)
 }
 
 // Page structures for frontend consumption

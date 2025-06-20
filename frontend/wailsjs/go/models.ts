@@ -710,6 +710,26 @@ export namespace types {
 	    REGULAR = "Regular",
 	    BADDRESS = "Baddress",
 	}
+	export enum DataFacet {
+	    DOWNLOADED = "downloaded",
+	    KNOWN = "known",
+	    FUNCTIONS = "functions",
+	    EVENTS = "events",
+	    STATS = "stats",
+	    INDEX = "index",
+	    BLOOMS = "blooms",
+	    MANIFEST = "manifest",
+	    STATEMENTS = "statements",
+	    TRANSFERS = "transfers",
+	    BALANCES = "balances",
+	    TRANSACTIONS = "transactions",
+	    MONITORS = "monitors",
+	    ALL = "all",
+	    CUSTOM = "custom",
+	    PREFUND = "prefund",
+	    REGULAR = "regular",
+	    BADDRESS = "baddress",
+	}
 	export enum LoadState {
 	    STALE = "stale",
 	    FETCHING = "fetching",

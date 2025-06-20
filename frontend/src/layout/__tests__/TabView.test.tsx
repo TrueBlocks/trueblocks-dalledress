@@ -14,15 +14,25 @@ const { useActiveProject, useEvent } = await import('@hooks');
 
 describe('TabView', () => {
   // Use real facet configurations but reorder to have transactions first for test expectations
+  const transactionsFacet = exportsFacets.find(
+    (f) => f.id === types.DataFacet.TRANSACTIONS,
+  );
+  const balancesFacet = exportsFacets.find(
+    (f) => f.id === types.DataFacet.BALANCES,
+  );
+  const statementsFacet = exportsFacets.find(
+    (f) => f.id === types.DataFacet.STATEMENTS,
+  );
+
   const reorderedFacets = [
-    exportsFacets.find((f) => f.id === types.DataFacet.TRANSACTIONS)!,
-    exportsFacets.find((f) => f.id === types.DataFacet.BALANCES)!,
-    exportsFacets.find((f) => f.id === types.DataFacet.STATEMENTS)!,
-  ];
+    transactionsFacet,
+    balancesFacet,
+    statementsFacet,
+  ].filter(Boolean) as typeof exportsFacets;
 
   const mockTabs = reorderedFacets.map((facet) => ({
     label: facet.label,
-    value: facet.listKind || facet.id,
+    value: facet.id,
     content: (
       <div data-testid={`${facet.id}-content`}>{facet.label} Content</div>
     ),
@@ -67,7 +77,7 @@ describe('TabView', () => {
 
     it('initializes with saved tab when available', () => {
       (useActiveProject as any).mockReturnValue({
-        lastTab: { [mockRoute]: types.ListKind.BALANCES },
+        lastTab: { [mockRoute]: types.DataFacet.BALANCES },
         setLastTab: mockSetLastTab,
       });
 
@@ -133,7 +143,7 @@ describe('TabView', () => {
 
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.BALANCES,
+        types.DataFacet.BALANCES,
       );
     });
 
@@ -148,13 +158,13 @@ describe('TabView', () => {
 
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.TRANSACTIONS,
+        types.DataFacet.TRANSACTIONS,
       );
     });
 
     it('does not set initial preference when saved tab exists', () => {
       (useActiveProject as any).mockReturnValue({
-        lastTab: { [mockRoute]: types.ListKind.BALANCES },
+        lastTab: { [mockRoute]: types.DataFacet.BALANCES },
         setLastTab: mockSetLastTab,
       });
 
@@ -181,7 +191,7 @@ describe('TabView', () => {
       const statementsTab = screen.getByText('Statements');
       fireEvent.click(statementsTab);
 
-      expect(mockOnTabChange).toHaveBeenCalledWith(types.ListKind.STATEMENTS);
+      expect(mockOnTabChange).toHaveBeenCalledWith(types.DataFacet.STATEMENTS);
     });
   });
 
@@ -218,9 +228,9 @@ describe('TabView', () => {
 
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.BALANCES,
+        types.DataFacet.BALANCES,
       );
-      expect(mockOnTabChange).toHaveBeenCalledWith(types.ListKind.BALANCES);
+      expect(mockOnTabChange).toHaveBeenCalledWith(types.DataFacet.BALANCES);
     });
 
     it('cycles to previous tab on alt+TAB_CYCLE event', () => {
@@ -240,9 +250,9 @@ describe('TabView', () => {
 
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.STATEMENTS,
+        types.DataFacet.STATEMENTS,
       );
-      expect(mockOnTabChange).toHaveBeenCalledWith(types.ListKind.STATEMENTS);
+      expect(mockOnTabChange).toHaveBeenCalledWith(types.DataFacet.STATEMENTS);
     });
 
     it('ignores TAB_CYCLE events for different routes', () => {
@@ -264,7 +274,7 @@ describe('TabView', () => {
     });
   });
 
-  describe('string ↔ ListKind casting (current behavior)', () => {
+  describe('string ↔ DataFacet casting (current behavior)', () => {
     it('handles tab values as strings in event handlers', () => {
       render(
         <TabView
@@ -279,12 +289,12 @@ describe('TabView', () => {
 
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.BALANCES,
+        types.DataFacet.BALANCES,
       );
     });
 
     // TODO: Fix cycling expectation - investigate actual vs expected behavior
-    it.skip('casts tab labels to ListKind in cycling logic', () => {
+    it.skip('casts tab labels to DataFacet in cycling logic', () => {
       render(
         <TabView
           tabs={mockTabs}
@@ -297,7 +307,7 @@ describe('TabView', () => {
       handler('', { route: mockRoute, key: 'tab' });
 
       expect(typeof mockSetLastTab.mock.calls[0]?.[1]).toBe('string');
-      expect(mockSetLastTab.mock.calls[0]?.[1]).toBe(types.ListKind.BALANCES);
+      expect(mockSetLastTab.mock.calls[0]?.[1]).toBe(types.DataFacet.BALANCES);
     });
   });
 
@@ -316,7 +326,7 @@ describe('TabView', () => {
 
     it('selects saved tab when preference exists', () => {
       (useActiveProject as any).mockReturnValue({
-        lastTab: { [mockRoute]: types.ListKind.STATEMENTS },
+        lastTab: { [mockRoute]: types.DataFacet.STATEMENTS },
         setLastTab: mockSetLastTab,
       });
 
@@ -343,7 +353,7 @@ describe('TabView', () => {
 
     it('handles invalid saved tab gracefully', () => {
       (useActiveProject as any).mockReturnValue({
-        lastTab: { [mockRoute]: 'invalid-tab' as types.ListKind },
+        lastTab: { [mockRoute]: 'invalid-tab' as types.DataFacet },
         setLastTab: mockSetLastTab,
       });
 
@@ -363,7 +373,7 @@ describe('TabView', () => {
     // TODO: Fix forward cycling expectations
     it.skip('cycles forward through tabs correctly', () => {
       (useActiveProject as any).mockReturnValue({
-        lastTab: { [mockRoute]: types.ListKind.TRANSACTIONS },
+        lastTab: { [mockRoute]: types.DataFacet.TRANSACTIONS },
         setLastTab: mockSetLastTab,
       });
 
@@ -380,7 +390,7 @@ describe('TabView', () => {
       handler('', { route: mockRoute, key: 'tab' });
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.BALANCES,
+        types.DataFacet.BALANCES,
       );
 
       vi.clearAllMocks();
@@ -388,14 +398,14 @@ describe('TabView', () => {
       handler('', { route: mockRoute, key: 'tab' });
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.BALANCES,
+        types.DataFacet.BALANCES,
       );
 
       vi.clearAllMocks();
       handler('', { route: mockRoute, key: 'tab' });
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.TRANSACTIONS,
+        types.DataFacet.TRANSACTIONS,
       );
     });
 
@@ -403,7 +413,7 @@ describe('TabView', () => {
     // The test expectations don't match actual behavior - may indicate real issue
     it.skip('cycles backward through tabs correctly', () => {
       (useActiveProject as any).mockReturnValue({
-        lastTab: { [mockRoute]: types.ListKind.TRANSACTIONS },
+        lastTab: { [mockRoute]: types.DataFacet.TRANSACTIONS },
         setLastTab: mockSetLastTab,
       });
 
@@ -421,21 +431,21 @@ describe('TabView', () => {
       handler('', { route: mockRoute, key: 'alt+tab' });
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.STATEMENTS,
+        types.DataFacet.STATEMENTS,
       );
 
       vi.clearAllMocks();
       handler('', { route: mockRoute, key: 'alt+tab' });
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.STATEMENTS,
+        types.DataFacet.STATEMENTS,
       );
 
       vi.clearAllMocks();
       handler('', { route: mockRoute, key: 'alt+tab' });
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.TRANSACTIONS,
+        types.DataFacet.TRANSACTIONS,
       );
     });
 
@@ -455,13 +465,13 @@ describe('TabView', () => {
 
     //   expect(mockSetLastTab).toHaveBeenCalledWith(
     //     mockRoute,
-    //     types.ListKind.TRANSACTIONS,
+    //     types.DataFacet.TRANSACTIONS,
     //   );
     // });
 
     it('wraps around at tab boundaries correctly', () => {
       (useActiveProject as any).mockReturnValue({
-        lastTab: { [mockRoute]: types.ListKind.STATEMENTS },
+        lastTab: { [mockRoute]: types.DataFacet.STATEMENTS },
         setLastTab: mockSetLastTab,
       });
 
@@ -481,7 +491,7 @@ describe('TabView', () => {
 
       expect(mockSetLastTab).toHaveBeenCalledWith(
         mockRoute,
-        types.ListKind.TRANSACTIONS,
+        types.DataFacet.TRANSACTIONS,
       );
     });
   });

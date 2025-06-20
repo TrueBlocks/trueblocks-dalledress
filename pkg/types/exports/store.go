@@ -228,8 +228,8 @@ func GetExportsTransactionsStore(chain string, address string) *store.Store[core
 }
 
 // GetExportsCount returns the count of items for a specific export facet
-func GetExportsCount(chain string, address string, listKind string) (uint64, error) {
-	switch listKind {
+func GetExportsCount(chain string, address string, dataFacet string) (uint64, error) {
+	switch dataFacet {
 	case string(ExportsTransactions):
 		return getExportsTransactionsCount(chain, address)
 	case string(ExportsStatements):
@@ -239,7 +239,7 @@ func GetExportsCount(chain string, address string, listKind string) (uint64, err
 	case string(ExportsBalances):
 		return getExportsBalancesCount(chain, address)
 	default:
-		return 0, fmt.Errorf("unknown list kind: %s", listKind)
+		return 0, fmt.Errorf("unknown dataFacet: %s", dataFacet)
 	}
 }
 
@@ -283,8 +283,8 @@ func getExportsBalancesCount(chain string, address string) (uint64, error) {
 	return getExportsTransactionsCount(chain, address)
 }
 
-// ResetExportsStore resets a specific store for a given chain, address, and listKind
-func ResetExportsStore(chain, address string, listKind types.ListKind) {
+// ResetExportsStore resets a specific store for a given chain, address, and dataFacet
+func ResetExportsStore(chain, address string, dataFacet types.DataFacet) {
 	chainName := chain
 	if chainName == "" {
 		chainName = preferences.GetChain()
@@ -292,7 +292,7 @@ func ResetExportsStore(chain, address string, listKind types.ListKind) {
 
 	storeKey := getStoreKey(chainName, address)
 
-	switch listKind {
+	switch dataFacet {
 	case ExportsTransactions:
 		transactionsMu.Lock()
 		if store, exists := transactionsStores[storeKey]; exists {

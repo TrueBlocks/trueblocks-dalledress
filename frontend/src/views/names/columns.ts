@@ -1,17 +1,17 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
-export const getColumns = (backendListKind: types.ListKind): FormField[] => {
-  switch (backendListKind) {
-    case types.ListKind.ALL:
+export const getColumns = (backendDataFacet: types.DataFacet): FormField[] => {
+  switch (backendDataFacet) {
+    case types.DataFacet.ALL:
     // fallthrough
-    case types.ListKind.CUSTOM:
+    case types.DataFacet.CUSTOM:
     // fallthrough
-    case types.ListKind.PREFUND:
+    case types.DataFacet.PREFUND:
     // fallthrough
-    case types.ListKind.REGULAR:
+    case types.DataFacet.REGULAR:
     // fallthrough
-    case types.ListKind.BADDRESS:
+    case types.DataFacet.BADDRESS:
     // fallthrough
     default:
       return getColumnsForName();

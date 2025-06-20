@@ -26,16 +26,16 @@ export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStoreForKind(arg1) {
-  return window['go']['abis']['AbisCollection']['GetStoreForKind'](arg1);
+export function GetStoreForFacet(arg1) {
+  return window['go']['abis']['AbisCollection']['GetStoreForFacet'](arg1);
 }
 
 export function GetSummary() {
   return window['go']['abis']['AbisCollection']['GetSummary']();
 }
 
-export function GetSupportedKinds() {
-  return window['go']['abis']['AbisCollection']['GetSupportedKinds']();
+export function GetSupportedFacets() {
+  return window['go']['abis']['AbisCollection']['GetSupportedFacets']();
 }
 
 export function LoadData(arg1) {

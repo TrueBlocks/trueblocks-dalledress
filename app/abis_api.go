@@ -11,16 +11,16 @@ import (
 )
 
 func (a *App) GetAbisPage(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
 ) (*abis.AbisPage, error) {
-	return getCollectionPage[*abis.AbisPage](a.abis, kind, first, pageSize, sort, filter)
+	return getCollectionPage[*abis.AbisPage](a.abis, dataFacet, first, pageSize, sort, filter)
 }
 
 func (a *App) AbisCrud(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	abi *coreTypes.Abi,
 	address string,
@@ -28,7 +28,7 @@ func (a *App) AbisCrud(
 	if address != "" && (abi == nil || abi.Address.IsZero()) {
 		abi = &coreTypes.Abi{Address: base.HexToAddress(address)}
 	}
-	return a.abis.Crud(kind, op, abi)
+	return a.abis.Crud(dataFacet, op, abi)
 }
 
 func (a *App) GetAbisSummary() types.Summary {

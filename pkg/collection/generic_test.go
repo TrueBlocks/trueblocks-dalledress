@@ -14,8 +14,8 @@ import (
 // CollectionTestSuite represents a generic test suite that can be applied to any Collection implementation
 type CollectionTestSuite struct {
 	collection        types.Collection
-	supportedKinds    []types.ListKind
-	invalidKinds      []types.ListKind
+	supportedFacets   []types.DataFacet
+	invalidFacets     []types.DataFacet
 	collectionName    string
 	expectedStoreName string
 }
@@ -23,15 +23,15 @@ type CollectionTestSuite struct {
 // CreateCollectionTestSuite creates a test suite for any Collection implementation
 func CreateCollectionTestSuite(
 	collection types.Collection,
-	supportedKinds []types.ListKind,
-	invalidKinds []types.ListKind,
+	supportedFacets []types.DataFacet,
+	invalidFacets []types.DataFacet,
 	collectionName string,
 	expectedStoreName string,
 ) *CollectionTestSuite {
 	return &CollectionTestSuite{
 		collection:        collection,
-		supportedKinds:    supportedKinds,
-		invalidKinds:      invalidKinds,
+		supportedFacets:   supportedFacets,
+		invalidFacets:     invalidFacets,
 		collectionName:    collectionName,
 		expectedStoreName: expectedStoreName,
 	}
@@ -44,87 +44,87 @@ func (suite *CollectionTestSuite) TestCollectionInterface(t *testing.T) {
 		assert.Equal(t, suite.collectionName, name, "Collection name should match expected")
 	})
 
-	t.Run("GetSupportedKinds", func(t *testing.T) {
-		kinds := suite.collection.GetSupportedKinds()
-		assert.NotEmpty(t, kinds, "Supported kinds should not be empty")
-		assert.ElementsMatch(t, suite.supportedKinds, kinds, "Supported kinds should match expected")
+	t.Run("GetSupportedFacets", func(t *testing.T) {
+		facets := suite.collection.GetSupportedFacets()
+		assert.NotEmpty(t, facets, "Supported facets should not be empty")
+		assert.ElementsMatch(t, suite.supportedFacets, facets, "Supported facets should match expected")
 	})
 
-	t.Run("GetStoreForKind_ValidKinds", func(t *testing.T) {
-		for _, kind := range suite.supportedKinds {
-			storeName := suite.collection.GetStoreForKind(kind)
-			assert.NotEmpty(t, storeName, "Store name should not be empty for valid kind %s", kind)
+	t.Run("GetStoreForFacet_ValidFacets", func(t *testing.T) {
+		for _, facet := range suite.supportedFacets {
+			storeName := suite.collection.GetStoreForFacet(facet)
+			assert.NotEmpty(t, storeName, "Store name should not be empty for valid facet %s", facet)
 		}
 	})
 
-	t.Run("GetStoreForKind_InvalidKinds", func(t *testing.T) {
-		for _, kind := range suite.invalidKinds {
-			storeName := suite.collection.GetStoreForKind(kind)
-			assert.Empty(t, storeName, "Store name should be empty for invalid kind %s", kind)
+	t.Run("GetStoreForFacet_invalidFacets", func(t *testing.T) {
+		for _, facet := range suite.invalidFacets {
+			storeName := suite.collection.GetStoreForFacet(facet)
+			assert.Empty(t, storeName, "Store name should be empty for invalid facet %s", facet)
 		}
 	})
 }
 
 // TestCollectionStateManagement tests NeedsUpdate/Reset/LoadData behavior
 func (suite *CollectionTestSuite) TestCollectionStateManagement(t *testing.T) {
-	t.Run("NeedsUpdate_ValidKinds", func(t *testing.T) {
-		for _, kind := range suite.supportedKinds {
-			needsUpdate := suite.collection.NeedsUpdate(kind)
+	t.Run("NeedsUpdate_ValidFacets", func(t *testing.T) {
+		for _, facet := range suite.supportedFacets {
+			needsUpdate := suite.collection.NeedsUpdate(facet)
 			// We can't assert true/false here as it depends on actual state
 			// But the call should not panic
 			_ = needsUpdate
 		}
 	})
 
-	t.Run("NeedsUpdate_InvalidKinds", func(t *testing.T) {
-		for _, kind := range suite.invalidKinds {
-			needsUpdate := suite.collection.NeedsUpdate(kind)
-			assert.False(t, needsUpdate, "Invalid kind %s should return false for NeedsUpdate", kind)
+	t.Run("NeedsUpdate_InvalidFacets", func(t *testing.T) {
+		for _, facet := range suite.invalidFacets {
+			needsUpdate := suite.collection.NeedsUpdate(facet)
+			assert.False(t, needsUpdate, "Invalid facet %s should return false for NeedsUpdate", facet)
 		}
 	})
 
-	t.Run("Reset_ValidKinds", func(t *testing.T) {
-		for _, kind := range suite.supportedKinds {
+	t.Run("Reset_ValidFacets", func(t *testing.T) {
+		for _, facet := range suite.supportedFacets {
 			assert.NotPanics(t, func() {
-				suite.collection.Reset(kind)
-			}, "Reset should not panic for valid kind %s", kind)
+				suite.collection.Reset(facet)
+			}, "Reset should not panic for valid facet %s", facet)
 		}
 	})
 
-	t.Run("Reset_InvalidKinds", func(t *testing.T) {
-		for _, kind := range suite.invalidKinds {
+	t.Run("Reset_InvalidFacets", func(t *testing.T) {
+		for _, facet := range suite.invalidFacets {
 			assert.NotPanics(t, func() {
-				suite.collection.Reset(kind)
-			}, "Reset should not panic for invalid kind %s", kind)
+				suite.collection.Reset(facet)
+			}, "Reset should not panic for invalid facet %s", facet)
 		}
 	})
 
-	t.Run("LoadData_ValidKinds", func(t *testing.T) {
-		for _, kind := range suite.supportedKinds {
+	t.Run("LoadData_ValidFacets", func(t *testing.T) {
+		for _, facet := range suite.supportedFacets {
 			assert.NotPanics(t, func() {
-				suite.collection.LoadData(kind)
-			}, "LoadData should not panic for valid kind %s", kind)
+				suite.collection.LoadData(facet)
+			}, "LoadData should not panic for valid facet %s", facet)
 		}
 	})
 
-	t.Run("LoadData_InvalidKinds", func(t *testing.T) {
-		for _, kind := range suite.invalidKinds {
+	t.Run("LoadData_InvalidFacets", func(t *testing.T) {
+		for _, facet := range suite.invalidFacets {
 			assert.NotPanics(t, func() {
-				suite.collection.LoadData(kind)
-			}, "LoadData should not panic for invalid kind %s", kind)
+				suite.collection.LoadData(facet)
+			}, "LoadData should not panic for invalid facet %s", facet)
 		}
 	})
 }
 
 // TestCollectionPageInterface tests Page interface compliance
 func (suite *CollectionTestSuite) TestCollectionPageInterface(t *testing.T) {
-	t.Run("GetPage_ValidKinds", func(t *testing.T) {
-		for _, kind := range suite.supportedKinds {
-			page, err := suite.collection.GetPage(kind, 0, 10, sdk.SortSpec{}, "")
+	t.Run("GetPage_ValidFacets", func(t *testing.T) {
+		for _, facet := range suite.supportedFacets {
+			page, err := suite.collection.GetPage(facet, 0, 10, sdk.SortSpec{}, "")
 
 			if err == nil && page != nil {
 				// Test Page interface compliance
-				assert.Equal(t, kind, page.GetKind(), "Page kind should match requested kind")
+				assert.Equal(t, facet, page.GetFacet(), "Page facet should match requested facet")
 				assert.GreaterOrEqual(t, page.GetTotalItems(), 0, "Total items should be non-negative")
 				assert.GreaterOrEqual(t, page.GetExpectedTotal(), 0, "Expected total should be non-negative")
 
@@ -139,27 +139,27 @@ func (suite *CollectionTestSuite) TestCollectionPageInterface(t *testing.T) {
 		}
 	})
 
-	t.Run("GetPage_InvalidKinds", func(t *testing.T) {
-		for _, kind := range suite.invalidKinds {
-			_, err := suite.collection.GetPage(kind, 0, 10, sdk.SortSpec{}, "")
-			assert.Error(t, err, "GetPage should return error for invalid kind %s", kind)
+	t.Run("GetPage_InvalidFacets", func(t *testing.T) {
+		for _, facet := range suite.invalidFacets {
+			_, err := suite.collection.GetPage(facet, 0, 10, sdk.SortSpec{}, "")
+			assert.Error(t, err, "GetPage should return error for invalid facet %s", facet)
 		}
 	})
 
 	t.Run("GetPage_ZeroPageSize", func(t *testing.T) {
-		for _, kind := range suite.supportedKinds {
-			page, err := suite.collection.GetPage(kind, 0, 0, sdk.SortSpec{}, "")
+		for _, facet := range suite.supportedFacets {
+			page, err := suite.collection.GetPage(facet, 0, 0, sdk.SortSpec{}, "")
 			if err == nil && page != nil {
-				assert.Equal(t, kind, page.GetKind(), "Page kind should match even with zero page size")
+				assert.Equal(t, facet, page.GetFacet(), "Page facet should match even with zero page size")
 			}
 		}
 	})
 
 	t.Run("GetPage_WithFilter", func(t *testing.T) {
-		for _, kind := range suite.supportedKinds {
-			page, err := suite.collection.GetPage(kind, 0, 5, sdk.SortSpec{}, "test")
+		for _, facet := range suite.supportedFacets {
+			page, err := suite.collection.GetPage(facet, 0, 5, sdk.SortSpec{}, "test")
 			if err == nil && page != nil {
-				assert.Equal(t, kind, page.GetKind(), "Page kind should match with filter")
+				assert.Equal(t, facet, page.GetFacet(), "Page facet should match with filter")
 				assert.GreaterOrEqual(t, page.GetTotalItems(), 0, "Filtered results should be non-negative")
 			}
 		}
@@ -181,34 +181,34 @@ func (suite *CollectionTestSuite) TestCollectionBoundaryConditions(t *testing.T)
 			{-10, -5, "both_negative"},
 		}
 
-		for _, kind := range suite.supportedKinds {
+		for _, facet := range suite.supportedFacets {
 			for _, param := range extremeParams {
-				t.Run(param.desc+"_"+string(kind), func(t *testing.T) {
+				t.Run(param.desc+"_"+string(facet), func(t *testing.T) {
 					assert.NotPanics(t, func() {
-						_, _ = suite.collection.GetPage(kind, param.first, param.pageSize, sdk.SortSpec{}, "")
+						_, _ = suite.collection.GetPage(facet, param.first, param.pageSize, sdk.SortSpec{}, "")
 					}, "Extreme parameters should not cause panic")
 				})
 			}
 		}
 	})
 
-	t.Run("CrossKindIsolation", func(t *testing.T) {
-		// Test that operations on one kind don't affect others
-		if len(suite.supportedKinds) >= 2 {
-			kind1 := suite.supportedKinds[0]
-			kind2 := suite.supportedKinds[1]
+	t.Run("CrossFacetIsolation", func(t *testing.T) {
+		// Test that operations on one facet don't affect others
+		if len(suite.supportedFacets) >= 2 {
+			facet1 := suite.supportedFacets[0]
+			facet2 := suite.supportedFacets[1]
 
-			// Reset one kind
-			suite.collection.Reset(kind1)
+			// Reset one facet
+			suite.collection.Reset(facet1)
 
-			// Operations on other kinds should still work
+			// Operations on other facets should still work
 			assert.NotPanics(t, func() {
-				suite.collection.NeedsUpdate(kind2)
-			}, "Operations on other kinds should work after reset")
+				suite.collection.NeedsUpdate(facet2)
+			}, "Operations on other facets should work after reset")
 
 			assert.NotPanics(t, func() {
-				_, _ = suite.collection.GetPage(kind2, 0, 5, sdk.SortSpec{}, "")
-			}, "GetPage on other kinds should work after reset")
+				_, _ = suite.collection.GetPage(facet2, 0, 5, sdk.SortSpec{}, "")
+			}, "GetPage on other facets should work after reset")
 		}
 	})
 }
@@ -218,11 +218,11 @@ func (suite *CollectionTestSuite) TestCollectionCrudInterface(t *testing.T) {
 	t.Run("Crud_MethodExists", func(t *testing.T) {
 		// Test that Crud method exists and can be called without panicking
 		// We don't test actual CRUD functionality here as it's domain-specific
-		for _, kind := range suite.supportedKinds {
+		for _, facet := range suite.supportedFacets {
 			assert.NotPanics(t, func() {
 				// Using nil item - actual CRUD logic is tested in domain-specific tests
-				_ = suite.collection.Crud(kind, "create", nil)
-			}, "Crud method should exist and not panic for valid kind %s", kind)
+				_ = suite.collection.Crud(facet, "create", nil)
+			}, "Crud method should exist and not panic for valid facet %s", facet)
 		}
 	})
 }
@@ -231,13 +231,13 @@ func (suite *CollectionTestSuite) TestCollectionCrudInterface(t *testing.T) {
 
 func TestNamesCollectionGeneric(t *testing.T) {
 	collection := names.NewNamesCollection()
-	supportedKinds := []types.ListKind{
+	supportedFacets := []types.DataFacet{
 		names.NamesAll, names.NamesCustom, names.NamesPrefund,
 		names.NamesRegular, names.NamesBaddress,
 	}
-	invalidKinds := []types.ListKind{"", "invalid", "NotAListKind", "monitors"}
+	invalidFacets := []types.DataFacet{"", "invalid", "NotADataFacet", "monitors"}
 
-	suite := CreateCollectionTestSuite(collection, supportedKinds, invalidKinds, "names", "names")
+	suite := CreateCollectionTestSuite(collection, supportedFacets, invalidFacets, "names", "names")
 
 	t.Run("Interface", suite.TestCollectionInterface)
 	t.Run("StateManagement", suite.TestCollectionStateManagement)
@@ -248,12 +248,12 @@ func TestNamesCollectionGeneric(t *testing.T) {
 
 func TestAbisCollectionGeneric(t *testing.T) {
 	collection := abis.NewAbisCollection()
-	supportedKinds := []types.ListKind{
+	supportedFacets := []types.DataFacet{
 		abis.AbisDownloaded, abis.AbisKnown, abis.AbisFunctions, abis.AbisEvents,
 	}
-	invalidKinds := []types.ListKind{"", "invalid", "NotAListKind", "names"}
+	invalidFacets := []types.DataFacet{"", "invalid", "NotADataFacet", "names"}
 
-	suite := CreateCollectionTestSuite(collection, supportedKinds, invalidKinds, "abis", "abis")
+	suite := CreateCollectionTestSuite(collection, supportedFacets, invalidFacets, "abis", "abis")
 
 	t.Run("Interface", suite.TestCollectionInterface)
 	t.Run("StateManagement", suite.TestCollectionStateManagement)
@@ -264,10 +264,10 @@ func TestAbisCollectionGeneric(t *testing.T) {
 
 func TestMonitorsCollectionGeneric(t *testing.T) {
 	collection := monitors.NewMonitorsCollection()
-	supportedKinds := []types.ListKind{monitors.MonitorsList}
-	invalidKinds := []types.ListKind{"", "invalid", "NotAListKind", "names"}
+	supportedFacets := []types.DataFacet{monitors.MonitorsList}
+	invalidFacets := []types.DataFacet{"", "invalid", "NotADataFacet", "names"}
 
-	suite := CreateCollectionTestSuite(collection, supportedKinds, invalidKinds, "monitors", "monitors")
+	suite := CreateCollectionTestSuite(collection, supportedFacets, invalidFacets, "monitors", "monitors")
 
 	t.Run("Interface", suite.TestCollectionInterface)
 	t.Run("StateManagement", suite.TestCollectionStateManagement)

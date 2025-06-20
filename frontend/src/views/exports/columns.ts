@@ -4,16 +4,16 @@ import { types } from '@models';
 import { formatWeiToEther, formatWeiToGigawei } from '../../utils/ether';
 
 export const getColumnsForExports = (
-  listKind: types.ListKind | string,
+  dataFacet: types.DataFacet | string,
 ): FormField[] => {
-  switch (listKind) {
-    case types.ListKind.STATEMENTS:
+  switch (dataFacet) {
+    case types.DataFacet.STATEMENTS:
       return getStatementColumns();
-    case types.ListKind.TRANSFERS:
+    case types.DataFacet.TRANSFERS:
       return getTransferColumns();
-    case types.ListKind.BALANCES:
+    case types.DataFacet.BALANCES:
       return getBalanceColumns();
-    case types.ListKind.TRANSACTIONS:
+    case types.DataFacet.TRANSACTIONS:
       return getTransactionColumns();
     default:
       return getTransactionColumns();

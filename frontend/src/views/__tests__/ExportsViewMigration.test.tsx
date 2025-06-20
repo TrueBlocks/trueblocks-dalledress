@@ -21,22 +21,18 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     {
       id: types.DataFacet.STATEMENTS,
       label: 'Statements',
-      listKind: 'STATEMENTS' as any,
     },
     {
       id: types.DataFacet.TRANSFERS,
       label: 'Transfers',
-      listKind: 'TRANSFERS' as any,
     },
     {
       id: types.DataFacet.BALANCES,
       label: 'Balances',
-      listKind: 'BALANCES' as any,
     },
     {
       id: types.DataFacet.TRANSACTIONS,
       label: 'Transactions',
-      listKind: 'TRANSACTIONS' as any,
       isDefault: true,
     },
   ];
@@ -85,7 +81,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     });
 
     it('should restore saved facet from preferences', () => {
-      mockLastTab['/exports'] = 'STATEMENTS';
+      mockLastTab['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -115,20 +111,20 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         result.current.setActiveFacet(types.DataFacet.TRANSFERS);
       });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith('/exports', 'TRANSFERS');
+      expect(mockSetLastTab).toHaveBeenCalledWith('/exports', 'transfers');
 
       // Switch to balances
       await act(async () => {
         result.current.setActiveFacet(types.DataFacet.BALANCES);
       });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith('/exports', 'BALANCES');
+      expect(mockSetLastTab).toHaveBeenCalledWith('/exports', 'balances');
 
       // Verify all expected calls were made
       expect(mockSetLastTab).toHaveBeenCalledTimes(2);
     });
 
-    it('should provide correct ListKind backward compatibility', () => {
+    it('should provide correct DataFacet backward compatibility', () => {
       mockLastTab['/exports'] = 'STATEMENTS';
 
       const { result } = renderHook(() =>
@@ -139,7 +135,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         }),
       );
 
-      expect(result.current.getCurrentListKind()).toBe('STATEMENTS');
+      expect(result.current.getCurrentDataFacet()).toBe('transactions');
     });
 
     it('should provide all available facets', () => {
@@ -161,7 +157,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     });
 
     it('should handle ViewStateKey generation', () => {
-      mockLastTab['/exports'] = 'BALANCES';
+      mockLastTab['/exports'] = 'balances';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -189,7 +185,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
   describe('state management integration', () => {
     it('should maintain facet state across preference updates', () => {
       // Set initial preference
-      mockLastTab['/exports'] = 'TRANSFERS';
+      mockLastTab['/exports'] = 'transfers';
 
       const { result } = renderHook(() =>
         useActiveFacet({

@@ -15,37 +15,23 @@ import (
 )
 
 const (
-	NamesAll      types.ListKind = "all"
-	NamesCustom   types.ListKind = "custom"
-	NamesPrefund  types.ListKind = "prefund"
-	NamesRegular  types.ListKind = "regular"
-	NamesBaddress types.ListKind = "baddress"
-)
-
-const (
-	DataFacetAll      types.DataFacet = "all"
-	DataFacetCustom   types.DataFacet = "custom"
-	DataFacetPrefund  types.DataFacet = "prefund"
-	DataFacetRegular  types.DataFacet = "regular"
-	DataFacetBaddress types.DataFacet = "baddress"
+	NamesAll      types.DataFacet = "all"
+	NamesCustom   types.DataFacet = "custom"
+	NamesPrefund  types.DataFacet = "prefund"
+	NamesRegular  types.DataFacet = "regular"
+	NamesBaddress types.DataFacet = "baddress"
 )
 
 func init() {
-	types.RegisterKind(NamesAll)
-	types.RegisterKind(NamesCustom)
-	types.RegisterKind(NamesPrefund)
-	types.RegisterKind(NamesRegular)
-	types.RegisterKind(NamesBaddress)
-
-	types.RegisterDataFacet(DataFacetAll)
-	types.RegisterDataFacet(DataFacetCustom)
-	types.RegisterDataFacet(DataFacetPrefund)
-	types.RegisterDataFacet(DataFacetRegular)
-	types.RegisterDataFacet(DataFacetBaddress)
+	types.RegisterDataFacet(NamesAll)
+	types.RegisterDataFacet(NamesCustom)
+	types.RegisterDataFacet(NamesPrefund)
+	types.RegisterDataFacet(NamesRegular)
+	types.RegisterDataFacet(NamesBaddress)
 }
 
 type NamesPage struct {
-	Kind          types.ListKind    `json:"kind"`
+	Facet         types.DataFacet   `json:"facet"`
 	Names         []*coreTypes.Name `json:"names"`
 	TotalItems    int               `json:"totalItems"`
 	ExpectedTotal int               `json:"expectedTotal"`
@@ -53,8 +39,8 @@ type NamesPage struct {
 	State         types.LoadState   `json:"state"`
 }
 
-func (np *NamesPage) GetKind() types.ListKind {
-	return np.Kind
+func (np *NamesPage) GetFacet() types.DataFacet {
+	return np.Facet
 }
 
 func (np *NamesPage) GetTotalItems() int {
@@ -145,15 +131,15 @@ func (nc *NamesCollection) initializeFacets() {
 	nc.baddressFacet = baddressFacet
 }
 
-func (nc *NamesCollection) LoadData(listKind types.ListKind) {
-	if !nc.NeedsUpdate(listKind) {
+func (nc *NamesCollection) LoadData(dataFacet types.DataFacet) {
+	if !nc.NeedsUpdate(dataFacet) {
 		return
 	}
 
 	var facet *facets.Facet[coreTypes.Name]
-	var facetName types.ListKind
+	var facetName types.DataFacet
 
-	switch listKind {
+	switch dataFacet {
 	case NamesAll:
 		facet = nc.allFacet
 		facetName = NamesAll
@@ -170,7 +156,7 @@ func (nc *NamesCollection) LoadData(listKind types.ListKind) {
 		facet = nc.baddressFacet
 		facetName = NamesBaddress
 	default:
-		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
 		return
 	}
 
@@ -181,8 +167,8 @@ func (nc *NamesCollection) LoadData(listKind types.ListKind) {
 	}()
 }
 
-func (nc *NamesCollection) Reset(listKind types.ListKind) {
-	switch listKind {
+func (nc *NamesCollection) Reset(dataFacet types.DataFacet) {
+	switch dataFacet {
 	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
 		namesStore.Reset()
 	default:
@@ -190,10 +176,10 @@ func (nc *NamesCollection) Reset(listKind types.ListKind) {
 	}
 }
 
-func (nc *NamesCollection) NeedsUpdate(listKind types.ListKind) bool {
+func (nc *NamesCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	var facet *facets.Facet[coreTypes.Name]
 
-	switch listKind {
+	switch dataFacet {
 	case NamesAll:
 		facet = nc.allFacet
 	case NamesCustom:
@@ -211,8 +197,8 @@ func (nc *NamesCollection) NeedsUpdate(listKind types.ListKind) bool {
 	return facet.NeedsUpdate()
 }
 
-func (nc *NamesCollection) getExpectedTotal(listKind types.ListKind) int {
-	_ = listKind
+func (nc *NamesCollection) getExpectedTotal(dataFacet types.DataFacet) int {
+	_ = dataFacet
 	if count, err := GetNamesCount(); err == nil && count > 0 {
 		return count
 	}
@@ -220,14 +206,14 @@ func (nc *NamesCollection) getExpectedTotal(listKind types.ListKind) int {
 }
 
 func (nc *NamesCollection) GetPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
 	var facet *facets.Facet[coreTypes.Name]
 
-	switch listKind {
+	switch dataFacet {
 	case NamesAll:
 		facet = nc.allFacet
 	case NamesCustom:
@@ -239,9 +225,9 @@ func (nc *NamesCollection) GetPage(
 	case NamesBaddress:
 		facet = nc.baddressFacet
 	default:
-		// This is truly a validation error - invalid ListKind for this collection
-		return nil, types.NewValidationError("names", listKind, "GetPage",
-			fmt.Errorf("unsupported list kind: %v", listKind))
+		// This is truly a validation error - invalid DataFacet for this collection
+		return nil, types.NewValidationError("names", dataFacet, "GetPage",
+			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
 
 	var filterFunc func(*coreTypes.Name) bool
@@ -264,7 +250,7 @@ func (nc *NamesCollection) GetPage(
 	)
 	if err != nil {
 		// This is likely an SDK or store error, not a validation error
-		return nil, types.NewStoreError("names", listKind, "GetPage", err)
+		return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
 	}
 
 	names := make([]*coreTypes.Name, 0, len(pageResult.Items))
@@ -273,10 +259,10 @@ func (nc *NamesCollection) GetPage(
 	}
 
 	return &NamesPage{
-		Kind:          listKind,
+		Facet:         dataFacet,
 		Names:         names,
 		TotalItems:    pageResult.TotalItems,
-		ExpectedTotal: nc.getExpectedTotal(listKind),
+		ExpectedTotal: nc.getExpectedTotal(dataFacet),
 		IsFetching:    facet.IsFetching(),
 		State:         pageResult.State,
 	}, nil
@@ -331,12 +317,12 @@ func GetNamesCount() (int, error) {
 }
 
 func (nc *NamesCollection) GetNamesPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (*NamesPage, error) {
-	page, err := nc.GetPage(listKind, first, pageSize, sortSpec, filter)
+	page, err := nc.GetPage(dataFacet, first, pageSize, sortSpec, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -349,8 +335,8 @@ func (nc *NamesCollection) GetNamesPage(
 	return namesPage, nil
 }
 
-func (nc *NamesCollection) GetSupportedKinds() []types.ListKind {
-	return []types.ListKind{
+func (nc *NamesCollection) GetSupportedFacets() []types.DataFacet {
+	return []types.DataFacet{
 		NamesAll,
 		NamesCustom,
 		NamesPrefund,
@@ -359,8 +345,8 @@ func (nc *NamesCollection) GetSupportedKinds() []types.ListKind {
 	}
 }
 
-func (nc *NamesCollection) GetStoreForKind(kind types.ListKind) string {
-	switch kind {
+func (nc *NamesCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
+	switch dataFacet {
 	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
 		return "names"
 	default:
@@ -385,7 +371,7 @@ func (nc *NamesCollection) AccumulateItem(item interface{}, summary *types.Summa
 
 		nc.summary.TotalCount++
 		if nc.summary.FacetCounts == nil {
-			nc.summary.FacetCounts = make(map[types.ListKind]int)
+			nc.summary.FacetCounts = make(map[types.DataFacet]int)
 		}
 		if name.Parts&coreTypes.Custom != 0 {
 			nc.summary.FacetCounts[NamesCustom]++
@@ -408,7 +394,7 @@ func (nc *NamesCollection) ResetSummary() {
 	defer nc.summaryMutex.Unlock()
 	nc.summary = types.Summary{
 		TotalCount:  0,
-		FacetCounts: make(map[types.ListKind]int),
+		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: time.Now().Unix(),
 	}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-describe('Cross-View Integration Tests (ListKind refactor preparation)', () => {
+describe('Cross-View Integration Tests (DataFacet refactor preparation)', () => {
   describe('facet switching behavior', () => {
     it('should support independent facet switching between views', () => {
       // Test that changing facet in Exports doesn't affect Names view facet

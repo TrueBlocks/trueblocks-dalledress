@@ -9,7 +9,7 @@ import (
 )
 
 func (a *App) GetExportsPage(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
@@ -17,53 +17,53 @@ func (a *App) GetExportsPage(
 	address string,
 ) (*exports.ExportsPage, error) {
 	collection := exports.GetExportsCollection(chain, address)
-	return getCollectionPage[*exports.ExportsPage](collection, kind, first, pageSize, sort, filter)
+	return getCollectionPage[*exports.ExportsPage](collection, dataFacet, first, pageSize, sort, filter)
 }
 
 func (a *App) ExportsCrud(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
 	chain string,
 	address string,
 ) error {
 	collection := exports.GetExportsCollection(chain, address)
-	return collection.Crud(kind, op, item)
+	return collection.Crud(dataFacet, op, item)
 }
 
 func (a *App) GetExportsCount(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	chain string,
 	address string,
 ) (uint64, error) {
-	return exports.GetExportsCount(chain, address, string(kind))
+	return exports.GetExportsCount(chain, address, string(dataFacet))
 }
 
 func (a *App) LoadExportsData(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	chain string,
 	address string,
 ) {
 	collection := exports.GetExportsCollection(chain, address)
-	collection.LoadData(kind)
+	collection.LoadData(dataFacet)
 }
 
 func (a *App) ResetExportsData(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	chain string,
 	address string,
 ) {
 	collection := exports.GetExportsCollection(chain, address)
-	collection.Reset(kind)
+	collection.Reset(dataFacet)
 }
 
 func (a *App) ExportsNeedsUpdate(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	chain string,
 	address string,
 ) bool {
 	collection := exports.GetExportsCollection(chain, address)
-	return collection.NeedsUpdate(kind)
+	return collection.NeedsUpdate(dataFacet)
 }
 
 func (a *App) GetExportsSummary(chain string, address string) types.Summary {

@@ -15,7 +15,7 @@ vi.mock('@contexts', async () => {
   };
 });
 
-describe('Hook Integration Tests (ListKind refactor preparation)', () => {
+describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
   describe('usePagination with ViewStateKey', () => {
     it('creates unique pagination state for different ViewStateKey combinations', () => {
       const exportsTransactionsKey: ViewStateKey = {
@@ -62,7 +62,7 @@ describe('Hook Integration Tests (ListKind refactor preparation)', () => {
     });
 
     it('maintains state isolation between different views with same tabName', () => {
-      // Test case where different views might use the same tabName (ListKind value)
+      // Test case where different views might use the same tabName (DataFacet value)
       const exportsKey: ViewStateKey = {
         viewName: '/exports',
         tabName: 'transactions',
@@ -158,12 +158,12 @@ describe('Hook Integration Tests (ListKind refactor preparation)', () => {
 
     it('handles ViewStateKey memoization patterns from views', () => {
       // This tests the useMemo pattern used in views:
-      // const viewStateKey = useMemo(() => ({ viewName: ROUTE, tabName: listKind }), [listKind]);
+      // const viewStateKey = useMemo(() => ({ viewName: ROUTE, tabName: dataFacet }), [dataFacet]);
 
-      let currentListKind = 'transactions';
+      let currentDataFacet = 'transactions';
       const getMemoizedKey = (): ViewStateKey => ({
         viewName: '/exports',
-        tabName: currentListKind,
+        tabName: currentDataFacet,
       });
 
       const { result: result1, rerender } = renderHook(() =>
@@ -172,8 +172,8 @@ describe('Hook Integration Tests (ListKind refactor preparation)', () => {
 
       expect(result1.current.pagination).toBeDefined();
 
-      // Simulate listKind change
-      currentListKind = 'receipts';
+      // Simulate dataFacet change
+      currentDataFacet = 'receipts';
       rerender();
 
       // Hook should handle the key change

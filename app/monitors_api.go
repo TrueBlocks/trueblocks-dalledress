@@ -11,16 +11,16 @@ import (
 )
 
 func (a *App) GetMonitorsPage(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
 ) (*monitors.MonitorsPage, error) {
-	return getCollectionPage[*monitors.MonitorsPage](a.monitors, kind, first, pageSize, sort, filter)
+	return getCollectionPage[*monitors.MonitorsPage](a.monitors, dataFacet, first, pageSize, sort, filter)
 }
 
 func (a *App) MonitorsCrud(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	monitor *coreTypes.Monitor,
 	address string,
@@ -28,7 +28,7 @@ func (a *App) MonitorsCrud(
 	if address != "" && (monitor == nil || monitor.Address.IsZero()) {
 		monitor = &coreTypes.Monitor{Address: base.HexToAddress(address)}
 	}
-	return a.monitors.Crud(kind, op, monitor)
+	return a.monitors.Crud(dataFacet, op, monitor)
 }
 
 func (a *App) MonitorsClean(addresses []string) error {

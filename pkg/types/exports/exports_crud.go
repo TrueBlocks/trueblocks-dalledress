@@ -29,7 +29,7 @@ func (c *ExportsCrud) Delete(item interface{}) error {
 }
 
 func (ec *ExportsCollection) Crud(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
 ) error {

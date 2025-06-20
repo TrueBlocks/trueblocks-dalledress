@@ -13,12 +13,12 @@ import (
 )
 
 func (c *MonitorsCollection) Crud(
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
 ) error {
-	if kind != MonitorsList {
-		return fmt.Errorf("unsupported list kind: %s", kind)
+	if dataFacet != MonitorsList {
+		return fmt.Errorf("unsupported dataFacet: %s", dataFacet)
 	}
 
 	// Type assertion to convert interface{} to the expected type

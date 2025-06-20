@@ -1,9 +1,5 @@
 package types
 
-import "strings"
-
-type ListKind string
-
 type LoadState string
 
 const (
@@ -25,19 +21,4 @@ var AllStates = []struct {
 	{StateLoaded, "LOADED"},
 	{StatePending, "PENDING"},
 	{StateError, "ERROR"},
-}
-
-var AllListKinds = []struct {
-	Value  ListKind `json:"value"`
-	TSName string   `json:"tsname"`
-}{}
-
-func RegisterKind(listKind ListKind) {
-	AllListKinds = append(AllListKinds, struct {
-		Value  ListKind `json:"value"`
-		TSName string   `json:"tsname"`
-	}{
-		listKind,
-		strings.ToUpper(string(listKind)),
-	})
 }

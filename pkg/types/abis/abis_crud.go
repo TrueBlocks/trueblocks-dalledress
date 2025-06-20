@@ -12,7 +12,7 @@ import (
 )
 
 func (ac *AbisCollection) Crud(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
 ) error {

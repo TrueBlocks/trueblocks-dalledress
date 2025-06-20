@@ -14,38 +14,25 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-// Define ListKind constants for different chunk views
+// Define DataFacet constants for different chunk views
 const (
-	ChunksStats    types.ListKind = "stats"
-	ChunksIndex    types.ListKind = "index"
-	ChunksBlooms   types.ListKind = "blooms"
-	ChunksManifest types.ListKind = "manifest"
+	ChunksStats    types.DataFacet = "stats"
+	ChunksIndex    types.DataFacet = "index"
+	ChunksBlooms   types.DataFacet = "blooms"
+	ChunksManifest types.DataFacet = "manifest"
 )
 
-// Define DataFacet constants for frontend UI
-const (
-	DataFacetStats    types.DataFacet = "stats"
-	DataFacetIndex    types.DataFacet = "index"
-	DataFacetBlooms   types.DataFacet = "blooms"
-	DataFacetManifest types.DataFacet = "manifest"
-)
-
-// REQUIRED: Register kinds for validation
+// REQUIRED: Register DataFacet values for validation
 func init() {
-	types.RegisterKind(ChunksStats)
-	types.RegisterKind(ChunksIndex)
-	types.RegisterKind(ChunksBlooms)
-	types.RegisterKind(ChunksManifest)
-
-	types.RegisterDataFacet(DataFacetStats)
-	types.RegisterDataFacet(DataFacetIndex)
-	types.RegisterDataFacet(DataFacetBlooms)
-	types.RegisterDataFacet(DataFacetManifest)
+	types.RegisterDataFacet(ChunksStats)
+	types.RegisterDataFacet(ChunksIndex)
+	types.RegisterDataFacet(ChunksBlooms)
+	types.RegisterDataFacet(ChunksManifest)
 }
 
 // Page structures for frontend consumption
 type ChunksStatsPage struct {
-	Kind          types.ListKind          `json:"kind"`
+	Facet         types.DataFacet         `json:"facet"`
 	ChunksStats   []*coreTypes.ChunkStats `json:"chunksStats"`
 	TotalItems    int                     `json:"totalItems"`
 	ExpectedTotal int                     `json:"expectedTotal"`
@@ -54,7 +41,7 @@ type ChunksStatsPage struct {
 }
 
 type ChunksIndexPage struct {
-	Kind          types.ListKind          `json:"kind"`
+	Facet         types.DataFacet         `json:"facet"`
 	ChunksIndex   []*coreTypes.ChunkIndex `json:"chunksIndex"`
 	TotalItems    int                     `json:"totalItems"`
 	ExpectedTotal int                     `json:"expectedTotal"`
@@ -63,7 +50,7 @@ type ChunksIndexPage struct {
 }
 
 type ChunksBloomsPage struct {
-	Kind          types.ListKind          `json:"kind"`
+	Facet         types.DataFacet         `json:"facet"`
 	ChunksBlooms  []*coreTypes.ChunkBloom `json:"chunksBlooms"`
 	TotalItems    int                     `json:"totalItems"`
 	ExpectedTotal int                     `json:"expectedTotal"`
@@ -72,7 +59,7 @@ type ChunksBloomsPage struct {
 }
 
 type ChunksManifestPage struct {
-	Kind           types.ListKind             `json:"kind"`
+	Facet          types.DataFacet            `json:"facet"`
 	ChunksManifest []*coreTypes.ChunkManifest `json:"chunksManifest"`
 	TotalItems     int                        `json:"totalItems"`
 	ExpectedTotal  int                        `json:"expectedTotal"`
@@ -81,25 +68,25 @@ type ChunksManifestPage struct {
 }
 
 // Implement Page interface for all page types
-func (csp *ChunksStatsPage) GetKind() types.ListKind   { return csp.Kind }
+func (csp *ChunksStatsPage) GetFacet() types.DataFacet { return csp.Facet }
 func (csp *ChunksStatsPage) GetTotalItems() int        { return csp.TotalItems }
 func (csp *ChunksStatsPage) GetExpectedTotal() int     { return csp.ExpectedTotal }
 func (csp *ChunksStatsPage) GetIsFetching() bool       { return csp.IsFetching }
 func (csp *ChunksStatsPage) GetState() types.LoadState { return csp.State }
 
-func (cip *ChunksIndexPage) GetKind() types.ListKind   { return cip.Kind }
+func (cip *ChunksIndexPage) GetFacet() types.DataFacet { return cip.Facet }
 func (cip *ChunksIndexPage) GetTotalItems() int        { return cip.TotalItems }
 func (cip *ChunksIndexPage) GetExpectedTotal() int     { return cip.ExpectedTotal }
 func (cip *ChunksIndexPage) GetIsFetching() bool       { return cip.IsFetching }
 func (cip *ChunksIndexPage) GetState() types.LoadState { return cip.State }
 
-func (cbp *ChunksBloomsPage) GetKind() types.ListKind   { return cbp.Kind }
+func (cbp *ChunksBloomsPage) GetFacet() types.DataFacet { return cbp.Facet }
 func (cbp *ChunksBloomsPage) GetTotalItems() int        { return cbp.TotalItems }
 func (cbp *ChunksBloomsPage) GetExpectedTotal() int     { return cbp.ExpectedTotal }
 func (cbp *ChunksBloomsPage) GetIsFetching() bool       { return cbp.IsFetching }
 func (cbp *ChunksBloomsPage) GetState() types.LoadState { return cbp.State }
 
-func (cmp *ChunksManifestPage) GetKind() types.ListKind   { return cmp.Kind }
+func (cmp *ChunksManifestPage) GetFacet() types.DataFacet { return cmp.Facet }
 func (cmp *ChunksManifestPage) GetTotalItems() int        { return cmp.TotalItems }
 func (cmp *ChunksManifestPage) GetExpectedTotal() int     { return cmp.ExpectedTotal }
 func (cmp *ChunksManifestPage) GetIsFetching() bool       { return cmp.IsFetching }
@@ -107,7 +94,7 @@ func (cmp *ChunksManifestPage) GetState() types.LoadState { return cmp.State }
 
 // ChunksPage is a union type that can represent any chunks page type
 type ChunksPage struct {
-	Kind           types.ListKind             `json:"kind"`
+	Facet          types.DataFacet            `json:"facet"`
 	ChunksStats    []*coreTypes.ChunkStats    `json:"chunksStats,omitempty"`
 	ChunksIndex    []*coreTypes.ChunkIndex    `json:"chunksIndex,omitempty"`
 	ChunksBlooms   []*coreTypes.ChunkBloom    `json:"chunksBlooms,omitempty"`
@@ -118,8 +105,8 @@ type ChunksPage struct {
 	State          types.LoadState            `json:"state"`
 }
 
-func (cp *ChunksPage) GetKind() types.ListKind {
-	return cp.Kind
+func (cp *ChunksPage) GetFacet() types.DataFacet {
+	return cp.Facet
 }
 
 func (cp *ChunksPage) GetTotalItems() int {
@@ -154,7 +141,7 @@ func NewChunksCollection() *ChunksCollection {
 	cc := &ChunksCollection{
 		summary: types.Summary{
 			TotalCount:  0,
-			FacetCounts: make(map[types.ListKind]int),
+			FacetCounts: make(map[types.DataFacet]int),
 			CustomData:  make(map[string]interface{}),
 		},
 	}
@@ -208,17 +195,17 @@ func (cc *ChunksCollection) initializeFacets() {
 
 // GetPage implements the Collection interface
 func (cc *ChunksCollection) GetPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
 	page := &ChunksPage{
-		Kind: listKind,
+		Facet: dataFacet,
 	}
 	filter = strings.ToLower(filter)
 
-	switch listKind {
+	switch dataFacet {
 	case ChunksStats:
 		var filterFunc func(*coreTypes.ChunkStats) bool
 		if filter != "" {
@@ -234,7 +221,7 @@ func (cc *ChunksCollection) GetPage(
 
 		if result, err := cc.statsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("chunks", listKind, "GetPage", err)
+			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
 			chunksStats := make([]*coreTypes.ChunkStats, 0, len(result.Items))
 			for i := range result.Items {
@@ -260,7 +247,7 @@ func (cc *ChunksCollection) GetPage(
 
 		if result, err := cc.indexFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("chunks", listKind, "GetPage", err)
+			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
 			chunksIndex := make([]*coreTypes.ChunkIndex, 0, len(result.Items))
 			for i := range result.Items {
@@ -286,7 +273,7 @@ func (cc *ChunksCollection) GetPage(
 
 		if result, err := cc.bloomsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("chunks", listKind, "GetPage", err)
+			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
 			chunksBlooms := make([]*coreTypes.ChunkBloom, 0, len(result.Items))
 			for i := range result.Items {
@@ -312,7 +299,7 @@ func (cc *ChunksCollection) GetPage(
 
 		if result, err := cc.manifestFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("chunks", listKind, "GetPage", err)
+			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
 			chunksManifest := make([]*coreTypes.ChunkManifest, 0, len(result.Items))
 			for i := range result.Items {
@@ -324,9 +311,9 @@ func (cc *ChunksCollection) GetPage(
 		page.ExpectedTotal = cc.manifestFacet.ExpectedCount()
 
 	default:
-		// This is truly a validation error - invalid ListKind for this collection
-		return nil, types.NewValidationError("chunks", listKind, "GetPage",
-			fmt.Errorf("unsupported list kind: %v", listKind))
+		// This is truly a validation error - invalid DataFacet for this collection
+		return nil, types.NewValidationError("chunks", dataFacet, "GetPage",
+			fmt.Errorf("unsupported data facet: %v", dataFacet))
 	}
 
 	return page, nil
@@ -417,8 +404,8 @@ func (cc *ChunksCollection) matchesManifestFilter(manifest *coreTypes.ChunkManif
 }
 
 // Implement Collection interface methods
-func (cc *ChunksCollection) LoadData(listKind types.ListKind) {
-	if !cc.NeedsUpdate(listKind) {
+func (cc *ChunksCollection) LoadData(dataFacet types.DataFacet) {
+	if !cc.NeedsUpdate(dataFacet) {
 		return
 	}
 
@@ -427,7 +414,7 @@ func (cc *ChunksCollection) LoadData(listKind types.ListKind) {
 	}
 	var facetName string
 
-	switch listKind {
+	switch dataFacet {
 	case ChunksStats:
 		facet = cc.statsFacet
 		facetName = "chunks.stats"
@@ -441,7 +428,7 @@ func (cc *ChunksCollection) LoadData(listKind types.ListKind) {
 		facet = cc.manifestFacet
 		facetName = "chunks.manifest"
 	default:
-		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		logging.LogError("LoadData: unexpected data facet: %v", fmt.Errorf("invalid data facet: %s", dataFacet), nil)
 		return
 	}
 
@@ -452,8 +439,8 @@ func (cc *ChunksCollection) LoadData(listKind types.ListKind) {
 	}()
 }
 
-func (cc *ChunksCollection) Reset(listKind types.ListKind) {
-	switch listKind {
+func (cc *ChunksCollection) Reset(dataFacet types.DataFacet) {
+	switch dataFacet {
 	case ChunksStats:
 		GetChunksStatsStore().Reset()
 		cc.statsFacet.Reset()
@@ -469,8 +456,8 @@ func (cc *ChunksCollection) Reset(listKind types.ListKind) {
 	}
 }
 
-func (cc *ChunksCollection) NeedsUpdate(listKind types.ListKind) bool {
-	switch listKind {
+func (cc *ChunksCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
+	switch dataFacet {
 	case ChunksStats:
 		return cc.statsFacet.NeedsUpdate()
 	case ChunksIndex:
@@ -484,12 +471,12 @@ func (cc *ChunksCollection) NeedsUpdate(listKind types.ListKind) bool {
 	}
 }
 
-func (cc *ChunksCollection) GetSupportedKinds() []types.ListKind {
-	return []types.ListKind{ChunksStats, ChunksIndex, ChunksBlooms, ChunksManifest}
+func (cc *ChunksCollection) GetSupportedFacets() []types.DataFacet {
+	return []types.DataFacet{ChunksStats, ChunksIndex, ChunksBlooms, ChunksManifest}
 }
 
-func (cc *ChunksCollection) GetStoreForKind(kind types.ListKind) string {
-	switch kind {
+func (cc *ChunksCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
+	switch dataFacet {
 	case ChunksStats:
 		return "chunks-stats"
 	case ChunksIndex:
@@ -508,7 +495,7 @@ func (cc *ChunksCollection) GetCollectionName() string {
 }
 
 // Crud implements the Collection interface with no-op operations since chunks data is immutable
-func (cc *ChunksCollection) Crud(kind types.ListKind, op crud.Operation, item interface{}) error {
+func (cc *ChunksCollection) Crud(dataFacet types.DataFacet, op crud.Operation, item interface{}) error {
 	// All CRUD operations are no-ops for chunks since the data is immutable blockchain data
 	return nil
 }
@@ -518,7 +505,7 @@ func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summ
 	defer cc.summaryMutex.Unlock()
 
 	if summary.FacetCounts == nil {
-		summary.FacetCounts = make(map[types.ListKind]int)
+		summary.FacetCounts = make(map[types.DataFacet]int)
 	}
 
 	switch item.(type) {
@@ -576,7 +563,7 @@ func (cc *ChunksCollection) GetCurrentSummary() types.Summary {
 	defer cc.summaryMutex.RUnlock()
 
 	summary := cc.summary
-	summary.FacetCounts = make(map[types.ListKind]int)
+	summary.FacetCounts = make(map[types.DataFacet]int)
 	for k, v := range cc.summary.FacetCounts {
 		summary.FacetCounts[k] = v
 	}
@@ -596,7 +583,7 @@ func (cc *ChunksCollection) ResetSummary() {
 	defer cc.summaryMutex.Unlock()
 	cc.summary = types.Summary{
 		TotalCount:  0,
-		FacetCounts: make(map[types.ListKind]int),
+		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: 0,
 	}

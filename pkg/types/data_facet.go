@@ -9,12 +9,12 @@ var AllDataFacets = []struct {
 	TSName string    `json:"tsname"`
 }{}
 
-func RegisterDataFacet(dataFacet DataFacet) {
+func RegisterDataFacet(df DataFacet) {
 	AllDataFacets = append(AllDataFacets, struct {
 		Value  DataFacet `json:"value"`
 		TSName string    `json:"tsname"`
 	}{
-		dataFacet,
-		strings.ToUpper(string(dataFacet)),
+		df,
+		strings.ToUpper(string(df)),
 	})
 }

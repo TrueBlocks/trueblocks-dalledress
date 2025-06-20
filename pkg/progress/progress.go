@@ -23,7 +23,7 @@ type Progress struct {
 	nItemsSinceUpdate int
 	nextThreshold     int
 	currentIncrement  int
-	listKind          types.ListKind
+	dataFacet         types.DataFacet
 	onFirstDataFunc   func()
 	firstDataSent     bool
 	collectionName    string
@@ -32,11 +32,11 @@ type Progress struct {
 
 // NewProgress creates and initializes a Progress.
 func NewProgress(
-	listKindCfg types.ListKind,
+	dataFacetCfg types.DataFacet,
 	onFirstData func(), // Can be nil
 ) *Progress {
 	pr := &Progress{
-		listKind:        listKindCfg,
+		dataFacet:       dataFacetCfg,
 		onFirstDataFunc: onFirstData,
 	}
 	// Initialize internal state
@@ -49,12 +49,12 @@ func NewProgress(
 }
 
 func NewProgressWithSummary(
-	listKindCfg types.ListKind,
+	dataFacetCfg types.DataFacet,
 	collectionName string,
 	summaryProvider types.SummaryAccumulator,
 	onFirstData func(),
 ) *Progress {
-	pr := NewProgress(listKindCfg, onFirstData)
+	pr := NewProgress(dataFacetCfg, onFirstData)
 	pr.collectionName = collectionName
 	pr.summaryProvider = summaryProvider
 	return pr
@@ -98,7 +98,7 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) {
 		if pr.collectionName != "" && pr.summaryProvider != nil {
 			collectionPayload := types.DataLoadedPayload{
 				Collection:    pr.collectionName,
-				ListKind:      pr.listKind,
+				DataFacet:     pr.dataFacet,
 				CurrentCount:  currentTotalCount,
 				ExpectedTotal: expectedTotal,
 				State:         types.StateFetching,
@@ -109,7 +109,7 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) {
 			msgs.EmitLoaded(collectionPayload)
 		}
 
-		msgs.EmitStatus(progressStr(currentTotalCount, pr.listKind, false))
+		msgs.EmitStatus(progressStr(currentTotalCount, pr.dataFacet, false))
 
 		pr.nItemsSinceUpdate = 0
 		pr.lastUpdate = now
@@ -126,7 +126,7 @@ func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) {
 		if pr.collectionName != "" && pr.summaryProvider != nil {
 			collectionPayload := types.DataLoadedPayload{
 				Collection:    pr.collectionName,
-				ListKind:      pr.listKind,
+				DataFacet:     pr.dataFacet,
 				CurrentCount:  currentTotalCount,
 				ExpectedTotal: expectedTotal,
 				State:         types.StateFetching,
@@ -137,15 +137,15 @@ func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) {
 			msgs.EmitLoaded(collectionPayload)
 		}
 
-		msgs.EmitStatus(progressStr(currentTotalCount, pr.listKind, true))
+		msgs.EmitStatus(progressStr(currentTotalCount, pr.dataFacet, true))
 
 		pr.nItemsSinceUpdate = 0
 		pr.lastUpdate = now
 	}
 }
 
-func progressStr(cnt int, kind types.ListKind, heartbeat bool) string {
-	k := strings.Trim(strings.ToLower(string(kind)), " ")
+func progressStr(cnt int, dataFacet types.DataFacet, heartbeat bool) string {
+	k := strings.Trim(strings.ToLower(string(dataFacet)), " ")
 	if heartbeat {
 		return fmt.Sprintf("Loaded %d %s...", cnt, k)
 	}

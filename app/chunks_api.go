@@ -9,20 +9,20 @@ import (
 )
 
 func (a *App) GetChunksPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (*chunks.ChunksPage, error) {
-	return getCollectionPage[*chunks.ChunksPage](a.chunks, listKind, first, pageSize, sortSpec, filter)
+	return getCollectionPage[*chunks.ChunksPage](a.chunks, dataFacet, first, pageSize, sortSpec, filter)
 }
 
 func (a *App) ChunksCrud(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
 ) error {
-	return a.chunks.Crud(listKind, op, item)
+	return a.chunks.Crud(dataFacet, op, item)
 }
 
 func (a *App) GetChunksSummary() types.Summary {

@@ -24,7 +24,7 @@ export const Abis = () => {
     viewRoute: ROUTE,
   });
 
-  const { getCurrentListKind } = activeFacetHook;
+  const { getCurrentDataFacet } = activeFacetHook;
 
   const { emitSuccess } = useActionMsgs('abis');
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
@@ -36,9 +36,9 @@ export const Abis = () => {
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
-      tabName: getCurrentListKind(),
+      tabName: getCurrentDataFacet(),
     }),
-    [getCurrentListKind],
+    [getCurrentDataFacet],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
@@ -46,19 +46,19 @@ export const Abis = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  const listKindRef = useRef(getCurrentListKind());
+  const dataFacetRef = useRef(getCurrentDataFacet());
   const renderCnt = useRef(0);
   // renderCnt.current++;
 
   useEffect(() => {
-    listKindRef.current = getCurrentListKind();
-  }, [getCurrentListKind]);
+    dataFacetRef.current = getCurrentDataFacet();
+  }, [getCurrentDataFacet]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetAbisPage(
-        listKindRef.current as types.ListKind,
+        dataFacetRef.current as types.DataFacet,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -68,7 +68,7 @@ export const Abis = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${listKindRef.current}`);
+      handleError(err, `Failed to fetch ${dataFacetRef.current}`);
     }
   }, [
     clearError,
@@ -81,24 +81,24 @@ export const Abis = () => {
   ]);
 
   const currentData = useMemo(() => {
-    const currentListKind = getCurrentListKind();
+    const currentDataFacet = getCurrentDataFacet();
     // For ABI-based tabs (Downloaded, Known), use abis data
     if (
-      currentListKind === types.ListKind.DOWNLOADED ||
-      currentListKind === types.ListKind.KNOWN
+      currentDataFacet === types.DataFacet.DOWNLOADED ||
+      currentDataFacet === types.DataFacet.KNOWN
     ) {
       return pageData?.abis || [];
     }
     // For function-based tabs (Functions, Events), use functions data
     return pageData?.functions || [];
-  }, [pageData?.abis, pageData?.functions, getCurrentListKind]);
+  }, [pageData?.abis, pageData?.functions, getCurrentDataFacet]);
 
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'abis') {
-        const eventListKind = payload.listKind as types.ListKind | undefined;
-        if (eventListKind === listKindRef.current) {
+        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
       }
@@ -113,7 +113,7 @@ export const Abis = () => {
     [
       'mod+r',
       () => {
-        Reload(getCurrentListKind() as types.ListKind).then(() => {
+        Reload(getCurrentDataFacet() as types.DataFacet).then(() => {
           fetchData();
         });
       },
@@ -148,7 +148,7 @@ export const Abis = () => {
         setTotalItems(Math.max(0, currentTotal - 1));
 
         AbisCrud(
-          listKindRef.current as types.ListKind,
+          dataFacetRef.current as types.DataFacet,
           crud.Operation.REMOVE,
           {} as types.Abi,
           address,
@@ -156,7 +156,7 @@ export const Abis = () => {
           .then(async () => {
             // Fetch fresh data to confirm the removal after successful backend operation
             const result = await GetAbisPage(
-              listKindRef.current as types.ListKind,
+              dataFacetRef.current as types.DataFacet,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -259,13 +259,15 @@ export const Abis = () => {
   }, []);
 
   const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(pageData?.kind || types.ListKind.DOWNLOADED);
+    const baseColumns = getColumns(
+      pageData?.facet || types.DataFacet.DOWNLOADED,
+    );
 
     // Only add actions for ABI-based tabs (Downloaded, Known), not for Functions/Events tabs
     const shouldShowActions =
-      (pageData?.kind || types.ListKind.DOWNLOADED) ===
-        types.ListKind.DOWNLOADED ||
-      (pageData?.kind || types.ListKind.DOWNLOADED) === types.ListKind.KNOWN;
+      (pageData?.facet || types.DataFacet.DOWNLOADED) ===
+        types.DataFacet.DOWNLOADED ||
+      (pageData?.facet || types.DataFacet.DOWNLOADED) === types.DataFacet.KNOWN;
 
     if (!shouldShowActions) {
       // For Functions/Events tabs, filter out the actions column
@@ -281,7 +283,7 @@ export const Abis = () => {
         const abi = row as unknown as types.Abi;
         const addressStr = getAddressString(abi.address);
         const isProcessing = processingAddresses.has(addressStr);
-        const canRemove = pageData?.kind === types.ListKind.DOWNLOADED;
+        const canRemove = pageData?.facet === types.DataFacet.DOWNLOADED;
 
         return (
           <div className="action-buttons-container">
@@ -300,7 +302,7 @@ export const Abis = () => {
     return baseColumns.map((col) =>
       col.key === 'actions' ? { ...col, ...actionsOverride } : col,
     );
-  }, [pageData?.kind, handleRemove, processingAddresses]);
+  }, [pageData?.facet, handleRemove, processingAddresses]);
 
   const perTabTable = useMemo(
     () => (
@@ -326,23 +328,23 @@ export const Abis = () => {
   const tabs = useMemo(
     () => [
       {
-        label: types.ListKind.DOWNLOADED,
-        value: types.ListKind.DOWNLOADED,
+        label: 'Downloaded',
+        value: types.DataFacet.DOWNLOADED,
         content: perTabTable,
       },
       {
-        label: types.ListKind.KNOWN,
-        value: types.ListKind.KNOWN,
+        label: 'Known',
+        value: types.DataFacet.KNOWN,
         content: perTabTable,
       },
       {
-        label: types.ListKind.FUNCTIONS,
-        value: types.ListKind.FUNCTIONS,
+        label: 'Functions',
+        value: types.DataFacet.FUNCTIONS,
         content: perTabTable,
       },
       {
-        label: types.ListKind.EVENTS,
-        value: types.ListKind.EVENTS,
+        label: 'Events',
+        value: types.DataFacet.EVENTS,
         content: perTabTable,
       },
     ],
@@ -355,7 +357,7 @@ export const Abis = () => {
       <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${getCurrentListKind()}`}</h3>
+          <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}

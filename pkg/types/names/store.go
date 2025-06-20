@@ -33,7 +33,7 @@ func GetNamesStore() *store.Store[coreTypes.Name] {
 			}
 			if _, _, err := listOpts.Names(); err != nil {
 				// Create structured error with proper context
-				wrappedErr := types.NewSDKError("names", types.ListKind("NamesAll"), "fetch", err)
+				wrappedErr := types.NewSDKError("names", types.DataFacet("NamesAll"), "fetch", err)
 				logging.LogBackend(fmt.Sprintf("Names SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
@@ -62,8 +62,8 @@ func GetNamesStore() *store.Store[coreTypes.Name] {
 	return namesStore
 }
 
-func GetStoreName(listKind types.ListKind) string {
-	switch listKind {
+func GetStoreName(dataFacet types.DataFacet) string {
+	switch dataFacet {
 	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
 		return "names-list"
 	default:

@@ -11,7 +11,7 @@ vi.mock('../abis/Abis', () => ({
 // Dynamically import after mocking
 const { Abis } = await import('../abis/Abis');
 
-describe('Abis View Integration Tests (ListKind refactor preparation)', () => {
+describe('Abis View Integration Tests (DataFacet refactor preparation)', () => {
   describe('basic rendering', () => {
     it('renders without crashing', () => {
       customRender(<Abis />);

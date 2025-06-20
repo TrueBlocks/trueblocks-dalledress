@@ -52,8 +52,8 @@ func GetMonitorsStore() *store.Store[coreTypes.Monitor] {
 	return monitorsStore
 }
 
-func GetStoreName(listKind types.ListKind) string {
-	switch listKind {
+func GetStoreName(dataFacet types.DataFacet) string {
+	switch dataFacet {
 	case MonitorsList:
 		return "monitors-list"
 	default:

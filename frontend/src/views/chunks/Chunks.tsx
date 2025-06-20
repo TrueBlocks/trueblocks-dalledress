@@ -23,7 +23,7 @@ export const Chunks = () => {
     viewRoute: ROUTE,
   });
 
-  const { getCurrentListKind } = activeFacetHook;
+  const { getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<chunks.ChunksPage | null>(null);
   const [_state, setState] = useState<types.LoadState>();
@@ -31,9 +31,9 @@ export const Chunks = () => {
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
-      tabName: getCurrentListKind(),
+      tabName: getCurrentDataFacet(),
     }),
-    [getCurrentListKind],
+    [getCurrentDataFacet],
   );
 
   const { handleError, clearError } = useErrorHandler();
@@ -41,17 +41,17 @@ export const Chunks = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  const listKindRef = useRef(getCurrentListKind());
+  const dataFacetRef = useRef(getCurrentDataFacet());
 
   useEffect(() => {
-    listKindRef.current = getCurrentListKind();
-  }, [getCurrentListKind]);
+    dataFacetRef.current = getCurrentDataFacet();
+  }, [getCurrentDataFacet]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetChunksPage(
-        listKindRef.current as types.ListKind,
+        dataFacetRef.current as types.DataFacet,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -61,7 +61,7 @@ export const Chunks = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${listKindRef.current}`);
+      handleError(err, `Failed to fetch ${dataFacetRef.current}`);
     }
   }, [
     clearError,
@@ -76,20 +76,20 @@ export const Chunks = () => {
   const currentData = useMemo(() => {
     if (!pageData) return [];
 
-    const currentListKind = getCurrentListKind();
-    switch (currentListKind) {
-      case types.ListKind.STATS:
+    const currentDataFacet = getCurrentDataFacet();
+    switch (currentDataFacet) {
+      case types.DataFacet.STATS:
         return pageData.chunksStats || [];
-      case types.ListKind.INDEX:
+      case types.DataFacet.INDEX:
         return pageData.chunksIndex || [];
-      case types.ListKind.BLOOMS:
+      case types.DataFacet.BLOOMS:
         return pageData.chunksBlooms || [];
-      case types.ListKind.MANIFEST:
+      case types.DataFacet.MANIFEST:
         return pageData.chunksManifest || [];
       default:
         return pageData.chunksStats || [];
     }
-  }, [pageData, getCurrentListKind]);
+  }, [pageData, getCurrentDataFacet]);
 
   useEffect(() => {
     fetchData();
@@ -97,12 +97,12 @@ export const Chunks = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      await Reload(getCurrentListKind() as types.ListKind);
+      await Reload(getCurrentDataFacet() as types.DataFacet);
       await fetchData();
     } catch (err: unknown) {
-      handleError(err, `Failed to reload ${getCurrentListKind()}`);
+      handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentListKind, fetchData, handleError]);
+  }, [getCurrentDataFacet, fetchData, handleError]);
 
   useEvent(
     msgs.EventType.DATA_LOADED,
@@ -116,8 +116,8 @@ export const Chunks = () => {
   useHotkeys([['mod+r', handleReload]]);
 
   const columns = useMemo(
-    () => getColumns(getCurrentListKind() as types.ListKind),
-    [getCurrentListKind],
+    () => getColumns(getCurrentDataFacet() as types.DataFacet),
+    [getCurrentDataFacet],
   );
 
   const perTabTable = useMemo(
@@ -138,22 +138,22 @@ export const Chunks = () => {
     () => [
       {
         label: 'Stats',
-        value: types.ListKind.STATS,
+        value: types.DataFacet.STATS,
         content: perTabTable,
       },
       {
         label: 'Index',
-        value: types.ListKind.INDEX,
+        value: types.DataFacet.INDEX,
         content: perTabTable,
       },
       {
         label: 'Blooms',
-        value: types.ListKind.BLOOMS,
+        value: types.DataFacet.BLOOMS,
         content: perTabTable,
       },
       {
         label: 'Manifest',
-        value: types.ListKind.MANIFEST,
+        value: types.DataFacet.MANIFEST,
         content: perTabTable,
       },
     ],

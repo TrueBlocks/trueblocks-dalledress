@@ -1,42 +1,27 @@
 import { types } from '@models';
+import { toProperCase } from 'src/utils/toProper';
 
 import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
 
-/**
- * Data facet configuration for the Chunks view
- * This replaces the direct ListKind usage and provides
- * a mapping between DataFacet and ListKind for backward compatibility
- */
 export const chunksFacets: DataFacetConfig[] = [
   {
     id: types.DataFacet.STATS,
-    label: 'Stats',
-    listKind: types.ListKind.STATS,
+    label: toProperCase(types.DataFacet.STATS),
     isDefault: true,
   },
   {
     id: types.DataFacet.INDEX,
-    label: 'Index',
-    listKind: types.ListKind.INDEX,
+    label: toProperCase(types.DataFacet.INDEX),
   },
   {
     id: types.DataFacet.BLOOMS,
-    label: 'Blooms',
-    listKind: types.ListKind.BLOOMS,
+    label: toProperCase(types.DataFacet.BLOOMS),
   },
   {
     id: types.DataFacet.MANIFEST,
-    label: 'Manifest',
-    listKind: types.ListKind.MANIFEST,
+    label: toProperCase(types.DataFacet.MANIFEST),
   },
 ];
 
-/**
- * The default facet for the Chunks view
- */
 export const CHUNKS_DEFAULT_FACET = types.DataFacet.STATS;
-
-/**
- * Route identifier for the Chunks view
- */
 export const CHUNKS_ROUTE = '/chunks' as const;

@@ -75,7 +75,7 @@ func TestMonitorsCollectionDomainSpecific(t *testing.T) {
 		page, err := collection.GetPage(MonitorsList, 0, 10, sdk.SortSpec{}, "0x")
 		if err == nil && page != nil {
 			monitorsPage := assertMonitorsPage(t, page)
-			assert.Equal(t, MonitorsList, monitorsPage.Kind)
+			assert.Equal(t, MonitorsList, monitorsPage.Facet)
 			assert.GreaterOrEqual(t, monitorsPage.TotalItems, 0)
 		}
 	})

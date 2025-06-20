@@ -1,47 +1,31 @@
 import { types } from '@models';
+import { toProperCase } from 'src/utils/toProper';
 
 import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
 
-/**
- * Data facet configuration for the Names view
- * This replaces the direct ListKind usage and provides
- * a mapping between DataFacet and ListKind for backward compatibility
- */
 export const namesFacets: DataFacetConfig[] = [
   {
     id: types.DataFacet.ALL,
-    label: 'All',
-    listKind: types.ListKind.ALL,
+    label: toProperCase(types.DataFacet.ALL),
     isDefault: true,
   },
   {
     id: types.DataFacet.CUSTOM,
-    label: 'Custom',
-    listKind: types.ListKind.CUSTOM,
+    label: toProperCase(types.DataFacet.CUSTOM),
   },
   {
     id: types.DataFacet.PREFUND,
-    label: 'Prefund',
-    listKind: types.ListKind.PREFUND,
+    label: toProperCase(types.DataFacet.PREFUND),
   },
   {
     id: types.DataFacet.REGULAR,
-    label: 'Regular',
-    listKind: types.ListKind.REGULAR,
+    label: toProperCase(types.DataFacet.REGULAR),
   },
   {
     id: types.DataFacet.BADDRESS,
-    label: 'Baddress',
-    listKind: types.ListKind.BADDRESS,
+    label: toProperCase(types.DataFacet.BADDRESS),
   },
 ];
 
-/**
- * The default facet for the Names view
- */
 export const NAMES_DEFAULT_FACET = types.DataFacet.ALL;
-
-/**
- * Route identifier for the Names view
- */
 export const NAMES_ROUTE = '/names' as const;

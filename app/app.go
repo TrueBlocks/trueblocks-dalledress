@@ -345,36 +345,36 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 	}, nil
 }
 
-func (a *App) Reload(listKind types.ListKind) error {
+func (a *App) Reload(dataFacet types.DataFacet) error {
 	lastView := a.GetAppPreferences().LastView
 
 	// ADD_ROUTE
 	switch lastView {
 	case "/names":
-		a.names.Reset(listKind)
-		a.names.LoadData(listKind)
+		a.names.Reset(dataFacet)
+		a.names.LoadData(dataFacet)
 	case "/abis":
-		a.abis.Reset(listKind)
-		a.abis.LoadData(listKind)
+		a.abis.Reset(dataFacet)
+		a.abis.LoadData(dataFacet)
 	case "/monitors":
-		a.monitors.Reset(listKind)
-		a.monitors.LoadData(listKind)
+		a.monitors.Reset(dataFacet)
+		a.monitors.LoadData(dataFacet)
 	case "/chunks":
-		a.chunks.Reset(listKind)
-		a.chunks.LoadData(listKind)
+		a.chunks.Reset(dataFacet)
+		a.chunks.LoadData(dataFacet)
 	}
 	// ADD_ROUTE
 
 	return nil
 }
 
-func (a *App) CancelFetch(listKind types.ListKind) {
+func (a *App) CancelFetch(dataFacet types.DataFacet) {
 	storeName := ""
 
 	for _, collection := range a.collections {
-		for _, kind := range collection.GetSupportedKinds() {
-			if kind == listKind {
-				storeName = collection.GetStoreForKind(kind)
+		for _, facet := range collection.GetSupportedFacets() {
+			if facet == dataFacet {
+				storeName = collection.GetStoreForFacet(facet)
 				break
 			}
 		}
@@ -407,16 +407,16 @@ func (a *App) RegisterCollection(collection types.Collection) {
 
 func getCollectionPage[T any](
 	collection interface {
-		GetPage(types.ListKind, int, int, sdk.SortSpec, string) (types.Page, error)
+		GetPage(types.DataFacet, int, int, sdk.SortSpec, string) (types.Page, error)
 	},
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
 ) (T, error) {
 	var zero T
 
-	page, err := collection.GetPage(kind, first, pageSize, sort, filter)
+	page, err := collection.GetPage(dataFacet, first, pageSize, sort, filter)
 	if err != nil {
 		// Preserve the original error context - don't wrap with type assertion errors
 		return zero, err
@@ -425,7 +425,7 @@ func getCollectionPage[T any](
 	typedPage, ok := page.(T)
 	if !ok {
 		// This is a true internal error - different from SDK/store errors
-		return zero, types.NewValidationError("app", kind, "getCollectionPage",
+		return zero, types.NewValidationError("app", dataFacet, "getCollectionPage",
 			fmt.Errorf("GetPage returned unexpected type %T, expected %T", page, zero))
 	}
 
@@ -434,9 +434,9 @@ func getCollectionPage[T any](
 
 func (a *App) ResetStore(storeName string) {
 	for _, collection := range a.collections {
-		for _, kind := range collection.GetSupportedKinds() {
-			if collection.GetStoreForKind(kind) == storeName {
-				collection.Reset(kind)
+		for _, facet := range collection.GetSupportedFacets() {
+			if collection.GetStoreForFacet(facet) == storeName {
+				collection.Reset(facet)
 			}
 		}
 	}

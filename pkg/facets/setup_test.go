@@ -29,10 +29,10 @@ func (t *TestItem) Model(chain, format string, verbose bool, extraOptions map[st
 	}
 }
 
-type TestListKind types.ListKind
+type TestDataFacet types.DataFacet
 
 const (
-	TestList TestListKind = "test-list"
+	TestList TestDataFacet = "test-list"
 )
 
 func createTestStore() *store.Store[TestItem] {
@@ -70,7 +70,7 @@ func createTestStore() *store.Store[TestItem] {
 
 func createTestFacet(store *store.Store[TestItem]) *Facet[TestItem] {
 	return NewFacet(
-		types.ListKind(TestList),
+		types.DataFacet(TestList),
 		nil,
 		nil,
 		store,
@@ -79,7 +79,7 @@ func createTestFacet(store *store.Store[TestItem]) *Facet[TestItem] {
 
 func createFilteredFacet(store *store.Store[TestItem], minValue int) *Facet[TestItem] {
 	return NewFacet(
-		types.ListKind(TestList),
+		types.DataFacet(TestList),
 		func(item *TestItem) bool {
 			return item.Value >= minValue
 		},
@@ -90,7 +90,7 @@ func createFilteredFacet(store *store.Store[TestItem], minValue int) *Facet[Test
 
 func createDedupedFacet(store *store.Store[TestItem]) *Facet[TestItem] {
 	return NewFacet(
-		types.ListKind(TestList),
+		types.DataFacet(TestList),
 		nil,
 		func(existing []*TestItem, newItem *TestItem) bool {
 			for _, existingItem := range existing {

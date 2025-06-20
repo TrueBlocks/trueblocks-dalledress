@@ -14,7 +14,7 @@ import (
 var namesLock atomic.Int32
 
 func (nc *NamesCollection) Crud(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
 ) error {
@@ -48,7 +48,7 @@ func (nc *NamesCollection) Crud(
 	}
 
 	// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-	nc.Reset(listKind)
+	nc.Reset(dataFacet)
 	return nil
 }
 

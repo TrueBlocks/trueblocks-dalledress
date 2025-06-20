@@ -60,8 +60,8 @@ func TestNamesCollectionLoadDataAsync(t *testing.T) {
 			wg.Add(1)
 			go func(index int) {
 				defer wg.Done()
-				listKind := []types.ListKind{NamesAll, NamesCustom, NamesPrefund}[index%3]
-				collection.LoadData(listKind)
+				dataFacet := []types.DataFacet{NamesAll, NamesCustom, NamesPrefund}[index%3]
+				collection.LoadData(dataFacet)
 			}(i)
 		}
 
@@ -84,26 +84,26 @@ func TestNamesCollectionLoadDataAsync(t *testing.T) {
 }
 
 func TestNamesCollectionAdvancedAsync(t *testing.T) {
-	t.Run("LoadDataAllListKinds", func(t *testing.T) {
+	t.Run("LoadDataAllDataFacets", func(t *testing.T) {
 		collection := NewNamesCollection()
 
-		listKinds := []types.ListKind{
+		dataFacets := []types.DataFacet{
 			NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress,
 		}
 
-		for _, listKind := range listKinds {
-			t.Run(fmt.Sprintf("LoadData_%s", listKind), func(t *testing.T) {
+		for _, dataFacet := range dataFacets {
+			t.Run(fmt.Sprintf("LoadData_%s", dataFacet), func(t *testing.T) {
 				assert.NotPanics(t, func() {
-					collection.LoadData(listKind)
+					collection.LoadData(dataFacet)
 				})
 			})
 		}
 
 		time.Sleep(25 * time.Millisecond)
 
-		for _, listKind := range listKinds {
+		for _, dataFacet := range dataFacets {
 			assert.NotPanics(t, func() {
-				collection.NeedsUpdate(listKind)
+				collection.NeedsUpdate(dataFacet)
 			})
 		}
 	})
@@ -134,25 +134,25 @@ func TestNamesCollectionAdvancedAsync(t *testing.T) {
 }
 
 func TestNamesCollectionIntegration(t *testing.T) {
-	t.Run("MultipleListKindsWorkflow", func(t *testing.T) {
+	t.Run("MultipleDataFacetsWorkflow", func(t *testing.T) {
 		collection := NewNamesCollection()
 
-		listKinds := []types.ListKind{
+		dataFacets := []types.DataFacet{
 			NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress,
 		}
 
-		for _, listKind := range listKinds {
-			collection.LoadData(listKind)
+		for _, dataFacet := range dataFacets {
+			collection.LoadData(dataFacet)
 		}
 
 		time.Sleep(15 * time.Millisecond)
 
-		for _, listKind := range listKinds {
-			t.Run(fmt.Sprintf("GetPage_%s", listKind), func(t *testing.T) {
-				page, err := collection.GetPage(listKind, 0, 5, sdk.SortSpec{}, "")
+		for _, dataFacet := range dataFacets {
+			t.Run(fmt.Sprintf("GetPage_%s", dataFacet), func(t *testing.T) {
+				page, err := collection.GetPage(dataFacet, 0, 5, sdk.SortSpec{}, "")
 
 				if err == nil && page != nil {
-					assert.Equal(t, listKind, page.GetKind())
+					assert.Equal(t, dataFacet, page.GetFacet())
 					assert.GreaterOrEqual(t, page.GetTotalItems(), 0)
 
 					// For names page, we need to type assert to access Names field
@@ -164,25 +164,25 @@ func TestNamesCollectionIntegration(t *testing.T) {
 		}
 	})
 
-	t.Run("FilteringAcrossListKinds", func(t *testing.T) {
+	t.Run("FilteringAcrossDataFacets", func(t *testing.T) {
 		collection := NewNamesCollection()
 
-		listKinds := []types.ListKind{
+		dataFacets := []types.DataFacet{
 			NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress,
 		}
 
 		filters := []string{"", "test", "0x", "custom"}
 
-		for _, listKind := range listKinds {
+		for _, dataFacet := range dataFacets {
 			for _, filter := range filters {
-				t.Run(fmt.Sprintf("Filter_%s_%s", listKind, filter), func(t *testing.T) {
-					page, err := collection.GetPage(listKind, 0, 3, sdk.SortSpec{}, filter)
+				t.Run(fmt.Sprintf("Filter_%s_%s", dataFacet, filter), func(t *testing.T) {
+					page, err := collection.GetPage(dataFacet, 0, 3, sdk.SortSpec{}, filter)
 
 					if err == nil && page != nil {
 						// Cast to concrete type to access fields
 						namesPage, ok := page.(*NamesPage)
 						assert.True(t, ok, "Expected *NamesPage type")
-						assert.Equal(t, listKind, namesPage.Kind)
+						assert.Equal(t, dataFacet, namesPage.Facet)
 						assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
 					}
 				})
@@ -193,23 +193,23 @@ func TestNamesCollectionIntegration(t *testing.T) {
 	t.Run("SortingAndPagination", func(t *testing.T) {
 		collection := NewNamesCollection()
 
-		listKinds := []types.ListKind{NamesAll, NamesCustom}
+		dataFacets := []types.DataFacet{NamesAll, NamesCustom}
 		sortSpecs := []sdk.SortSpec{
 			{},
 		}
 		pageSizes := []int{1, 5, 10}
 
-		for _, listKind := range listKinds {
+		for _, dataFacet := range dataFacets {
 			for _, sortSpec := range sortSpecs {
 				for _, pageSize := range pageSizes {
-					t.Run(fmt.Sprintf("Sort_%s_%d", listKind, pageSize), func(t *testing.T) {
-						page, err := collection.GetPage(listKind, 0, pageSize, sortSpec, "")
+					t.Run(fmt.Sprintf("Sort_%s_%d", dataFacet, pageSize), func(t *testing.T) {
+						page, err := collection.GetPage(dataFacet, 0, pageSize, sortSpec, "")
 
 						if err == nil && page != nil {
 							// Cast to concrete type to access fields
 							namesPage, ok := page.(*NamesPage)
 							assert.True(t, ok, "Expected *NamesPage type")
-							assert.Equal(t, listKind, namesPage.Kind)
+							assert.Equal(t, dataFacet, namesPage.Facet)
 							assert.LessOrEqual(t, len(namesPage.Names), pageSize)
 						}
 					})
@@ -246,18 +246,18 @@ func TestNamesCollectionDomainSpecificIntegration(t *testing.T) {
 	t.Run("ResetAfterMultipleLoads", func(t *testing.T) {
 		collection := NewNamesCollection()
 
-		listKinds := []types.ListKind{NamesAll, NamesCustom, NamesPrefund}
-		for _, listKind := range listKinds {
-			collection.LoadData(listKind)
+		dataFacets := []types.DataFacet{NamesAll, NamesCustom, NamesPrefund}
+		for _, dataFacet := range dataFacets {
+			collection.LoadData(dataFacet)
 		}
 
 		time.Sleep(10 * time.Millisecond)
 
 		collection.Reset(NamesAll)
 
-		for _, listKind := range listKinds {
+		for _, dataFacet := range dataFacets {
 			assert.NotPanics(t, func() {
-				collection.NeedsUpdate(listKind)
+				collection.NeedsUpdate(dataFacet)
 			})
 		}
 	})

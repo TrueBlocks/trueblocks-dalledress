@@ -129,7 +129,7 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+r',
             label: 'Reload',
             action: () => {
-              Reload(currentTab as types.ListKind).then(() => {
+              Reload(currentTab as types.DataFacet).then(() => {
                 // do nothing
               });
             },
@@ -295,7 +295,7 @@ export const useAppHotkeys = (): void => {
     {
       key: 'escape',
       handler: (_e: KeyboardEvent) => {
-        CancelFetch(currentTab as types.ListKind)
+        CancelFetch(currentTab as types.DataFacet)
           .then(() => {
             emitStatus('Cancellation request processed.');
           })

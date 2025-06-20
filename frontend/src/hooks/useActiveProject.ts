@@ -13,7 +13,7 @@ export interface UseActiveProjectReturn {
   lastView: string;
   menuCollapsed: boolean;
   helpCollapsed: boolean;
-  lastTab: Record<string, types.ListKind>;
+  lastTab: Record<string, types.DataFacet>;
   loading: boolean;
 
   // Actions
@@ -24,7 +24,7 @@ export interface UseActiveProjectReturn {
   changeLanguage: (language: string) => Promise<void>;
   setMenuCollapsed: (collapsed: boolean) => Promise<void>;
   setHelpCollapsed: (collapsed: boolean) => Promise<void>;
-  setLastTab: (route: string, tab: types.ListKind) => Promise<void>;
+  setLastTab: (route: string, tab: types.DataFacet) => Promise<void>;
   setLastView: (view: string) => Promise<void>;
   isDarkMode: boolean;
   toggleDarkMode: () => Promise<void>;

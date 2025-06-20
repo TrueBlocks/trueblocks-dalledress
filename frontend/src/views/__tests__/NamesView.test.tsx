@@ -11,7 +11,7 @@ vi.mock('../names/Names', () => ({
 // Dynamically import after mocking
 const { Names } = await import('../names/Names');
 
-describe('Names View Integration Tests (ListKind refactor preparation)', () => {
+describe('Names View Integration Tests (DataFacet refactor preparation)', () => {
   describe('basic rendering', () => {
     it('renders without crashing', () => {
       customRender(<Names />);

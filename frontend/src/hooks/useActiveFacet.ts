@@ -17,7 +17,7 @@ import { useActiveProject } from './useActiveProject';
  * - Managing the currently active facet in a view
  * - Persisting facet selection to user preferences
  * - Providing facet configuration and metadata
- * - Backward compatibility with existing ListKind usage
+ * - Backward compatibility with existing DataFacet usage
  *
  * @param params Configuration for the hook
  * @returns Hook interface for facet management
@@ -44,14 +44,9 @@ export const useActiveFacet = (
     const saved = lastTab[viewRoute];
 
     if (saved) {
-      // Try to find facet by ListKind (what's actually saved in preferences)
-      const facetByListKind = facets.find((f) => f.listKind === saved);
-      if (facetByListKind) {
-        return facetByListKind.id;
-      }
-      // Fallback: try to find by ID (in case preferences were updated)
-      if (facets.some((f) => f.id === (saved as unknown as DataFacet))) {
-        return saved as unknown as DataFacet;
+      const savedAsFacet = saved as unknown as DataFacet;
+      if (facets.some((f) => f.id === savedAsFacet)) {
+        return savedAsFacet;
       }
     }
     return computedDefaultFacet;
@@ -60,13 +55,9 @@ export const useActiveFacet = (
   // Function to change the active facet
   const setActiveFacet = useCallback(
     (facet: DataFacet): void => {
-      // Find the corresponding ListKind for this facet
-      const config = facets.find((f) => f.id === facet);
-      const listKindValue =
-        config?.listKind || (facet as unknown as types.ListKind);
-      setLastTab(viewRoute, listKindValue);
+      setLastTab(viewRoute, facet);
     },
-    [setLastTab, viewRoute, facets],
+    [setLastTab, viewRoute],
   );
 
   // Get configuration for a specific facet
@@ -90,11 +81,9 @@ export const useActiveFacet = (
     return computedDefaultFacet;
   }, [computedDefaultFacet]);
 
-  // Backward compatibility: get ListKind for current facet
-  const getCurrentListKind = useCallback(() => {
-    const config = getFacetConfig(activeFacet);
-    return config?.listKind || activeFacet;
-  }, [activeFacet, getFacetConfig]);
+  const getCurrentDataFacet = useCallback(() => {
+    return activeFacet;
+  }, [activeFacet]);
 
   return {
     activeFacet,
@@ -103,6 +92,6 @@ export const useActiveFacet = (
     getFacetConfig,
     isFacetActive,
     getDefaultFacet,
-    getCurrentListKind,
+    getCurrentDataFacet,
   };
 };

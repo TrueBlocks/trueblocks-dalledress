@@ -7,7 +7,7 @@ interface StructuredError {
   type: string;
   operation: string;
   collection: string;
-  listKind: string;
+  dataFacet: string;
   message: string;
 }
 
@@ -29,7 +29,7 @@ const parseStructuredError = (errorMessage: string): StructuredError | null => {
       return {
         type: match[1] || 'unknown',
         collection: match[2] || 'unknown',
-        listKind: match[3] || 'unknown',
+        dataFacet: match[3] || 'unknown',
         operation: match[4] || 'unknown',
         message: match[match.length - 1] || 'Unknown error', // Last capture group is always the message
       };
@@ -46,7 +46,7 @@ const getUserFriendlyMessage = (structured: StructuredError): string => {
 
   switch (structured.type) {
     case 'validation':
-      return `Invalid ${structured.listKind} parameters for ${collection}. Please check your input and try again.`;
+      return `Invalid ${structured.dataFacet} parameters for ${collection}. Please check your input and try again.`;
 
     case 'sdk':
       if (
@@ -58,10 +58,10 @@ const getUserFriendlyMessage = (structured: StructuredError): string => {
       if (structured.message.includes('cache')) {
         return `Cache operation failed for ${collection}. The requested data may not be available yet.`;
       }
-      return `Failed to ${operation} ${structured.listKind} data from TrueBlocks. Please try again or check your configuration.`;
+      return `Failed to ${operation} ${structured.dataFacet} data from TrueBlocks. Please try again or check your configuration.`;
 
     case 'cache':
-      return `Cache operation not supported for ${structured.listKind} in ${collection}.`;
+      return `Cache operation not supported for ${structured.dataFacet} in ${collection}.`;
 
     case 'network':
       return `Network error while accessing ${collection} data. Please check your connection and try again.`;
@@ -93,7 +93,7 @@ export const useErrorHandler = () => {
 
       if (structured) {
         userMessage = getUserFriendlyMessage(structured);
-        logMessage = `${structured.type} error in ${structured.collection}[${structured.listKind}] during ${structured.operation}: ${structured.message}`;
+        logMessage = `${structured.type} error in ${structured.collection}[${structured.dataFacet}] during ${structured.operation}: ${structured.message}`;
       } else {
         userMessage = `${e.message} ${context}`;
         logMessage = `Error in ${context}: ${e.message}`;

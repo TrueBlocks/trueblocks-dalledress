@@ -1,9 +1,9 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
-export const getColumns = (listKind: types.ListKind): FormField[] => {
-  switch (listKind) {
-    case types.ListKind.MONITORS:
+export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
+  switch (dataFacet) {
+    case types.DataFacet.MONITORS:
     default:
       return getColumnsForMonitor();
   }

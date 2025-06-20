@@ -91,7 +91,7 @@ func TestFacetLoad(t *testing.T) {
 		)
 
 		facet := NewFacet(
-			types.ListKind(TestList),
+			types.DataFacet(TestList),
 			nil,
 			nil,
 			singleItemStore,

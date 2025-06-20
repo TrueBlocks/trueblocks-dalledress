@@ -24,7 +24,7 @@ export const Monitors = () => {
     viewRoute: ROUTE,
   });
 
-  const { getCurrentListKind } = activeFacetHook;
+  const { getCurrentDataFacet } = activeFacetHook;
 
   const { emitSuccess, emitCleaningStatus, failure } =
     useActionMsgs('monitors');
@@ -37,9 +37,9 @@ export const Monitors = () => {
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
-      tabName: getCurrentListKind(),
+      tabName: getCurrentDataFacet(),
     }),
-    [getCurrentListKind],
+    [getCurrentDataFacet],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
@@ -48,18 +48,18 @@ export const Monitors = () => {
   const { filter } = useFiltering(viewStateKey);
   const { emitStatus } = useEmitters();
 
-  const listKindRef = useRef(getCurrentListKind());
+  const dataFacetRef = useRef(getCurrentDataFacet());
   const renderCnt = useRef(0);
 
   useEffect(() => {
-    listKindRef.current = getCurrentListKind();
-  }, [getCurrentListKind]);
+    dataFacetRef.current = getCurrentDataFacet();
+  }, [getCurrentDataFacet]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetMonitorsPage(
-        listKindRef.current as types.ListKind,
+        dataFacetRef.current as types.DataFacet,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -72,7 +72,7 @@ export const Monitors = () => {
       // Emit status message after successful data load
       emitStatus(`Loaded ${result.totalItems || 0} monitors successfully`);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${listKindRef.current}`);
+      handleError(err, `Failed to fetch ${dataFacetRef.current}`);
     }
   }, [
     clearError,
@@ -93,8 +93,8 @@ export const Monitors = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'monitors') {
-        const eventListKind = payload.listKind as types.ListKind | undefined;
-        if (eventListKind === listKindRef.current) {
+        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
       }
@@ -109,7 +109,7 @@ export const Monitors = () => {
     [
       'mod+r',
       () => {
-        Reload(getCurrentListKind() as types.ListKind).then(() => {
+        Reload(getCurrentDataFacet() as types.DataFacet).then(() => {
           fetchData();
         });
       },
@@ -144,14 +144,14 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          listKindRef.current as types.ListKind,
+          dataFacetRef.current as types.DataFacet,
           crud.Operation.DELETE,
           {} as types.Monitor,
           address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              listKindRef.current as types.ListKind,
+              dataFacetRef.current as types.DataFacet,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -212,14 +212,14 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          listKindRef.current as types.ListKind,
+          dataFacetRef.current as types.DataFacet,
           crud.Operation.UNDELETE,
           {} as types.Monitor,
           address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              listKindRef.current as types.ListKind,
+              dataFacetRef.current as types.DataFacet,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -277,14 +277,14 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          listKindRef.current as types.ListKind,
+          dataFacetRef.current as types.DataFacet,
           crud.Operation.REMOVE,
           {} as types.Monitor,
           address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              listKindRef.current as types.ListKind,
+              dataFacetRef.current as types.DataFacet,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -406,7 +406,7 @@ export const Monitors = () => {
   );
 
   const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(getCurrentListKind() as types.ListKind);
+    const baseColumns = getColumns(getCurrentDataFacet() as types.DataFacet);
 
     // Add action buttons render function to the actions column
     const actionsOverride: Partial<FormField> = {
@@ -451,7 +451,7 @@ export const Monitors = () => {
     return baseColumns.map((col) =>
       col.key === 'actions' ? { ...col, ...actionsOverride } : col,
     );
-  }, [getCurrentListKind, handleMonitorAction, processingAddresses]);
+  }, [getCurrentDataFacet, handleMonitorAction, processingAddresses]);
 
   const handleSubmit = useCallback(
     (data: Record<string, unknown>) => {
@@ -492,7 +492,7 @@ export const Monitors = () => {
     () => [
       {
         label: 'Monitors',
-        value: types.ListKind.MONITORS,
+        value: types.DataFacet.MONITORS,
         content: perTabTable,
       },
     ],
@@ -505,7 +505,7 @@ export const Monitors = () => {
       <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${getCurrentListKind()}`}</h3>
+          <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}

@@ -1,17 +1,17 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
-export const getColumns = (listKind: types.ListKind): FormField[] => {
-  switch (listKind) {
-    case types.ListKind.FUNCTIONS:
-    case types.ListKind.EVENTS:
+export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
+  switch (dataFacet) {
+    case types.DataFacet.FUNCTIONS:
+    case types.DataFacet.EVENTS:
       return getColumnsForFunction();
-    case types.ListKind.KNOWN:
+    case types.DataFacet.KNOWN:
       return getColumnsForAbi().filter((col) => {
         const skip = col.key !== 'address';
         return skip;
       });
-    case types.ListKind.DOWNLOADED:
+    case types.DataFacet.DOWNLOADED:
     // fallthrough intended
     default:
       return getColumnsForAbi();

@@ -2,7 +2,7 @@ package types
 
 type Summary struct {
 	TotalCount  int                    `json:"totalCount"`
-	FacetCounts map[ListKind]int       `json:"facetCounts"`
+	FacetCounts map[DataFacet]int      `json:"facetCounts"`
 	CustomData  map[string]interface{} `json:"customData,omitempty"`
 	LastUpdated int64                  `json:"lastUpdated"`
 }
@@ -15,7 +15,7 @@ type SummaryAccumulator interface {
 
 type DataLoadedPayload struct {
 	Collection    string    `json:"collection"`
-	ListKind      ListKind  `json:"listKind"`
+	DataFacet     DataFacet `json:"dataFacet"`
 	CurrentCount  int       `json:"currentCount"`
 	ExpectedTotal int       `json:"expectedTotal"`
 	State         LoadState `json:"state"`

@@ -22,16 +22,16 @@ export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['chunks']['ChunksCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStoreForKind(arg1) {
-  return window['go']['chunks']['ChunksCollection']['GetStoreForKind'](arg1);
+export function GetStoreForFacet(arg1) {
+  return window['go']['chunks']['ChunksCollection']['GetStoreForFacet'](arg1);
 }
 
 export function GetSummary() {
   return window['go']['chunks']['ChunksCollection']['GetSummary']();
 }
 
-export function GetSupportedKinds() {
-  return window['go']['chunks']['ChunksCollection']['GetSupportedKinds']();
+export function GetSupportedFacets() {
+  return window['go']['chunks']['ChunksCollection']['GetSupportedFacets']();
 }
 
 export function LoadData(arg1) {

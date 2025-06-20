@@ -1,15 +1,15 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
-export const getColumns = (listKind: types.ListKind): FormField[] => {
-  switch (listKind) {
-    case types.ListKind.STATS:
+export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
+  switch (dataFacet) {
+    case types.DataFacet.STATS:
       return getColumnsForChunkStats();
-    case types.ListKind.INDEX:
+    case types.DataFacet.INDEX:
       return getColumnsForChunkIndex();
-    case types.ListKind.BLOOMS:
+    case types.DataFacet.BLOOMS:
       return getColumnsForChunkBloom();
-    case types.ListKind.MANIFEST:
+    case types.DataFacet.MANIFEST:
       return getColumnsForChunkManifest();
     default:
       return getColumnsForChunkStats(); // Default to stats

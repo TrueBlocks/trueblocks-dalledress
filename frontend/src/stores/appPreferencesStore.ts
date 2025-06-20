@@ -14,7 +14,7 @@ interface AppPreferencesState {
   lastView: string;
   menuCollapsed: boolean;
   helpCollapsed: boolean;
-  lastTab: Record<string, types.ListKind>;
+  lastTab: Record<string, types.DataFacet>;
 
   // Loading state
   loading: boolean;
@@ -117,7 +117,7 @@ class AppPreferencesStore {
         lastView: prefs.lastView || '/',
         menuCollapsed: prefs.menuCollapsed || false,
         helpCollapsed: prefs.helpCollapsed || false,
-        lastTab: (prefs.lastTab || {}) as Record<string, types.ListKind>,
+        lastTab: (prefs.lastTab || {}) as Record<string, types.DataFacet>,
         loading: false,
       });
     } catch (error) {
@@ -163,7 +163,7 @@ class AppPreferencesStore {
     this.setState({ helpCollapsed: collapsed });
   };
 
-  setLastTab = async (route: string, tab: types.ListKind): Promise<void> => {
+  setLastTab = async (route: string, tab: types.DataFacet): Promise<void> => {
     // Skip backend calls in test mode
     if (!this.isTestMode) {
       await App.SetLastTab(route, tab);

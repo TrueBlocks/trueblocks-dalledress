@@ -2,7 +2,7 @@ import { types } from '@models';
 
 /**
  * Re-export the generated DataFacet enum from the backend
- * This replaces direct ListKind usage in frontend components
+ * This replaces direct DataFacet usage in frontend components
  */
 export type DataFacet = types.DataFacet;
 
@@ -16,8 +16,6 @@ export interface DataFacetConfig {
   label: string;
   /** Whether this facet is the default for its view */
   isDefault?: boolean;
-  /** Backend API compatibility: maps to types.ListKind */
-  listKind?: types.ListKind;
 }
 
 /**
@@ -42,8 +40,8 @@ export interface UseActiveFacetReturn {
   /** Get the default facet for the view */
   getDefaultFacet: () => DataFacet;
 
-  /** Backend API compatibility: get types.ListKind for current facet */
-  getCurrentListKind: () => types.ListKind | string;
+  /** Backend API compatibility: get types.DataFacet for current facet */
+  getCurrentDataFacet: () => types.DataFacet | string;
 }
 
 /**

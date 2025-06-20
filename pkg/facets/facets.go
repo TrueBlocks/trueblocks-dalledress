@@ -28,7 +28,7 @@ type Facet[T any] struct {
 	store           *store.Store[T]
 	view            []*T
 	expectedCnt     int
-	listKind        types.ListKind
+	dataFacet       types.DataFacet
 	filterFunc      FilterFunc[T]
 	isDupFunc       func(existing []*T, newItem *T) bool
 	mutex           sync.RWMutex
@@ -39,7 +39,7 @@ type Facet[T any] struct {
 
 // NewFacet creates a new facet that uses a store for data fetching
 func NewFacet[T any](
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	filterFunc FilterFunc[T],
 	isDupFunc func(existing []*T, newItem *T) bool,
 	store *store.Store[T],
@@ -48,10 +48,10 @@ func NewFacet[T any](
 		store:       store,
 		view:        make([]*T, 0),
 		expectedCnt: 0,
-		listKind:    listKind,
+		dataFacet:   dataFacet,
 		filterFunc:  filterFunc,
 		isDupFunc:   isDupFunc,
-		progress:    progress.NewProgress(listKind, nil),
+		progress:    progress.NewProgress(dataFacet, nil),
 	}
 	facet.state.Store(types.StateStale)
 	store.RegisterObserver(facet)
@@ -60,7 +60,7 @@ func NewFacet[T any](
 }
 
 func NewFacetWithSummary[T any](
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	filterFunc FilterFunc[T],
 	isDupFunc func(existing []*T, newItem *T) bool,
 	store *store.Store[T],
@@ -71,12 +71,12 @@ func NewFacetWithSummary[T any](
 		store:           store,
 		view:            make([]*T, 0),
 		expectedCnt:     0,
-		listKind:        listKind,
+		dataFacet:       dataFacet,
 		filterFunc:      filterFunc,
 		isDupFunc:       isDupFunc,
 		summaryProvider: summaryProvider,
 		collectionName:  collectionName,
-		progress:        progress.NewProgressWithSummary(listKind, collectionName, summaryProvider, nil),
+		progress:        progress.NewProgressWithSummary(dataFacet, collectionName, summaryProvider, nil),
 	}
 	facet.state.Store(types.StateStale)
 	store.RegisterObserver(facet)
@@ -354,7 +354,7 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 		if r.summaryProvider != nil {
 			collectionPayload := types.DataLoadedPayload{
 				Collection:    r.collectionName,
-				ListKind:      r.listKind,
+				DataFacet:     r.dataFacet,
 				CurrentCount:  currentCount,
 				ExpectedTotal: currentCount,
 				State:         types.StateLoaded,

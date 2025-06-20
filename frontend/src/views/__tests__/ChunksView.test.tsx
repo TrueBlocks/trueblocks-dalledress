@@ -11,7 +11,7 @@ vi.mock('../chunks/Chunks', () => ({
 // Dynamically import after mocking
 const { Chunks } = await import('../chunks/Chunks');
 
-describe('Chunks View Integration Tests (ListKind refactor preparation)', () => {
+describe('Chunks View Integration Tests (DataFacet refactor preparation)', () => {
   describe('basic rendering', () => {
     it('renders without crashing', () => {
       customRender(<Chunks />);

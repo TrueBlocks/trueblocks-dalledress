@@ -78,7 +78,7 @@ func TestNamesCollectionDomainSpecificFiltering(t *testing.T) {
 
 		if err == nil && page != nil {
 			namesPage := assertNamesPage(t, page)
-			assert.Equal(t, NamesAll, namesPage.Kind)
+			assert.Equal(t, NamesAll, namesPage.Facet)
 			assert.GreaterOrEqual(t, namesPage.TotalItems, 0)
 		}
 	})

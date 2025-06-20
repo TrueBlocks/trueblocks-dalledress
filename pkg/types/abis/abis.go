@@ -13,33 +13,21 @@ import (
 )
 
 const (
-	AbisDownloaded types.ListKind = "downloaded"
-	AbisKnown      types.ListKind = "known"
-	AbisFunctions  types.ListKind = "functions"
-	AbisEvents     types.ListKind = "events"
-)
-
-const (
-	DataFacetDownloaded types.DataFacet = "downloaded"
-	DataFacetKnown      types.DataFacet = "known"
-	DataFacetFunctions  types.DataFacet = "functions"
-	DataFacetEvents     types.DataFacet = "events"
+	AbisDownloaded types.DataFacet = "downloaded"
+	AbisKnown      types.DataFacet = "known"
+	AbisFunctions  types.DataFacet = "functions"
+	AbisEvents     types.DataFacet = "events"
 )
 
 func init() {
-	types.RegisterKind(AbisDownloaded)
-	types.RegisterKind(AbisKnown)
-	types.RegisterKind(AbisFunctions)
-	types.RegisterKind(AbisEvents)
-
-	types.RegisterDataFacet(DataFacetDownloaded)
-	types.RegisterDataFacet(DataFacetKnown)
-	types.RegisterDataFacet(DataFacetFunctions)
-	types.RegisterDataFacet(DataFacetEvents)
+	types.RegisterDataFacet(AbisDownloaded)
+	types.RegisterDataFacet(AbisKnown)
+	types.RegisterDataFacet(AbisFunctions)
+	types.RegisterDataFacet(AbisEvents)
 }
 
 type AbisPage struct {
-	Kind          types.ListKind       `json:"kind"`
+	Facet         types.DataFacet      `json:"facet"`
 	Abis          []coreTypes.Abi      `json:"abis,omitempty"`
 	Functions     []coreTypes.Function `json:"functions,omitempty"`
 	TotalItems    int                  `json:"totalItems"`
@@ -48,8 +36,8 @@ type AbisPage struct {
 	State         types.LoadState      `json:"state"`
 }
 
-func (ap *AbisPage) GetKind() types.ListKind {
-	return ap.Kind
+func (ap *AbisPage) GetFacet() types.DataFacet {
+	return ap.Facet
 }
 
 func (ap *AbisPage) GetTotalItems() int {
@@ -81,7 +69,7 @@ func NewAbisCollection() *AbisCollection {
 	ac := &AbisCollection{
 		summary: types.Summary{
 			TotalCount:  0,
-			FacetCounts: make(map[types.ListKind]int),
+			FacetCounts: make(map[types.DataFacet]int),
 			CustomData:  make(map[string]interface{}),
 		},
 	}
@@ -166,8 +154,8 @@ func isDupEncoding() func(existing []*coreTypes.Function, newItem *coreTypes.Fun
 	}
 }
 
-func (ac *AbisCollection) LoadData(listKind types.ListKind) {
-	if !ac.NeedsUpdate(listKind) {
+func (ac *AbisCollection) LoadData(dataFacet types.DataFacet) {
+	if !ac.NeedsUpdate(dataFacet) {
 		return
 	}
 
@@ -175,7 +163,7 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 	var facetFunction *facets.Facet[coreTypes.Function]
 	var facetName string
 
-	switch listKind {
+	switch dataFacet {
 	case AbisDownloaded:
 		facetAbi = ac.downloadedFacet
 		facetName = "downloaded"
@@ -189,7 +177,7 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 		facetFunction = ac.eventsFacet
 		facetName = "events"
 	default:
-		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
 		return
 	}
 
@@ -206,8 +194,8 @@ func (ac *AbisCollection) LoadData(listKind types.ListKind) {
 	}()
 }
 
-func (ac *AbisCollection) Reset(listKind types.ListKind) {
-	switch listKind {
+func (ac *AbisCollection) Reset(dataFacet types.DataFacet) {
+	switch dataFacet {
 	case AbisDownloaded, AbisKnown:
 		abisListStore.Reset()
 	case AbisFunctions, AbisEvents:
@@ -217,11 +205,11 @@ func (ac *AbisCollection) Reset(listKind types.ListKind) {
 	}
 }
 
-func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
+func (ac *AbisCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	var facetAbi *facets.Facet[coreTypes.Abi]
 	var facetFunction *facets.Facet[coreTypes.Function]
 
-	switch listKind {
+	switch dataFacet {
 	case AbisDownloaded:
 		facetAbi = ac.downloadedFacet
 	case AbisKnown:
@@ -244,20 +232,20 @@ func (ac *AbisCollection) NeedsUpdate(listKind types.ListKind) bool {
 }
 
 func (ac *AbisCollection) GetPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
 	page := &AbisPage{
-		Kind: listKind,
+		Facet: dataFacet,
 	}
 	filter = strings.ToLower(filter)
 
 	var listFacet *facets.Facet[coreTypes.Abi]
 	var detailFacet *facets.Facet[coreTypes.Function]
 
-	switch listKind {
+	switch dataFacet {
 	case AbisDownloaded:
 		listFacet = ac.downloadedFacet
 	case AbisKnown:
@@ -267,9 +255,9 @@ func (ac *AbisCollection) GetPage(
 	case AbisEvents:
 		detailFacet = ac.eventsFacet
 	default:
-		// This is truly a validation error - invalid ListKind for this collection
-		return nil, types.NewValidationError("abis", listKind, "GetPage",
-			fmt.Errorf("unsupported list kind: %v", listKind))
+		// This is truly a validation error - invalid DataFacet for this collection
+		return nil, types.NewValidationError("abis", dataFacet, "GetPage",
+			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
 
 	if listFacet != nil {
@@ -281,7 +269,7 @@ func (ac *AbisCollection) GetPage(
 		}
 		if result, err := listFacet.GetPage(first, pageSize, listFilterFunc, sortSpec, listSortFunc); err != nil {
 			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("abis", listKind, "GetPage", err)
+			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
 		} else {
 			page.Abis, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
@@ -298,7 +286,7 @@ func (ac *AbisCollection) GetPage(
 		}
 		if result, err := detailFacet.GetPage(first, pageSize, detailFilter, sortSpec, detailSortFunc); err != nil {
 			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("abis", listKind, "GetPage", err)
+			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
 		} else {
 			page.Functions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
@@ -306,21 +294,21 @@ func (ac *AbisCollection) GetPage(
 		page.ExpectedTotal = detailFacet.ExpectedCount()
 
 	} else {
-		// This should not happen since we validated listKind above
-		return nil, types.NewValidationError("abis", listKind, "GetPage",
-			fmt.Errorf("no facet found for list kind: %v", listKind))
+		// This should not happen since we validated dataFacet above
+		return nil, types.NewValidationError("abis", dataFacet, "GetPage",
+			fmt.Errorf("no facet found for dataFacet: %v", dataFacet))
 	}
 
 	return page, nil
 }
 
 func (ac *AbisCollection) GetAbisPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (*AbisPage, error) {
-	page, err := ac.GetPage(listKind, first, pageSize, sortSpec, filter)
+	page, err := ac.GetPage(dataFacet, first, pageSize, sortSpec, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -333,8 +321,8 @@ func (ac *AbisCollection) GetAbisPage(
 	return abisPage, nil
 }
 
-func (ac *AbisCollection) GetSupportedKinds() []types.ListKind {
-	return []types.ListKind{
+func (ac *AbisCollection) GetSupportedFacets() []types.DataFacet {
+	return []types.DataFacet{
 		AbisDownloaded,
 		AbisKnown,
 		AbisFunctions,
@@ -342,8 +330,8 @@ func (ac *AbisCollection) GetSupportedKinds() []types.ListKind {
 	}
 }
 
-func (ac *AbisCollection) GetStoreForKind(kind types.ListKind) string {
-	switch kind {
+func (ac *AbisCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
+	switch dataFacet {
 	case AbisDownloaded, AbisKnown:
 		return "abis-list"
 	case AbisFunctions, AbisEvents:
@@ -362,7 +350,7 @@ func (ac *AbisCollection) AccumulateItem(item interface{}, summary *types.Summar
 	defer ac.summaryMutex.Unlock()
 
 	if summary.FacetCounts == nil {
-		summary.FacetCounts = make(map[types.ListKind]int)
+		summary.FacetCounts = make(map[types.DataFacet]int)
 	}
 
 	switch v := item.(type) {
@@ -423,7 +411,7 @@ func (ac *AbisCollection) GetCurrentSummary() types.Summary {
 	defer ac.summaryMutex.RUnlock()
 
 	summary := ac.summary
-	summary.FacetCounts = make(map[types.ListKind]int)
+	summary.FacetCounts = make(map[types.DataFacet]int)
 	for k, v := range ac.summary.FacetCounts {
 		summary.FacetCounts[k] = v
 	}
@@ -443,7 +431,7 @@ func (ac *AbisCollection) ResetSummary() {
 	defer ac.summaryMutex.Unlock()
 	ac.summary = types.Summary{
 		TotalCount:  0,
-		FacetCounts: make(map[types.ListKind]int),
+		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: 0,
 	}

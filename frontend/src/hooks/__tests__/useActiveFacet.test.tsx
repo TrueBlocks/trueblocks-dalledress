@@ -20,18 +20,15 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     {
       id: 'transactions' as DataFacet,
       label: 'Transactions',
-      listKind: 'TRANSACTIONS' as any,
       isDefault: true,
     },
     {
       id: 'receipts' as DataFacet,
       label: 'Receipts',
-      listKind: 'RECEIPTS' as any,
     },
     {
       id: 'statements' as DataFacet,
       label: 'Statements',
-      listKind: 'STATEMENTS' as any,
     },
   ];
 
@@ -85,7 +82,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should restore saved preference via backend API mapping', () => {
-      mockLastTab['/exports'] = 'STATEMENTS';
+      mockLastTab['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -111,7 +108,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
         result.current.setActiveFacet('receipts' as DataFacet);
       });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith('/exports', 'RECEIPTS');
+      expect(mockSetLastTab).toHaveBeenCalledWith('/exports', 'receipts');
     });
   });
 
@@ -128,7 +125,6 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
       expect(config).toEqual({
         id: 'receipts',
         label: 'Receipts',
-        listKind: 'RECEIPTS',
       });
     });
 
@@ -145,7 +141,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should check if facet is active correctly', () => {
-      mockLastTab['/exports'] = 'STATEMENTS';
+      mockLastTab['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -163,7 +159,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
 
   describe('backward compatibility', () => {
     it('should provide correct backend API value for current facet', () => {
-      mockLastTab['/exports'] = 'STATEMENTS';
+      mockLastTab['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -172,7 +168,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
         }),
       );
 
-      expect(result.current.getCurrentListKind()).toBe('STATEMENTS');
+      expect(result.current.getCurrentDataFacet()).toBe('statements');
     });
 
     it('should fallback to facet ID when no backend API mapping exists', () => {
@@ -180,7 +176,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
         {
           id: 'custom-facet' as DataFacet,
           label: 'Custom Facet',
-          // No listKind property
+          // No dataFacet property
         },
       ];
 
@@ -191,7 +187,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
         }),
       );
 
-      expect(result.current.getCurrentListKind()).toBe('custom-facet');
+      expect(result.current.getCurrentDataFacet()).toBe('custom-facet');
     });
   });
 
@@ -209,7 +205,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should handle invalid saved preference', () => {
-      mockLastTab['/exports'] = 'INVALID_LISTKIND';
+      mockLastTab['/exports'] = 'INVALID_DATAFACET';
 
       const { result } = renderHook(() =>
         useActiveFacet({

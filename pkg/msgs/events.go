@@ -45,7 +45,7 @@
 //
 //	 // Start a goroutine to wait for the "Downloaded" abis to be loaded.
 //	 // The string argument to WaitForLoadedEvent ("Downloaded", "Known", "Monitors", "All", etc.)
-//	 // must match the 'facetName' or 'listKind' string used when msgs.EmitLoaded is called
+//	 // must match the 'facetName' or 'dataFacet' string used when msgs.EmitLoaded is called
 //	 // by the collection's LoadData method.
 //	 doneCh := msgs.WaitForLoadedEvent(string(abis.AbisDownloaded))
 //

@@ -13,20 +13,15 @@ import (
 )
 
 const (
-	MonitorsList types.ListKind = "monitors"
-)
-
-const (
-	DataFacetMonitors types.DataFacet = "monitors"
+	MonitorsList types.DataFacet = "monitors"
 )
 
 func init() {
-	types.RegisterKind(MonitorsList)
-	types.RegisterDataFacet(DataFacetMonitors)
+	types.RegisterDataFacet(MonitorsList)
 }
 
 type MonitorsPage struct {
-	Kind          types.ListKind      `json:"kind"`
+	Facet         types.DataFacet     `json:"facet"`
 	Monitors      []coreTypes.Monitor `json:"monitors,omitempty"`
 	TotalItems    int                 `json:"totalItems"`
 	ExpectedTotal int                 `json:"expectedTotal"`
@@ -34,8 +29,8 @@ type MonitorsPage struct {
 	State         types.LoadState     `json:"state"`
 }
 
-func (mp *MonitorsPage) GetKind() types.ListKind {
-	return mp.Kind
+func (mp *MonitorsPage) GetFacet() types.DataFacet {
+	return mp.Facet
 }
 
 func (mp *MonitorsPage) GetTotalItems() int {
@@ -64,7 +59,7 @@ func NewMonitorsCollection() *MonitorsCollection {
 	mc := &MonitorsCollection{
 		summary: types.Summary{
 			TotalCount:  0,
-			FacetCounts: make(map[types.ListKind]int),
+			FacetCounts: make(map[types.DataFacet]int),
 			CustomData:  make(map[string]interface{}),
 		},
 	}
@@ -89,20 +84,20 @@ func (mc *MonitorsCollection) initializeFacets() {
 	mc.monitorsFacet = monitorsFacet
 }
 
-func (mc *MonitorsCollection) LoadData(listKind types.ListKind) {
-	if !mc.NeedsUpdate(listKind) {
+func (mc *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
+	if !mc.NeedsUpdate(dataFacet) {
 		return
 	}
 
 	var facet *facets.Facet[coreTypes.Monitor]
 	var facetName string
 
-	switch listKind {
+	switch dataFacet {
 	case MonitorsList:
 		facet = mc.monitorsFacet
 		facetName = "monitors"
 	default:
-		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
 		return
 	}
 
@@ -114,12 +109,12 @@ func (mc *MonitorsCollection) LoadData(listKind types.ListKind) {
 }
 
 func (mc *MonitorsCollection) GetPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
-	switch listKind {
+	switch dataFacet {
 	case MonitorsList:
 		var filterFunc func(*coreTypes.Monitor) bool
 		if filter != "" {
@@ -142,26 +137,26 @@ func (mc *MonitorsCollection) GetPage(
 		)
 		if err != nil {
 			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("monitors", listKind, "GetPage", err)
+			return nil, types.NewStoreError("monitors", dataFacet, "GetPage", err)
 		}
 
 		return &MonitorsPage{
-			Kind:          listKind,
+			Facet:         dataFacet,
 			Monitors:      pageResult.Items,
 			TotalItems:    pageResult.TotalItems,
-			ExpectedTotal: mc.getExpectedTotal(listKind),
+			ExpectedTotal: mc.getExpectedTotal(dataFacet),
 			IsFetching:    mc.monitorsFacet.IsFetching(),
 			State:         pageResult.State,
 		}, nil
 	default:
-		// This is truly a validation error - invalid ListKind for this collection
-		return nil, types.NewValidationError("monitors", listKind, "GetPage",
-			fmt.Errorf("unsupported list kind: %s", listKind))
+		// This is truly a validation error - invalid DataFacet for this collection
+		return nil, types.NewValidationError("monitors", dataFacet, "GetPage",
+			fmt.Errorf("unsupported dataFacet: %s", dataFacet))
 	}
 }
 
-func (mc *MonitorsCollection) Reset(listKind types.ListKind) {
-	switch listKind {
+func (mc *MonitorsCollection) Reset(dataFacet types.DataFacet) {
+	switch dataFacet {
 	case MonitorsList:
 		monitorsStore.Reset()
 	default:
@@ -169,10 +164,10 @@ func (mc *MonitorsCollection) Reset(listKind types.ListKind) {
 	}
 }
 
-func (mc *MonitorsCollection) NeedsUpdate(listKind types.ListKind) bool {
+func (mc *MonitorsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	var facet *facets.Facet[coreTypes.Monitor]
 
-	switch listKind {
+	switch dataFacet {
 	case MonitorsList:
 		facet = mc.monitorsFacet
 	default:
@@ -182,8 +177,8 @@ func (mc *MonitorsCollection) NeedsUpdate(listKind types.ListKind) bool {
 	return facet.NeedsUpdate()
 }
 
-func (mc *MonitorsCollection) getExpectedTotal(listKind types.ListKind) int {
-	_ = listKind
+func (mc *MonitorsCollection) getExpectedTotal(dataFacet types.DataFacet) int {
+	_ = dataFacet
 	if count, err := GetMonitorsCount(); err == nil && count > 0 {
 		return count
 	}
@@ -231,12 +226,12 @@ func (mc *MonitorsCollection) matchesFilter(monitor *coreTypes.Monitor, filter s
 }
 
 func (mc *MonitorsCollection) GetMonitorsPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (*MonitorsPage, error) {
-	page, err := mc.GetPage(listKind, first, pageSize, sortSpec, filter)
+	page, err := mc.GetPage(dataFacet, first, pageSize, sortSpec, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -249,12 +244,12 @@ func (mc *MonitorsCollection) GetMonitorsPage(
 	return monitorsPage, nil
 }
 
-func (mc *MonitorsCollection) GetSupportedKinds() []types.ListKind {
-	return []types.ListKind{MonitorsList}
+func (mc *MonitorsCollection) GetSupportedFacets() []types.DataFacet {
+	return []types.DataFacet{MonitorsList}
 }
 
-func (mc *MonitorsCollection) GetStoreForKind(kind types.ListKind) string {
-	switch kind {
+func (mc *MonitorsCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
+	switch dataFacet {
 	case MonitorsList:
 		return "monitors"
 	default:
@@ -278,7 +273,7 @@ func (mc *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Su
 	summary.TotalCount++
 
 	if summary.FacetCounts == nil {
-		summary.FacetCounts = make(map[types.ListKind]int)
+		summary.FacetCounts = make(map[types.DataFacet]int)
 	}
 
 	summary.FacetCounts[MonitorsList]++
@@ -317,7 +312,7 @@ func (mc *MonitorsCollection) GetCurrentSummary() types.Summary {
 	defer mc.summaryMutex.RUnlock()
 
 	summary := mc.summary
-	summary.FacetCounts = make(map[types.ListKind]int)
+	summary.FacetCounts = make(map[types.DataFacet]int)
 	for k, v := range mc.summary.FacetCounts {
 		summary.FacetCounts[k] = v
 	}
@@ -337,7 +332,7 @@ func (mc *MonitorsCollection) ResetSummary() {
 	defer mc.summaryMutex.Unlock()
 	mc.summary = types.Summary{
 		TotalCount:  0,
-		FacetCounts: make(map[types.ListKind]int),
+		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: 0,
 	}

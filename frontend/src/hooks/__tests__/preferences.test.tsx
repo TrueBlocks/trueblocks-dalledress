@@ -27,7 +27,7 @@ vi.mock('@stores', () => ({
   },
 }));
 
-describe('Preference System Tests (ListKind refactor preparation)', () => {
+describe('Preference System Tests (DataFacet refactor preparation)', () => {
   let mockStoreState: any;
 
   beforeEach(() => {
@@ -43,9 +43,9 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
       menuCollapsed: false,
       helpCollapsed: false,
       lastTab: {
-        '/exports': 'transactions' as types.ListKind,
-        '/chunks': 'chunk-summary' as types.ListKind,
-        '/monitors': 'txs' as types.ListKind,
+        '/exports': 'transactions' as types.DataFacet,
+        '/chunks': 'chunk-summary' as types.DataFacet,
+        '/monitors': 'txs' as types.DataFacet,
       },
       loading: false,
     };
@@ -91,7 +91,7 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
       await act(async () => {
         await result.current.setLastTab(
           '/exports',
-          'receipts' as types.ListKind,
+          'receipts' as types.DataFacet,
         );
       });
 
@@ -101,26 +101,26 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
       );
     });
 
-    it('supports all known ListKind values in setLastTab', async () => {
+    it('supports all known DataFacet values in setLastTab', async () => {
       const { result } = renderHook(() => useActiveProject());
 
-      const testCases: Array<[string, types.ListKind]> = [
-        ['/exports', types.ListKind.TRANSACTIONS],
-        ['/exports', 'receipts' as types.ListKind],
-        ['/chunks', 'chunk-summary' as types.ListKind],
-        ['/monitors', 'txs' as types.ListKind],
-        ['/names', 'entity-names' as types.ListKind],
-        ['/abis', 'get-abis' as types.ListKind],
+      const testCases: Array<[string, types.DataFacet]> = [
+        ['/exports', types.DataFacet.TRANSACTIONS],
+        ['/exports', 'receipts' as types.DataFacet],
+        ['/chunks', 'chunk-summary' as types.DataFacet],
+        ['/monitors', 'txs' as types.DataFacet],
+        ['/names', 'entity-names' as types.DataFacet],
+        ['/abis', 'get-abis' as types.DataFacet],
       ];
 
-      for (const [route, listKind] of testCases) {
+      for (const [route, dataFacet] of testCases) {
         await act(async () => {
-          await result.current.setLastTab(route, listKind);
+          await result.current.setLastTab(route, dataFacet);
         });
 
         expect(appPreferencesStore.setLastTab as any).toHaveBeenCalledWith(
           route,
-          listKind,
+          dataFacet,
         );
       }
     });
@@ -132,10 +132,10 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
       const storedState = {
         ...mockStoreState,
         lastTab: {
-          '/exports': 'receipts' as types.ListKind,
-          '/chunks': 'chunk-summary' as types.ListKind,
-          '/monitors': 'txs' as types.ListKind,
-          '/names': 'entity-names' as types.ListKind,
+          '/exports': 'receipts' as types.DataFacet,
+          '/chunks': 'chunk-summary' as types.DataFacet,
+          '/monitors': 'txs' as types.DataFacet,
+          '/names': 'entity-names' as types.DataFacet,
         },
       };
 
@@ -176,7 +176,7 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
       await act(async () => {
         await result.current.setLastTab(
           '/new-route',
-          'transactions' as types.ListKind,
+          'transactions' as types.DataFacet,
         );
       });
 
@@ -221,7 +221,7 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
         await act(async () => {
           await result.current.setLastTab(
             route,
-            'transactions' as types.ListKind,
+            'transactions' as types.DataFacet,
           );
         });
 
@@ -237,9 +237,15 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
 
       // Simulate rapid tab switching
       const promises = [
-        result.current.setLastTab('/exports', 'transactions' as types.ListKind),
-        result.current.setLastTab('/exports', 'receipts' as types.ListKind),
-        result.current.setLastTab('/chunks', 'chunk-summary' as types.ListKind),
+        result.current.setLastTab(
+          '/exports',
+          'transactions' as types.DataFacet,
+        ),
+        result.current.setLastTab('/exports', 'receipts' as types.DataFacet),
+        result.current.setLastTab(
+          '/chunks',
+          'chunk-summary' as types.DataFacet,
+        ),
       ];
 
       await act(async () => {
@@ -249,7 +255,7 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
       expect(appPreferencesStore.setLastTab as any).toHaveBeenCalledTimes(3);
     });
 
-    it('handles invalid ListKind values gracefully', async () => {
+    it('handles invalid DataFacet values gracefully', async () => {
       const { result } = renderHook(() => useActiveProject());
 
       // This tests the function signature - TypeScript should catch invalid types,
@@ -258,7 +264,7 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
       await act(async () => {
         await result.current.setLastTab(
           '/exports',
-          'transactions' as types.ListKind,
+          'transactions' as types.DataFacet,
         );
       });
 
@@ -294,7 +300,7 @@ describe('Preference System Tests (ListKind refactor preparation)', () => {
         ...mockStoreState,
         lastTab: {
           ...mockStoreState.lastTab,
-          '/exports': 'receipts' as types.ListKind,
+          '/exports': 'receipts' as types.DataFacet,
         },
       };
       (appPreferencesStore.getState as any).mockReturnValue(newState);

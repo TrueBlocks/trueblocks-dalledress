@@ -30,16 +30,16 @@ export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['monitors']['MonitorsCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStoreForKind(arg1) {
-  return window['go']['monitors']['MonitorsCollection']['GetStoreForKind'](arg1);
+export function GetStoreForFacet(arg1) {
+  return window['go']['monitors']['MonitorsCollection']['GetStoreForFacet'](arg1);
 }
 
 export function GetSummary() {
   return window['go']['monitors']['MonitorsCollection']['GetSummary']();
 }
 
-export function GetSupportedKinds() {
-  return window['go']['monitors']['MonitorsCollection']['GetSupportedKinds']();
+export function GetSupportedFacets() {
+  return window['go']['monitors']['MonitorsCollection']['GetSupportedFacets']();
 }
 
 export function LoadData(arg1) {

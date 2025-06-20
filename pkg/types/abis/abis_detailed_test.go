@@ -65,7 +65,7 @@ func TestAbisCollectionLoadDataAsync(t *testing.T) {
 			go func(index int) {
 				defer wg.Done()
 				time.Sleep(time.Duration(index*10) * time.Millisecond)
-				collection.LoadData([]types.ListKind{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}[index%4])
+				collection.LoadData([]types.DataFacet{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}[index%4])
 			}(i)
 		}
 
@@ -186,55 +186,55 @@ func TestAbisCollectionAdvancedAsync(t *testing.T) {
 }
 
 func TestAbisCollectionIntegration(t *testing.T) {
-	t.Run("FullWorkflowAllListKinds", func(t *testing.T) {
+	t.Run("FullWorkflowAllDataFacets", func(t *testing.T) {
 		collection := NewAbisCollection()
-		listKinds := []types.ListKind{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
+		dataFacets := []types.DataFacet{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
 
-		for _, listKind := range listKinds {
-			t.Run(fmt.Sprintf("Workflow_%s", listKind), func(t *testing.T) {
-				needsUpdate := collection.NeedsUpdate(listKind)
+		for _, dataFacet := range dataFacets {
+			t.Run(fmt.Sprintf("Workflow_%s", dataFacet), func(t *testing.T) {
+				needsUpdate := collection.NeedsUpdate(dataFacett)
 				assert.True(t, needsUpdate, "Should need update initially")
 
-				collection.LoadData(listKind)
+				collection.LoadData(dataFacet)
 
-				page1, err := collection.GetPage(listKind, 0, 5, sdk.SortSpec{}, "")
+				page1, err := collection.GetPage(dataFacet, 0, 5, sdk.SortSpec{}, "")
 				if err == nil && page1 != nil {
 					// Cast to concrete type to access fields
 					abisPage1, ok := page1.(*AbisPage)
 					assert.True(t, ok, "Expected *AbisPage type")
-					assert.Equal(t, listKind, abisPage1.Kind)
+					assert.Equal(t, dataFacet, abisPage1.Facet)
 					assert.GreaterOrEqual(t, abisPage1.TotalItems, 0)
 
 					if abisPage1.TotalItems > 5 {
-						page2, err := collection.GetPage(listKind, 5, 5, sdk.SortSpec{}, "")
+						page2, err := collection.GetPage(dataFacet, 5, 5, sdk.SortSpec{}, "")
 						if err == nil && page2 != nil {
 							// Cast to concrete type to access fields
 							abisPage2, ok := page2.(*AbisPage)
 							assert.True(t, ok, "Expected *AbisPage type")
-							assert.Equal(t, listKind, abisPage2.Kind)
+							assert.Equal(t, dataFacet, abisPage2.Facet)
 						}
 					}
 
 					if abisPage1.TotalItems > 0 {
-						filteredPage, err := collection.GetPage(listKind, 0, 5, sdk.SortSpec{}, "test")
+						filteredPage, err := collection.GetPage(dataFacet, 0, 5, sdk.SortSpec{}, "test")
 						if err == nil && filteredPage != nil {
 							// Cast to concrete type to access fields
 							abisFilteredPage, ok := filteredPage.(*AbisPage)
 							assert.True(t, ok, "Expected *AbisPage type")
-							assert.Equal(t, listKind, abisFilteredPage.Kind)
+							assert.Equal(t, dataFacet, abisFilteredPage.Facet)
 							assert.LessOrEqual(t, abisFilteredPage.TotalItems, abisPage1.TotalItems)
 						}
 					}
 				}
 
-				collection.Reset(listKind)
-				needsUpdate = collection.NeedsUpdate(listKind)
+				collection.Reset(dataFacet)
+				needsUpdate = collection.NeedsUpdate(dataFacet)
 				assert.True(t, needsUpdate, "Should need update after reset")
 			})
 		}
 	})
 
-	t.Run("MixedOperationsAllKinds", func(t *testing.T) {
+	t.Run("MixedOperationsAllFacets", func(t *testing.T) {
 		collection := NewAbisCollection()
 
 		collection.LoadData(AbisDownloaded)
@@ -245,16 +245,16 @@ func TestAbisCollectionIntegration(t *testing.T) {
 		time.Sleep(50 * time.Millisecond)
 
 		pages := make([]*AbisPage, 4)
-		listKinds := []types.ListKind{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
+		dataFacets := []types.DataFacet{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
 
-		for i, listKind := range listKinds {
-			page, err := collection.GetPage(listKind, 0, 2, sdk.SortSpec{}, "")
+		for i, dataFacet := range dataFacets {
+			page, err := collection.GetPage(dataFacet, 0, 2, sdk.SortSpec{}, "")
 			if err == nil {
 				// Cast to concrete type to access fields
 				abisPage, ok := page.(*AbisPage)
 				assert.True(t, ok, "Expected *AbisPage type")
 				pages[i] = abisPage
-				assert.Equal(t, listKind, abisPage.Kind)
+				assert.Equal(t, dataFacet, abisPage.Facet)
 			}
 		}
 
@@ -269,49 +269,49 @@ func TestAbisCollectionIntegration(t *testing.T) {
 }
 
 func TestAbisCollectionBoundaryConditions(t *testing.T) {
-	t.Run("AllListKindsCoverage", func(t *testing.T) {
+	t.Run("AllDataFacetsCoverage", func(t *testing.T) {
 		collection := NewAbisCollection()
-		validKinds := []types.ListKind{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
+		validFacets := []types.DataFacet{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
 
-		for _, kind := range validKinds {
-			t.Run(fmt.Sprintf("Kind_%s", kind), func(t *testing.T) {
+		for _, facet := range validFacets {
+			t.Run(fmt.Sprintf("Facet_%s", facet), func(t *testing.T) {
 				assert.NotPanics(t, func() {
-					collection.LoadData(kind)
-				}, "LoadData should not panic with valid kind")
+					collection.LoadData(facet)
+				}, "LoadData should not panic with valid facet")
 
 				assert.NotPanics(t, func() {
-					collection.Reset(kind)
-				}, "Reset should not panic with valid kind")
+					collection.Reset(facet)
+				}, "Reset should not panic with valid facet")
 
-				needsUpdate := collection.NeedsUpdate(kind)
-				assert.True(t, needsUpdate, "Should need update for valid kind")
+				needsUpdate := collection.NeedsUpdate(facet)
+				assert.True(t, needsUpdate, "Should need update for valid facet")
 
-				_, err := collection.GetPage(kind, 0, 5, sdk.SortSpec{}, "")
+				_, err := collection.GetPage(facet, 0, 5, sdk.SortSpec{}, "")
 				_ = err
 			})
 		}
 	})
 
-	t.Run("InvalidListKinds", func(t *testing.T) {
+	t.Run("InvalidDataFacets", func(t *testing.T) {
 		collection := NewAbisCollection()
-		invalidKinds := []string{"", "invalid", "Monitors", "Unknown"}
+		invalidFacets := []string{"", "invalid", "Monitors", "Unknown"}
 
-		for _, kind := range invalidKinds {
-			t.Run(fmt.Sprintf("InvalidKind_%s", kind), func(t *testing.T) {
+		for _, facet := range invalidFacets {
+			t.Run(fmt.Sprintf("InvalidFacet_%s", facet), func(t *testing.T) {
 				assert.NotPanics(t, func() {
-					collection.LoadData(types.ListKind(kind))
-				}, "LoadData should not panic with invalid kind")
+					collection.LoadData(types.DataFacet(facet))
+				}, "LoadData should not panic with invalid facet")
 
 				assert.NotPanics(t, func() {
-					collection.Reset(types.ListKind(kind))
-				}, "Reset should not panic with invalid kind")
+					collection.Reset(types.DataFacet(facet))
+				}, "Reset should not panic with invalid facet")
 
-				needsUpdate := collection.NeedsUpdate(types.ListKind(kind))
-				assert.False(t, needsUpdate, "Should not need update for invalid kind")
+				needsUpdate := collection.NeedsUpdate(types.DataFacet(facet))
+				assert.False(t, needsUpdate, "Should not need update for invalid facet")
 
-				_, err := collection.GetPage(types.ListKind(kind), 0, 5, sdk.SortSpec{}, "")
-				assert.Error(t, err, "GetPage should return error for invalid kind")
-				assert.Contains(t, err.Error(), "unexpected list kind", "Error should mention unexpected list kind")
+				_, err := collection.GetPage(types.DataFacet(facet), 0, 5, sdk.SortSpec{}, "")
+				assert.Error(t, err, "GetPage should return error for invalid facet")
+				assert.Contains(t, err.Error(), "unexpected dataFacet", "Error should mention unexpected dataFacet")
 			})
 		}
 	})
@@ -343,7 +343,7 @@ func TestAbisCollectionBoundaryConditions(t *testing.T) {
 					// Cast to concrete type to access fields
 					abisPage, ok := page.(*AbisPage)
 					assert.True(t, ok, "Expected *AbisPage type")
-					assert.Equal(t, AbisDownloaded, abisPage.Kind)
+					assert.Equal(t, AbisDownloaded, abisPage.Facet)
 					assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
 				}
 			})

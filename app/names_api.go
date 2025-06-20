@@ -11,21 +11,21 @@ import (
 )
 
 func (a *App) GetNamesPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (*names.NamesPage, error) {
-	return getCollectionPage[*names.NamesPage](a.names, listKind, first, pageSize, sortSpec, filter)
+	return getCollectionPage[*names.NamesPage](a.names, dataFacet, first, pageSize, sortSpec, filter)
 }
 
 func (a *App) NamesCrud(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	op crud.Operation,
 	name *coreTypes.Name,
 	address string,
 ) error {
-	return a.names.Crud(listKind, op, name)
+	return a.names.Crud(dataFacet, op, name)
 }
 
 func (a *App) CleanNames(tabName string) error {

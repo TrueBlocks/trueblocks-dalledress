@@ -33,7 +33,7 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
 
   useEffect(() => {
     if (activeTab && !lastTab[route]) {
-      setLastTab(route, activeTab as types.ListKind);
+      setLastTab(route, activeTab as types.DataFacet);
       if (onTabChange) {
         onTabChange(activeTab);
       }
@@ -58,7 +58,7 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
       if (event?.route === route) {
         const newTab = event.key.startsWith('alt+') ? prevTab() : nextTab();
         setActiveTab(newTab);
-        setLastTab(route, newTab as types.ListKind);
+        setLastTab(route, newTab as types.DataFacet);
         if (onTabChange) {
           onTabChange(newTab);
         }
@@ -69,7 +69,7 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   const handleTabChange = (newTab: string | null) => {
     if (newTab === null) return;
     setActiveTab(newTab);
-    setLastTab(route, newTab as types.ListKind);
+    setLastTab(route, newTab as types.DataFacet);
     if (onTabChange) {
       onTabChange(newTab);
     }

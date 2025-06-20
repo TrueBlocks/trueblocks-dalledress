@@ -26,16 +26,16 @@ export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['names']['NamesCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStoreForKind(arg1) {
-  return window['go']['names']['NamesCollection']['GetStoreForKind'](arg1);
+export function GetStoreForFacet(arg1) {
+  return window['go']['names']['NamesCollection']['GetStoreForFacet'](arg1);
 }
 
 export function GetSummary() {
   return window['go']['names']['NamesCollection']['GetSummary']();
 }
 
-export function GetSupportedKinds() {
-  return window['go']['names']['NamesCollection']['GetSupportedKinds']();
+export function GetSupportedFacets() {
+  return window['go']['names']['NamesCollection']['GetSupportedFacets']();
 }
 
 export function LoadData(arg1) {

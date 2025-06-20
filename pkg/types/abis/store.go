@@ -89,8 +89,8 @@ func GetAbisDetailStore() *store.Store[coreTypes.Function] {
 	return abisDetailStore
 }
 
-func GetStoreName(listKind types.ListKind) string {
-	switch listKind {
+func GetStoreName(dataFacet types.DataFacet) string {
+	switch dataFacet {
 	case AbisDownloaded:
 		fallthrough
 	case AbisKnown:

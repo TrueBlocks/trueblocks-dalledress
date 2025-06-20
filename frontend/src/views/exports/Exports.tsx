@@ -31,7 +31,7 @@ export const Exports = () => {
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
-      tabName: activeFacetHook.getCurrentListKind(),
+      tabName: activeFacetHook.getCurrentDataFacet(),
     }),
     [activeFacetHook],
   );
@@ -41,18 +41,18 @@ export const Exports = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  const listKindRef = useRef(activeFacetHook.getCurrentListKind());
+  const dataFacetRef = useRef(activeFacetHook.getCurrentDataFacet());
   const renderCnt = useRef(0);
 
   useEffect(() => {
-    listKindRef.current = activeFacetHook.getCurrentListKind();
+    dataFacetRef.current = activeFacetHook.getCurrentDataFacet();
   }, [activeFacetHook]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetExportsPage(
-        listKindRef.current as types.ListKind,
+        dataFacetRef.current as types.DataFacet,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -64,7 +64,7 @@ export const Exports = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${listKindRef.current}`);
+      handleError(err, `Failed to fetch ${dataFacetRef.current}`);
     }
   }, [
     clearError,
@@ -81,16 +81,16 @@ export const Exports = () => {
   const currentData = useMemo(() => {
     if (!pageData) return [];
 
-    const currentListKind =
-      activeFacetHook.getCurrentListKind() as types.ListKind;
-    switch (currentListKind) {
-      case types.ListKind.STATEMENTS:
+    const currentDataFacet =
+      activeFacetHook.getCurrentDataFacet() as types.DataFacet;
+    switch (currentDataFacet) {
+      case types.DataFacet.STATEMENTS:
         return pageData.statements || [];
-      case types.ListKind.TRANSFERS:
+      case types.DataFacet.TRANSFERS:
         return pageData.transfers || [];
-      case types.ListKind.BALANCES:
+      case types.DataFacet.BALANCES:
         return pageData.balances || [];
-      case types.ListKind.TRANSACTIONS:
+      case types.DataFacet.TRANSACTIONS:
         return pageData.transactions || [];
       default:
         return pageData.transactions || [];
@@ -101,8 +101,8 @@ export const Exports = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'exports') {
-        const eventListKind = payload.listKind as types.ListKind | undefined;
-        if (eventListKind === listKindRef.current) {
+        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
       }
@@ -115,19 +115,19 @@ export const Exports = () => {
 
   // Load data when component mounts or facet changes
   useEffect(() => {
-    const currentListKind =
-      activeFacetHook.getCurrentListKind() as types.ListKind;
-    LoadExportsData(currentListKind, effectiveChain, effectiveAddress);
+    const currentDataFacet =
+      activeFacetHook.getCurrentDataFacet() as types.DataFacet;
+    LoadExportsData(currentDataFacet, effectiveChain, effectiveAddress);
   }, [activeFacetHook, effectiveChain, effectiveAddress]);
 
   useHotkeys([
     [
       'mod+r',
       () => {
-        const currentListKind =
-          activeFacetHook.getCurrentListKind() as types.ListKind;
+        const currentDataFacet =
+          activeFacetHook.getCurrentDataFacet() as types.DataFacet;
         ResetExportsData(
-          currentListKind,
+          currentDataFacet,
           effectiveChain,
           effectiveAddress,
         ).then(() => {
@@ -143,12 +143,12 @@ export const Exports = () => {
 
   const currentColumns = useMemo(() => {
     const baseColumns = getColumnsForExports(
-      pageData?.kind || activeFacetHook.getCurrentListKind(),
+      pageData?.facet || activeFacetHook.getCurrentDataFacet(),
     );
 
     // Exports are read-only, so we filter out any actions column
     return baseColumns.filter((col) => col.key !== 'actions');
-  }, [pageData?.kind, activeFacetHook]);
+  }, [pageData?.facet, activeFacetHook]);
 
   const perTabTable = useMemo(
     () => (
@@ -187,7 +187,7 @@ export const Exports = () => {
       <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${activeFacetHook.getCurrentListKind()}`}</h3>
+          <h3>{`Error fetching ${activeFacetHook.getCurrentDataFacet()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}

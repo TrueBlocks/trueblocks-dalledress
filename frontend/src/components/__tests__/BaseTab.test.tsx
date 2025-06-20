@@ -65,8 +65,8 @@ describe('BaseTab', () => {
     expect(container.innerHTML).toContain('data-testid="mock-table"');
   });
 
-  // ListKind-related tests for refactor preparation
-  describe('ViewStateKey handling (ListKind refactor preparation)', () => {
+  // DataFacet-related tests for refactor preparation
+  describe('ViewStateKey handling (DataFacet refactor preparation)', () => {
     it('passes ViewStateKey with different tabName values correctly', () => {
       const exportsTxnKey: ViewStateKey = {
         viewName: '/exports',
@@ -109,7 +109,7 @@ describe('BaseTab', () => {
     });
 
     it('handles ViewStateKey creation patterns used in views', () => {
-      // Simulate the pattern used in actual views: { viewName: ROUTE, tabName: listKind }
+      // Simulate the pattern used in actual views: { viewName: ROUTE, tabName: dataFacet }
       const chunksKey: ViewStateKey = {
         viewName: '/chunks',
         tabName: 'chunk-summary',

@@ -13,7 +13,7 @@ import (
 // PageFactory creates a concrete Page from facet PageResult
 // This allows each collection type to create its own Page implementation
 type PageFactory[T any] interface {
-	CreatePage(kind types.ListKind, pageResult *facets.PageResult[T], facet *facets.Facet[T]) (types.Page, error)
+	CreatePage(dataFacet types.DataFacet, pageResult *facets.PageResult[T], facet *facets.Facet[T]) (types.Page, error)
 }
 
 // FilterFunc creates a filter function from a string filter
@@ -40,13 +40,13 @@ type HandlerInterface interface {
 	GetPageAny(first, pageSize int, sort sdk.SortSpec, filter string) (types.Page, error)
 	CrudAny(op crud.Operation, item interface{}) error
 	GetStoreName() string
-	GetKind() types.ListKind
+	GetFacet() types.DataFacet
 }
 
 // TypedHandler provides a type-safe wrapper around facets for a specific type T
 // This bridges the gap between the generic interface and strongly-typed facet operations
 type TypedHandler[T any] struct {
-	kind        types.ListKind
+	dataFacet   types.DataFacet
 	storeName   string
 	facet       *facets.Facet[T]
 	pageFactory PageFactory[T]
@@ -55,9 +55,9 @@ type TypedHandler[T any] struct {
 	crudHandler CrudHandler[T]
 }
 
-// NewTypedHandler creates a new typed handler for a specific type and kind
+// NewTypedHandler creates a new typed handler for a specific type and dataFacet
 func NewTypedHandler[T any](
-	kind types.ListKind,
+	dataFacet types.DataFacet,
 	storeName string,
 	facet *facets.Facet[T],
 	pageFactory PageFactory[T],
@@ -66,7 +66,7 @@ func NewTypedHandler[T any](
 	crudHandler CrudHandler[T],
 ) *TypedHandler[T] {
 	return &TypedHandler[T]{
-		kind:        kind,
+		dataFacet:   dataFacet,
 		storeName:   storeName,
 		facet:       facet,
 		pageFactory: pageFactory,
@@ -100,7 +100,7 @@ func (th *TypedHandler[T]) CrudAny(op crud.Operation, item interface{}) error {
 	// Type assertion to convert interface{} back to T
 	typedItem, ok := item.(T)
 	if !ok {
-		return fmt.Errorf("invalid type for %s operation: expected %T, got %T", th.kind, *new(T), item)
+		return fmt.Errorf("invalid type for %s operation: expected %T, got %T", th.dataFacet, *new(T), item)
 	}
 	return th.Crud(op, typedItem)
 }
@@ -109,8 +109,8 @@ func (th *TypedHandler[T]) GetStoreName() string {
 	return th.storeName
 }
 
-func (th *TypedHandler[T]) GetKind() types.ListKind {
-	return th.kind
+func (th *TypedHandler[T]) GetFacet() types.DataFacet {
+	return th.dataFacet
 }
 
 // Type-safe methods that work with concrete types
@@ -135,23 +135,23 @@ func (th *TypedHandler[T]) GetPage(first, pageSize int, sort sdk.SortSpec, filte
 
 	// Use the page factory to create the concrete page type
 	if th.pageFactory != nil {
-		return th.pageFactory.CreatePage(th.kind, pageResult, th.facet)
+		return th.pageFactory.CreatePage(th.dataFacet, pageResult, th.facet)
 	}
 
-	return nil, fmt.Errorf("no page factory configured for %s", th.kind)
+	return nil, fmt.Errorf("no page factory configured for %s", th.dataFacet)
 }
 
 func (th *TypedHandler[T]) Crud(op crud.Operation, item T) error {
 	if th.crudHandler != nil {
 		return th.crudHandler.Crud(op, item)
 	}
-	return fmt.Errorf("CRUD operation %s not supported for %s", op, th.kind)
+	return fmt.Errorf("CRUD operation %s not supported for %s", op, th.dataFacet)
 }
 
 // GenericCollection provides a unified registry and interface for all collection operations
 type GenericCollection struct {
 	name     string
-	handlers map[types.ListKind]HandlerInterface
+	handlers map[types.DataFacet]HandlerInterface
 	mutex    sync.RWMutex
 }
 
@@ -159,48 +159,33 @@ type GenericCollection struct {
 func NewGenericCollection(name string) *GenericCollection {
 	return &GenericCollection{
 		name:     name,
-		handlers: make(map[types.ListKind]HandlerInterface),
+		handlers: make(map[types.DataFacet]HandlerInterface),
 	}
 }
 
-// RegisterHandler registers a handler for a specific list kind
-func (gc *GenericCollection) RegisterHandler(kind types.ListKind, handler HandlerInterface) {
+// RegisterHandler registers a handler for a specific list dataFacet
+func (gc *GenericCollection) RegisterHandler(dataFacet types.DataFacet, handler HandlerInterface) {
 	gc.mutex.Lock()
 	defer gc.mutex.Unlock()
-	gc.handlers[kind] = handler
-}
-
-// RegisterKind provides a type-safe way to register a handler for a specific type
-func RegisterKind[T any](
-	gc *GenericCollection,
-	kind types.ListKind,
-	storeName string,
-	facet *facets.Facet[T],
-	pageFactory PageFactory[T],
-	filterFunc FilterFunc[T],
-	sortFunc SortFunc[T],
-	crudHandler CrudHandler[T],
-) {
-	handler := NewTypedHandler(kind, storeName, facet, pageFactory, filterFunc, sortFunc, crudHandler)
-	gc.RegisterHandler(kind, handler)
+	gc.handlers[dataFacet] = handler
 }
 
 // Implement the Collection interface
-func (gc *GenericCollection) GetPage(kind types.ListKind, first, pageSize int, sort sdk.SortSpec, filter string) (types.Page, error) {
+func (gc *GenericCollection) GetPage(dataFacet types.DataFacet, first, pageSize int, sort sdk.SortSpec, filter string) (types.Page, error) {
 	gc.mutex.RLock()
-	handler, exists := gc.handlers[kind]
+	handler, exists := gc.handlers[dataFacet]
 	gc.mutex.RUnlock()
 
 	if !exists {
-		return nil, fmt.Errorf("unsupported list kind: %s", kind)
+		return nil, fmt.Errorf("unsupported list dataFacet: %s", dataFacet)
 	}
 
 	return handler.GetPageAny(first, pageSize, sort, filter)
 }
 
-func (gc *GenericCollection) LoadData(kind types.ListKind) {
+func (gc *GenericCollection) LoadData(dataFacet types.DataFacet) {
 	gc.mutex.RLock()
-	handler, exists := gc.handlers[kind]
+	handler, exists := gc.handlers[dataFacet]
 	gc.mutex.RUnlock()
 
 	if exists {
@@ -208,9 +193,9 @@ func (gc *GenericCollection) LoadData(kind types.ListKind) {
 	}
 }
 
-func (gc *GenericCollection) Reset(kind types.ListKind) {
+func (gc *GenericCollection) Reset(dataFacet types.DataFacet) {
 	gc.mutex.RLock()
-	handler, exists := gc.handlers[kind]
+	handler, exists := gc.handlers[dataFacet]
 	gc.mutex.RUnlock()
 
 	if exists {
@@ -218,9 +203,9 @@ func (gc *GenericCollection) Reset(kind types.ListKind) {
 	}
 }
 
-func (gc *GenericCollection) NeedsUpdate(kind types.ListKind) bool {
+func (gc *GenericCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	gc.mutex.RLock()
-	handler, exists := gc.handlers[kind]
+	handler, exists := gc.handlers[dataFacet]
 	gc.mutex.RUnlock()
 
 	if !exists {
@@ -230,32 +215,32 @@ func (gc *GenericCollection) NeedsUpdate(kind types.ListKind) bool {
 	return handler.NeedsUpdate()
 }
 
-func (gc *GenericCollection) Crud(kind types.ListKind, op crud.Operation, item interface{}) error {
+func (gc *GenericCollection) Crud(dataFacet types.DataFacet, op crud.Operation, item interface{}) error {
 	gc.mutex.RLock()
-	handler, exists := gc.handlers[kind]
+	handler, exists := gc.handlers[dataFacet]
 	gc.mutex.RUnlock()
 
 	if !exists {
-		return fmt.Errorf("unsupported list kind: %s", kind)
+		return fmt.Errorf("unsupported list dataFacet: %s", dataFacet)
 	}
 
 	return handler.CrudAny(op, item)
 }
 
-func (gc *GenericCollection) GetSupportedKinds() []types.ListKind {
+func (gc *GenericCollection) GetSupportedFacets() []types.DataFacet {
 	gc.mutex.RLock()
 	defer gc.mutex.RUnlock()
 
-	kinds := make([]types.ListKind, 0, len(gc.handlers))
-	for kind := range gc.handlers {
-		kinds = append(kinds, kind)
+	dataFacets := make([]types.DataFacet, 0, len(gc.handlers))
+	for dataFacet := range gc.handlers {
+		dataFacets = append(dataFacets, dataFacet)
 	}
-	return kinds
+	return dataFacets
 }
 
-func (gc *GenericCollection) GetStoreForKind(kind types.ListKind) string {
+func (gc *GenericCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
 	gc.mutex.RLock()
-	handler, exists := gc.handlers[kind]
+	handler, exists := gc.handlers[dataFacet]
 	gc.mutex.RUnlock()
 
 	if !exists {

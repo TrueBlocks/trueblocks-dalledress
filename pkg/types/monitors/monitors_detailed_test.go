@@ -289,26 +289,26 @@ func TestMonitorsCollectionAdvancedAsync(t *testing.T) {
 	})
 
 	t.Run("LoadDataErrorScenarios", func(t *testing.T) {
-		// Test with invalid list kinds to ensure graceful handling
-		invalidKinds := []string{
+		// Test with invalid list facets to ensure graceful handling
+		invalidFacets := []string{
 			"",
-			"InvalidKind",
+			"InvalidFacet",
 			"monitors", // lowercase
 			"MONITORS", // uppercase
 			"monitors-list",
 		}
 
-		for _, kind := range invalidKinds {
-			t.Run(fmt.Sprintf("InvalidKind_%s", kind), func(t *testing.T) {
+		for _, facet := range invalidFacets {
+			t.Run(fmt.Sprintf("InvalidFacet_%s", facet), func(t *testing.T) {
 				collection := NewMonitorsCollection()
 
 				start := time.Now()
 				assert.NotPanics(t, func() {
-					collection.LoadData(types.ListKind(kind))
-				}, "LoadData with invalid kind should not panic")
+					collection.LoadData(types.DataFacet(facet))
+				}, "LoadData with invalid facet should not panic")
 
 				duration := time.Since(start)
-				assert.Less(t, duration, 100*time.Millisecond, "Invalid kind should return quickly")
+				assert.Less(t, duration, 100*time.Millisecond, "Invalid facet should return quickly")
 			})
 		}
 	})
@@ -418,7 +418,7 @@ func TestMonitorsCollectionIntegration(t *testing.T) {
 						// Cast to concrete type to access fields
 						monitorsPage, ok := page.(*MonitorsPage)
 						assert.True(t, ok, "Expected *MonitorsPage type")
-						assert.Equal(t, MonitorsList, monitorsPage.Kind)
+						assert.Equal(t, MonitorsList, monitorsPage.Facet)
 					}
 				},
 			},
@@ -452,8 +452,8 @@ func TestMonitorsCollectionBoundaryConditions(t *testing.T) {
 
 		assert.NotPanics(t, func() {
 			_, err := collection.GetPage("", 0, 0, sdk.SortSpec{}, "")
-			assert.Error(t, err, "GetPage with empty kind should return error")
-		}, "GetPage with empty kind should not panic")
+			assert.Error(t, err, "GetPage with empty facet should return error")
+		}, "GetPage with empty facet should not panic")
 
 		assert.NotPanics(t, func() {
 			collection.Reset("")
@@ -488,7 +488,7 @@ func TestMonitorsCollectionBoundaryConditions(t *testing.T) {
 						// Cast to concrete type to access fields
 						monitorsPage, ok := page.(*MonitorsPage)
 						assert.True(t, ok, "Expected *MonitorsPage type")
-						assert.Equal(t, MonitorsList, monitorsPage.Kind)
+						assert.Equal(t, MonitorsList, monitorsPage.Facet)
 						assert.GreaterOrEqual(t, monitorsPage.TotalItems, 0)
 					}
 				}, "Extreme page values should not panic")

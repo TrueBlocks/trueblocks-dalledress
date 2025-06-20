@@ -80,14 +80,14 @@ func (a *App) SetLastChain(chain string) {
 }
 
 // GetLastTab returns the last tab for a given route
-func (a *App) GetLastTab(route string) types.ListKind {
+func (a *App) GetLastTab(route string) types.DataFacet {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
-	return types.ListKind(a.Preferences.App.LastTab[route])
+	return types.DataFacet(a.Preferences.App.LastTab[route])
 }
 
 // SetLastTab sets the last tab for a given route
-func (a *App) SetLastTab(route string, tab types.ListKind) {
+func (a *App) SetLastTab(route string, tab types.DataFacet) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
 

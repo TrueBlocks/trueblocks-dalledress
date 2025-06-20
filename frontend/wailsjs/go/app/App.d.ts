@@ -16,7 +16,7 @@ import {monitors} from '../models';
 import {names} from '../models';
 import {app} from '../models';
 
-export function AbisCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Abi,arg4:string):Promise<void>;
+export function AbisCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:types.Abi,arg4:string):Promise<void>;
 
 export function AddrToName(arg1:base.Address):Promise<string>;
 
@@ -24,13 +24,13 @@ export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
 export function CancelAllFetches():Promise<number>;
 
-export function CancelFetch(arg1:types.ListKind):Promise<void>;
+export function CancelFetch(arg1:types.DataFacet):Promise<void>;
 
 export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 
 export function CheckRPCStatus():Promise<string>;
 
-export function ChunksCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:any):Promise<void>;
+export function ChunksCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function CleanNames(arg1:string):Promise<void>;
 
@@ -38,9 +38,9 @@ export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
 
-export function ExportsCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:any,arg4:string,arg5:string):Promise<void>;
+export function ExportsCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any,arg4:string,arg5:string):Promise<void>;
 
-export function ExportsNeedsUpdate(arg1:types.ListKind,arg2:string,arg3:string):Promise<boolean>;
+export function ExportsNeedsUpdate(arg1:types.DataFacet,arg2:string,arg3:string):Promise<boolean>;
 
 export function FileNew(arg1:menu.CallbackData):Promise<void>;
 
@@ -52,7 +52,7 @@ export function FileSave(arg1:menu.CallbackData):Promise<void>;
 
 export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
-export function GetAbisPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
+export function GetAbisPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
 export function GetAbisSummary():Promise<types.Summary>;
 
@@ -62,15 +62,15 @@ export function GetAppPreferences():Promise<preferences.AppPreferences>;
 
 export function GetChainList():Promise<utils.ChainList>;
 
-export function GetChunksPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
+export function GetChunksPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
 
 export function GetChunksSummary():Promise<types.Summary>;
 
 export function GetContext():Promise<context.Context>;
 
-export function GetExportsCount(arg1:types.ListKind,arg2:string,arg3:string):Promise<number>;
+export function GetExportsCount(arg1:types.DataFacet,arg2:string,arg3:string):Promise<number>;
 
-export function GetExportsPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string,arg6:string,arg7:string):Promise<exports.ExportsPage>;
+export function GetExportsPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string,arg6:string,arg7:string):Promise<exports.ExportsPage>;
 
 export function GetExportsSummary(arg1:string,arg2:string):Promise<types.Summary>;
 
@@ -84,15 +84,15 @@ export function GetLastAddress():Promise<string>;
 
 export function GetLastChain():Promise<string>;
 
-export function GetLastTab(arg1:string):Promise<types.ListKind>;
+export function GetLastTab(arg1:string):Promise<types.DataFacet>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
-export function GetMonitorsPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
+export function GetMonitorsPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
 
 export function GetMonitorsSummary():Promise<types.Summary>;
 
-export function GetNamesPage(arg1:types.ListKind,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
+export function GetNamesPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
 export function GetNamesSummary():Promise<types.Summary>;
 
@@ -116,7 +116,7 @@ export function IsInitialized():Promise<boolean>;
 
 export function IsReady():Promise<boolean>;
 
-export function LoadExportsData(arg1:types.ListKind,arg2:string,arg3:string):Promise<void>;
+export function LoadExportsData(arg1:types.DataFacet,arg2:string,arg3:string):Promise<void>;
 
 export function LogBackend(arg1:string):Promise<void>;
 
@@ -124,19 +124,19 @@ export function LogFrontend(arg1:string):Promise<void>;
 
 export function MonitorsClean(arg1:Array<string>):Promise<void>;
 
-export function MonitorsCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Monitor,arg4:string):Promise<void>;
+export function MonitorsCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:types.Monitor,arg4:string):Promise<void>;
 
 export function NameFromAddress(arg1:string):Promise<types.Name|boolean>;
 
-export function NamesCrud(arg1:types.ListKind,arg2:crud.Operation,arg3:types.Name,arg4:string):Promise<void>;
+export function NamesCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:types.Name,arg4:string):Promise<void>;
 
 export function PublishNames(arg1:string):Promise<void>;
 
 export function RegisterCollection(arg1:types.Collection):Promise<void>;
 
-export function Reload(arg1:types.ListKind):Promise<void>;
+export function Reload(arg1:types.DataFacet):Promise<void>;
 
-export function ResetExportsData(arg1:types.ListKind,arg2:string,arg3:string):Promise<void>;
+export function ResetExportsData(arg1:types.DataFacet,arg2:string,arg3:string):Promise<void>;
 
 export function ResetStore(arg1:string):Promise<void>;
 
@@ -156,7 +156,7 @@ export function SetLastAddress(arg1:string):Promise<void>;
 
 export function SetLastChain(arg1:string):Promise<void>;
 
-export function SetLastTab(arg1:string,arg2:types.ListKind):Promise<void>;
+export function SetLastTab(arg1:string,arg2:types.DataFacet):Promise<void>;
 
 export function SetLastView(arg1:string):Promise<void>;
 

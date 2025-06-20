@@ -116,7 +116,7 @@ func TestAbisCollectionDomainSpecific(t *testing.T) {
 		page, err := collection.GetPage(AbisDownloaded, 0, 10, sdk.SortSpec{}, "test")
 		if err == nil && page != nil {
 			abisPage := assertAbisPage(t, page)
-			assert.Equal(t, AbisDownloaded, abisPage.Kind)
+			assert.Equal(t, AbisDownloaded, abisPage.Facet)
 			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
 		}
 
@@ -124,21 +124,21 @@ func TestAbisCollectionDomainSpecific(t *testing.T) {
 		page, err = collection.GetPage(AbisFunctions, 0, 10, sdk.SortSpec{}, "transfer")
 		if err == nil && page != nil {
 			abisPage := assertAbisPage(t, page)
-			assert.Equal(t, AbisFunctions, abisPage.Kind)
+			assert.Equal(t, AbisFunctions, abisPage.Facet)
 			assert.GreaterOrEqual(t, abisPage.TotalItems, 0)
 		}
 	})
 
 	t.Run("MultiFacetSupport", func(t *testing.T) {
 		// Test that different facets work correctly
-		kinds := []types.ListKind{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
-		for _, kind := range kinds {
-			page, err := collection.GetPage(kind, 0, 5, sdk.SortSpec{}, "")
+		facets := []types.DataFacet{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
+		for _, facet := range facets {
+			page, err := collection.GetPage(facet, 0, 5, sdk.SortSpec{}, "")
 			if err == nil && page != nil {
 				abisPage := assertAbisPage(t, page)
-				assert.Equal(t, kind, abisPage.Kind)
+				assert.Equal(t, facet, abisPage.Facet)
 				// Verify the right data structure is populated based on facet
-				switch kind {
+				switch facet {
 				case AbisDownloaded, AbisKnown:
 					// Should have Abis populated
 					assert.NotNil(t, abisPage.Abis)

@@ -20,28 +20,23 @@ describe('Names View + useActiveFacet Integration Tests', () => {
     {
       id: 'all' as DataFacet,
       label: 'All',
-      listKind: 'ALL' as any,
       isDefault: true,
     },
     {
       id: 'custom' as DataFacet,
       label: 'Custom',
-      listKind: 'CUSTOM' as any,
     },
     {
       id: 'prefund' as DataFacet,
       label: 'Prefund',
-      listKind: 'PREFUND' as any,
     },
     {
       id: 'regular' as DataFacet,
       label: 'Regular',
-      listKind: 'REGULAR' as any,
     },
     {
       id: 'baddress' as DataFacet,
       label: 'Bad Addresses',
-      listKind: 'BADDRESS' as any,
     },
   ];
 
@@ -76,11 +71,11 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       );
 
       expect(result.current.activeFacet).toBe('all');
-      expect(result.current.getCurrentListKind()).toBe('ALL');
+      expect(result.current.getCurrentDataFacet()).toBe('all');
       expect(result.current.availableFacets).toHaveLength(5);
     });
 
-    it('correctly maps facet IDs to ListKind values', () => {
+    it('correctly maps facet IDs to DataFacet values', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
@@ -89,7 +84,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         }),
       );
 
-      expect(result.current.getCurrentListKind()).toBe('CUSTOM');
+      expect(result.current.getCurrentDataFacet()).toBe('custom');
     });
 
     it('maintains facet consistency across state changes', () => {
@@ -110,10 +105,10 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       });
 
       // Verify the preference was set correctly
-      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'PREFUND');
+      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'prefund');
 
       // Update mock to simulate preference persistence
-      mockLastTab['/names'] = 'PREFUND';
+      mockLastTab['/names'] = 'prefund';
 
       // Re-render hook with updated preferences
       const { result: result2 } = renderHook(() =>
@@ -125,7 +120,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       );
 
       expect(result2.current.activeFacet).toBe('prefund');
-      expect(result2.current.getCurrentListKind()).toBe('PREFUND');
+      expect(result2.current.getCurrentDataFacet()).toBe('prefund');
     });
 
     it('respects saved preferences for Names view', () => {
@@ -140,7 +135,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       );
 
       expect(result.current.activeFacet).toBe('custom');
-      expect(result.current.getCurrentListKind()).toBe('CUSTOM');
+      expect(result.current.getCurrentDataFacet()).toBe('custom');
     });
 
     it('persists facet changes to preferences', () => {
@@ -156,22 +151,22 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         result.current.setActiveFacet('baddress' as DataFacet);
       });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'BADDRESS');
+      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'baddress');
     });
 
     it('handles all Names view facets correctly', () => {
       // Test each facet individually with fresh hook instances
       const facetMappings = [
-        { facet: 'all', listKind: 'ALL' },
-        { facet: 'custom', listKind: 'CUSTOM' },
-        { facet: 'prefund', listKind: 'PREFUND' },
-        { facet: 'regular', listKind: 'REGULAR' },
-        { facet: 'baddress', listKind: 'BADDRESS' },
+        { facet: 'all', dataFacet: 'all' },
+        { facet: 'custom', dataFacet: 'custom' },
+        { facet: 'prefund', dataFacet: 'prefund' },
+        { facet: 'regular', dataFacet: 'regular' },
+        { facet: 'baddress', dataFacet: 'baddress' },
       ];
 
-      facetMappings.forEach(({ facet, listKind }) => {
+      facetMappings.forEach(({ facet, dataFacet }) => {
         // Set up mock with this facet as saved preference
-        mockLastTab['/names'] = listKind;
+        mockLastTab['/names'] = dataFacet;
 
         const { result } = renderHook(() =>
           useActiveFacet({
@@ -182,7 +177,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         );
 
         expect(result.current.activeFacet).toBe(facet);
-        expect(result.current.getCurrentListKind()).toBe(listKind);
+        expect(result.current.getCurrentDataFacet()).toBe(dataFacet);
       });
     });
   });
@@ -263,7 +258,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         result.current.setActiveFacet('custom' as DataFacet);
       });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'CUSTOM');
+      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'custom');
     });
   });
 });

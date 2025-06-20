@@ -53,14 +53,14 @@ export const Names = () => {
     viewRoute: ROUTE,
   });
 
-  const { getCurrentListKind } = activeFacetHook;
+  const { getCurrentDataFacet } = activeFacetHook;
 
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
-      tabName: getCurrentListKind(),
+      tabName: getCurrentDataFacet(),
     }),
-    [getCurrentListKind],
+    [getCurrentDataFacet],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
@@ -69,22 +69,22 @@ export const Names = () => {
   const { filter, setFiltering } = useFiltering(viewStateKey);
   const { emitSuccess, failure } = useActionMsgs('names');
 
-  // Cache the current backend ListKind for API calls
-  const currentListKindRef = useRef(activeFacetHook.getCurrentListKind());
+  // Cache the current backend DataFacet for API calls
+  const currentDataFacetRef = useRef(activeFacetHook.getCurrentDataFacet());
   const renderCnt = useRef(0);
   // renderCnt.current++;
 
   useEffect(() => {
-    currentListKindRef.current = getCurrentListKind();
-  }, [getCurrentListKind]);
+    currentDataFacetRef.current = getCurrentDataFacet();
+  }, [getCurrentDataFacet]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
-      const currentListKind = getCurrentListKind() as types.ListKind;
+      const currentDataFacet = getCurrentDataFacet() as types.DataFacet;
 
       const result = await GetNamesPage(
-        currentListKind,
+        currentDataFacet,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -94,7 +94,7 @@ export const Names = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${getCurrentListKind()}`);
+      handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
     }
   }, [
     clearError,
@@ -104,7 +104,7 @@ export const Names = () => {
     filter,
     setTotalItems,
     handleError,
-    getCurrentListKind,
+    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
@@ -115,11 +115,11 @@ export const Names = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'names') {
-        const eventBackendListKind = payload.listKind as
-          | types.ListKind
+        const eventBackendDataFacet = payload.dataFacet as
+          | types.DataFacet
           | undefined;
-        const currentListKind = activeFacetHook.getCurrentListKind();
-        if (eventBackendListKind === currentListKind) {
+        const currentDataFacet = activeFacetHook.getCurrentDataFacet();
+        if (eventBackendDataFacet === currentDataFacet) {
           fetchData();
         }
       }
@@ -134,7 +134,7 @@ export const Names = () => {
     [
       'mod+r',
       () => {
-        Reload(activeFacetHook.getCurrentListKind() as types.ListKind).then(
+        Reload(activeFacetHook.getCurrentDataFacet() as types.DataFacet).then(
           () => {
             fetchData();
           },
@@ -165,14 +165,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          currentListKindRef.current as types.ListKind,
+          currentDataFacetRef.current as types.DataFacet,
           crud.Operation.DELETE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              currentListKindRef.current as types.ListKind,
+              currentDataFacetRef.current as types.DataFacet,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -233,14 +233,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          currentListKindRef.current as types.ListKind,
+          currentDataFacetRef.current as types.DataFacet,
           crud.Operation.UNDELETE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              currentListKindRef.current as types.ListKind,
+              currentDataFacetRef.current as types.DataFacet,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -298,14 +298,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          currentListKindRef.current as types.ListKind,
+          currentDataFacetRef.current as types.DataFacet,
           crud.Operation.REMOVE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              currentListKindRef.current as types.ListKind,
+              currentDataFacetRef.current as types.DataFacet,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -366,14 +366,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          currentListKindRef.current as types.ListKind,
+          currentDataFacetRef.current as types.DataFacet,
           crud.Operation.AUTONAME,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              currentListKindRef.current as types.ListKind,
+              currentDataFacetRef.current as types.DataFacet,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -453,7 +453,7 @@ export const Names = () => {
   const currentColumns = useMemo(() => {
     const handleChipClick = (chip: string) => {
       setFiltering(chip);
-      Reload(activeFacetHook.getCurrentListKind() as types.ListKind).then(
+      Reload(activeFacetHook.getCurrentDataFacet() as types.DataFacet).then(
         () => {
           fetchData();
         },
@@ -461,7 +461,7 @@ export const Names = () => {
     };
 
     const baseColumns = getColumns(
-      activeFacetHook.getCurrentListKind() as types.ListKind,
+      activeFacetHook.getCurrentDataFacet() as types.DataFacet,
     ).map((col) =>
       col.key === 'chips'
         ? {
@@ -577,14 +577,14 @@ export const Names = () => {
       });
 
       NamesCrud(
-        currentListKindRef.current as types.ListKind,
+        currentDataFacetRef.current as types.DataFacet,
         crud.Operation.UPDATE,
         submittedName as types.Name,
         '',
       )
         .then(async () => {
           const result = await GetNamesPage(
-            currentListKindRef.current as types.ListKind,
+            currentDataFacetRef.current as types.DataFacet,
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
             sort,
@@ -658,7 +658,7 @@ export const Names = () => {
       <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${activeFacetHook.getCurrentListKind()}`}</h3>
+          <h3>{`Error fetching ${activeFacetHook.getCurrentDataFacet()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}

@@ -13,33 +13,21 @@ import (
 )
 
 const (
-	ExportsStatements   types.ListKind = "statements"
-	ExportsTransfers    types.ListKind = "transfers"
-	ExportsBalances     types.ListKind = "balances"
-	ExportsTransactions types.ListKind = "transactions"
-)
-
-const (
-	DataFacetStatements   types.DataFacet = "statements"
-	DataFacetTransfers    types.DataFacet = "transfers"
-	DataFacetBalances     types.DataFacet = "balances"
-	DataFacetTransactions types.DataFacet = "transactions"
+	ExportsStatements   types.DataFacet = "statements"
+	ExportsTransfers    types.DataFacet = "transfers"
+	ExportsBalances     types.DataFacet = "balances"
+	ExportsTransactions types.DataFacet = "transactions"
 )
 
 func init() {
-	types.RegisterKind(ExportsStatements)
-	types.RegisterKind(ExportsTransfers)
-	types.RegisterKind(ExportsBalances)
-	types.RegisterKind(ExportsTransactions)
-
-	types.RegisterDataFacet(DataFacetStatements)
-	types.RegisterDataFacet(DataFacetTransfers)
-	types.RegisterDataFacet(DataFacetBalances)
-	types.RegisterDataFacet(DataFacetTransactions)
+	types.RegisterDataFacet(ExportsStatements)
+	types.RegisterDataFacet(ExportsTransfers)
+	types.RegisterDataFacet(ExportsBalances)
+	types.RegisterDataFacet(ExportsTransactions)
 }
 
 type ExportsPage struct {
-	Kind          types.ListKind          `json:"kind"`
+	Facet         types.DataFacet         `json:"facet"`
 	Statements    []coreTypes.Statement   `json:"statements,omitempty"`
 	Transfers     []coreTypes.Transfer    `json:"transfers,omitempty"`
 	Balances      []coreTypes.Token       `json:"balances,omitempty"`
@@ -50,7 +38,7 @@ type ExportsPage struct {
 	State         types.LoadState         `json:"state"`
 }
 
-func (ep *ExportsPage) GetKind() types.ListKind   { return ep.Kind }
+func (ep *ExportsPage) GetFacet() types.DataFacet { return ep.Facet }
 func (ep *ExportsPage) GetTotalItems() int        { return ep.TotalItems }
 func (ep *ExportsPage) GetExpectedTotal() int     { return ep.ExpectedTotal }
 func (ep *ExportsPage) GetIsFetching() bool       { return ep.IsFetching }
@@ -73,7 +61,7 @@ func NewExportsCollection(chain, address string) *ExportsCollection {
 		address: address,
 		summary: types.Summary{
 			TotalCount:  0,
-			FacetCounts: make(map[types.ListKind]int),
+			FacetCounts: make(map[types.DataFacet]int),
 			CustomData:  make(map[string]interface{}),
 		},
 	}
@@ -117,12 +105,12 @@ func (ec *ExportsCollection) initializeFacets() {
 }
 
 func (ec *ExportsCollection) GetPage(
-	listKind types.ListKind,
+	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
-	switch listKind {
+	switch dataFacet {
 	case ExportsStatements:
 		return ec.getStatementsPage(first, pageSize, sortSpec, filter)
 	case ExportsTransfers:
@@ -132,13 +120,13 @@ func (ec *ExportsCollection) GetPage(
 	case ExportsTransactions:
 		return ec.getTransactionsPage(first, pageSize, sortSpec, filter)
 	default:
-		return nil, fmt.Errorf("GetPage: unexpected list kind: %v", listKind)
+		return nil, fmt.Errorf("GetPage: unexpected dataFacet: %v", dataFacet)
 	}
 }
 
 func (ec *ExportsCollection) getStatementsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
 	page := &ExportsPage{
-		Kind: ExportsStatements,
+		Facet: ExportsStatements,
 	}
 	filter = strings.ToLower(filter)
 
@@ -169,7 +157,7 @@ func (ec *ExportsCollection) getStatementsPage(first, pageSize int, sortSpec sdk
 
 func (ec *ExportsCollection) getTransfersPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
 	page := &ExportsPage{
-		Kind: ExportsTransfers,
+		Facet: ExportsTransfers,
 	}
 	filter = strings.ToLower(filter)
 
@@ -201,7 +189,7 @@ func (ec *ExportsCollection) getTransfersPage(first, pageSize int, sortSpec sdk.
 
 func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
 	page := &ExportsPage{
-		Kind: ExportsBalances,
+		Facet: ExportsBalances,
 	}
 	filter = strings.ToLower(filter)
 
@@ -231,7 +219,7 @@ func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.S
 
 func (ec *ExportsCollection) getTransactionsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
 	page := &ExportsPage{
-		Kind: ExportsTransactions,
+		Facet: ExportsTransactions,
 	}
 	filter = strings.ToLower(filter)
 
@@ -259,14 +247,14 @@ func (ec *ExportsCollection) getTransactionsPage(first, pageSize int, sortSpec s
 	return page, nil
 }
 
-func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
-	if !ec.NeedsUpdate(listKind) {
+func (ec *ExportsCollection) LoadData(dataFacet types.DataFacet) {
+	if !ec.NeedsUpdate(dataFacet) {
 		return
 	}
 
 	var facetName string
 
-	switch listKind {
+	switch dataFacet {
 	case ExportsStatements:
 		facetName = string(ExportsStatements)
 	case ExportsTransfers:
@@ -276,13 +264,13 @@ func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
 	case ExportsTransactions:
 		facetName = string(ExportsTransactions)
 	default:
-		logging.LogError("LoadData: unexpected list kind: %v", fmt.Errorf("invalid list kind: %s", listKind), nil)
+		logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
 		return
 	}
 
 	go func() {
 		// Handle each facet type specifically since they're different types
-		switch listKind {
+		switch dataFacet {
 		case ExportsStatements:
 			if err := ec.statementsFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
@@ -303,8 +291,8 @@ func (ec *ExportsCollection) LoadData(listKind types.ListKind) {
 	}()
 }
 
-func (ec *ExportsCollection) Reset(listKind types.ListKind) {
-	switch listKind {
+func (ec *ExportsCollection) Reset(dataFacet types.DataFacet) {
+	switch dataFacet {
 	case ExportsStatements:
 		ResetExportsStore(ec.chain, ec.address, ExportsStatements)
 		ec.statementsFacet.Reset()
@@ -320,8 +308,8 @@ func (ec *ExportsCollection) Reset(listKind types.ListKind) {
 	}
 }
 
-func (ec *ExportsCollection) NeedsUpdate(listKind types.ListKind) bool {
-	switch listKind {
+func (ec *ExportsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
+	switch dataFacet {
 	case ExportsStatements:
 		return ec.statementsFacet.NeedsUpdate()
 	case ExportsTransfers:
@@ -335,8 +323,8 @@ func (ec *ExportsCollection) NeedsUpdate(listKind types.ListKind) bool {
 	}
 }
 
-func (ec *ExportsCollection) GetSupportedKinds() []types.ListKind {
-	return []types.ListKind{
+func (ec *ExportsCollection) GetSupportedFacets() []types.DataFacet {
+	return []types.DataFacet{
 		ExportsStatements,
 		ExportsTransfers,
 		ExportsBalances,
@@ -344,8 +332,8 @@ func (ec *ExportsCollection) GetSupportedKinds() []types.ListKind {
 	}
 }
 
-func (ec *ExportsCollection) GetStoreForKind(kind types.ListKind) string {
-	switch kind {
+func (ec *ExportsCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
+	switch dataFacet {
 	case ExportsStatements:
 		return "exports-statements"
 	case ExportsTransfers:
@@ -411,7 +399,7 @@ func (ec *ExportsCollection) AccumulateItem(item interface{}, summary *types.Sum
 	defer ec.summaryMutex.Unlock()
 
 	if summary.FacetCounts == nil {
-		summary.FacetCounts = make(map[types.ListKind]int)
+		summary.FacetCounts = make(map[types.DataFacet]int)
 	}
 
 	switch v := item.(type) {
@@ -475,7 +463,7 @@ func (ec *ExportsCollection) GetCurrentSummary() types.Summary {
 	defer ec.summaryMutex.RUnlock()
 
 	summary := ec.summary
-	summary.FacetCounts = make(map[types.ListKind]int)
+	summary.FacetCounts = make(map[types.DataFacet]int)
 	for k, v := range ec.summary.FacetCounts {
 		summary.FacetCounts[k] = v
 	}
@@ -495,7 +483,7 @@ func (ec *ExportsCollection) ResetSummary() {
 	defer ec.summaryMutex.Unlock()
 	ec.summary = types.Summary{
 		TotalCount:  0,
-		FacetCounts: make(map[types.ListKind]int),
+		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: 0,
 	}

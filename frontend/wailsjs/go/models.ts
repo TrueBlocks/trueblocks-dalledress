@@ -1,7 +1,7 @@
 export namespace abis {
 	
 	export class AbisPage {
-	    kind: types.ListKind;
+	    facet: types.DataFacet;
 	    abis?: types.Abi[];
 	    functions?: types.Function[];
 	    totalItems: number;
@@ -15,7 +15,7 @@ export namespace abis {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.kind = source["kind"];
+	        this.facet = source["facet"];
 	        this.abis = this.convertValues(source["abis"], types.Abi);
 	        this.functions = this.convertValues(source["functions"], types.Function);
 	        this.totalItems = source["totalItems"];
@@ -96,7 +96,7 @@ export namespace base {
 export namespace chunks {
 	
 	export class ChunksPage {
-	    kind: types.ListKind;
+	    facet: types.DataFacet;
 	    chunksStats?: types.ChunkStats[];
 	    chunksIndex?: types.ChunkIndex[];
 	    chunksBlooms?: types.ChunkBloom[];
@@ -112,7 +112,7 @@ export namespace chunks {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.kind = source["kind"];
+	        this.facet = source["facet"];
 	        this.chunksStats = this.convertValues(source["chunksStats"], types.ChunkStats);
 	        this.chunksIndex = this.convertValues(source["chunksIndex"], types.ChunkIndex);
 	        this.chunksBlooms = this.convertValues(source["chunksBlooms"], types.ChunkBloom);
@@ -160,7 +160,7 @@ export namespace crud {
 export namespace exports {
 	
 	export class ExportsPage {
-	    kind: types.ListKind;
+	    facet: types.DataFacet;
 	    statements?: types.Statement[];
 	    transfers?: types.Transfer[];
 	    balances?: types.Token[];
@@ -176,7 +176,7 @@ export namespace exports {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.kind = source["kind"];
+	        this.facet = source["facet"];
 	        this.statements = this.convertValues(source["statements"], types.Statement);
 	        this.transfers = this.convertValues(source["transfers"], types.Transfer);
 	        this.balances = this.convertValues(source["balances"], types.Token);
@@ -340,7 +340,7 @@ export namespace menu {
 export namespace monitors {
 	
 	export class MonitorsPage {
-	    kind: types.ListKind;
+	    facet: types.DataFacet;
 	    monitors?: types.Monitor[];
 	    totalItems: number;
 	    expectedTotal: number;
@@ -353,7 +353,7 @@ export namespace monitors {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.kind = source["kind"];
+	        this.facet = source["facet"];
 	        this.monitors = this.convertValues(source["monitors"], types.Monitor);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
@@ -398,7 +398,7 @@ export namespace msgs {
 export namespace names {
 	
 	export class NamesPage {
-	    kind: types.ListKind;
+	    facet: types.DataFacet;
 	    names: types.Name[];
 	    totalItems: number;
 	    expectedTotal: number;
@@ -411,7 +411,7 @@ export namespace names {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.kind = source["kind"];
+	        this.facet = source["facet"];
 	        this.names = this.convertValues(source["names"], types.Name);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
@@ -690,26 +690,6 @@ export namespace sdk {
 
 export namespace types {
 	
-	export enum ListKind {
-	    DOWNLOADED = "downloaded",
-	    KNOWN = "known",
-	    FUNCTIONS = "functions",
-	    EVENTS = "events",
-	    STATS = "stats",
-	    INDEX = "index",
-	    BLOOMS = "blooms",
-	    MANIFEST = "manifest",
-	    STATEMENTS = "statements",
-	    TRANSFERS = "transfers",
-	    BALANCES = "balances",
-	    TRANSACTIONS = "transactions",
-	    MONITORS = "monitors",
-	    ALL = "all",
-	    CUSTOM = "custom",
-	    PREFUND = "prefund",
-	    REGULAR = "regular",
-	    BADDRESS = "baddress",
-	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",

@@ -1,8 +1,8 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
-export const getColumns = (listKind: types.ListKind): FormField[] => {
-  switch (listKind) {
+export const getColumns = (backendListKind: types.ListKind): FormField[] => {
+  switch (backendListKind) {
     case types.ListKind.ALL:
     // fallthrough
     case types.ListKind.CUSTOM:

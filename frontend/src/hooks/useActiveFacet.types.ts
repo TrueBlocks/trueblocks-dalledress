@@ -1,8 +1,8 @@
 import { types } from '@models';
 
 /**
- * Data facet types that will replace ListKind string usage
- * This represents the new architecture for tab/facet selection
+ * Data facet types for the new tab/facet selection architecture
+ * This replaces direct ListKind usage in frontend components
  */
 export type DataFacet =
   // Exports view facets
@@ -15,15 +15,19 @@ export type DataFacet =
   | 'index'
   | 'blooms'
   | 'manifest'
-  | 'chunk-summary'
   // Names view facets
-  | 'entity-names'
+  | 'all'
+  | 'custom'
+  | 'prefund'
+  | 'regular'
+  | 'baddress'
   // Monitors view facets
-  | 'txs'
+  | 'monitors'
   // ABIs view facets
-  | 'get-abis'
-  // Future extensibility
-  | string;
+  | 'downloaded'
+  | 'known'
+  | 'functions'
+  | 'events';
 
 /**
  * Configuration for a data facet
@@ -35,7 +39,7 @@ export interface DataFacetConfig {
   label: string;
   /** Whether this facet is the default for its view */
   isDefault?: boolean;
-  /** ListKind mapping for backward compatibility */
+  /** Backend API compatibility: maps to types.ListKind */
   listKind?: types.ListKind;
 }
 
@@ -61,7 +65,7 @@ export interface UseActiveFacetReturn {
   /** Get the default facet for the view */
   getDefaultFacet: () => DataFacet;
 
-  /** Backward compatibility: get ListKind for current facet */
+  /** Backend API compatibility: get types.ListKind for current facet */
   getCurrentListKind: () => types.ListKind | string;
 }
 

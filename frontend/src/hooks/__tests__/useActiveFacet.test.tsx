@@ -84,7 +84,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
       expect(result.current.activeFacet).toBe('statements');
     });
 
-    it('should restore saved preference via ListKind mapping', () => {
+    it('should restore saved preference via backend API mapping', () => {
       mockLastTab['/exports'] = 'STATEMENTS';
 
       const { result } = renderHook(() =>
@@ -99,7 +99,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
   });
 
   describe('facet switching', () => {
-    it('should change active facet and persist ListKind to preferences', () => {
+    it('should change active facet and persist backend API value to preferences', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           viewRoute: '/exports',
@@ -162,7 +162,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
   });
 
   describe('backward compatibility', () => {
-    it('should provide correct ListKind for current facet', () => {
+    it('should provide correct backend API value for current facet', () => {
       mockLastTab['/exports'] = 'STATEMENTS';
 
       const { result } = renderHook(() =>
@@ -175,8 +175,8 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
       expect(result.current.getCurrentListKind()).toBe('STATEMENTS');
     });
 
-    it('should fallback to facet ID when no ListKind mapping exists', () => {
-      const facetsWithoutListKind: DataFacetConfig[] = [
+    it('should fallback to facet ID when no backend API mapping exists', () => {
+      const facetsWithoutApiMapping: DataFacetConfig[] = [
         {
           id: 'custom-facet' as DataFacet,
           label: 'Custom Facet',
@@ -187,7 +187,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           viewRoute: '/exports',
-          facets: facetsWithoutListKind,
+          facets: facetsWithoutApiMapping,
         }),
       );
 

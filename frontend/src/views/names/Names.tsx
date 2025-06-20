@@ -53,7 +53,7 @@ export const Names = () => {
     viewRoute: ROUTE,
   });
 
-  const { activeFacet, getCurrentListKind } = activeFacetHook;
+  const { getCurrentListKind } = activeFacetHook;
 
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
@@ -69,12 +69,13 @@ export const Names = () => {
   const { filter, setFiltering } = useFiltering(viewStateKey);
   const { emitSuccess, failure } = useActionMsgs('names');
 
-  const listKindRef = useRef(activeFacetHook.getCurrentListKind());
+  // Cache the current backend ListKind for API calls
+  const currentListKindRef = useRef(activeFacetHook.getCurrentListKind());
   const renderCnt = useRef(0);
   // renderCnt.current++;
 
   useEffect(() => {
-    listKindRef.current = getCurrentListKind();
+    currentListKindRef.current = getCurrentListKind();
   }, [getCurrentListKind]);
 
   const fetchData = useCallback(async () => {
@@ -114,9 +115,11 @@ export const Names = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'names') {
-        const eventListKind = payload.listKind as types.ListKind | undefined;
+        const eventBackendListKind = payload.listKind as
+          | types.ListKind
+          | undefined;
         const currentListKind = activeFacetHook.getCurrentListKind();
-        if (eventListKind === currentListKind) {
+        if (eventBackendListKind === currentListKind) {
           fetchData();
         }
       }
@@ -162,14 +165,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          listKindRef.current as types.ListKind,
+          currentListKindRef.current as types.ListKind,
           crud.Operation.DELETE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              listKindRef.current as types.ListKind,
+              currentListKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -230,14 +233,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          listKindRef.current as types.ListKind,
+          currentListKindRef.current as types.ListKind,
           crud.Operation.UNDELETE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              listKindRef.current as types.ListKind,
+              currentListKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -295,14 +298,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          listKindRef.current as types.ListKind,
+          currentListKindRef.current as types.ListKind,
           crud.Operation.REMOVE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              listKindRef.current as types.ListKind,
+              currentListKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -363,14 +366,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          listKindRef.current as types.ListKind,
+          currentListKindRef.current as types.ListKind,
           crud.Operation.AUTONAME,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              listKindRef.current as types.ListKind,
+              currentListKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -574,14 +577,14 @@ export const Names = () => {
       });
 
       NamesCrud(
-        listKindRef.current as types.ListKind,
+        currentListKindRef.current as types.ListKind,
         crud.Operation.UPDATE,
         submittedName as types.Name,
         '',
       )
         .then(async () => {
           const result = await GetNamesPage(
-            listKindRef.current as types.ListKind,
+            currentListKindRef.current as types.ListKind,
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
             sort,

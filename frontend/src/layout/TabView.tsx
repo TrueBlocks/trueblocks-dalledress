@@ -8,6 +8,7 @@ import './TabView.css';
 
 interface Tab {
   label: string;
+  value: string;
   content: React.ReactNode;
 }
 
@@ -20,19 +21,19 @@ interface TabViewProps {
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   const { lastTab, setLastTab } = useActiveProject();
 
-  const getInitialTab = (): types.ListKind => {
+  const getInitialTab = (): string => {
     const savedTab = lastTab[route];
     if (savedTab) {
       return savedTab;
     }
-    return (tabs[0]?.label as types.ListKind) || ('' as types.ListKind);
+    return tabs[0]?.value || '';
   };
 
-  const [activeTab, setActiveTab] = useState<types.ListKind>(getInitialTab());
+  const [activeTab, setActiveTab] = useState<string>(getInitialTab());
 
   useEffect(() => {
     if (activeTab && !lastTab[route]) {
-      setLastTab(route, activeTab);
+      setLastTab(route, activeTab as types.ListKind);
       if (onTabChange) {
         onTabChange(activeTab);
       }
@@ -40,26 +41,24 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   }, [activeTab, lastTab, route, setLastTab, onTabChange]);
 
   const nextTab = useCallback((): string => {
-    const currentIndex = tabs.findIndex((tab) => tab.label === activeTab);
+    const currentIndex = tabs.findIndex((tab) => tab.value === activeTab);
     const nextIndex = (currentIndex + 1) % tabs.length;
-    return tabs[nextIndex]?.label || activeTab;
+    return tabs[nextIndex]?.value || activeTab;
   }, [tabs, activeTab]);
 
   const prevTab = useCallback((): string => {
-    const currentIndex = tabs.findIndex((tab) => tab.label === activeTab);
+    const currentIndex = tabs.findIndex((tab) => tab.value === activeTab);
     const prevIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-    return tabs[prevIndex]?.label || activeTab;
+    return tabs[prevIndex]?.value || activeTab;
   }, [tabs, activeTab]);
 
   useEvent<{ route: string; key: string }>(
     msgs.EventType.TAB_CYCLE,
     (_message: string, event?: { route: string; key: string }) => {
       if (event?.route === route) {
-        const newTab = (
-          event.key.startsWith('alt+') ? prevTab() : nextTab()
-        ) as types.ListKind;
+        const newTab = event.key.startsWith('alt+') ? prevTab() : nextTab();
         setActiveTab(newTab);
-        setLastTab(route, newTab);
+        setLastTab(route, newTab as types.ListKind);
         if (onTabChange) {
           onTabChange(newTab);
         }
@@ -69,9 +68,8 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
 
   const handleTabChange = (newTab: string | null) => {
     if (newTab === null) return;
-    const listKind = newTab as types.ListKind;
-    setActiveTab(listKind);
-    setLastTab(route, listKind);
+    setActiveTab(newTab);
+    setLastTab(route, newTab as types.ListKind);
     if (onTabChange) {
       onTabChange(newTab);
     }
@@ -87,14 +85,14 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
       >
         <Tabs.List>
           {tabs.map((tab) => (
-            <Tabs.Tab key={tab.label} value={tab.label}>
+            <Tabs.Tab key={tab.value} value={tab.value}>
               {tab.label}
             </Tabs.Tab>
           ))}
         </Tabs.List>
 
         {tabs.map((tab) => (
-          <Tabs.Panel key={tab.label} value={tab.label}>
+          <Tabs.Panel key={tab.value} value={tab.value}>
             {tab.content}
           </Tabs.Panel>
         ))}

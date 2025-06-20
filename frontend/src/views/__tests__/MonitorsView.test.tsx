@@ -11,7 +11,7 @@ vi.mock('../monitors/Monitors', () => ({
 // Dynamically import after mocking
 const { Monitors } = await import('../monitors/Monitors');
 
-describe('Monitors View Integration Tests (ListKind refactor preparation)', () => {
+describe('Monitors View Integration Tests (DataFacet architecture)', () => {
   describe('basic rendering', () => {
     it('renders without crashing', () => {
       customRender(<Monitors />);

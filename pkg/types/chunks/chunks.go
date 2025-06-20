@@ -16,10 +16,10 @@ import (
 
 // Define ListKind constants for different chunk views
 const (
-	ChunksStats    types.ListKind = "Stats"
-	ChunksIndex    types.ListKind = "Index"
-	ChunksBlooms   types.ListKind = "Blooms"
-	ChunksManifest types.ListKind = "Manifest"
+	ChunksStats    types.ListKind = "stats"
+	ChunksIndex    types.ListKind = "index"
+	ChunksBlooms   types.ListKind = "blooms"
+	ChunksManifest types.ListKind = "manifest"
 )
 
 // Define DataFacet constants for frontend UI

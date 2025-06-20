@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	MonitorsList types.ListKind = "Monitors"
+	MonitorsList types.ListKind = "monitors"
 )
 
 const (

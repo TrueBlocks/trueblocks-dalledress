@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	ExportsStatements   types.ListKind = "Statements"
-	ExportsTransfers    types.ListKind = "Transfers"
-	ExportsBalances     types.ListKind = "Balances"
-	ExportsTransactions types.ListKind = "Transactions"
+	ExportsStatements   types.ListKind = "statements"
+	ExportsTransfers    types.ListKind = "transfers"
+	ExportsBalances     types.ListKind = "balances"
+	ExportsTransactions types.ListKind = "transactions"
 )
 
 const (

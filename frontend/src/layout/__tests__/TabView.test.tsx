@@ -15,11 +15,11 @@ const { useActiveProject, useEvent } = await import('@hooks');
 describe('TabView', () => {
   // Use real facet configurations but reorder to have transactions first for test expectations
   const reorderedFacets = [
-    exportsFacets.find(f => f.id === types.DataFacet.TRANSACTIONS)!,
-    exportsFacets.find(f => f.id === types.DataFacet.BALANCES)!,
-    exportsFacets.find(f => f.id === types.DataFacet.STATEMENTS)!,
+    exportsFacets.find((f) => f.id === types.DataFacet.TRANSACTIONS)!,
+    exportsFacets.find((f) => f.id === types.DataFacet.BALANCES)!,
+    exportsFacets.find((f) => f.id === types.DataFacet.STATEMENTS)!,
   ];
-  
+
   const mockTabs = reorderedFacets.map((facet) => ({
     label: facet.label,
     value: facet.listKind || facet.id,

@@ -15,11 +15,11 @@ import (
 )
 
 const (
-	NamesAll      types.ListKind = "All"
-	NamesCustom   types.ListKind = "Custom"
-	NamesPrefund  types.ListKind = "Prefund"
-	NamesRegular  types.ListKind = "Regular"
-	NamesBaddress types.ListKind = "Baddress"
+	NamesAll      types.ListKind = "all"
+	NamesCustom   types.ListKind = "custom"
+	NamesPrefund  types.ListKind = "prefund"
+	NamesRegular  types.ListKind = "regular"
+	NamesBaddress types.ListKind = "baddress"
 )
 
 const (

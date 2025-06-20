@@ -3,28 +3,37 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActiveProject, useEvent } from '@hooks';
+import { useActiveFacet, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { chunks, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
 
+import {
+  CHUNKS_DEFAULT_FACET,
+  CHUNKS_ROUTE as ROUTE,
+  chunksFacets,
+} from './chunksFacets';
 import { getColumns } from './columns';
 
-const CHUNKS_ROUTE = '/chunks';
-const CHUNKS_DEFAULT_LIST = types.ListKind.STATS;
-
 export const Chunks = () => {
-  const { lastTab } = useActiveProject();
+  const activeFacetHook = useActiveFacet({
+    facets: chunksFacets,
+    defaultFacet: CHUNKS_DEFAULT_FACET,
+    viewRoute: ROUTE,
+  });
+
+  const { getCurrentListKind } = activeFacetHook;
+
   const [pageData, setPageData] = useState<chunks.ChunksPage | null>(null);
   const [_state, setState] = useState<types.LoadState>();
 
-  const [listKind, setListKind] = useState<types.ListKind>(
-    lastTab[CHUNKS_ROUTE] || CHUNKS_DEFAULT_LIST,
-  );
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({ viewName: CHUNKS_ROUTE, tabName: listKind }),
-    [listKind],
+    (): ViewStateKey => ({
+      viewName: ROUTE,
+      tabName: getCurrentListKind(),
+    }),
+    [getCurrentListKind],
   );
 
   const { handleError, clearError } = useErrorHandler();
@@ -32,17 +41,17 @@ export const Chunks = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  const listKindRef = useRef(listKind);
+  const listKindRef = useRef(getCurrentListKind());
 
   useEffect(() => {
-    listKindRef.current = listKind;
-  }, [listKind]);
+    listKindRef.current = getCurrentListKind();
+  }, [getCurrentListKind]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetChunksPage(
-        listKindRef.current,
+        listKindRef.current as types.ListKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -67,7 +76,8 @@ export const Chunks = () => {
   const currentData = useMemo(() => {
     if (!pageData) return [];
 
-    switch (listKind) {
+    const currentListKind = getCurrentListKind();
+    switch (currentListKind) {
       case types.ListKind.STATS:
         return pageData.chunksStats || [];
       case types.ListKind.INDEX:
@@ -79,14 +89,7 @@ export const Chunks = () => {
       default:
         return pageData.chunksStats || [];
     }
-  }, [pageData, listKind]);
-
-  useEffect(() => {
-    const currentTab = lastTab[CHUNKS_ROUTE];
-    if (currentTab && currentTab !== listKind) {
-      setListKind(currentTab);
-    }
-  }, [lastTab, listKind]);
+  }, [pageData, getCurrentListKind]);
 
   useEffect(() => {
     fetchData();
@@ -94,12 +97,12 @@ export const Chunks = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      await Reload(listKind);
+      await Reload(getCurrentListKind() as types.ListKind);
       await fetchData();
     } catch (err: unknown) {
-      handleError(err, `Failed to reload ${listKind}`);
+      handleError(err, `Failed to reload ${getCurrentListKind()}`);
     }
-  }, [listKind, fetchData, handleError]);
+  }, [getCurrentListKind, fetchData, handleError]);
 
   useEvent(
     msgs.EventType.DATA_LOADED,
@@ -112,7 +115,10 @@ export const Chunks = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  const columns = useMemo(() => getColumns(listKind), [listKind]);
+  const columns = useMemo(
+    () => getColumns(getCurrentListKind() as types.ListKind),
+    [getCurrentListKind],
+  );
 
   const perTabTable = useMemo(
     () => (
@@ -156,7 +162,7 @@ export const Chunks = () => {
 
   return (
     <div className="mainView">
-      <TabView tabs={tabs} route={CHUNKS_ROUTE} />
+      <TabView tabs={tabs} route={ROUTE} />
     </div>
   );
 };

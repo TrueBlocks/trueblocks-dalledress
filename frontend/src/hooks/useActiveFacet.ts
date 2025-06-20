@@ -42,15 +42,16 @@ export const useActiveFacet = (
   // Get the currently active facet from preferences or default
   const activeFacet = useMemo((): DataFacet => {
     const saved = lastTab[viewRoute];
+
     if (saved) {
-      // Find the facet that corresponds to the saved ListKind
-      const facetConfig = facets.find((f) => f.listKind === saved);
-      if (facetConfig) {
-        return facetConfig.id;
-      }
-      // Fallback: if saved value matches a facet ID directly
+      // First try to find facet by ID
       if (facets.some((f) => f.id === saved)) {
         return saved as DataFacet;
+      }
+      // Then try to find by ListKind
+      const facetByListKind = facets.find((f) => f.listKind === saved);
+      if (facetByListKind) {
+        return facetByListKind.id;
       }
     }
     return computedDefaultFacet;
@@ -59,7 +60,7 @@ export const useActiveFacet = (
   // Function to change the active facet
   const setActiveFacet = useCallback(
     (facet: DataFacet): void => {
-      // Find the corresponding ListKind for this facet, or fallback to the facet itself
+      // Find the corresponding ListKind for this facet
       const config = facets.find((f) => f.id === facet);
       const listKindValue = config?.listKind || (facet as types.ListKind);
       setLastTab(viewRoute, listKindValue);

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
+import { useActionMsgs, useActiveFacet, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, crud, msgs, types } from '@models';
@@ -11,9 +11,21 @@ import { getAddressString, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
 import { getColumns } from './';
+import {
+  ABIS_DEFAULT_FACET,
+  ABIS_ROUTE as ROUTE,
+  abisFacets,
+} from './abisFacets';
 
 export const Abis = () => {
-  const { lastTab } = useActiveProject();
+  const activeFacetHook = useActiveFacet({
+    facets: abisFacets,
+    defaultFacet: ABIS_DEFAULT_FACET,
+    viewRoute: ROUTE,
+  });
+
+  const { getCurrentListKind } = activeFacetHook;
+
   const { emitSuccess } = useActionMsgs('abis');
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
   const [state, setState] = useState<types.LoadState>();
@@ -21,12 +33,12 @@ export const Abis = () => {
     new Set(),
   );
 
-  const [listKind, setListKind] = useState<types.ListKind>(
-    lastTab[ABIS_ROUTE] || ABIS_DEFAULT_LIST,
-  );
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({ viewName: ABIS_ROUTE, tabName: listKind }),
-    [listKind],
+    (): ViewStateKey => ({
+      viewName: ROUTE,
+      tabName: getCurrentListKind(),
+    }),
+    [getCurrentListKind],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
@@ -34,19 +46,19 @@ export const Abis = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  const listKindRef = useRef(listKind);
+  const listKindRef = useRef(getCurrentListKind());
   const renderCnt = useRef(0);
   // renderCnt.current++;
 
   useEffect(() => {
-    listKindRef.current = listKind;
-  }, [listKind]);
+    listKindRef.current = getCurrentListKind();
+  }, [getCurrentListKind]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetAbisPage(
-        listKindRef.current,
+        listKindRef.current as types.ListKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -69,23 +81,17 @@ export const Abis = () => {
   ]);
 
   const currentData = useMemo(() => {
+    const currentListKind = getCurrentListKind();
     // For ABI-based tabs (Downloaded, Known), use abis data
     if (
-      listKind === types.ListKind.DOWNLOADED ||
-      listKind === types.ListKind.KNOWN
+      currentListKind === types.ListKind.DOWNLOADED ||
+      currentListKind === types.ListKind.KNOWN
     ) {
       return pageData?.abis || [];
     }
     // For function-based tabs (Functions, Events), use functions data
     return pageData?.functions || [];
-  }, [pageData?.abis, pageData?.functions, listKind]);
-
-  useEffect(() => {
-    const currentTab = lastTab[ABIS_ROUTE];
-    if (currentTab && currentTab !== listKindRef.current) {
-      setListKind(currentTab);
-    }
-  }, [lastTab]);
+  }, [pageData?.abis, pageData?.functions, getCurrentListKind]);
 
   useEvent(
     msgs.EventType.DATA_LOADED,
@@ -101,13 +107,13 @@ export const Abis = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, listKind]);
+  }, [fetchData]);
 
   useHotkeys([
     [
       'mod+r',
       () => {
-        Reload(listKind).then(() => {
+        Reload(getCurrentListKind() as types.ListKind).then(() => {
           fetchData();
         });
       },
@@ -142,7 +148,7 @@ export const Abis = () => {
         setTotalItems(Math.max(0, currentTotal - 1));
 
         AbisCrud(
-          listKindRef.current,
+          listKindRef.current as types.ListKind,
           crud.Operation.REMOVE,
           {} as types.Abi,
           address,
@@ -150,7 +156,7 @@ export const Abis = () => {
           .then(async () => {
             // Fetch fresh data to confirm the removal after successful backend operation
             const result = await GetAbisPage(
-              listKindRef.current,
+              listKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -253,12 +259,13 @@ export const Abis = () => {
   }, []);
 
   const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(pageData?.kind || ABIS_DEFAULT_LIST);
+    const baseColumns = getColumns(pageData?.kind || types.ListKind.DOWNLOADED);
 
     // Only add actions for ABI-based tabs (Downloaded, Known), not for Functions/Events tabs
     const shouldShowActions =
-      (pageData?.kind || ABIS_DEFAULT_LIST) === types.ListKind.DOWNLOADED ||
-      (pageData?.kind || ABIS_DEFAULT_LIST) === types.ListKind.KNOWN;
+      (pageData?.kind || types.ListKind.DOWNLOADED) ===
+        types.ListKind.DOWNLOADED ||
+      (pageData?.kind || types.ListKind.DOWNLOADED) === types.ListKind.KNOWN;
 
     if (!shouldShowActions) {
       // For Functions/Events tabs, filter out the actions column
@@ -345,10 +352,10 @@ export const Abis = () => {
   return (
     <div className="mainView">
       {(state as string) === '' && <div>{`state: ${state}`}</div>}
-      <TabView tabs={tabs} route={ABIS_ROUTE} />
+      <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${listKind}`}</h3>
+          <h3>{`Error fetching ${getCurrentListKind()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}
@@ -356,6 +363,3 @@ export const Abis = () => {
     </div>
   );
 };
-
-const ABIS_DEFAULT_LIST = types.ListKind.DOWNLOADED;
-const ABIS_ROUTE = '/abis';

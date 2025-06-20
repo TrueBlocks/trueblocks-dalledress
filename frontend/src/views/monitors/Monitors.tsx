@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
+import { useActionMsgs, useActiveFacet, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, monitors, msgs, types } from '@models';
@@ -11,9 +11,21 @@ import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
 import { getColumns } from './';
+import {
+  MONITORS_DEFAULT_FACET,
+  MONITORS_ROUTE as ROUTE,
+  monitorsFacets,
+} from './monitorsFacets';
 
 export const Monitors = () => {
-  const { lastTab } = useActiveProject();
+  const activeFacetHook = useActiveFacet({
+    facets: monitorsFacets,
+    defaultFacet: MONITORS_DEFAULT_FACET,
+    viewRoute: ROUTE,
+  });
+
+  const { getCurrentListKind } = activeFacetHook;
+
   const { emitSuccess, emitCleaningStatus, failure } =
     useActionMsgs('monitors');
   const [pageData, setPageData] = useState<monitors.MonitorsPage | null>(null);
@@ -22,12 +34,12 @@ export const Monitors = () => {
     new Set(),
   );
 
-  const [listKind, setListKind] = useState<types.ListKind>(
-    lastTab[MONITORS_ROUTE] || MONITORS_DEFAULT_LIST,
-  );
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({ viewName: MONITORS_ROUTE, tabName: listKind }),
-    [listKind],
+    (): ViewStateKey => ({
+      viewName: ROUTE,
+      tabName: getCurrentListKind(),
+    }),
+    [getCurrentListKind],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
@@ -36,18 +48,18 @@ export const Monitors = () => {
   const { filter } = useFiltering(viewStateKey);
   const { emitStatus } = useEmitters();
 
-  const listKindRef = useRef(listKind);
+  const listKindRef = useRef(getCurrentListKind());
   const renderCnt = useRef(0);
 
   useEffect(() => {
-    listKindRef.current = listKind;
-  }, [listKind]);
+    listKindRef.current = getCurrentListKind();
+  }, [getCurrentListKind]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetMonitorsPage(
-        listKindRef.current,
+        listKindRef.current as types.ListKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -77,13 +89,6 @@ export const Monitors = () => {
     return pageData?.monitors || [];
   }, [pageData?.monitors]);
 
-  useEffect(() => {
-    const currentTab = lastTab[MONITORS_ROUTE];
-    if (currentTab && currentTab !== listKind) {
-      setListKind(currentTab);
-    }
-  }, [lastTab, listKind]);
-
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
@@ -98,13 +103,13 @@ export const Monitors = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, listKind]);
+  }, [fetchData]);
 
   useHotkeys([
     [
       'mod+r',
       () => {
-        Reload(listKind).then(() => {
+        Reload(getCurrentListKind() as types.ListKind).then(() => {
           fetchData();
         });
       },
@@ -139,14 +144,14 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          listKindRef.current,
+          listKindRef.current as types.ListKind,
           crud.Operation.DELETE,
           {} as types.Monitor,
           address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              listKindRef.current,
+              listKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -207,14 +212,14 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          listKindRef.current,
+          listKindRef.current as types.ListKind,
           crud.Operation.UNDELETE,
           {} as types.Monitor,
           address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              listKindRef.current,
+              listKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -272,14 +277,14 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          listKindRef.current,
+          listKindRef.current as types.ListKind,
           crud.Operation.REMOVE,
           {} as types.Monitor,
           address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              listKindRef.current,
+              listKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -401,7 +406,7 @@ export const Monitors = () => {
   );
 
   const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(listKind);
+    const baseColumns = getColumns(getCurrentListKind() as types.ListKind);
 
     // Add action buttons render function to the actions column
     const actionsOverride: Partial<FormField> = {
@@ -446,7 +451,7 @@ export const Monitors = () => {
     return baseColumns.map((col) =>
       col.key === 'actions' ? { ...col, ...actionsOverride } : col,
     );
-  }, [listKind, handleMonitorAction, processingAddresses]);
+  }, [getCurrentListKind, handleMonitorAction, processingAddresses]);
 
   const handleSubmit = useCallback(
     (data: Record<string, unknown>) => {
@@ -497,10 +502,10 @@ export const Monitors = () => {
   return (
     <div className="mainView">
       {(state as string) === '' && <div>{`state: ${state}`}</div>}
-      <TabView tabs={tabs} route={MONITORS_ROUTE} />
+      <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${listKind}`}</h3>
+          <h3>{`Error fetching ${getCurrentListKind()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}
@@ -508,6 +513,3 @@ export const Monitors = () => {
     </div>
   );
 };
-
-const MONITORS_DEFAULT_LIST = types.ListKind.MONITORS;
-const MONITORS_ROUTE = '/monitors';

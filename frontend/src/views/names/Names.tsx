@@ -10,14 +10,20 @@ import {
   usePagination,
 } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActionMsgs, useActiveProject, useEvent } from '@hooks';
+import { useActionMsgs, useActiveFacet, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, msgs, names, types } from '@models';
 import { getAddressString, useErrorHandler } from '@utils';
 
+import { DataFacetConfig } from '../../hooks/useActiveFacet.types';
 import { Address } from '../../types/address';
 import { getColumns } from './columns';
+import {
+  NAMES_DEFAULT_FACET,
+  NAMES_ROUTE as ROUTE,
+  namesFacets,
+} from './namesFacets';
 
 type IndexableName = types.Name & Record<string, unknown>;
 
@@ -35,19 +41,26 @@ function removeUndefinedProps(
 }
 
 export const Names = () => {
-  const { lastTab } = useActiveProject();
   const [pageData, setPageData] = useState<names.NamesPage | null>(null);
   const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
 
-  const [listKind, setListKind] = useState<types.ListKind>(
-    lastTab[NAMES_ROUTE] || NAMES_DEFAULT_LIST,
-  );
+  const activeFacetHook = useActiveFacet({
+    facets: namesFacets,
+    defaultFacet: NAMES_DEFAULT_FACET,
+    viewRoute: ROUTE,
+  });
+
+  const { activeFacet, getCurrentListKind } = activeFacetHook;
+
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({ viewName: NAMES_ROUTE, tabName: listKind }),
-    [listKind],
+    (): ViewStateKey => ({
+      viewName: ROUTE,
+      tabName: getCurrentListKind(),
+    }),
+    [getCurrentListKind],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
@@ -56,19 +69,21 @@ export const Names = () => {
   const { filter, setFiltering } = useFiltering(viewStateKey);
   const { emitSuccess, failure } = useActionMsgs('names');
 
-  const listKindRef = useRef(listKind);
+  const listKindRef = useRef(activeFacetHook.getCurrentListKind());
   const renderCnt = useRef(0);
   // renderCnt.current++;
 
   useEffect(() => {
-    listKindRef.current = listKind;
-  }, [listKind]);
+    listKindRef.current = getCurrentListKind();
+  }, [getCurrentListKind]);
 
   const fetchData = useCallback(async () => {
     clearError();
     try {
+      const currentListKind = getCurrentListKind() as types.ListKind;
+
       const result = await GetNamesPage(
-        listKindRef.current,
+        currentListKind,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -78,7 +93,7 @@ export const Names = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${listKindRef.current}`);
+      handleError(err, `Failed to fetch ${getCurrentListKind()}`);
     }
   }, [
     clearError,
@@ -88,25 +103,20 @@ export const Names = () => {
     filter,
     setTotalItems,
     handleError,
+    getCurrentListKind,
   ]);
 
   const currentData = useMemo(() => {
     return pageData?.names || [];
   }, [pageData?.names]);
 
-  useEffect(() => {
-    const currentTab = lastTab[NAMES_ROUTE];
-    if (currentTab && currentTab !== listKind) {
-      setListKind(currentTab);
-    }
-  }, [lastTab, listKind]);
-
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'names') {
         const eventListKind = payload.listKind as types.ListKind | undefined;
-        if (eventListKind === listKindRef.current) {
+        const currentListKind = activeFacetHook.getCurrentListKind();
+        if (eventListKind === currentListKind) {
           fetchData();
         }
       }
@@ -115,15 +125,17 @@ export const Names = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, listKind]);
+  }, [fetchData]);
 
   useHotkeys([
     [
       'mod+r',
       () => {
-        Reload(listKind).then(() => {
-          fetchData();
-        });
+        Reload(activeFacetHook.getCurrentListKind() as types.ListKind).then(
+          () => {
+            fetchData();
+          },
+        );
       },
     ],
   ]);
@@ -150,14 +162,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          listKindRef.current,
+          listKindRef.current as types.ListKind,
           crud.Operation.DELETE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              listKindRef.current,
+              listKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -218,14 +230,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          listKindRef.current,
+          listKindRef.current as types.ListKind,
           crud.Operation.UNDELETE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              listKindRef.current,
+              listKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -283,14 +295,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          listKindRef.current,
+          listKindRef.current as types.ListKind,
           crud.Operation.REMOVE,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              listKindRef.current,
+              listKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -351,14 +363,14 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          listKindRef.current,
+          listKindRef.current as types.ListKind,
           crud.Operation.AUTONAME,
           {} as types.Name,
           address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              listKindRef.current,
+              listKindRef.current as types.ListKind,
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -438,12 +450,16 @@ export const Names = () => {
   const currentColumns = useMemo(() => {
     const handleChipClick = (chip: string) => {
       setFiltering(chip);
-      Reload(listKind).then(() => {
-        fetchData();
-      });
+      Reload(activeFacetHook.getCurrentListKind() as types.ListKind).then(
+        () => {
+          fetchData();
+        },
+      );
     };
 
-    const baseColumns = getColumns(listKind).map((col) =>
+    const baseColumns = getColumns(
+      activeFacetHook.getCurrentListKind() as types.ListKind,
+    ).map((col) =>
       col.key === 'chips'
         ? {
             ...col,
@@ -507,7 +523,7 @@ export const Names = () => {
       col.key === 'actions' ? { ...col, ...actionsOverride } : col,
     );
   }, [
-    listKind,
+    activeFacetHook,
     setFiltering,
     fetchData,
     processingAddresses,
@@ -558,14 +574,14 @@ export const Names = () => {
       });
 
       NamesCrud(
-        listKindRef.current,
+        listKindRef.current as types.ListKind,
         crud.Operation.UPDATE,
         submittedName as types.Name,
         '',
       )
         .then(async () => {
           const result = await GetNamesPage(
-            listKindRef.current,
+            listKindRef.current as types.ListKind,
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
             sort,
@@ -624,43 +640,22 @@ export const Names = () => {
   );
 
   const tabs = useMemo(
-    () => [
-      {
-        label: types.ListKind.ALL,
-        value: types.ListKind.ALL,
+    () =>
+      activeFacetHook.availableFacets.map((facetConfig: DataFacetConfig) => ({
+        label: facetConfig.label,
+        value: facetConfig.id,
         content: perTabTable,
-      },
-      {
-        label: types.ListKind.CUSTOM,
-        value: types.ListKind.CUSTOM,
-        content: perTabTable,
-      },
-      {
-        label: types.ListKind.PREFUND,
-        value: types.ListKind.PREFUND,
-        content: perTabTable,
-      },
-      {
-        label: types.ListKind.REGULAR,
-        value: types.ListKind.REGULAR,
-        content: perTabTable,
-      },
-      {
-        label: types.ListKind.BADDRESS,
-        value: types.ListKind.BADDRESS,
-        content: perTabTable,
-      },
-    ],
-    [perTabTable],
+      })),
+    [activeFacetHook.availableFacets, perTabTable],
   );
 
   return (
     <div className="mainView">
       {(state as string) === '' && <div>{`state: ${state}`}</div>}
-      <TabView tabs={tabs} route={NAMES_ROUTE} />
+      <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${listKind}`}</h3>
+          <h3>{`Error fetching ${activeFacetHook.getCurrentListKind()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}
@@ -668,6 +663,3 @@ export const Names = () => {
     </div>
   );
 };
-
-const NAMES_DEFAULT_LIST = types.ListKind.ALL;
-const NAMES_ROUTE = '/names';

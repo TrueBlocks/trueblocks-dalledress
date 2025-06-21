@@ -14,12 +14,14 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
+type Name = coreTypes.Name
+
 var (
-	namesStore *store.Store[coreTypes.Name]
+	namesStore *store.Store[Name]
 	namesMu    sync.Mutex
 )
 
-func GetNamesStore() *store.Store[coreTypes.Name] {
+func GetNamesStore() *store.Store[Name] {
 	namesMu.Lock()
 	defer namesMu.Unlock()
 
@@ -41,14 +43,14 @@ func GetNamesStore() *store.Store[coreTypes.Name] {
 			return nil
 		}
 
-		processFunc := func(itemIntf interface{}) *coreTypes.Name {
-			if name, ok := itemIntf.(*coreTypes.Name); ok {
+		processFunc := func(itemIntf interface{}) *Name {
+			if name, ok := itemIntf.(*Name); ok {
 				return name
 			}
 			return nil
 		}
 
-		mappingFunc := func(item *coreTypes.Name) (key interface{}, includeInMap bool) {
+		mappingFunc := func(item *Name) (key interface{}, includeInMap bool) {
 			if item == nil || item.Address.IsZero() {
 				return nil, false
 			}
@@ -71,6 +73,6 @@ func GetStoreName(dataFacet types.DataFacet) string {
 	}
 }
 
-func (nc *NamesCollection) NameFromAddress(address base.Address) (*coreTypes.Name, bool) {
+func (nc *NamesCollection) NameFromAddress(address base.Address) (*Name, bool) {
 	return namesStore.GetItemFromMap(address)
 }

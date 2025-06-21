@@ -26,7 +26,7 @@ func assertNamesPage(t *testing.T, page types.Page) *NamesPage {
 
 func TestNamesMatchesFilter(t *testing.T) {
 	collection := NewNamesCollection()
-	testName := &coreTypes.Name{
+	testName := &Name{
 		Address:    base.HexToAddress("0x1234567890123456789012345678901234567890"),
 		Name:       "Test Name",
 		Tags:       "testing,example",

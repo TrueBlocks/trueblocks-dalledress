@@ -1,12 +1,11 @@
 package names
 
 import (
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	testingPkg "github.com/TrueBlocks/trueblocks-dalledress/pkg/testing"
 )
 
 type MockSDKName struct {
-	*testingPkg.MockSDKBase[coreTypes.Name]
+	*testingPkg.MockSDKBase[Name]
 }
 
 func NewMockSDKName() *MockSDKName {
@@ -15,7 +14,7 @@ func NewMockSDKName() *MockSDKName {
 	}
 }
 
-func (m *MockSDKName) SetNames(names []coreTypes.Name) {
+func (m *MockSDKName) SetNames(names []Name) {
 	m.SetItems(names)
 }
 

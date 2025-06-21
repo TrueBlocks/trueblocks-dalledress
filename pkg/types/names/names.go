@@ -31,12 +31,12 @@ func init() {
 }
 
 type NamesPage struct {
-	Facet         types.DataFacet   `json:"facet"`
-	Names         []*coreTypes.Name `json:"names"`
-	TotalItems    int               `json:"totalItems"`
-	ExpectedTotal int               `json:"expectedTotal"`
-	IsFetching    bool              `json:"isFetching"`
-	State         types.LoadState   `json:"state"`
+	Facet         types.DataFacet `json:"facet"`
+	Names         []*Name         `json:"names"`
+	TotalItems    int             `json:"totalItems"`
+	ExpectedTotal int             `json:"expectedTotal"`
+	IsFetching    bool            `json:"isFetching"`
+	State         types.LoadState `json:"state"`
 }
 
 func (np *NamesPage) GetFacet() types.DataFacet {
@@ -60,11 +60,11 @@ func (np *NamesPage) GetState() types.LoadState {
 }
 
 type NamesCollection struct {
-	allFacet      *facets.Facet[coreTypes.Name]
-	customFacet   *facets.Facet[coreTypes.Name]
-	prefundFacet  *facets.Facet[coreTypes.Name]
-	regularFacet  *facets.Facet[coreTypes.Name]
-	baddressFacet *facets.Facet[coreTypes.Name]
+	allFacet      *facets.Facet[Name]
+	customFacet   *facets.Facet[Name]
+	prefundFacet  *facets.Facet[Name]
+	regularFacet  *facets.Facet[Name]
+	baddressFacet *facets.Facet[Name]
 	summary       types.Summary
 	summaryMutex  sync.RWMutex
 }
@@ -90,7 +90,7 @@ func (nc *NamesCollection) initializeFacets() {
 
 	customFacet := facets.NewFacetWithSummary(
 		NamesCustom,
-		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Custom != 0 },
+		func(name *Name) bool { return name.Parts&coreTypes.Custom != 0 },
 		nil,
 		namesStore,
 		"names",
@@ -99,7 +99,7 @@ func (nc *NamesCollection) initializeFacets() {
 
 	prefundFacet := facets.NewFacetWithSummary(
 		NamesPrefund,
-		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Prefund != 0 },
+		func(name *Name) bool { return name.Parts&coreTypes.Prefund != 0 },
 		nil,
 		namesStore,
 		"names",
@@ -108,7 +108,7 @@ func (nc *NamesCollection) initializeFacets() {
 
 	regularFacet := facets.NewFacetWithSummary(
 		NamesRegular,
-		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Regular != 0 },
+		func(name *Name) bool { return name.Parts&coreTypes.Regular != 0 },
 		nil,
 		namesStore,
 		"names",
@@ -117,7 +117,7 @@ func (nc *NamesCollection) initializeFacets() {
 
 	baddressFacet := facets.NewFacetWithSummary(
 		NamesBaddress,
-		func(name *coreTypes.Name) bool { return name.Parts&coreTypes.Baddress != 0 },
+		func(name *Name) bool { return name.Parts&coreTypes.Baddress != 0 },
 		nil,
 		namesStore,
 		"names",
@@ -136,7 +136,7 @@ func (nc *NamesCollection) LoadData(dataFacet types.DataFacet) {
 		return
 	}
 
-	var facet *facets.Facet[coreTypes.Name]
+	var facet *facets.Facet[Name]
 	var facetName types.DataFacet
 
 	switch dataFacet {
@@ -177,7 +177,7 @@ func (nc *NamesCollection) Reset(dataFacet types.DataFacet) {
 }
 
 func (nc *NamesCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
-	var facet *facets.Facet[coreTypes.Name]
+	var facet *facets.Facet[Name]
 
 	switch dataFacet {
 	case NamesAll:
@@ -211,7 +211,7 @@ func (nc *NamesCollection) GetPage(
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
-	var facet *facets.Facet[coreTypes.Name]
+	var facet *facets.Facet[Name]
 
 	switch dataFacet {
 	case NamesAll:
@@ -230,14 +230,14 @@ func (nc *NamesCollection) GetPage(
 			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
 
-	var filterFunc func(*coreTypes.Name) bool
+	var filterFunc func(*Name) bool
 	if filter != "" {
-		filterFunc = func(name *coreTypes.Name) bool {
+		filterFunc = func(name *Name) bool {
 			return nc.matchesFilter(name, filter)
 		}
 	}
 
-	sortFunc := func(items []coreTypes.Name, sort sdk.SortSpec) error {
+	sortFunc := func(items []Name, sort sdk.SortSpec) error {
 		return sdk.SortNames(items, sort)
 	}
 
@@ -253,7 +253,7 @@ func (nc *NamesCollection) GetPage(
 		return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
 	}
 
-	names := make([]*coreTypes.Name, 0, len(pageResult.Items))
+	names := make([]*Name, 0, len(pageResult.Items))
 	for i := range pageResult.Items {
 		names = append(names, &pageResult.Items[i])
 	}
@@ -268,7 +268,7 @@ func (nc *NamesCollection) GetPage(
 	}, nil
 }
 
-func (nc *NamesCollection) matchesFilter(name *coreTypes.Name, filter string) bool {
+func (nc *NamesCollection) matchesFilter(name *Name, filter string) bool {
 	filterLower := strings.ToLower(filter)
 
 	addressHex := strings.ToLower(name.Address.Hex())
@@ -365,7 +365,7 @@ func (nc *NamesCollection) GetSummary() types.Summary {
 }
 
 func (nc *NamesCollection) AccumulateItem(item interface{}, summary *types.Summary) {
-	if name, ok := item.(*coreTypes.Name); ok {
+	if name, ok := item.(*Name); ok {
 		nc.summaryMutex.Lock()
 		defer nc.summaryMutex.Unlock()
 

@@ -5,7 +5,6 @@ import (
 	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -19,9 +18,9 @@ func (nc *NamesCollection) Crud(
 	item interface{},
 ) error {
 	// Type assertion to convert interface{} to the expected type
-	name, ok := item.(*coreTypes.Name)
+	name, ok := item.(*Name)
 	if !ok {
-		return fmt.Errorf("invalid type for name operation: expected *coreTypes.Name, got %T", item)
+		return fmt.Errorf("invalid type for name operation: expected *Name, got %T", item)
 	}
 
 	if name == nil || name.Address.IsZero() {

@@ -4,7 +4,6 @@ package app
 import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -22,7 +21,7 @@ func (a *App) GetNamesPage(
 func (a *App) NamesCrud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
-	name *coreTypes.Name,
+	name *names.Name,
 	address string,
 ) error {
 	return a.names.Crud(dataFacet, op, name)
@@ -56,7 +55,7 @@ func (a *App) PublishNames(tabName string) error {
 	return nil
 }
 
-func (a *App) NameFromAddress(address string) (*coreTypes.Name, bool) {
+func (a *App) NameFromAddress(address string) (*names.Name, bool) {
 	return a.names.NameFromAddress(base.HexToAddress(address))
 }
 

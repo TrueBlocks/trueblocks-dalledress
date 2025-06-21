@@ -9,7 +9,7 @@ type Summary struct {
 
 type SummaryAccumulator interface {
 	AccumulateItem(item interface{}, summary *Summary)
-	GetCurrentSummary() Summary
+	GetSummary() Summary
 	ResetSummary()
 }
 

@@ -358,7 +358,7 @@ func (nc *NamesCollection) GetCollectionName() string {
 	return "names"
 }
 
-func (nc *NamesCollection) GetCurrentSummary() types.Summary {
+func (nc *NamesCollection) GetSummary() types.Summary {
 	nc.summaryMutex.RLock()
 	defer nc.summaryMutex.RUnlock()
 	return nc.summary
@@ -398,8 +398,4 @@ func (nc *NamesCollection) ResetSummary() {
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: time.Now().Unix(),
 	}
-}
-
-func (nc *NamesCollection) GetSummary() types.Summary {
-	return nc.GetCurrentSummary()
 }

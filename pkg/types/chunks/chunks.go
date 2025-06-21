@@ -558,7 +558,7 @@ func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summ
 	}
 }
 
-func (cc *ChunksCollection) GetCurrentSummary() types.Summary {
+func (cc *ChunksCollection) GetSummary() types.Summary {
 	cc.summaryMutex.RLock()
 	defer cc.summaryMutex.RUnlock()
 
@@ -587,8 +587,4 @@ func (cc *ChunksCollection) ResetSummary() {
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: 0,
 	}
-}
-
-func (cc *ChunksCollection) GetSummary() types.Summary {
-	return cc.GetCurrentSummary()
 }

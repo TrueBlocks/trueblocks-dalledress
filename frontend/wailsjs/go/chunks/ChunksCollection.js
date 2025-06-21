@@ -14,10 +14,6 @@ export function GetCollectionName() {
   return window['go']['chunks']['ChunksCollection']['GetCollectionName']();
 }
 
-export function GetCurrentSummary() {
-  return window['go']['chunks']['ChunksCollection']['GetCurrentSummary']();
-}
-
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['chunks']['ChunksCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

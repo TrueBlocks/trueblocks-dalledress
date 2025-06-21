@@ -18,10 +18,6 @@ export function GetCollectionName() {
   return window['go']['abis']['AbisCollection']['GetCollectionName']();
 }
 
-export function GetCurrentSummary() {
-  return window['go']['abis']['AbisCollection']['GetCurrentSummary']();
-}
-
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

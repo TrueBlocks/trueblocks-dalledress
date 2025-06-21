@@ -102,7 +102,7 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) {
 				CurrentCount:  currentTotalCount,
 				ExpectedTotal: expectedTotal,
 				State:         types.StateFetching,
-				Summary:       pr.summaryProvider.GetCurrentSummary(),
+				Summary:       pr.summaryProvider.GetSummary(),
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "streaming",
 			}
@@ -130,7 +130,7 @@ func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) {
 				CurrentCount:  currentTotalCount,
 				ExpectedTotal: expectedTotal,
 				State:         types.StateFetching,
-				Summary:       pr.summaryProvider.GetCurrentSummary(),
+				Summary:       pr.summaryProvider.GetSummary(),
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "streaming",
 			}

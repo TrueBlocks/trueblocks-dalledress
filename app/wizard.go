@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/rpc"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/validation"
 )
 
@@ -27,7 +28,7 @@ func (a *App) GetUserInfoStatus() UserInfoStatus {
 		}
 
 		if hasRpcs {
-			_, err := a.CheckRPCStatus()
+			_, err := rpc.CheckRPCStatus()
 			rpcUnavailable = err != nil
 		}
 	}
@@ -99,20 +100,4 @@ func (a *App) SetChain(ch preferences.Chain) error {
 	}
 
 	return preferences.SetUserPreferences(&a.Preferences.User)
-}
-
-func (a *App) CheckRPCStatus() (string, error) {
-	var lastErr error = fmt.Errorf("no RPCs configured")
-
-	for _, chain := range a.Preferences.User.Chains {
-		for _, rpc := range chain.RpcProviders {
-			if err := validation.ValidRPC(rpc); err == nil {
-				return rpc, nil
-			} else {
-				lastErr = err
-			}
-		}
-	}
-
-	return "", lastErr
 }

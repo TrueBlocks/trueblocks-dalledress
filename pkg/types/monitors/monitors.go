@@ -307,7 +307,7 @@ func (mc *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Su
 	summary.CustomData["totalFileSize"] = totalFileSize
 }
 
-func (mc *MonitorsCollection) GetCurrentSummary() types.Summary {
+func (mc *MonitorsCollection) GetSummary() types.Summary {
 	mc.summaryMutex.RLock()
 	defer mc.summaryMutex.RUnlock()
 
@@ -336,8 +336,4 @@ func (mc *MonitorsCollection) ResetSummary() {
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: 0,
 	}
-}
-
-func (mc *MonitorsCollection) GetSummary() types.Summary {
-	return mc.GetCurrentSummary()
 }

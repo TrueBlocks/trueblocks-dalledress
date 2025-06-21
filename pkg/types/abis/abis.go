@@ -28,8 +28,8 @@ func init() {
 
 type AbisPage struct {
 	Facet         types.DataFacet      `json:"facet"`
-	Abis          []coreTypes.Abi      `json:"abis,omitempty"`
-	Functions     []coreTypes.Function `json:"functions,omitempty"`
+	Abis          []coreTypes.Abi      `json:"abis"`
+	Functions     []coreTypes.Function `json:"functions"`
 	TotalItems    int                  `json:"totalItems"`
 	ExpectedTotal int                  `json:"expectedTotal"`
 	IsFetching    bool                 `json:"isFetching"`
@@ -406,7 +406,7 @@ func (ac *AbisCollection) AccumulateItem(item interface{}, summary *types.Summar
 	}
 }
 
-func (ac *AbisCollection) GetCurrentSummary() types.Summary {
+func (ac *AbisCollection) GetSummary() types.Summary {
 	ac.summaryMutex.RLock()
 	defer ac.summaryMutex.RUnlock()
 
@@ -435,8 +435,4 @@ func (ac *AbisCollection) ResetSummary() {
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: 0,
 	}
-}
-
-func (ac *AbisCollection) GetSummary() types.Summary {
-	return ac.GetCurrentSummary()
 }

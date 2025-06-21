@@ -12,8 +12,6 @@ export function Crud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<
 
 export function GetCollectionName():Promise<string>;
 
-export function GetCurrentSummary():Promise<types.Summary>;
-
 export function GetNamesPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
 export function GetPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;

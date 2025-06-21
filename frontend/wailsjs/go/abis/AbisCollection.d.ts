@@ -13,8 +13,6 @@ export function GetAbisPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sd
 
 export function GetCollectionName():Promise<string>;
 
-export function GetCurrentSummary():Promise<types.Summary>;
-
 export function GetPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
 
 export function GetStoreForFacet(arg1:types.DataFacet):Promise<string>;

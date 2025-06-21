@@ -16,6 +16,7 @@ import (
 )
 
 type FilterFunc[T any] func(item *T) bool
+type DupFunc[T any] func(existing []*T, newItem *T) bool
 
 type PageResult[T any] struct {
 	Items      []T
@@ -30,7 +31,7 @@ type Facet[T any] struct {
 	expectedCnt     int
 	dataFacet       types.DataFacet
 	filterFunc      FilterFunc[T]
-	isDupFunc       func(existing []*T, newItem *T) bool
+	isDupFunc       DupFunc[T]
 	mutex           sync.RWMutex
 	progress        *progress.Progress
 	summaryProvider types.SummaryAccumulator
@@ -41,7 +42,7 @@ type Facet[T any] struct {
 func NewFacet[T any](
 	dataFacet types.DataFacet,
 	filterFunc FilterFunc[T],
-	isDupFunc func(existing []*T, newItem *T) bool,
+	isDupFunc DupFunc[T],
 	store *store.Store[T],
 ) *Facet[T] {
 	facet := &Facet[T]{
@@ -62,7 +63,7 @@ func NewFacet[T any](
 func NewFacetWithSummary[T any](
 	dataFacet types.DataFacet,
 	filterFunc FilterFunc[T],
-	isDupFunc func(existing []*T, newItem *T) bool,
+	isDupFunc DupFunc[T],
 	store *store.Store[T],
 	collectionName string,
 	summaryProvider types.SummaryAccumulator,
@@ -358,7 +359,7 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 				CurrentCount:  currentCount,
 				ExpectedTotal: currentCount,
 				State:         types.StateLoaded,
-				Summary:       r.summaryProvider.GetCurrentSummary(),
+				Summary:       r.summaryProvider.GetSummary(),
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "complete",
 			}

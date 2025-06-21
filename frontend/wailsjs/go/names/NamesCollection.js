@@ -14,10 +14,6 @@ export function GetCollectionName() {
   return window['go']['names']['NamesCollection']['GetCollectionName']();
 }
 
-export function GetCurrentSummary() {
-  return window['go']['names']['NamesCollection']['GetCurrentSummary']();
-}
-
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['names']['NamesCollection']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
 }

@@ -13,8 +13,6 @@ export function Crud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<
 
 export function GetCollectionName():Promise<string>;
 
-export function GetCurrentSummary():Promise<types.Summary>;
-
 export function GetMonitorsPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
 
 export function GetPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;

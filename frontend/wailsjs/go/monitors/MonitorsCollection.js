@@ -18,10 +18,6 @@ export function GetCollectionName() {
   return window['go']['monitors']['MonitorsCollection']['GetCollectionName']();
 }
 
-export function GetCurrentSummary() {
-  return window['go']['monitors']['MonitorsCollection']['GetCurrentSummary']();
-}
-
 export function GetMonitorsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['monitors']['MonitorsCollection']['GetMonitorsPage'](arg1, arg2, arg3, arg4, arg5);
 }

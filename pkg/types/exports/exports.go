@@ -28,10 +28,10 @@ func init() {
 
 type ExportsPage struct {
 	Facet         types.DataFacet         `json:"facet"`
-	Statements    []coreTypes.Statement   `json:"statements,omitempty"`
-	Transfers     []coreTypes.Transfer    `json:"transfers,omitempty"`
-	Balances      []coreTypes.Token       `json:"balances,omitempty"`
-	Transactions  []coreTypes.Transaction `json:"transactions,omitempty"`
+	Statements    []coreTypes.Statement   `json:"statements"`
+	Transfers     []coreTypes.Transfer    `json:"transfers"`
+	Balances      []coreTypes.Token       `json:"balances"`
+	Transactions  []coreTypes.Transaction `json:"transactions"`
 	TotalItems    int                     `json:"totalItems"`
 	ExpectedTotal int                     `json:"expectedTotal"`
 	IsFetching    bool                    `json:"isFetching"`
@@ -458,7 +458,7 @@ func (ec *ExportsCollection) AccumulateItem(item interface{}, summary *types.Sum
 	}
 }
 
-func (ec *ExportsCollection) GetCurrentSummary() types.Summary {
+func (ec *ExportsCollection) GetSummary() types.Summary {
 	ec.summaryMutex.RLock()
 	defer ec.summaryMutex.RUnlock()
 
@@ -487,8 +487,4 @@ func (ec *ExportsCollection) ResetSummary() {
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: 0,
 	}
-}
-
-func (ec *ExportsCollection) GetSummary() types.Summary {
-	return ec.GetCurrentSummary()
 }

@@ -15,6 +15,10 @@ lint:
 test:
 	@export $(grep -v '^#' ../.env | xargs) >/dev/null && yarn test
 
+generate:
+	@cd ~/Development/trueblocks-core/build && make -j 12 goMaker && cd -
+	@goMaker
+
 app:
 	@rm -fR build/bin
 	@wails build

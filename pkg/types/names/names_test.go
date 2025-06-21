@@ -83,3 +83,31 @@ func TestNamesCollectionDomainSpecificFiltering(t *testing.T) {
 		}
 	})
 }
+
+// ...existing code...
+
+// -----------------------------------------------------------------------------
+// Test Coverage Summary for names_detailed_test.go
+//
+// TestNamesCollectionLoadDataAsync
+// - "LoadDataDoesNotBlock": Verifies that LoadData completes without panicking.
+// - "LoadDataStartsAsyncOperation": Ensures LoadData starts an async operation and NeedsUpdate can be called during loading.
+// - "MultipleLoadDataCalls": Confirms multiple sequential LoadData calls do not panic and NeedsUpdate remains functional.
+// - "ConcurrentLoadDataCalls": Checks that concurrent LoadData calls from multiple goroutines do not panic and NeedsUpdate remains functional.
+//
+// TestNamesCollectionAdvancedAsync
+// - "LoadDataAllDataFacets": For each data facet, verifies LoadData and NeedsUpdate do not panic and work as expected.
+// - "ResetDuringAsyncLoad": Ensures Reset can be called during or after LoadData without panics and LoadData remains functional after Reset.
+// - "GetPageDuringAsyncLoad": Confirms GetPage can be called during async LoadData without panics.
+//
+// TestNamesCollectionIntegration
+// - "MultipleDataFacetsWorkflow": Loads all data facets, then for each, gets a page and checks facet and item count, including type assertion for NamesPage.
+// - "FilteringAcrossDataFacets": For each data facet and various filters, gets a page and checks correct type, facet, and non-negative item count.
+// - "SortingAndPagination": For selected data facets, sort specs, and page sizes, gets a page and checks correct type, facet, and that the number of names does not exceed the page size.
+//
+// TestNamesCollectionDomainSpecificIntegration
+// - "SpecialFilterStrings": For a variety of special and edge-case filter strings, ensures GetPage does not panic.
+// - "ResetAfterMultipleLoads": Loads multiple data facets, resets one, and verifies NeedsUpdate does not panic for any facet.
+//
+// -----------------------------------------------------------------------------
+// End of Test

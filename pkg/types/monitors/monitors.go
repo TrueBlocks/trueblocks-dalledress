@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -21,12 +20,12 @@ func init() {
 }
 
 type MonitorsPage struct {
-	Facet         types.DataFacet     `json:"facet"`
-	Monitors      []coreTypes.Monitor `json:"monitors,omitempty"`
-	TotalItems    int                 `json:"totalItems"`
-	ExpectedTotal int                 `json:"expectedTotal"`
-	IsFetching    bool                `json:"isFetching"`
-	State         types.LoadState     `json:"state"`
+	Facet         types.DataFacet `json:"facet"`
+	Monitors      []Monitor       `json:"monitors"`
+	TotalItems    int             `json:"totalItems"`
+	ExpectedTotal int             `json:"expectedTotal"`
+	IsFetching    bool            `json:"isFetching"`
+	State         types.LoadState `json:"state"`
 }
 
 func (mp *MonitorsPage) GetFacet() types.DataFacet {
@@ -50,7 +49,7 @@ func (mp *MonitorsPage) GetState() types.LoadState {
 }
 
 type MonitorsCollection struct {
-	monitorsFacet *facets.Facet[coreTypes.Monitor]
+	monitorsFacet *facets.Facet[Monitor]
 	summary       types.Summary
 	summaryMutex  sync.RWMutex
 }
@@ -89,7 +88,7 @@ func (mc *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
 		return
 	}
 
-	var facet *facets.Facet[coreTypes.Monitor]
+	var facet *facets.Facet[Monitor]
 	var facetName string
 
 	switch dataFacet {
@@ -116,15 +115,15 @@ func (mc *MonitorsCollection) GetPage(
 ) (types.Page, error) {
 	switch dataFacet {
 	case MonitorsList:
-		var filterFunc func(*coreTypes.Monitor) bool
+		var filterFunc func(*Monitor) bool
 		if filter != "" {
-			filterFunc = func(monitor *coreTypes.Monitor) bool {
+			filterFunc = func(monitor *Monitor) bool {
 				return mc.matchesFilter(monitor, filter)
 			}
 		}
 
-		var sortFunc func([]coreTypes.Monitor, sdk.SortSpec) error
-		sortFunc = func(items []coreTypes.Monitor, sort sdk.SortSpec) error {
+		var sortFunc func([]Monitor, sdk.SortSpec) error
+		sortFunc = func(items []Monitor, sort sdk.SortSpec) error {
 			return sdk.SortMonitors(items, sort)
 		}
 
@@ -165,7 +164,7 @@ func (mc *MonitorsCollection) Reset(dataFacet types.DataFacet) {
 }
 
 func (mc *MonitorsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
-	var facet *facets.Facet[coreTypes.Monitor]
+	var facet *facets.Facet[Monitor]
 
 	switch dataFacet {
 	case MonitorsList:
@@ -185,7 +184,7 @@ func (mc *MonitorsCollection) getExpectedTotal(dataFacet types.DataFacet) int {
 	return mc.monitorsFacet.ExpectedCount()
 }
 
-func (mc *MonitorsCollection) matchesFilter(monitor *coreTypes.Monitor, filter string) bool {
+func (mc *MonitorsCollection) matchesFilter(monitor *Monitor, filter string) bool {
 	if filter == "" {
 		return true
 	}
@@ -262,7 +261,7 @@ func (mc *MonitorsCollection) GetCollectionName() string {
 }
 
 func (mc *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Summary) {
-	monitor, ok := item.(*coreTypes.Monitor)
+	monitor, ok := item.(*Monitor)
 	if !ok {
 		return
 	}

@@ -13,12 +13,14 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
+type Monitor = coreTypes.Monitor
+
 var (
-	monitorsStore *store.Store[coreTypes.Monitor]
+	monitorsStore *store.Store[Monitor]
 	monitorsMu    sync.Mutex
 )
 
-func GetMonitorsStore() *store.Store[coreTypes.Monitor] {
+func GetMonitorsStore() *store.Store[Monitor] {
 	monitorsMu.Lock()
 	defer monitorsMu.Unlock()
 
@@ -38,8 +40,8 @@ func GetMonitorsStore() *store.Store[coreTypes.Monitor] {
 			return nil
 		}
 
-		processFunc := func(itemIntf interface{}) *coreTypes.Monitor {
-			if monitor, ok := itemIntf.(*coreTypes.Monitor); ok {
+		processFunc := func(itemIntf interface{}) *Monitor {
+			if monitor, ok := itemIntf.(*Monitor); ok {
 				return monitor
 			}
 			return nil

@@ -341,7 +341,7 @@ export namespace monitors {
 	
 	export class MonitorsPage {
 	    facet: types.DataFacet;
-	    monitors?: types.Monitor[];
+	    monitors: types.Monitor[];
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;

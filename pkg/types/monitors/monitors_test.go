@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +25,7 @@ func assertMonitorsPage(t *testing.T, page types.Page) *MonitorsPage {
 
 func TestMonitorsMatchesFilter(t *testing.T) {
 	collection := NewMonitorsCollection()
-	testMonitor := &coreTypes.Monitor{
+	testMonitor := &Monitor{
 		Address:     base.HexToAddress("0x1234567890123456789012345678901234567890"),
 		Name:        "Test Monitor",
 		NRecords:    100,
@@ -80,3 +79,37 @@ func TestMonitorsCollectionDomainSpecific(t *testing.T) {
 		}
 	})
 }
+
+// ...existing code...
+
+// -----------------------------------------------------------------------------
+// Test Coverage Summary for monitors_detailed_test.go
+//
+// TestMonitorsCollectionLoadDataAsync
+// - "LoadDataDoesNotBlock": Verifies that LoadData returns quickly and does not block the caller.
+// - "LoadDataStartsAsyncOperation": Ensures LoadData starts an async operation and other methods remain functional during loading.
+// - "MultipleLoadDataCalls": Confirms that multiple sequential LoadData calls do not panic and collection remains usable.
+// - "ConcurrentLoadDataCalls": Checks that concurrent LoadData calls from multiple goroutines do not panic and collection remains functional.
+// - "LoadDataStateConsistency": Validates that repeated NeedsUpdate calls after LoadData are consistent.
+// - "LoadDataWithResetInteraction": Ensures Reset can be called during or after LoadData without panics and collection remains functional.
+// - "LoadDataErrorScenarios": Tests various LoadData and Reset scenarios (including rapid cycles) to ensure no panics and continued functionality.
+// - "LoadDataMemoryManagement": Verifies that repeated LoadData calls do not cause memory issues and collection remains functional.
+//
+// TestMonitorsCollectionAdvancedAsync
+// - "StateTransitionVerification": Checks that state transitions (including IsFetching and State field) occur correctly during async loading.
+// - "ConcurrentLoadDataSafety": Ensures multiple goroutines calling LoadData concurrently do not panic and collection remains functional.
+// - "LoadDataErrorScenarios": Validates that LoadData with invalid facet names does not panic and returns quickly.
+// - "LoadDataMemoryAndResourceManagement": Confirms that rapid repeated LoadData calls do not cause resource issues and collection remains responsive.
+// - "LoadDataWithResetInteraction": Tests various sequences of LoadData and Reset calls to ensure no panics and correct post-operation functionality.
+//
+// TestMonitorsCollectionIntegration
+// - "ErrorHandlingIntegration":
+//   - "InvalidPageRequests": Ensures GetPage with invalid facets or arguments returns errors or reasonable responses without panics.
+//   - "LoadDataAfterErrors": Confirms LoadData remains functional after previous errors in GetPage.
+//
+// TestMonitorsCollectionBoundaryConditions
+// - "NilAndEmptyInputs": Verifies that LoadData, GetPage, Reset, and NeedsUpdate handle empty or nil inputs without panics and return expected results.
+// - "ExtremePageValues": Ensures GetPage handles extreme values for paging arguments (negative, zero, large) without panics and returns valid results.
+//
+// -----------------------------------------------------------------------------
+// End of Test

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
@@ -22,9 +21,9 @@ func (c *MonitorsCollection) Crud(
 	}
 
 	// Type assertion to convert interface{} to the expected type
-	monitor, ok := item.(*coreTypes.Monitor)
+	monitor, ok := item.(*Monitor)
 	if !ok {
-		return fmt.Errorf("invalid type for monitor operation: expected *coreTypes.Monitor, got %T", item)
+		return fmt.Errorf("invalid type for monitor operation: expected *Monitor, got %T", item)
 	}
 
 	chainName := preferences.GetChain()

@@ -149,3 +149,29 @@ func TestAbisCollectionDomainSpecific(t *testing.T) {
 		}
 	})
 }
+
+// -----------------------------------------------------------------------------
+// Test Coverage Summary for abis_detailed_test.go
+//
+// TestAbisCollectionLoadDataAsync
+// - "LoadDataDoesNotBlock": Verifies that calling LoadData does not panic.
+// - "LoadDataStartsAsyncOperation": Ensures LoadData starts an async operation and GetPage works after loading.
+// - "MultipleLoadDataCalls": Confirms multiple LoadData calls for all facets do not panic and update state.
+// - "ConcurrentLoadDataCalls": Checks that concurrent LoadData calls from multiple goroutines do not panic and collection remains functional.
+//
+// TestAbisCollectionAdvancedAsync
+// - "LoadDataWhileGettingPages": Validates that concurrent LoadData and GetPage calls do not cause errors.
+// - "ResetDuringOperations": Ensures Reset can be called concurrently with LoadData and GetPage without panics, and collection remains functional.
+//
+// TestAbisCollectionIntegration
+// - "FullWorkflowAllDataFacets": For each data facet, checks initial NeedsUpdate, LoadData, GetPage, filtering, paging, Reset, and post-reset NeedsUpdate.
+// - "MixedOperationsAllFacets": Loads all facets, retrieves pages for each, resets one facet, and verifies correct update and accessibility of others.
+//
+// TestAbisCollectionBoundaryConditions
+// - "AllDataFacetsCoverage": For each valid facet, verifies LoadData, Reset, NeedsUpdate, and GetPage do not panic and behave as expected.
+// - "InvalidDataFacets": For various invalid facet strings, ensures LoadData, Reset, and NeedsUpdate do not panic, NeedsUpdate returns false, and GetPage returns an error mentioning the unexpected facet.
+// - "RapidResetOperations": Calls Reset rapidly and repeatedly for multiple facets, confirming no panics and continued correct NeedsUpdate behavior.
+// - "EmptyStringFilters": Calls GetPage with various empty or whitespace filters, ensuring correct page type, facet, and non-negative item count.
+//
+// -----------------------------------------------------------------------------
+// End of Test Coverage Summary

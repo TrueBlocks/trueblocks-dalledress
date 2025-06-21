@@ -2,13 +2,11 @@ package abis
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 const (
@@ -23,36 +21,6 @@ func init() {
 	types.RegisterDataFacet(AbisKnown)
 	types.RegisterDataFacet(AbisFunctions)
 	types.RegisterDataFacet(AbisEvents)
-}
-
-type AbisPage struct {
-	Facet         types.DataFacet `json:"facet"`
-	Abis          []Abi           `json:"abis"`
-	Functions     []Function      `json:"functions"`
-	TotalItems    int             `json:"totalItems"`
-	ExpectedTotal int             `json:"expectedTotal"`
-	IsFetching    bool            `json:"isFetching"`
-	State         types.LoadState `json:"state"`
-}
-
-func (ap *AbisPage) GetFacet() types.DataFacet {
-	return ap.Facet
-}
-
-func (ap *AbisPage) GetTotalItems() int {
-	return ap.TotalItems
-}
-
-func (ap *AbisPage) GetExpectedTotal() int {
-	return ap.ExpectedTotal
-}
-
-func (ap *AbisPage) GetIsFetching() bool {
-	return ap.IsFetching
-}
-
-func (ap *AbisPage) GetState() types.LoadState {
-	return ap.State
 }
 
 type AbisCollection struct {
@@ -228,96 +196,6 @@ func (ac *AbisCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	}
 
 	return false
-}
-
-func (ac *AbisCollection) GetPage(
-	dataFacet types.DataFacet,
-	first, pageSize int,
-	sortSpec sdk.SortSpec,
-	filter string,
-) (types.Page, error) {
-	page := &AbisPage{
-		Facet: dataFacet,
-	}
-	filter = strings.ToLower(filter)
-
-	var listFacet *facets.Facet[Abi]
-	var detailFacet *facets.Facet[Function]
-
-	switch dataFacet {
-	case AbisDownloaded:
-		listFacet = ac.downloadedFacet
-	case AbisKnown:
-		listFacet = ac.knownFacet
-	case AbisFunctions:
-		detailFacet = ac.functionsFacet
-	case AbisEvents:
-		detailFacet = ac.eventsFacet
-	default:
-		// This is truly a validation error - invalid DataFacet for this collection
-		return nil, types.NewValidationError("abis", dataFacet, "GetPage",
-			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
-	}
-
-	if listFacet != nil {
-		var listFilterFunc = func(item *Abi) bool {
-			return strings.Contains(strings.ToLower(item.Name), filter)
-		}
-		var listSortFunc = func(items []Abi, sort sdk.SortSpec) error {
-			return sdk.SortAbis(items, sort)
-		}
-		if result, err := listFacet.GetPage(first, pageSize, listFilterFunc, sortSpec, listSortFunc); err != nil {
-			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
-		} else {
-			page.Abis, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-		}
-		page.IsFetching = listFacet.IsFetching()
-		page.ExpectedTotal = listFacet.ExpectedCount()
-
-	} else if detailFacet != nil {
-		var detailFilter = func(item *Function) bool {
-			return strings.Contains(strings.ToLower(item.Name), filter) ||
-				strings.Contains(strings.ToLower(item.Encoding), filter)
-		}
-		var detailSortFunc = func(items []Function, sort sdk.SortSpec) error {
-			return sdk.SortFunctions(items, sort)
-		}
-		if result, err := detailFacet.GetPage(first, pageSize, detailFilter, sortSpec, detailSortFunc); err != nil {
-			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
-		} else {
-			page.Functions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-		}
-		page.IsFetching = detailFacet.IsFetching()
-		page.ExpectedTotal = detailFacet.ExpectedCount()
-
-	} else {
-		// This should not happen since we validated dataFacet above
-		return nil, types.NewValidationError("abis", dataFacet, "GetPage",
-			fmt.Errorf("no facet found for dataFacet: %v", dataFacet))
-	}
-
-	return page, nil
-}
-
-func (ac *AbisCollection) GetAbisPage(
-	dataFacet types.DataFacet,
-	first, pageSize int,
-	sortSpec sdk.SortSpec,
-	filter string,
-) (*AbisPage, error) {
-	page, err := ac.GetPage(dataFacet, first, pageSize, sortSpec, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	abisPage, ok := page.(*AbisPage)
-	if !ok {
-		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
-	}
-
-	return abisPage, nil
 }
 
 func (ac *AbisCollection) GetSupportedFacets() []types.DataFacet {

@@ -13,11 +13,16 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
+type Statement = coreTypes.Statement
+type Transfer = coreTypes.Transfer
+type Token = coreTypes.Token
+type Transaction = coreTypes.Transaction
+
 var (
-	transactionsStores = make(map[string]*store.Store[coreTypes.Transaction])
-	statementsStores   = make(map[string]*store.Store[coreTypes.Statement])
-	transfersStores    = make(map[string]*store.Store[coreTypes.Transfer])
-	balancesStores     = make(map[string]*store.Store[coreTypes.Token])
+	transactionsStores = make(map[string]*store.Store[Transaction])
+	statementsStores   = make(map[string]*store.Store[Statement])
+	transfersStores    = make(map[string]*store.Store[Transfer])
+	balancesStores     = make(map[string]*store.Store[Token])
 	transactionsMu     sync.Mutex
 	statementsMu       sync.Mutex
 	transfersMu        sync.Mutex
@@ -30,7 +35,7 @@ func getStoreKey(chain, address string) string {
 }
 
 // GetExportsStatementsStore returns a singleton store for statements export data per (chain, address)
-func GetExportsStatementsStore(chain string, address string) *store.Store[coreTypes.Statement] {
+func GetExportsStatementsStore(chain string, address string) *store.Store[Statement] {
 	statementsMu.Lock()
 	defer statementsMu.Unlock()
 
@@ -61,8 +66,8 @@ func GetExportsStatementsStore(chain string, address string) *store.Store[coreTy
 		return nil
 	}
 
-	processFunc := func(itemIntf interface{}) *coreTypes.Statement {
-		if stmt, ok := itemIntf.(*coreTypes.Statement); ok {
+	processFunc := func(itemIntf interface{}) *Statement {
+		if stmt, ok := itemIntf.(*Statement); ok {
 			return stmt
 		}
 		return nil
@@ -80,7 +85,7 @@ func GetExportsStatementsStore(chain string, address string) *store.Store[coreTy
 }
 
 // GetExportsTransfersStore returns a singleton store for transfers export data per (chain, address)
-func GetExportsTransfersStore(chain string, address string) *store.Store[coreTypes.Transfer] {
+func GetExportsTransfersStore(chain string, address string) *store.Store[Transfer] {
 	transfersMu.Lock()
 	defer transfersMu.Unlock()
 
@@ -111,8 +116,8 @@ func GetExportsTransfersStore(chain string, address string) *store.Store[coreTyp
 		return nil
 	}
 
-	processFunc := func(itemIntf interface{}) *coreTypes.Transfer {
-		if transfer, ok := itemIntf.(*coreTypes.Transfer); ok {
+	processFunc := func(itemIntf interface{}) *Transfer {
+		if transfer, ok := itemIntf.(*Transfer); ok {
 			return transfer
 		}
 		return nil
@@ -130,7 +135,7 @@ func GetExportsTransfersStore(chain string, address string) *store.Store[coreTyp
 }
 
 // GetExportsBalancesStore returns a singleton store for balances export data per (chain, address)
-func GetExportsBalancesStore(chain string, address string) *store.Store[coreTypes.Token] {
+func GetExportsBalancesStore(chain string, address string) *store.Store[Token] {
 	balancesMu.Lock()
 	defer balancesMu.Unlock()
 
@@ -161,8 +166,8 @@ func GetExportsBalancesStore(chain string, address string) *store.Store[coreType
 		return nil
 	}
 
-	processFunc := func(itemIntf interface{}) *coreTypes.Token {
-		if state, ok := itemIntf.(*coreTypes.Token); ok {
+	processFunc := func(itemIntf interface{}) *Token {
+		if state, ok := itemIntf.(*Token); ok {
 			return state
 		}
 		return nil
@@ -180,7 +185,7 @@ func GetExportsBalancesStore(chain string, address string) *store.Store[coreType
 }
 
 // GetExportsTransactionsStore returns a singleton store for transactions export data per (chain, address)
-func GetExportsTransactionsStore(chain string, address string) *store.Store[coreTypes.Transaction] {
+func GetExportsTransactionsStore(chain string, address string) *store.Store[Transaction] {
 	transactionsMu.Lock()
 	defer transactionsMu.Unlock()
 
@@ -209,8 +214,8 @@ func GetExportsTransactionsStore(chain string, address string) *store.Store[core
 		return nil
 	}
 
-	processFunc := func(itemIntf interface{}) *coreTypes.Transaction {
-		if tx, ok := itemIntf.(*coreTypes.Transaction); ok {
+	processFunc := func(itemIntf interface{}) *Transaction {
+		if tx, ok := itemIntf.(*Transaction); ok {
 			return tx
 		}
 		return nil
@@ -349,18 +354,18 @@ func ClearExportsStores(chain, address string) {
 // ClearAllExportsStores clears all cached stores (useful for global reset)
 func ClearAllExportsStores() {
 	transactionsMu.Lock()
-	transactionsStores = make(map[string]*store.Store[coreTypes.Transaction])
+	transactionsStores = make(map[string]*store.Store[Transaction])
 	transactionsMu.Unlock()
 
 	statementsMu.Lock()
-	statementsStores = make(map[string]*store.Store[coreTypes.Statement])
+	statementsStores = make(map[string]*store.Store[Statement])
 	statementsMu.Unlock()
 
 	transfersMu.Lock()
-	transfersStores = make(map[string]*store.Store[coreTypes.Transfer])
+	transfersStores = make(map[string]*store.Store[Transfer])
 	transfersMu.Unlock()
 
 	balancesMu.Lock()
-	balancesStores = make(map[string]*store.Store[coreTypes.Token])
+	balancesStores = make(map[string]*store.Store[Token])
 	balancesMu.Unlock()
 }

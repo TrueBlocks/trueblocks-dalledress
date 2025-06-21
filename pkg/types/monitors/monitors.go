@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
@@ -19,35 +20,6 @@ func init() {
 	types.RegisterDataFacet(MonitorsList)
 }
 
-type MonitorsPage struct {
-	Facet         types.DataFacet `json:"facet"`
-	Monitors      []Monitor       `json:"monitors"`
-	TotalItems    int             `json:"totalItems"`
-	ExpectedTotal int             `json:"expectedTotal"`
-	IsFetching    bool            `json:"isFetching"`
-	State         types.LoadState `json:"state"`
-}
-
-func (mp *MonitorsPage) GetFacet() types.DataFacet {
-	return mp.Facet
-}
-
-func (mp *MonitorsPage) GetTotalItems() int {
-	return mp.TotalItems
-}
-
-func (mp *MonitorsPage) GetExpectedTotal() int {
-	return mp.ExpectedTotal
-}
-
-func (mp *MonitorsPage) GetIsFetching() bool {
-	return mp.IsFetching
-}
-
-func (mp *MonitorsPage) GetState() types.LoadState {
-	return mp.State
-}
-
 type MonitorsCollection struct {
 	monitorsFacet *facets.Facet[Monitor]
 	summary       types.Summary
@@ -55,20 +27,18 @@ type MonitorsCollection struct {
 }
 
 func NewMonitorsCollection() *MonitorsCollection {
-	mc := &MonitorsCollection{
+	c := &MonitorsCollection{
 		summary: types.Summary{
 			TotalCount:  0,
 			FacetCounts: make(map[types.DataFacet]int),
 			CustomData:  make(map[string]interface{}),
 		},
 	}
-
-	mc.initializeFacets()
-
-	return mc
+	c.initializeFacets()
+	return c
 }
 
-func (mc *MonitorsCollection) initializeFacets() {
+func (c *MonitorsCollection) initializeFacets() {
 	monitorsStore := GetMonitorsStore()
 
 	monitorsFacet := facets.NewFacetWithSummary(
@@ -77,10 +47,10 @@ func (mc *MonitorsCollection) initializeFacets() {
 		nil,
 		monitorsStore,
 		"monitors",
-		mc,
+		c,
 	)
 
-	mc.monitorsFacet = monitorsFacet
+	c.monitorsFacet = monitorsFacet
 }
 
 func (mc *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
@@ -107,54 +77,7 @@ func (mc *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
 	}()
 }
 
-func (mc *MonitorsCollection) GetPage(
-	dataFacet types.DataFacet,
-	first, pageSize int,
-	sortSpec sdk.SortSpec,
-	filter string,
-) (types.Page, error) {
-	switch dataFacet {
-	case MonitorsList:
-		var filterFunc func(*Monitor) bool
-		if filter != "" {
-			filterFunc = func(monitor *Monitor) bool {
-				return mc.matchesFilter(monitor, filter)
-			}
-		}
-
-		var sortFunc func([]Monitor, sdk.SortSpec) error
-		sortFunc = func(items []Monitor, sort sdk.SortSpec) error {
-			return sdk.SortMonitors(items, sort)
-		}
-
-		pageResult, err := mc.monitorsFacet.GetPage(
-			first,
-			pageSize,
-			filterFunc,
-			sortSpec,
-			sortFunc,
-		)
-		if err != nil {
-			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("monitors", dataFacet, "GetPage", err)
-		}
-
-		return &MonitorsPage{
-			Facet:         dataFacet,
-			Monitors:      pageResult.Items,
-			TotalItems:    pageResult.TotalItems,
-			ExpectedTotal: mc.getExpectedTotal(dataFacet),
-			IsFetching:    mc.monitorsFacet.IsFetching(),
-			State:         pageResult.State,
-		}, nil
-	default:
-		// This is truly a validation error - invalid DataFacet for this collection
-		return nil, types.NewValidationError("monitors", dataFacet, "GetPage",
-			fmt.Errorf("unsupported dataFacet: %s", dataFacet))
-	}
-}
-
-func (mc *MonitorsCollection) Reset(dataFacet types.DataFacet) {
+func (c *MonitorsCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
 	case MonitorsList:
 		monitorsStore.Reset()
@@ -163,12 +86,12 @@ func (mc *MonitorsCollection) Reset(dataFacet types.DataFacet) {
 	}
 }
 
-func (mc *MonitorsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
+func (c *MonitorsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	var facet *facets.Facet[Monitor]
 
 	switch dataFacet {
 	case MonitorsList:
-		facet = mc.monitorsFacet
+		facet = c.monitorsFacet
 	default:
 		return false
 	}
@@ -224,13 +147,13 @@ func (mc *MonitorsCollection) matchesFilter(monitor *Monitor, filter string) boo
 	return false
 }
 
-func (mc *MonitorsCollection) GetMonitorsPage(
+func (c *MonitorsCollection) GetMonitorsPage(
 	dataFacet types.DataFacet,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (*MonitorsPage, error) {
-	page, err := mc.GetPage(dataFacet, first, pageSize, sortSpec, filter)
+	page, err := c.GetPage(dataFacet, first, pageSize, sortSpec, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -243,11 +166,13 @@ func (mc *MonitorsCollection) GetMonitorsPage(
 	return monitorsPage, nil
 }
 
-func (mc *MonitorsCollection) GetSupportedFacets() []types.DataFacet {
-	return []types.DataFacet{MonitorsList}
+func (c *MonitorsCollection) GetSupportedFacets() []types.DataFacet {
+	return []types.DataFacet{
+		MonitorsList,
+	}
 }
 
-func (mc *MonitorsCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
+func (c *MonitorsCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
 	switch dataFacet {
 	case MonitorsList:
 		return "monitors"
@@ -256,18 +181,18 @@ func (mc *MonitorsCollection) GetStoreForFacet(dataFacet types.DataFacet) string
 	}
 }
 
-func (mc *MonitorsCollection) GetCollectionName() string {
+func (c *MonitorsCollection) GetCollectionName() string {
 	return "monitors"
 }
 
-func (mc *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+func (c *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Summary) {
 	monitor, ok := item.(*Monitor)
 	if !ok {
 		return
 	}
 
-	mc.summaryMutex.Lock()
-	defer mc.summaryMutex.Unlock()
+	c.summaryMutex.Lock()
+	defer c.summaryMutex.Unlock()
 
 	summary.TotalCount++
 
@@ -306,19 +231,19 @@ func (mc *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Su
 	summary.CustomData["totalFileSize"] = totalFileSize
 }
 
-func (mc *MonitorsCollection) GetSummary() types.Summary {
-	mc.summaryMutex.RLock()
-	defer mc.summaryMutex.RUnlock()
+func (c *MonitorsCollection) GetSummary() types.Summary {
+	c.summaryMutex.RLock()
+	defer c.summaryMutex.RUnlock()
 
-	summary := mc.summary
+	summary := c.summary
 	summary.FacetCounts = make(map[types.DataFacet]int)
-	for k, v := range mc.summary.FacetCounts {
+	for k, v := range c.summary.FacetCounts {
 		summary.FacetCounts[k] = v
 	}
 
-	if mc.summary.CustomData != nil {
+	if c.summary.CustomData != nil {
 		summary.CustomData = make(map[string]interface{})
-		for k, v := range mc.summary.CustomData {
+		for k, v := range c.summary.CustomData {
 			summary.CustomData[k] = v
 		}
 	}
@@ -326,13 +251,13 @@ func (mc *MonitorsCollection) GetSummary() types.Summary {
 	return summary
 }
 
-func (mc *MonitorsCollection) ResetSummary() {
-	mc.summaryMutex.Lock()
-	defer mc.summaryMutex.Unlock()
-	mc.summary = types.Summary{
+func (c *MonitorsCollection) ResetSummary() {
+	c.summaryMutex.Lock()
+	defer c.summaryMutex.Unlock()
+	c.summary = types.Summary{
 		TotalCount:  0,
 		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
-		LastUpdated: 0,
+		LastUpdated: time.Now().Unix(),
 	}
 }

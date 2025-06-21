@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -32,39 +31,39 @@ func init() {
 
 // Page structures for frontend consumption
 type ChunksStatsPage struct {
-	Facet         types.DataFacet         `json:"facet"`
-	ChunksStats   []*coreTypes.ChunkStats `json:"stats"`
-	TotalItems    int                     `json:"totalItems"`
-	ExpectedTotal int                     `json:"expectedTotal"`
-	IsFetching    bool                    `json:"isFetching"`
-	State         types.LoadState         `json:"state"`
+	Facet         types.DataFacet `json:"facet"`
+	ChunksStats   []*Stats        `json:"stats"`
+	TotalItems    int             `json:"totalItems"`
+	ExpectedTotal int             `json:"expectedTotal"`
+	IsFetching    bool            `json:"isFetching"`
+	State         types.LoadState `json:"state"`
 }
 
 type ChunksIndexPage struct {
-	Facet         types.DataFacet         `json:"facet"`
-	ChunksIndex   []*coreTypes.ChunkIndex `json:"index"`
-	TotalItems    int                     `json:"totalItems"`
-	ExpectedTotal int                     `json:"expectedTotal"`
-	IsFetching    bool                    `json:"isFetching"`
-	State         types.LoadState         `json:"state"`
+	Facet         types.DataFacet `json:"facet"`
+	ChunksIndex   []*Index        `json:"index"`
+	TotalItems    int             `json:"totalItems"`
+	ExpectedTotal int             `json:"expectedTotal"`
+	IsFetching    bool            `json:"isFetching"`
+	State         types.LoadState `json:"state"`
 }
 
 type ChunksBloomsPage struct {
-	Facet         types.DataFacet         `json:"facet"`
-	ChunksBlooms  []*coreTypes.ChunkBloom `json:"blooms"`
-	TotalItems    int                     `json:"totalItems"`
-	ExpectedTotal int                     `json:"expectedTotal"`
-	IsFetching    bool                    `json:"isFetching"`
-	State         types.LoadState         `json:"state"`
+	Facet         types.DataFacet `json:"facet"`
+	ChunksBlooms  []*Bloom        `json:"blooms"`
+	TotalItems    int             `json:"totalItems"`
+	ExpectedTotal int             `json:"expectedTotal"`
+	IsFetching    bool            `json:"isFetching"`
+	State         types.LoadState `json:"state"`
 }
 
 type ChunksManifestPage struct {
-	Facet          types.DataFacet            `json:"facet"`
-	ChunksManifest []*coreTypes.ChunkManifest `json:"manifest"`
-	TotalItems     int                        `json:"totalItems"`
-	ExpectedTotal  int                        `json:"expectedTotal"`
-	IsFetching     bool                       `json:"isFetching"`
-	State          types.LoadState            `json:"state"`
+	Facet          types.DataFacet `json:"facet"`
+	ChunksManifest []*Manifest     `json:"manifest"`
+	TotalItems     int             `json:"totalItems"`
+	ExpectedTotal  int             `json:"expectedTotal"`
+	IsFetching     bool            `json:"isFetching"`
+	State          types.LoadState `json:"state"`
 }
 
 // Implement Page interface for all page types
@@ -94,15 +93,15 @@ func (cmp *ChunksManifestPage) GetState() types.LoadState { return cmp.State }
 
 // ChunksPage is a union type that can represent any chunks page type
 type ChunksPage struct {
-	Facet          types.DataFacet            `json:"facet"`
-	ChunksStats    []*coreTypes.ChunkStats    `json:"stats"`
-	ChunksIndex    []*coreTypes.ChunkIndex    `json:"index"`
-	ChunksBlooms   []*coreTypes.ChunkBloom    `json:"blooms"`
-	ChunksManifest []*coreTypes.ChunkManifest `json:"manifest"`
-	TotalItems     int                        `json:"totalItems"`
-	ExpectedTotal  int                        `json:"expectedTotal"`
-	IsFetching     bool                       `json:"isFetching"`
-	State          types.LoadState            `json:"state"`
+	Facet          types.DataFacet `json:"facet"`
+	ChunksStats    []*Stats        `json:"stats"`
+	ChunksIndex    []*Index        `json:"index"`
+	ChunksBlooms   []*Bloom        `json:"blooms"`
+	ChunksManifest []*Manifest     `json:"manifest"`
+	TotalItems     int             `json:"totalItems"`
+	ExpectedTotal  int             `json:"expectedTotal"`
+	IsFetching     bool            `json:"isFetching"`
+	State          types.LoadState `json:"state"`
 }
 
 func (cp *ChunksPage) GetFacet() types.DataFacet {
@@ -128,10 +127,10 @@ func (cp *ChunksPage) GetState() types.LoadState {
 // Collection structure with multiple facets
 type ChunksCollection struct {
 	// Facets for different chunk views
-	statsFacet    *facets.Facet[coreTypes.ChunkStats]
-	indexFacet    *facets.Facet[coreTypes.ChunkIndex]
-	bloomsFacet   *facets.Facet[coreTypes.ChunkBloom]
-	manifestFacet *facets.Facet[coreTypes.ChunkManifest]
+	statsFacet    *facets.Facet[Stats]
+	indexFacet    *facets.Facet[Index]
+	bloomsFacet   *facets.Facet[Bloom]
+	manifestFacet *facets.Facet[Manifest]
 	summary       types.Summary
 	summaryMutex  sync.RWMutex
 }
@@ -207,14 +206,14 @@ func (cc *ChunksCollection) GetPage(
 
 	switch dataFacet {
 	case ChunksStats:
-		var filterFunc func(*coreTypes.ChunkStats) bool
+		var filterFunc func(*Stats) bool
 		if filter != "" {
-			filterFunc = func(stat *coreTypes.ChunkStats) bool {
+			filterFunc = func(stat *Stats) bool {
 				return cc.matchesStatsFilter(stat, filter)
 			}
 		}
 
-		sortFunc := func(items []coreTypes.ChunkStats, sort sdk.SortSpec) error {
+		sortFunc := func(items []Stats, sort sdk.SortSpec) error {
 			// Placeholder - implement actual sorting if needed
 			return nil
 		}
@@ -223,7 +222,7 @@ func (cc *ChunksCollection) GetPage(
 			// This is likely an SDK or store error, not a validation error
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			stats := make([]*coreTypes.ChunkStats, 0, len(result.Items))
+			stats := make([]*Stats, 0, len(result.Items))
 			for i := range result.Items {
 				stats = append(stats, &result.Items[i])
 			}
@@ -233,14 +232,14 @@ func (cc *ChunksCollection) GetPage(
 		page.ExpectedTotal = cc.statsFacet.ExpectedCount()
 
 	case ChunksIndex:
-		var filterFunc func(*coreTypes.ChunkIndex) bool
+		var filterFunc func(*Index) bool
 		if filter != "" {
-			filterFunc = func(index *coreTypes.ChunkIndex) bool {
+			filterFunc = func(index *Index) bool {
 				return cc.matchesIndexFilter(index, filter)
 			}
 		}
 
-		sortFunc := func(items []coreTypes.ChunkIndex, sort sdk.SortSpec) error {
+		sortFunc := func(items []Index, sort sdk.SortSpec) error {
 			// Placeholder - implement actual sorting if needed
 			return nil
 		}
@@ -249,7 +248,7 @@ func (cc *ChunksCollection) GetPage(
 			// This is likely an SDK or store error, not a validation error
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			index := make([]*coreTypes.ChunkIndex, 0, len(result.Items))
+			index := make([]*Index, 0, len(result.Items))
 			for i := range result.Items {
 				index = append(index, &result.Items[i])
 			}
@@ -259,14 +258,14 @@ func (cc *ChunksCollection) GetPage(
 		page.ExpectedTotal = cc.indexFacet.ExpectedCount()
 
 	case ChunksBlooms:
-		var filterFunc func(*coreTypes.ChunkBloom) bool
+		var filterFunc func(*Bloom) bool
 		if filter != "" {
-			filterFunc = func(bloom *coreTypes.ChunkBloom) bool {
+			filterFunc = func(bloom *Bloom) bool {
 				return cc.matchesBloomsFilter(bloom, filter)
 			}
 		}
 
-		sortFunc := func(items []coreTypes.ChunkBloom, sort sdk.SortSpec) error {
+		sortFunc := func(items []Bloom, sort sdk.SortSpec) error {
 			// Placeholder - implement actual sorting if needed
 			return nil
 		}
@@ -275,7 +274,7 @@ func (cc *ChunksCollection) GetPage(
 			// This is likely an SDK or store error, not a validation error
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			blooms := make([]*coreTypes.ChunkBloom, 0, len(result.Items))
+			blooms := make([]*Bloom, 0, len(result.Items))
 			for i := range result.Items {
 				blooms = append(blooms, &result.Items[i])
 			}
@@ -285,14 +284,14 @@ func (cc *ChunksCollection) GetPage(
 		page.ExpectedTotal = cc.bloomsFacet.ExpectedCount()
 
 	case ChunksManifest:
-		var filterFunc func(*coreTypes.ChunkManifest) bool
+		var filterFunc func(*Manifest) bool
 		if filter != "" {
-			filterFunc = func(manifest *coreTypes.ChunkManifest) bool {
+			filterFunc = func(manifest *Manifest) bool {
 				return cc.matchesManifestFilter(manifest, filter)
 			}
 		}
 
-		sortFunc := func(items []coreTypes.ChunkManifest, sort sdk.SortSpec) error {
+		sortFunc := func(items []Manifest, sort sdk.SortSpec) error {
 			// Placeholder - implement actual sorting if needed
 			return nil
 		}
@@ -301,7 +300,7 @@ func (cc *ChunksCollection) GetPage(
 			// This is likely an SDK or store error, not a validation error
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			manifest := make([]*coreTypes.ChunkManifest, 0, len(result.Items))
+			manifest := make([]*Manifest, 0, len(result.Items))
 			for i := range result.Items {
 				manifest = append(manifest, &result.Items[i])
 			}
@@ -320,7 +319,7 @@ func (cc *ChunksCollection) GetPage(
 }
 
 // Filter functions for each facet
-func (cc *ChunksCollection) matchesStatsFilter(stat *coreTypes.ChunkStats, filter string) bool {
+func (cc *ChunksCollection) matchesStatsFilter(stat *Stats, filter string) bool {
 	filterLower := strings.ToLower(filter)
 
 	// Filter by various fields in ChunkStats
@@ -340,7 +339,7 @@ func (cc *ChunksCollection) matchesStatsFilter(stat *coreTypes.ChunkStats, filte
 	return false
 }
 
-func (cc *ChunksCollection) matchesIndexFilter(index *coreTypes.ChunkIndex, filter string) bool {
+func (cc *ChunksCollection) matchesIndexFilter(index *Index, filter string) bool {
 	filterLower := strings.ToLower(filter)
 
 	// Filter by various fields in ChunkIndex
@@ -363,7 +362,7 @@ func (cc *ChunksCollection) matchesIndexFilter(index *coreTypes.ChunkIndex, filt
 	return false
 }
 
-func (cc *ChunksCollection) matchesBloomsFilter(bloom *coreTypes.ChunkBloom, filter string) bool {
+func (cc *ChunksCollection) matchesBloomsFilter(bloom *Bloom, filter string) bool {
 	filterLower := strings.ToLower(filter)
 
 	// Filter by various fields in ChunkBloom
@@ -386,7 +385,7 @@ func (cc *ChunksCollection) matchesBloomsFilter(bloom *coreTypes.ChunkBloom, fil
 	return false
 }
 
-func (cc *ChunksCollection) matchesManifestFilter(manifest *coreTypes.ChunkManifest, filter string) bool {
+func (cc *ChunksCollection) matchesManifestFilter(manifest *Manifest, filter string) bool {
 	filterLower := strings.ToLower(filter)
 
 	// Filter by various fields in ChunkManifest
@@ -509,7 +508,7 @@ func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summ
 	}
 
 	switch item.(type) {
-	case *coreTypes.ChunkStats:
+	case *Stats:
 		summary.TotalCount++
 		summary.FacetCounts[ChunksStats]++
 		if summary.CustomData == nil {
@@ -523,7 +522,7 @@ func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summ
 		summary.CustomData["statsCount"] = statsCount
 		summary.CustomData["totalBytes"] = totalBytes
 
-	case *coreTypes.ChunkIndex:
+	case *Index:
 		summary.TotalCount++
 		summary.FacetCounts[ChunksIndex]++
 		if summary.CustomData == nil {
@@ -534,7 +533,7 @@ func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summ
 		indexCount++
 		summary.CustomData["indexCount"] = indexCount
 
-	case *coreTypes.ChunkBloom:
+	case *Bloom:
 		summary.TotalCount++
 		summary.FacetCounts[ChunksBlooms]++
 		if summary.CustomData == nil {
@@ -545,7 +544,7 @@ func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summ
 		bloomsCount++
 		summary.CustomData["bloomsCount"] = bloomsCount
 
-	case *coreTypes.ChunkManifest:
+	case *Manifest:
 		summary.TotalCount++
 		summary.FacetCounts[ChunksManifest]++
 		if summary.CustomData == nil {

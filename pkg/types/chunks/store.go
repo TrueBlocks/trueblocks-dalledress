@@ -14,11 +14,16 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
+type Bloom = coreTypes.ChunkBloom
+type Index = coreTypes.ChunkIndex
+type Stats = coreTypes.ChunkStats
+type Manifest = coreTypes.ChunkManifest
+
 var (
-	chunksStatsStore    *store.Store[coreTypes.ChunkStats]
-	chunksIndexStore    *store.Store[coreTypes.ChunkIndex]
-	chunksBloomsStore   *store.Store[coreTypes.ChunkBloom]
-	chunksManifestStore *store.Store[coreTypes.ChunkManifest]
+	chunksStatsStore    *store.Store[Stats]
+	chunksIndexStore    *store.Store[Index]
+	chunksBloomsStore   *store.Store[Bloom]
+	chunksManifestStore *store.Store[Manifest]
 
 	statsStoreMu    sync.Mutex
 	indexStoreMu    sync.Mutex
@@ -27,7 +32,7 @@ var (
 )
 
 // GetChunksStatsStore returns singleton store instance for chunk statistics
-func GetChunksStatsStore() *store.Store[coreTypes.ChunkStats] {
+func GetChunksStatsStore() *store.Store[Stats] {
 	statsStoreMu.Lock()
 	defer statsStoreMu.Unlock()
 
@@ -52,14 +57,14 @@ func GetChunksStatsStore() *store.Store[coreTypes.ChunkStats] {
 			return nil
 		}
 
-		processFunc := func(item interface{}) *coreTypes.ChunkStats {
-			if stats, ok := item.(*coreTypes.ChunkStats); ok {
+		processFunc := func(item interface{}) *Stats {
+			if stats, ok := item.(*Stats); ok {
 				return stats
 			}
 			return nil
 		}
 
-		mappingFunc := func(item *coreTypes.ChunkStats) (key interface{}, includeInMap bool) {
+		mappingFunc := func(item *Stats) (key interface{}, includeInMap bool) {
 			if item == nil {
 				return nil, false
 			}
@@ -74,7 +79,7 @@ func GetChunksStatsStore() *store.Store[coreTypes.ChunkStats] {
 }
 
 // GetChunksIndexStore returns singleton store instance for chunk index
-func GetChunksIndexStore() *store.Store[coreTypes.ChunkIndex] {
+func GetChunksIndexStore() *store.Store[Index] {
 	indexStoreMu.Lock()
 	defer indexStoreMu.Unlock()
 
@@ -99,14 +104,14 @@ func GetChunksIndexStore() *store.Store[coreTypes.ChunkIndex] {
 			return nil
 		}
 
-		processFunc := func(item interface{}) *coreTypes.ChunkIndex {
-			if index, ok := item.(*coreTypes.ChunkIndex); ok {
+		processFunc := func(item interface{}) *Index {
+			if index, ok := item.(*Index); ok {
 				return index
 			}
 			return nil
 		}
 
-		mappingFunc := func(item *coreTypes.ChunkIndex) (key interface{}, includeInMap bool) {
+		mappingFunc := func(item *Index) (key interface{}, includeInMap bool) {
 			if item == nil {
 				return nil, false
 			}
@@ -121,7 +126,7 @@ func GetChunksIndexStore() *store.Store[coreTypes.ChunkIndex] {
 }
 
 // GetChunksBloomsStore returns singleton store instance for chunk blooms
-func GetChunksBloomsStore() *store.Store[coreTypes.ChunkBloom] {
+func GetChunksBloomsStore() *store.Store[Bloom] {
 	bloomsStoreMu.Lock()
 	defer bloomsStoreMu.Unlock()
 
@@ -146,14 +151,14 @@ func GetChunksBloomsStore() *store.Store[coreTypes.ChunkBloom] {
 			return nil
 		}
 
-		processFunc := func(item interface{}) *coreTypes.ChunkBloom {
-			if bloom, ok := item.(*coreTypes.ChunkBloom); ok {
+		processFunc := func(item interface{}) *Bloom {
+			if bloom, ok := item.(*Bloom); ok {
 				return bloom
 			}
 			return nil
 		}
 
-		mappingFunc := func(item *coreTypes.ChunkBloom) (key interface{}, includeInMap bool) {
+		mappingFunc := func(item *Bloom) (key interface{}, includeInMap bool) {
 			if item == nil {
 				return nil, false
 			}
@@ -168,7 +173,7 @@ func GetChunksBloomsStore() *store.Store[coreTypes.ChunkBloom] {
 }
 
 // GetChunksManifestStore returns singleton store instance for chunk manifest
-func GetChunksManifestStore() *store.Store[coreTypes.ChunkManifest] {
+func GetChunksManifestStore() *store.Store[Manifest] {
 	manifestStoreMu.Lock()
 	defer manifestStoreMu.Unlock()
 
@@ -193,14 +198,14 @@ func GetChunksManifestStore() *store.Store[coreTypes.ChunkManifest] {
 			return nil
 		}
 
-		processFunc := func(item interface{}) *coreTypes.ChunkManifest {
-			if manifest, ok := item.(*coreTypes.ChunkManifest); ok {
+		processFunc := func(item interface{}) *Manifest {
+			if manifest, ok := item.(*Manifest); ok {
 				return manifest
 			}
 			return nil
 		}
 
-		mappingFunc := func(item *coreTypes.ChunkManifest) (key interface{}, includeInMap bool) {
+		mappingFunc := func(item *Manifest) (key interface{}, includeInMap bool) {
 			if item == nil {
 				return nil, false
 			}

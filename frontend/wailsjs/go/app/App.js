@@ -26,10 +26,6 @@ export function ChangeImageStorageLocation(arg1) {
   return window['go']['app']['App']['ChangeImageStorageLocation'](arg1);
 }
 
-export function CheckRPCStatus() {
-  return window['go']['app']['App']['CheckRPCStatus']();
-}
-
 export function ChunksCrud(arg1, arg2, arg3) {
   return window['go']['app']['App']['ChunksCrud'](arg1, arg2, arg3);
 }

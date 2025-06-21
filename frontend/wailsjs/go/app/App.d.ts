@@ -28,8 +28,6 @@ export function CancelFetch(arg1:types.DataFacet):Promise<void>;
 
 export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 
-export function CheckRPCStatus():Promise<string>;
-
 export function ChunksCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function CleanNames(arg1:string):Promise<void>;

@@ -192,7 +192,7 @@ func TestAbisCollectionIntegration(t *testing.T) {
 
 		for _, dataFacet := range dataFacets {
 			t.Run(fmt.Sprintf("Workflow_%s", dataFacet), func(t *testing.T) {
-				needsUpdate := collection.NeedsUpdate(dataFacett)
+				needsUpdate := collection.NeedsUpdate(dataFacet)
 				assert.True(t, needsUpdate, "Should need update initially")
 
 				collection.LoadData(dataFacet)

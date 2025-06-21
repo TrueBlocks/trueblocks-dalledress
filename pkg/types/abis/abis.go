@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -27,13 +26,13 @@ func init() {
 }
 
 type AbisPage struct {
-	Facet         types.DataFacet      `json:"facet"`
-	Abis          []coreTypes.Abi      `json:"abis"`
-	Functions     []coreTypes.Function `json:"functions"`
-	TotalItems    int                  `json:"totalItems"`
-	ExpectedTotal int                  `json:"expectedTotal"`
-	IsFetching    bool                 `json:"isFetching"`
-	State         types.LoadState      `json:"state"`
+	Facet         types.DataFacet `json:"facet"`
+	Abis          []Abi           `json:"abis"`
+	Functions     []Function      `json:"functions"`
+	TotalItems    int             `json:"totalItems"`
+	ExpectedTotal int             `json:"expectedTotal"`
+	IsFetching    bool            `json:"isFetching"`
+	State         types.LoadState `json:"state"`
 }
 
 func (ap *AbisPage) GetFacet() types.DataFacet {
@@ -57,10 +56,10 @@ func (ap *AbisPage) GetState() types.LoadState {
 }
 
 type AbisCollection struct {
-	downloadedFacet *facets.Facet[coreTypes.Abi]
-	knownFacet      *facets.Facet[coreTypes.Abi]
-	functionsFacet  *facets.Facet[coreTypes.Function]
-	eventsFacet     *facets.Facet[coreTypes.Function]
+	downloadedFacet *facets.Facet[Abi]
+	knownFacet      *facets.Facet[Abi]
+	functionsFacet  *facets.Facet[Function]
+	eventsFacet     *facets.Facet[Function]
 	summary         types.Summary
 	summaryMutex    sync.RWMutex
 }
@@ -102,7 +101,7 @@ func (ac *AbisCollection) initializeFacets() {
 
 	functionsFacet := facets.NewFacetWithSummary(
 		AbisFunctions,
-		func(fn *coreTypes.Function) bool { return fn.FunctionType != "event" },
+		func(fn *Function) bool { return fn.FunctionType != "event" },
 		isDupEncoding(),
 		abisDetailStore,
 		"abis",
@@ -111,7 +110,7 @@ func (ac *AbisCollection) initializeFacets() {
 
 	eventsFacet := facets.NewFacetWithSummary(
 		AbisEvents,
-		func(fn *coreTypes.Function) bool { return fn.FunctionType == "event" },
+		func(fn *Function) bool { return fn.FunctionType == "event" },
 		isDupEncoding(),
 		abisDetailStore,
 		"abis",
@@ -124,19 +123,19 @@ func (ac *AbisCollection) initializeFacets() {
 	ac.eventsFacet = eventsFacet
 }
 
-func isDownload(abi *coreTypes.Abi) bool {
+func isDownload(abi *Abi) bool {
 	return !abi.IsKnown
 }
 
-func isKnown(abi *coreTypes.Abi) bool {
+func isKnown(abi *Abi) bool {
 	return abi.IsKnown
 }
 
-func isDupEncoding() func(existing []*coreTypes.Function, newItem *coreTypes.Function) bool {
+func isDupEncoding() func(existing []*Function, newItem *Function) bool {
 	seen := make(map[string]bool)
 	lastExistingLen := 0
 
-	return func(existing []*coreTypes.Function, newItem *coreTypes.Function) bool {
+	return func(existing []*Function, newItem *Function) bool {
 		if newItem == nil {
 			return false
 		}
@@ -159,8 +158,8 @@ func (ac *AbisCollection) LoadData(dataFacet types.DataFacet) {
 		return
 	}
 
-	var facetAbi *facets.Facet[coreTypes.Abi]
-	var facetFunction *facets.Facet[coreTypes.Function]
+	var facetAbi *facets.Facet[Abi]
+	var facetFunction *facets.Facet[Function]
 	var facetName string
 
 	switch dataFacet {
@@ -206,8 +205,8 @@ func (ac *AbisCollection) Reset(dataFacet types.DataFacet) {
 }
 
 func (ac *AbisCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
-	var facetAbi *facets.Facet[coreTypes.Abi]
-	var facetFunction *facets.Facet[coreTypes.Function]
+	var facetAbi *facets.Facet[Abi]
+	var facetFunction *facets.Facet[Function]
 
 	switch dataFacet {
 	case AbisDownloaded:
@@ -242,8 +241,8 @@ func (ac *AbisCollection) GetPage(
 	}
 	filter = strings.ToLower(filter)
 
-	var listFacet *facets.Facet[coreTypes.Abi]
-	var detailFacet *facets.Facet[coreTypes.Function]
+	var listFacet *facets.Facet[Abi]
+	var detailFacet *facets.Facet[Function]
 
 	switch dataFacet {
 	case AbisDownloaded:
@@ -261,10 +260,10 @@ func (ac *AbisCollection) GetPage(
 	}
 
 	if listFacet != nil {
-		var listFilterFunc = func(item *coreTypes.Abi) bool {
+		var listFilterFunc = func(item *Abi) bool {
 			return strings.Contains(strings.ToLower(item.Name), filter)
 		}
-		var listSortFunc = func(items []coreTypes.Abi, sort sdk.SortSpec) error {
+		var listSortFunc = func(items []Abi, sort sdk.SortSpec) error {
 			return sdk.SortAbis(items, sort)
 		}
 		if result, err := listFacet.GetPage(first, pageSize, listFilterFunc, sortSpec, listSortFunc); err != nil {
@@ -277,11 +276,11 @@ func (ac *AbisCollection) GetPage(
 		page.ExpectedTotal = listFacet.ExpectedCount()
 
 	} else if detailFacet != nil {
-		var detailFilter = func(item *coreTypes.Function) bool {
+		var detailFilter = func(item *Function) bool {
 			return strings.Contains(strings.ToLower(item.Name), filter) ||
 				strings.Contains(strings.ToLower(item.Encoding), filter)
 		}
-		var detailSortFunc = func(items []coreTypes.Function, sort sdk.SortSpec) error {
+		var detailSortFunc = func(items []Function, sort sdk.SortSpec) error {
 			return sdk.SortFunctions(items, sort)
 		}
 		if result, err := detailFacet.GetPage(first, pageSize, detailFilter, sortSpec, detailSortFunc); err != nil {
@@ -354,7 +353,7 @@ func (ac *AbisCollection) AccumulateItem(item interface{}, summary *types.Summar
 	}
 
 	switch v := item.(type) {
-	case *coreTypes.Abi:
+	case *Abi:
 		summary.TotalCount++
 
 		if v.IsKnown {
@@ -379,7 +378,7 @@ func (ac *AbisCollection) AccumulateItem(item interface{}, summary *types.Summar
 		summary.CustomData["knownCount"] = knownCount
 		summary.CustomData["downloadedCount"] = downloadedCount
 
-	case *coreTypes.Function:
+	case *Function:
 		summary.TotalCount++
 
 		if v.FunctionType == "event" {

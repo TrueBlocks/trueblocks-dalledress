@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -17,9 +16,9 @@ func (ac *AbisCollection) Crud(
 	item interface{},
 ) error {
 	// Type assertion to convert interface{} to the expected type
-	abi, ok := item.(*coreTypes.Abi)
+	abi, ok := item.(*Abi)
 	if !ok {
-		return fmt.Errorf("invalid type for abi operation: expected *coreTypes.Abi, got %T", item)
+		return fmt.Errorf("invalid type for abi operation: expected *Abi, got %T", item)
 	}
 	switch op {
 	case crud.Remove:
@@ -31,10 +30,10 @@ func (ac *AbisCollection) Crud(
 			return err
 		}
 
-		actionFunc := func(itemMatched *coreTypes.Abi) (error, bool) {
+		actionFunc := func(itemMatched *Abi) (error, bool) {
 			return nil, true
 		}
-		matchFunc := func(existing *coreTypes.Abi) bool {
+		matchFunc := func(existing *Abi) bool {
 			return existing.Address == abi.Address
 		}
 		removedCount, err := ac.downloadedFacet.ForEvery(actionFunc, matchFunc)

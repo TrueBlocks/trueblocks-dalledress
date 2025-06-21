@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/stretchr/testify/assert"
@@ -27,14 +26,14 @@ func assertAbisPage(t *testing.T, page types.Page) *AbisPage {
 
 func TestAbisMatchesFilter(t *testing.T) {
 	collection := NewAbisCollection()
-	testAbi := &coreTypes.Abi{
+	testAbi := &Abi{
 		Address:  base.HexToAddress("0x1234567890123456789012345678901234567890"),
 		Name:     "Test ABI",
 		IsKnown:  false,
 		FileSize: 1024,
 	}
 
-	testFunction := &coreTypes.Function{
+	testFunction := &Function{
 		Name:         "transfer",
 		FunctionType: "function",
 		Signature:    "transfer(address,uint256)",
@@ -42,13 +41,13 @@ func TestAbisMatchesFilter(t *testing.T) {
 	}
 
 	t.Run("AbiNameMatch", func(t *testing.T) {
-		filterFunc := func(item *coreTypes.Abi) bool {
+		filterFunc := func(item *Abi) bool {
 			filter := "test"
 			return collection.matchesAbiFilter(item, filter)
 		}
 		assert.True(t, filterFunc(testAbi))
 
-		filterFunc2 := func(item *coreTypes.Abi) bool {
+		filterFunc2 := func(item *Abi) bool {
 			filter := "ABI"
 			return collection.matchesAbiFilter(item, filter)
 		}
@@ -57,7 +56,7 @@ func TestAbisMatchesFilter(t *testing.T) {
 
 	t.Run("FunctionNameMatch", func(t *testing.T) {
 
-		filterFunc := func(item *coreTypes.Function) bool {
+		filterFunc := func(item *Function) bool {
 			filter := "transfer"
 			return collection.matchesFunctionFilter(item, filter)
 		}
@@ -66,7 +65,7 @@ func TestAbisMatchesFilter(t *testing.T) {
 
 	t.Run("FunctionEncodingMatch", func(t *testing.T) {
 
-		filterFunc := func(item *coreTypes.Function) bool {
+		filterFunc := func(item *Function) bool {
 			filter := "0xa9059cbb"
 			return collection.matchesFunctionFilter(item, filter)
 		}
@@ -74,7 +73,7 @@ func TestAbisMatchesFilter(t *testing.T) {
 	})
 
 	t.Run("EmptyFilter", func(t *testing.T) {
-		filterFunc := func(item *coreTypes.Abi) bool {
+		filterFunc := func(item *Abi) bool {
 			filter := ""
 			return collection.matchesAbiFilter(item, filter)
 		}
@@ -83,7 +82,7 @@ func TestAbisMatchesFilter(t *testing.T) {
 	})
 
 	t.Run("NoMatch", func(t *testing.T) {
-		filterFunc := func(item *coreTypes.Abi) bool {
+		filterFunc := func(item *Abi) bool {
 			filter := "nonexistent"
 			return collection.matchesAbiFilter(item, filter)
 		}
@@ -91,7 +90,7 @@ func TestAbisMatchesFilter(t *testing.T) {
 	})
 }
 
-func (ac *AbisCollection) matchesAbiFilter(abi *coreTypes.Abi, filter string) bool {
+func (ac *AbisCollection) matchesAbiFilter(abi *Abi, filter string) bool {
 	if filter == "" {
 		return true
 	}
@@ -99,7 +98,7 @@ func (ac *AbisCollection) matchesAbiFilter(abi *coreTypes.Abi, filter string) bo
 	return strings.Contains(strings.ToLower(abi.Name), filterLower)
 }
 
-func (ac *AbisCollection) matchesFunctionFilter(fn *coreTypes.Function, filter string) bool {
+func (ac *AbisCollection) matchesFunctionFilter(fn *Function, filter string) bool {
 	if filter == "" {
 		return true
 	}

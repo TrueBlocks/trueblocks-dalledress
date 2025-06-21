@@ -13,15 +13,18 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
+type Abi = coreTypes.Abi
+type Function = coreTypes.Function
+
 var (
-	abisListStore *store.Store[coreTypes.Abi]
+	abisListStore *store.Store[Abi]
 	listStoreMu   sync.Mutex
 
-	abisDetailStore *store.Store[coreTypes.Function]
+	abisDetailStore *store.Store[Function]
 	detailStoreMu   sync.Mutex
 )
 
-func GetAbisListStore() *store.Store[coreTypes.Abi] {
+func GetAbisListStore() *store.Store[Abi] {
 	listStoreMu.Lock()
 	defer listStoreMu.Unlock()
 
@@ -41,8 +44,8 @@ func GetAbisListStore() *store.Store[coreTypes.Abi] {
 			return nil
 		}
 
-		processFunc := func(itemIntf interface{}) *coreTypes.Abi {
-			if abi, ok := itemIntf.(*coreTypes.Abi); ok {
+		processFunc := func(itemIntf interface{}) *Abi {
+			if abi, ok := itemIntf.(*Abi); ok {
 				return abi
 			}
 			return nil
@@ -55,7 +58,7 @@ func GetAbisListStore() *store.Store[coreTypes.Abi] {
 	return abisListStore
 }
 
-func GetAbisDetailStore() *store.Store[coreTypes.Function] {
+func GetAbisDetailStore() *store.Store[Function] {
 	detailStoreMu.Lock()
 	defer detailStoreMu.Unlock()
 
@@ -75,8 +78,8 @@ func GetAbisDetailStore() *store.Store[coreTypes.Function] {
 			return nil
 		}
 
-		processFunc := func(itemIntf interface{}) *coreTypes.Function {
-			if fn, ok := itemIntf.(*coreTypes.Function); ok {
+		processFunc := func(itemIntf interface{}) *Function {
+			if fn, ok := itemIntf.(*Function); ok {
 				return fn
 			}
 			return nil

@@ -4,7 +4,6 @@ package app
 import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -22,11 +21,11 @@ func (a *App) GetAbisPage(
 func (a *App) AbisCrud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
-	abi *coreTypes.Abi,
+	abi *abis.Abi,
 	address string,
 ) error {
 	if address != "" && (abi == nil || abi.Address.IsZero()) {
-		abi = &coreTypes.Abi{Address: base.HexToAddress(address)}
+		abi = &abis.Abi{Address: base.HexToAddress(address)}
 	}
 	return a.abis.Crud(dataFacet, op, abi)
 }

@@ -13,13 +13,3 @@ func NewMockSDKMonitor() *MockSDKMonitor {
 		MockSDKBase: NewMockSDKBase(CreateTestMonitors()),
 	}
 }
-
-type MockSDKName struct {
-	*MockSDKBase[coreTypes.Name]
-}
-
-func NewMockSDKName() *MockSDKName {
-	return &MockSDKName{
-		MockSDKBase: NewMockSDKBase(CreateTestNames()),
-	}
-}

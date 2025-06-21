@@ -18,10 +18,3 @@ func NewMockSDKMonitor() *MockSDKMonitor {
 func (m *MockSDKMonitor) SetMonitors(monitors []coreTypes.Monitor) {
 	m.SetItems(monitors)
 }
-
-type MessageCapture = testingPkg.MessageCapture
-type CapturedMessage = testingPkg.CapturedMessage
-
-func NewMessageCapture() *MessageCapture {
-	return testingPkg.NewMessageCapture()
-}

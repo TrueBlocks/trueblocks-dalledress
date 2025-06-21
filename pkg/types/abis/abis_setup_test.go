@@ -2,7 +2,6 @@ package abis
 
 import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
-	testingPkg "github.com/TrueBlocks/trueblocks-dalledress/pkg/testing"
 )
 
 func CreateTestAbis() []Abi {
@@ -69,11 +68,4 @@ func (m *MockSDKAbi) SetAbis(abis []Abi) {
 
 func (m *MockSDKAbi) SetFunctions(functions []Function) {
 	m.functions = functions
-}
-
-type MessageCapture = testingPkg.MessageCapture
-type CapturedMessage = testingPkg.CapturedMessage
-
-func NewMessageCapture() *MessageCapture {
-	return testingPkg.NewMessageCapture()
 }

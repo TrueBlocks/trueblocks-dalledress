@@ -12,12 +12,11 @@ import (
 
 var namesLock atomic.Int32
 
-func (nc *NamesCollection) Crud(
+func (c *NamesCollection) Crud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
 ) error {
-	// Type assertion to convert interface{} to the expected type
 	name, ok := item.(*Name)
 	if !ok {
 		return fmt.Errorf("invalid type for name operation: expected *Name, got %T", item)
@@ -47,7 +46,7 @@ func (nc *NamesCollection) Crud(
 	}
 
 	// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-	nc.Reset(dataFacet)
+	c.Reset(dataFacet)
 	return nil
 }
 

@@ -33,7 +33,7 @@ func init() {
 // Page structures for frontend consumption
 type ChunksStatsPage struct {
 	Facet         types.DataFacet         `json:"facet"`
-	ChunksStats   []*coreTypes.ChunkStats `json:"chunksStats"`
+	ChunksStats   []*coreTypes.ChunkStats `json:"stats"`
 	TotalItems    int                     `json:"totalItems"`
 	ExpectedTotal int                     `json:"expectedTotal"`
 	IsFetching    bool                    `json:"isFetching"`
@@ -42,7 +42,7 @@ type ChunksStatsPage struct {
 
 type ChunksIndexPage struct {
 	Facet         types.DataFacet         `json:"facet"`
-	ChunksIndex   []*coreTypes.ChunkIndex `json:"chunksIndex"`
+	ChunksIndex   []*coreTypes.ChunkIndex `json:"index"`
 	TotalItems    int                     `json:"totalItems"`
 	ExpectedTotal int                     `json:"expectedTotal"`
 	IsFetching    bool                    `json:"isFetching"`
@@ -51,7 +51,7 @@ type ChunksIndexPage struct {
 
 type ChunksBloomsPage struct {
 	Facet         types.DataFacet         `json:"facet"`
-	ChunksBlooms  []*coreTypes.ChunkBloom `json:"chunksBlooms"`
+	ChunksBlooms  []*coreTypes.ChunkBloom `json:"blooms"`
 	TotalItems    int                     `json:"totalItems"`
 	ExpectedTotal int                     `json:"expectedTotal"`
 	IsFetching    bool                    `json:"isFetching"`
@@ -60,7 +60,7 @@ type ChunksBloomsPage struct {
 
 type ChunksManifestPage struct {
 	Facet          types.DataFacet            `json:"facet"`
-	ChunksManifest []*coreTypes.ChunkManifest `json:"chunksManifest"`
+	ChunksManifest []*coreTypes.ChunkManifest `json:"manifest"`
 	TotalItems     int                        `json:"totalItems"`
 	ExpectedTotal  int                        `json:"expectedTotal"`
 	IsFetching     bool                       `json:"isFetching"`
@@ -95,10 +95,10 @@ func (cmp *ChunksManifestPage) GetState() types.LoadState { return cmp.State }
 // ChunksPage is a union type that can represent any chunks page type
 type ChunksPage struct {
 	Facet          types.DataFacet            `json:"facet"`
-	ChunksStats    []*coreTypes.ChunkStats    `json:"chunksStats,omitempty"`
-	ChunksIndex    []*coreTypes.ChunkIndex    `json:"chunksIndex,omitempty"`
-	ChunksBlooms   []*coreTypes.ChunkBloom    `json:"chunksBlooms,omitempty"`
-	ChunksManifest []*coreTypes.ChunkManifest `json:"chunksManifest,omitempty"`
+	ChunksStats    []*coreTypes.ChunkStats    `json:"stats"`
+	ChunksIndex    []*coreTypes.ChunkIndex    `json:"index"`
+	ChunksBlooms   []*coreTypes.ChunkBloom    `json:"blooms"`
+	ChunksManifest []*coreTypes.ChunkManifest `json:"manifest"`
 	TotalItems     int                        `json:"totalItems"`
 	ExpectedTotal  int                        `json:"expectedTotal"`
 	IsFetching     bool                       `json:"isFetching"`
@@ -223,11 +223,11 @@ func (cc *ChunksCollection) GetPage(
 			// This is likely an SDK or store error, not a validation error
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			chunksStats := make([]*coreTypes.ChunkStats, 0, len(result.Items))
+			stats := make([]*coreTypes.ChunkStats, 0, len(result.Items))
 			for i := range result.Items {
-				chunksStats = append(chunksStats, &result.Items[i])
+				stats = append(stats, &result.Items[i])
 			}
-			page.ChunksStats, page.TotalItems, page.State = chunksStats, result.TotalItems, result.State
+			page.ChunksStats, page.TotalItems, page.State = stats, result.TotalItems, result.State
 		}
 		page.IsFetching = cc.statsFacet.IsFetching()
 		page.ExpectedTotal = cc.statsFacet.ExpectedCount()
@@ -249,11 +249,11 @@ func (cc *ChunksCollection) GetPage(
 			// This is likely an SDK or store error, not a validation error
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			chunksIndex := make([]*coreTypes.ChunkIndex, 0, len(result.Items))
+			index := make([]*coreTypes.ChunkIndex, 0, len(result.Items))
 			for i := range result.Items {
-				chunksIndex = append(chunksIndex, &result.Items[i])
+				index = append(index, &result.Items[i])
 			}
-			page.ChunksIndex, page.TotalItems, page.State = chunksIndex, result.TotalItems, result.State
+			page.ChunksIndex, page.TotalItems, page.State = index, result.TotalItems, result.State
 		}
 		page.IsFetching = cc.indexFacet.IsFetching()
 		page.ExpectedTotal = cc.indexFacet.ExpectedCount()
@@ -275,11 +275,11 @@ func (cc *ChunksCollection) GetPage(
 			// This is likely an SDK or store error, not a validation error
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			chunksBlooms := make([]*coreTypes.ChunkBloom, 0, len(result.Items))
+			blooms := make([]*coreTypes.ChunkBloom, 0, len(result.Items))
 			for i := range result.Items {
-				chunksBlooms = append(chunksBlooms, &result.Items[i])
+				blooms = append(blooms, &result.Items[i])
 			}
-			page.ChunksBlooms, page.TotalItems, page.State = chunksBlooms, result.TotalItems, result.State
+			page.ChunksBlooms, page.TotalItems, page.State = blooms, result.TotalItems, result.State
 		}
 		page.IsFetching = cc.bloomsFacet.IsFetching()
 		page.ExpectedTotal = cc.bloomsFacet.ExpectedCount()
@@ -301,11 +301,11 @@ func (cc *ChunksCollection) GetPage(
 			// This is likely an SDK or store error, not a validation error
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			chunksManifest := make([]*coreTypes.ChunkManifest, 0, len(result.Items))
+			manifest := make([]*coreTypes.ChunkManifest, 0, len(result.Items))
 			for i := range result.Items {
-				chunksManifest = append(chunksManifest, &result.Items[i])
+				manifest = append(manifest, &result.Items[i])
 			}
-			page.ChunksManifest, page.TotalItems, page.State = chunksManifest, result.TotalItems, result.State
+			page.ChunksManifest, page.TotalItems, page.State = manifest, result.TotalItems, result.State
 		}
 		page.IsFetching = cc.manifestFacet.IsFetching()
 		page.ExpectedTotal = cc.manifestFacet.ExpectedCount()

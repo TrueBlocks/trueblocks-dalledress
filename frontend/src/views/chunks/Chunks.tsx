@@ -79,15 +79,15 @@ export const Chunks = () => {
     const currentDataFacet = getCurrentDataFacet();
     switch (currentDataFacet) {
       case types.DataFacet.STATS:
-        return pageData.chunksStats || [];
+        return pageData.stats || [];
       case types.DataFacet.INDEX:
-        return pageData.chunksIndex || [];
+        return pageData.index || [];
       case types.DataFacet.BLOOMS:
-        return pageData.chunksBlooms || [];
+        return pageData.blooms || [];
       case types.DataFacet.MANIFEST:
-        return pageData.chunksManifest || [];
+        return pageData.manifest || [];
       default:
-        return pageData.chunksStats || [];
+        return pageData.stats || [];
     }
   }, [pageData, getCurrentDataFacet]);
 

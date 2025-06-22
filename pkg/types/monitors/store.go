@@ -85,6 +85,7 @@ func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet) string {
 	}
 }
 
+// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetMonitorsCount() (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.MonitorsOptions{

@@ -74,6 +74,7 @@ func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet) string {
 	}
 }
 
+// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func Get{{.Class}}Count() (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.{{.Class}}Options{

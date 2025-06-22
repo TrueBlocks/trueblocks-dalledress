@@ -99,6 +99,7 @@ func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet) string {
 	}
 }
 
+// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetNamesCount() (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.NamesOptions{

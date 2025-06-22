@@ -1,7 +1,16 @@
 {{$class := .Class}}
 {{$isAbis := eq $class "Abis"}}
 {{$isMonitors := eq $class "Monitors"}}
-{{$isPtr := or $isAbis $isMonitors	}}
+{{$isExports := eq $class "Exports"}}
+{{$shouldBePtr := or (or $isAbis $isMonitors) $isExports}}
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package {{toLower .Class}}
 
 import (
@@ -9,9 +18,12 @@ import (
 	// EXISTING_CODE
 )
 
+{{- if $shouldBePtr}}
+
+// TODO: The slices should be slices to pointers{{end}}
 type {{.Class}}Page struct {
 	Facet         types.DataFacet      `json:"facet"`
-	{{range .Stores}}{{.}} []{{if $isPtr}}{{else}}*{{end}}{{toSingular .}} `json:"{{toLower .}}"`
+	{{range .Stores}}{{.}} []{{if $shouldBePtr}}{{else}}*{{end}}{{toSingular .}} `json:"{{toLower .}}"`
 {{end -}}
 	TotalItems    int                  `json:"totalItems"`
 	ExpectedTotal int                  `json:"expectedTotal"`

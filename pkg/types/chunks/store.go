@@ -270,6 +270,7 @@ func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet) string {
 	}
 }
 
+// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetChunksCount() (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.ChunksOptions{

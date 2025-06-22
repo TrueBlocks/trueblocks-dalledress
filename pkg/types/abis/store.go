@@ -141,6 +141,7 @@ func (c *AbisCollection) GetStoreName(dataFacet types.DataFacet) string {
 	}
 }
 
+// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetAbisCount() (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.AbisOptions{
@@ -152,6 +153,25 @@ func GetAbisCount() (int, error) {
 		return int(countResult[0].Count), nil
 	}
 	return 0, nil
+}
+
+var (
+	collections   = make(map[store.CollectionKey]*AbisCollection)
+	collectionsMu sync.Mutex
+)
+
+func GetAbisCollection() *AbisCollection {
+	collectionsMu.Lock()
+	defer collectionsMu.Unlock()
+
+	key := store.GetCollectionKey("", "")
+	if collection, exists := collections[key]; exists {
+		return collection
+	}
+
+	collection := NewAbisCollection()
+	collections[key] = collection
+	return collection
 }
 
 // EXISTING_CODE

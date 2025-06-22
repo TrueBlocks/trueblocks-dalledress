@@ -1,11 +1,12 @@
 package names
 
 import (
+	// EXISTING_CODE
 	"fmt"
-
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 type NamesPage struct {
@@ -37,6 +38,7 @@ func (p *NamesPage) GetState() types.LoadState {
 	return p.State
 }
 
+// EXISTING_CODE
 func (c *NamesCollection) GetPage(
 	dataFacet types.DataFacet,
 	first, pageSize int,
@@ -100,22 +102,4 @@ func (c *NamesCollection) GetPage(
 	}, nil
 }
 
-func (c *NamesCollection) GetNamesPage(
-	dataFacet types.DataFacet,
-	first, pageSize int,
-	sortSpec sdk.SortSpec,
-	filter string,
-) (*NamesPage, error) {
-	page, err := c.GetPage(dataFacet, first, pageSize, sortSpec, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	namesPage, ok := page.(*NamesPage)
-	if !ok {
-		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
-	}
-
-	return namesPage, nil
-}
-
+// EXISTING_CODE

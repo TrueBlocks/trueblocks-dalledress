@@ -207,7 +207,7 @@ func (s *Store[T]) Fetch() error {
 
 	for !modelChanClosed || !errorChanClosed {
 		select {
-		case itemIntf, ok := <-renderCtx.ModelChan:
+		case item, ok := <-renderCtx.ModelChan:
 			if !ok {
 				modelChanClosed = true
 				if errorChanClosed && processingError == nil {
@@ -216,7 +216,7 @@ func (s *Store[T]) Fetch() error {
 				continue
 			}
 
-			itemPtr := s.processFunc(itemIntf)
+			itemPtr := s.processFunc(item)
 			if itemPtr == nil {
 				continue
 			}

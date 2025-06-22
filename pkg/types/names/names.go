@@ -1,17 +1,24 @@
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package names
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
+	// EXISTING_CODE
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 const (
@@ -41,190 +48,164 @@ type NamesCollection struct {
 }
 
 func NewNamesCollection() *NamesCollection {
-	nc := &NamesCollection{}
-	nc.ResetSummary()
-	nc.initializeFacets()
-	return nc
+	c := &NamesCollection{}
+	c.ResetSummary()
+	c.initializeFacets()
+	return c
 }
 
-func (nc *NamesCollection) initializeFacets() {
-	namesStore := GetNamesStore()
-
-	allFacet := facets.NewFacetWithSummary(
+func (c *NamesCollection) initializeFacets() {
+	c.allFacet = facets.NewFacetWithSummary(
 		NamesAll,
-		nil,
-		nil,
-		namesStore,
+		isAll,
+		isDupName(),
+		c.getNamesStore(),
 		"names",
-		nc,
+		c,
 	)
 
-	customFacet := facets.NewFacetWithSummary(
+	c.customFacet = facets.NewFacetWithSummary(
 		NamesCustom,
-		func(name *Name) bool { return name.Parts&coreTypes.Custom != 0 },
-		nil,
-		namesStore,
+		isCustom,
+		isDupName(),
+		c.getNamesStore(),
 		"names",
-		nc,
+		c,
 	)
 
-	prefundFacet := facets.NewFacetWithSummary(
+	c.prefundFacet = facets.NewFacetWithSummary(
 		NamesPrefund,
-		func(name *Name) bool { return name.Parts&coreTypes.Prefund != 0 },
-		nil,
-		namesStore,
+		isPrefund,
+		isDupName(),
+		c.getNamesStore(),
 		"names",
-		nc,
+		c,
 	)
 
-	regularFacet := facets.NewFacetWithSummary(
+	c.regularFacet = facets.NewFacetWithSummary(
 		NamesRegular,
-		func(name *Name) bool { return name.Parts&coreTypes.Regular != 0 },
-		nil,
-		namesStore,
+		isRegular,
+		isDupName(),
+		c.getNamesStore(),
 		"names",
-		nc,
+		c,
 	)
 
-	baddressFacet := facets.NewFacetWithSummary(
+	c.baddressFacet = facets.NewFacetWithSummary(
 		NamesBaddress,
-		func(name *Name) bool { return name.Parts&coreTypes.Baddress != 0 },
-		nil,
-		namesStore,
+		isBaddress,
+		isDupName(),
+		c.getNamesStore(),
 		"names",
-		nc,
+		c,
 	)
-
-	nc.allFacet = allFacet
-	nc.customFacet = customFacet
-	nc.prefundFacet = prefundFacet
-	nc.regularFacet = regularFacet
-	nc.baddressFacet = baddressFacet
 }
 
-func (nc *NamesCollection) LoadData(dataFacet types.DataFacet) {
-	if !nc.NeedsUpdate(dataFacet) {
-		return
-	}
+func isAll(item *Name) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
 
-	var facet *facets.Facet[Name]
-	var facetName types.DataFacet
+func isCustom(item *Name) bool {
+	// EXISTING_CODE
+	return item.Parts&coreTypes.Custom != 0
+	// EXISTING_CODE
+}
 
-	switch dataFacet {
-	case NamesAll:
-		facet = nc.allFacet
-		facetName = NamesAll
-	case NamesCustom:
-		facet = nc.customFacet
-		facetName = NamesCustom
-	case NamesPrefund:
-		facet = nc.prefundFacet
-		facetName = NamesPrefund
-	case NamesRegular:
-		facet = nc.regularFacet
-		facetName = NamesRegular
-	case NamesBaddress:
-		facet = nc.baddressFacet
-		facetName = NamesBaddress
-	default:
-		logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
+func isPrefund(item *Name) bool {
+	// EXISTING_CODE
+	return item.Parts&coreTypes.Prefund != 0
+	// EXISTING_CODE
+}
+
+func isRegular(item *Name) bool {
+	// EXISTING_CODE
+	return item.Parts&coreTypes.Regular != 0
+	// EXISTING_CODE
+}
+
+func isBaddress(item *Name) bool {
+	// EXISTING_CODE
+	return item.Parts&coreTypes.Baddress != 0
+	// EXISTING_CODE
+}
+
+func isDupName() func(existing []*Name, newItem *Name) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func (c *NamesCollection) LoadData(dataFacet types.DataFacet) {
+	if !c.NeedsUpdate(dataFacet) {
 		return
 	}
 
 	go func() {
-		if err := facet.Load(); err != nil {
-			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+		switch dataFacet {
+		case NamesAll:
+			if err := c.allFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case NamesCustom:
+			if err := c.customFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case NamesPrefund:
+			if err := c.prefundFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case NamesRegular:
+			if err := c.regularFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case NamesBaddress:
+			if err := c.baddressFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		default:
+			logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
+			return
 		}
 	}()
 }
 
-func (nc *NamesCollection) Reset(dataFacet types.DataFacet) {
+func (c *NamesCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
-	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
-		namesStore.Reset()
+	case NamesAll:
+		c.allFacet.GetStore().Reset()
+	case NamesCustom:
+		c.customFacet.GetStore().Reset()
+	case NamesPrefund:
+		c.prefundFacet.GetStore().Reset()
+	case NamesRegular:
+		c.regularFacet.GetStore().Reset()
+	case NamesBaddress:
+		c.baddressFacet.GetStore().Reset()
 	default:
 		return
 	}
 }
 
-func (nc *NamesCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
-	var facet *facets.Facet[Name]
-
+func (c *NamesCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	switch dataFacet {
 	case NamesAll:
-		facet = nc.allFacet
+		return c.allFacet.NeedsUpdate()
 	case NamesCustom:
-		facet = nc.customFacet
+		return c.customFacet.NeedsUpdate()
 	case NamesPrefund:
-		facet = nc.prefundFacet
+		return c.prefundFacet.NeedsUpdate()
 	case NamesRegular:
-		facet = nc.regularFacet
+		return c.regularFacet.NeedsUpdate()
 	case NamesBaddress:
-		facet = nc.baddressFacet
+		return c.baddressFacet.NeedsUpdate()
 	default:
 		return false
 	}
-
-	return facet.NeedsUpdate()
 }
 
-func (nc *NamesCollection) getExpectedTotal(dataFacet types.DataFacet) int {
-	_ = dataFacet
-	if count, err := GetNamesCount(); err == nil && count > 0 {
-		return count
-	}
-	return nc.allFacet.ExpectedCount()
-}
-
-func (nc *NamesCollection) matchesFilter(name *Name, filter string) bool {
-	filterLower := strings.ToLower(filter)
-
-	addressHex := strings.ToLower(name.Address.Hex())
-	addressNoPrefix := strings.TrimPrefix(addressHex, "0x")
-	addressNoLeadingZeros := strings.TrimLeft(addressNoPrefix, "0")
-
-	if strings.Contains(addressHex, filterLower) ||
-		strings.Contains(addressNoPrefix, filterLower) ||
-		strings.Contains(addressNoLeadingZeros, filterLower) {
-		return true
-	}
-
-	if strings.Contains(strings.ToLower(name.Name), filterLower) {
-		return true
-	}
-
-	if strings.Contains(strings.ToLower(name.Tags), filterLower) {
-		return true
-	}
-
-	if strings.Contains(strings.ToLower(name.Source), filterLower) {
-		return true
-	}
-
-	if strings.HasPrefix(filterLower, "0x") {
-		fNoPrefix := strings.TrimPrefix(filterLower, "0x")
-		if strings.Contains(addressNoPrefix, fNoPrefix) || strings.Contains(addressNoLeadingZeros, fNoPrefix) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func GetNamesCount() (int, error) {
-	chainName := preferences.GetChain()
-	countOpts := sdk.NamesOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
-	}
-	if countResult, _, err := countOpts.NamesCount(); err != nil {
-		return 0, fmt.Errorf("NamesCount query error: %v", err)
-	} else if len(countResult) > 0 {
-		return int(countResult[0].Count), nil
-	}
-	return 0, nil
-}
-
-func (nc *NamesCollection) GetSupportedFacets() []types.DataFacet {
+func (c *NamesCollection) GetSupportedFacets() []types.DataFacet {
 	return []types.DataFacet{
 		NamesAll,
 		NamesCustom,
@@ -234,53 +215,71 @@ func (nc *NamesCollection) GetSupportedFacets() []types.DataFacet {
 	}
 }
 
-func (nc *NamesCollection) GetStoreName(dataFacet types.DataFacet) string {
-	switch dataFacet {
-	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
-		return "names"
-	default:
-		return ""
-	}
-}
-
-func (nc *NamesCollection) GetSummary() types.Summary {
-	nc.summaryMutex.RLock()
-	defer nc.summaryMutex.RUnlock()
-	return nc.summary
-}
-
-func (nc *NamesCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+func (c *NamesCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	// EXISTING_CODE
 	if name, ok := item.(*Name); ok {
-		nc.summaryMutex.Lock()
-		defer nc.summaryMutex.Unlock()
+		c.summaryMutex.Lock()
+		defer c.summaryMutex.Unlock()
 
-		nc.summary.TotalCount++
-		if nc.summary.FacetCounts == nil {
-			nc.summary.FacetCounts = make(map[types.DataFacet]int)
+		c.summary.TotalCount++
+		if c.summary.FacetCounts == nil {
+			c.summary.FacetCounts = make(map[types.DataFacet]int)
 		}
 		if name.Parts&coreTypes.Custom != 0 {
-			nc.summary.FacetCounts[NamesCustom]++
+			c.summary.FacetCounts[NamesCustom]++
 		}
 		if name.Parts&coreTypes.Prefund != 0 {
-			nc.summary.FacetCounts[NamesPrefund]++
+			c.summary.FacetCounts[NamesPrefund]++
 		}
 		if name.Parts&coreTypes.Regular != 0 {
-			nc.summary.FacetCounts[NamesRegular]++
+			c.summary.FacetCounts[NamesRegular]++
 		}
 		if name.Parts&coreTypes.Baddress != 0 {
-			nc.summary.FacetCounts[NamesBaddress]++
+			c.summary.FacetCounts[NamesBaddress]++
 		}
-		nc.summary.LastUpdated = time.Now().Unix()
+		c.summary.LastUpdated = time.Now().Unix()
 	}
+	// EXISTING_CODE
 }
 
-func (nc *NamesCollection) ResetSummary() {
-	nc.summaryMutex.Lock()
-	defer nc.summaryMutex.Unlock()
-	nc.summary = types.Summary{
+func (c *NamesCollection) GetSummary() types.Summary {
+	c.summaryMutex.RLock()
+	defer c.summaryMutex.RUnlock()
+
+	summary := c.summary
+	summary.FacetCounts = make(map[types.DataFacet]int)
+	for k, v := range c.summary.FacetCounts {
+		summary.FacetCounts[k] = v
+	}
+
+	if c.summary.CustomData != nil {
+		summary.CustomData = make(map[string]interface{})
+		for k, v := range c.summary.CustomData {
+			summary.CustomData[k] = v
+		}
+	}
+
+	return summary
+}
+
+func (c *NamesCollection) ResetSummary() {
+	c.summaryMutex.Lock()
+	defer c.summaryMutex.Unlock()
+	c.summary = types.Summary{
 		TotalCount:  0,
 		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: time.Now().Unix(),
 	}
 }
+
+// EXISTING_CODE
+func (c *NamesCollection) getExpectedTotal(dataFacet types.DataFacet) int {
+	_ = dataFacet
+	if count, err := GetNamesCount(); err == nil && count > 0 {
+		return count
+	}
+	return c.allFacet.ExpectedCount()
+}
+
+// EXISTING_CODE

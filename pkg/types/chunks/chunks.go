@@ -71,8 +71,8 @@ func (c *ChunksCollection) initializeFacets() {
 
 	c.bloomsFacet = facets.NewFacetWithSummary(
 		ChunksBlooms,
-		isBlooms,
-		isDupBlooms(),
+		isBloom,
+		isDupBloom(),
 		c.getBloomsStore(),
 		"chunks",
 		c,
@@ -100,7 +100,7 @@ func isIndex(item *Index) bool {
 	// EXISTING_CODE
 }
 
-func isBlooms(item *Bloom) bool {
+func isBloom(item *Bloom) bool {
 	// EXISTING_CODE
 	return true
 	// EXISTING_CODE
@@ -112,7 +112,7 @@ func isManifest(item *Manifest) bool {
 	// EXISTING_CODE
 }
 
-func isDupBlooms() func(existing []*Bloom, newItem *Bloom) bool {
+func isDupBloom() func(existing []*Bloom, newItem *Bloom) bool {
 	// EXISTING_CODE
 	return nil
 	// EXISTING_CODE

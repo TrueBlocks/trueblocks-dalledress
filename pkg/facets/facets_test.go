@@ -81,9 +81,9 @@ func TestFacetLoad(t *testing.T) {
 				close(ctx.ErrorChan)
 				return nil
 			},
-			func(itemIntf interface{}) *TestItem {
-				if item, ok := itemIntf.(*TestItem); ok {
-					return item
+			func(item interface{}) *TestItem {
+				if it, ok := item.(*TestItem); ok {
+					return it
 				}
 				return nil
 			},

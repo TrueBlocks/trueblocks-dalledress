@@ -1,10 +1,12 @@
 package monitors
 
 import (
+	// EXISTING_CODE
 	"fmt"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 type MonitorsPage struct {
@@ -36,6 +38,7 @@ func (p *MonitorsPage) GetState() types.LoadState {
 	return p.State
 }
 
+// EXISTING_CODE
 func (c *MonitorsCollection) GetPage(
 	dataFacet types.DataFacet,
 	first, pageSize int,
@@ -43,7 +46,7 @@ func (c *MonitorsCollection) GetPage(
 	filter string,
 ) (types.Page, error) {
 	switch dataFacet {
-	case MonitorsList:
+	case MonitorsMonitors:
 		var filterFunc func(*Monitor) bool
 		if filter != "" {
 			filterFunc = func(monitor *Monitor) bool {
@@ -83,3 +86,4 @@ func (c *MonitorsCollection) GetPage(
 	}
 }
 
+// EXISTING_CODE

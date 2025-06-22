@@ -39,24 +39,5 @@ func (p *{{.Class}}Page) GetState() types.LoadState {
 	return p.State
 }
 
-func (c *{{.Class}}Collection) Get{{.Class}}Page(
-	dataFacet types.DataFacet,
-	first, pageSize int,
-	sortSpec sdk.SortSpec,
-	filter string,
-) (*{{.Class}}Page, error) {
-	page, err := c.GetPage(dataFacet, first, pageSize, sortSpec, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	{{toLower .Class}}Page, ok := page.(*{{.Class}}Page)
-	if !ok {
-		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
-	}
-
-	return {{toLower .Class}}Page, nil
-}
-
 // EXISTING_CODE
 // EXISTING_CODE

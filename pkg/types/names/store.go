@@ -1,9 +1,18 @@
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package names
 
 import (
 	"fmt"
 	"sync"
 
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
@@ -12,21 +21,23 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 type Name = coreTypes.Name
 
 var (
-	namesStore *store.Store[Name]
-	namesMu    sync.Mutex
+	namesStore   *store.Store[Name]
+	namesStoreMu sync.Mutex
 )
 
-func GetNamesStore() *store.Store[Name] {
-	namesMu.Lock()
-	defer namesMu.Unlock()
+func (c *NamesCollection) getNamesStore() *store.Store[Name] {
+	namesStoreMu.Lock()
+	defer namesStoreMu.Unlock()
 
 	if namesStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
 			chainName := preferences.GetChain()
 			listOpts := sdk.NamesOptions{
 				Globals:   sdk.Globals{Verbose: true, Chain: chainName},
@@ -40,38 +51,70 @@ func GetNamesStore() *store.Store[Name] {
 				return wrappedErr
 			}
 			logging.LogBackend("The names query function returned without an error.")
+			// EXISTING_CODE
 			return nil
 		}
 
-		processFunc := func(itemIntf interface{}) *Name {
-			if name, ok := itemIntf.(*Name); ok {
-				return name
+		processFunc := func(item interface{}) *Name {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			if it, ok := item.(*Name); ok {
+				return it
 			}
 			return nil
 		}
 
 		mappingFunc := func(item *Name) (key interface{}, includeInMap bool) {
-			if item == nil || item.Address.IsZero() {
-				return nil, false
+			// EXISTING_CODE
+			if item != nil && !item.Address.IsZero() {
+				return item.Address, true
 			}
-			return item.Address, true
+			// EXISTING_CODE
+			return nil, false
 		}
 
-		namesStore = store.NewStore(GetStoreName(NamesAll), queryFunc, processFunc, mappingFunc)
+		// EXISTING_CODE
+		storeName := c.GetStoreName(NamesAll)
+		// EXISTING_CODE
+		namesStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 	}
 
 	return namesStore
 }
 
-func GetStoreName(dataFacet types.DataFacet) string {
+func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet) string {
 	switch dataFacet {
-	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
-		return "names-list"
+	case NamesAll:
+		return "names-names"
+	case NamesCustom:
+		return "names-names"
+	case NamesPrefund:
+		return "names-names"
+	case NamesRegular:
+		return "names-names"
+	case NamesBaddress:
+		return "names-names"
 	default:
 		return ""
 	}
 }
 
+func GetNamesCount() (int, error) {
+	chainName := preferences.GetChain()
+	countOpts := sdk.NamesOptions{
+		Globals: sdk.Globals{Cache: true, Chain: chainName},
+	}
+	if countResult, _, err := countOpts.NamesCount(); err != nil {
+		return 0, fmt.Errorf("NamesCount query error: %v", err)
+	} else if len(countResult) > 0 {
+		return int(countResult[0].Count), nil
+	}
+	return 0, nil
+}
+
+// EXISTING_CODE
 func (nc *NamesCollection) NameFromAddress(address base.Address) (*Name, bool) {
 	return namesStore.GetItemFromMap(address)
 }
+
+// EXISTING_CODE

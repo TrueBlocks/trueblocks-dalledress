@@ -10,7 +10,6 @@ package monitors
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -18,16 +17,15 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
 )
 
 const (
-	MonitorsList types.DataFacet = "monitors"
+	MonitorsMonitors types.DataFacet = "monitors"
 )
 
 func init() {
-	types.RegisterDataFacet(MonitorsList)
+	types.RegisterDataFacet(MonitorsMonitors)
 }
 
 type MonitorsCollection struct {
@@ -45,7 +43,7 @@ func NewMonitorsCollection() *MonitorsCollection {
 
 func (c *MonitorsCollection) initializeFacets() {
 	c.monitorsFacet = facets.NewFacetWithSummary(
-		MonitorsList,
+		MonitorsMonitors,
 		isMonitor,
 		isDupMonitor(),
 		c.getMonitorsStore(),
@@ -73,7 +71,7 @@ func (c *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
 
 	go func() {
 		switch dataFacet {
-		case MonitorsList:
+		case MonitorsMonitors:
 			if err := c.monitorsFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
 			}
@@ -86,7 +84,7 @@ func (c *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
 
 func (c *MonitorsCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
-	case MonitorsList:
+	case MonitorsMonitors:
 		c.monitorsFacet.GetStore().Reset()
 	default:
 		return
@@ -95,35 +93,16 @@ func (c *MonitorsCollection) Reset(dataFacet types.DataFacet) {
 
 func (c *MonitorsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	switch dataFacet {
-	case MonitorsList:
+	case MonitorsMonitors:
 		return c.monitorsFacet.NeedsUpdate()
 	default:
 		return false
 	}
 }
 
-func (c *MonitorsCollection) GetMonitorsPage(
-	dataFacet types.DataFacet,
-	first, pageSize int,
-	sortSpec sdk.SortSpec,
-	filter string,
-) (*MonitorsPage, error) {
-	page, err := c.GetPage(dataFacet, first, pageSize, sortSpec, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	monitorsPage, ok := page.(*MonitorsPage)
-	if !ok {
-		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
-	}
-
-	return monitorsPage, nil
-}
-
 func (c *MonitorsCollection) GetSupportedFacets() []types.DataFacet {
 	return []types.DataFacet{
-		MonitorsList,
+		MonitorsMonitors,
 	}
 }
 
@@ -143,7 +122,7 @@ func (c *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Sum
 		summary.FacetCounts = make(map[types.DataFacet]int)
 	}
 
-	summary.FacetCounts[MonitorsList]++
+	summary.FacetCounts[MonitorsMonitors]++
 	if summary.CustomData == nil {
 		summary.CustomData = make(map[string]interface{})
 	}
@@ -213,46 +192,6 @@ func (c *MonitorsCollection) getExpectedTotal(dataFacet types.DataFacet) int {
 		return count
 	}
 	return c.monitorsFacet.ExpectedCount()
-}
-
-func (c *MonitorsCollection) matchesFilter(monitor *Monitor, filter string) bool {
-	if filter == "" {
-		return true
-	}
-
-	filterLower := strings.ToLower(filter)
-
-	addressHex := strings.ToLower(monitor.Address.Hex())
-	addressNoPrefix := strings.TrimPrefix(addressHex, "0x")
-	addressNoLeadingZeros := strings.TrimLeft(addressNoPrefix, "0")
-
-	if strings.Contains(addressHex, filterLower) ||
-		strings.Contains(addressNoPrefix, filterLower) ||
-		strings.Contains(addressNoLeadingZeros, filterLower) {
-		return true
-	}
-
-	if strings.Contains(strings.ToLower(monitor.Name), filterLower) {
-		return true
-	}
-
-	if strings.Contains(fmt.Sprintf("%d", monitor.NRecords), filterLower) ||
-		strings.Contains(fmt.Sprintf("%d", monitor.FileSize), filterLower) ||
-		strings.Contains(fmt.Sprintf("%d", monitor.LastScanned), filterLower) {
-		return true
-	}
-
-	if monitor.IsEmpty && strings.Contains("empty", filterLower) {
-		return true
-	}
-	if monitor.IsStaged && strings.Contains("staged", filterLower) {
-		return true
-	}
-	if monitor.Deleted && strings.Contains("deleted", filterLower) {
-		return true
-	}
-
-	return false
 }
 
 // EXISTING_CODE

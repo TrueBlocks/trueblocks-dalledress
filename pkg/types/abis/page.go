@@ -41,25 +41,6 @@ func (p *AbisPage) GetState() types.LoadState {
 	return p.State
 }
 
-func (c *AbisCollection) GetAbisPage(
-	dataFacet types.DataFacet,
-	first, pageSize int,
-	sortSpec sdk.SortSpec,
-	filter string,
-) (*AbisPage, error) {
-	page, err := c.GetPage(dataFacet, first, pageSize, sortSpec, filter)
-	if err != nil {
-		return nil, err
-	}
-
-	abisPage, ok := page.(*AbisPage)
-	if !ok {
-		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
-	}
-
-	return abisPage, nil
-}
-
 // EXISTING_CODE
 func (c *AbisCollection) GetPage(
 	dataFacet types.DataFacet,

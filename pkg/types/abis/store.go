@@ -56,12 +56,12 @@ func (c *AbisCollection) getAbisStore() *store.Store[Abi] {
 			return nil
 		}
 
-		processFunc := func(itemIntf interface{}) *Abi {
+		processFunc := func(item interface{}) *Abi {
 			// EXISTING_CODE
-			if abi, ok := itemIntf.(*Abi); ok {
-				return abi
+			// EXISTING_CODE
+			if it, ok := item.(*Abi); ok {
+				return it
 			}
-			// EXISTING_CODE
 			return nil
 		}
 
@@ -102,12 +102,12 @@ func (c *AbisCollection) getFunctionsStore() *store.Store[Function] {
 			return nil
 		}
 
-		processFunc := func(itemIntf interface{}) *Function {
+		processFunc := func(item interface{}) *Function {
 			// EXISTING_CODE
-			if fn, ok := itemIntf.(*Function); ok {
-				return fn
+			// EXISTING_CODE
+			if it, ok := item.(*Function); ok {
+				return it
 			}
-			// EXISTING_CODE
 			return nil
 		}
 

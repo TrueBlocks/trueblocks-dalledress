@@ -66,8 +66,8 @@ func GetExportsStatementsStore(chain string, address string) *store.Store[Statem
 		return nil
 	}
 
-	processFunc := func(itemIntf interface{}) *Statement {
-		if stmt, ok := itemIntf.(*Statement); ok {
+	processFunc := func(item interface{}) *Statement {
+		if stmt, ok := item.(*Statement); ok {
 			return stmt
 		}
 		return nil
@@ -116,8 +116,8 @@ func GetExportsTransfersStore(chain string, address string) *store.Store[Transfe
 		return nil
 	}
 
-	processFunc := func(itemIntf interface{}) *Transfer {
-		if transfer, ok := itemIntf.(*Transfer); ok {
+	processFunc := func(item interface{}) *Transfer {
+		if transfer, ok := item.(*Transfer); ok {
 			return transfer
 		}
 		return nil
@@ -166,8 +166,8 @@ func GetExportsBalancesStore(chain string, address string) *store.Store[Token] {
 		return nil
 	}
 
-	processFunc := func(itemIntf interface{}) *Token {
-		if state, ok := itemIntf.(*Token); ok {
+	processFunc := func(item interface{}) *Token {
+		if state, ok := item.(*Token); ok {
 			return state
 		}
 		return nil
@@ -214,8 +214,8 @@ func GetExportsTransactionsStore(chain string, address string) *store.Store[Tran
 		return nil
 	}
 
-	processFunc := func(itemIntf interface{}) *Transaction {
-		if tx, ok := itemIntf.(*Transaction); ok {
+	processFunc := func(item interface{}) *Transaction {
+		if tx, ok := item.(*Transaction); ok {
 			return tx
 		}
 		return nil

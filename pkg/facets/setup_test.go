@@ -55,12 +55,12 @@ func createTestStore() *store.Store[TestItem] {
 			close(ctx.ErrorChan)
 			return nil
 		},
-		func(itemIntf interface{}) *TestItem {
-			if item, ok := itemIntf.(TestItem); ok {
-				return &item
+		func(item interface{}) *TestItem {
+			if it, ok := item.(TestItem); ok {
+				return &it
 			}
-			if item, ok := itemIntf.(*TestItem); ok {
-				return item
+			if it, ok := item.(*TestItem); ok {
+				return it
 			}
 			return nil
 		},

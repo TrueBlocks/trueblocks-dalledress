@@ -299,7 +299,95 @@
             "return_type": "string",
             "attributes": "visible|docs",
             "capabilities": "code",
-            "summary": "Chunks route"
+            "summary": "Chunks route",
+            "productions": [
+                {
+                    "class": "Chunks",
+                    "doc_group": "04-Admin",
+                    "doc_route": "412-chunkIndex",
+                    "doc_descr": "internal-use only data model detailing a single index chunk file",
+                    "produced_by": "chunks",
+                    "members": [
+                        {
+                            "name": "range",
+                            "type": "blkrange",
+                            "docOrder": 1,
+                            "description": "the block range (inclusive) covered by this chunk",
+                            "num": 1
+                        },
+                        {
+                            "name": "magic",
+                            "type": "string",
+                            "docOrder": 2,
+                            "description": "an internal use only magic number to indicate file format",
+                            "num": 2
+                        },
+                        {
+                            "name": "hash",
+                            "type": "hash",
+                            "docOrder": 3,
+                            "description": "the hash of the specification under which this chunk was generated",
+                            "num": 3
+                        },
+                        {
+                            "name": "nAddresses",
+                            "type": "uint64",
+                            "docOrder": 4,
+                            "description": "the number of addresses in this chunk",
+                            "num": 4
+                        },
+                        {
+                            "name": "nAppearances",
+                            "type": "uint64",
+                            "docOrder": 5,
+                            "description": "the number of appearances in this chunk",
+                            "num": 5
+                        },
+                        {
+                            "name": "size",
+                            "type": "uint64",
+                            "docOrder": 6,
+                            "description": "the size of the chunk in bytes",
+                            "num": 6
+                        },
+                        {
+                            "name": "rangeDates",
+                            "type": "RangeDates",
+                            "attributes": "omitempty",
+                            "docOrder": 7,
+                            "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                            "num": 7,
+                            "isPointer": true
+                        }
+                    ],
+                    "facets": [
+                        {
+                            "name": "Stats",
+                            "store": "Stats"
+                        },
+                        {
+                            "name": "Index",
+                            "store": "Index"
+                        },
+                        {
+                            "name": "Blooms",
+                            "store": "Blooms"
+                        },
+                        {
+                            "name": "Manifest",
+                            "store": "Manifest"
+                        }
+                    ]
+                },
+                {
+                    "class": "RangeDates",
+                    "doc_group": "04-Admin",
+                    "doc_route": "442-rangeDates",
+                    "doc_descr": "shows first and last timestamps and dates for a given block range",
+                    "produced_by": "chunks",
+                    "disable_go": true
+                }
+            ]
         },
         {
             "num": 6300,
@@ -321,7 +409,90 @@
             "return_type": "string",
             "attributes": "visible|docs",
             "capabilities": "code",
-            "summary": "Monitors route"
+            "summary": "Monitors route",
+            "productions": [
+                {
+                    "class": "Monitors",
+                    "doc_group": "01-Accounts",
+                    "doc_route": "106-monitor",
+                    "doc_descr": "a local file indicating a user's interest in an address. Includes caches for reconicilations, transactions, and appearances as well as an optional association to named account",
+                    "produced_by": "monitors,list,export,slurp",
+                    "cache_type": "marshal_only",
+                    "members": [
+                        {
+                            "name": "address",
+                            "type": "address",
+                            "attributes": "sorts",
+                            "docOrder": 1,
+                            "description": "the address of this monitor",
+                            "num": 1
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "docOrder": 2,
+                            "description": "the name of this monitor (if any)",
+                            "num": 8
+                        },
+                        {
+                            "name": "nRecords",
+                            "type": "int64",
+                            "attributes": "sorts",
+                            "docOrder": 3,
+                            "description": "the number of appearances for this monitor",
+                            "num": 7
+                        },
+                        {
+                            "name": "fileSize",
+                            "type": "int64",
+                            "attributes": "sorts",
+                            "docOrder": 4,
+                            "description": "the size of this monitor on disc",
+                            "num": 5
+                        },
+                        {
+                            "name": "lastScanned",
+                            "type": "uint32",
+                            "attributes": "sorts",
+                            "docOrder": 5,
+                            "description": "the last scanned block number",
+                            "num": 6
+                        },
+                        {
+                            "name": "isEmpty",
+                            "type": "bool",
+                            "attributes": "sorts",
+                            "docOrder": 6,
+                            "upgrades": "\u003e3.1.2:bool",
+                            "description": "`true` if the monitor has no appearances, `false` otherwise",
+                            "num": 3
+                        },
+                        {
+                            "name": "isStaged",
+                            "type": "bool",
+                            "attributes": "sorts",
+                            "docOrder": 7,
+                            "upgrades": "\u003e3.1.2:bool",
+                            "description": "`true` if the monitor file in on the stage, `false` otherwise",
+                            "num": 4
+                        },
+                        {
+                            "name": "deleted",
+                            "type": "bool",
+                            "attributes": "sorts",
+                            "docOrder": 8,
+                            "description": "`true` if this monitor has been deleted, `false` otherwise",
+                            "num": 2
+                        }
+                    ],
+                    "facets": [
+                        {
+                            "name": "Monitors",
+                            "store": "Monitors"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "num": 6500,
@@ -332,10 +503,433 @@
             "return_type": "string",
             "attributes": "visible|docs",
             "capabilities": "code",
-            "summary": "Names route"
+            "summary": "Names route",
+            "productions": [
+                {
+                    "class": "Names",
+                    "doc_group": "01-Accounts",
+                    "doc_route": "109-name",
+                    "doc_descr": "an association between a human-readable name and an address used throughout TrueBlocks",
+                    "produced_by": "names",
+                    "members": [
+                        {
+                            "name": "tags",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 1,
+                            "description": "colon separated list of tags",
+                            "num": 1
+                        },
+                        {
+                            "name": "address",
+                            "type": "address",
+                            "attributes": "sorts",
+                            "docOrder": 2,
+                            "description": "the address associated with this name",
+                            "num": 2
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 3,
+                            "description": "the name associated with this address (retrieved from on-chain data if available)",
+                            "num": 3
+                        },
+                        {
+                            "name": "symbol",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 4,
+                            "description": "the symbol for this address (retrieved from on-chain data if available)",
+                            "num": 4
+                        },
+                        {
+                            "name": "source",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 5,
+                            "description": "user supplied source of where this name was found (or on-chain if name is on-chain)",
+                            "num": 5
+                        },
+                        {
+                            "name": "decimals",
+                            "type": "uint64",
+                            "attributes": "sorts",
+                            "docOrder": 6,
+                            "description": "number of decimals retrieved from an ERC20 smart contract, defaults to 18",
+                            "num": 6
+                        },
+                        {
+                            "name": "deleted",
+                            "type": "bool",
+                            "attributes": "omitempty|sorts",
+                            "docOrder": 7,
+                            "description": "`true` if deleted, `false` otherwise",
+                            "num": 12
+                        },
+                        {
+                            "name": "isCustom",
+                            "type": "bool",
+                            "attributes": "omitempty|sorts",
+                            "docOrder": 8,
+                            "description": "`true` if the address is a custom address, `false` otherwise",
+                            "num": 7
+                        },
+                        {
+                            "name": "isPrefund",
+                            "type": "bool",
+                            "attributes": "omitempty|sorts",
+                            "docOrder": 9,
+                            "description": "`true` if the address was one of the prefund addresses, `false` otherwise",
+                            "num": 8
+                        },
+                        {
+                            "name": "isContract",
+                            "type": "bool",
+                            "attributes": "omitempty|sorts",
+                            "docOrder": 10,
+                            "description": "`true` if the address is a smart contract, `false` otherwise",
+                            "num": 9
+                        },
+                        {
+                            "name": "isErc20",
+                            "type": "bool",
+                            "attributes": "omitempty|sorts",
+                            "docOrder": 11,
+                            "description": "`true` if the address is an ERC20, `false` otherwise",
+                            "num": 10
+                        },
+                        {
+                            "name": "isErc721",
+                            "type": "bool",
+                            "attributes": "omitempty|sorts",
+                            "docOrder": 12,
+                            "description": "`true` if the address is an ERC720, `false` otherwise",
+                            "num": 11
+                        }
+                    ],
+                    "facets": [
+                        {
+                            "name": "All",
+                            "store": "Names"
+                        },
+                        {
+                            "name": "Custom",
+                            "store": "Names"
+                        },
+                        {
+                            "name": "Prefund",
+                            "store": "Names"
+                        },
+                        {
+                            "name": "Regular",
+                            "store": "Names"
+                        },
+                        {
+                            "name": "Baddress",
+                            "store": "Names"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "structures": [
+        {
+            "class": "Monitors",
+            "doc_group": "01-Accounts",
+            "doc_route": "106-monitor",
+            "doc_descr": "a local file indicating a user's interest in an address. Includes caches for reconicilations, transactions, and appearances as well as an optional association to named account",
+            "produced_by": "monitors,list,export,slurp",
+            "cache_type": "marshal_only",
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "sorts",
+                    "docOrder": 1,
+                    "description": "the address of this monitor",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "the name of this monitor (if any)",
+                    "num": 8
+                },
+                {
+                    "name": "nRecords",
+                    "type": "int64",
+                    "attributes": "sorts",
+                    "docOrder": 3,
+                    "description": "the number of appearances for this monitor",
+                    "num": 7
+                },
+                {
+                    "name": "fileSize",
+                    "type": "int64",
+                    "attributes": "sorts",
+                    "docOrder": 4,
+                    "description": "the size of this monitor on disc",
+                    "num": 5
+                },
+                {
+                    "name": "lastScanned",
+                    "type": "uint32",
+                    "attributes": "sorts",
+                    "docOrder": 5,
+                    "description": "the last scanned block number",
+                    "num": 6
+                },
+                {
+                    "name": "isEmpty",
+                    "type": "bool",
+                    "attributes": "sorts",
+                    "docOrder": 6,
+                    "upgrades": "\u003e3.1.2:bool",
+                    "description": "`true` if the monitor has no appearances, `false` otherwise",
+                    "num": 3
+                },
+                {
+                    "name": "isStaged",
+                    "type": "bool",
+                    "attributes": "sorts",
+                    "docOrder": 7,
+                    "upgrades": "\u003e3.1.2:bool",
+                    "description": "`true` if the monitor file in on the stage, `false` otherwise",
+                    "num": 4
+                },
+                {
+                    "name": "deleted",
+                    "type": "bool",
+                    "attributes": "sorts",
+                    "docOrder": 8,
+                    "description": "`true` if this monitor has been deleted, `false` otherwise",
+                    "num": 2
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Monitors",
+                    "store": "Monitors"
+                }
+            ]
+        },
+        {
+            "class": "Names",
+            "doc_group": "01-Accounts",
+            "doc_route": "109-name",
+            "doc_descr": "an association between a human-readable name and an address used throughout TrueBlocks",
+            "produced_by": "names",
+            "members": [
+                {
+                    "name": "tags",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 1,
+                    "description": "colon separated list of tags",
+                    "num": 1
+                },
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "sorts",
+                    "docOrder": 2,
+                    "description": "the address associated with this name",
+                    "num": 2
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 3,
+                    "description": "the name associated with this address (retrieved from on-chain data if available)",
+                    "num": 3
+                },
+                {
+                    "name": "symbol",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 4,
+                    "description": "the symbol for this address (retrieved from on-chain data if available)",
+                    "num": 4
+                },
+                {
+                    "name": "source",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 5,
+                    "description": "user supplied source of where this name was found (or on-chain if name is on-chain)",
+                    "num": 5
+                },
+                {
+                    "name": "decimals",
+                    "type": "uint64",
+                    "attributes": "sorts",
+                    "docOrder": 6,
+                    "description": "number of decimals retrieved from an ERC20 smart contract, defaults to 18",
+                    "num": 6
+                },
+                {
+                    "name": "deleted",
+                    "type": "bool",
+                    "attributes": "omitempty|sorts",
+                    "docOrder": 7,
+                    "description": "`true` if deleted, `false` otherwise",
+                    "num": 12
+                },
+                {
+                    "name": "isCustom",
+                    "type": "bool",
+                    "attributes": "omitempty|sorts",
+                    "docOrder": 8,
+                    "description": "`true` if the address is a custom address, `false` otherwise",
+                    "num": 7
+                },
+                {
+                    "name": "isPrefund",
+                    "type": "bool",
+                    "attributes": "omitempty|sorts",
+                    "docOrder": 9,
+                    "description": "`true` if the address was one of the prefund addresses, `false` otherwise",
+                    "num": 8
+                },
+                {
+                    "name": "isContract",
+                    "type": "bool",
+                    "attributes": "omitempty|sorts",
+                    "docOrder": 10,
+                    "description": "`true` if the address is a smart contract, `false` otherwise",
+                    "num": 9
+                },
+                {
+                    "name": "isErc20",
+                    "type": "bool",
+                    "attributes": "omitempty|sorts",
+                    "docOrder": 11,
+                    "description": "`true` if the address is an ERC20, `false` otherwise",
+                    "num": 10
+                },
+                {
+                    "name": "isErc721",
+                    "type": "bool",
+                    "attributes": "omitempty|sorts",
+                    "docOrder": 12,
+                    "description": "`true` if the address is an ERC720, `false` otherwise",
+                    "num": 11
+                }
+            ],
+            "facets": [
+                {
+                    "name": "All",
+                    "store": "Names"
+                },
+                {
+                    "name": "Custom",
+                    "store": "Names"
+                },
+                {
+                    "name": "Prefund",
+                    "store": "Names"
+                },
+                {
+                    "name": "Regular",
+                    "store": "Names"
+                },
+                {
+                    "name": "Baddress",
+                    "store": "Names"
+                }
+            ]
+        },
+        {
+            "class": "Chunks",
+            "doc_group": "04-Admin",
+            "doc_route": "412-chunkIndex",
+            "doc_descr": "internal-use only data model detailing a single index chunk file",
+            "produced_by": "chunks",
+            "members": [
+                {
+                    "name": "range",
+                    "type": "blkrange",
+                    "docOrder": 1,
+                    "description": "the block range (inclusive) covered by this chunk",
+                    "num": 1
+                },
+                {
+                    "name": "magic",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "an internal use only magic number to indicate file format",
+                    "num": 2
+                },
+                {
+                    "name": "hash",
+                    "type": "hash",
+                    "docOrder": 3,
+                    "description": "the hash of the specification under which this chunk was generated",
+                    "num": 3
+                },
+                {
+                    "name": "nAddresses",
+                    "type": "uint64",
+                    "docOrder": 4,
+                    "description": "the number of addresses in this chunk",
+                    "num": 4
+                },
+                {
+                    "name": "nAppearances",
+                    "type": "uint64",
+                    "docOrder": 5,
+                    "description": "the number of appearances in this chunk",
+                    "num": 5
+                },
+                {
+                    "name": "size",
+                    "type": "uint64",
+                    "docOrder": 6,
+                    "description": "the size of the chunk in bytes",
+                    "num": 6
+                },
+                {
+                    "name": "rangeDates",
+                    "type": "RangeDates",
+                    "attributes": "omitempty",
+                    "docOrder": 7,
+                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                    "num": 7,
+                    "isPointer": true
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Stats",
+                    "store": "Stats"
+                },
+                {
+                    "name": "Index",
+                    "store": "Index"
+                },
+                {
+                    "name": "Blooms",
+                    "store": "Blooms"
+                },
+                {
+                    "name": "Manifest",
+                    "store": "Manifest"
+                }
+            ]
+        },
+        {
+            "class": "RangeDates",
+            "doc_group": "04-Admin",
+            "doc_route": "442-rangeDates",
+            "doc_descr": "shows first and last timestamps and dates for a given block range",
+            "produced_by": "chunks",
+            "disable_go": true
+        },
         {
             "class": "Abis",
             "doc_group": "05-Other",

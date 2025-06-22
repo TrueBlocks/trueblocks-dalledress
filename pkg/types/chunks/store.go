@@ -70,10 +70,10 @@ func (c *ChunksCollection) getBloomsStore() *store.Store[Bloom] {
 
 		processFunc := func(item interface{}) *Bloom {
 			// EXISTING_CODE
-			if bloom, ok := item.(*Bloom); ok {
-				return bloom
-			}
 			// EXISTING_CODE
+			if it, ok := item.(*Bloom); ok {
+				return it
+			}
 			return nil
 		}
 
@@ -123,20 +123,21 @@ func (c *ChunksCollection) getIndexStore() *store.Store[Index] {
 
 		processFunc := func(item interface{}) *Index {
 			// EXISTING_CODE
-			if index, ok := item.(*Index); ok {
-				return index
-			}
 			// EXISTING_CODE
+			if it, ok := item.(*Index); ok {
+				return it
+			}
 			return nil
 		}
 
 		mappingFunc := func(item *Index) (key interface{}, includeInMap bool) {
 			// EXISTING_CODE
-			if item != nil {
-				return nil, false
-			}
+			// TODO: Do we need a mapping function for chunks. I think yes
+			// if item != nil {
+			// 	return item.Range, true
+			// }
 			// EXISTING_CODE
-			return item.Range, true
+			return nil, false
 		}
 
 		// EXISTING_CODE
@@ -176,10 +177,10 @@ func (c *ChunksCollection) getManifestStore() *store.Store[Manifest] {
 
 		processFunc := func(item interface{}) *Manifest {
 			// EXISTING_CODE
-			if manifest, ok := item.(*Manifest); ok {
-				return manifest
-			}
 			// EXISTING_CODE
+			if it, ok := item.(*Manifest); ok {
+				return it
+			}
 			return nil
 		}
 
@@ -229,10 +230,10 @@ func (c *ChunksCollection) getStatsStore() *store.Store[Stats] {
 
 		processFunc := func(item interface{}) *Stats {
 			// EXISTING_CODE
-			if stats, ok := item.(*Stats); ok {
-				return stats
-			}
 			// EXISTING_CODE
+			if it, ok := item.(*Stats); ok {
+				return it
+			}
 			return nil
 		}
 
@@ -269,75 +270,18 @@ func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet) string {
 	}
 }
 
+func GetChunksCount() (int, error) {
+	chainName := preferences.GetChain()
+	countOpts := sdk.ChunksOptions{
+		Globals: sdk.Globals{Cache: true, Chain: chainName},
+	}
+	if countResult, _, err := countOpts.ChunksCount(); err != nil {
+		return 0, fmt.Errorf("ChunksCount query error: %v", err)
+	} else if len(countResult) > 0 {
+		return int(countResult[0].Count), nil
+	}
+	return 0, nil
+}
+
 // EXISTING_CODE
-func GetStatsCount() (int, error) {
-	chainName := preferences.GetChain()
-
-	// Use dedicated count method if available in SDK
-	opts := sdk.ChunksOptions{
-		Globals: sdk.Globals{Chain: chainName},
-	}
-
-	// Try to use count functionality if available
-	countResults, _, err := opts.ChunksCount()
-	if err == nil && len(countResults) > 0 {
-		// Assuming the count result contains the total count
-		return int(countResults[0].Count), nil
-	}
-
-	// Fallback to store count
-	return statsStore.Count(), nil
-}
-
-func GetIndexCount() (int, error) {
-	chainName := preferences.GetChain()
-
-	opts := sdk.ChunksOptions{
-		Globals: sdk.Globals{Chain: chainName},
-	}
-
-	// Try to use count functionality if available
-	countResults, _, err := opts.ChunksCount()
-	if err == nil && len(countResults) > 0 {
-		return int(countResults[0].Count), nil
-	}
-
-	// Fallback to store count
-	return indexStore.Count(), nil
-}
-
-func GetBloomsCount() (int, error) {
-	chainName := preferences.GetChain()
-
-	opts := sdk.ChunksOptions{
-		Globals: sdk.Globals{Chain: chainName},
-	}
-
-	// Try to use count functionality if available
-	countResults, _, err := opts.ChunksCount()
-	if err == nil && len(countResults) > 0 {
-		return int(countResults[0].Count), nil
-	}
-
-	// Fallback to store count
-	return bloomsStore.Count(), nil
-}
-
-func GetManifestCount() (int, error) {
-	chainName := preferences.GetChain()
-
-	opts := sdk.ChunksOptions{
-		Globals: sdk.Globals{Chain: chainName},
-	}
-
-	// Try to use count functionality if available
-	countResults, _, err := opts.ChunksCount()
-	if err == nil && len(countResults) > 0 {
-		return int(countResults[0].Count), nil
-	}
-
-	// Fallback to store count
-	return manifestStore.Count(), nil
-}
-
 // EXISTING_CODE

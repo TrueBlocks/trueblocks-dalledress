@@ -44,7 +44,7 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 			}
 			if _, _, err := listOpts.MonitorsList(); err != nil {
 				// Create structured error with proper context
-				wrappedErr := types.NewSDKError("monitors", MonitorsList, "fetch", err)
+				wrappedErr := types.NewSDKError("monitors", MonitorsMonitors, "fetch", err)
 				logger.Error(fmt.Sprintf("Monitors SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
@@ -52,12 +52,12 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 			return nil
 		}
 
-		processFunc := func(itemIntf interface{}) *Monitor {
+		processFunc := func(item interface{}) *Monitor {
 			// EXISTING_CODE
-			if monitor, ok := itemIntf.(*Monitor); ok {
-				return monitor
+			// EXISTING_CODE
+			if it, ok := item.(*Monitor); ok {
+				return it
 			}
-			// EXISTING_CODE
 			return nil
 		}
 
@@ -68,7 +68,7 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(MonitorsList)
+		storeName := c.GetStoreName(MonitorsMonitors)
 		// EXISTING_CODE
 		monitorsStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 	}
@@ -78,7 +78,7 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 
 func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet) string {
 	switch dataFacet {
-	case MonitorsList:
+	case MonitorsMonitors:
 		return "monitors-monitors"
 	default:
 		return ""

@@ -16,7 +16,7 @@ func (c *MonitorsCollection) Crud(
 	op crud.Operation,
 	item interface{},
 ) error {
-	if dataFacet != MonitorsList {
+	if dataFacet != MonitorsMonitors {
 		return fmt.Errorf("unsupported dataFacet: %s", dataFacet)
 	}
 
@@ -43,7 +43,7 @@ func (c *MonitorsCollection) Crud(
 		logging.LogBackend(fmt.Sprintf("Removed monitor for address: %s", monitor.Address))
 
 		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-		c.Reset(MonitorsList)
+		c.Reset(MonitorsMonitors)
 		return nil
 
 	case crud.Delete:
@@ -60,7 +60,7 @@ func (c *MonitorsCollection) Crud(
 		logging.LogBackend(fmt.Sprintf("Deleted monitor for address: %s", monitor.Address))
 
 		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-		c.Reset(MonitorsList)
+		c.Reset(MonitorsMonitors)
 		return nil
 
 	case crud.Undelete:
@@ -77,7 +77,7 @@ func (c *MonitorsCollection) Crud(
 		logging.LogBackend(fmt.Sprintf("Undeleted monitor for address: %s", monitor.Address))
 
 		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-		c.Reset(MonitorsList)
+		c.Reset(MonitorsMonitors)
 		return nil
 
 	default:
@@ -111,6 +111,6 @@ func (c *MonitorsCollection) Clean(addresses []string) error {
 	}
 
 	// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-	c.Reset(MonitorsList)
+	c.Reset(MonitorsMonitors)
 	return nil
 }

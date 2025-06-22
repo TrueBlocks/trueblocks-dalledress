@@ -1,19 +1,18 @@
 package chunks
 
 import (
-	"fmt"
-	"strings"
-
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 type ChunksPage struct {
 	Facet         types.DataFacet `json:"facet"`
-	Stats         []*Stats        `json:"stats"`
-	Index         []*Index        `json:"index"`
 	Blooms        []*Bloom        `json:"blooms"`
+	Index         []*Index        `json:"index"`
 	Manifest      []*Manifest     `json:"manifest"`
+	Stats         []*Stats        `json:"stats"`
 	TotalItems    int             `json:"totalItems"`
 	ExpectedTotal int             `json:"expectedTotal"`
 	IsFetching    bool            `json:"isFetching"`
@@ -40,6 +39,7 @@ func (p *ChunksPage) GetState() types.LoadState {
 	return p.State
 }
 
+// EXISTING_CODE
 func (c *ChunksCollection) GetPage(
 	dataFacet types.DataFacet,
 	first, pageSize int,
@@ -165,103 +165,4 @@ func (c *ChunksCollection) GetPage(
 	return page, nil
 }
 
-func (c *ChunksCollection) matchesStatsFilter(stat *Stats, filter string) bool {
-	filterLower := strings.ToLower(filter)
-
-	// Filter by various fields in ChunkStats
-	if strings.Contains(strings.ToLower(stat.Range), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(fmt.Sprintf("%d", stat.NAddrs)), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(fmt.Sprintf("%d", stat.NApps)), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(fmt.Sprintf("%d", stat.NBlocks)), filterLower) {
-		return true
-	}
-
-	return false
-}
-
-func (c *ChunksCollection) matchesIndexFilter(index *Index, filter string) bool {
-	filterLower := strings.ToLower(filter)
-
-	// Filter by various fields in ChunkIndex
-	if strings.Contains(strings.ToLower(index.Range), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(index.Hash.String()), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(fmt.Sprintf("%d", index.NAddresses)), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(fmt.Sprintf("%d", index.NAppearances)), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(index.Magic), filterLower) {
-		return true
-	}
-
-	return false
-}
-
-func (c *ChunksCollection) matchesBloomsFilter(bloom *Bloom, filter string) bool {
-	filterLower := strings.ToLower(filter)
-
-	// Filter by various fields in ChunkBloom
-	if strings.Contains(strings.ToLower(bloom.Range), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(bloom.Hash.String()), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(fmt.Sprintf("%d", bloom.NBlooms)), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(fmt.Sprintf("%d", bloom.NInserted)), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(bloom.Magic), filterLower) {
-		return true
-	}
-
-	return false
-}
-
-func (c *ChunksCollection) matchesManifestFilter(manifest *Manifest, filter string) bool {
-	filterLower := strings.ToLower(filter)
-
-	// Filter by various fields in ChunkManifest
-	if strings.Contains(strings.ToLower(manifest.Version), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(manifest.Chain), filterLower) {
-		return true
-	}
-	if strings.Contains(strings.ToLower(manifest.Specification.String()), filterLower) {
-		return true
-	}
-
-	return false
-}
-
-// TODO: THIS ISN'T NEEDED (FOR CHUNKS OR ANY OTHER -- SEE THE APP)
-// func (c *ChunksCollection) Get ChunksPage(
-// 	dataFacet types.DataFacet,
-// 	first, pageSize int,
-// 	sortSpec sdk.SortSpec,
-// 	filter string,
-// ) (*ChunksPage, error) {
-// 	page, err := c.GetPage(dataFacet, first, pageSize, sortSpec, filter)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	chunksPage, ok := page.(*ChunksPage)
-// 	if !ok {
-// 		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
-// 	}
-// 	return chunksPage, nil
-// }
+// EXISTING_CODE

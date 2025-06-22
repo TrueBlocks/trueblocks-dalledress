@@ -52,7 +52,7 @@ func (c *ExportsCollection) getBalancesStore(chain string, address string) *stor
 	}
 
 	storeKey := getStoreKey(chainName, address)
-	theStore, _ := balancesStoreMap[storeKey]
+	theStore := balancesStoreMap[storeKey]
 
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -106,7 +106,7 @@ func (c *ExportsCollection) getStatementsStore(chain string, address string) *st
 	}
 
 	storeKey := getStoreKey(chainName, address)
-	theStore, _ := statementsStoreMap[storeKey]
+	theStore := statementsStoreMap[storeKey]
 
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -161,7 +161,7 @@ func (c *ExportsCollection) getTransactionsStore(chain string, address string) *
 	}
 
 	storeKey := getStoreKey(chainName, address)
-	theStore, _ := transactionsStoreMap[storeKey]
+	theStore := transactionsStoreMap[storeKey]
 
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -215,7 +215,7 @@ func (c *ExportsCollection) getTransfersStore(chain string, address string) *sto
 	}
 
 	storeKey := getStoreKey(chainName, address)
-	theStore, _ := transfersStoreMap[storeKey]
+	theStore := transfersStoreMap[storeKey]
 
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -429,4 +429,5 @@ func ClearAllExportsStores() {
 func getStoreKey(chain, address string) string {
 	return fmt.Sprintf("%s_%s", chain, address)
 }
+
 // EXISTING_CODE

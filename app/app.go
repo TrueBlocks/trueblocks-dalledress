@@ -41,7 +41,6 @@ type App struct {
 	chainList   *utils.ChainList
 	// ADD_ROUTE
 	names    *names.NamesCollection
-	abis     *abis.AbisCollection
 	monitors *monitors.MonitorsCollection
 	chunks   *chunks.ChunksCollection
 	exports  *exports.ExportsCollection
@@ -70,7 +69,6 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	}
 	// ADD_ROUTE
 	app.names = names.NewNamesCollection()
-	app.abis = abis.NewAbisCollection()
 	app.monitors = monitors.NewMonitorsCollection()
 	app.chunks = chunks.NewChunksCollection()
 	// Note: exports created on-demand per chain/address when needed
@@ -79,7 +77,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 
 	app.collections = make([]types.Collection, 0, 4)
 	app.RegisterCollection(app.names)
-	app.RegisterCollection(app.abis)
+	app.RegisterCollection(abis.GetAbisCollection())
 	app.RegisterCollection(app.monitors)
 	app.RegisterCollection(app.chunks)
 	// Note: exports created on-demand per chain/address when needed
@@ -354,8 +352,8 @@ func (a *App) Reload(dataFacet types.DataFacet) error {
 		a.names.Reset(dataFacet)
 		a.names.LoadData(dataFacet)
 	case "/abis":
-		a.abis.Reset(dataFacet)
-		a.abis.LoadData(dataFacet)
+		abis.GetAbisCollection().Reset(dataFacet)
+		abis.GetAbisCollection().LoadData(dataFacet)
 	case "/monitors":
 		a.monitors.Reset(dataFacet)
 		a.monitors.LoadData(dataFacet)

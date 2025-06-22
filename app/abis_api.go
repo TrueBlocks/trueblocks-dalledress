@@ -15,7 +15,7 @@ func (a *App) GetAbisPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*abis.AbisPage, error) {
-	return getCollectionPage[*abis.AbisPage](a.abis, dataFacet, first, pageSize, sort, filter)
+	return getCollectionPage[*abis.AbisPage](abis.GetAbisCollection(), dataFacet, first, pageSize, sort, filter)
 }
 
 func (a *App) AbisCrud(
@@ -27,11 +27,11 @@ func (a *App) AbisCrud(
 	if address != "" && (abi == nil || abi.Address.IsZero()) {
 		abi = &abis.Abi{Address: base.HexToAddress(address)}
 	}
-	return a.abis.Crud(dataFacet, op, abi)
+	return abis.GetAbisCollection().Crud(dataFacet, op, abi)
 }
 
 func (a *App) GetAbisSummary() types.Summary {
-	return a.abis.GetSummary()
+	return abis.GetAbisCollection().GetSummary()
 }
 
 // ADD_ROUTE

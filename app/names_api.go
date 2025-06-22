@@ -1,4 +1,3 @@
-// ADD_ROUTE
 package app
 
 import (
@@ -27,40 +26,13 @@ func (a *App) NamesCrud(
 	return a.names.Crud(dataFacet, op, name)
 }
 
-func (a *App) CleanNames(tabName string) error {
-	// opts := sdk.NamesOptions{
-	// 	Globals: sdk.Globals{
-	// 		Chain: "mainnet",
-	// 	},
-	// 	Clean: true,
-	// }
-	// if _, _, err := opts.CleanNames(); err != nil {
-	// 	msgs.Emit Message(msgs. EventError, "CleanNames: "+err.Error())
-	// 	return err
-	// }
-	return nil
-}
-
-func (a *App) PublishNames(tabName string) error {
-	// opts := sdk.NamesOptions{
-	// 	Globals: sdk.Globals{
-	// 		Chain: "mainnet",
-	// 	},
-	// 	Publish: true,
-	// }
-	// if _, _, err := opts.PublishNames(); err != nil {
-	// 	msgs.Emit Message(msgs. EventError, "PublishNames: "+err.Error())
-	// 	return err
-	// }
-	return nil
-}
-
-func (a *App) NameFromAddress(address string) (*names.Name, bool) {
-	return a.names.NameFromAddress(base.HexToAddress(address))
-}
-
 func (a *App) GetNamesSummary() types.Summary {
 	return a.names.GetSummary()
 }
 
-// ADD_ROUTE
+// EXISTING_CODE
+func (a *App) NameFromAddress(address string) (*names.Name, bool) {
+	return a.names.NameFromAddress(base.HexToAddress(address))
+}
+
+// EXISTING_CODE

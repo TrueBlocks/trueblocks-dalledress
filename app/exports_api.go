@@ -35,7 +35,7 @@ func (a *App) GetExportsCount(
 	dataFacet types.DataFacet,
 	chain string,
 	address string,
-) (uint64, error) {
+) (int, error) {
 	return exports.GetExportsCount(chain, address, string(dataFacet))
 }
 

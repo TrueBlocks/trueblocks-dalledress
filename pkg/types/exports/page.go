@@ -1,31 +1,57 @@
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package exports
 
 import (
+	// EXISTING_CODE
 	"fmt"
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
+// TODO: The slices should be slices to pointers
 type ExportsPage struct {
 	Facet         types.DataFacet `json:"facet"`
-	Statements    []Statement     `json:"statements"`
-	Transfers     []Transfer      `json:"transfers"`
 	Balances      []Token         `json:"balances"`
+	Statements    []Statement     `json:"statements"`
 	Transactions  []Transaction   `json:"transactions"`
+	Transfers     []Transfer      `json:"transfers"`
 	TotalItems    int             `json:"totalItems"`
 	ExpectedTotal int             `json:"expectedTotal"`
 	IsFetching    bool            `json:"isFetching"`
 	State         types.LoadState `json:"state"`
 }
 
-func (ep *ExportsPage) GetFacet() types.DataFacet { return ep.Facet }
-func (ep *ExportsPage) GetTotalItems() int        { return ep.TotalItems }
-func (ep *ExportsPage) GetExpectedTotal() int     { return ep.ExpectedTotal }
-func (ep *ExportsPage) GetIsFetching() bool       { return ep.IsFetching }
-func (ep *ExportsPage) GetState() types.LoadState { return ep.State }
+func (p *ExportsPage) GetFacet() types.DataFacet {
+	return p.Facet
+}
 
+func (p *ExportsPage) GetTotalItems() int {
+	return p.TotalItems
+}
+
+func (p *ExportsPage) GetExpectedTotal() int {
+	return p.ExpectedTotal
+}
+
+func (p *ExportsPage) GetIsFetching() bool {
+	return p.IsFetching
+}
+
+func (p *ExportsPage) GetState() types.LoadState {
+	return p.State
+}
+
+// EXISTING_CODE
 func (ec *ExportsCollection) GetPage(
 	dataFacet types.DataFacet,
 	first, pageSize int,
@@ -169,3 +195,4 @@ func (ec *ExportsCollection) getTransactionsPage(first, pageSize int, sortSpec s
 	return page, nil
 }
 
+// EXISTING_CODE

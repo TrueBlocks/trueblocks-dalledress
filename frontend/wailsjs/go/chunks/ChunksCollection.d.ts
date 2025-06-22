@@ -6,15 +6,11 @@ import {sdk} from '../models';
 
 export function AccumulateItem(arg1:any,arg2:types.Summary):Promise<void>;
 
-export function ChunksCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<void>;
-
 export function Crud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<void>;
-
-export function GetCollectionName():Promise<string>;
 
 export function GetPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
 
-export function GetStoreForFacet(arg1:types.DataFacet):Promise<string>;
+export function GetStoreName(arg1:types.DataFacet):Promise<string>;
 
 export function GetSummary():Promise<types.Summary>;
 

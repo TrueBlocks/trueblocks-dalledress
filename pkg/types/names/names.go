@@ -234,17 +234,13 @@ func (nc *NamesCollection) GetSupportedFacets() []types.DataFacet {
 	}
 }
 
-func (nc *NamesCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
+func (nc *NamesCollection) GetStoreName(dataFacet types.DataFacet) string {
 	switch dataFacet {
 	case NamesAll, NamesCustom, NamesPrefund, NamesRegular, NamesBaddress:
 		return "names"
 	default:
 		return ""
 	}
-}
-
-func (nc *NamesCollection) GetCollectionName() string {
-	return "names"
 }
 
 func (nc *NamesCollection) GetSummary() types.Summary {

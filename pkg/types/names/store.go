@@ -57,8 +57,7 @@ func GetNamesStore() *store.Store[Name] {
 			return item.Address, true
 		}
 
-		storeName := GetStoreName(NamesAll)
-		namesStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		namesStore = store.NewStore(GetStoreName(NamesAll), queryFunc, processFunc, mappingFunc)
 	}
 
 	return namesStore

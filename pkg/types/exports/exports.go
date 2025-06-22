@@ -168,7 +168,7 @@ func (ec *ExportsCollection) GetSupportedFacets() []types.DataFacet {
 	}
 }
 
-func (ec *ExportsCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
+func (ec *ExportsCollection) GetStoreName(dataFacet types.DataFacet) string {
 	switch dataFacet {
 	case ExportsStatements:
 		return "exports-statements"
@@ -181,10 +181,6 @@ func (ec *ExportsCollection) GetStoreForFacet(dataFacet types.DataFacet) string 
 	default:
 		return ""
 	}
-}
-
-func (ec *ExportsCollection) GetCollectionName() string {
-	return "exports"
 }
 
 var (

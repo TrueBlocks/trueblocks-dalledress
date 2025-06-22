@@ -13,7 +13,7 @@ func NewChunksCrud() *ChunksCrud {
 	return &ChunksCrud{}
 }
 
-func (c *ChunksCollection) ChunksCrud(
+func (c *ChunksCollection) Crud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},

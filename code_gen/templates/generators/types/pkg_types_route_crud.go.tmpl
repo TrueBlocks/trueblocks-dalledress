@@ -1,0 +1,51 @@
+{{if eq 1 2}}
+package {{toLower .Class}}
+
+import (
+	"fmt"
+
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+)
+
+type {{.Class}}Crud struct{}
+
+func New{{.Class}}Crud() *{{.Class}}Crud {
+	return &{{.Class}}Crud{}
+}
+
+func (c *{{.Class}}Collection) Crud(
+	dataFacet types.DataFacet,
+	op crud.Operation,
+	item interface{},
+) error {
+	crudHandler := New{{.Class}}Crud()
+	switch op {
+	case crud.Create:
+		return crudHandler.Create(item)
+	case crud.Update:
+		return crudHandler.Update(item)
+	case crud.Delete:
+		return crudHandler.Delete(item)
+	case crud.Remove:
+		return crudHandler.Delete(item)
+	default:
+		return fmt.Errorf("operation %s not supported for {{toLower .Class}}", op)
+	}
+}
+
+func (c *{{.Class}}Crud) Create(item interface{}) error {
+	return types.NewValidationError("{{toLower .Class}}", "", "create",
+		fmt.Errorf("{{toLower .Class}} collection is read-only"))
+}
+
+func (c *{{.Class}}Crud) Update(item interface{}) error {
+	return types.NewValidationError("{{toLower .Class}}", "", "update",
+		fmt.Errorf("{{toLower .Class}} collection is read-only"))
+}
+
+func (c *{{.Class}}Crud) Delete(item interface{}) error {
+	return types.NewValidationError("{{toLower .Class}}", "", "delete",
+		fmt.Errorf("{{toLower .Class}} collection is read-only"))
+}
+{{end}}

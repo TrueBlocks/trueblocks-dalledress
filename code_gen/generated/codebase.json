@@ -1,0 +1,616 @@
+{
+    "commands": [
+        {
+            "num": 6000,
+            "group": "Types",
+            "description": "TrueBlocks Types",
+            "summary": "TrueBlocks Types"
+        },
+        {
+            "num": 6100,
+            "folder": "pkg",
+            "route": "abis",
+            "group": "Types",
+            "description": "The route for the abis folder",
+            "return_type": "string",
+            "attributes": "visible|docs",
+            "capabilities": "code",
+            "summary": "ABIs route",
+            "productions": [
+                {
+                    "class": "Abis",
+                    "doc_group": "05-Other",
+                    "doc_route": "503-abi",
+                    "doc_descr": "a human-readable representation of a Solidity smart contract",
+                    "produced_by": "abis",
+                    "members": [
+                        {
+                            "name": "address",
+                            "type": "address",
+                            "attributes": "sorts",
+                            "docOrder": 1,
+                            "description": "the address for the ABI",
+                            "num": 1
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 2,
+                            "description": "the filename of the ABI (likely the smart contract address)",
+                            "num": 2
+                        },
+                        {
+                            "name": "path",
+                            "type": "string",
+                            "docOrder": 3,
+                            "description": "the folder holding the abi file",
+                            "num": 3
+                        },
+                        {
+                            "name": "fileSize",
+                            "type": "int64",
+                            "attributes": "sorts",
+                            "docOrder": 4,
+                            "description": "the size of this file on disc",
+                            "num": 4
+                        },
+                        {
+                            "name": "lastModDate",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 5,
+                            "description": "the last update date of the file",
+                            "num": 5
+                        },
+                        {
+                            "name": "isKnown",
+                            "type": "bool",
+                            "attributes": "sorts",
+                            "docOrder": 6,
+                            "description": "true if this is the ABI for a known smart contract or protocol",
+                            "num": 6
+                        },
+                        {
+                            "name": "isEmpty",
+                            "type": "bool",
+                            "attributes": "sorts",
+                            "docOrder": 7,
+                            "description": "true if the ABI could not be found (and won't be looked for again)",
+                            "num": 7
+                        },
+                        {
+                            "name": "nFunctions",
+                            "type": "int64",
+                            "attributes": "sorts",
+                            "docOrder": 8,
+                            "description": "if verbose, the number of functions in the ABI",
+                            "num": 8
+                        },
+                        {
+                            "name": "nEvents",
+                            "type": "int64",
+                            "attributes": "sorts",
+                            "docOrder": 9,
+                            "description": "if verbose, the number of events in the ABI",
+                            "num": 9
+                        },
+                        {
+                            "name": "hasConstructor",
+                            "type": "bool",
+                            "attributes": "sorts",
+                            "docOrder": 10,
+                            "description": "if verbose and the abi has a constructor, then `true`, else `false`",
+                            "num": 10
+                        },
+                        {
+                            "name": "hasFallback",
+                            "type": "bool",
+                            "attributes": "sorts",
+                            "docOrder": 11,
+                            "description": "if verbose and the abi has a fallback, then `true`, else `false`",
+                            "num": 11
+                        },
+                        {
+                            "name": "functions",
+                            "type": "Function",
+                            "docOrder": 12,
+                            "description": "the functions for this address",
+                            "num": 12,
+                            "isArray": true
+                        }
+                    ],
+                    "facets": [
+                        {
+                            "name": "Downloaded",
+                            "store": "Abis"
+                        },
+                        {
+                            "name": "Known",
+                            "store": "Abis"
+                        },
+                        {
+                            "name": "Functions",
+                            "store": "Functions"
+                        },
+                        {
+                            "name": "Events",
+                            "store": "Functions"
+                        }
+                    ]
+                },
+                {
+                    "class": "Function",
+                    "doc_group": "05-Other",
+                    "doc_route": "506-function",
+                    "doc_descr": "a human-readable representation of a Solidity function call or event",
+                    "produced_by": "abis,export,transactions,receipts,logs,traces,state,slurp",
+                    "contained_by": "abi, log, receipt, result, slurp, trace, transaction",
+                    "cache_type": "marshal_only",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 1,
+                            "description": "the name of the interface",
+                            "num": 1
+                        },
+                        {
+                            "name": "type",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 2,
+                            "description": "the type of the interface, either 'event' or 'function'",
+                            "num": 2
+                        },
+                        {
+                            "name": "anonymous",
+                            "type": "bool",
+                            "attributes": "omitempty",
+                            "num": 3
+                        },
+                        {
+                            "name": "constant",
+                            "type": "bool",
+                            "attributes": "omitempty",
+                            "num": 4
+                        },
+                        {
+                            "name": "stateMutability",
+                            "type": "string",
+                            "attributes": "omitempty|sorts",
+                            "num": 5
+                        },
+                        {
+                            "name": "signature",
+                            "type": "string",
+                            "attributes": "omitempty|sorts",
+                            "docOrder": 3,
+                            "description": "the canonical signature of the interface",
+                            "num": 6
+                        },
+                        {
+                            "name": "encoding",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 4,
+                            "description": "the signature encoded with keccak",
+                            "num": 7
+                        },
+                        {
+                            "name": "message",
+                            "type": "string",
+                            "attributes": "omitempty",
+                            "num": 8
+                        },
+                        {
+                            "name": "inputs",
+                            "type": "Parameter",
+                            "docOrder": 5,
+                            "description": "the input parameters to the function, if any",
+                            "num": 9,
+                            "isArray": true
+                        },
+                        {
+                            "name": "outputs",
+                            "type": "Parameter",
+                            "docOrder": 6,
+                            "description": "the output parameters to the function, if any",
+                            "num": 10,
+                            "isArray": true
+                        }
+                    ]
+                },
+                {
+                    "class": "Parameter",
+                    "doc_group": "05-Other",
+                    "doc_route": "509-parameter",
+                    "doc_descr": "an input or output parameter to a Solidity function or event",
+                    "produced_by": "abis,export,transactions,receipts,logs,traces,state,slurp",
+                    "contained_by": "function, parameter",
+                    "cache_type": "marshal_only",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "type",
+                            "type": "string",
+                            "docOrder": 1,
+                            "description": "the type of this parameter",
+                            "num": 1
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "docOrder": 2,
+                            "description": "the name of this parameter",
+                            "num": 2
+                        },
+                        {
+                            "name": "strDefault",
+                            "type": "string",
+                            "attributes": "omitempty",
+                            "docOrder": 3,
+                            "description": "the default value of this parameter, if any",
+                            "num": 3
+                        },
+                        {
+                            "name": "value",
+                            "type": "string",
+                            "attributes": "omitempty",
+                            "num": 4
+                        },
+                        {
+                            "name": "indexed",
+                            "type": "bool",
+                            "attributes": "omitempty",
+                            "docOrder": 4,
+                            "description": "`true` if this parameter is indexed",
+                            "num": 5
+                        },
+                        {
+                            "name": "internalType",
+                            "type": "string",
+                            "attributes": "omitempty",
+                            "docOrder": 5,
+                            "description": "for composite types, the internal type of the parameter",
+                            "num": 6
+                        },
+                        {
+                            "name": "components",
+                            "type": "Parameter",
+                            "attributes": "omitempty",
+                            "docOrder": 6,
+                            "description": "for composite types, the parameters making up the composite",
+                            "num": 7,
+                            "isArray": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "num": 6200,
+            "folder": "pkg",
+            "route": "chunks",
+            "group": "Types",
+            "description": "The route for the chunks folder",
+            "return_type": "string",
+            "attributes": "visible|docs",
+            "capabilities": "code",
+            "summary": "Chunks route"
+        },
+        {
+            "num": 6300,
+            "folder": "pkg",
+            "route": "exports",
+            "group": "Types",
+            "description": "The route for the exports folder",
+            "return_type": "string",
+            "attributes": "visible|docs",
+            "capabilities": "code",
+            "summary": "Exports route"
+        },
+        {
+            "num": 6400,
+            "folder": "pkg",
+            "route": "monitors",
+            "group": "Types",
+            "description": "The route for the monitors folder",
+            "return_type": "string",
+            "attributes": "visible|docs",
+            "capabilities": "code",
+            "summary": "Monitors route"
+        },
+        {
+            "num": 6500,
+            "folder": "pkg",
+            "route": "names",
+            "group": "Types",
+            "description": "The route for the names folder",
+            "return_type": "string",
+            "attributes": "visible|docs",
+            "capabilities": "code",
+            "summary": "Names route"
+        }
+    ],
+    "structures": [
+        {
+            "class": "Abis",
+            "doc_group": "05-Other",
+            "doc_route": "503-abi",
+            "doc_descr": "a human-readable representation of a Solidity smart contract",
+            "produced_by": "abis",
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "sorts",
+                    "docOrder": 1,
+                    "description": "the address for the ABI",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 2,
+                    "description": "the filename of the ABI (likely the smart contract address)",
+                    "num": 2
+                },
+                {
+                    "name": "path",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "the folder holding the abi file",
+                    "num": 3
+                },
+                {
+                    "name": "fileSize",
+                    "type": "int64",
+                    "attributes": "sorts",
+                    "docOrder": 4,
+                    "description": "the size of this file on disc",
+                    "num": 4
+                },
+                {
+                    "name": "lastModDate",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 5,
+                    "description": "the last update date of the file",
+                    "num": 5
+                },
+                {
+                    "name": "isKnown",
+                    "type": "bool",
+                    "attributes": "sorts",
+                    "docOrder": 6,
+                    "description": "true if this is the ABI for a known smart contract or protocol",
+                    "num": 6
+                },
+                {
+                    "name": "isEmpty",
+                    "type": "bool",
+                    "attributes": "sorts",
+                    "docOrder": 7,
+                    "description": "true if the ABI could not be found (and won't be looked for again)",
+                    "num": 7
+                },
+                {
+                    "name": "nFunctions",
+                    "type": "int64",
+                    "attributes": "sorts",
+                    "docOrder": 8,
+                    "description": "if verbose, the number of functions in the ABI",
+                    "num": 8
+                },
+                {
+                    "name": "nEvents",
+                    "type": "int64",
+                    "attributes": "sorts",
+                    "docOrder": 9,
+                    "description": "if verbose, the number of events in the ABI",
+                    "num": 9
+                },
+                {
+                    "name": "hasConstructor",
+                    "type": "bool",
+                    "attributes": "sorts",
+                    "docOrder": 10,
+                    "description": "if verbose and the abi has a constructor, then `true`, else `false`",
+                    "num": 10
+                },
+                {
+                    "name": "hasFallback",
+                    "type": "bool",
+                    "attributes": "sorts",
+                    "docOrder": 11,
+                    "description": "if verbose and the abi has a fallback, then `true`, else `false`",
+                    "num": 11
+                },
+                {
+                    "name": "functions",
+                    "type": "Function",
+                    "docOrder": 12,
+                    "description": "the functions for this address",
+                    "num": 12,
+                    "isArray": true
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Downloaded",
+                    "store": "Abis"
+                },
+                {
+                    "name": "Known",
+                    "store": "Abis"
+                },
+                {
+                    "name": "Functions",
+                    "store": "Functions"
+                },
+                {
+                    "name": "Events",
+                    "store": "Functions"
+                }
+            ]
+        },
+        {
+            "class": "Function",
+            "doc_group": "05-Other",
+            "doc_route": "506-function",
+            "doc_descr": "a human-readable representation of a Solidity function call or event",
+            "produced_by": "abis,export,transactions,receipts,logs,traces,state,slurp",
+            "contained_by": "abi, log, receipt, result, slurp, trace, transaction",
+            "cache_type": "marshal_only",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 1,
+                    "description": "the name of the interface",
+                    "num": 1
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 2,
+                    "description": "the type of the interface, either 'event' or 'function'",
+                    "num": 2
+                },
+                {
+                    "name": "anonymous",
+                    "type": "bool",
+                    "attributes": "omitempty",
+                    "num": 3
+                },
+                {
+                    "name": "constant",
+                    "type": "bool",
+                    "attributes": "omitempty",
+                    "num": 4
+                },
+                {
+                    "name": "stateMutability",
+                    "type": "string",
+                    "attributes": "omitempty|sorts",
+                    "num": 5
+                },
+                {
+                    "name": "signature",
+                    "type": "string",
+                    "attributes": "omitempty|sorts",
+                    "docOrder": 3,
+                    "description": "the canonical signature of the interface",
+                    "num": 6
+                },
+                {
+                    "name": "encoding",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 4,
+                    "description": "the signature encoded with keccak",
+                    "num": 7
+                },
+                {
+                    "name": "message",
+                    "type": "string",
+                    "attributes": "omitempty",
+                    "num": 8
+                },
+                {
+                    "name": "inputs",
+                    "type": "Parameter",
+                    "docOrder": 5,
+                    "description": "the input parameters to the function, if any",
+                    "num": 9,
+                    "isArray": true
+                },
+                {
+                    "name": "outputs",
+                    "type": "Parameter",
+                    "docOrder": 6,
+                    "description": "the output parameters to the function, if any",
+                    "num": 10,
+                    "isArray": true
+                }
+            ]
+        },
+        {
+            "class": "Parameter",
+            "doc_group": "05-Other",
+            "doc_route": "509-parameter",
+            "doc_descr": "an input or output parameter to a Solidity function or event",
+            "produced_by": "abis,export,transactions,receipts,logs,traces,state,slurp",
+            "contained_by": "function, parameter",
+            "cache_type": "marshal_only",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "type",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "the type of this parameter",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "the name of this parameter",
+                    "num": 2
+                },
+                {
+                    "name": "strDefault",
+                    "type": "string",
+                    "attributes": "omitempty",
+                    "docOrder": 3,
+                    "description": "the default value of this parameter, if any",
+                    "num": 3
+                },
+                {
+                    "name": "value",
+                    "type": "string",
+                    "attributes": "omitempty",
+                    "num": 4
+                },
+                {
+                    "name": "indexed",
+                    "type": "bool",
+                    "attributes": "omitempty",
+                    "docOrder": 4,
+                    "description": "`true` if this parameter is indexed",
+                    "num": 5
+                },
+                {
+                    "name": "internalType",
+                    "type": "string",
+                    "attributes": "omitempty",
+                    "docOrder": 5,
+                    "description": "for composite types, the internal type of the parameter",
+                    "num": 6
+                },
+                {
+                    "name": "components",
+                    "type": "Parameter",
+                    "attributes": "omitempty",
+                    "docOrder": 6,
+                    "description": "for composite types, the parameters making up the composite",
+                    "num": 7,
+                    "isArray": true
+                }
+            ]
+        }
+    ],
+    "baseTypes": [
+        {},
+        {},
+        {}
+    ]
+}

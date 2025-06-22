@@ -1,17 +1,25 @@
-// CHUNKS_ROUTE
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package chunks
 
 import (
 	"fmt"
 	"sync"
+	"time"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	// EXISTING_CODE
 )
 
-// Define DataFacet constants for different chunk views
 const (
 	ChunksStats    types.DataFacet = "stats"
 	ChunksIndex    types.DataFacet = "index"
@@ -19,7 +27,6 @@ const (
 	ChunksManifest types.DataFacet = "manifest"
 )
 
-// REQUIRED: Register DataFacet values for validation
 func init() {
 	types.RegisterDataFacet(ChunksStats)
 	types.RegisterDataFacet(ChunksIndex)
@@ -27,9 +34,7 @@ func init() {
 	types.RegisterDataFacet(ChunksManifest)
 }
 
-// Collection structure with multiple facets
 type ChunksCollection struct {
-	// Facets for different chunk views
 	statsFacet    *facets.Facet[Stats]
 	indexFacet    *facets.Facet[Index]
 	bloomsFacet   *facets.Facet[Bloom]
@@ -38,163 +43,172 @@ type ChunksCollection struct {
 	summaryMutex  sync.RWMutex
 }
 
-// NewChunksCollection constructor function to initialize the chunks collection with all its facets
 func NewChunksCollection() *ChunksCollection {
-	cc := &ChunksCollection{
-		summary: types.Summary{
-			TotalCount:  0,
-			FacetCounts: make(map[types.DataFacet]int),
-			CustomData:  make(map[string]interface{}),
-		},
-	}
-
-	cc.initializeFacets()
-	return cc
+	c := &ChunksCollection{}
+	c.ResetSummary()
+	c.initializeFacets()
+	return c
 }
 
-// Initialize facets with appropriate filters
-func (cc *ChunksCollection) initializeFacets() {
-	// Stats facet - shows chunk statistics
-	cc.statsFacet = facets.NewFacetWithSummary(
+func (c *ChunksCollection) initializeFacets() {
+	c.statsFacet = facets.NewFacetWithSummary(
 		ChunksStats,
-		nil,
-		nil,
-		GetChunksStatsStore(),
+		isStats,
+		isDupStats(),
+		c.getStatsStore(),
 		"chunks",
-		cc,
+		c,
 	)
 
-	// Index facet - shows index chunk information
-	cc.indexFacet = facets.NewFacetWithSummary(
+	c.indexFacet = facets.NewFacetWithSummary(
 		ChunksIndex,
-		nil,
-		nil,
-		GetChunksIndexStore(),
+		isIndex,
+		isDupIndex(),
+		c.getIndexStore(),
 		"chunks",
-		cc,
+		c,
 	)
 
-	// Blooms facet - shows bloom filter information
-	cc.bloomsFacet = facets.NewFacetWithSummary(
+	c.bloomsFacet = facets.NewFacetWithSummary(
 		ChunksBlooms,
-		nil,
-		nil,
-		GetChunksBloomsStore(),
+		isBlooms,
+		isDupBlooms(),
+		c.getBloomsStore(),
 		"chunks",
-		cc,
+		c,
 	)
 
-	// Manifest facet - shows manifest information
-	cc.manifestFacet = facets.NewFacetWithSummary(
+	c.manifestFacet = facets.NewFacetWithSummary(
 		ChunksManifest,
-		nil,
-		nil,
-		GetChunksManifestStore(),
+		isManifest,
+		isDupManifest(),
+		c.getManifestStore(),
 		"chunks",
-		cc,
+		c,
 	)
 }
 
-// Implement Collection interface methods
-func (cc *ChunksCollection) LoadData(dataFacet types.DataFacet) {
-	if !cc.NeedsUpdate(dataFacet) {
-		return
-	}
+func isStats(item *Stats) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
 
-	var facet interface {
-		Load() error
-	}
-	var facetName string
+func isIndex(item *Index) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
 
-	switch dataFacet {
-	case ChunksStats:
-		facet = cc.statsFacet
-		facetName = "chunks.stats"
-	case ChunksIndex:
-		facet = cc.indexFacet
-		facetName = "chunks.index"
-	case ChunksBlooms:
-		facet = cc.bloomsFacet
-		facetName = "chunks.blooms"
-	case ChunksManifest:
-		facet = cc.manifestFacet
-		facetName = "chunks.manifest"
-	default:
-		logging.LogError("LoadData: unexpected data facet: %v", fmt.Errorf("invalid data facet: %s", dataFacet), nil)
+func isBlooms(item *Bloom) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
+
+func isManifest(item *Manifest) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
+
+func isDupBlooms() func(existing []*Bloom, newItem *Bloom) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func isDupIndex() func(existing []*Index, newItem *Index) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func isDupManifest() func(existing []*Manifest, newItem *Manifest) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func isDupStats() func(existing []*Stats, newItem *Stats) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func (c *ChunksCollection) LoadData(dataFacet types.DataFacet) {
+	if !c.NeedsUpdate(dataFacet) {
 		return
 	}
 
 	go func() {
-		if err := facet.Load(); err != nil {
-			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+		switch dataFacet {
+		case ChunksStats:
+			if err := c.statsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case ChunksIndex:
+			if err := c.indexFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case ChunksBlooms:
+			if err := c.bloomsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case ChunksManifest:
+			if err := c.manifestFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		default:
+			logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
+			return
 		}
 	}()
 }
 
-func (cc *ChunksCollection) Reset(dataFacet types.DataFacet) {
+func (c *ChunksCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
 	case ChunksStats:
-		GetChunksStatsStore().Reset()
-		cc.statsFacet.Reset()
+		c.statsFacet.GetStore().Reset()
 	case ChunksIndex:
-		GetChunksIndexStore().Reset()
-		cc.indexFacet.Reset()
+		c.indexFacet.GetStore().Reset()
 	case ChunksBlooms:
-		GetChunksBloomsStore().Reset()
-		cc.bloomsFacet.Reset()
+		c.bloomsFacet.GetStore().Reset()
 	case ChunksManifest:
-		GetChunksManifestStore().Reset()
-		cc.manifestFacet.Reset()
+		c.manifestFacet.GetStore().Reset()
+	default:
+		return
 	}
 }
 
-func (cc *ChunksCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
+func (c *ChunksCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	switch dataFacet {
 	case ChunksStats:
-		return cc.statsFacet.NeedsUpdate()
+		return c.statsFacet.NeedsUpdate()
 	case ChunksIndex:
-		return cc.indexFacet.NeedsUpdate()
+		return c.indexFacet.NeedsUpdate()
 	case ChunksBlooms:
-		return cc.bloomsFacet.NeedsUpdate()
+		return c.bloomsFacet.NeedsUpdate()
 	case ChunksManifest:
-		return cc.manifestFacet.NeedsUpdate()
+		return c.manifestFacet.NeedsUpdate()
 	default:
 		return false
 	}
 }
 
-func (cc *ChunksCollection) GetSupportedFacets() []types.DataFacet {
-	return []types.DataFacet{ChunksStats, ChunksIndex, ChunksBlooms, ChunksManifest}
-}
-
-func (cc *ChunksCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
-	switch dataFacet {
-	case ChunksStats:
-		return "chunks-stats"
-	case ChunksIndex:
-		return "chunks-index"
-	case ChunksBlooms:
-		return "chunks-blooms"
-	case ChunksManifest:
-		return "chunks-manifest"
-	default:
-		return ""
+func (c *ChunksCollection) GetSupportedFacets() []types.DataFacet {
+	return []types.DataFacet{
+		ChunksStats,
+		ChunksIndex,
+		ChunksBlooms,
+		ChunksManifest,
 	}
 }
 
-func (cc *ChunksCollection) GetCollectionName() string {
-	return "chunks"
-}
-
-// Crud implements the Collection interface with no-op operations since chunks data is immutable
-func (cc *ChunksCollection) Crud(dataFacet types.DataFacet, op crud.Operation, item interface{}) error {
-	// All CRUD operations are no-ops for chunks since the data is immutable blockchain data
-	return nil
-}
-
-func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summary) {
-	cc.summaryMutex.Lock()
-	defer cc.summaryMutex.Unlock()
+func (c *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	// EXISTING_CODE
+	c.summaryMutex.Lock()
+	defer c.summaryMutex.Unlock()
 
 	if summary.FacetCounts == nil {
 		summary.FacetCounts = make(map[types.DataFacet]int)
@@ -248,21 +262,22 @@ func (cc *ChunksCollection) AccumulateItem(item interface{}, summary *types.Summ
 		manifestCount++
 		summary.CustomData["manifestCount"] = manifestCount
 	}
+	// EXISTING_CODE
 }
 
-func (cc *ChunksCollection) GetSummary() types.Summary {
-	cc.summaryMutex.RLock()
-	defer cc.summaryMutex.RUnlock()
+func (c *ChunksCollection) GetSummary() types.Summary {
+	c.summaryMutex.RLock()
+	defer c.summaryMutex.RUnlock()
 
-	summary := cc.summary
+	summary := c.summary
 	summary.FacetCounts = make(map[types.DataFacet]int)
-	for k, v := range cc.summary.FacetCounts {
+	for k, v := range c.summary.FacetCounts {
 		summary.FacetCounts[k] = v
 	}
 
-	if cc.summary.CustomData != nil {
+	if c.summary.CustomData != nil {
 		summary.CustomData = make(map[string]interface{})
-		for k, v := range cc.summary.CustomData {
+		for k, v := range c.summary.CustomData {
 			summary.CustomData[k] = v
 		}
 	}
@@ -270,13 +285,16 @@ func (cc *ChunksCollection) GetSummary() types.Summary {
 	return summary
 }
 
-func (cc *ChunksCollection) ResetSummary() {
-	cc.summaryMutex.Lock()
-	defer cc.summaryMutex.Unlock()
-	cc.summary = types.Summary{
+func (c *ChunksCollection) ResetSummary() {
+	c.summaryMutex.Lock()
+	defer c.summaryMutex.Unlock()
+	c.summary = types.Summary{
 		TotalCount:  0,
 		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
-		LastUpdated: 0,
+		LastUpdated: time.Now().Unix(),
 	}
 }
+
+// EXISTING_CODE
+// EXISTING_CODE

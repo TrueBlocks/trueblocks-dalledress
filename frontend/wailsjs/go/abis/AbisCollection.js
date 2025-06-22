@@ -14,16 +14,12 @@ export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetAbisPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetCollectionName() {
-  return window['go']['abis']['AbisCollection']['GetCollectionName']();
-}
-
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStoreForFacet(arg1) {
-  return window['go']['abis']['AbisCollection']['GetStoreForFacet'](arg1);
+export function GetStoreName(arg1) {
+  return window['go']['abis']['AbisCollection']['GetStoreName'](arg1);
 }
 
 export function GetSummary() {

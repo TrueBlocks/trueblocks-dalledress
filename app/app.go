@@ -374,7 +374,7 @@ func (a *App) CancelFetch(dataFacet types.DataFacet) {
 	for _, collection := range a.collections {
 		for _, facet := range collection.GetSupportedFacets() {
 			if facet == dataFacet {
-				storeName = collection.GetStoreForFacet(facet)
+				storeName = collection.GetStoreName(facet)
 				break
 			}
 		}
@@ -435,7 +435,7 @@ func getCollectionPage[T any](
 func (a *App) ResetStore(storeName string) {
 	for _, collection := range a.collections {
 		for _, facet := range collection.GetSupportedFacets() {
-			if collection.GetStoreForFacet(facet) == storeName {
+			if collection.GetStoreName(facet) == storeName {
 				collection.Reset(facet)
 			}
 		}

@@ -1,0 +1,62 @@
+{{$class := .Class}}
+{{$isAbis := eq $class "Abis"}}
+{{$isMonitors := eq $class "Monitors"}}
+{{$isPtr := or $isAbis $isMonitors	}}
+package {{toLower .Class}}
+
+import (
+	// EXISTING_CODE
+	// EXISTING_CODE
+)
+
+type {{.Class}}Page struct {
+	Facet         types.DataFacet      `json:"facet"`
+	{{range .Stores}}{{.}} []{{if $isPtr}}{{else}}*{{end}}{{toSingular .}} `json:"{{toLower .}}"`
+{{end -}}
+	TotalItems    int                  `json:"totalItems"`
+	ExpectedTotal int                  `json:"expectedTotal"`
+	IsFetching    bool                 `json:"isFetching"`
+	State         types.LoadState      `json:"state"`
+}
+
+func (p *{{.Class}}Page) GetFacet() types.DataFacet {
+	return p.Facet
+}
+
+func (p *{{.Class}}Page) GetTotalItems() int {
+	return p.TotalItems
+}
+
+func (p *{{.Class}}Page) GetExpectedTotal() int {
+	return p.ExpectedTotal
+}
+
+func (p *{{.Class}}Page) GetIsFetching() bool {
+	return p.IsFetching
+}
+
+func (p *{{.Class}}Page) GetState() types.LoadState {
+	return p.State
+}
+
+func (c *{{.Class}}Collection) Get{{.Class}}Page(
+	dataFacet types.DataFacet,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (*{{.Class}}Page, error) {
+	page, err := c.GetPage(dataFacet, first, pageSize, sortSpec, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	{{toLower .Class}}Page, ok := page.(*{{.Class}}Page)
+	if !ok {
+		return nil, fmt.Errorf("internal error: GetPage returned unexpected type %T", page)
+	}
+
+	return {{toLower .Class}}Page, nil
+}
+
+// EXISTING_CODE
+// EXISTING_CODE

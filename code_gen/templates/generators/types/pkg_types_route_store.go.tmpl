@@ -1,0 +1,88 @@
+{{$class := .Class}}
+{{$isChunks := eq $class "Chunks"}}
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
+package {{toLower .Class}}
+
+import (
+	"fmt"
+	"sync"
+
+	// EXISTING_CODE
+	// EXISTING_CODE
+)
+
+{{range .Stores}}type {{toSingular .}} = coreTypes.{{if $isChunks}}Chunk{{end}}{{toSingular .}}
+{{end}}
+
+var (
+	{{range .Stores}}
+	{{toLower .}}Store *store.Store[{{toSingular .}}]
+	{{toLower .}}StoreMu   sync.Mutex
+	{{end}}
+)
+
+{{range .Stores}}
+func (c *{{$class}}Collection) get{{.}}Store() *store.Store[{{toSingular .}}] {
+	{{toLower .}}StoreMu.Lock()
+	defer {{toLower .}}StoreMu.Unlock()
+
+	if {{toLower .}}Store == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil
+		}
+
+		processFunc := func(itemIntf interface{}) *{{toSingular .}} {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil
+		}
+
+		mappingFunc := func(item *{{toSingular .}}) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+		{{toLower .}}Store = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+	}
+
+	return {{toLower .}}Store
+}
+{{end}}
+
+func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet) string {
+	switch dataFacet {
+	{{range .Facets}}case {{$class}}{{.Name}}:
+		return "{{toLower $class}}-{{toLower .Store}}"
+	{{end -}}
+	default:
+		return ""
+	}
+}
+
+func Get{{.Class}}Count() (int, error) {
+	chainName := preferences.GetChain()
+	countOpts := sdk.{{.Class}}Options{
+		Globals: sdk.Globals{Cache: true, Chain: chainName},
+	}
+	if countResult, _, err := countOpts.{{.Class}}Count(); err != nil {
+		return 0, fmt.Errorf("{{.Class}}Count query error: %v", err)
+	} else if len(countResult) > 0 {
+		return int(countResult[0].Count), nil
+	}
+	return 0, nil
+}
+
+// EXISTING_CODE
+// EXISTING_CODE

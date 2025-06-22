@@ -1,3 +1,11 @@
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package monitors
 
 import (
@@ -6,10 +14,12 @@ import (
 	"sync"
 	"time"
 
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 const (
@@ -27,52 +37,49 @@ type MonitorsCollection struct {
 }
 
 func NewMonitorsCollection() *MonitorsCollection {
-	c := &MonitorsCollection{
-		summary: types.Summary{
-			TotalCount:  0,
-			FacetCounts: make(map[types.DataFacet]int),
-			CustomData:  make(map[string]interface{}),
-		},
-	}
+	c := &MonitorsCollection{}
+	c.ResetSummary()
 	c.initializeFacets()
 	return c
 }
 
 func (c *MonitorsCollection) initializeFacets() {
-	monitorsStore := GetMonitorsStore()
-
-	monitorsFacet := facets.NewFacetWithSummary(
+	c.monitorsFacet = facets.NewFacetWithSummary(
 		MonitorsList,
-		nil,
-		nil,
-		monitorsStore,
+		isMonitor,
+		isDupMonitor(),
+		c.getMonitorsStore(),
 		"monitors",
 		c,
 	)
-
-	c.monitorsFacet = monitorsFacet
 }
 
-func (mc *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
-	if !mc.NeedsUpdate(dataFacet) {
-		return
-	}
+func isMonitor(item *Monitor) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
 
-	var facet *facets.Facet[Monitor]
-	var facetName string
+func isDupMonitor() func(existing []*Monitor, newItem *Monitor) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
 
-	switch dataFacet {
-	case MonitorsList:
-		facet = mc.monitorsFacet
-		facetName = "monitors"
-	default:
-		logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
+func (c *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
+	if !c.NeedsUpdate(dataFacet) {
 		return
 	}
 
 	go func() {
-		if err := facet.Load(); err != nil {
-			logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+		switch dataFacet {
+		case MonitorsList:
+			if err := c.monitorsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		default:
+			logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
+			return
 		}
 	}()
 }
@@ -80,71 +87,19 @@ func (mc *MonitorsCollection) LoadData(dataFacet types.DataFacet) {
 func (c *MonitorsCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
 	case MonitorsList:
-		monitorsStore.Reset()
+		c.monitorsFacet.GetStore().Reset()
 	default:
 		return
 	}
 }
 
 func (c *MonitorsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
-	var facet *facets.Facet[Monitor]
-
 	switch dataFacet {
 	case MonitorsList:
-		facet = c.monitorsFacet
+		return c.monitorsFacet.NeedsUpdate()
 	default:
 		return false
 	}
-
-	return facet.NeedsUpdate()
-}
-
-func (mc *MonitorsCollection) getExpectedTotal(dataFacet types.DataFacet) int {
-	_ = dataFacet
-	if count, err := GetMonitorsCount(); err == nil && count > 0 {
-		return count
-	}
-	return mc.monitorsFacet.ExpectedCount()
-}
-
-func (mc *MonitorsCollection) matchesFilter(monitor *Monitor, filter string) bool {
-	if filter == "" {
-		return true
-	}
-
-	filterLower := strings.ToLower(filter)
-
-	addressHex := strings.ToLower(monitor.Address.Hex())
-	addressNoPrefix := strings.TrimPrefix(addressHex, "0x")
-	addressNoLeadingZeros := strings.TrimLeft(addressNoPrefix, "0")
-
-	if strings.Contains(addressHex, filterLower) ||
-		strings.Contains(addressNoPrefix, filterLower) ||
-		strings.Contains(addressNoLeadingZeros, filterLower) {
-		return true
-	}
-
-	if strings.Contains(strings.ToLower(monitor.Name), filterLower) {
-		return true
-	}
-
-	if strings.Contains(fmt.Sprintf("%d", monitor.NRecords), filterLower) ||
-		strings.Contains(fmt.Sprintf("%d", monitor.FileSize), filterLower) ||
-		strings.Contains(fmt.Sprintf("%d", monitor.LastScanned), filterLower) {
-		return true
-	}
-
-	if monitor.IsEmpty && strings.Contains("empty", filterLower) {
-		return true
-	}
-	if monitor.IsStaged && strings.Contains("staged", filterLower) {
-		return true
-	}
-	if monitor.Deleted && strings.Contains("deleted", filterLower) {
-		return true
-	}
-
-	return false
 }
 
 func (c *MonitorsCollection) GetMonitorsPage(
@@ -172,20 +127,8 @@ func (c *MonitorsCollection) GetSupportedFacets() []types.DataFacet {
 	}
 }
 
-func (c *MonitorsCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
-	switch dataFacet {
-	case MonitorsList:
-		return "monitors"
-	default:
-		return ""
-	}
-}
-
-func (c *MonitorsCollection) GetCollectionName() string {
-	return "monitors"
-}
-
 func (c *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	// EXISTING_CODE
 	monitor, ok := item.(*Monitor)
 	if !ok {
 		return
@@ -229,6 +172,7 @@ func (c *MonitorsCollection) AccumulateItem(item interface{}, summary *types.Sum
 	summary.CustomData["deletedCount"] = deletedCount
 	summary.CustomData["totalRecords"] = totalRecords
 	summary.CustomData["totalFileSize"] = totalFileSize
+	// EXISTING_CODE
 }
 
 func (c *MonitorsCollection) GetSummary() types.Summary {
@@ -261,3 +205,54 @@ func (c *MonitorsCollection) ResetSummary() {
 		LastUpdated: time.Now().Unix(),
 	}
 }
+
+// EXISTING_CODE
+func (c *MonitorsCollection) getExpectedTotal(dataFacet types.DataFacet) int {
+	_ = dataFacet
+	if count, err := GetMonitorsCount(); err == nil && count > 0 {
+		return count
+	}
+	return c.monitorsFacet.ExpectedCount()
+}
+
+func (c *MonitorsCollection) matchesFilter(monitor *Monitor, filter string) bool {
+	if filter == "" {
+		return true
+	}
+
+	filterLower := strings.ToLower(filter)
+
+	addressHex := strings.ToLower(monitor.Address.Hex())
+	addressNoPrefix := strings.TrimPrefix(addressHex, "0x")
+	addressNoLeadingZeros := strings.TrimLeft(addressNoPrefix, "0")
+
+	if strings.Contains(addressHex, filterLower) ||
+		strings.Contains(addressNoPrefix, filterLower) ||
+		strings.Contains(addressNoLeadingZeros, filterLower) {
+		return true
+	}
+
+	if strings.Contains(strings.ToLower(monitor.Name), filterLower) {
+		return true
+	}
+
+	if strings.Contains(fmt.Sprintf("%d", monitor.NRecords), filterLower) ||
+		strings.Contains(fmt.Sprintf("%d", monitor.FileSize), filterLower) ||
+		strings.Contains(fmt.Sprintf("%d", monitor.LastScanned), filterLower) {
+		return true
+	}
+
+	if monitor.IsEmpty && strings.Contains("empty", filterLower) {
+		return true
+	}
+	if monitor.IsStaged && strings.Contains("staged", filterLower) {
+		return true
+	}
+	if monitor.Deleted && strings.Contains("deleted", filterLower) {
+		return true
+	}
+
+	return false
+}
+
+// EXISTING_CODE

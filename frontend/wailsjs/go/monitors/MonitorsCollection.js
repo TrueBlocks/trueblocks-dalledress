@@ -14,10 +14,6 @@ export function Crud(arg1, arg2, arg3) {
   return window['go']['monitors']['MonitorsCollection']['Crud'](arg1, arg2, arg3);
 }
 
-export function GetCollectionName() {
-  return window['go']['monitors']['MonitorsCollection']['GetCollectionName']();
-}
-
 export function GetMonitorsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['monitors']['MonitorsCollection']['GetMonitorsPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -26,8 +22,8 @@ export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['monitors']['MonitorsCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStoreForFacet(arg1) {
-  return window['go']['monitors']['MonitorsCollection']['GetStoreForFacet'](arg1);
+export function GetStoreName(arg1) {
+  return window['go']['monitors']['MonitorsCollection']['GetStoreName'](arg1);
 }
 
 export function GetSummary() {

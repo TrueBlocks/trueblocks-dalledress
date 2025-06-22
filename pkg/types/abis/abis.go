@@ -1,12 +1,23 @@
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package abis
 
 import (
 	"fmt"
 	"sync"
+	"time"
 
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	// EXISTING_CODE
 )
 
 const (
@@ -33,73 +44,82 @@ type AbisCollection struct {
 }
 
 func NewAbisCollection() *AbisCollection {
-	ac := &AbisCollection{
-		summary: types.Summary{
-			TotalCount:  0,
-			FacetCounts: make(map[types.DataFacet]int),
-			CustomData:  make(map[string]interface{}),
-		},
-	}
-
-	ac.initializeFacets()
-	return ac
+	c := &AbisCollection{}
+	c.ResetSummary()
+	c.initializeFacets()
+	return c
 }
 
-func (ac *AbisCollection) initializeFacets() {
-	abisListStore := GetAbisListStore()
-	abisDetailStore := GetAbisDetailStore()
-
-	downloadedFacet := facets.NewFacetWithSummary(
+func (c *AbisCollection) initializeFacets() {
+	c.downloadedFacet = facets.NewFacetWithSummary(
 		AbisDownloaded,
-		isDownload,
-		nil,
-		abisListStore,
+		isDownloaded,
+		isDupAbi(),
+		c.getAbisStore(),
 		"abis",
-		ac,
+		c,
 	)
 
-	knownFacet := facets.NewFacetWithSummary(
+	c.knownFacet = facets.NewFacetWithSummary(
 		AbisKnown,
 		isKnown,
-		nil,
-		abisListStore,
+		isDupAbi(),
+		c.getAbisStore(),
 		"abis",
-		ac,
+		c,
 	)
 
-	functionsFacet := facets.NewFacetWithSummary(
+	c.functionsFacet = facets.NewFacetWithSummary(
 		AbisFunctions,
-		func(fn *Function) bool { return fn.FunctionType != "event" },
-		isDupEncoding(),
-		abisDetailStore,
+		isFunction,
+		isDupFunction(),
+		c.getFunctionsStore(),
 		"abis",
-		ac,
+		c,
 	)
 
-	eventsFacet := facets.NewFacetWithSummary(
+	c.eventsFacet = facets.NewFacetWithSummary(
 		AbisEvents,
-		func(fn *Function) bool { return fn.FunctionType == "event" },
-		isDupEncoding(),
-		abisDetailStore,
+		isEvent,
+		isDupFunction(),
+		c.getFunctionsStore(),
 		"abis",
-		ac,
+		c,
 	)
-
-	ac.downloadedFacet = downloadedFacet
-	ac.knownFacet = knownFacet
-	ac.functionsFacet = functionsFacet
-	ac.eventsFacet = eventsFacet
 }
 
-func isDownload(abi *Abi) bool {
-	return !abi.IsKnown
+func isDownloaded(item *Abi) bool {
+	// EXISTING_CODE
+	return !item.IsKnown
+	// EXISTING_CODE
 }
 
-func isKnown(abi *Abi) bool {
-	return abi.IsKnown
+func isKnown(item *Abi) bool {
+	// EXISTING_CODE
+	return item.IsKnown
+	// EXISTING_CODE
 }
 
-func isDupEncoding() func(existing []*Function, newItem *Function) bool {
+func isFunction(item *Function) bool {
+	// EXISTING_CODE
+	return item.FunctionType != "event"
+	// EXISTING_CODE
+}
+
+func isEvent(item *Function) bool {
+	// EXISTING_CODE
+	return item.FunctionType == "event"
+	// EXISTING_CODE
+}
+
+func isDupAbi() func(existing []*Abi, newItem *Abi) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func isDupFunction() func(existing []*Function, newItem *Function) bool {
+	// EXISTING_CODE
 	seen := make(map[string]bool)
 	lastExistingLen := 0
 
@@ -119,86 +139,70 @@ func isDupEncoding() func(existing []*Function, newItem *Function) bool {
 		seen[newItem.Encoding] = true
 		return false
 	}
+	// EXISTING_CODE
 }
 
-func (ac *AbisCollection) LoadData(dataFacet types.DataFacet) {
-	if !ac.NeedsUpdate(dataFacet) {
-		return
-	}
-
-	var facetAbi *facets.Facet[Abi]
-	var facetFunction *facets.Facet[Function]
-	var facetName string
-
-	switch dataFacet {
-	case AbisDownloaded:
-		facetAbi = ac.downloadedFacet
-		facetName = "downloaded"
-	case AbisKnown:
-		facetAbi = ac.knownFacet
-		facetName = "known"
-	case AbisFunctions:
-		facetFunction = ac.functionsFacet
-		facetName = "functions"
-	case AbisEvents:
-		facetFunction = ac.eventsFacet
-		facetName = "events"
-	default:
-		logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
+func (c *AbisCollection) LoadData(dataFacet types.DataFacet) {
+	if !c.NeedsUpdate(dataFacet) {
 		return
 	}
 
 	go func() {
-		if facetAbi != nil {
-			if err := facetAbi.Load(); err != nil {
-				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+		switch dataFacet {
+		case AbisDownloaded:
+			if err := c.downloadedFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
 			}
-		} else if facetFunction != nil {
-			if err := facetFunction.Load(); err != nil {
-				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", facetName), err, facets.ErrAlreadyLoading)
+		case AbisKnown:
+			if err := c.knownFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
 			}
+		case AbisFunctions:
+			if err := c.functionsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case AbisEvents:
+			if err := c.eventsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		default:
+			logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
+			return
 		}
 	}()
 }
 
-func (ac *AbisCollection) Reset(dataFacet types.DataFacet) {
+func (c *AbisCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
-	case AbisDownloaded, AbisKnown:
-		abisListStore.Reset()
-	case AbisFunctions, AbisEvents:
-		abisDetailStore.Reset()
+	case AbisDownloaded:
+		c.downloadedFacet.GetStore().Reset()
+	case AbisKnown:
+		c.knownFacet.GetStore().Reset()
+	case AbisFunctions:
+		c.functionsFacet.GetStore().Reset()
+	case AbisEvents:
+		c.eventsFacet.GetStore().Reset()
 	default:
 		return
 	}
 }
 
-func (ac *AbisCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
-	var facetAbi *facets.Facet[Abi]
-	var facetFunction *facets.Facet[Function]
-
+func (c *AbisCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	switch dataFacet {
 	case AbisDownloaded:
-		facetAbi = ac.downloadedFacet
+		return c.downloadedFacet.NeedsUpdate()
 	case AbisKnown:
-		facetAbi = ac.knownFacet
+		return c.knownFacet.NeedsUpdate()
 	case AbisFunctions:
-		facetFunction = ac.functionsFacet
+		return c.functionsFacet.NeedsUpdate()
 	case AbisEvents:
-		facetFunction = ac.eventsFacet
+		return c.eventsFacet.NeedsUpdate()
 	default:
 		return false
 	}
-
-	if facetAbi != nil {
-		return facetAbi.NeedsUpdate()
-	} else if facetFunction != nil {
-		return facetFunction.NeedsUpdate()
-	}
-
-	return false
 }
 
-func (ac *AbisCollection) GetSupportedFacets() []types.DataFacet {
+func (c *AbisCollection) GetSupportedFacets() []types.DataFacet {
 	return []types.DataFacet{
 		AbisDownloaded,
 		AbisKnown,
@@ -207,24 +211,10 @@ func (ac *AbisCollection) GetSupportedFacets() []types.DataFacet {
 	}
 }
 
-func (ac *AbisCollection) GetStoreForFacet(dataFacet types.DataFacet) string {
-	switch dataFacet {
-	case AbisDownloaded, AbisKnown:
-		return "abis-list"
-	case AbisFunctions, AbisEvents:
-		return "abis-detail"
-	default:
-		return ""
-	}
-}
-
-func (ac *AbisCollection) GetCollectionName() string {
-	return "abis"
-}
-
-func (ac *AbisCollection) AccumulateItem(item interface{}, summary *types.Summary) {
-	ac.summaryMutex.Lock()
-	defer ac.summaryMutex.Unlock()
+func (c *AbisCollection) AccumulateItem(item interface{}, summary *types.Summary) {
+	// EXISTING_CODE
+	c.summaryMutex.Lock()
+	defer c.summaryMutex.Unlock()
 
 	if summary.FacetCounts == nil {
 		summary.FacetCounts = make(map[types.DataFacet]int)
@@ -281,21 +271,22 @@ func (ac *AbisCollection) AccumulateItem(item interface{}, summary *types.Summar
 		summary.CustomData["functionsCount"] = functionsCount
 		summary.CustomData["eventsCount"] = eventsCount
 	}
+	// EXISTING_CODE
 }
 
-func (ac *AbisCollection) GetSummary() types.Summary {
-	ac.summaryMutex.RLock()
-	defer ac.summaryMutex.RUnlock()
+func (c *AbisCollection) GetSummary() types.Summary {
+	c.summaryMutex.RLock()
+	defer c.summaryMutex.RUnlock()
 
-	summary := ac.summary
+	summary := c.summary
 	summary.FacetCounts = make(map[types.DataFacet]int)
-	for k, v := range ac.summary.FacetCounts {
+	for k, v := range c.summary.FacetCounts {
 		summary.FacetCounts[k] = v
 	}
 
-	if ac.summary.CustomData != nil {
+	if c.summary.CustomData != nil {
 		summary.CustomData = make(map[string]interface{})
-		for k, v := range ac.summary.CustomData {
+		for k, v := range c.summary.CustomData {
 			summary.CustomData[k] = v
 		}
 	}
@@ -303,13 +294,16 @@ func (ac *AbisCollection) GetSummary() types.Summary {
 	return summary
 }
 
-func (ac *AbisCollection) ResetSummary() {
-	ac.summaryMutex.Lock()
-	defer ac.summaryMutex.Unlock()
-	ac.summary = types.Summary{
+func (c *AbisCollection) ResetSummary() {
+	c.summaryMutex.Lock()
+	defer c.summaryMutex.Unlock()
+	c.summary = types.Summary{
 		TotalCount:  0,
 		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
-		LastUpdated: 0,
+		LastUpdated: time.Now().Unix(),
 	}
 }
+
+// EXISTING_CODE
+// EXISTING_CODE

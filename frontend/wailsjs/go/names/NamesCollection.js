@@ -10,10 +10,6 @@ export function Crud(arg1, arg2, arg3) {
   return window['go']['names']['NamesCollection']['Crud'](arg1, arg2, arg3);
 }
 
-export function GetCollectionName() {
-  return window['go']['names']['NamesCollection']['GetCollectionName']();
-}
-
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['names']['NamesCollection']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -22,8 +18,8 @@ export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['names']['NamesCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStoreForFacet(arg1) {
-  return window['go']['names']['NamesCollection']['GetStoreForFacet'](arg1);
+export function GetStoreName(arg1) {
+  return window['go']['names']['NamesCollection']['GetStoreName'](arg1);
 }
 
 export function GetSummary() {

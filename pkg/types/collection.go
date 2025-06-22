@@ -20,8 +20,7 @@ type Collection interface {
 	NeedsUpdate(facet DataFacet) bool
 	Crud(facet DataFacet, op crud.Operation, item interface{}) error
 	GetSupportedFacets() []DataFacet
-	GetStoreForFacet(facet DataFacet) string
-	GetCollectionName() string
+	GetStoreName(facet DataFacet) string
 	GetSummary() Summary
 	SummaryAccumulator
 }

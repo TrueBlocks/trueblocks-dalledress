@@ -1,9 +1,18 @@
+// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package monitors
 
 import (
 	"fmt"
 	"sync"
 
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
@@ -11,21 +20,23 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 type Monitor = coreTypes.Monitor
 
 var (
-	monitorsStore *store.Store[Monitor]
-	monitorsMu    sync.Mutex
+	monitorsStore   *store.Store[Monitor]
+	monitorsStoreMu sync.Mutex
 )
 
-func GetMonitorsStore() *store.Store[Monitor] {
-	monitorsMu.Lock()
-	defer monitorsMu.Unlock()
+func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
+	monitorsStoreMu.Lock()
+	defer monitorsStoreMu.Unlock()
 
 	if monitorsStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
 			chainName := preferences.GetChain()
 			listOpts := sdk.MonitorsOptions{
 				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
@@ -37,27 +48,38 @@ func GetMonitorsStore() *store.Store[Monitor] {
 				logger.Error(fmt.Sprintf("Monitors SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
+			// EXISTING_CODE
 			return nil
 		}
 
 		processFunc := func(itemIntf interface{}) *Monitor {
+			// EXISTING_CODE
 			if monitor, ok := itemIntf.(*Monitor); ok {
 				return monitor
 			}
+			// EXISTING_CODE
 			return nil
 		}
 
-		storeName := GetStoreName(MonitorsList)
-		monitorsStore = store.NewStore(storeName, queryFunc, processFunc, nil)
+		mappingFunc := func(item *Monitor) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		// EXISTING_CODE
+		storeName := c.GetStoreName(MonitorsList)
+		// EXISTING_CODE
+		monitorsStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 	}
 
 	return monitorsStore
 }
 
-func GetStoreName(dataFacet types.DataFacet) string {
+func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet) string {
 	switch dataFacet {
 	case MonitorsList:
-		return "monitors-list"
+		return "monitors-monitors"
 	default:
 		return ""
 	}
@@ -75,3 +97,6 @@ func GetMonitorsCount() (int, error) {
 	}
 	return 0, nil
 }
+
+// EXISTING_CODE
+// EXISTING_CODE

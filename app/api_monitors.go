@@ -1,12 +1,13 @@
-// ADD_ROUTE
 package app
 
 import (
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 func (a *App) GetMonitorsPage(
@@ -15,7 +16,7 @@ func (a *App) GetMonitorsPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*monitors.MonitorsPage, error) {
-	return getCollectionPage[*monitors.MonitorsPage](a.monitors, dataFacet, first, pageSize, sort, filter)
+	return getCollectionPage[*monitors.MonitorsPage](monitors.GetMonitorsCollection(), dataFacet, first, pageSize, sort, filter)
 }
 
 func (a *App) MonitorsCrud(
@@ -27,15 +28,16 @@ func (a *App) MonitorsCrud(
 	if address != "" && (monitor == nil || monitor.Address.IsZero()) {
 		monitor = &monitors.Monitor{Address: base.HexToAddress(address)}
 	}
-	return a.monitors.Crud(dataFacet, op, monitor)
+	return monitors.GetMonitorsCollection().Crud(dataFacet, op, monitor)
 }
 
+func (a *App) GetMonitorsSummary() types.Summary {
+	return monitors.GetMonitorsCollection().GetSummary()
+}
+
+// EXISTING_CODE
 func (a *App) MonitorsClean(addresses []string) error {
 	return a.monitors.Clean(addresses)
 }
 
-func (a *App) GetMonitorsSummary() types.Summary {
-	return a.monitors.GetSummary()
-}
-
-// ADD_ROUTE
+// EXISTING_CODE

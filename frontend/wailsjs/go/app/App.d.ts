@@ -28,7 +28,7 @@ export function CancelFetch(arg1:types.DataFacet):Promise<void>;
 
 export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 
-export function ChunksCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<void>;
+export function ChunksCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:types.ChunkIndex,arg4:string):Promise<void>;
 
 export function CloseProject(arg1:string):Promise<void>;
 

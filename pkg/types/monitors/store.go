@@ -99,5 +99,24 @@ func GetMonitorsCount() (int, error) {
 	return 0, nil
 }
 
+var (
+	collections   = make(map[store.CollectionKey]*MonitorsCollection)
+	collectionsMu sync.Mutex
+)
+
+func GetMonitorsCollection() *MonitorsCollection {
+	collectionsMu.Lock()
+	defer collectionsMu.Unlock()
+
+	key := store.GetCollectionKey("", "")
+	if collection, exists := collections[key]; exists {
+		return collection
+	}
+
+	collection := NewMonitorsCollection()
+	collections[key] = collection
+	return collection
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

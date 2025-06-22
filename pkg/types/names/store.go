@@ -113,6 +113,25 @@ func GetNamesCount() (int, error) {
 	return 0, nil
 }
 
+var (
+	collections   = make(map[store.CollectionKey]*NamesCollection)
+	collectionsMu sync.Mutex
+)
+
+func GetNamesCollection() *NamesCollection {
+	collectionsMu.Lock()
+	defer collectionsMu.Unlock()
+
+	key := store.GetCollectionKey("", "")
+	if collection, exists := collections[key]; exists {
+		return collection
+	}
+
+	collection := NewNamesCollection()
+	collections[key] = collection
+	return collection
+}
+
 // EXISTING_CODE
 func (nc *NamesCollection) NameFromAddress(address base.Address) (*Name, bool) {
 	return namesStore.GetItemFromMap(address)

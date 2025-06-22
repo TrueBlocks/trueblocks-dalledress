@@ -105,21 +105,57 @@ class AppPreferencesStore {
 
     try {
       this.setState({ loading: true });
-      const prefs = await App.GetAppPreferences();
-
-      this.setState({
-        lastProject: prefs.lastProject || '',
-        lastChain: prefs.lastChain || '',
-        lastAddress:
-          prefs.lastAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
-        lastTheme: prefs.lastTheme || 'dark',
-        lastLanguage: prefs.lastLanguage || 'en',
-        lastView: prefs.lastView || '/',
-        menuCollapsed: prefs.menuCollapsed || false,
-        helpCollapsed: prefs.helpCollapsed || false,
-        lastTab: (prefs.lastTab || {}) as Record<string, types.DataFacet>,
-        loading: false,
-      });
+      let retries = 0;
+      const maxRetries = 10;
+      let prefs = null;
+      while (retries < maxRetries) {
+        try {
+          prefs = await App.GetAppPreferences();
+          break; // Success, exit retry loop
+        } catch (error) {
+          retries++;
+          console.log(
+            `App preferences load attempt ${retries}/${maxRetries} failed:`,
+            error,
+          );
+          if (retries >= maxRetries) {
+            console.warn(
+              'Failed to load app preferences after max retries, using defaults',
+            );
+            // Use safe defaults if backend is not ready
+            this.setState({
+              lastProject: '',
+              lastChain: '',
+              lastAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
+              lastTheme: 'dark',
+              lastLanguage: 'en',
+              lastView: '/',
+              menuCollapsed: false,
+              helpCollapsed: false,
+              lastTab: {},
+              loading: false,
+            });
+            return;
+          }
+          // Wait before retry
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+      }
+      if (prefs) {
+        this.setState({
+          lastProject: prefs.lastProject || '',
+          lastChain: prefs.lastChain || '',
+          lastAddress:
+            prefs.lastAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
+          lastTheme: prefs.lastTheme || 'dark',
+          lastLanguage: prefs.lastLanguage || 'en',
+          lastView: prefs.lastView || '/',
+          menuCollapsed: prefs.menuCollapsed || false,
+          helpCollapsed: prefs.helpCollapsed || false,
+          lastTab: (prefs.lastTab || {}) as Record<string, types.DataFacet>,
+          loading: false,
+        });
+      }
     } catch (error) {
       console.error('Failed to load app preferences:', error);
       this.setState({ loading: false });
@@ -216,7 +252,6 @@ if (
   typeof window !== 'undefined' &&
   typeof import.meta.env.VITEST === 'undefined'
 ) {
-  // Only initialize when we're in the browser (not during SSR or tests)
   appPreferencesStore.initialize();
 } else {
   // In test environment, enable test mode

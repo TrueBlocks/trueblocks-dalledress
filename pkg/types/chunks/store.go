@@ -284,5 +284,24 @@ func GetChunksCount() (int, error) {
 	return 0, nil
 }
 
+var (
+	collections   = make(map[store.CollectionKey]*ChunksCollection)
+	collectionsMu sync.Mutex
+)
+
+func GetChunksCollection() *ChunksCollection {
+	collectionsMu.Lock()
+	defer collectionsMu.Unlock()
+
+	key := store.GetCollectionKey("", "")
+	if collection, exists := collections[key]; exists {
+		return collection
+	}
+
+	collection := NewChunksCollection()
+	collections[key] = collection
+	return collection
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

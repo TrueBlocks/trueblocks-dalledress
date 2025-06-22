@@ -1,32 +1,36 @@
-// ADD_ROUTE
 package app
 
 import (
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 func (a *App) GetChunksPage(
 	dataFacet types.DataFacet,
 	first, pageSize int,
-	sortSpec sdk.SortSpec,
+	sort sdk.SortSpec,
 	filter string,
 ) (*chunks.ChunksPage, error) {
-	return getCollectionPage[*chunks.ChunksPage](a.chunks, dataFacet, first, pageSize, sortSpec, filter)
+	return getCollectionPage[*chunks.ChunksPage](chunks.GetChunksCollection(), dataFacet, first, pageSize, sort, filter)
 }
 
 func (a *App) ChunksCrud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
-	item interface{},
+	chunk *chunks.Index,
+	address string,
 ) error {
-	return a.chunks.Crud(dataFacet, op, item)
+	_ = address
+	return chunks.GetChunksCollection().Crud(dataFacet, op, chunk)
 }
 
 func (a *App) GetChunksSummary() types.Summary {
-	return a.chunks.GetSummary()
+	return chunks.GetChunksCollection().GetSummary()
 }
 
-// ADD_ROUTE
+// EXISTING_CODE
+// EXISTING_CODE

@@ -1,0 +1,42 @@
+{{$single := toSingular .Class}}
+{{$singleLower := toLower (toSingular .Class)}}
+{{$isChunk := eq .Class "Chunks"}}
+package app
+
+import (
+    // EXISTING_CODE
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/{{toLower .Class}}"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+    // EXISTING_CODE
+)
+
+func (a *App) Get{{.Class}}Page(
+	dataFacet types.DataFacet,
+	first, pageSize int,
+	sort sdk.SortSpec,
+	filter string,
+) (*{{toLower .Class}}.{{.Class}}Page, error) {
+	return getCollectionPage[*{{toLower .Class}}.{{.Class}}Page]({{toLower .Class}}.Get{{.Class}}Collection(), dataFacet, first, pageSize, sort, filter)
+}
+
+func (a *App) {{.Class}}Crud(
+	dataFacet types.DataFacet,
+	op crud.Operation,
+	{{toLower $single}} *{{toLower .Class}}.{{$single}},
+	address string,
+) error {
+	{{if $isChunk}}_ = address{{else}}if address != "" && ({{$singleLower}} == nil || {{$singleLower}}.Address.IsZero()) {
+		{{$singleLower}} = &{{toLower .Class}}.{{$single}}{Address: base.HexToAddress(address)}
+	}{{end}}
+	return {{toLower .Class}}.Get{{.Class}}Collection().Crud(dataFacet, op, {{$singleLower}})
+}
+
+func (a *App) Get{{.Class}}Summary() types.Summary {
+	return {{toLower .Class}}.Get{{.Class}}Collection().GetSummary()
+}
+
+// EXISTING_CODE
+// EXISTING_CODE

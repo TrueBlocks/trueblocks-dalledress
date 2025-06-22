@@ -88,5 +88,24 @@ func Get{{.Class}}Count() (int, error) {
 	return 0, nil
 }
 
+var (
+	collections   = make(map[store.CollectionKey]*{{.Class}}Collection)
+	collectionsMu sync.Mutex
+)
+
+func Get{{.Class}}Collection() *{{.Class}}Collection {
+	collectionsMu.Lock()
+	defer collectionsMu.Unlock()
+
+	key := store.GetCollectionKey("", "")
+	if collection, exists := collections[key]; exists {
+		return collection
+	}
+
+	collection := New{{.Class}}Collection()
+	collections[key] = collection
+	return collection
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

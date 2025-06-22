@@ -398,7 +398,88 @@
             "return_type": "string",
             "attributes": "visible|docs",
             "capabilities": "code",
-            "summary": "Exports route"
+            "summary": "Exports route",
+            "productions": [
+                {
+                    "class": "Exports",
+                    "doc_group": "04-Admin",
+                    "doc_route": "412-chunkIndex",
+                    "doc_descr": "internal-use only data model detailing a single index chunk file",
+                    "produced_by": "exports",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "range",
+                            "type": "blkrange",
+                            "docOrder": 1,
+                            "description": "the block range (inclusive) covered by this chunk",
+                            "num": 1
+                        },
+                        {
+                            "name": "magic",
+                            "type": "string",
+                            "docOrder": 2,
+                            "description": "an internal use only magic number to indicate file format",
+                            "num": 2
+                        },
+                        {
+                            "name": "hash",
+                            "type": "hash",
+                            "docOrder": 3,
+                            "description": "the hash of the specification under which this chunk was generated",
+                            "num": 3
+                        },
+                        {
+                            "name": "nAddresses",
+                            "type": "uint64",
+                            "docOrder": 4,
+                            "description": "the number of addresses in this chunk",
+                            "num": 4
+                        },
+                        {
+                            "name": "nAppearances",
+                            "type": "uint64",
+                            "docOrder": 5,
+                            "description": "the number of appearances in this chunk",
+                            "num": 5
+                        },
+                        {
+                            "name": "size",
+                            "type": "uint64",
+                            "docOrder": 6,
+                            "description": "the size of the chunk in bytes",
+                            "num": 6
+                        },
+                        {
+                            "name": "rangeDates",
+                            "type": "RangeDates",
+                            "attributes": "omitempty",
+                            "docOrder": 7,
+                            "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                            "num": 7,
+                            "isPointer": true
+                        }
+                    ],
+                    "facets": [
+                        {
+                            "name": "Statements",
+                            "store": "Statements"
+                        },
+                        {
+                            "name": "Balances",
+                            "store": "Balances"
+                        },
+                        {
+                            "name": "Transfers",
+                            "store": "Transfers"
+                        },
+                        {
+                            "name": "Transactions",
+                            "store": "Transactions"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "num": 6400,
@@ -919,6 +1000,85 @@
                 {
                     "name": "Manifest",
                     "store": "Manifest"
+                }
+            ]
+        },
+        {
+            "class": "Exports",
+            "doc_group": "04-Admin",
+            "doc_route": "412-chunkIndex",
+            "doc_descr": "internal-use only data model detailing a single index chunk file",
+            "produced_by": "exports",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "range",
+                    "type": "blkrange",
+                    "docOrder": 1,
+                    "description": "the block range (inclusive) covered by this chunk",
+                    "num": 1
+                },
+                {
+                    "name": "magic",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "an internal use only magic number to indicate file format",
+                    "num": 2
+                },
+                {
+                    "name": "hash",
+                    "type": "hash",
+                    "docOrder": 3,
+                    "description": "the hash of the specification under which this chunk was generated",
+                    "num": 3
+                },
+                {
+                    "name": "nAddresses",
+                    "type": "uint64",
+                    "docOrder": 4,
+                    "description": "the number of addresses in this chunk",
+                    "num": 4
+                },
+                {
+                    "name": "nAppearances",
+                    "type": "uint64",
+                    "docOrder": 5,
+                    "description": "the number of appearances in this chunk",
+                    "num": 5
+                },
+                {
+                    "name": "size",
+                    "type": "uint64",
+                    "docOrder": 6,
+                    "description": "the size of the chunk in bytes",
+                    "num": 6
+                },
+                {
+                    "name": "rangeDates",
+                    "type": "RangeDates",
+                    "attributes": "omitempty",
+                    "docOrder": 7,
+                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                    "num": 7,
+                    "isPointer": true
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Statements",
+                    "store": "Statements"
+                },
+                {
+                    "name": "Balances",
+                    "store": "Balances"
+                },
+                {
+                    "name": "Transfers",
+                    "store": "Transfers"
+                },
+                {
+                    "name": "Transactions",
+                    "store": "Transactions"
                 }
             ]
         },

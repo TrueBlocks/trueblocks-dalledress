@@ -30,10 +30,6 @@ export function ChunksCrud(arg1, arg2, arg3) {
   return window['go']['app']['App']['ChunksCrud'](arg1, arg2, arg3);
 }
 
-export function CleanNames(arg1) {
-  return window['go']['app']['App']['CleanNames'](arg1);
-}
-
 export function CloseProject(arg1) {
   return window['go']['app']['App']['CloseProject'](arg1);
 }
@@ -224,10 +220,6 @@ export function NameFromAddress(arg1) {
 
 export function NamesCrud(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['NamesCrud'](arg1, arg2, arg3, arg4);
-}
-
-export function PublishNames(arg1) {
-  return window['go']['app']['App']['PublishNames'](arg1);
 }
 
 export function RegisterCollection(arg1) {

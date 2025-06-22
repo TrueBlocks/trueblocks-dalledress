@@ -1,0 +1,24 @@
+[settings]
+    class = "Exports"
+    doc_group = "04-Admin"
+    doc_descr = "internal-use only data model detailing a single index chunk file"
+    doc_route = "412-chunkIndex"
+    attributes = ""
+    produced_by = "exports"
+    disable_go = true
+
+[[facets]]
+name = "Statements"
+store = "Statements"
+
+[[facets]]
+name = "Balances"
+store = "Balances"
+
+[[facets]]
+name = "Transfers"
+store = "Transfers"
+
+[[facets]]
+name = "Transactions"
+store = "Transactions"

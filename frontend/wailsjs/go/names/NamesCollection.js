@@ -10,10 +10,6 @@ export function Crud(arg1, arg2, arg3) {
   return window['go']['names']['NamesCollection']['Crud'](arg1, arg2, arg3);
 }
 
-export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['names']['NamesCollection']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
-}
-
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['names']['NamesCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

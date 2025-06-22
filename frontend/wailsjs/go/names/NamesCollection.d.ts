@@ -3,14 +3,11 @@
 import {types} from '../models';
 import {crud} from '../models';
 import {sdk} from '../models';
-import {names} from '../models';
 import {base} from '../models';
 
 export function AccumulateItem(arg1:any,arg2:types.Summary):Promise<void>;
 
 export function Crud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<void>;
-
-export function GetNamesPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
 export function GetPage(arg1:types.DataFacet,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
 

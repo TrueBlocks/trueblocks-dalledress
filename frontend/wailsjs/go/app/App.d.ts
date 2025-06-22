@@ -30,8 +30,6 @@ export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 
 export function ChunksCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:any):Promise<void>;
 
-export function CleanNames(arg1:string):Promise<void>;
-
 export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
@@ -127,8 +125,6 @@ export function MonitorsCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:types
 export function NameFromAddress(arg1:string):Promise<types.Name|boolean>;
 
 export function NamesCrud(arg1:types.DataFacet,arg2:crud.Operation,arg3:types.Name,arg4:string):Promise<void>;
-
-export function PublishNames(arg1:string):Promise<void>;
 
 export function RegisterCollection(arg1:types.Collection):Promise<void>;
 

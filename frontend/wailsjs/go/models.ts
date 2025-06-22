@@ -97,10 +97,10 @@ export namespace chunks {
 	
 	export class ChunksPage {
 	    facet: types.DataFacet;
-	    stats: types.ChunkStats[];
-	    index: types.ChunkIndex[];
 	    blooms: types.ChunkBloom[];
+	    index: types.ChunkIndex[];
 	    manifest: types.Manifest[];
+	    stats: types.ChunkStats[];
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
@@ -113,10 +113,10 @@ export namespace chunks {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.facet = source["facet"];
-	        this.stats = this.convertValues(source["stats"], types.ChunkStats);
-	        this.index = this.convertValues(source["index"], types.ChunkIndex);
 	        this.blooms = this.convertValues(source["blooms"], types.ChunkBloom);
+	        this.index = this.convertValues(source["index"], types.ChunkIndex);
 	        this.manifest = this.convertValues(source["manifest"], types.Manifest);
+	        this.stats = this.convertValues(source["stats"], types.ChunkStats);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];
@@ -161,10 +161,10 @@ export namespace exports {
 	
 	export class ExportsPage {
 	    facet: types.DataFacet;
-	    statements: types.Statement[];
-	    transfers: types.Transfer[];
 	    balances: types.Token[];
+	    statements: types.Statement[];
 	    transactions: types.Transaction[];
+	    transfers: types.Transfer[];
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
@@ -177,10 +177,10 @@ export namespace exports {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.facet = source["facet"];
-	        this.statements = this.convertValues(source["statements"], types.Statement);
-	        this.transfers = this.convertValues(source["transfers"], types.Transfer);
 	        this.balances = this.convertValues(source["balances"], types.Token);
+	        this.statements = this.convertValues(source["statements"], types.Statement);
 	        this.transactions = this.convertValues(source["transactions"], types.Transaction);
+	        this.transfers = this.convertValues(source["transfers"], types.Transfer);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];
@@ -690,14 +690,6 @@ export namespace sdk {
 
 export namespace types {
 	
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
-	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -708,8 +700,8 @@ export namespace types {
 	    BLOOMS = "blooms",
 	    MANIFEST = "manifest",
 	    STATEMENTS = "statements",
-	    TRANSFERS = "transfers",
 	    BALANCES = "balances",
+	    TRANSFERS = "transfers",
 	    TRANSACTIONS = "transactions",
 	    MONITORS = "monitors",
 	    ALL = "all",
@@ -717,6 +709,14 @@ export namespace types {
 	    PREFUND = "prefund",
 	    REGULAR = "regular",
 	    BADDRESS = "baddress",
+	}
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];

@@ -11,25 +11,27 @@ import (
 )
 
 func (a *App) GetMonitorsPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
 ) (*monitors.MonitorsPage, error) {
-	return getCollectionPage[*monitors.MonitorsPage](monitors.GetMonitorsCollection(), dataFacet, first, pageSize, sort, filter)
+	collection := monitors.GetMonitorsCollection()
+	return getCollectionPage[*monitors.MonitorsPage](collection, payload, first, pageSize, sort, filter)
 }
 
 func (a *App) MonitorsCrud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
-	return monitors.GetMonitorsCollection().Crud(dataFacet, op, item, itemStr)
+	collection := monitors.GetMonitorsCollection()
+	return collection.Crud(payload, op, item)
 }
 
 func (a *App) GetMonitorsSummary() types.Summary {
-	return monitors.GetMonitorsCollection().GetSummary()
+	collection := monitors.GetMonitorsCollection()
+	return collection.GetSummary()
 }
 
 // EXISTING_CODE

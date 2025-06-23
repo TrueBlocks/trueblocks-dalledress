@@ -1271,6 +1271,24 @@ export namespace types {
 		}
 	}
 	
+	export class Payload {
+	    collection: string;
+	    dataFacet: DataFacet;
+	    chain?: string;
+	    address?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Payload(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.collection = source["collection"];
+	        this.dataFacet = source["dataFacet"];
+	        this.chain = source["chain"];
+	        this.address = source["address"];
+	    }
+	}
 	
 	export class Receipt {
 	    blockHash?: base.Hash;

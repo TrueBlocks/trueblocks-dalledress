@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { GetExportsPage, LoadExportsData, ResetExportsData } from '@app';
+import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import {
@@ -56,13 +56,15 @@ export const Exports = () => {
     clearError();
     try {
       const result = await GetExportsPage(
-        dataFacetRef.current as types.DataFacet,
+        types.Payload.createFrom({
+          dataFacet: dataFacetRef.current,
+          chain: effectiveChain,
+          address: effectiveAddress,
+        }),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
         filter,
-        effectiveChain,
-        effectiveAddress,
       );
       setState(result.state);
       setPageData(result);
@@ -117,24 +119,13 @@ export const Exports = () => {
     fetchData();
   }, [fetchData, activeFacetHook.activeFacet]);
 
-  // Load data when component mounts or facet changes
-  useEffect(() => {
-    const currentDataFacet =
-      activeFacetHook.getCurrentDataFacet() as types.DataFacet;
-    LoadExportsData(currentDataFacet, effectiveChain, effectiveAddress);
-  }, [activeFacetHook, effectiveChain, effectiveAddress]);
-
   useHotkeys([
     [
       'mod+r',
       () => {
         const currentDataFacet =
           activeFacetHook.getCurrentDataFacet() as types.DataFacet;
-        ResetExportsData(
-          currentDataFacet,
-          effectiveChain,
-          effectiveAddress,
-        ).then(() => {
+        Reload(currentDataFacet, effectiveChain, effectiveAddress).then(() => {
           fetchData();
         });
       },

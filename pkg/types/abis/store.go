@@ -23,6 +23,9 @@ import (
 	// EXISTING_CODE
 )
 
+// EXISTING_CODE
+// EXISTING_CODE
+
 type Abi = coreTypes.Abi
 type Function = coreTypes.Function
 

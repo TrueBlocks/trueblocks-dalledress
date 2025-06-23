@@ -14,25 +14,28 @@ import (
 )
 
 func (a *App) Get{{.Class}}Page(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
 ) (*{{toLower .Class}}.{{.Class}}Page, error) {
-	return getCollectionPage[*{{toLower .Class}}.{{.Class}}Page]({{toLower .Class}}.Get{{.Class}}Collection(), dataFacet, first, pageSize, sort, filter)
+	collection := {{toLower .Class}}.Get{{.Class}}Collection()
+	return getCollectionPage[*{{toLower .Class}}.{{.Class}}Page](collection, payload.DataFacet, first, pageSize, sort, filter)
 }
 
 func (a *App) {{.Class}}Crud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
-	item interface{},,
-	itemString string,
+	item interface{},
+	itemStr string,
 ) error {
-	return {{toLower .Class}}.Get{{.Class}}Collection().Crud(dataFacet, op, item, itemString)
+	collection := {{toLower .Class}}.Get{{.Class}}Collection()
+	return collection.Crud(payload.DataFacet, op, item, itemStr)
 }
 
 func (a *App) Get{{.Class}}Summary() types.Summary {
-	return {{toLower .Class}}.Get{{.Class}}Collection().GetSummary()
+	collection := {{toLower .Class}}.Get{{.Class}}Collection()
+	return collection.GetSummary()
 }
 
 // EXISTING_CODE

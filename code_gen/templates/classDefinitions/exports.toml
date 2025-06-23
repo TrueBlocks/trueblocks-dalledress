@@ -5,7 +5,7 @@
     doc_route = "412-chunkIndex"
     attributes = ""
     produced_by = "exports"
-    disable_go = true
+    # disable_go = true
 
 [[facets]]
 name = "Statements"

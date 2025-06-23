@@ -51,7 +51,9 @@ export const Chunks = () => {
     clearError();
     try {
       const result = await GetChunksPage(
-        dataFacetRef.current as types.DataFacet,
+        types.Payload.createFrom({
+          dataFacet: dataFacetRef.current,
+        }),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -97,7 +99,7 @@ export const Chunks = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      await Reload(getCurrentDataFacet() as types.DataFacet);
+      await Reload(getCurrentDataFacet() as types.DataFacet, '', '');
       await fetchData();
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);

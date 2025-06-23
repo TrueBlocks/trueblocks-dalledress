@@ -10,25 +10,27 @@ import (
 )
 
 func (a *App) GetChunksPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
 ) (*chunks.ChunksPage, error) {
-	return getCollectionPage[*chunks.ChunksPage](chunks.GetChunksCollection(), dataFacet, first, pageSize, sort, filter)
+	collection := chunks.GetChunksCollection()
+	return getCollectionPage[*chunks.ChunksPage](collection, payload, first, pageSize, sort, filter)
 }
 
 func (a *App) ChunksCrud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
-	return chunks.GetChunksCollection().Crud(dataFacet, op, item, itemStr)
+	collection := chunks.GetChunksCollection()
+	return collection.Crud(payload, op, item)
 }
 
 func (a *App) GetChunksSummary() types.Summary {
-	return chunks.GetChunksCollection().GetSummary()
+	collection := chunks.GetChunksCollection()
+	return collection.GetSummary()
 }
 
 // EXISTING_CODE

@@ -13,12 +13,13 @@ import (
 var namesLock atomic.Int32
 
 func (c *NamesCollection) Crud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
-	var name = &Name{Address: base.HexToAddress(itemStr)}
+	dataFacet := payload.DataFacet
+
+	var name = &Name{Address: base.HexToAddress(payload.Address)}
 	if cast, ok := item.(*Name); ok && cast != nil {
 		name = cast
 	}

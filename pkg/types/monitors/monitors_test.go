@@ -65,13 +65,15 @@ func TestMonitorsCollectionDomainSpecific(t *testing.T) {
 		assert.NotPanics(t, func() {
 			// Test monitor-specific operations
 			// Actual CRUD logic would be tested here
-			_, _ = collection.GetPage(MonitorsMonitors, 0, 5, sdk.SortSpec{}, "")
+			payload := types.Payload{DataFacet: MonitorsMonitors}
+			_, _ = collection.GetPage(payload, 0, 5, sdk.SortSpec{}, "")
 		})
 	})
 
 	t.Run("AddressFilteringLogic", func(t *testing.T) {
 		// Test monitors-specific filtering with addresses
-		page, err := collection.GetPage(MonitorsMonitors, 0, 10, sdk.SortSpec{}, "0x")
+		payload := types.Payload{DataFacet: MonitorsMonitors}
+		page, err := collection.GetPage(payload, 0, 10, sdk.SortSpec{}, "0x")
 		if err == nil && page != nil {
 			monitorsPage := assertMonitorsPage(t, page)
 			assert.Equal(t, MonitorsMonitors, monitorsPage.Facet)

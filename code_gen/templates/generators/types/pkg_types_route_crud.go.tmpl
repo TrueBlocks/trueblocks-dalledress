@@ -23,10 +23,9 @@ func New{{.Class}}Crud() *{{.Class}}Crud {
 }
 
 func (c *{{.Class}}Collection) Crud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
 	crudHandler := New{{.Class}}Crud()
 	switch op {

@@ -14,11 +14,11 @@ type Page interface {
 }
 
 type Collection interface {
-	GetPage(facet DataFacet, first, pageSize int, sort sdk.SortSpec, filter string) (Page, error)
+	GetPage(payload Payload, first, pageSize int, sort sdk.SortSpec, filter string) (Page, error)
 	LoadData(facet DataFacet)
 	Reset(facet DataFacet)
 	NeedsUpdate(facet DataFacet) bool
-	Crud(facet DataFacet, op crud.Operation, item interface{}, itemStr string) error
+	Crud(payload Payload, op crud.Operation, item interface{}) error
 	GetSupportedFacets() []DataFacet
 	GetStoreName(facet DataFacet) string
 	GetSummary() Summary

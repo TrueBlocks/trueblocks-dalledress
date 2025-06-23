@@ -58,7 +58,7 @@ export const Abis = () => {
     clearError();
     try {
       const result = await GetAbisPage(
-        dataFacetRef.current as types.DataFacet,
+        types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -113,7 +113,7 @@ export const Abis = () => {
     [
       'mod+r',
       () => {
-        Reload(getCurrentDataFacet() as types.DataFacet).then(() => {
+        Reload(getCurrentDataFacet() as types.DataFacet, '', '').then(() => {
           fetchData();
         });
       },
@@ -148,15 +148,17 @@ export const Abis = () => {
         setTotalItems(Math.max(0, currentTotal - 1));
 
         AbisCrud(
-          dataFacetRef.current as types.DataFacet,
+          types.Payload.createFrom({
+            dataFacet: dataFacetRef.current,
+            address: address,
+          }),
           crud.Operation.REMOVE,
           {} as types.Abi,
-          address,
         )
           .then(async () => {
             // Fetch fresh data to confirm the removal after successful backend operation
             const result = await GetAbisPage(
-              dataFacetRef.current as types.DataFacet,
+              types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,

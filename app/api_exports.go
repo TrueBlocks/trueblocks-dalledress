@@ -1,73 +1,37 @@
-// ADD_ROUTE
 package app
 
 import (
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 )
 
 func (a *App) GetExportsPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
-	chain string,
-	address string,
 ) (*exports.ExportsPage, error) {
-	collection := exports.GetExportsCollection(chain, address)
-	return getCollectionPage[*exports.ExportsPage](collection, dataFacet, first, pageSize, sort, filter)
+	collection := exports.GetExportsCollection(payload.Chain, payload.Address)
+	return getCollectionPage[*exports.ExportsPage](collection, payload, first, pageSize, sort, filter)
 }
 
 func (a *App) ExportsCrud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	chain string,
-	itemStr string,
 ) error {
-	return exports.GetExportsCollection(chain, itemStr).Crud(dataFacet, op, item, itemStr)
+	collection := exports.GetExportsCollection(payload.Chain, payload.Address)
+	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetExportsCount(
-	dataFacet types.DataFacet,
-	chain string,
-	address string,
-) (int, error) {
-	return exports.GetExportsCount(chain, address, string(dataFacet))
-}
-
-func (a *App) LoadExportsData(
-	dataFacet types.DataFacet,
-	chain string,
-	address string,
-) {
-	collection := exports.GetExportsCollection(chain, address)
-	collection.LoadData(dataFacet)
-}
-
-func (a *App) ResetExportsData(
-	dataFacet types.DataFacet,
-	chain string,
-	address string,
-) {
-	collection := exports.GetExportsCollection(chain, address)
-	collection.Reset(dataFacet)
-}
-
-func (a *App) ExportsNeedsUpdate(
-	dataFacet types.DataFacet,
-	chain string,
-	address string,
-) bool {
-	collection := exports.GetExportsCollection(chain, address)
-	return collection.NeedsUpdate(dataFacet)
-}
-
-func (a *App) GetExportsSummary(chain string, address string) types.Summary {
-	collection := exports.GetExportsCollection(chain, address)
+func (a *App) GetExportsSummary(payload types.Payload) types.Summary {
+	collection := exports.GetExportsCollection(payload.Chain, payload.Address)
 	return collection.GetSummary()
 }
 
-// ADD_ROUTE
+// EXISTING_CODE
+// EXISTING_CODE

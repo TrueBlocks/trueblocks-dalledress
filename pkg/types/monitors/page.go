@@ -49,11 +49,13 @@ func (p *MonitorsPage) GetState() types.LoadState {
 
 // EXISTING_CODE
 func (c *MonitorsCollection) GetPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
+	dataFacet := payload.DataFacet
+
 	switch dataFacet {
 	case MonitorsMonitors:
 		var filterFunc func(*Monitor) bool

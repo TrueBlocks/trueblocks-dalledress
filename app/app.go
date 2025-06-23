@@ -337,7 +337,7 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 	}, nil
 }
 
-func (a *App) Reload(dataFacet types.DataFacet) error {
+func (a *App) Reload(dataFacet types.DataFacet, str1, str2 string) error {
 	lastView := a.GetAppPreferences().LastView
 
 	// ADD_ROUTE
@@ -348,6 +348,9 @@ func (a *App) Reload(dataFacet types.DataFacet) error {
 	case "/abis":
 		abis.GetAbisCollection().Reset(dataFacet)
 		abis.GetAbisCollection().LoadData(dataFacet)
+	case "/exports":
+		exports.GetExportsCollection(str1, str2).Reset(dataFacet)
+		exports.GetExportsCollection(str1, str2).LoadData(dataFacet)
 	case "/monitors":
 		monitors.GetMonitorsCollection().Reset(dataFacet)
 		monitors.GetMonitorsCollection().LoadData(dataFacet)
@@ -399,16 +402,17 @@ func (a *App) RegisterCollection(collection types.Collection) {
 
 func getCollectionPage[T any](
 	collection interface {
-		GetPage(types.DataFacet, int, int, sdk.SortSpec, string) (types.Page, error)
+		GetPage(types.Payload, int, int, sdk.SortSpec, string) (types.Page, error)
 	},
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
 ) (T, error) {
 	var zero T
 
-	page, err := collection.GetPage(dataFacet, first, pageSize, sort, filter)
+	dataFacet := payload.DataFacet
+	page, err := collection.GetPage(payload, first, pageSize, sort, filter)
 	if err != nil {
 		// Preserve the original error context - don't wrap with type assertion errors
 		return zero, err

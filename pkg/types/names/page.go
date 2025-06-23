@@ -11,6 +11,7 @@ package names
 import (
 	// EXISTING_CODE
 	"fmt"
+
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -48,13 +49,14 @@ func (p *NamesPage) GetState() types.LoadState {
 
 // EXISTING_CODE
 func (c *NamesCollection) GetPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
-	var facet *facets.Facet[Name]
+	dataFacet := payload.DataFacet
 
+	var facet *facets.Facet[Name]
 	switch dataFacet {
 	case NamesAll:
 		facet = c.allFacet

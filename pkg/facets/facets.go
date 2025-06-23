@@ -354,8 +354,6 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 
 		if r.summaryProvider != nil {
 			collectionPayload := types.DataLoadedPayload{
-				Collection:    r.collectionName,
-				DataFacet:     r.dataFacet,
 				CurrentCount:  currentCount,
 				ExpectedTotal: currentCount,
 				State:         types.StateLoaded,
@@ -363,6 +361,8 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "complete",
 			}
+			collectionPayload.Collection = r.collectionName
+			collectionPayload.DataFacet = r.dataFacet
 			msgs.EmitLoaded(collectionPayload)
 		}
 

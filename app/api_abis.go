@@ -11,25 +11,27 @@ import (
 )
 
 func (a *App) GetAbisPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
 ) (*abis.AbisPage, error) {
-	return getCollectionPage[*abis.AbisPage](abis.GetAbisCollection(), dataFacet, first, pageSize, sort, filter)
+	collection := abis.GetAbisCollection()
+	return getCollectionPage[*abis.AbisPage](collection, payload, first, pageSize, sort, filter)
 }
 
 func (a *App) AbisCrud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
-	return abis.GetAbisCollection().Crud(dataFacet, op, item, itemStr)
+	collection := abis.GetAbisCollection()
+	return collection.Crud(payload, op, item)
 }
 
 func (a *App) GetAbisSummary() types.Summary {
-	return abis.GetAbisCollection().GetSummary()
+	collection := abis.GetAbisCollection()
+	return collection.GetSummary()
 }
 
 // EXISTING_CODE

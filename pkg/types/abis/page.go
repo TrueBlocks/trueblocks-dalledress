@@ -52,11 +52,12 @@ func (p *AbisPage) GetState() types.LoadState {
 
 // EXISTING_CODE
 func (c *AbisCollection) GetPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
+	dataFacet := payload.DataFacet
 	page := &AbisPage{
 		Facet: dataFacet,
 	}

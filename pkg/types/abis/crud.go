@@ -12,12 +12,11 @@ import (
 )
 
 func (ac *AbisCollection) Crud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
-	var abi = &Abi{Address: base.HexToAddress(itemStr)}
+	var abi = &Abi{Address: base.HexToAddress(payload.Address)}
 	if cast, ok := item.(*Abi); ok && cast != nil {
 		abi = cast
 	}

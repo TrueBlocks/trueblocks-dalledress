@@ -18,6 +18,9 @@ import (
 	// EXISTING_CODE
 )
 
+// EXISTING_CODE
+// EXISTING_CODE
+
 {{range .Stores}}type {{toSingular .}} = coreTypes.{{if $isChunks}}Chunk{{end}}{{toSingular .}}
 {{end}}
 

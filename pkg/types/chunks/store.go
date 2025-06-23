@@ -23,6 +23,9 @@ import (
 	// EXISTING_CODE
 )
 
+// EXISTING_CODE
+// EXISTING_CODE
+
 type Bloom = coreTypes.ChunkBloom
 type Index = coreTypes.ChunkIndex
 type Manifest = coreTypes.ChunkManifest

@@ -10,8 +10,8 @@ export function Clean(arg1) {
   return window['go']['monitors']['MonitorsCollection']['Clean'](arg1);
 }
 
-export function Crud(arg1, arg2, arg3, arg4) {
-  return window['go']['monitors']['MonitorsCollection']['Crud'](arg1, arg2, arg3, arg4);
+export function Crud(arg1, arg2, arg3) {
+  return window['go']['monitors']['MonitorsCollection']['Crud'](arg1, arg2, arg3);
 }
 
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {

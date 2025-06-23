@@ -406,7 +406,6 @@
                     "doc_route": "412-chunkIndex",
                     "doc_descr": "internal-use only data model detailing a single index chunk file",
                     "produced_by": "exports",
-                    "disable_go": true,
                     "members": [
                         {
                             "name": "range",
@@ -1009,7 +1008,6 @@
             "doc_route": "412-chunkIndex",
             "doc_descr": "internal-use only data model detailing a single index chunk file",
             "produced_by": "exports",
-            "disable_go": true,
             "members": [
                 {
                     "name": "range",

@@ -13,12 +13,11 @@ import (
 )
 
 func (c *MonitorsCollection) Crud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
-	var monitor = &Monitor{Address: base.HexToAddress(itemStr)}
+	var monitor = &Monitor{Address: base.HexToAddress(payload.Address)}
 	if cast, ok := item.(*Monitor); ok && cast != nil {
 		monitor = cast
 	}

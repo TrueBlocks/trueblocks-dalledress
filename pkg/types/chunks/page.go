@@ -52,11 +52,13 @@ func (p *ChunksPage) GetState() types.LoadState {
 
 // EXISTING_CODE
 func (c *ChunksCollection) GetPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
+	dataFacet := payload.DataFacet
+
 	page := &ChunksPage{
 		Facet: dataFacet,
 	}

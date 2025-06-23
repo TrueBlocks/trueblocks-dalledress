@@ -59,7 +59,7 @@ export const Monitors = () => {
     clearError();
     try {
       const result = await GetMonitorsPage(
-        dataFacetRef.current as types.DataFacet,
+        types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -109,7 +109,7 @@ export const Monitors = () => {
     [
       'mod+r',
       () => {
-        Reload(getCurrentDataFacet() as types.DataFacet).then(() => {
+        Reload(getCurrentDataFacet() as types.DataFacet, '', '').then(() => {
           fetchData();
         });
       },
@@ -144,14 +144,16 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          dataFacetRef.current as types.DataFacet,
+          types.Payload.createFrom({
+            dataFacet: dataFacetRef.current,
+            address: address,
+          }),
           crud.Operation.DELETE,
           {} as types.Monitor,
-          address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              dataFacetRef.current as types.DataFacet,
+              types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -212,14 +214,16 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          dataFacetRef.current as types.DataFacet,
+          types.Payload.createFrom({
+            dataFacet: dataFacetRef.current,
+            address: address,
+          }),
           crud.Operation.UNDELETE,
           {} as types.Monitor,
-          address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              dataFacetRef.current as types.DataFacet,
+              types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -277,14 +281,16 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          dataFacetRef.current as types.DataFacet,
+          types.Payload.createFrom({
+            dataFacet: dataFacetRef.current,
+            address: address,
+          }),
           crud.Operation.REMOVE,
           {} as types.Monitor,
-          address,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              dataFacetRef.current as types.DataFacet,
+              types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,

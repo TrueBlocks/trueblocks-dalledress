@@ -6,8 +6,8 @@ export function AccumulateItem(arg1, arg2) {
   return window['go']['abis']['AbisCollection']['AccumulateItem'](arg1, arg2);
 }
 
-export function Crud(arg1, arg2, arg3, arg4) {
-  return window['go']['abis']['AbisCollection']['Crud'](arg1, arg2, arg3, arg4);
+export function Crud(arg1, arg2, arg3) {
+  return window['go']['abis']['AbisCollection']['Crud'](arg1, arg2, arg3);
 }
 
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {

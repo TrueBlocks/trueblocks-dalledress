@@ -53,11 +53,13 @@ func (p *ExportsPage) GetState() types.LoadState {
 
 // EXISTING_CODE
 func (ec *ExportsCollection) GetPage(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
+	dataFacet := payload.DataFacet
+
 	switch dataFacet {
 	case ExportsStatements:
 		return ec.getStatementsPage(first, pageSize, sortSpec, filter)

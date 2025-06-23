@@ -97,8 +97,6 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) {
 	if sendUpdateThisTick {
 		if pr.collectionName != "" && pr.summaryProvider != nil {
 			collectionPayload := types.DataLoadedPayload{
-				Collection:    pr.collectionName,
-				DataFacet:     pr.dataFacet,
 				CurrentCount:  currentTotalCount,
 				ExpectedTotal: expectedTotal,
 				State:         types.StateFetching,
@@ -106,6 +104,8 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) {
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "streaming",
 			}
+			collectionPayload.Collection = pr.collectionName
+			collectionPayload.DataFacet = pr.dataFacet
 			msgs.EmitLoaded(collectionPayload)
 		}
 
@@ -125,8 +125,6 @@ func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) {
 	if now.Sub(pr.lastUpdate) >= MaxWaitTime && pr.nItemsSinceUpdate > 0 {
 		if pr.collectionName != "" && pr.summaryProvider != nil {
 			collectionPayload := types.DataLoadedPayload{
-				Collection:    pr.collectionName,
-				DataFacet:     pr.dataFacet,
 				CurrentCount:  currentTotalCount,
 				ExpectedTotal: expectedTotal,
 				State:         types.StateFetching,
@@ -134,6 +132,8 @@ func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) {
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "streaming",
 			}
+			collectionPayload.Collection = pr.collectionName
+			collectionPayload.DataFacet = pr.dataFacet
 			msgs.EmitLoaded(collectionPayload)
 		}
 

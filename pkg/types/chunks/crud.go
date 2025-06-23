@@ -14,10 +14,9 @@ func NewChunksCrud() *ChunksCrud {
 }
 
 func (c *ChunksCollection) Crud(
-	dataFacet types.DataFacet,
+	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
 	return fmt.Errorf("operation %s not supported for chunks", op)
 }

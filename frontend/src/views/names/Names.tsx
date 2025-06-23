@@ -85,10 +85,10 @@ export const Names = () => {
   const fetchData = useCallback(async () => {
     clearError();
     try {
-      const currentDataFacet = getCurrentDataFacet() as types.DataFacet;
-
       const result = await GetNamesPage(
-        currentDataFacet,
+        types.Payload.createFrom({
+          dataFacet: currentDataFacetRef.current,
+        }),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -138,11 +138,13 @@ export const Names = () => {
     [
       'mod+r',
       () => {
-        Reload(activeFacetHook.getCurrentDataFacet() as types.DataFacet).then(
-          () => {
-            fetchData();
-          },
-        );
+        Reload(
+          activeFacetHook.getCurrentDataFacet() as types.DataFacet,
+          '',
+          '',
+        ).then(() => {
+          fetchData();
+        });
       },
     ],
   ]);
@@ -169,14 +171,18 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          currentDataFacetRef.current as types.DataFacet,
+          types.Payload.createFrom({
+            dataFacet: currentDataFacetRef.current,
+            address: address,
+          }),
           crud.Operation.DELETE,
           {} as types.Name,
-          address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              currentDataFacetRef.current as types.DataFacet,
+              types.Payload.createFrom({
+                dataFacet: currentDataFacetRef.current,
+              }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -237,14 +243,18 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          currentDataFacetRef.current as types.DataFacet,
+          types.Payload.createFrom({
+            dataFacet: currentDataFacetRef.current,
+            address: address,
+          }),
           crud.Operation.UNDELETE,
           {} as types.Name,
-          address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              currentDataFacetRef.current as types.DataFacet,
+              types.Payload.createFrom({
+                dataFacet: currentDataFacetRef.current,
+              }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -302,14 +312,18 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          currentDataFacetRef.current as types.DataFacet,
+          types.Payload.createFrom({
+            dataFacet: currentDataFacetRef.current,
+            address: address,
+          }),
           crud.Operation.REMOVE,
           {} as types.Name,
-          address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              currentDataFacetRef.current as types.DataFacet,
+              types.Payload.createFrom({
+                dataFacet: currentDataFacetRef.current,
+              }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -370,14 +384,18 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          currentDataFacetRef.current as types.DataFacet,
+          types.Payload.createFrom({
+            dataFacet: currentDataFacetRef.current,
+            address: address,
+          }),
           crud.Operation.AUTONAME,
           {} as types.Name,
-          address,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              currentDataFacetRef.current as types.DataFacet,
+              types.Payload.createFrom({
+                dataFacet: currentDataFacetRef.current,
+              }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -457,11 +475,13 @@ export const Names = () => {
   const currentColumns = useMemo(() => {
     const handleChipClick = (chip: string) => {
       setFiltering(chip);
-      Reload(activeFacetHook.getCurrentDataFacet() as types.DataFacet).then(
-        () => {
-          fetchData();
-        },
-      );
+      Reload(
+        activeFacetHook.getCurrentDataFacet() as types.DataFacet,
+        '',
+        '',
+      ).then(() => {
+        fetchData();
+      });
     };
 
     const baseColumns = getColumns(
@@ -581,14 +601,18 @@ export const Names = () => {
       });
 
       NamesCrud(
-        currentDataFacetRef.current as types.DataFacet,
+        types.Payload.createFrom({
+          dataFacet: currentDataFacetRef.current,
+          address: '',
+        }),
         crud.Operation.UPDATE,
         submittedName as types.Name,
-        '',
       )
         .then(async () => {
           const result = await GetNamesPage(
-            currentDataFacetRef.current as types.DataFacet,
+            types.Payload.createFrom({
+              dataFacet: currentDataFacetRef.current,
+            }),
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
             sort,

@@ -15,7 +15,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -26,7 +25,7 @@ import (
 // EXISTING_CODE
 // EXISTING_CODE
 
-type Monitor = coreTypes.Monitor
+type Monitor = sdk.Monitor
 
 var (
 	monitorsStore   *store.Store[Monitor]
@@ -107,7 +106,7 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetMonitorsCollection() *MonitorsCollection {
+func GetMonitorsCollection(payload types.Payload) *MonitorsCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 

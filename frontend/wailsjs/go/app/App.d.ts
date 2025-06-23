@@ -18,8 +18,6 @@ import {app} from '../models';
 
 export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
 
-export function AddrToName(arg1:base.Address):Promise<string>;
-
 export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
 export function CancelAllFetches():Promise<number>;
@@ -48,7 +46,7 @@ export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
 export function GetAbisPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
-export function GetAbisSummary():Promise<types.Summary>;
+export function GetAbisSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetAppId():Promise<preferences.Id>;
 
@@ -58,7 +56,7 @@ export function GetChainList():Promise<utils.ChainList>;
 
 export function GetChunksPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
 
-export function GetChunksSummary():Promise<types.Summary>;
+export function GetChunksSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetContext():Promise<context.Context>;
 
@@ -82,11 +80,11 @@ export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>
 
 export function GetMonitorsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
 
-export function GetMonitorsSummary():Promise<types.Summary>;
+export function GetMonitorsSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetNamesPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
-export function GetNamesSummary():Promise<types.Summary>;
+export function GetNamesSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetNodeStatus():Promise<types.MetaData>;
 
@@ -112,7 +110,7 @@ export function LogBackend(arg1:string):Promise<void>;
 
 export function LogFrontend(arg1:string):Promise<void>;
 
-export function MonitorsClean(arg1:Array<string>):Promise<void>;
+export function MonitorsClean(arg1:types.Payload,arg2:Array<string>):Promise<void>;
 
 export function MonitorsCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
 

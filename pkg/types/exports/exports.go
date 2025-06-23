@@ -17,7 +17,6 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	// EXISTING_CODE
 )
@@ -40,7 +39,7 @@ type ExportsCollection struct {
 	chain             string
 	address           string
 	statementsFacet   *facets.Facet[Statement]
-	balancesFacet     *facets.Facet[Token]
+	balancesFacet     *facets.Facet[Balance]
 	transfersFacet    *facets.Facet[Transfer]
 	transactionsFacet *facets.Facet[Transaction]
 	summary           types.Summary
@@ -62,7 +61,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsStatements,
 		isStatement,
 		isDupStatement(),
-		c.getStatementsStore(c.chain, c.address),
+		c.getStatementsStore(),
 		"exports",
 		c,
 	)
@@ -71,7 +70,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsBalances,
 		isBalance,
 		isDupBalance(),
-		c.getBalancesStore(c.chain, c.address),
+		c.getBalancesStore(),
 		"exports",
 		c,
 	)
@@ -80,7 +79,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsTransfers,
 		isTransfer,
 		isDupTransfer(),
-		c.getTransfersStore(c.chain, c.address),
+		c.getTransfersStore(),
 		"exports",
 		c,
 	)
@@ -89,7 +88,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsTransactions,
 		isTransaction,
 		isDupTransaction(),
-		c.getTransactionsStore(c.chain, c.address),
+		c.getTransactionsStore(),
 		"exports",
 		c,
 	)
@@ -101,7 +100,7 @@ func isStatement(item *Statement) bool {
 	// EXISTING_CODE
 }
 
-func isBalance(item *Token) bool {
+func isBalance(item *Balance) bool {
 	// EXISTING_CODE
 	return true
 	// EXISTING_CODE
@@ -119,7 +118,7 @@ func isTransaction(item *Transaction) bool {
 	// EXISTING_CODE
 }
 
-func isDupBalance() func(existing []*Token, newItem *Token) bool {
+func isDupBalance() func(existing []*Balance, newItem *Balance) bool {
 	// EXISTING_CODE
 	return nil
 	// EXISTING_CODE
@@ -244,7 +243,7 @@ func (c *ExportsCollection) AccumulateItem(item interface{}, summary *types.Summ
 		transferCount++
 		summary.CustomData["transfersCount"] = transferCount
 
-	case *Token:
+	case *Balance:
 		summary.TotalCount++
 		summary.FacetCounts[ExportsBalances]++
 		if summary.CustomData == nil {
@@ -307,25 +306,6 @@ func (c *ExportsCollection) ResetSummary() {
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: time.Now().Unix(),
 	}
-}
-
-var (
-	collections   = make(map[store.CollectionKey]*ExportsCollection)
-	collectionsMu sync.Mutex
-)
-
-func GetExportsCollection(chain, address string) *ExportsCollection {
-	collectionsMu.Lock()
-	defer collectionsMu.Unlock()
-
-	key := store.GetCollectionKey(chain, address)
-	if collection, exists := collections[key]; exists {
-		return collection
-	}
-
-	collection := NewExportsCollection(chain, address)
-	collections[key] = collection
-	return collection
 }
 
 // EXISTING_CODE

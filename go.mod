@@ -3,6 +3,8 @@ module github.com/TrueBlocks/trueblocks-dalledress
 // GoLang version
 go 1.23.8
 
+replace github.com/TrueBlocks/trueblocks-sdk/v5 => ../trueblocks-core/sdk
+
 require (
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250623031722-6e806696c627
 	github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250504164335-8b49b03dddef

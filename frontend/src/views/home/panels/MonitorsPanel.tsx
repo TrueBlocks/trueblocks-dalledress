@@ -36,7 +36,9 @@ export const MonitorsPanel = ({
       if (showLoading) setLoading(true);
 
       // Use the new GetMonitorsSummary API that returns pre-computed summaries
-      const summaryData = await GetMonitorsSummary();
+      const summaryData = await GetMonitorsSummary(
+        types.Payload.createFrom({}),
+      );
 
       if (summaryData) {
         // Use the backend Summary structure directly

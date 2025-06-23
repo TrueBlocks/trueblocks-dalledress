@@ -33,7 +33,7 @@ export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
       if (showLoading) setLoading(true);
 
       // Use the new GetNamesSummary API that returns pre-computed summaries
-      const summaryData = await GetNamesSummary();
+      const summaryData = await GetNamesSummary(types.Payload.createFrom({}));
 
       if (summaryData) {
         setSummary(summaryData);

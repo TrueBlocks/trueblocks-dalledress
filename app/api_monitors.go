@@ -16,7 +16,7 @@ func (a *App) GetMonitorsPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*monitors.MonitorsPage, error) {
-	collection := monitors.GetMonitorsCollection()
+	collection := monitors.GetMonitorsCollection(payload)
 	return getCollectionPage[*monitors.MonitorsPage](collection, payload, first, pageSize, sort, filter)
 }
 
@@ -25,18 +25,19 @@ func (a *App) MonitorsCrud(
 	op crud.Operation,
 	item interface{},
 ) error {
-	collection := monitors.GetMonitorsCollection()
+	collection := monitors.GetMonitorsCollection(payload)
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetMonitorsSummary() types.Summary {
-	collection := monitors.GetMonitorsCollection()
+func (a *App) GetMonitorsSummary(payload types.Payload) types.Summary {
+	collection := monitors.GetMonitorsCollection(payload)
 	return collection.GetSummary()
 }
 
 // EXISTING_CODE
-func (a *App) MonitorsClean(addresses []string) error {
-	return monitors.GetMonitorsCollection().Clean(addresses)
+func (a *App) MonitorsClean(payload types.Payload, addresses []string) error {
+	collection := monitors.GetMonitorsCollection(payload)
+	return collection.Clean(addresses)
 }
 
 // EXISTING_CODE

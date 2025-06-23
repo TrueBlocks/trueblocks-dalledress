@@ -15,7 +15,7 @@ func (a *App) GetChunksPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*chunks.ChunksPage, error) {
-	collection := chunks.GetChunksCollection()
+	collection := chunks.GetChunksCollection(payload)
 	return getCollectionPage[*chunks.ChunksPage](collection, payload, first, pageSize, sort, filter)
 }
 
@@ -24,12 +24,12 @@ func (a *App) ChunksCrud(
 	op crud.Operation,
 	item interface{},
 ) error {
-	collection := chunks.GetChunksCollection()
+	collection := chunks.GetChunksCollection(payload)
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetChunksSummary() types.Summary {
-	collection := chunks.GetChunksCollection()
+func (a *App) GetChunksSummary(payload types.Payload) types.Summary {
+	collection := chunks.GetChunksCollection(payload)
 	return collection.GetSummary()
 }
 

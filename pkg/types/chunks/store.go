@@ -14,7 +14,6 @@ import (
 
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
@@ -26,10 +25,10 @@ import (
 // EXISTING_CODE
 // EXISTING_CODE
 
-type Bloom = coreTypes.ChunkBloom
-type Index = coreTypes.ChunkIndex
-type Manifest = coreTypes.ChunkManifest
-type Stats = coreTypes.ChunkStats
+type Bloom = sdk.Bloom
+type Index = sdk.Index
+type Manifest = sdk.Manifest
+type Stats = sdk.Stats
 
 var (
 	bloomsStore   *store.Store[Bloom]
@@ -292,7 +291,7 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetChunksCollection() *ChunksCollection {
+func GetChunksCollection(payload types.Payload) *ChunksCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 

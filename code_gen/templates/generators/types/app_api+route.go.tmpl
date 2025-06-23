@@ -19,22 +19,21 @@ func (a *App) Get{{.Class}}Page(
 	sort sdk.SortSpec,
 	filter string,
 ) (*{{toLower .Class}}.{{.Class}}Page, error) {
-	collection := {{toLower .Class}}.Get{{.Class}}Collection()
-	return getCollectionPage[*{{toLower .Class}}.{{.Class}}Page](collection, payload.DataFacet, first, pageSize, sort, filter)
+	collection := {{toLower .Class}}.Get{{.Class}}Collection(payload)
+	return getCollectionPage[*{{toLower .Class}}.{{.Class}}Page](collection, payload, first, pageSize, sort, filter)
 }
 
 func (a *App) {{.Class}}Crud(
 	payload types.Payload,
 	op crud.Operation,
 	item interface{},
-	itemStr string,
 ) error {
-	collection := {{toLower .Class}}.Get{{.Class}}Collection()
-	return collection.Crud(payload.DataFacet, op, item, itemStr)
+	collection := {{toLower .Class}}.Get{{.Class}}Collection(payload)
+	return collection.Crud(payload, op, item)
 }
 
-func (a *App) Get{{.Class}}Summary() types.Summary {
-	collection := {{toLower .Class}}.Get{{.Class}}Collection()
+func (a *App) Get{{.Class}}Summary(payload types.Payload) types.Summary {
+	collection := {{toLower .Class}}.Get{{.Class}}Collection(payload)
 	return collection.GetSummary()
 }
 

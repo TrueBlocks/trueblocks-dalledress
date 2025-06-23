@@ -2,6 +2,7 @@ package app
 
 import (
 	// EXISTING_CODE
+
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -16,7 +17,7 @@ func (a *App) GetNamesPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*names.NamesPage, error) {
-	collection := names.GetNamesCollection()
+	collection := names.GetNamesCollection(payload)
 	return getCollectionPage[*names.NamesPage](collection, payload, first, pageSize, sort, filter)
 }
 
@@ -25,18 +26,19 @@ func (a *App) NamesCrud(
 	op crud.Operation,
 	item interface{},
 ) error {
-	collection := names.GetNamesCollection()
+	collection := names.GetNamesCollection(payload)
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetNamesSummary() types.Summary {
-	collection := names.GetNamesCollection()
+func (a *App) GetNamesSummary(payload types.Payload) types.Summary {
+	collection := names.GetNamesCollection(payload)
 	return collection.GetSummary()
 }
 
 // EXISTING_CODE
 func (a *App) NameFromAddress(address string) (*names.Name, bool) {
-	return names.GetNamesCollection().NameFromAddress(base.HexToAddress(address))
+	collection := names.GetNamesCollection(types.Payload{})
+	return collection.NameFromAddress(base.HexToAddress(address))
 }
 
 // EXISTING_CODE

@@ -16,7 +16,7 @@ func (a *App) GetAbisPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*abis.AbisPage, error) {
-	collection := abis.GetAbisCollection()
+	collection := abis.GetAbisCollection(payload)
 	return getCollectionPage[*abis.AbisPage](collection, payload, first, pageSize, sort, filter)
 }
 
@@ -25,12 +25,12 @@ func (a *App) AbisCrud(
 	op crud.Operation,
 	item interface{},
 ) error {
-	collection := abis.GetAbisCollection()
+	collection := abis.GetAbisCollection(payload)
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetAbisSummary() types.Summary {
-	collection := abis.GetAbisCollection()
+func (a *App) GetAbisSummary(payload types.Payload) types.Summary {
+	collection := abis.GetAbisCollection(payload)
 	return collection.GetSummary()
 }
 

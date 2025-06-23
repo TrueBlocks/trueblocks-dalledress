@@ -371,7 +371,10 @@ export const Monitors = () => {
     clearError();
     try {
       emitCleaningStatus();
-      await MonitorsClean([]);
+      await MonitorsClean(
+        types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
+        [],
+      );
       await fetchData();
       emitSuccess('clean', 0);
     } catch (err: unknown) {
@@ -393,7 +396,10 @@ export const Monitors = () => {
       clearError();
       try {
         emitCleaningStatus(addresses.length);
-        await MonitorsClean(addresses);
+        await MonitorsClean(
+          types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
+          addresses,
+        );
         await fetchData();
         emitSuccess('clean', addresses.length);
       } catch (err: unknown) {

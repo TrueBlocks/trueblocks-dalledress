@@ -15,7 +15,7 @@ func (a *App) GetExportsPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*exports.ExportsPage, error) {
-	collection := exports.GetExportsCollection(payload.Chain, payload.Address)
+	collection := exports.GetExportsCollection(payload)
 	return getCollectionPage[*exports.ExportsPage](collection, payload, first, pageSize, sort, filter)
 }
 
@@ -24,12 +24,12 @@ func (a *App) ExportsCrud(
 	op crud.Operation,
 	item interface{},
 ) error {
-	collection := exports.GetExportsCollection(payload.Chain, payload.Address)
+	collection := exports.GetExportsCollection(payload)
 	return collection.Crud(payload, op, item)
 }
 
 func (a *App) GetExportsSummary(payload types.Payload) types.Summary {
-	collection := exports.GetExportsCollection(payload.Chain, payload.Address)
+	collection := exports.GetExportsCollection(payload)
 	return collection.GetSummary()
 }
 

@@ -38,7 +38,7 @@ export const ChunksPanel = ({ onViewAll }: ChunksPanelProps) => {
       if (showLoading) setLoading(true);
 
       // Use the new GetChunksSummary API that returns pre-computed summaries
-      const summaryData = await GetChunksSummary();
+      const summaryData = await GetChunksSummary(types.Payload.createFrom({}));
 
       if (summaryData) {
         // Use the backend Summary structure directly

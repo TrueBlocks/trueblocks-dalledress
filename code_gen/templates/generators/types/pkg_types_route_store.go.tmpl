@@ -1,5 +1,4 @@
 {{$class := .Class}}
-{{$isChunks := eq $class "Chunks"}}
 // Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
@@ -21,7 +20,7 @@ import (
 // EXISTING_CODE
 // EXISTING_CODE
 
-{{range .Stores}}type {{toSingular .}} = coreTypes.{{if $isChunks}}Chunk{{end}}{{toSingular .}}
+{{range .Stores}}type {{toSingular .}} = sdk.{{toSingular .}}
 {{end}}
 
 var (
@@ -96,7 +95,7 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func Get{{.Class}}Collection() *{{.Class}}Collection {
+func Get{{.Class}}Collection(payload types.Payload) *{{.Class}}Collection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 

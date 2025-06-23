@@ -15,7 +15,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
@@ -27,7 +26,7 @@ import (
 // EXISTING_CODE
 // EXISTING_CODE
 
-type Name = coreTypes.Name
+type Name = sdk.Name
 
 var (
 	namesStore   *store.Store[Name]
@@ -121,7 +120,7 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetNamesCollection() *NamesCollection {
+func GetNamesCollection(payload types.Payload) *NamesCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 

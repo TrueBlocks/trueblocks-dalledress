@@ -21,7 +21,7 @@ import (
 // TODO: The slices should be slices to pointers
 type ExportsPage struct {
 	Facet         types.DataFacet `json:"facet"`
-	Balances      []Token         `json:"balances"`
+	Balances      []Balance       `json:"balances"`
 	Statements    []Statement     `json:"statements"`
 	Transactions  []Transaction   `json:"transactions"`
 	Transfers     []Transfer      `json:"transfers"`
@@ -143,7 +143,7 @@ func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.S
 	}
 	filter = strings.ToLower(filter)
 
-	var filterFunc = func(item *Token) bool {
+	var filterFunc = func(item *Balance) bool {
 		if filter == "" {
 			return true
 		}
@@ -151,7 +151,7 @@ func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.S
 		return strings.Contains(strings.ToLower(item.Address.Hex()), filter)
 	}
 
-	var sortFunc = func(items []Token, sort sdk.SortSpec) error {
+	var sortFunc = func(items []Balance, sort sdk.SortSpec) error {
 		// TODO: Implement proper sorting when SDK methods are available
 		return nil
 	}

@@ -33,7 +33,7 @@ export const AbisPanel = ({ onViewAll, onAddAbi }: AbisPanelProps) => {
       if (showLoading) setLoading(true);
 
       // Use the new GetAbisSummary API that returns pre-computed summaries
-      const summaryData = await GetAbisSummary();
+      const summaryData = await GetAbisSummary(types.Payload.createFrom({}));
 
       if (summaryData) {
         // Use the backend Summary structure directly

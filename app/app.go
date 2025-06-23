@@ -69,12 +69,14 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	app.exports = nil
 	// ADD_ROUTE
 
+	emptyPayload := types.Payload{}
+
 	app.collections = make([]types.Collection, 0, 4)
-	app.RegisterCollection(names.GetNamesCollection())
-	app.RegisterCollection(abis.GetAbisCollection())
-	app.RegisterCollection(monitors.GetMonitorsCollection())
-	app.RegisterCollection(chunks.GetChunksCollection())
-	// Note: exports created on-demand per chain/address when needed
+	app.RegisterCollection(abis.GetAbisCollection(emptyPayload))
+	app.RegisterCollection(chunks.GetChunksCollection(emptyPayload))
+	// app.RegisterCollection(exports.GetExportsCollection(emptyPayload))
+	app.RegisterCollection(monitors.GetMonitorsCollection(emptyPayload))
+	app.RegisterCollection(names.GetNamesCollection(emptyPayload))
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 
@@ -341,22 +343,25 @@ func (a *App) Reload(dataFacet types.DataFacet, str1, str2 string) error {
 	lastView := a.GetAppPreferences().LastView
 
 	// ADD_ROUTE
+	emptyPayload := types.Payload{}
 	switch lastView {
 	case "/names":
-		names.GetNamesCollection().Reset(dataFacet)
-		names.GetNamesCollection().LoadData(dataFacet)
+		names.GetNamesCollection(emptyPayload).Reset(dataFacet)
+		names.GetNamesCollection(emptyPayload).LoadData(dataFacet)
 	case "/abis":
-		abis.GetAbisCollection().Reset(dataFacet)
-		abis.GetAbisCollection().LoadData(dataFacet)
+		abis.GetAbisCollection(emptyPayload).Reset(dataFacet)
+		abis.GetAbisCollection(emptyPayload).LoadData(dataFacet)
 	case "/exports":
-		exports.GetExportsCollection(str1, str2).Reset(dataFacet)
-		exports.GetExportsCollection(str1, str2).LoadData(dataFacet)
+		emptyPayload.Chain = str1
+		emptyPayload.Address = str2
+		exports.GetExportsCollection(emptyPayload).Reset(dataFacet)
+		exports.GetExportsCollection(emptyPayload).LoadData(dataFacet)
 	case "/monitors":
-		monitors.GetMonitorsCollection().Reset(dataFacet)
-		monitors.GetMonitorsCollection().LoadData(dataFacet)
+		monitors.GetMonitorsCollection(emptyPayload).Reset(dataFacet)
+		monitors.GetMonitorsCollection(emptyPayload).LoadData(dataFacet)
 	case "/chunks":
-		chunks.GetChunksCollection().Reset(dataFacet)
-		chunks.GetChunksCollection().LoadData(dataFacet)
+		chunks.GetChunksCollection(emptyPayload).Reset(dataFacet)
+		chunks.GetChunksCollection(emptyPayload).LoadData(dataFacet)
 	}
 	// ADD_ROUTE
 

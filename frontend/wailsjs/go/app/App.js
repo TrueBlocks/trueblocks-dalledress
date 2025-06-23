@@ -6,10 +6,6 @@ export function AbisCrud(arg1, arg2, arg3) {
   return window['go']['app']['App']['AbisCrud'](arg1, arg2, arg3);
 }
 
-export function AddrToName(arg1) {
-  return window['go']['app']['App']['AddrToName'](arg1);
-}
-
 export function BuildDalleDressForProject() {
   return window['go']['app']['App']['BuildDalleDressForProject']();
 }
@@ -66,8 +62,8 @@ export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetAbisPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetAbisSummary() {
-  return window['go']['app']['App']['GetAbisSummary']();
+export function GetAbisSummary(arg1) {
+  return window['go']['app']['App']['GetAbisSummary'](arg1);
 }
 
 export function GetAppId() {
@@ -86,8 +82,8 @@ export function GetChunksPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetChunksPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetChunksSummary() {
-  return window['go']['app']['App']['GetChunksSummary']();
+export function GetChunksSummary(arg1) {
+  return window['go']['app']['App']['GetChunksSummary'](arg1);
 }
 
 export function GetContext() {
@@ -134,16 +130,16 @@ export function GetMonitorsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetMonitorsPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetMonitorsSummary() {
-  return window['go']['app']['App']['GetMonitorsSummary']();
+export function GetMonitorsSummary(arg1) {
+  return window['go']['app']['App']['GetMonitorsSummary'](arg1);
 }
 
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetNamesSummary() {
-  return window['go']['app']['App']['GetNamesSummary']();
+export function GetNamesSummary(arg1) {
+  return window['go']['app']['App']['GetNamesSummary'](arg1);
 }
 
 export function GetNodeStatus() {
@@ -194,8 +190,8 @@ export function LogFrontend(arg1) {
   return window['go']['app']['App']['LogFrontend'](arg1);
 }
 
-export function MonitorsClean(arg1) {
-  return window['go']['app']['App']['MonitorsClean'](arg1);
+export function MonitorsClean(arg1, arg2) {
+  return window['go']['app']['App']['MonitorsClean'](arg1, arg2);
 }
 
 export function MonitorsCrud(arg1, arg2, arg3) {

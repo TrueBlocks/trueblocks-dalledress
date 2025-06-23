@@ -15,7 +15,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
-	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -26,8 +25,8 @@ import (
 // EXISTING_CODE
 // EXISTING_CODE
 
-type Abi = coreTypes.Abi
-type Function = coreTypes.Function
+type Abi = sdk.Abi
+type Function = sdk.Function
 
 var (
 	abisStore   *store.Store[Abi]
@@ -163,7 +162,7 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetAbisCollection() *AbisCollection {
+func GetAbisCollection(payload types.Payload) *AbisCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 

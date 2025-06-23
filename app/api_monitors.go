@@ -2,7 +2,7 @@ package app
 
 import (
 	// EXISTING_CODE
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
@@ -22,13 +22,10 @@ func (a *App) GetMonitorsPage(
 func (a *App) MonitorsCrud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
-	monitor *monitors.Monitor,
-	address string,
+	item interface{},
+	itemStr string,
 ) error {
-	if address != "" && (monitor == nil || monitor.Address.IsZero()) {
-		monitor = &monitors.Monitor{Address: base.HexToAddress(address)}
-	}
-	return monitors.GetMonitorsCollection().Crud(dataFacet, op, monitor)
+	return monitors.GetMonitorsCollection().Crud(dataFacet, op, item, itemStr)
 }
 
 func (a *App) GetMonitorsSummary() types.Summary {
@@ -37,7 +34,7 @@ func (a *App) GetMonitorsSummary() types.Summary {
 
 // EXISTING_CODE
 func (a *App) MonitorsClean(addresses []string) error {
-	return a.monitors.Clean(addresses)
+	return monitors.GetMonitorsCollection().Clean(addresses)
 }
 
 // EXISTING_CODE

@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
@@ -45,7 +46,7 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 }
 
 func (a *App) AddrToName(addr base.Address) string {
-	if name, exists := a.names.NameFromAddress(addr); exists {
+	if name, exists := names.GetNamesCollection().NameFromAddress(addr); exists {
 		return name.Name
 	}
 	return addr.Hex()

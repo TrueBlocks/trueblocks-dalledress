@@ -3,6 +3,7 @@ package monitors
 import (
 	"fmt"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
@@ -15,15 +16,11 @@ func (c *MonitorsCollection) Crud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
+	itemStr string,
 ) error {
-	if dataFacet != MonitorsMonitors {
-		return fmt.Errorf("unsupported dataFacet: %s", dataFacet)
-	}
-
-	// Type assertion to convert interface{} to the expected type
-	monitor, ok := item.(*Monitor)
-	if !ok {
-		return fmt.Errorf("invalid type for monitor operation: expected *Monitor, got %T", item)
+	var monitor = &Monitor{Address: base.HexToAddress(itemStr)}
+	if cast, ok := item.(*Monitor); ok && cast != nil {
+		monitor = cast
 	}
 
 	chainName := preferences.GetChain()

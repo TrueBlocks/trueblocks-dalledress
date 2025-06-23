@@ -25,13 +25,10 @@ func (a *App) Get{{.Class}}Page(
 func (a *App) {{.Class}}Crud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
-	{{toLower $single}} *{{toLower .Class}}.{{$single}},
-	address string,
+	item interface{},,
+	itemString string,
 ) error {
-	{{if $isChunk}}_ = address{{else}}if address != "" && ({{$singleLower}} == nil || {{$singleLower}}.Address.IsZero()) {
-		{{$singleLower}} = &{{toLower .Class}}.{{$single}}{Address: base.HexToAddress(address)}
-	}{{end}}
-	return {{toLower .Class}}.Get{{.Class}}Collection().Crud(dataFacet, op, {{$singleLower}})
+	return {{toLower .Class}}.Get{{.Class}}Collection().Crud(dataFacet, op, item, itemString)
 }
 
 func (a *App) Get{{.Class}}Summary() types.Summary {

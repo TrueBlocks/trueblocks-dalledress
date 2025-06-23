@@ -2,7 +2,7 @@ package app
 
 import (
 	// EXISTING_CODE
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
@@ -22,13 +22,10 @@ func (a *App) GetAbisPage(
 func (a *App) AbisCrud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
-	abi *abis.Abi,
-	address string,
+	item interface{},
+	itemStr string,
 ) error {
-	if address != "" && (abi == nil || abi.Address.IsZero()) {
-		abi = &abis.Abi{Address: base.HexToAddress(address)}
-	}
-	return abis.GetAbisCollection().Crud(dataFacet, op, abi)
+	return abis.GetAbisCollection().Crud(dataFacet, op, item, itemStr)
 }
 
 func (a *App) GetAbisSummary() types.Summary {

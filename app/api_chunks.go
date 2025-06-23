@@ -21,11 +21,10 @@ func (a *App) GetChunksPage(
 func (a *App) ChunksCrud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
-	chunk *chunks.Index,
-	address string,
+	item interface{},
+	itemStr string,
 ) error {
-	_ = address
-	return chunks.GetChunksCollection().Crud(dataFacet, op, chunk)
+	return chunks.GetChunksCollection().Crud(dataFacet, op, item, itemStr)
 }
 
 func (a *App) GetChunksSummary() types.Summary {

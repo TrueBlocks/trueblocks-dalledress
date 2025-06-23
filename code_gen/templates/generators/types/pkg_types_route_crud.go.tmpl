@@ -26,6 +26,7 @@ func (c *{{.Class}}Collection) Crud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
+	itemStr string,
 ) error {
 	crudHandler := New{{.Class}}Crud()
 	switch op {

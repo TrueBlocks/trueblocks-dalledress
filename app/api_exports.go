@@ -25,10 +25,9 @@ func (a *App) ExportsCrud(
 	op crud.Operation,
 	item interface{},
 	chain string,
-	address string,
+	itemStr string,
 ) error {
-	collection := exports.GetExportsCollection(chain, address)
-	return collection.Crud(dataFacet, op, item)
+	return exports.GetExportsCollection(chain, itemStr).Crud(dataFacet, op, item, itemStr)
 }
 
 func (a *App) GetExportsCount(

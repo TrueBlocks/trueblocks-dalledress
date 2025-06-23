@@ -17,7 +17,7 @@ func (c *ChunksCollection) Crud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
+	itemStr string,
 ) error {
-	// crudHandler := NewChunksCrud()
 	return fmt.Errorf("operation %s not supported for chunks", op)
 }

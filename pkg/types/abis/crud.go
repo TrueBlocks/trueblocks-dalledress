@@ -3,6 +3,7 @@ package abis
 import (
 	"fmt"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
@@ -14,12 +15,13 @@ func (ac *AbisCollection) Crud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
+	itemStr string,
 ) error {
-	// Type assertion to convert interface{} to the expected type
-	abi, ok := item.(*Abi)
-	if !ok {
-		return fmt.Errorf("invalid type for abi operation: expected *Abi, got %T", item)
+	var abi = &Abi{Address: base.HexToAddress(itemStr)}
+	if cast, ok := item.(*Abi); ok && cast != nil {
+		abi = cast
 	}
+
 	switch op {
 	case crud.Remove:
 		opts := sdk.AbisOptions{

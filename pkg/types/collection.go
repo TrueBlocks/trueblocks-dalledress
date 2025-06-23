@@ -18,7 +18,7 @@ type Collection interface {
 	LoadData(facet DataFacet)
 	Reset(facet DataFacet)
 	NeedsUpdate(facet DataFacet) bool
-	Crud(facet DataFacet, op crud.Operation, item interface{}) error
+	Crud(facet DataFacet, op crud.Operation, item interface{}, itemStr string) error
 	GetSupportedFacets() []DataFacet
 	GetStoreName(facet DataFacet) string
 	GetSummary() Summary

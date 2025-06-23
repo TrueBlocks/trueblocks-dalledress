@@ -22,13 +22,10 @@ func (a *App) GetNamesPage(
 func (a *App) NamesCrud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
-	name *names.Name,
-	address string,
+	item interface{},
+	itemStr string,
 ) error {
-	if address != "" && (name == nil || name.Address.IsZero()) {
-		name = &names.Name{Address: base.HexToAddress(address)}
-	}
-	return names.GetNamesCollection().Crud(dataFacet, op, name)
+	return names.GetNamesCollection().Crud(dataFacet, op, item, itemStr)
 }
 
 func (a *App) GetNamesSummary() types.Summary {
@@ -37,7 +34,7 @@ func (a *App) GetNamesSummary() types.Summary {
 
 // EXISTING_CODE
 func (a *App) NameFromAddress(address string) (*names.Name, bool) {
-	return a.names.NameFromAddress(base.HexToAddress(address))
+	return names.GetNamesCollection().NameFromAddress(base.HexToAddress(address))
 }
 
 // EXISTING_CODE

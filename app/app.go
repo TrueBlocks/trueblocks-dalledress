@@ -40,10 +40,7 @@ type App struct {
 	Projects    *project.Manager
 	chainList   *utils.ChainList
 	// ADD_ROUTE
-	names    *names.NamesCollection
-	monitors *monitors.MonitorsCollection
-	chunks   *chunks.ChunksCollection
-	exports  *exports.ExportsCollection
+	exports *exports.ExportsCollection
 	// ADD_ROUTE
 	collections []types.Collection
 	meta        *coreTypes.MetaData
@@ -68,18 +65,15 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		ensMap:  make(map[string]base.Address),
 	}
 	// ADD_ROUTE
-	app.names = names.NewNamesCollection()
-	app.monitors = monitors.NewMonitorsCollection()
-	app.chunks = chunks.NewChunksCollection()
 	// Note: exports created on-demand per chain/address when needed
 	app.exports = nil
 	// ADD_ROUTE
 
 	app.collections = make([]types.Collection, 0, 4)
-	app.RegisterCollection(app.names)
+	app.RegisterCollection(names.GetNamesCollection())
 	app.RegisterCollection(abis.GetAbisCollection())
-	app.RegisterCollection(app.monitors)
-	app.RegisterCollection(app.chunks)
+	app.RegisterCollection(monitors.GetMonitorsCollection())
+	app.RegisterCollection(chunks.GetChunksCollection())
 	// Note: exports created on-demand per chain/address when needed
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
@@ -349,17 +343,17 @@ func (a *App) Reload(dataFacet types.DataFacet) error {
 	// ADD_ROUTE
 	switch lastView {
 	case "/names":
-		a.names.Reset(dataFacet)
-		a.names.LoadData(dataFacet)
+		names.GetNamesCollection().Reset(dataFacet)
+		names.GetNamesCollection().LoadData(dataFacet)
 	case "/abis":
 		abis.GetAbisCollection().Reset(dataFacet)
 		abis.GetAbisCollection().LoadData(dataFacet)
 	case "/monitors":
-		a.monitors.Reset(dataFacet)
-		a.monitors.LoadData(dataFacet)
+		monitors.GetMonitorsCollection().Reset(dataFacet)
+		monitors.GetMonitorsCollection().LoadData(dataFacet)
 	case "/chunks":
-		a.chunks.Reset(dataFacet)
-		a.chunks.LoadData(dataFacet)
+		chunks.GetChunksCollection().Reset(dataFacet)
+		chunks.GetChunksCollection().LoadData(dataFacet)
 	}
 	// ADD_ROUTE
 

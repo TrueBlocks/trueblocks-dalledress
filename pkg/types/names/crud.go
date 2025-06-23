@@ -1,9 +1,9 @@
 package names
 
 import (
-	"fmt"
 	"sync/atomic"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -16,14 +16,11 @@ func (c *NamesCollection) Crud(
 	dataFacet types.DataFacet,
 	op crud.Operation,
 	item interface{},
+	itemStr string,
 ) error {
-	name, ok := item.(*Name)
-	if !ok {
-		return fmt.Errorf("invalid type for name operation: expected *Name, got %T", item)
-	}
-
-	if name == nil || name.Address.IsZero() {
-		return fmt.Errorf("Crud operation requires a valid name with a non-zero address")
+	var name = &Name{Address: base.HexToAddress(itemStr)}
+	if cast, ok := item.(*Name); ok && cast != nil {
+		name = cast
 	}
 
 	if !namesLock.CompareAndSwap(0, 1) {

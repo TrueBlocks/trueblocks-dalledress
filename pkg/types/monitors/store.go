@@ -36,7 +36,8 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 	monitorsStoreMu.Lock()
 	defer monitorsStoreMu.Unlock()
 
-	if monitorsStore == nil {
+	theStore := monitorsStore
+	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			chainName := preferences.GetChain()
@@ -72,10 +73,11 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 		// EXISTING_CODE
 		storeName := c.GetStoreName(MonitorsMonitors)
 		// EXISTING_CODE
-		monitorsStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		monitorsStore = theStore
 	}
 
-	return monitorsStore
+	return theStore
 }
 
 func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet) string {
@@ -88,7 +90,7 @@ func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetMonitorsCount() (int, error) {
+func GetMonitorsCount(payload types.Payload) (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.MonitorsOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chainName},

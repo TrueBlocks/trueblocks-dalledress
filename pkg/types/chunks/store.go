@@ -48,7 +48,8 @@ func (c *ChunksCollection) getBloomsStore() *store.Store[Bloom] {
 	bloomsStoreMu.Lock()
 	defer bloomsStoreMu.Unlock()
 
-	if bloomsStore == nil {
+	theStore := bloomsStore
+	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			chainName := preferences.GetChain()
@@ -91,17 +92,19 @@ func (c *ChunksCollection) getBloomsStore() *store.Store[Bloom] {
 		// EXISTING_CODE
 		storeName := c.GetStoreName(ChunksBlooms)
 		// EXISTING_CODE
-		bloomsStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		bloomsStore = theStore
 	}
 
-	return bloomsStore
+	return theStore
 }
 
 func (c *ChunksCollection) getIndexStore() *store.Store[Index] {
 	indexStoreMu.Lock()
 	defer indexStoreMu.Unlock()
 
-	if indexStore == nil {
+	theStore := indexStore
+	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			chainName := preferences.GetChain()
@@ -145,17 +148,19 @@ func (c *ChunksCollection) getIndexStore() *store.Store[Index] {
 		// EXISTING_CODE
 		storeName := c.GetStoreName(ChunksIndex)
 		// EXISTING_CODE
-		indexStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		indexStore = theStore
 	}
 
-	return indexStore
+	return theStore
 }
 
 func (c *ChunksCollection) getManifestStore() *store.Store[Manifest] {
 	manifestStoreMu.Lock()
 	defer manifestStoreMu.Unlock()
 
-	if manifestStore == nil {
+	theStore := manifestStore
+	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			chainName := preferences.GetChain()
@@ -198,17 +203,19 @@ func (c *ChunksCollection) getManifestStore() *store.Store[Manifest] {
 		// EXISTING_CODE
 		storeName := c.GetStoreName(ChunksManifest)
 		// EXISTING_CODE
-		manifestStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		manifestStore = theStore
 	}
 
-	return manifestStore
+	return theStore
 }
 
 func (c *ChunksCollection) getStatsStore() *store.Store[Stats] {
 	statsStoreMu.Lock()
 	defer statsStoreMu.Unlock()
 
-	if statsStore == nil {
+	theStore := statsStore
+	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			chainName := preferences.GetChain()
@@ -251,10 +258,11 @@ func (c *ChunksCollection) getStatsStore() *store.Store[Stats] {
 		// EXISTING_CODE
 		storeName := c.GetStoreName(ChunksStats)
 		// EXISTING_CODE
-		statsStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		statsStore = theStore
 	}
 
-	return statsStore
+	return theStore
 }
 
 func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet) string {
@@ -273,7 +281,7 @@ func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetChunksCount() (int, error) {
+func GetChunksCount(payload types.Payload) (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.ChunksOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chainName},

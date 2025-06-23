@@ -188,7 +188,7 @@ func (c *MonitorsCollection) ResetSummary() {
 // EXISTING_CODE
 func (c *MonitorsCollection) getExpectedTotal(dataFacet types.DataFacet) int {
 	_ = dataFacet
-	if count, err := GetMonitorsCount(); err == nil && count > 0 {
+	if count, err := GetMonitorsCount(types.Payload{DataFacet: dataFacet}); err == nil && count > 0 {
 		return count
 	}
 	return c.monitorsFacet.ExpectedCount()

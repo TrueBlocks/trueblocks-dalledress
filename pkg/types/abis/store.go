@@ -40,7 +40,8 @@ func (c *AbisCollection) getAbisStore() *store.Store[Abi] {
 	abisStoreMu.Lock()
 	defer abisStoreMu.Unlock()
 
-	if abisStore == nil {
+	theStore := abisStore
+	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			chainName := preferences.GetChain()
@@ -76,17 +77,19 @@ func (c *AbisCollection) getAbisStore() *store.Store[Abi] {
 		// EXISTING_CODE
 		storeName := c.GetStoreName(AbisDownloaded)
 		// EXISTING_CODE
-		abisStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		abisStore = theStore
 	}
 
-	return abisStore
+	return theStore
 }
 
 func (c *AbisCollection) getFunctionsStore() *store.Store[Function] {
 	functionsStoreMu.Lock()
 	defer functionsStoreMu.Unlock()
 
-	if functionsStore == nil {
+	theStore := functionsStore
+	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			chainName := preferences.GetChain()
@@ -122,10 +125,11 @@ func (c *AbisCollection) getFunctionsStore() *store.Store[Function] {
 		// EXISTING_CODE
 		storeName := c.GetStoreName(AbisFunctions)
 		// EXISTING_CODE
-		functionsStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		functionsStore = theStore
 	}
 
-	return functionsStore
+	return theStore
 }
 
 func (c *AbisCollection) GetStoreName(dataFacet types.DataFacet) string {
@@ -144,7 +148,7 @@ func (c *AbisCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetAbisCount() (int, error) {
+func GetAbisCount(payload types.Payload) (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.AbisOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chainName},

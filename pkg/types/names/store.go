@@ -37,7 +37,8 @@ func (c *NamesCollection) getNamesStore() *store.Store[Name] {
 	namesStoreMu.Lock()
 	defer namesStoreMu.Unlock()
 
-	if namesStore == nil {
+	theStore := namesStore
+	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			chainName := preferences.GetChain()
@@ -78,10 +79,11 @@ func (c *NamesCollection) getNamesStore() *store.Store[Name] {
 		// EXISTING_CODE
 		storeName := c.GetStoreName(NamesAll)
 		// EXISTING_CODE
-		namesStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		namesStore = theStore
 	}
 
-	return namesStore
+	return theStore
 }
 
 func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet) string {
@@ -102,7 +104,7 @@ func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetNamesCount() (int, error) {
+func GetNamesCount(payload types.Payload) (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.NamesOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chainName},

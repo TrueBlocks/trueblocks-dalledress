@@ -48,11 +48,7 @@ func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
 	balancesStoreMu.Lock()
 	defer balancesStoreMu.Unlock()
 
-	chainName := c.chain
-	if chainName == "" {
-		chainName = preferences.GetChain()
-	}
-
+	chainName := preferences.GetChain()
 	storeKey := getStoreKey(chainName, c.address)
 	theStore := balancesStore[storeKey]
 
@@ -102,11 +98,7 @@ func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
 	statementsStoreMu.Lock()
 	defer statementsStoreMu.Unlock()
 
-	chainName := c.chain
-	if chainName == "" {
-		chainName = preferences.GetChain()
-	}
-
+	chainName := preferences.GetChain()
 	storeKey := getStoreKey(chainName, c.address)
 	theStore := statementsStore[storeKey]
 
@@ -157,11 +149,7 @@ func (c *ExportsCollection) getTransactionsStore() *store.Store[Transaction] {
 	transactionsStoreMu.Lock()
 	defer transactionsStoreMu.Unlock()
 
-	chainName := c.chain
-	if chainName == "" {
-		chainName = preferences.GetChain()
-	}
-
+	chainName := preferences.GetChain()
 	storeKey := getStoreKey(chainName, c.address)
 	theStore := transactionsStore[storeKey]
 
@@ -211,11 +199,7 @@ func (c *ExportsCollection) getTransfersStore() *store.Store[Transfer] {
 	transfersStoreMu.Lock()
 	defer transfersStoreMu.Unlock()
 
-	chainName := c.chain
-	if chainName == "" {
-		chainName = preferences.GetChain()
-	}
-
+	chainName := preferences.GetChain()
 	storeKey := getStoreKey(chainName, c.address)
 	theStore := transfersStore[storeKey]
 
@@ -278,7 +262,7 @@ func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetExportsCount(chain string, address string, dataFacet string) (int, error) {
+func GetExportsCount(payload types.Payload) (int, error) {
 	chainName := preferences.GetChain()
 	countOpts := sdk.ExportOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chainName},
@@ -305,7 +289,7 @@ func GetExportsCollection(payload types.Payload) *ExportsCollection {
 		return collection
 	}
 
-	collection := NewExportsCollection(payload.Chain, payload.Address)
+	collection := NewExportsCollection(payload.Address)
 	collections[key] = collection
 	return collection
 }

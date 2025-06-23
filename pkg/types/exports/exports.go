@@ -36,7 +36,6 @@ func init() {
 }
 
 type ExportsCollection struct {
-	chain             string
 	address           string
 	statementsFacet   *facets.Facet[Statement]
 	balancesFacet     *facets.Facet[Balance]
@@ -46,9 +45,8 @@ type ExportsCollection struct {
 	summaryMutex      sync.RWMutex
 }
 
-func NewExportsCollection(chain, address string) *ExportsCollection {
+func NewExportsCollection(address string) *ExportsCollection {
 	c := &ExportsCollection{
-		chain:   chain,
 		address: address,
 	}
 	c.ResetSummary()

@@ -1,8 +1,13 @@
 {{$class := .Class}}
 {{$isAbis := eq $class "Abis"}}
+{{$isNames := eq $class "Names"}}
+{{$isMonitors := eq $class "Monitors"}}
+{{$isChunks := eq $class "Chunks"}}
+{{$pager := or (or $isChunks $isAbis) $isMonitors}}
 {{$isMonitors := eq $class "Monitors"}}
 {{$isExports := eq $class "Exports"}}
 {{$shouldBePtr := or (or $isAbis $isMonitors) $isExports}}
+{{$isPtr := not $shouldBePtr}}
 // Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
@@ -50,6 +55,55 @@ func (p *{{.Class}}Page) GetIsFetching() bool {
 func (p *{{.Class}}Page) GetState() types.LoadState {
 	return p.State
 }
+
+{{if $pager}}func (c *{{.Class}}Collection) GetPage(
+	payload *types.Payload,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (types.Page, error) {
+	dataFacet := payload.DataFacet
+
+	page := &{{.Class}}Page{
+		Facet: dataFacet,
+	}
+	filter = strings.ToLower(filter)
+
+	switch dataFacet {
+	{{range .Facets -}}
+	{{- $sing := toSingular .Name -}}
+	{{- $sing2 := toSingular .Store -}}
+	case {{$class}}{{.Name}}:
+		facet := c.{{toLower .Name}}Facet
+		var filterFunc func(*{{$sing2}}) bool
+		if filter != "" {
+			filterFunc = func(item *{{$sing2}}) bool {
+				return c.matches{{$sing}}Filter(item, filter)
+			}
+		}
+		sortFunc := func(items []{{$sing2}}, sort sdk.SortSpec) error {
+			return sdk.Sort{{.Store}}(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("{{toLower $class}}", dataFacet, "GetPage", err)
+		} else {
+			{{if $isPtr -}}{{toLower $sing}} := make([]*{{$sing}}, 0, len(result.Items))
+			for i := range result.Items {
+				{{toLower $sing}} = append({{toLower $sing}}, &result.Items[i])
+			}{{end}}
+			page.{{.Store}}, page.TotalItems, page.State = {{if $isPtr}}{{toLower $sing}}{{else}}result.Items{{end}}, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
+		{{end -}}
+	default:
+		return nil, types.NewValidationError("{{toLower .Class}}", dataFacet, "GetPage",
+			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
+	}
+
+	return page, nil
+}
+{{end -}}
 
 // EXISTING_CODE
 // EXISTING_CODE

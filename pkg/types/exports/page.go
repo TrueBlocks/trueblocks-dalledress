@@ -25,6 +25,7 @@ type ExportsPage struct {
 	Statements    []Statement     `json:"statements"`
 	Transactions  []Transaction   `json:"transactions"`
 	Transfers     []Transfer      `json:"transfers"`
+	Withdrawals   []Withdrawal    `json:"withdrawals"`
 	TotalItems    int             `json:"totalItems"`
 	ExpectedTotal int             `json:"expectedTotal"`
 	IsFetching    bool            `json:"isFetching"`
@@ -69,6 +70,8 @@ func (ec *ExportsCollection) GetPage(
 		return ec.getBalancesPage(first, pageSize, sortSpec, filter)
 	case ExportsTransactions:
 		return ec.getTransactionsPage(first, pageSize, sortSpec, filter)
+	case ExportsWithdrawals:
+		return ec.getWithdrawalsPage(first, pageSize, sortSpec, filter)
 	default:
 		return nil, fmt.Errorf("GetPage: unexpected dataFacet: %v", dataFacet)
 	}
@@ -194,6 +197,36 @@ func (ec *ExportsCollection) getTransactionsPage(first, pageSize int, sortSpec s
 
 	page.IsFetching = ec.transactionsFacet.IsFetching()
 	page.ExpectedTotal = ec.transactionsFacet.ExpectedCount()
+	return page, nil
+}
+
+func (ec *ExportsCollection) getWithdrawalsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
+	page := &ExportsPage{
+		Facet: ExportsWithdrawals,
+	}
+	filter = strings.ToLower(filter)
+
+	var filterFunc = func(item *Withdrawal) bool {
+		if filter == "" {
+			return true
+		}
+		// TODO: Implement proper filtering based on withdrawal fields
+		return false // TODO: strings.Contains(strings.ToLower(item.Hash.Hex()), filter)
+	}
+
+	var sortFunc = func(items []Withdrawal, sort sdk.SortSpec) error {
+		// TODO: Implement proper sorting when SDK methods are available
+		return nil
+	}
+
+	if result, err := ec.withdrawalsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+		return nil, types.NewStoreError("exports", ExportsWithdrawals, "GetPage", err)
+	} else {
+		page.Withdrawals, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+	}
+
+	page.IsFetching = ec.withdrawalsFacet.IsFetching()
+	page.ExpectedTotal = ec.withdrawalsFacet.ExpectedCount()
 	return page, nil
 }
 

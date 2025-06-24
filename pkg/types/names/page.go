@@ -69,7 +69,6 @@ func (c *NamesCollection) GetPage(
 	case NamesBaddress:
 		facet = c.baddressFacet
 	default:
-		// This is truly a validation error - invalid DataFacet for this collection
 		return nil, types.NewValidationError("names", dataFacet, "GetPage",
 			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
@@ -93,7 +92,6 @@ func (c *NamesCollection) GetPage(
 		sortFunc,
 	)
 	if err != nil {
-		// This is likely an SDK or store error, not a validation error
 		return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
 	}
 

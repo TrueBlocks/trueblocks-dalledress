@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (c *MonitorsCollection) matchesFilter(monitor *Monitor, filter string) bool {
+func (c *MonitorsCollection) matchesMonitorFilter(monitor *Monitor, filter string) bool {
 	if filter == "" {
 		return true
 	}

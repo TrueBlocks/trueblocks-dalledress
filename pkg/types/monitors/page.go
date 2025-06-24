@@ -11,6 +11,7 @@ package monitors
 import (
 	// EXISTING_CODE
 	"fmt"
+	"strings"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -47,7 +48,6 @@ func (p *MonitorsPage) GetState() types.LoadState {
 	return p.State
 }
 
-// EXISTING_CODE
 func (c *MonitorsCollection) GetPage(
 	payload *types.Payload,
 	first, pageSize int,
@@ -56,45 +56,38 @@ func (c *MonitorsCollection) GetPage(
 ) (types.Page, error) {
 	dataFacet := payload.DataFacet
 
+	page := &MonitorsPage{
+		Facet: dataFacet,
+	}
+	filter = strings.ToLower(filter)
+
 	switch dataFacet {
 	case MonitorsMonitors:
+		facet := c.monitorsFacet
 		var filterFunc func(*Monitor) bool
 		if filter != "" {
-			filterFunc = func(monitor *Monitor) bool {
-				return c.matchesFilter(monitor, filter)
+			filterFunc = func(item *Monitor) bool {
+				return c.matchesMonitorFilter(item, filter)
 			}
 		}
-
-		var sortFunc func([]Monitor, sdk.SortSpec) error
-		sortFunc = func(items []Monitor, sort sdk.SortSpec) error {
+		sortFunc := func(items []Monitor, sort sdk.SortSpec) error {
 			return sdk.SortMonitors(items, sort)
 		}
-
-		pageResult, err := c.monitorsFacet.GetPage(
-			first,
-			pageSize,
-			filterFunc,
-			sortSpec,
-			sortFunc,
-		)
-		if err != nil {
-			// This is likely an SDK or store error, not a validation error
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("monitors", dataFacet, "GetPage", err)
-		}
+		} else {
 
-		return &MonitorsPage{
-			Facet:         dataFacet,
-			Monitors:      pageResult.Items,
-			TotalItems:    pageResult.TotalItems,
-			ExpectedTotal: c.getExpectedTotal(dataFacet),
-			IsFetching:    c.monitorsFacet.IsFetching(),
-			State:         pageResult.State,
-		}, nil
+			page.Monitors, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	default:
-		// This is truly a validation error - invalid DataFacet for this collection
 		return nil, types.NewValidationError("monitors", dataFacet, "GetPage",
-			fmt.Errorf("unsupported dataFacet: %s", dataFacet))
+			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
+
+	return page, nil
 }
 
+// EXISTING_CODE
 // EXISTING_CODE

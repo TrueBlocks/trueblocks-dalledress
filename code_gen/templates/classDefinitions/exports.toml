@@ -22,3 +22,8 @@ store = "Transfers"
 [[facets]]
 name = "Transactions"
 store = "Transactions"
+
+[[facets]]
+name = "Withdrawals"
+store = "Withdrawals"
+

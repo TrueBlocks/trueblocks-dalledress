@@ -50,7 +50,6 @@ func (p *ChunksPage) GetState() types.LoadState {
 	return p.State
 }
 
-// EXISTING_CODE
 func (c *ChunksCollection) GetPage(
 	payload *types.Payload,
 	first, pageSize int,
@@ -66,20 +65,17 @@ func (c *ChunksCollection) GetPage(
 
 	switch dataFacet {
 	case ChunksStats:
+		facet := c.statsFacet
 		var filterFunc func(*Stats) bool
 		if filter != "" {
-			filterFunc = func(stat *Stats) bool {
-				return c.matchesStatsFilter(stat, filter)
+			filterFunc = func(item *Stats) bool {
+				return c.matchesStatsFilter(item, filter)
 			}
 		}
-
 		sortFunc := func(items []Stats, sort sdk.SortSpec) error {
-			// Placeholder - implement actual sorting if needed
-			return nil
+			return sdk.SortStats(items, sort)
 		}
-
-		if result, err := c.statsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			// This is likely an SDK or store error, not a validation error
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
 			stats := make([]*Stats, 0, len(result.Items))
@@ -88,24 +84,20 @@ func (c *ChunksCollection) GetPage(
 			}
 			page.Stats, page.TotalItems, page.State = stats, result.TotalItems, result.State
 		}
-		page.IsFetching = c.statsFacet.IsFetching()
-		page.ExpectedTotal = c.statsFacet.ExpectedCount()
-
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case ChunksIndex:
+		facet := c.indexFacet
 		var filterFunc func(*Index) bool
 		if filter != "" {
-			filterFunc = func(index *Index) bool {
-				return c.matchesIndexFilter(index, filter)
+			filterFunc = func(item *Index) bool {
+				return c.matchesIndexFilter(item, filter)
 			}
 		}
-
 		sortFunc := func(items []Index, sort sdk.SortSpec) error {
-			// Placeholder - implement actual sorting if needed
-			return nil
+			return sdk.SortIndex(items, sort)
 		}
-
-		if result, err := c.indexFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			// This is likely an SDK or store error, not a validation error
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
 			index := make([]*Index, 0, len(result.Items))
@@ -114,50 +106,42 @@ func (c *ChunksCollection) GetPage(
 			}
 			page.Index, page.TotalItems, page.State = index, result.TotalItems, result.State
 		}
-		page.IsFetching = c.indexFacet.IsFetching()
-		page.ExpectedTotal = c.indexFacet.ExpectedCount()
-
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case ChunksBlooms:
+		facet := c.bloomsFacet
 		var filterFunc func(*Bloom) bool
 		if filter != "" {
-			filterFunc = func(bloom *Bloom) bool {
-				return c.matchesBloomsFilter(bloom, filter)
+			filterFunc = func(item *Bloom) bool {
+				return c.matchesBloomFilter(item, filter)
 			}
 		}
-
 		sortFunc := func(items []Bloom, sort sdk.SortSpec) error {
-			// Placeholder - implement actual sorting if needed
-			return nil
+			return sdk.SortBlooms(items, sort)
 		}
-
-		if result, err := c.bloomsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			// This is likely an SDK or store error, not a validation error
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
-			blooms := make([]*Bloom, 0, len(result.Items))
+			bloom := make([]*Bloom, 0, len(result.Items))
 			for i := range result.Items {
-				blooms = append(blooms, &result.Items[i])
+				bloom = append(bloom, &result.Items[i])
 			}
-			page.Blooms, page.TotalItems, page.State = blooms, result.TotalItems, result.State
+			page.Blooms, page.TotalItems, page.State = bloom, result.TotalItems, result.State
 		}
-		page.IsFetching = c.bloomsFacet.IsFetching()
-		page.ExpectedTotal = c.bloomsFacet.ExpectedCount()
-
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case ChunksManifest:
+		facet := c.manifestFacet
 		var filterFunc func(*Manifest) bool
 		if filter != "" {
-			filterFunc = func(manifest *Manifest) bool {
-				return c.matchesManifestFilter(manifest, filter)
+			filterFunc = func(item *Manifest) bool {
+				return c.matchesManifestFilter(item, filter)
 			}
 		}
-
 		sortFunc := func(items []Manifest, sort sdk.SortSpec) error {
-			// Placeholder - implement actual sorting if needed
-			return nil
+			return sdk.SortManifest(items, sort)
 		}
-
-		if result, err := c.manifestFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			// This is likely an SDK or store error, not a validation error
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("chunks", dataFacet, "GetPage", err)
 		} else {
 			manifest := make([]*Manifest, 0, len(result.Items))
@@ -166,16 +150,15 @@ func (c *ChunksCollection) GetPage(
 			}
 			page.Manifest, page.TotalItems, page.State = manifest, result.TotalItems, result.State
 		}
-		page.IsFetching = c.manifestFacet.IsFetching()
-		page.ExpectedTotal = c.manifestFacet.ExpectedCount()
-
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	default:
-		// This is truly a validation error - invalid DataFacet for this collection
 		return nil, types.NewValidationError("chunks", dataFacet, "GetPage",
-			fmt.Errorf("unsupported data facet: %v", dataFacet))
+			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
 
 	return page, nil
 }
 
+// EXISTING_CODE
 // EXISTING_CODE

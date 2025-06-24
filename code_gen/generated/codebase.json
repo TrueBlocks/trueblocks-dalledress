@@ -475,6 +475,10 @@
                         {
                             "name": "Transactions",
                             "store": "Transactions"
+                        },
+                        {
+                            "name": "Withdrawals",
+                            "store": "Withdrawals"
                         }
                     ]
                 }
@@ -1077,6 +1081,10 @@
                 {
                     "name": "Transactions",
                     "store": "Transactions"
+                },
+                {
+                    "name": "Withdrawals",
+                    "store": "Withdrawals"
                 }
             ]
         },

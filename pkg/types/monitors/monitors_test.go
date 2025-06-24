@@ -37,22 +37,22 @@ func TestMonitorsMatchesFilter(t *testing.T) {
 	}
 
 	t.Run("AddressMatch", func(t *testing.T) {
-		assert.True(t, collection.matchesFilter(testMonitor, "1234"))
-		assert.True(t, collection.matchesFilter(testMonitor, "0x1234"))
+		assert.True(t, collection.matchesMonitorFilter(testMonitor, "1234"))
+		assert.True(t, collection.matchesMonitorFilter(testMonitor, "0x1234"))
 	})
 
 	t.Run("NameMatch", func(t *testing.T) {
-		assert.True(t, collection.matchesFilter(testMonitor, "test"))
-		assert.True(t, collection.matchesFilter(testMonitor, "Monitor"))
+		assert.True(t, collection.matchesMonitorFilter(testMonitor, "test"))
+		assert.True(t, collection.matchesMonitorFilter(testMonitor, "Monitor"))
 	})
 
 	t.Run("EmptyFilter", func(t *testing.T) {
-		result := collection.matchesFilter(testMonitor, "")
+		result := collection.matchesMonitorFilter(testMonitor, "")
 		assert.True(t, result)
 	})
 
 	t.Run("NoMatch", func(t *testing.T) {
-		assert.False(t, collection.matchesFilter(testMonitor, "nonexistent"))
+		assert.False(t, collection.matchesMonitorFilter(testMonitor, "nonexistent"))
 	})
 }
 

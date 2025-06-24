@@ -98,15 +98,6 @@ func (ac *AbisCollection) matchesAbiFilter(abi *Abi, filter string) bool {
 	return strings.Contains(strings.ToLower(abi.Name), filterLower)
 }
 
-func (ac *AbisCollection) matchesFunctionFilter(fn *Function, filter string) bool {
-	if filter == "" {
-		return true
-	}
-	filterLower := strings.ToLower(filter)
-	return strings.Contains(strings.ToLower(fn.Name), filterLower) ||
-		strings.Contains(strings.ToLower(fn.Encoding), filterLower)
-}
-
 func TestAbisCollectionDomainSpecific(t *testing.T) {
 	collection := NewAbisCollection()
 

@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
@@ -50,7 +49,6 @@ func (p *AbisPage) GetState() types.LoadState {
 	return p.State
 }
 
-// EXISTING_CODE
 func (c *AbisCollection) GetPage(
 	payload *types.Payload,
 	first, pageSize int,
@@ -58,69 +56,118 @@ func (c *AbisCollection) GetPage(
 	filter string,
 ) (types.Page, error) {
 	dataFacet := payload.DataFacet
+
 	page := &AbisPage{
 		Facet: dataFacet,
 	}
 	filter = strings.ToLower(filter)
 
-	var listFacet *facets.Facet[Abi]
-	var detailFacet *facets.Facet[Function]
-
 	switch dataFacet {
 	case AbisDownloaded:
-		listFacet = c.downloadedFacet
+		facet := c.downloadedFacet
+		var filterFunc func(*Abi) bool
+		if filter != "" {
+			filterFunc = func(item *Abi) bool {
+				return c.matchesDownloadedFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Abi, sort sdk.SortSpec) error {
+			return sdk.SortAbis(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
+		} else {
+
+			page.Abis, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case AbisKnown:
-		listFacet = c.knownFacet
+		facet := c.knownFacet
+		var filterFunc func(*Abi) bool
+		if filter != "" {
+			filterFunc = func(item *Abi) bool {
+				return c.matchesKnownFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Abi, sort sdk.SortSpec) error {
+			return sdk.SortAbis(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
+		} else {
+
+			page.Abis, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case AbisFunctions:
-		detailFacet = c.functionsFacet
+		facet := c.functionsFacet
+		var filterFunc func(*Function) bool
+		if filter != "" {
+			filterFunc = func(item *Function) bool {
+				return c.matchesFunctionFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Function, sort sdk.SortSpec) error {
+			return sdk.SortFunctions(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
+		} else {
+
+			page.Functions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case AbisEvents:
-		detailFacet = c.eventsFacet
+		facet := c.eventsFacet
+		var filterFunc func(*Function) bool
+		if filter != "" {
+			filterFunc = func(item *Function) bool {
+				return c.matchesEventFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Function, sort sdk.SortSpec) error {
+			return sdk.SortFunctions(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
+		} else {
+
+			page.Functions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	default:
-		// This is truly a validation error - invalid DataFacet for this collection
 		return nil, types.NewValidationError("abis", dataFacet, "GetPage",
 			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
 
-	if listFacet != nil {
-		var listFilterFunc = func(item *Abi) bool {
-			return strings.Contains(strings.ToLower(item.Name), filter)
-		}
-		var listSortFunc = func(items []Abi, sort sdk.SortSpec) error {
-			return sdk.SortAbis(items, sort)
-		}
-		if result, err := listFacet.GetPage(first, pageSize, listFilterFunc, sortSpec, listSortFunc); err != nil {
-			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
-		} else {
-			page.Abis, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-		}
-		page.IsFetching = listFacet.IsFetching()
-		page.ExpectedTotal = listFacet.ExpectedCount()
-
-	} else if detailFacet != nil {
-		var detailFilter = func(item *Function) bool {
-			return strings.Contains(strings.ToLower(item.Name), filter) ||
-				strings.Contains(strings.ToLower(item.Encoding), filter)
-		}
-		var detailSortFunc = func(items []Function, sort sdk.SortSpec) error {
-			return sdk.SortFunctions(items, sort)
-		}
-		if result, err := detailFacet.GetPage(first, pageSize, detailFilter, sortSpec, detailSortFunc); err != nil {
-			// This is likely an SDK or store error, not a validation error
-			return nil, types.NewStoreError("abis", dataFacet, "GetPage", err)
-		} else {
-			page.Functions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-		}
-		page.IsFetching = detailFacet.IsFetching()
-		page.ExpectedTotal = detailFacet.ExpectedCount()
-
-	} else {
-		// This should not happen since we validated dataFacet above
-		return nil, types.NewValidationError("abis", dataFacet, "GetPage",
-			fmt.Errorf("no facet found for dataFacet: %v", dataFacet))
-	}
-
 	return page, nil
+}
+
+// EXISTING_CODE
+func (c *AbisCollection) matchesDownloadedFilter(item *Abi, filter string) bool {
+	return strings.Contains(strings.ToLower(item.Name), filter)
+}
+
+func (c *AbisCollection) matchesKnownFilter(item *Abi, filter string) bool {
+	return strings.Contains(strings.ToLower(item.Name), filter)
+}
+
+func (ac *AbisCollection) matchesFunctionFilter(fn *Function, filter string) bool {
+	if filter == "" {
+		return true
+	}
+	filterLower := strings.ToLower(filter)
+	return strings.Contains(strings.ToLower(fn.Name), filterLower) ||
+		strings.Contains(strings.ToLower(fn.Encoding), filterLower)
+}
+
+func (c *AbisCollection) matchesEventFilter(item *Function, filter string) bool {
+	return strings.Contains(strings.ToLower(item.Name), filter) ||
+		strings.Contains(strings.ToLower(item.Encoding), filter)
 }
 
 // EXISTING_CODE

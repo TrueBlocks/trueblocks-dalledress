@@ -48,7 +48,7 @@ func (c *ChunksCollection) matchesIndexFilter(index *Index, filter string) bool 
 	return false
 }
 
-func (c *ChunksCollection) matchesBloomsFilter(bloom *Bloom, filter string) bool {
+func (c *ChunksCollection) matchesBloomFilter(bloom *Bloom, filter string) bool {
 	filterLower := strings.ToLower(filter)
 
 	// Filter by various fields in ChunkBloom
@@ -87,4 +87,3 @@ func (c *ChunksCollection) matchesManifestFilter(manifest *Manifest, filter stri
 
 	return false
 }
-

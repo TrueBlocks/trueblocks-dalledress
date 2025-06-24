@@ -165,6 +165,7 @@ export namespace exports {
 	    statements: types.Statement[];
 	    transactions: types.Transaction[];
 	    transfers: types.Transfer[];
+	    withdrawals: types.Withdrawal[];
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
@@ -181,6 +182,7 @@ export namespace exports {
 	        this.statements = this.convertValues(source["statements"], types.Statement);
 	        this.transactions = this.convertValues(source["transactions"], types.Transaction);
 	        this.transfers = this.convertValues(source["transfers"], types.Transfer);
+	        this.withdrawals = this.convertValues(source["withdrawals"], types.Withdrawal);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];
@@ -703,6 +705,7 @@ export namespace types {
 	    BALANCES = "balances",
 	    TRANSFERS = "transfers",
 	    TRANSACTIONS = "transactions",
+	    WITHDRAWALS = "withdrawals",
 	    MONITORS = "monitors",
 	    ALL = "all",
 	    CUSTOM = "custom",
@@ -1868,6 +1871,47 @@ export namespace types {
 	        this.transactionIndex = source["transactionIndex"];
 	        this.log = this.convertValues(source["log"], Log);
 	        this.transaction = this.convertValues(source["transaction"], Transaction);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Withdrawal {
+	    address: base.Address;
+	    // Go type: base
+	    amount: any;
+	    blockNumber: number;
+	    index: number;
+	    timestamp: number;
+	    validatorIndex: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Withdrawal(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.address = this.convertValues(source["address"], base.Address);
+	        this.amount = this.convertValues(source["amount"], null);
+	        this.blockNumber = source["blockNumber"];
+	        this.index = source["index"];
+	        this.timestamp = source["timestamp"];
+	        this.validatorIndex = source["validatorIndex"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

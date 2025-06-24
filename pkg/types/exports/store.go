@@ -29,6 +29,7 @@ type Balance = sdk.Balance
 type Statement = sdk.Statement
 type Transaction = sdk.Transaction
 type Transfer = sdk.Transfer
+type Withdrawal = sdk.Withdrawal
 
 var (
 	balancesStore   = make(map[string]*store.Store[Balance])
@@ -42,6 +43,9 @@ var (
 
 	transfersStore   = make(map[string]*store.Store[Transfer])
 	transfersStoreMu sync.Mutex
+
+	withdrawalsStore   = make(map[string]*store.Store[Withdrawal])
+	withdrawalsStoreMu sync.Mutex
 )
 
 func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
@@ -246,6 +250,46 @@ func (c *ExportsCollection) getTransfersStore() *store.Store[Transfer] {
 	return theStore
 }
 
+func (c *ExportsCollection) getWithdrawalsStore() *store.Store[Withdrawal] {
+	withdrawalsStoreMu.Lock()
+	defer withdrawalsStoreMu.Unlock()
+
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
+	theStore := withdrawalsStore[storeKey]
+	if theStore == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil
+		}
+
+		processFunc := func(item interface{}) *Withdrawal {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			if it, ok := item.(*Withdrawal); ok {
+				return it
+			}
+			return nil
+		}
+
+		mappingFunc := func(item *Withdrawal) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		// EXISTING_CODE
+		storeName := fmt.Sprintf("exports_withdrawals_%s_%s", chain, address)
+		// EXISTING_CODE
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		withdrawalsStore[storeKey] = theStore
+	}
+
+	return theStore
+}
+
 func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet) string {
 	switch dataFacet {
 	case ExportsStatements:
@@ -256,6 +300,8 @@ func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet) string {
 		return "exports-transfers"
 	case ExportsTransactions:
 		return "exports-transactions"
+	case ExportsWithdrawals:
+		return "exports-withdrawals"
 	default:
 		return ""
 	}
@@ -298,15 +344,17 @@ func GetExportsCollection(payload *types.Payload) *ExportsCollection {
 
 // EXISTING_CODE
 func GetExportsCount2(dataFacet string) (int, error) {
-	switch dataFacet {
-	case string(ExportsTransactions):
+	switch types.DataFacet(dataFacet) {
+	case ExportsTransactions:
 		return getExportsTransactionsCount()
-	case string(ExportsStatements):
+	case ExportsStatements:
 		return getExportsStatementsCount()
-	case string(ExportsTransfers):
+	case ExportsTransfers:
 		return getExportsTransfersCount()
-	case string(ExportsBalances):
+	case ExportsBalances:
 		return getExportsBalancesCount()
+	case ExportsWithdrawals:
+		return getExportsWithdrawalsCount()
 	default:
 		return 0, fmt.Errorf("unknown dataFacet: %s", dataFacet)
 	}
@@ -334,17 +382,18 @@ func getExportsTransactionsCount() (int, error) {
 }
 
 func getExportsStatementsCount() (int, error) {
-	// For statements, we can use the same base count since statements are derived from transactions
 	return getExportsTransactionsCount()
 }
 
 func getExportsTransfersCount() (int, error) {
-	// For transfers, we can use the same base count since transfers are derived from transactions
 	return getExportsTransactionsCount()
 }
 
 func getExportsBalancesCount() (int, error) {
-	// For balances, we can use the same base count since balances are derived from transactions
+	return getExportsTransactionsCount()
+}
+
+func getExportsWithdrawalsCount() (int, error) {
 	return getExportsTransactionsCount()
 }
 
@@ -379,6 +428,12 @@ func ResetExportsStore(dataFacet types.DataFacet) {
 			store.Reset()
 		}
 		balancesStoreMu.Unlock()
+	case ExportsWithdrawals:
+		withdrawalsStoreMu.Lock()
+		if store, exists := withdrawalsStore[storeKey]; exists {
+			store.Reset()
+		}
+		withdrawalsStoreMu.Unlock()
 	}
 }
 
@@ -403,6 +458,10 @@ func ClearExportsStores() {
 	balancesStoreMu.Lock()
 	delete(balancesStore, storeKey)
 	balancesStoreMu.Unlock()
+
+	withdrawalsStoreMu.Lock()
+	delete(withdrawalsStore, storeKey)
+	withdrawalsStoreMu.Unlock()
 }
 
 // ClearAllExportsStores clears all cached stores (useful for global reset)
@@ -422,6 +481,10 @@ func ClearAllExportsStores() {
 	balancesStoreMu.Lock()
 	balancesStore = make(map[string]*store.Store[Balance])
 	balancesStoreMu.Unlock()
+
+	withdrawalsStoreMu.Lock()
+	withdrawalsStore = make(map[string]*store.Store[Withdrawal])
+	withdrawalsStoreMu.Unlock()
 }
 
 func getStoreKey(chain, address string) string {

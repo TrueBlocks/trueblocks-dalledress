@@ -48,17 +48,17 @@ func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
 	balancesStoreMu.Lock()
 	defer balancesStoreMu.Unlock()
 
-	chainName := preferences.GetChain()
-	storeKey := getStoreKey(chainName, c.address)
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
 	theStore := balancesStore[storeKey]
-
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			exportOpts := sdk.ExportOptions{
-				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
 				RenderCtx: ctx,
-				Addrs:     []string{c.address},
+				Addrs:     []string{address},
 			}
 			if _, _, err := exportOpts.ExportBalances(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsBalances, "fetch", err)
@@ -85,7 +85,7 @@ func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_balances_%s_%s", chainName, c.address)
+		storeName := fmt.Sprintf("exports_balances_%s_%s", chain, address)
 		// EXISTING_CODE
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		balancesStore[storeKey] = theStore
@@ -98,17 +98,17 @@ func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
 	statementsStoreMu.Lock()
 	defer statementsStoreMu.Unlock()
 
-	chainName := preferences.GetChain()
-	storeKey := getStoreKey(chainName, c.address)
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
 	theStore := statementsStore[storeKey]
-
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			exportOpts := sdk.ExportOptions{
-				Globals:    sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
+				Globals:    sdk.Globals{Cache: true, Verbose: true, Chain: chain},
 				RenderCtx:  ctx,
-				Addrs:      []string{c.address},
+				Addrs:      []string{address},
 				Accounting: true, // Enable accounting for statements
 			}
 			if _, _, err := exportOpts.ExportStatements(); err != nil {
@@ -136,7 +136,7 @@ func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_statements_%s_%s", chainName, c.address)
+		storeName := fmt.Sprintf("exports_statements_%s_%s", chain, address)
 		// EXISTING_CODE
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		statementsStore[storeKey] = theStore
@@ -149,17 +149,17 @@ func (c *ExportsCollection) getTransactionsStore() *store.Store[Transaction] {
 	transactionsStoreMu.Lock()
 	defer transactionsStoreMu.Unlock()
 
-	chainName := preferences.GetChain()
-	storeKey := getStoreKey(chainName, c.address)
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
 	theStore := transactionsStore[storeKey]
-
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			exportOpts := sdk.ExportOptions{
-				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
 				RenderCtx: ctx,
-				Addrs:     []string{c.address},
+				Addrs:     []string{address},
 			}
 			if _, _, err := exportOpts.Export(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsTransactions, "fetch", err)
@@ -186,7 +186,7 @@ func (c *ExportsCollection) getTransactionsStore() *store.Store[Transaction] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_transactions_%s_%s", chainName, c.address)
+		storeName := fmt.Sprintf("exports_transactions_%s_%s", chain, address)
 		// EXISTING_CODE
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		transactionsStore[storeKey] = theStore
@@ -199,17 +199,17 @@ func (c *ExportsCollection) getTransfersStore() *store.Store[Transfer] {
 	transfersStoreMu.Lock()
 	defer transfersStoreMu.Unlock()
 
-	chainName := preferences.GetChain()
-	storeKey := getStoreKey(chainName, c.address)
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
 	theStore := transfersStore[storeKey]
-
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			exportOpts := sdk.ExportOptions{
-				Globals:    sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
+				Globals:    sdk.Globals{Cache: true, Verbose: true, Chain: chain},
 				RenderCtx:  ctx,
-				Addrs:      []string{c.address},
+				Addrs:      []string{address},
 				Accounting: true, // Enable accounting for transfers
 			}
 			if _, _, err := exportOpts.ExportTransfers(); err != nil {
@@ -237,7 +237,7 @@ func (c *ExportsCollection) getTransfersStore() *store.Store[Transfer] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_transfers_%s_%s", chainName, c.address)
+		storeName := fmt.Sprintf("exports_transfers_%s_%s", chain, address)
 		// EXISTING_CODE
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		transfersStore[storeKey] = theStore
@@ -262,10 +262,12 @@ func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetExportsCount(payload types.Payload) (int, error) {
-	chainName := preferences.GetChain()
+func GetExportsCount(payload *types.Payload) (int, error) {
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	countOpts := sdk.ExportOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
+		Globals: sdk.Globals{Cache: true, Chain: chain},
+		Addrs:   []string{address},
 	}
 	if countResult, _, err := countOpts.ExportCount(); err != nil {
 		return 0, fmt.Errorf("ExportsCount query error: %v", err)
@@ -280,44 +282,41 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetExportsCollection(payload types.Payload) *ExportsCollection {
+func GetExportsCollection(payload *types.Payload) *ExportsCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey(payload.Chain, payload.Address)
+	key := store.GetCollectionKey(payload)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}
 
-	collection := NewExportsCollection(payload.Address)
+	collection := NewExportsCollection()
 	collections[key] = collection
 	return collection
 }
 
 // EXISTING_CODE
-func GetExportsCount2(chain string, address string, dataFacet string) (int, error) {
+func GetExportsCount2(dataFacet string) (int, error) {
 	switch dataFacet {
 	case string(ExportsTransactions):
-		return getExportsTransactionsCount(chain, address)
+		return getExportsTransactionsCount()
 	case string(ExportsStatements):
-		return getExportsStatementsCount(chain, address)
+		return getExportsStatementsCount()
 	case string(ExportsTransfers):
-		return getExportsTransfersCount(chain, address)
+		return getExportsTransfersCount()
 	case string(ExportsBalances):
-		return getExportsBalancesCount(chain, address)
+		return getExportsBalancesCount()
 	default:
 		return 0, fmt.Errorf("unknown dataFacet: %s", dataFacet)
 	}
 }
 
-func getExportsTransactionsCount(chain string, address string) (int, error) {
-	chainName := chain
-	if chainName == "" {
-		chainName = preferences.GetChain()
-	}
-
+func getExportsTransactionsCount() (int, error) {
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	exportOpts := sdk.ExportOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
+		Globals: sdk.Globals{Cache: true, Chain: chain},
 		Addrs:   []string{address},
 	}
 
@@ -334,29 +333,26 @@ func getExportsTransactionsCount(chain string, address string) (int, error) {
 	}
 }
 
-func getExportsStatementsCount(chain string, address string) (int, error) {
+func getExportsStatementsCount() (int, error) {
 	// For statements, we can use the same base count since statements are derived from transactions
-	return getExportsTransactionsCount(chain, address)
+	return getExportsTransactionsCount()
 }
 
-func getExportsTransfersCount(chain string, address string) (int, error) {
+func getExportsTransfersCount() (int, error) {
 	// For transfers, we can use the same base count since transfers are derived from transactions
-	return getExportsTransactionsCount(chain, address)
+	return getExportsTransactionsCount()
 }
 
-func getExportsBalancesCount(chain string, address string) (int, error) {
+func getExportsBalancesCount() (int, error) {
 	// For balances, we can use the same base count since balances are derived from transactions
-	return getExportsTransactionsCount(chain, address)
+	return getExportsTransactionsCount()
 }
 
 // ResetExportsStore resets a specific store for a given chain, address, and dataFacet
-func ResetExportsStore(chain, address string, dataFacet types.DataFacet) {
-	chainName := chain
-	if chainName == "" {
-		chainName = preferences.GetChain()
-	}
-
-	storeKey := getStoreKey(chainName, address)
+func ResetExportsStore(dataFacet types.DataFacet) {
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
 
 	switch dataFacet {
 	case ExportsTransactions:
@@ -387,13 +383,10 @@ func ResetExportsStore(chain, address string, dataFacet types.DataFacet) {
 }
 
 // ClearExportsStores clears all cached stores for a given chain and address
-func ClearExportsStores(chain, address string) {
-	chainName := chain
-	if chainName == "" {
-		chainName = preferences.GetChain()
-	}
-
-	storeKey := getStoreKey(chainName, address)
+func ClearExportsStores() {
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
 
 	transactionsStoreMu.Lock()
 	delete(transactionsStore, storeKey)

@@ -13,7 +13,7 @@ import (
 )
 
 func (c *MonitorsCollection) Crud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
@@ -22,14 +22,14 @@ func (c *MonitorsCollection) Crud(
 		monitor = cast
 	}
 
-	chainName := preferences.GetChain()
+	chain := preferences.GetLastChain()
 
 	switch op {
 	case crud.Remove:
 		opts := sdk.MonitorsOptions{
 			Addrs:   []string{monitor.Address.Hex()},
 			Remove:  true,
-			Globals: sdk.Globals{Chain: chainName},
+			Globals: sdk.Globals{Chain: chain},
 		}
 		if _, _, err := opts.Monitors(); err != nil {
 			return err
@@ -46,7 +46,7 @@ func (c *MonitorsCollection) Crud(
 		opts := sdk.MonitorsOptions{
 			Addrs:   []string{monitor.Address.Hex()},
 			Delete:  true,
-			Globals: sdk.Globals{Cache: true, Chain: chainName},
+			Globals: sdk.Globals{Cache: true, Chain: chain},
 		}
 		if _, _, err := opts.Monitors(); err != nil {
 			return err
@@ -63,7 +63,7 @@ func (c *MonitorsCollection) Crud(
 		opts := sdk.MonitorsOptions{
 			Addrs:    []string{monitor.Address.Hex()},
 			Undelete: true,
-			Globals:  sdk.Globals{Cache: true, Chain: chainName},
+			Globals:  sdk.Globals{Cache: true, Chain: chain},
 		}
 		if _, _, err := opts.Monitors(); err != nil {
 			return err
@@ -83,10 +83,10 @@ func (c *MonitorsCollection) Crud(
 }
 
 func (c *MonitorsCollection) Clean(addresses []string) error {
-	chainName := preferences.GetChain()
+	chain := preferences.GetLastChain()
 
 	opts := sdk.MonitorsOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
+		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
 
 	if len(addresses) > 0 {

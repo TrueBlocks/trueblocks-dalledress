@@ -23,7 +23,7 @@ func New{{.Class}}Crud() *{{.Class}}Crud {
 }
 
 func (c *{{.Class}}Collection) Crud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {

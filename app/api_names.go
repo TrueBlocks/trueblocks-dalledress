@@ -12,7 +12,7 @@ import (
 )
 
 func (a *App) GetNamesPage(
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
@@ -22,7 +22,7 @@ func (a *App) GetNamesPage(
 }
 
 func (a *App) NamesCrud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
@@ -30,14 +30,14 @@ func (a *App) NamesCrud(
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetNamesSummary(payload types.Payload) types.Summary {
+func (a *App) GetNamesSummary(payload *types.Payload) types.Summary {
 	collection := names.GetNamesCollection(payload)
 	return collection.GetSummary()
 }
 
 // EXISTING_CODE
 func (a *App) NameFromAddress(address string) (*names.Name, bool) {
-	collection := names.GetNamesCollection(types.Payload{})
+	collection := names.GetNamesCollection(&types.Payload{})
 	return collection.NameFromAddress(base.HexToAddress(address))
 }
 

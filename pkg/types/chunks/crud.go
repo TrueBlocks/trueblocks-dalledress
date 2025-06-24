@@ -14,7 +14,7 @@ func NewChunksCrud() *ChunksCrud {
 }
 
 func (c *ChunksCollection) Crud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {

@@ -112,7 +112,7 @@ func TestAbisCollectionDomainSpecific(t *testing.T) {
 
 	t.Run("GetPageMultiFacetFiltering", func(t *testing.T) {
 		// Test ABI list filtering
-		payload := types.Payload{DataFacet: AbisDownloaded}
+		payload := &types.Payload{DataFacet: AbisDownloaded}
 		page, err := collection.GetPage(payload, 0, 10, sdk.SortSpec{}, "test")
 		if err == nil && page != nil {
 			abisPage := assertAbisPage(t, page)
@@ -121,7 +121,7 @@ func TestAbisCollectionDomainSpecific(t *testing.T) {
 		}
 
 		// Test function filtering
-		payload = types.Payload{DataFacet: AbisFunctions}
+		payload = &types.Payload{DataFacet: AbisFunctions}
 		page, err = collection.GetPage(payload, 0, 10, sdk.SortSpec{}, "transfer")
 		if err == nil && page != nil {
 			abisPage := assertAbisPage(t, page)
@@ -134,7 +134,7 @@ func TestAbisCollectionDomainSpecific(t *testing.T) {
 		// Test that different facets work correctly
 		facets := []types.DataFacet{AbisDownloaded, AbisKnown, AbisFunctions, AbisEvents}
 		for _, facet := range facets {
-			payload := types.Payload{DataFacet: facet}
+			payload := &types.Payload{DataFacet: facet}
 			page, err := collection.GetPage(payload, 0, 5, sdk.SortSpec{}, "")
 			if err == nil && page != nil {
 				abisPage := assertAbisPage(t, page)

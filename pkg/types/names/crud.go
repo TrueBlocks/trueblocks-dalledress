@@ -13,7 +13,7 @@ import (
 var namesLock atomic.Int32
 
 func (c *NamesCollection) Crud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {

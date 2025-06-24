@@ -69,7 +69,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	app.exports = nil
 	// ADD_ROUTE
 
-	emptyPayload := types.Payload{}
+	emptyPayload := &types.Payload{}
 
 	app.collections = make([]types.Collection, 0, 4)
 	app.RegisterCollection(abis.GetAbisCollection(emptyPayload))
@@ -343,7 +343,7 @@ func (a *App) Reload(dataFacet types.DataFacet, str1, str2 string) error {
 	lastView := a.GetAppPreferences().LastView
 
 	// ADD_ROUTE
-	emptyPayload := types.Payload{}
+	emptyPayload := &types.Payload{}
 	switch lastView {
 	case "/names":
 		names.GetNamesCollection(emptyPayload).Reset(dataFacet)
@@ -394,10 +394,7 @@ func (a *App) CancelAllFetches() int {
 
 func (a *App) GetNodeStatus() *coreTypes.MetaData {
 	defer logging.Silence()()
-
-	chainName := preferences.GetChain()
-	a.meta, _ = sdk.GetMetaData(chainName)
-
+	a.meta, _ = sdk.GetMetaData(preferences.GetLastChain())
 	return a.meta
 }
 
@@ -407,9 +404,9 @@ func (a *App) RegisterCollection(collection types.Collection) {
 
 func getCollectionPage[T any](
 	collection interface {
-		GetPage(types.Payload, int, int, sdk.SortSpec, string) (types.Page, error)
+		GetPage(*types.Payload, int, int, sdk.SortSpec, string) (types.Page, error)
 	},
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,

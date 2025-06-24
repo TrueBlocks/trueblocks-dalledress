@@ -40,9 +40,9 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chainName := preferences.GetChain()
+			chain := preferences.GetLastChain()
 			listOpts := sdk.MonitorsOptions{
-				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
 				RenderCtx: ctx,
 			}
 			if _, _, err := listOpts.MonitorsList(); err != nil {
@@ -90,10 +90,10 @@ func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetMonitorsCount(payload types.Payload) (int, error) {
-	chainName := preferences.GetChain()
+func GetMonitorsCount(payload *types.Payload) (int, error) {
+	chain := preferences.GetLastChain()
 	countOpts := sdk.MonitorsOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
+		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
 	if countResult, _, err := countOpts.MonitorsCount(); err != nil {
 		return 0, fmt.Errorf("MonitorsCount query error: %v", err)
@@ -108,11 +108,11 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetMonitorsCollection(payload types.Payload) *MonitorsCollection {
+func GetMonitorsCollection(payload *types.Payload) *MonitorsCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey("", "")
+	key := store.GetCollectionKey(payload)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}

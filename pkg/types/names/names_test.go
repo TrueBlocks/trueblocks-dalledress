@@ -74,7 +74,7 @@ func TestNamesCollectionDomainSpecificFiltering(t *testing.T) {
 	collection := NewNamesCollection()
 
 	t.Run("GetPageWithDomainSpecificFilter", func(t *testing.T) {
-		payload := types.Payload{DataFacet: NamesAll}
+		payload := &types.Payload{DataFacet: NamesAll}
 		page, err := collection.GetPage(payload, 0, 10, sdk.SortSpec{}, "test")
 
 		if err == nil && page != nil {

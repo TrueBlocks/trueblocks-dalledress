@@ -53,7 +53,7 @@ func (p *ExportsPage) GetState() types.LoadState {
 
 // EXISTING_CODE
 func (ec *ExportsCollection) GetPage(
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,

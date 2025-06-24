@@ -48,8 +48,8 @@ type AppPreferences struct {
 	LastViewNoWizard string            `json:"lastViewNoWizard,omitempty"`
 	MenuCollapsed    bool              `json:"menuCollapsed,omitempty"`
 	Name             string            `json:"name,omitempty"`
-	RecentProjects   []string          `json:"recentProjects,omitempty"`
-	Version          string            `json:"version,omitempty"`
+	RecentProjects   []string          `json:"recentProjects"`
+	Version          string            `json:"version"`
 }
 
 func (p *AppPreferences) String() string {

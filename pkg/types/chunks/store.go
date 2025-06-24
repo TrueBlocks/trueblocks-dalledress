@@ -52,11 +52,11 @@ func (c *ChunksCollection) getBloomsStore() *store.Store[Bloom] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chainName := preferences.GetChain()
+			chain := preferences.GetLastChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
 					Verbose: false, // Set to false to avoid weird output issues
-					Chain:   chainName,
+					Chain:   chain,
 				},
 				RenderCtx: ctx,
 			}
@@ -107,11 +107,11 @@ func (c *ChunksCollection) getIndexStore() *store.Store[Index] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chainName := preferences.GetChain()
+			chain := preferences.GetLastChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
 					Verbose: true,
-					Chain:   chainName,
+					Chain:   chain,
 				},
 				RenderCtx: ctx,
 			}
@@ -163,11 +163,11 @@ func (c *ChunksCollection) getManifestStore() *store.Store[Manifest] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chainName := preferences.GetChain()
+			chain := preferences.GetLastChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
 					Verbose: true,
-					Chain:   chainName,
+					Chain:   chain,
 				},
 				RenderCtx: ctx,
 			}
@@ -218,11 +218,11 @@ func (c *ChunksCollection) getStatsStore() *store.Store[Stats] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chainName := preferences.GetChain()
+			chain := preferences.GetLastChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
 					Verbose: true,
-					Chain:   chainName,
+					Chain:   chain,
 				},
 				RenderCtx: ctx,
 			}
@@ -281,10 +281,10 @@ func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetChunksCount(payload types.Payload) (int, error) {
-	chainName := preferences.GetChain()
+func GetChunksCount(payload *types.Payload) (int, error) {
+	chain := preferences.GetLastChain()
 	countOpts := sdk.ChunksOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
+		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
 	if countResult, _, err := countOpts.ChunksCount(); err != nil {
 		return 0, fmt.Errorf("ChunksCount query error: %v", err)
@@ -299,11 +299,11 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetChunksCollection(payload types.Payload) *ChunksCollection {
+func GetChunksCollection(payload *types.Payload) *ChunksCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey("", "")
+	key := store.GetCollectionKey(payload)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}

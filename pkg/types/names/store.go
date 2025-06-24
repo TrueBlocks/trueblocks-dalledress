@@ -41,9 +41,9 @@ func (c *NamesCollection) getNamesStore() *store.Store[Name] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chainName := preferences.GetChain()
+			chain := preferences.GetLastChain()
 			listOpts := sdk.NamesOptions{
-				Globals:   sdk.Globals{Verbose: true, Chain: chainName},
+				Globals:   sdk.Globals{Verbose: true, Chain: chain},
 				RenderCtx: ctx,
 				All:       true,
 			}
@@ -104,10 +104,10 @@ func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetNamesCount(payload types.Payload) (int, error) {
-	chainName := preferences.GetChain()
+func GetNamesCount(payload *types.Payload) (int, error) {
+	chain := preferences.GetLastChain()
 	countOpts := sdk.NamesOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
+		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
 	if countResult, _, err := countOpts.NamesCount(); err != nil {
 		return 0, fmt.Errorf("NamesCount query error: %v", err)
@@ -122,11 +122,11 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetNamesCollection(payload types.Payload) *NamesCollection {
+func GetNamesCollection(payload *types.Payload) *NamesCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey("", "")
+	key := store.GetCollectionKey(payload)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}

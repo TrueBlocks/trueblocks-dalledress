@@ -10,7 +10,7 @@ import (
 )
 
 func (a *App) GetChunksPage(
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
@@ -20,7 +20,7 @@ func (a *App) GetChunksPage(
 }
 
 func (a *App) ChunksCrud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
@@ -28,7 +28,7 @@ func (a *App) ChunksCrud(
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetChunksSummary(payload types.Payload) types.Summary {
+func (a *App) GetChunksSummary(payload *types.Payload) types.Summary {
 	collection := chunks.GetChunksCollection(payload)
 	return collection.GetSummary()
 }

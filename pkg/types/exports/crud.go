@@ -14,7 +14,7 @@ func NewExportsCrud() *ExportsCrud {
 }
 
 func (c *ExportsCollection) Crud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {

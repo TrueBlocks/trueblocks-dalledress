@@ -52,7 +52,7 @@ func (p *AbisPage) GetState() types.LoadState {
 
 // EXISTING_CODE
 func (c *AbisCollection) GetPage(
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
 	filter string,

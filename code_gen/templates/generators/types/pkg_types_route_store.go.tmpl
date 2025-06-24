@@ -26,7 +26,7 @@ import (
 
 var (
 	{{range .Stores}}
-	{{toLower .}}Store *store.Store[{{toSingular .}}]
+	{{toLower .}}Store {{if $isExports}}= make(map[string]{{end}}*store.Store[{{toSingular .}}]{{if $isExports}}){{end}}
 	{{toLower .}}StoreMu   sync.Mutex
 	{{end}}
 )
@@ -36,7 +36,12 @@ func (c *{{$class}}Collection) get{{.}}Store() *store.Store[{{toSingular .}}] {
 	{{toLower .}}StoreMu.Lock()
 	defer {{toLower .}}StoreMu.Unlock()
 
-	theStore := {{toLower .}}Store
+{{if $isExports}}	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
+	theStore := {{toLower .}}Store[storeKey]
+{{else}}	theStore := {{toLower .}}Store
+{{end -}}
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
@@ -62,7 +67,7 @@ func (c *{{$class}}Collection) get{{.}}Store() *store.Store[{{toSingular .}}] {
 		// EXISTING_CODE
 		// EXISTING_CODE
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
-		{{toLower .}}Store = theStore
+		{{toLower .}}Store{{if $isExports}}[storeKey]{{end}} = theStore
 	}
 
 	return theStore
@@ -80,10 +85,10 @@ func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func Get{{.Class}}Count(payload types.Payload) (int, error) {
-	chainName := preferences.GetChain()
+func Get{{.Class}}Count(payload *types.Payload) (int, error) {
+	chain := preferences.GetLastChain()
 	countOpts := sdk.{{.Class}}Options{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
+		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
 	if countResult, _, err := countOpts.{{.Class}}Count(); err != nil {
 		return 0, fmt.Errorf("{{.Class}}Count query error: %v", err)
@@ -98,16 +103,16 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func Get{{.Class}}Collection(payload types.Payload) *{{.Class}}Collection {
+func Get{{.Class}}Collection(payload *types.Payload) *{{.Class}}Collection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey({{if $isExports}}payload.Chain, payload.Address{{else}}"", ""{{end}})
+	key := store.GetCollectionKey(payload)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}
 
-	collection := New{{.Class}}Collection({{if $isExports}}payload.Chain, payload.Address{{end}})
+	collection := New{{.Class}}Collection()
 	collections[key] = collection
 	return collection
 }

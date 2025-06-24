@@ -473,8 +473,8 @@ export namespace preferences {
 	    lastViewNoWizard?: string;
 	    menuCollapsed?: boolean;
 	    name?: string;
-	    recentProjects?: string[];
-	    version?: string;
+	    recentProjects: string[];
+	    version: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppPreferences(source);

@@ -11,7 +11,7 @@ import (
 )
 
 func (a *App) GetAbisPage(
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
@@ -21,7 +21,7 @@ func (a *App) GetAbisPage(
 }
 
 func (a *App) AbisCrud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
@@ -29,7 +29,7 @@ func (a *App) AbisCrud(
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetAbisSummary(payload types.Payload) types.Summary {
+func (a *App) GetAbisSummary(payload *types.Payload) types.Summary {
 	collection := abis.GetAbisCollection(payload)
 	return collection.GetSummary()
 }

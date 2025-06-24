@@ -36,7 +36,6 @@ func init() {
 }
 
 type ExportsCollection struct {
-	address           string
 	statementsFacet   *facets.Facet[Statement]
 	balancesFacet     *facets.Facet[Balance]
 	transfersFacet    *facets.Facet[Transfer]
@@ -45,10 +44,8 @@ type ExportsCollection struct {
 	summaryMutex      sync.RWMutex
 }
 
-func NewExportsCollection(address string) *ExportsCollection {
-	c := &ExportsCollection{
-		address: address,
-	}
+func NewExportsCollection() *ExportsCollection {
+	c := &ExportsCollection{}
 	c.ResetSummary()
 	c.initializeFacets()
 	return c

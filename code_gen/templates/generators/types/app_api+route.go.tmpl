@@ -14,7 +14,7 @@ import (
 )
 
 func (a *App) Get{{.Class}}Page(
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
@@ -24,7 +24,7 @@ func (a *App) Get{{.Class}}Page(
 }
 
 func (a *App) {{.Class}}Crud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
@@ -32,7 +32,7 @@ func (a *App) {{.Class}}Crud(
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) Get{{.Class}}Summary(payload types.Payload) types.Summary {
+func (a *App) Get{{.Class}}Summary(payload *types.Payload) types.Summary {
 	collection := {{toLower .Class}}.Get{{.Class}}Collection(payload)
 	return collection.GetSummary()
 }

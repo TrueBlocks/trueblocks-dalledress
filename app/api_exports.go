@@ -10,7 +10,7 @@ import (
 )
 
 func (a *App) GetExportsPage(
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
@@ -20,7 +20,7 @@ func (a *App) GetExportsPage(
 }
 
 func (a *App) ExportsCrud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
@@ -28,7 +28,7 @@ func (a *App) ExportsCrud(
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetExportsSummary(payload types.Payload) types.Summary {
+func (a *App) GetExportsSummary(payload *types.Payload) types.Summary {
 	collection := exports.GetExportsCollection(payload)
 	return collection.GetSummary()
 }

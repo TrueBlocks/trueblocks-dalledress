@@ -11,7 +11,7 @@ import (
 )
 
 func (a *App) GetMonitorsPage(
-	payload types.Payload,
+	payload *types.Payload,
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
@@ -21,7 +21,7 @@ func (a *App) GetMonitorsPage(
 }
 
 func (a *App) MonitorsCrud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
@@ -29,13 +29,13 @@ func (a *App) MonitorsCrud(
 	return collection.Crud(payload, op, item)
 }
 
-func (a *App) GetMonitorsSummary(payload types.Payload) types.Summary {
+func (a *App) GetMonitorsSummary(payload *types.Payload) types.Summary {
 	collection := monitors.GetMonitorsCollection(payload)
 	return collection.GetSummary()
 }
 
 // EXISTING_CODE
-func (a *App) MonitorsClean(payload types.Payload, addresses []string) error {
+func (a *App) MonitorsClean(payload *types.Payload, addresses []string) error {
 	collection := monitors.GetMonitorsCollection(payload)
 	return collection.Clean(addresses)
 }

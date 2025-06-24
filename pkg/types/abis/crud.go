@@ -12,7 +12,7 @@ import (
 )
 
 func (ac *AbisCollection) Crud(
-	payload types.Payload,
+	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {

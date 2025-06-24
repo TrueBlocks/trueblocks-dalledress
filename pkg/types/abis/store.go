@@ -44,9 +44,9 @@ func (c *AbisCollection) getAbisStore() *store.Store[Abi] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chainName := preferences.GetChain()
+			chain := preferences.GetLastChain()
 			listOpts := sdk.AbisOptions{
-				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chainName},
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
 				RenderCtx: ctx,
 			}
 			if _, _, err := listOpts.AbisList(); err != nil {
@@ -92,9 +92,9 @@ func (c *AbisCollection) getFunctionsStore() *store.Store[Function] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chainName := preferences.GetChain()
+			chain := preferences.GetLastChain()
 			detailOpts := sdk.AbisOptions{
-				Globals:   sdk.Globals{Cache: true, Chain: chainName},
+				Globals:   sdk.Globals{Cache: true, Chain: chain},
 				RenderCtx: ctx,
 			}
 			if _, _, err := detailOpts.AbisDetails(); err != nil {
@@ -148,10 +148,10 @@ func (c *AbisCollection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetAbisCount(payload types.Payload) (int, error) {
-	chainName := preferences.GetChain()
+func GetAbisCount(payload *types.Payload) (int, error) {
+	chain := preferences.GetLastChain()
 	countOpts := sdk.AbisOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chainName},
+		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
 	if countResult, _, err := countOpts.AbisCount(); err != nil {
 		return 0, fmt.Errorf("AbisCount query error: %v", err)
@@ -166,11 +166,11 @@ var (
 	collectionsMu sync.Mutex
 )
 
-func GetAbisCollection(payload types.Payload) *AbisCollection {
+func GetAbisCollection(payload *types.Payload) *AbisCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey("", "")
+	key := store.GetCollectionKey(payload)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}

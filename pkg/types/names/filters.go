@@ -2,6 +2,26 @@ package names
 
 import "strings"
 
+func (c *NamesCollection) matchesAllFilter(name *Name, filter string) bool {
+	return c.matchesFilter(name, filter)
+}
+
+func (c *NamesCollection) matchesCustomFilter(name *Name, filter string) bool {
+	return c.matchesFilter(name, filter)
+}
+
+func (c *NamesCollection) matchesPrefundFilter(name *Name, filter string) bool {
+	return c.matchesFilter(name, filter)
+}
+
+func (c *NamesCollection) matchesRegularFilter(name *Name, filter string) bool {
+	return c.matchesFilter(name, filter)
+}
+
+func (c *NamesCollection) matchesBaddressFilter(name *Name, filter string) bool {
+	return c.matchesFilter(name, filter)
+}
+
 func (c *NamesCollection) matchesFilter(name *Name, filter string) bool {
 	filterLower := strings.ToLower(filter)
 

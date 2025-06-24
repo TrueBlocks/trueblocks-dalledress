@@ -1,11 +1,7 @@
 {{$class := .Class}}
 {{$isAbis := eq $class "Abis"}}
-{{$isNames := eq $class "Names"}}
-{{$isMonitors := eq $class "Monitors"}}
-{{$isChunks := eq $class "Chunks"}}
-{{$pager := or (or $isChunks $isAbis) $isMonitors}}
-{{$isMonitors := eq $class "Monitors"}}
 {{$isExports := eq $class "Exports"}}
+{{$isMonitors := eq $class "Monitors"}}
 {{$shouldBePtr := or (or $isAbis $isMonitors) $isExports}}
 {{$isPtr := not $shouldBePtr}}
 // Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
@@ -56,7 +52,7 @@ func (p *{{.Class}}Page) GetState() types.LoadState {
 	return p.State
 }
 
-{{if $pager}}func (c *{{.Class}}Collection) GetPage(
+func (c *{{.Class}}Collection) GetPage(
 	payload *types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
@@ -82,12 +78,12 @@ func (p *{{.Class}}Page) GetState() types.LoadState {
 			}
 		}
 		sortFunc := func(items []{{$sing2}}, sort sdk.SortSpec) error {
-			return sdk.Sort{{.Store}}(items, sort)
+			return {{if $isExports}}nil // {{end}}sdk.Sort{{.Store}}(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("{{toLower $class}}", dataFacet, "GetPage", err)
 		} else {
-			{{if $isPtr -}}{{toLower $sing}} := make([]*{{$sing}}, 0, len(result.Items))
+			{{if $isPtr -}}{{toLower $sing}} := make([]*{{toSingular .Store}}, 0, len(result.Items))
 			for i := range result.Items {
 				{{toLower $sing}} = append({{toLower $sing}}, &result.Items[i])
 			}{{end}}
@@ -103,7 +99,6 @@ func (p *{{.Class}}Page) GetState() types.LoadState {
 
 	return page, nil
 }
-{{end -}}
 
 // EXISTING_CODE
 // EXISTING_CODE

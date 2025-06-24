@@ -11,8 +11,8 @@ package names
 import (
 	// EXISTING_CODE
 	"fmt"
+	"strings"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
@@ -47,7 +47,6 @@ func (p *NamesPage) GetState() types.LoadState {
 	return p.State
 }
 
-// EXISTING_CODE
 func (c *NamesCollection) GetPage(
 	payload *types.Payload,
 	first, pageSize int,
@@ -56,58 +55,129 @@ func (c *NamesCollection) GetPage(
 ) (types.Page, error) {
 	dataFacet := payload.DataFacet
 
-	var facet *facets.Facet[Name]
+	page := &NamesPage{
+		Facet: dataFacet,
+	}
+	filter = strings.ToLower(filter)
+
 	switch dataFacet {
 	case NamesAll:
-		facet = c.allFacet
+		facet := c.allFacet
+		var filterFunc func(*Name) bool
+		if filter != "" {
+			filterFunc = func(item *Name) bool {
+				return c.matchesAllFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Name, sort sdk.SortSpec) error {
+			return sdk.SortNames(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
+		} else {
+			all := make([]*Name, 0, len(result.Items))
+			for i := range result.Items {
+				all = append(all, &result.Items[i])
+			}
+			page.Names, page.TotalItems, page.State = all, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case NamesCustom:
-		facet = c.customFacet
+		facet := c.customFacet
+		var filterFunc func(*Name) bool
+		if filter != "" {
+			filterFunc = func(item *Name) bool {
+				return c.matchesCustomFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Name, sort sdk.SortSpec) error {
+			return sdk.SortNames(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
+		} else {
+			custom := make([]*Name, 0, len(result.Items))
+			for i := range result.Items {
+				custom = append(custom, &result.Items[i])
+			}
+			page.Names, page.TotalItems, page.State = custom, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case NamesPrefund:
-		facet = c.prefundFacet
+		facet := c.prefundFacet
+		var filterFunc func(*Name) bool
+		if filter != "" {
+			filterFunc = func(item *Name) bool {
+				return c.matchesPrefundFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Name, sort sdk.SortSpec) error {
+			return sdk.SortNames(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
+		} else {
+			prefund := make([]*Name, 0, len(result.Items))
+			for i := range result.Items {
+				prefund = append(prefund, &result.Items[i])
+			}
+			page.Names, page.TotalItems, page.State = prefund, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case NamesRegular:
-		facet = c.regularFacet
+		facet := c.regularFacet
+		var filterFunc func(*Name) bool
+		if filter != "" {
+			filterFunc = func(item *Name) bool {
+				return c.matchesRegularFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Name, sort sdk.SortSpec) error {
+			return sdk.SortNames(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
+		} else {
+			regular := make([]*Name, 0, len(result.Items))
+			for i := range result.Items {
+				regular = append(regular, &result.Items[i])
+			}
+			page.Names, page.TotalItems, page.State = regular, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case NamesBaddress:
-		facet = c.baddressFacet
+		facet := c.baddressFacet
+		var filterFunc func(*Name) bool
+		if filter != "" {
+			filterFunc = func(item *Name) bool {
+				return c.matchesBaddressFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Name, sort sdk.SortSpec) error {
+			return sdk.SortNames(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
+		} else {
+			baddress := make([]*Name, 0, len(result.Items))
+			for i := range result.Items {
+				baddress = append(baddress, &result.Items[i])
+			}
+			page.Names, page.TotalItems, page.State = baddress, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	default:
 		return nil, types.NewValidationError("names", dataFacet, "GetPage",
 			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
 
-	var filterFunc func(*Name) bool
-	if filter != "" {
-		filterFunc = func(name *Name) bool {
-			return c.matchesFilter(name, filter)
-		}
-	}
-
-	sortFunc := func(items []Name, sort sdk.SortSpec) error {
-		return sdk.SortNames(items, sort)
-	}
-
-	pageResult, err := facet.GetPage(
-		first,
-		pageSize,
-		filterFunc,
-		sortSpec,
-		sortFunc,
-	)
-	if err != nil {
-		return nil, types.NewStoreError("names", dataFacet, "GetPage", err)
-	}
-
-	names := make([]*Name, 0, len(pageResult.Items))
-	for i := range pageResult.Items {
-		names = append(names, &pageResult.Items[i])
-	}
-
-	return &NamesPage{
-		Facet:         dataFacet,
-		Names:         names,
-		TotalItems:    pageResult.TotalItems,
-		ExpectedTotal: c.getExpectedTotal(dataFacet),
-		IsFetching:    facet.IsFetching(),
-		State:         pageResult.State,
-	}, nil
+	return page, nil
 }
 
+// EXISTING_CODE
 // EXISTING_CODE

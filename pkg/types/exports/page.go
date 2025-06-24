@@ -56,8 +56,7 @@ func (p *ExportsPage) GetState() types.LoadState {
 	return p.State
 }
 
-// EXISTING_CODE
-func (ec *ExportsCollection) GetPage(
+func (c *ExportsCollection) GetPage(
 	payload *types.Payload,
 	first, pageSize int,
 	sortSpec sdk.SortSpec,
@@ -65,173 +64,232 @@ func (ec *ExportsCollection) GetPage(
 ) (types.Page, error) {
 	dataFacet := payload.DataFacet
 
+	page := &ExportsPage{
+		Facet: dataFacet,
+	}
+	filter = strings.ToLower(filter)
+
 	switch dataFacet {
 	case ExportsStatements:
-		return ec.getStatementsPage(first, pageSize, sortSpec, filter)
-	case ExportsTransfers:
-		return ec.getTransfersPage(first, pageSize, sortSpec, filter)
+		facet := c.statementsFacet
+		var filterFunc func(*Statement) bool
+		if filter != "" {
+			filterFunc = func(item *Statement) bool {
+				return c.matchesStatementFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Statement, sort sdk.SortSpec) error {
+			return nil // sdk.SortStatements(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Statements, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case ExportsBalances:
-		return ec.getBalancesPage(first, pageSize, sortSpec, filter)
+		facet := c.balancesFacet
+		var filterFunc func(*Balance) bool
+		if filter != "" {
+			filterFunc = func(item *Balance) bool {
+				return c.matchesBalanceFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Balance, sort sdk.SortSpec) error {
+			return nil // sdk.SortBalances(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Balances, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
+	case ExportsTransfers:
+		facet := c.transfersFacet
+		var filterFunc func(*Transfer) bool
+		if filter != "" {
+			filterFunc = func(item *Transfer) bool {
+				return c.matchesTransferFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Transfer, sort sdk.SortSpec) error {
+			return nil // sdk.SortTransfers(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Transfers, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case ExportsTransactions:
-		return ec.getTransactionsPage(first, pageSize, sortSpec, filter)
+		facet := c.transactionsFacet
+		var filterFunc func(*Transaction) bool
+		if filter != "" {
+			filterFunc = func(item *Transaction) bool {
+				return c.matchesTransactionFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Transaction, sort sdk.SortSpec) error {
+			return nil // sdk.SortTransactions(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Transactions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case ExportsWithdrawals:
-		return ec.getWithdrawalsPage(first, pageSize, sortSpec, filter)
+		facet := c.withdrawalsFacet
+		var filterFunc func(*Withdrawal) bool
+		if filter != "" {
+			filterFunc = func(item *Withdrawal) bool {
+				return c.matchesWithdrawalFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Withdrawal, sort sdk.SortSpec) error {
+			return nil // sdk.SortWithdrawals(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Withdrawals, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
+	case ExportsAssets:
+		facet := c.assetsFacet
+		var filterFunc func(*Asset) bool
+		if filter != "" {
+			filterFunc = func(item *Asset) bool {
+				return c.matchesAssetFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Asset, sort sdk.SortSpec) error {
+			return nil // sdk.SortAssets(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Assets, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
+	case ExportsLogs:
+		facet := c.logsFacet
+		var filterFunc func(*Log) bool
+		if filter != "" {
+			filterFunc = func(item *Log) bool {
+				return c.matchesLogFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Log, sort sdk.SortSpec) error {
+			return nil // sdk.SortLogs(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Logs, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
+	case ExportsTraces:
+		facet := c.tracesFacet
+		var filterFunc func(*Trace) bool
+		if filter != "" {
+			filterFunc = func(item *Trace) bool {
+				return c.matchesTraceFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Trace, sort sdk.SortSpec) error {
+			return nil // sdk.SortTraces(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Traces, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
+	case ExportsReceipts:
+		facet := c.receiptsFacet
+		var filterFunc func(*Receipt) bool
+		if filter != "" {
+			filterFunc = func(item *Receipt) bool {
+				return c.matchesReceiptFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Receipt, sort sdk.SortSpec) error {
+			return nil // sdk.SortReceipts(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Receipts, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	default:
-		return nil, fmt.Errorf("GetPage: unexpected dataFacet: %v", dataFacet)
-	}
-}
-
-func (ec *ExportsCollection) getStatementsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
-	page := &ExportsPage{
-		Facet: ExportsStatements,
-	}
-	filter = strings.ToLower(filter)
-
-	var filterFunc = func(item *Statement) bool {
-		if filter == "" {
-			return true
-		}
-		// Filter based on statement fields
-		return strings.Contains(strings.ToLower(item.AccountedFor.Hex()), filter) ||
-			strings.Contains(strings.ToLower(item.Asset.Hex()), filter)
+		return nil, types.NewValidationError("exports", dataFacet, "GetPage",
+			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
 
-	var sortFunc = func(items []Statement, sort sdk.SortSpec) error {
-		// TODO: Implement proper sorting when SDK methods are available
-		return nil
-	}
-
-	if result, err := ec.statementsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-		return nil, types.NewStoreError("exports", ExportsStatements, "GetPage", err)
-	} else {
-		page.Statements, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-	}
-
-	page.IsFetching = ec.statementsFacet.IsFetching()
-	page.ExpectedTotal = ec.statementsFacet.ExpectedCount()
 	return page, nil
 }
 
-func (ec *ExportsCollection) getTransfersPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
-	page := &ExportsPage{
-		Facet: ExportsTransfers,
-	}
-	filter = strings.ToLower(filter)
-
-	var filterFunc = func(item *Transfer) bool {
-		if filter == "" {
-			return true
-		}
-		// Filter based on transfer fields
-		return strings.Contains(strings.ToLower(item.Asset.Hex()), filter) ||
-			strings.Contains(strings.ToLower(item.Sender.Hex()), filter) ||
-			strings.Contains(strings.ToLower(item.Recipient.Hex()), filter)
-	}
-
-	var sortFunc = func(items []Transfer, sort sdk.SortSpec) error {
-		// TODO: Implement proper sorting when SDK methods are available
-		return nil
-	}
-
-	if result, err := ec.transfersFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-		return nil, types.NewStoreError("exports", ExportsTransfers, "GetPage", err)
-	} else {
-		page.Transfers, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-	}
-
-	page.IsFetching = ec.transfersFacet.IsFetching()
-	page.ExpectedTotal = ec.transfersFacet.ExpectedCount()
-	return page, nil
+// EXISTING_CODE
+func (c *ExportsCollection) matchesStatementFilter(item *Statement, filter string) bool {
+	return strings.Contains(strings.ToLower(item.AccountedFor.Hex()), filter) || strings.Contains(strings.ToLower(item.Asset.Hex()), filter)
 }
 
-func (ec *ExportsCollection) getBalancesPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
-	page := &ExportsPage{
-		Facet: ExportsBalances,
-	}
-	filter = strings.ToLower(filter)
-
-	var filterFunc = func(item *Balance) bool {
-		if filter == "" {
-			return true
-		}
-		// Filter based on balance/state fields
-		return strings.Contains(strings.ToLower(item.Address.Hex()), filter)
-	}
-
-	var sortFunc = func(items []Balance, sort sdk.SortSpec) error {
-		// TODO: Implement proper sorting when SDK methods are available
-		return nil
-	}
-
-	if result, err := ec.balancesFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-		return nil, types.NewStoreError("exports", ExportsBalances, "GetPage", err)
-	} else {
-		page.Balances, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-	}
-
-	page.IsFetching = ec.balancesFacet.IsFetching()
-	page.ExpectedTotal = ec.balancesFacet.ExpectedCount()
-	return page, nil
+func (c *ExportsCollection) matchesBalanceFilter(item *Balance, filter string) bool {
+	return strings.Contains(strings.ToLower(item.Address.Hex()), filter)
 }
 
-func (ec *ExportsCollection) getTransactionsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
-	page := &ExportsPage{
-		Facet: ExportsTransactions,
-	}
-	filter = strings.ToLower(filter)
-
-	var filterFunc = func(item *Transaction) bool {
-		if filter == "" {
-			return true
-		}
-		// TODO: Implement proper filtering based on transaction fields
-		return strings.Contains(strings.ToLower(item.Hash.Hex()), filter)
-	}
-
-	var sortFunc = func(items []Transaction, sort sdk.SortSpec) error {
-		// TODO: Implement proper sorting when SDK methods are available
-		return nil
-	}
-
-	if result, err := ec.transactionsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-		return nil, types.NewStoreError("exports", ExportsTransactions, "GetPage", err)
-	} else {
-		page.Transactions, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-	}
-
-	page.IsFetching = ec.transactionsFacet.IsFetching()
-	page.ExpectedTotal = ec.transactionsFacet.ExpectedCount()
-	return page, nil
+func (c *ExportsCollection) matchesTransferFilter(item *Transfer, filter string) bool {
+	return strings.Contains(strings.ToLower(item.Asset.Hex()), filter) ||
+		strings.Contains(strings.ToLower(item.Sender.Hex()), filter) ||
+		strings.Contains(strings.ToLower(item.Recipient.Hex()), filter)
 }
 
-func (ec *ExportsCollection) getWithdrawalsPage(first, pageSize int, sortSpec sdk.SortSpec, filter string) (*ExportsPage, error) {
-	page := &ExportsPage{
-		Facet: ExportsWithdrawals,
-	}
-	filter = strings.ToLower(filter)
+func (c *ExportsCollection) matchesTransactionFilter(item *Transaction, filter string) bool {
+	return strings.Contains(strings.ToLower(item.Hash.Hex()), filter)
+}
 
-	var filterFunc = func(item *Withdrawal) bool {
-		if filter == "" {
-			return true
-		}
-		// TODO: Implement proper filtering based on withdrawal fields
-		return false // TODO: strings.Contains(strings.ToLower(item.Hash.Hex()), filter)
-	}
+func (c *ExportsCollection) matchesWithdrawalFilter(item *Withdrawal, filter string) bool {
+	return strings.Contains(strings.ToLower("item.Hash.Hex()"), filter)
+}
 
-	var sortFunc = func(items []Withdrawal, sort sdk.SortSpec) error {
-		// TODO: Implement proper sorting when SDK methods are available
-		return nil
-	}
+func (c *ExportsCollection) matchesAssetFilter(item *Asset, filter string) bool {
+	return strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
+		strings.Contains(strings.ToLower(item.Name), filter) ||
+		strings.Contains(strings.ToLower(item.Symbol), filter)
+}
 
-	if result, err := ec.withdrawalsFacet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-		return nil, types.NewStoreError("exports", ExportsWithdrawals, "GetPage", err)
-	} else {
-		page.Withdrawals, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
-	}
+func (c *ExportsCollection) matchesLogFilter(item *Log, filter string) bool {
+	return strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
+		strings.Contains(strings.ToLower(item.Topics[0].Hex()), filter)
+}
 
-	page.IsFetching = ec.withdrawalsFacet.IsFetching()
-	page.ExpectedTotal = ec.withdrawalsFacet.ExpectedCount()
-	return page, nil
+func (c *ExportsCollection) matchesTraceFilter(item *Trace, filter string) bool {
+	return strings.Contains(strings.ToLower(item.BlockHash.Hex()), filter)
+}
+
+func (c *ExportsCollection) matchesReceiptFilter(item *Receipt, filter string) bool {
+	return strings.Contains(strings.ToLower(item.TransactionHash.Hex()), filter) ||
+		strings.Contains(strings.ToLower(item.ContractAddress.Hex()), filter)
 }
 
 // EXISTING_CODE

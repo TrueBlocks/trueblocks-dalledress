@@ -122,6 +122,16 @@ export function RegisterCollection(arg1:types.Collection):Promise<void>;
 
 export function Reload(arg1:types.DataFacet,arg2:string,arg3:string):Promise<void>;
 
+export function ReloadAbis(arg1:types.Payload):Promise<void>;
+
+export function ReloadChunks(arg1:types.Payload):Promise<void>;
+
+export function ReloadExports(arg1:types.Payload):Promise<void>;
+
+export function ReloadMonitors(arg1:types.Payload):Promise<void>;
+
+export function ReloadNames(arg1:types.Payload):Promise<void>;
+
 export function ResetStore(arg1:string):Promise<void>;
 
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;

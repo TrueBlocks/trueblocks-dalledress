@@ -1,3 +1,10 @@
+// Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
 import { FormField } from '@components';
 import { types } from '@models';
 
@@ -5,6 +12,8 @@ import { types } from '@models';
 import { formatWeiToEther, formatWeiToGigawei } from '../../utils/ether';
 
 // EXISTING_CODE
+
+// Column configurations for the Exports data facets
 
 export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
   switch (dataFacet) {
@@ -33,6 +42,49 @@ export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
 
 const getAssetsColumns = (): FormField[] => [
   // EXISTING_CODE
+  {
+    key: 'address',
+    header: 'Address',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'name',
+    header: 'Name',
+    type: 'text',
+    sortable: true,
+    width: 'col-name',
+  },
+  {
+    key: 'symbol',
+    header: 'Symbol',
+    type: 'text',
+    sortable: true,
+    width: 'col-symbol',
+  },
+  {
+    key: 'decimals',
+    header: 'Decimals',
+    type: 'number',
+    sortable: true,
+    width: 'col-decimals',
+    textAlign: 'right',
+  },
+  {
+    key: 'source',
+    header: 'Source',
+    type: 'text',
+    sortable: true,
+    width: 'col-source',
+  },
+  {
+    key: 'tags',
+    header: 'Tags',
+    type: 'text',
+    sortable: true,
+    width: 'col-tags',
+  },
   // EXISTING_CODE
 ];
 
@@ -119,11 +171,164 @@ const getBalancesColumns = (): FormField[] => [
 
 const getLogsColumns = (): FormField[] => [
   // EXISTING_CODE
+  {
+    key: 'blockNumber',
+    header: 'Block',
+    type: 'number',
+    sortable: true,
+    width: 'col-block',
+    textAlign: 'right',
+  },
+  {
+    key: 'transactionIndex',
+    header: 'Tx Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'logIndex',
+    header: 'Log Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'blockHash',
+    header: 'Block Hash',
+    type: 'text',
+    sortable: true,
+    width: 'col-hash',
+  },
+  {
+    key: 'transactionHash',
+    header: 'Tx Hash',
+    type: 'text',
+    sortable: true,
+    width: 'col-hash',
+  },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    type: 'timestamp',
+    sortable: true,
+    width: 'col-timestamp',
+  },
+  {
+    key: 'date',
+    header: 'Date',
+    type: 'text',
+    sortable: true,
+    width: 'col-date',
+  },
+  {
+    key: 'address',
+    header: 'Address',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'topic0',
+    header: 'Topic 0',
+    type: 'text',
+    sortable: true,
+    width: 'col-topic',
+  },
+  {
+    key: 'topic1',
+    header: 'Topic 1',
+    type: 'text',
+    sortable: true,
+    width: 'col-topic',
+  },
+  {
+    key: 'topic2',
+    header: 'Topic 2',
+    type: 'text',
+    sortable: true,
+    width: 'col-topic',
+  },
+  {
+    key: 'topic3',
+    header: 'Topic 3',
+    type: 'text',
+    sortable: true,
+    width: 'col-topic',
+  },
+  {
+    key: 'data',
+    header: 'Data',
+    type: 'text',
+    sortable: true,
+    width: 'col-data',
+  },
   // EXISTING_CODE
 ];
 
 const getReceiptsColumns = (): FormField[] => [
   // EXISTING_CODE
+  {
+    key: 'blockNumber',
+    header: 'Block',
+    type: 'number',
+    sortable: true,
+    width: 'col-block',
+    textAlign: 'right',
+  },
+  {
+    key: 'transactionIndex',
+    header: 'Tx Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'transactionHash',
+    header: 'Tx Hash',
+    type: 'text',
+    sortable: true,
+    width: 'col-hash',
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    type: 'text',
+    sortable: true,
+    width: 'col-status',
+  },
+  {
+    key: 'gasUsed',
+    header: 'Gas Used',
+    type: 'number',
+    sortable: true,
+    width: 'col-gas',
+    textAlign: 'right',
+  },
+  {
+    key: 'contractAddress',
+    header: 'Contract Address',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'from',
+    header: 'From',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'to',
+    header: 'To',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
   // EXISTING_CODE
 ];
 
@@ -211,6 +416,110 @@ const getStatementsColumns = (): FormField[] => [
 
 const getTracesColumns = (): FormField[] => [
   // EXISTING_CODE
+  {
+    key: 'blockNumber',
+    header: 'Block',
+    type: 'number',
+    sortable: true,
+    width: 'col-block',
+    textAlign: 'right',
+  },
+  {
+    key: 'transactionIndex',
+    header: 'Tx Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    type: 'timestamp',
+    sortable: true,
+    width: 'col-timestamp',
+  },
+  {
+    key: 'date',
+    header: 'Date',
+    type: 'text',
+    sortable: true,
+    width: 'col-date',
+  },
+  {
+    key: 'error',
+    header: 'Error',
+    type: 'text',
+    sortable: true,
+    width: 'col-error',
+  },
+  {
+    key: 'action::callType',
+    header: 'Call Type',
+    type: 'text',
+    sortable: true,
+    width: 'col-calltype',
+  },
+  {
+    key: 'action::from',
+    header: 'From',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'action::to',
+    header: 'To',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'action::value',
+    header: 'Value',
+    type: 'ether',
+    sortable: true,
+    width: 'col-value',
+    textAlign: 'right',
+  },
+  {
+    key: 'action::ether',
+    header: 'Ether',
+    type: 'ether',
+    sortable: true,
+    width: 'col-ether',
+    textAlign: 'right',
+  },
+  {
+    key: 'action::gas',
+    header: 'Gas',
+    type: 'gas',
+    sortable: true,
+    width: 'col-gas',
+    textAlign: 'right',
+  },
+  {
+    key: 'result::gasUsed',
+    header: 'Gas Used',
+    type: 'number',
+    sortable: true,
+    width: 'col-gas',
+    textAlign: 'right',
+  },
+  {
+    key: 'action::input',
+    header: 'Input',
+    type: 'text',
+    sortable: true,
+    width: 'col-input',
+  },
+  {
+    key: 'result::output',
+    header: 'Output',
+    type: 'text',
+    sortable: true,
+    width: 'col-output',
+  },
   // EXISTING_CODE
 ];
 

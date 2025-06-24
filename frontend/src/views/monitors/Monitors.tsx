@@ -15,7 +15,7 @@ import {
   MONITORS_DEFAULT_FACET,
   MONITORS_ROUTE as ROUTE,
   monitorsFacets,
-} from './monitorsFacets';
+} from './facets';
 
 export const Monitors = () => {
   const activeFacetHook = useActiveFacet({

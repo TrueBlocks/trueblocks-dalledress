@@ -1,10 +1,12 @@
-{{$class := .Class}}
-{{$isAbis := eq $class "Abis"}}
-{{$isExports := eq $class "Exports"}}
-{{$isMonitors := eq $class "Monitors"}}
-{{$shouldBePtr := or (or $isAbis $isMonitors) $isExports}}
-{{$isPtr := not $shouldBePtr}}
-// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+{{- $class := .Class -}}
+{{- $lower := toLower $class -}}
+{{- $single := toSingular $class -}}
+{{- $isAbis := eq $class "Abis" -}}
+{{- $isExports := eq $class "Exports" -}}
+{{- $isMonitors := eq $class "Monitors" -}}
+{{- $shouldBePtr := or (or $isAbis $isMonitors) $isExports -}}
+{{- $isPtr := not $shouldBePtr -}}
+// Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
 /*

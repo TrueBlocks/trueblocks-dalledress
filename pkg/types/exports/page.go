@@ -1,4 +1,4 @@
-// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+// Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
 /*
@@ -273,23 +273,23 @@ func (c *ExportsCollection) matchesWithdrawalFilter(item *Withdrawal, filter str
 }
 
 func (c *ExportsCollection) matchesAssetFilter(item *Asset, filter string) bool {
-	return strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
-		strings.Contains(strings.ToLower(item.Name), filter) ||
-		strings.Contains(strings.ToLower(item.Symbol), filter)
+	return true //strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
+	// strings.Contains(strings.ToLower(item.Name), filter) ||
+	// strings.Contains(strings.ToLower(item.Symbol), filter)
 }
 
 func (c *ExportsCollection) matchesLogFilter(item *Log, filter string) bool {
-	return strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
-		strings.Contains(strings.ToLower(item.Topics[0].Hex()), filter)
+	return true // strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
+	// strings.Contains(strings.ToLower(item.Topics[0].Hex()), filter)
 }
 
 func (c *ExportsCollection) matchesTraceFilter(item *Trace, filter string) bool {
-	return strings.Contains(strings.ToLower(item.BlockHash.Hex()), filter)
+	return true // strings.Contains(strings.ToLower(item.BlockHash.Hex()), filter)
 }
 
 func (c *ExportsCollection) matchesReceiptFilter(item *Receipt, filter string) bool {
-	return strings.Contains(strings.ToLower(item.TransactionHash.Hex()), filter) ||
-		strings.Contains(strings.ToLower(item.ContractAddress.Hex()), filter)
+	return true // strings.Contains(strings.ToLower(item.TransactionHash.Hex()), filter) ||
+	// strings.Contains(strings.ToLower(item.ContractAddress.Hex()), filter)
 }
 
 // EXISTING_CODE

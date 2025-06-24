@@ -214,6 +214,26 @@ export function Reload(arg1, arg2, arg3) {
   return window['go']['app']['App']['Reload'](arg1, arg2, arg3);
 }
 
+export function ReloadAbis(arg1) {
+  return window['go']['app']['App']['ReloadAbis'](arg1);
+}
+
+export function ReloadChunks(arg1) {
+  return window['go']['app']['App']['ReloadChunks'](arg1);
+}
+
+export function ReloadExports(arg1) {
+  return window['go']['app']['App']['ReloadExports'](arg1);
+}
+
+export function ReloadMonitors(arg1) {
+  return window['go']['app']['App']['ReloadMonitors'](arg1);
+}
+
+export function ReloadNames(arg1) {
+  return window['go']['app']['App']['ReloadNames'](arg1);
+}
+
 export function ResetStore(arg1) {
   return window['go']['app']['App']['ResetStore'](arg1);
 }

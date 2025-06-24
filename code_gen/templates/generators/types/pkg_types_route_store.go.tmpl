@@ -1,6 +1,8 @@
-{{$class := .Class}}
-{{$isExports := eq .Class "Exports"}}
-// Copyright 2016, 2025 The TrueBlocks Authors. All rights reserved.
+{{- $class := .Class -}}
+{{- $lower := toLower $class -}}
+{{- $single := toSingular $class -}}
+{{- $isExports := eq .Class "Exports" -}}
+// Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
 /*

@@ -11,11 +11,7 @@ import { getAddressString, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
 import { getColumns } from './';
-import {
-  ABIS_DEFAULT_FACET,
-  ABIS_ROUTE as ROUTE,
-  abisFacets,
-} from './abisFacets';
+import { ABIS_DEFAULT_FACET, ABIS_ROUTE as ROUTE, abisFacets } from './facets';
 
 export const Abis = () => {
   const activeFacetHook = useActiveFacet({

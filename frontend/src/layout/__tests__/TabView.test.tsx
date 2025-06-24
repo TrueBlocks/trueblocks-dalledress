@@ -2,7 +2,7 @@ import { msgs, types } from '@models';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { act, fireEvent, render, screen } from '../../__tests__/mocks';
-import { exportsFacets } from '../../views/exports/exportsFacets';
+import { exportsFacets } from '../../views/exports/facets';
 import { TabView } from '../TabView';
 
 vi.mock('@hooks', () => ({

@@ -9,12 +9,12 @@ import { useHotkeys } from '@mantine/hooks';
 import { chunks, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
 
+import { getColumns } from './columns';
 import {
   CHUNKS_DEFAULT_FACET,
   CHUNKS_ROUTE as ROUTE,
   chunksFacets,
-} from './chunksFacets';
-import { getColumns } from './columns';
+} from './facets';
 
 export const Chunks = () => {
   const activeFacetHook = useActiveFacet({

@@ -339,29 +339,27 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 	}, nil
 }
 
-func (a *App) Reload(dataFacet types.DataFacet, str1, str2 string) error {
+func (a *App) Reload(dataFacet types.DataFacet, chain, address string) error {
 	lastView := a.GetAppPreferences().LastView
 
+	payload := &types.Payload{
+		DataFacet: dataFacet,
+		Chain:     chain,
+		Address:   address,
+	}
+
 	// ADD_ROUTE
-	emptyPayload := &types.Payload{}
 	switch lastView {
 	case "/names":
-		names.GetNamesCollection(emptyPayload).Reset(dataFacet)
-		names.GetNamesCollection(emptyPayload).LoadData(dataFacet)
+		return a.ReloadNames(payload)
 	case "/abis":
-		abis.GetAbisCollection(emptyPayload).Reset(dataFacet)
-		abis.GetAbisCollection(emptyPayload).LoadData(dataFacet)
+		return a.ReloadAbis(payload)
 	case "/exports":
-		emptyPayload.Chain = str1
-		emptyPayload.Address = str2
-		exports.GetExportsCollection(emptyPayload).Reset(dataFacet)
-		exports.GetExportsCollection(emptyPayload).LoadData(dataFacet)
+		return a.ReloadExports(payload)
 	case "/monitors":
-		monitors.GetMonitorsCollection(emptyPayload).Reset(dataFacet)
-		monitors.GetMonitorsCollection(emptyPayload).LoadData(dataFacet)
+		return a.ReloadMonitors(payload)
 	case "/chunks":
-		chunks.GetChunksCollection(emptyPayload).Reset(dataFacet)
-		chunks.GetChunksCollection(emptyPayload).LoadData(dataFacet)
+		return a.ReloadChunks(payload)
 	}
 	// ADD_ROUTE
 
@@ -416,13 +414,11 @@ func getCollectionPage[T any](
 	dataFacet := payload.DataFacet
 	page, err := collection.GetPage(payload, first, pageSize, sort, filter)
 	if err != nil {
-		// Preserve the original error context - don't wrap with type assertion errors
 		return zero, err
 	}
 
 	typedPage, ok := page.(T)
 	if !ok {
-		// This is a true internal error - different from SDK/store errors
 		return zero, types.NewValidationError("app", dataFacet, "getCollectionPage",
 			fmt.Errorf("GetPage returned unexpected type %T, expected %T", page, zero))
 	}

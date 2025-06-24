@@ -27,7 +27,7 @@ import {
   NAMES_DEFAULT_FACET,
   NAMES_ROUTE as ROUTE,
   namesFacets,
-} from './namesFacets';
+} from './facets';
 
 type IndexableName = types.Name & Record<string, unknown>;
 

@@ -19,7 +19,7 @@ import {
   EXPORTS_DEFAULT_FACET,
   EXPORTS_ROUTE as ROUTE,
   exportsFacets,
-} from './exportsFacets';
+} from './facets';
 
 export const Exports = () => {
   const { effectiveAddress, effectiveChain } = useActiveProject();
@@ -100,8 +100,16 @@ export const Exports = () => {
         return pageData.transactions || [];
       case types.DataFacet.WITHDRAWALS:
         return pageData.withdrawals || [];
+      case types.DataFacet.ASSETS:
+        return pageData.assets || [];
+      case types.DataFacet.LOGS:
+        return pageData.logs || [];
+      case types.DataFacet.TRACES:
+        return pageData.traces || [];
+      case types.DataFacet.RECEIPTS:
+        return pageData.receipts || [];
       default:
-        return pageData.transactions || [];
+        return [];
     }
   }, [pageData, activeFacetHook]);
 

@@ -326,7 +326,7 @@ func GetExportsCount(payload *types.Payload) (int, error) {
 		Addrs:   []string{address},
 	}
 	if countResult, _, err := countOpts.ExportCount(); err != nil {
-		return 0, fmt.Errorf("ExportsCount query error: %v", err)
+		return 0, fmt.Errorf("ExportCount query error: %v", err)
 	} else if len(countResult) > 0 {
 		return int(countResult[0].Count), nil
 	}

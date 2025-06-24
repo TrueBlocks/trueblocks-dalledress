@@ -85,13 +85,19 @@ func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet) string {
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
+{{- $val := .Class}}
+{{if $isExports}}{{$val = toSingular .Class}}{{end -}}
 func Get{{.Class}}Count(payload *types.Payload) (int, error) {
 	chain := preferences.GetLastChain()
-	countOpts := sdk.{{.Class}}Options{
+	{{if $isExports}}address := preferences.GetLastAddress()
+	{{end -}}
+	countOpts := sdk.{{$val}}Options{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
+		{{if $isExports}}Addrs: []string{address},
+		{{end -}}
 	}
-	if countResult, _, err := countOpts.{{.Class}}Count(); err != nil {
-		return 0, fmt.Errorf("{{.Class}}Count query error: %v", err)
+	if countResult, _, err := countOpts.{{$val}}Count(); err != nil {
+		return 0, fmt.Errorf("{{$val}}Count query error: %v", err)
 	} else if len(countResult) > 0 {
 		return int(countResult[0].Count), nil
 	}

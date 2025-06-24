@@ -6,9 +6,9 @@ go 1.23.8
 replace github.com/TrueBlocks/trueblocks-sdk/v5 => ../trueblocks-core/sdk
 
 require (
-	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250623031722-6e806696c627
+	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250624120922-ab0bddc580f5
 	github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250504164335-8b49b03dddef
-	github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250619102315-d7368741c1ef
+	github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250624120843-f9924d425b80
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/google/go-cmp v0.7.0
 	github.com/joho/godotenv v1.5.1

@@ -20,6 +20,10 @@ export const exportsFacets: DataFacetConfig[] = [
     label: toProperCase(types.DataFacet.TRANSACTIONS),
     isDefault: true,
   },
+  {
+    id: types.DataFacet.WITHDRAWALS,
+    label: toProperCase(types.DataFacet.WITHDRAWALS),
+  },
 ];
 
 export const EXPORTS_DEFAULT_FACET = types.DataFacet.TRANSACTIONS;

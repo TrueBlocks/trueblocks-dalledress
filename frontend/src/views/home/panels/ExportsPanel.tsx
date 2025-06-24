@@ -20,6 +20,7 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
       transfersCount: 0,
       balancesCount: 0,
       transactionsCount: 0,
+      withdrawalsCount: 0,
     },
     lastUpdated: Date.now(),
   });
@@ -39,6 +40,7 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
             transfersCount: 0,
             balancesCount: 0,
             transactionsCount: 0,
+            withdrawalsCount: 0,
           },
           lastUpdated: Date.now(),
         });
@@ -113,6 +115,9 @@ export const ExportsPanel = ({ onViewAll, onNewExport }: ExportsPanelProps) => {
           </Badge>
           <Badge size="xs" variant="light" color="blue">
             Txns: {(summary.customData?.transactionsCount as number) || 0}
+          </Badge>
+          <Badge size="xs" variant="light" color="blue">
+            With: {(summary.customData?.withdrawalsCount as number) || 0}
           </Badge>
         </div>
 

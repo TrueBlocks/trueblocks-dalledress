@@ -15,6 +15,8 @@ export const getColumnsForExports = (
       return getBalanceColumns();
     case types.DataFacet.TRANSACTIONS:
       return getTransactionColumns();
+    case types.DataFacet.WITHDRAWALS:
+      return getWithdrawalColumns();
     default:
       return getTransactionColumns();
   }
@@ -339,5 +341,61 @@ const getBalanceColumns = (): FormField[] => [
     type: 'text',
     sortable: false,
     width: '120px',
+  },
+];
+
+const getWithdrawalColumns = (): FormField[] => [
+  {
+    key: 'blockNumber',
+    header: 'Block',
+    type: 'number',
+    sortable: true,
+    width: 'col-block',
+    textAlign: 'right',
+  },
+  {
+    key: 'index',
+    header: 'Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'validatorIndex',
+    header: 'Validator Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-validator-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'address',
+    header: 'Address',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    type: 'text',
+    sortable: true,
+    width: 'col-timestamp',
+  },
+  {
+    key: 'date',
+    header: 'Date',
+    type: 'text',
+    sortable: true,
+    width: 'col-date',
+  },
+  {
+    key: 'amount',
+    header: 'Amount',
+    type: 'ether',
+    sortable: true,
+    width: 'col-amount',
+    textAlign: 'right',
   },
 ];

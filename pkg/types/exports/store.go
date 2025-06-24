@@ -261,6 +261,16 @@ func (c *ExportsCollection) getWithdrawalsStore() *store.Store[Withdrawal] {
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
+			exportOpts := sdk.ExportOptions{
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
+				RenderCtx: ctx,
+				Addrs:     []string{address},
+			}
+			if _, _, err := exportOpts.ExportWithdrawals(); err != nil {
+				wrappedErr := types.NewSDKError("exports", ExportsTransfers, "fetch", err)
+				logger.Error(fmt.Sprintf("Exports transfers SDK query error: %v", wrappedErr))
+				return wrappedErr
+			}
 			// EXISTING_CODE
 			return nil
 		}
@@ -318,7 +328,7 @@ func GetExportsCount(payload *types.Payload) (int, error) {
 	if countResult, _, err := countOpts.ExportCount(); err != nil {
 		return 0, fmt.Errorf("ExportsCount query error: %v", err)
 	} else if len(countResult) > 0 {
-		return len(countResult), nil
+		return int(countResult[0].Count), nil
 	}
 	return 0, nil
 }
@@ -363,21 +373,16 @@ func GetExportsCount2(dataFacet string) (int, error) {
 func getExportsTransactionsCount() (int, error) {
 	chain := preferences.GetLastChain()
 	address := preferences.GetLastAddress()
-	exportOpts := sdk.ExportOptions{
+	listOpts := sdk.ListOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 		Addrs:   []string{address},
 	}
 
 	// Use ExportCount for optimized counting
-	if results, _, err := exportOpts.ExportCount(); err != nil {
+	if results, _, err := listOpts.ListCount(); err != nil {
 		return 0, fmt.Errorf("failed to get exports transactions count: %w", err)
 	} else {
-		// Count the relevant transactions for this address
-		count := int(0)
-		for _, monitor := range results {
-			count += int(monitor.NRecords)
-		}
-		return count, nil
+		return int(results[0].Count), nil
 	}
 }
 

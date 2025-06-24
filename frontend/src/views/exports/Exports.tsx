@@ -98,6 +98,8 @@ export const Exports = () => {
         return pageData.balances || [];
       case types.DataFacet.TRANSACTIONS:
         return pageData.transactions || [];
+      case types.DataFacet.WITHDRAWALS:
+        return pageData.withdrawals || [];
       default:
         return pageData.transactions || [];
     }

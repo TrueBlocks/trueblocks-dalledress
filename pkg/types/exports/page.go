@@ -21,8 +21,12 @@ import (
 // TODO: The slices should be slices to pointers
 type ExportsPage struct {
 	Facet         types.DataFacet `json:"facet"`
+	Assets        []Asset         `json:"assets"`
 	Balances      []Balance       `json:"balances"`
+	Logs          []Log           `json:"logs"`
+	Receipts      []Receipt       `json:"receipts"`
 	Statements    []Statement     `json:"statements"`
+	Traces        []Trace         `json:"traces"`
 	Transactions  []Transaction   `json:"transactions"`
 	Transfers     []Transfer      `json:"transfers"`
 	Withdrawals   []Withdrawal    `json:"withdrawals"`

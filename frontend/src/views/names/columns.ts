@@ -1,24 +1,28 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
-export const getColumns = (backendDataFacet: types.DataFacet): FormField[] => {
-  switch (backendDataFacet) {
+// EXISTING_CODE
+// EXISTING_CODE
+
+export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
+  switch (dataFacet) {
     case types.DataFacet.ALL:
-    // fallthrough
+      return getNamesColumns();
     case types.DataFacet.CUSTOM:
-    // fallthrough
+      return getNamesColumns();
     case types.DataFacet.PREFUND:
-    // fallthrough
+      return getNamesColumns();
     case types.DataFacet.REGULAR:
-    // fallthrough
+      return getNamesColumns();
     case types.DataFacet.BADDRESS:
-    // fallthrough
+      return getNamesColumns();
     default:
-      return getColumnsForName();
+      return [];
   }
 };
 
-const getColumnsForName = (): FormField[] => [
+const getNamesColumns = (): FormField[] => [
+  // EXISTING_CODE
   {
     key: 'address',
     name: 'address',
@@ -96,4 +100,8 @@ const getColumnsForName = (): FormField[] => [
     type: 'button',
     width: '200px',
   },
+  // EXISTING_CODE
 ];
+
+// EXISTING_CODE
+// EXISTING_CODE

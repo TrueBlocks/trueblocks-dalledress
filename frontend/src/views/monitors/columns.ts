@@ -1,15 +1,20 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
+// EXISTING_CODE
+// EXISTING_CODE
+
 export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
   switch (dataFacet) {
     case types.DataFacet.MONITORS:
+      return getMonitorsColumns();
     default:
-      return getColumnsForMonitor();
+      return [];
   }
 };
 
-const getColumnsForMonitor = (): FormField[] => [
+const getMonitorsColumns = (): FormField[] => [
+  // EXISTING_CODE
   {
     key: 'address',
     name: 'address',
@@ -78,4 +83,8 @@ const getColumnsForMonitor = (): FormField[] => [
     type: 'button',
     width: '120px',
   },
+  // EXISTING_CODE
 ];
+
+// EXISTING_CODE
+// EXISTING_CODE

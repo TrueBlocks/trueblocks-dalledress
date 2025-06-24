@@ -161,8 +161,12 @@ export namespace exports {
 	
 	export class ExportsPage {
 	    facet: types.DataFacet;
+	    assets: types.Name[];
 	    balances: types.Token[];
+	    logs: types.Log[];
+	    receipts: types.Receipt[];
 	    statements: types.Statement[];
+	    traces: types.Trace[];
 	    transactions: types.Transaction[];
 	    transfers: types.Transfer[];
 	    withdrawals: types.Withdrawal[];
@@ -178,8 +182,12 @@ export namespace exports {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.facet = source["facet"];
+	        this.assets = this.convertValues(source["assets"], types.Name);
 	        this.balances = this.convertValues(source["balances"], types.Token);
+	        this.logs = this.convertValues(source["logs"], types.Log);
+	        this.receipts = this.convertValues(source["receipts"], types.Receipt);
 	        this.statements = this.convertValues(source["statements"], types.Statement);
+	        this.traces = this.convertValues(source["traces"], types.Trace);
 	        this.transactions = this.convertValues(source["transactions"], types.Transaction);
 	        this.transfers = this.convertValues(source["transfers"], types.Transfer);
 	        this.withdrawals = this.convertValues(source["withdrawals"], types.Withdrawal);
@@ -706,6 +714,10 @@ export namespace types {
 	    TRANSFERS = "transfers",
 	    TRANSACTIONS = "transactions",
 	    WITHDRAWALS = "withdrawals",
+	    ASSETS = "assets",
+	    LOGS = "logs",
+	    TRACES = "traces",
+	    RECEIPTS = "receipts",
 	    MONITORS = "monitors",
 	    ALL = "all",
 	    CUSTOM = "custom",

@@ -1,24 +1,26 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
+// EXISTING_CODE
+// EXISTING_CODE
+
 export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
   switch (dataFacet) {
-    case types.DataFacet.FUNCTIONS:
-    case types.DataFacet.EVENTS:
-      return getColumnsForFunction();
-    case types.DataFacet.KNOWN:
-      return getColumnsForAbi().filter((col) => {
-        const skip = col.key !== 'address';
-        return skip;
-      });
     case types.DataFacet.DOWNLOADED:
-    // fallthrough intended
+      return getAbisColumns();
+    case types.DataFacet.KNOWN:
+      return getAbisColumns();
+    case types.DataFacet.FUNCTIONS:
+      return getFunctionsColumns();
+    case types.DataFacet.EVENTS:
+      return getFunctionsColumns();
     default:
-      return getColumnsForAbi();
+      return [];
   }
 };
 
-const getColumnsForAbi = (): FormField[] => [
+const getAbisColumns = (): FormField[] => [
+  // EXISTING_CODE
   {
     key: 'address',
     header: 'Address',
@@ -59,9 +61,11 @@ const getColumnsForAbi = (): FormField[] => [
     type: 'text',
     width: '120px',
   },
+  // EXISTING_CODE
 ];
 
-const getColumnsForFunction = (): FormField[] => [
+const getFunctionsColumns = (): FormField[] => [
+  // EXISTING_CODE
   {
     key: 'encoding',
     header: 'Encoding',
@@ -90,4 +94,8 @@ const getColumnsForFunction = (): FormField[] => [
     sortable: true,
     width: 'col-signature',
   },
+  // EXISTING_CODE
 ];
+
+// EXISTING_CODE
+// EXISTING_CODE

@@ -14,7 +14,7 @@ import { useHotkeys } from '@mantine/hooks';
 import { exports, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
 
-import { getColumnsForExports } from './columns';
+import { getColumns } from './columns';
 import {
   EXPORTS_DEFAULT_FACET,
   EXPORTS_ROUTE as ROUTE,
@@ -139,8 +139,9 @@ export const Exports = () => {
   }, []);
 
   const currentColumns = useMemo(() => {
-    const baseColumns = getColumnsForExports(
-      pageData?.facet || activeFacetHook.getCurrentDataFacet(),
+    const baseColumns = getColumns(
+      pageData?.facet ||
+        (activeFacetHook.getCurrentDataFacet() as types.DataFacet),
     );
 
     // Exports are read-only, so we filter out any actions column

@@ -27,6 +27,10 @@ const (
 	ExportsTransfers    types.DataFacet = "transfers"
 	ExportsTransactions types.DataFacet = "transactions"
 	ExportsWithdrawals  types.DataFacet = "withdrawals"
+	ExportsAssets       types.DataFacet = "assets"
+	ExportsLogs         types.DataFacet = "logs"
+	ExportsTraces       types.DataFacet = "traces"
+	ExportsReceipts     types.DataFacet = "receipts"
 )
 
 func init() {
@@ -35,6 +39,10 @@ func init() {
 	types.RegisterDataFacet(ExportsTransfers)
 	types.RegisterDataFacet(ExportsTransactions)
 	types.RegisterDataFacet(ExportsWithdrawals)
+	types.RegisterDataFacet(ExportsAssets)
+	types.RegisterDataFacet(ExportsLogs)
+	types.RegisterDataFacet(ExportsTraces)
+	types.RegisterDataFacet(ExportsReceipts)
 }
 
 type ExportsCollection struct {
@@ -43,6 +51,10 @@ type ExportsCollection struct {
 	transfersFacet    *facets.Facet[Transfer]
 	transactionsFacet *facets.Facet[Transaction]
 	withdrawalsFacet  *facets.Facet[Withdrawal]
+	assetsFacet       *facets.Facet[Asset]
+	logsFacet         *facets.Facet[Log]
+	tracesFacet       *facets.Facet[Trace]
+	receiptsFacet     *facets.Facet[Receipt]
 	summary           types.Summary
 	summaryMutex      sync.RWMutex
 }
@@ -99,6 +111,42 @@ func (c *ExportsCollection) initializeFacets() {
 		"exports",
 		c,
 	)
+
+	c.assetsFacet = facets.NewFacetWithSummary(
+		ExportsAssets,
+		isAsset,
+		isDupAsset(),
+		c.getAssetsStore(),
+		"exports",
+		c,
+	)
+
+	c.logsFacet = facets.NewFacetWithSummary(
+		ExportsLogs,
+		isLog,
+		isDupLog(),
+		c.getLogsStore(),
+		"exports",
+		c,
+	)
+
+	c.tracesFacet = facets.NewFacetWithSummary(
+		ExportsTraces,
+		isTrace,
+		isDupTrace(),
+		c.getTracesStore(),
+		"exports",
+		c,
+	)
+
+	c.receiptsFacet = facets.NewFacetWithSummary(
+		ExportsReceipts,
+		isReceipt,
+		isDupReceipt(),
+		c.getReceiptsStore(),
+		"exports",
+		c,
+	)
 }
 
 func isStatement(item *Statement) bool {
@@ -131,13 +179,61 @@ func isWithdrawal(item *Withdrawal) bool {
 	// EXISTING_CODE
 }
 
+func isAsset(item *Asset) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
+
+func isLog(item *Log) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
+
+func isTrace(item *Trace) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
+
+func isReceipt(item *Receipt) bool {
+	// EXISTING_CODE
+	return true
+	// EXISTING_CODE
+}
+
+func isDupAsset() func(existing []*Asset, newItem *Asset) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
 func isDupBalance() func(existing []*Balance, newItem *Balance) bool {
 	// EXISTING_CODE
 	return nil
 	// EXISTING_CODE
 }
 
+func isDupLog() func(existing []*Log, newItem *Log) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func isDupReceipt() func(existing []*Receipt, newItem *Receipt) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
 func isDupStatement() func(existing []*Statement, newItem *Statement) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func isDupTrace() func(existing []*Trace, newItem *Trace) bool {
 	// EXISTING_CODE
 	return nil
 	// EXISTING_CODE
@@ -188,6 +284,22 @@ func (c *ExportsCollection) LoadData(dataFacet types.DataFacet) {
 			if err := c.withdrawalsFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
 			}
+		case ExportsAssets:
+			if err := c.assetsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case ExportsLogs:
+			if err := c.logsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case ExportsTraces:
+			if err := c.tracesFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
+		case ExportsReceipts:
+			if err := c.receiptsFacet.Load(); err != nil {
+				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
+			}
 		default:
 			logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
 			return
@@ -207,6 +319,14 @@ func (c *ExportsCollection) Reset(dataFacet types.DataFacet) {
 		c.transactionsFacet.GetStore().Reset()
 	case ExportsWithdrawals:
 		c.withdrawalsFacet.GetStore().Reset()
+	case ExportsAssets:
+		c.assetsFacet.GetStore().Reset()
+	case ExportsLogs:
+		c.logsFacet.GetStore().Reset()
+	case ExportsTraces:
+		c.tracesFacet.GetStore().Reset()
+	case ExportsReceipts:
+		c.receiptsFacet.GetStore().Reset()
 	default:
 		return
 	}
@@ -224,6 +344,14 @@ func (c *ExportsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 		return c.transactionsFacet.NeedsUpdate()
 	case ExportsWithdrawals:
 		return c.withdrawalsFacet.NeedsUpdate()
+	case ExportsAssets:
+		return c.assetsFacet.NeedsUpdate()
+	case ExportsLogs:
+		return c.logsFacet.NeedsUpdate()
+	case ExportsTraces:
+		return c.tracesFacet.NeedsUpdate()
+	case ExportsReceipts:
+		return c.receiptsFacet.NeedsUpdate()
 	default:
 		return false
 	}
@@ -236,6 +364,10 @@ func (c *ExportsCollection) GetSupportedFacets() []types.DataFacet {
 		ExportsTransfers,
 		ExportsTransactions,
 		ExportsWithdrawals,
+		ExportsAssets,
+		ExportsLogs,
+		ExportsTraces,
+		ExportsReceipts,
 	}
 }
 
@@ -243,6 +375,11 @@ func (c *ExportsCollection) AccumulateItem(item interface{}, summary *types.Summ
 	// EXISTING_CODE
 	c.summaryMutex.Lock()
 	defer c.summaryMutex.Unlock()
+
+	if summary == nil {
+		logging.LogError("AccumulateItem called with nil summary", nil, nil)
+		return
+	}
 
 	if summary.FacetCounts == nil {
 		summary.FacetCounts = make(map[types.DataFacet]int)
@@ -295,7 +432,9 @@ func (c *ExportsCollection) AccumulateItem(item interface{}, summary *types.Summ
 
 		txCount++
 		totalValue += int64(v.Value.Uint64())
-		totalGasUsed += int64(v.Receipt.GasUsed)
+		if v.Receipt != nil {
+			totalGasUsed += int64(v.Receipt.GasUsed)
+		}
 
 		summary.CustomData["transactionsCount"] = txCount
 		summary.CustomData["totalValue"] = totalValue

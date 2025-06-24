@@ -25,18 +25,34 @@ import (
 // EXISTING_CODE
 // EXISTING_CODE
 
+type Asset = sdk.Asset
 type Balance = sdk.Balance
+type Log = sdk.Log
+type Receipt = sdk.Receipt
 type Statement = sdk.Statement
+type Trace = sdk.Trace
 type Transaction = sdk.Transaction
 type Transfer = sdk.Transfer
 type Withdrawal = sdk.Withdrawal
 
 var (
+	assetsStore   = make(map[string]*store.Store[Asset])
+	assetsStoreMu sync.Mutex
+
 	balancesStore   = make(map[string]*store.Store[Balance])
 	balancesStoreMu sync.Mutex
 
+	logsStore   = make(map[string]*store.Store[Log])
+	logsStoreMu sync.Mutex
+
+	receiptsStore   = make(map[string]*store.Store[Receipt])
+	receiptsStoreMu sync.Mutex
+
 	statementsStore   = make(map[string]*store.Store[Statement])
 	statementsStoreMu sync.Mutex
+
+	tracesStore   = make(map[string]*store.Store[Trace])
+	tracesStoreMu sync.Mutex
 
 	transactionsStore   = make(map[string]*store.Store[Transaction])
 	transactionsStoreMu sync.Mutex
@@ -47,6 +63,56 @@ var (
 	withdrawalsStore   = make(map[string]*store.Store[Withdrawal])
 	withdrawalsStoreMu sync.Mutex
 )
+
+func (c *ExportsCollection) getAssetsStore() *store.Store[Asset] {
+	assetsStoreMu.Lock()
+	defer assetsStoreMu.Unlock()
+
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
+	theStore := assetsStore[storeKey]
+	if theStore == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			exportOpts := sdk.ExportOptions{
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
+				RenderCtx: ctx,
+				Addrs:     []string{address},
+			}
+			if _, _, err := exportOpts.ExportAssets(); err != nil {
+				wrappedErr := types.NewSDKError("exports", ExportsAssets, "fetch", err)
+				logger.Error(fmt.Sprintf("Exports assets SDK query error: %v", wrappedErr))
+				return wrappedErr
+			}
+			// EXISTING_CODE
+			return nil
+		}
+
+		processFunc := func(item interface{}) *Asset {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			if it, ok := item.(*Asset); ok {
+				return it
+			}
+			return nil
+		}
+
+		mappingFunc := func(item *Asset) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		// EXISTING_CODE
+		storeName := fmt.Sprintf("exports_assets_%s_%s", chain, address)
+		// EXISTING_CODE
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		assetsStore[storeKey] = theStore
+	}
+
+	return theStore
+}
 
 func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
 	balancesStoreMu.Lock()
@@ -98,6 +164,106 @@ func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
 	return theStore
 }
 
+func (c *ExportsCollection) getLogsStore() *store.Store[Log] {
+	logsStoreMu.Lock()
+	defer logsStoreMu.Unlock()
+
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
+	theStore := logsStore[storeKey]
+	if theStore == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			exportOpts := sdk.ExportOptions{
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
+				RenderCtx: ctx,
+				Addrs:     []string{address},
+			}
+			if _, _, err := exportOpts.ExportLogs(); err != nil {
+				wrappedErr := types.NewSDKError("exports", ExportsLogs, "fetch", err)
+				logger.Error(fmt.Sprintf("Exports logs SDK query error: %v", wrappedErr))
+				return wrappedErr
+			}
+			// EXISTING_CODE
+			return nil
+		}
+
+		processFunc := func(item interface{}) *Log {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			if it, ok := item.(*Log); ok {
+				return it
+			}
+			return nil
+		}
+
+		mappingFunc := func(item *Log) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		// EXISTING_CODE
+		storeName := fmt.Sprintf("exports_logs_%s_%s", chain, address)
+		// EXISTING_CODE
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		logsStore[storeKey] = theStore
+	}
+
+	return theStore
+}
+
+func (c *ExportsCollection) getReceiptsStore() *store.Store[Receipt] {
+	receiptsStoreMu.Lock()
+	defer receiptsStoreMu.Unlock()
+
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
+	theStore := receiptsStore[storeKey]
+	if theStore == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			exportOpts := sdk.ExportOptions{
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
+				RenderCtx: ctx,
+				Addrs:     []string{address},
+			}
+			if _, _, err := exportOpts.ExportReceipts(); err != nil {
+				wrappedErr := types.NewSDKError("exports", ExportsReceipts, "fetch", err)
+				logger.Error(fmt.Sprintf("Exports receipts SDK query error: %v", wrappedErr))
+				return wrappedErr
+			}
+			// EXISTING_CODE
+			return nil
+		}
+
+		processFunc := func(item interface{}) *Receipt {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			if it, ok := item.(*Receipt); ok {
+				return it
+			}
+			return nil
+		}
+
+		mappingFunc := func(item *Receipt) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		// EXISTING_CODE
+		storeName := fmt.Sprintf("exports_receipts_%s_%s", chain, address)
+		// EXISTING_CODE
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		receiptsStore[storeKey] = theStore
+	}
+
+	return theStore
+}
+
 func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
 	statementsStoreMu.Lock()
 	defer statementsStoreMu.Unlock()
@@ -144,6 +310,56 @@ func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
 		// EXISTING_CODE
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		statementsStore[storeKey] = theStore
+	}
+
+	return theStore
+}
+
+func (c *ExportsCollection) getTracesStore() *store.Store[Trace] {
+	tracesStoreMu.Lock()
+	defer tracesStoreMu.Unlock()
+
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
+	storeKey := getStoreKey(chain, address)
+	theStore := tracesStore[storeKey]
+	if theStore == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			exportOpts := sdk.ExportOptions{
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
+				RenderCtx: ctx,
+				Addrs:     []string{address},
+			}
+			if _, _, err := exportOpts.ExportTraces(); err != nil {
+				wrappedErr := types.NewSDKError("exports", ExportsTraces, "fetch", err)
+				logger.Error(fmt.Sprintf("Exports traces SDK query error: %v", wrappedErr))
+				return wrappedErr
+			}
+			// EXISTING_CODE
+			return nil
+		}
+
+		processFunc := func(item interface{}) *Trace {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			if it, ok := item.(*Trace); ok {
+				return it
+			}
+			return nil
+		}
+
+		mappingFunc := func(item *Trace) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		// EXISTING_CODE
+		storeName := fmt.Sprintf("exports_traces_%s_%s", chain, address)
+		// EXISTING_CODE
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+		tracesStore[storeKey] = theStore
 	}
 
 	return theStore
@@ -312,6 +528,14 @@ func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet) string {
 		return "exports-transactions"
 	case ExportsWithdrawals:
 		return "exports-withdrawals"
+	case ExportsAssets:
+		return "exports-assets"
+	case ExportsLogs:
+		return "exports-logs"
+	case ExportsTraces:
+		return "exports-traces"
+	case ExportsReceipts:
+		return "exports-receipts"
 	default:
 		return ""
 	}

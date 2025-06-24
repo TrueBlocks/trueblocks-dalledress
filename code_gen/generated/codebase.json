@@ -479,6 +479,22 @@
                         {
                             "name": "Withdrawals",
                             "store": "Withdrawals"
+                        },
+                        {
+                            "name": "Assets",
+                            "store": "Assets"
+                        },
+                        {
+                            "name": "Logs",
+                            "store": "Logs"
+                        },
+                        {
+                            "name": "Traces",
+                            "store": "Traces"
+                        },
+                        {
+                            "name": "Receipts",
+                            "store": "Receipts"
                         }
                     ]
                 }
@@ -1085,6 +1101,22 @@
                 {
                     "name": "Withdrawals",
                     "store": "Withdrawals"
+                },
+                {
+                    "name": "Assets",
+                    "store": "Assets"
+                },
+                {
+                    "name": "Logs",
+                    "store": "Logs"
+                },
+                {
+                    "name": "Traces",
+                    "store": "Traces"
+                },
+                {
+                    "name": "Receipts",
+                    "store": "Receipts"
                 }
             ]
         },

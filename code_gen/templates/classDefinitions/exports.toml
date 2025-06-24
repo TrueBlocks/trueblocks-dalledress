@@ -27,3 +27,18 @@ store = "Transactions"
 name = "Withdrawals"
 store = "Withdrawals"
 
+[[facets]]
+name = "Assets"
+store = "Assets"
+
+[[facets]]
+name = "Logs"
+store = "Logs"
+
+[[facets]]
+name = "Traces"
+store = "Traces"
+
+[[facets]]
+name = "Receipts"
+store = "Receipts"

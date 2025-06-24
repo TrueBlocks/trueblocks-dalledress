@@ -1,0 +1,120 @@
+import { FormField } from '@components';
+import { types } from '@models';
+
+// EXISTING_CODE
+import { formatWeiToEther, formatWeiToGigawei } from '../../utils/ether';
+// EXISTING_CODE
+
+export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
+  switch (dataFacet) {
+    {{range .Facets}}case types.DataFacet.{{toUpper .Name}}:
+      return get{{.Store}}Columns();
+    {{end -}}
+    default:
+      return [];
+  }
+};
+
+{{range .Stores}}const get{{.}}Columns = (): FormField[] => [
+  // EXISTING_CODE
+  {
+    key: 'hash',
+    header: 'Hash',
+    type: 'text',
+    sortable: true,
+    width: 'col-hash',
+  },
+  {
+    key: 'blockNumber',
+    header: 'Block',
+    type: 'number',
+    sortable: true,
+    width: 'col-block',
+    textAlign: 'right',
+  },
+  {
+    key: 'transactionIndex',
+    header: 'Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'from',
+    header: 'From',
+    type: 'text',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'to',
+    header: 'To',
+    type: 'text',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'value',
+    header: 'Value',
+    type: 'ether',
+    sortable: true,
+    width: 'col-value',
+    textAlign: 'right',
+  },
+  {
+    key: 'gas',
+    header: 'Gas',
+    type: 'gas',
+    sortable: true,
+    width: 'col-gas',
+    textAlign: 'right',
+  },
+  {
+    key: 'gasPrice',
+    header: 'Gas Price',
+    type: 'ether',
+    sortable: true,
+    width: 'col-gas-price',
+    textAlign: 'right',
+  },
+  {
+    key: 'gasCost',
+    header: 'Gas Cost',
+    type: 'gas',
+    sortable: true,
+    width: 'col-gas-price',
+    textAlign: 'right',
+    render: renderGasCost,
+  },
+  {
+    key: 'actions',
+    header: 'Actions',
+    type: 'text',
+    sortable: false,
+    width: '120px',
+  },
+  // EXISTING_CODE
+];
+
+{{end -}}
+// EXISTING_CODE
+export function renderGasCost(row: Record<string, unknown>) {
+  const gas = BigInt((row.gas as string) || '0');
+  const gasPrice = BigInt((row.gasPrice as string) || '0');
+  const gasCost = gas * gasPrice;
+  return formatWeiToGigawei(gasCost.toString());
+}
+
+export function renderStatementNetAmount(row: Record<string, unknown>) {
+  const amountIn = BigInt((row.amountIn as string) || '0');
+  const amountOut = BigInt((row.amountOut as string) || '0');
+  const netAmount = amountIn + amountOut;
+  return formatWeiToEther(netAmount.toString());
+}
+
+export function renderPriorBalance(row: Record<string, unknown>) {
+  const balance = (row.priorBalance as string) || '0';
+  return formatWeiToEther(balance);
+}
+// EXISTING_CODE

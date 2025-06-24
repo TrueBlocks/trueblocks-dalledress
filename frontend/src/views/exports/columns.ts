@@ -1,28 +1,221 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
+// EXISTING_CODE
 import { formatWeiToEther, formatWeiToGigawei } from '../../utils/ether';
 
-export const getColumnsForExports = (
-  dataFacet: types.DataFacet | string,
-): FormField[] => {
+// EXISTING_CODE
+
+export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
   switch (dataFacet) {
     case types.DataFacet.STATEMENTS:
-      return getStatementColumns();
-    case types.DataFacet.TRANSFERS:
-      return getTransferColumns();
+      return getStatementsColumns();
     case types.DataFacet.BALANCES:
-      return getBalanceColumns();
+      return getBalancesColumns();
+    case types.DataFacet.TRANSFERS:
+      return getTransfersColumns();
     case types.DataFacet.TRANSACTIONS:
-      return getTransactionColumns();
+      return getTransactionsColumns();
     case types.DataFacet.WITHDRAWALS:
-      return getWithdrawalColumns();
+      return getWithdrawalsColumns();
+    case types.DataFacet.ASSETS:
+      return getAssetsColumns();
+    case types.DataFacet.LOGS:
+      return getLogsColumns();
+    case types.DataFacet.TRACES:
+      return getTracesColumns();
+    case types.DataFacet.RECEIPTS:
+      return getReceiptsColumns();
     default:
-      return getTransactionColumns();
+      return [];
   }
 };
 
-const getTransactionColumns = (): FormField[] => [
+const getAssetsColumns = (): FormField[] => [
+  // EXISTING_CODE
+  // EXISTING_CODE
+];
+
+const getBalancesColumns = (): FormField[] => [
+  // EXISTING_CODE
+  {
+    key: 'blockNumber',
+    header: 'Block',
+    type: 'number',
+    sortable: true,
+    width: 'col-block',
+    textAlign: 'right',
+  },
+  {
+    key: 'transactionIndex',
+    header: 'Tx Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'holder',
+    header: 'Holder',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'address',
+    header: 'Token Address',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'symbol',
+    header: 'Symbol',
+    type: 'text',
+    sortable: true,
+    width: 'col-symbol',
+  },
+  {
+    key: 'name',
+    header: 'Token Name',
+    type: 'text',
+    sortable: true,
+    width: 'col-name',
+  },
+  {
+    key: 'balance',
+    header: 'Balance',
+    type: 'ether',
+    sortable: true,
+    width: 'col-balance',
+    textAlign: 'right',
+  },
+  {
+    key: 'priorBalance',
+    header: 'Prior Balance',
+    type: 'ether',
+    sortable: true,
+    width: 'col-balance',
+    textAlign: 'right',
+    render: renderPriorBalance,
+  },
+  {
+    key: 'decimals',
+    header: 'Decimals',
+    type: 'number',
+    sortable: true,
+    width: 'col-decimals',
+    textAlign: 'right',
+  },
+  {
+    key: 'actions',
+    header: 'Actions',
+    type: 'text',
+    sortable: false,
+    width: '120px',
+  },
+  // EXISTING_CODE
+];
+
+const getLogsColumns = (): FormField[] => [
+  // EXISTING_CODE
+  // EXISTING_CODE
+];
+
+const getReceiptsColumns = (): FormField[] => [
+  // EXISTING_CODE
+  // EXISTING_CODE
+];
+
+const getStatementsColumns = (): FormField[] => [
+  // EXISTING_CODE
+  {
+    key: 'blockNumber',
+    header: 'Block',
+    type: 'number',
+    sortable: true,
+    width: 'col-block',
+    textAlign: 'right',
+  },
+  {
+    key: 'transactionIndex',
+    header: 'Tx Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'logIndex',
+    header: 'Log Index',
+    type: 'number',
+    sortable: true,
+    width: 'col-index',
+    textAlign: 'right',
+  },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    type: 'text',
+    sortable: true,
+    width: 'col-timestamp',
+  },
+  {
+    key: 'accountedFor',
+    header: 'Account',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'asset',
+    header: 'Asset',
+    type: 'address',
+    sortable: true,
+    width: 'col-address',
+  },
+  {
+    key: 'prevBal',
+    header: 'Prev Balance',
+    type: 'ether',
+    sortable: true,
+    width: 'col-balance',
+    textAlign: 'right',
+  },
+  {
+    key: 'amountNet',
+    header: 'Net Amount',
+    type: 'ether',
+    sortable: true,
+    width: 'col-amount',
+    textAlign: 'right',
+    render: renderStatementNetAmount,
+  },
+  {
+    key: 'endBal',
+    header: 'End Balance',
+    type: 'ether',
+    sortable: true,
+    width: 'col-balance',
+    textAlign: 'right',
+  },
+  {
+    key: 'actions',
+    header: 'Actions',
+    type: 'text',
+    sortable: false,
+    width: '120px',
+  },
+  // EXISTING_CODE
+];
+
+const getTracesColumns = (): FormField[] => [
+  // EXISTING_CODE
+  // EXISTING_CODE
+];
+
+const getTransactionsColumns = (): FormField[] => [
+  // EXISTING_CODE
   {
     key: 'hash',
     header: 'Hash',
@@ -91,12 +284,7 @@ const getTransactionColumns = (): FormField[] => [
     sortable: true,
     width: 'col-gas-price',
     textAlign: 'right',
-    render: (row) => {
-      const gas = BigInt((row.gas as string) || '0');
-      const gasPrice = BigInt((row.gasPrice as string) || '0');
-      const gasCost = gas * gasPrice;
-      return formatWeiToGigawei(gasCost.toString());
-    },
+    render: renderGasCost,
   },
   {
     key: 'actions',
@@ -105,94 +293,11 @@ const getTransactionColumns = (): FormField[] => [
     sortable: false,
     width: '120px',
   },
+  // EXISTING_CODE
 ];
 
-const getStatementColumns = (): FormField[] => [
-  {
-    key: 'blockNumber',
-    header: 'Block',
-    type: 'number',
-    sortable: true,
-    width: 'col-block',
-    textAlign: 'right',
-  },
-  {
-    key: 'transactionIndex',
-    header: 'Tx Index',
-    type: 'number',
-    sortable: true,
-    width: 'col-index',
-    textAlign: 'right',
-  },
-  {
-    key: 'logIndex',
-    header: 'Log Index',
-    type: 'number',
-    sortable: true,
-    width: 'col-index',
-    textAlign: 'right',
-  },
-  {
-    key: 'timestamp',
-    header: 'Timestamp',
-    type: 'text',
-    sortable: true,
-    width: 'col-timestamp',
-  },
-  {
-    key: 'accountedFor',
-    header: 'Account',
-    type: 'address',
-    sortable: true,
-    width: 'col-address',
-  },
-  {
-    key: 'asset',
-    header: 'Asset',
-    type: 'address',
-    sortable: true,
-    width: 'col-address',
-  },
-  {
-    key: 'prevBal',
-    header: 'Prev Balance',
-    type: 'ether',
-    sortable: true,
-    width: 'col-balance',
-    textAlign: 'right',
-  },
-  {
-    key: 'amountNet',
-    header: 'Net Amount',
-    type: 'ether',
-    sortable: true,
-    width: 'col-amount',
-    textAlign: 'right',
-    render: (row) => {
-      const amountIn = BigInt((row.amountIn as string) || '0');
-      const amountOut = BigInt((row.amountOut as string) || '0');
-      const netAmount = amountIn + amountOut;
-      return formatWeiToEther(netAmount.toString());
-    },
-  },
-  {
-    key: 'endBal',
-    header: 'End Balance',
-    type: 'ether',
-    sortable: true,
-    width: 'col-balance',
-    textAlign: 'right',
-  },
-  {
-    key: 'actions',
-    header: 'Actions',
-    type: 'text',
-    sortable: false,
-    width: '120px',
-  },
-];
-
-const getTransferColumns = (): FormField[] => [
+const getTransfersColumns = (): FormField[] => [
+  // EXISTING_CODE
   {
     key: 'blockNumber',
     header: 'Block',
@@ -260,91 +365,11 @@ const getTransferColumns = (): FormField[] => [
     sortable: false,
     width: '120px',
   },
+  // EXISTING_CODE
 ];
 
-const getBalanceColumns = (): FormField[] => [
-  {
-    key: 'blockNumber',
-    header: 'Block',
-    type: 'number',
-    sortable: true,
-    width: 'col-block',
-    textAlign: 'right',
-  },
-  {
-    key: 'transactionIndex',
-    header: 'Tx Index',
-    type: 'number',
-    sortable: true,
-    width: 'col-index',
-    textAlign: 'right',
-  },
-  {
-    key: 'holder',
-    header: 'Holder',
-    type: 'address',
-    sortable: true,
-    width: 'col-address',
-  },
-  {
-    key: 'address',
-    header: 'Token Address',
-    type: 'address',
-    sortable: true,
-    width: 'col-address',
-  },
-  {
-    key: 'symbol',
-    header: 'Symbol',
-    type: 'text',
-    sortable: true,
-    width: 'col-symbol',
-  },
-  {
-    key: 'name',
-    header: 'Token Name',
-    type: 'text',
-    sortable: true,
-    width: 'col-name',
-  },
-  {
-    key: 'balance',
-    header: 'Balance',
-    type: 'ether',
-    sortable: true,
-    width: 'col-balance',
-    textAlign: 'right',
-  },
-  {
-    key: 'priorBalance',
-    header: 'Prior Balance',
-    type: 'ether',
-    sortable: true,
-    width: 'col-balance',
-    textAlign: 'right',
-    render: (row) => {
-      const balance = (row.priorBalance as string) || '0';
-      return formatWeiToEther(balance);
-    },
-  },
-  {
-    key: 'decimals',
-    header: 'Decimals',
-    type: 'number',
-    sortable: true,
-    width: 'col-decimals',
-    textAlign: 'right',
-  },
-  {
-    key: 'actions',
-    header: 'Actions',
-    type: 'text',
-    sortable: false,
-    width: '120px',
-  },
-];
-
-const getWithdrawalColumns = (): FormField[] => [
+const getWithdrawalsColumns = (): FormField[] => [
+  // EXISTING_CODE
   {
     key: 'blockNumber',
     header: 'Block',
@@ -379,23 +404,39 @@ const getWithdrawalColumns = (): FormField[] => [
   {
     key: 'timestamp',
     header: 'Timestamp',
-    type: 'text',
+    type: 'timestamp',
     sortable: true,
     width: 'col-timestamp',
   },
   {
-    key: 'date',
-    header: 'Date',
-    type: 'text',
-    sortable: true,
-    width: 'col-date',
-  },
-  {
     key: 'amount',
     header: 'Amount',
-    type: 'ether',
+    type: 'text',
     sortable: true,
     width: 'col-amount',
     textAlign: 'right',
   },
+  // EXISTING_CODE
 ];
+
+// EXISTING_CODE
+export function renderGasCost(row: Record<string, unknown>) {
+  const gas = BigInt((row.gas as string) || '0');
+  const gasPrice = BigInt((row.gasPrice as string) || '0');
+  const gasCost = gas * gasPrice;
+  return formatWeiToGigawei(gasCost.toString());
+}
+
+export function renderStatementNetAmount(row: Record<string, unknown>) {
+  const amountIn = BigInt((row.amountIn as string) || '0');
+  const amountOut = BigInt((row.amountOut as string) || '0');
+  const netAmount = amountIn + amountOut;
+  return formatWeiToEther(netAmount.toString());
+}
+
+export function renderPriorBalance(row: Record<string, unknown>) {
+  const balance = (row.priorBalance as string) || '0';
+  return formatWeiToEther(balance);
+}
+
+// EXISTING_CODE

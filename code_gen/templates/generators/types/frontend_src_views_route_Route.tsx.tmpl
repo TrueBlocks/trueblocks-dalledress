@@ -1,6 +1,7 @@
 {{- $class := .Class -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
+{{- $upper := toUpper $class -}}
 // === SECTION 1: Imports & Dependencies ===
 // EXISTING_CODE
 // EXISTING_CODE
@@ -8,9 +9,30 @@
 
 export const {{$class}} = () => {
   // === SECTION 2: Hook Initialization ===
+  // EXISTING_CODE
+  // EXISTING_CODE
   const createPayload = usePayload();
-  // EXISTING_CODE
-  // EXISTING_CODE
+
+  const activeFacetHook = useActiveFacet({
+    facets: {{$lower}}Facets,
+    defaultFacet: {{$upper}}_DEFAULT_FACET,
+    viewRoute: ROUTE,
+  });
+  const { getCurrentDataFacet } = activeFacetHook;
+
+  const [pageData, setPageData] = useState<{{$lower}}.{{$class}}Page | null>(null);
+  const viewStateKey = useMemo(
+    (): ViewStateKey => ({
+      viewName: ROUTE,
+      tabName: getCurrentDataFacet(),
+    }),
+    [getCurrentDataFacet],
+  );
+
+  const { error, handleError, clearError } = useErrorHandler();
+  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { sort } = useSorting(viewStateKey);
+  const { filter } = useFiltering(viewStateKey);
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
@@ -21,8 +43,45 @@ export const {{$class}} = () => {
   // === END SECTION 3 ===
 
   // === SECTION 4: Data Fetching Logic ===
-  // EXISTING_CODE
-  // EXISTING_CODE
+  const fetchData = useCallback(async () => {
+    clearError();
+    try {
+      const result = await Get{{$class}}Page(
+        createPayload(dataFacetRef.current),
+        pagination.currentPage * pagination.pageSize,
+        pagination.pageSize,
+        sort,
+        filter,
+      );
+      setPageData(result);
+      setTotalItems(result.totalItems || 0);
+    } catch (err: unknown) {
+      handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
+    }
+  }, [
+    clearError,
+    createPayload,
+    pagination.currentPage,
+    pagination.pageSize,
+    sort,
+    filter,
+    setTotalItems,
+    handleError,
+    getCurrentDataFacet,
+  ]);
+
+  const currentData = useMemo(() => {
+    if (!pageData) return [];
+
+    const facet = getCurrentDataFacet();
+    switch (facet) {
+      {{range .Facets}}case types.DataFacet.{{toUpper .Name}}:
+        return pageData.{{toLower .Store}} || [];
+      {{end -}}
+      default:
+        return [];
+    }
+  }, [pageData, getCurrentDataFacet]);
   // === END SECTION 4 ===
 
   // === SECTION 5: Event Handling ===

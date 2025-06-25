@@ -23,20 +23,18 @@ import {
 
 export const Chunks = () => {
   // === SECTION 2: Hook Initialization ===
-  const createPayload = usePayload();
   // EXISTING_CODE
+  // EXISTING_CODE
+  const createPayload = usePayload();
+
   const activeFacetHook = useActiveFacet({
     facets: chunksFacets,
     defaultFacet: CHUNKS_DEFAULT_FACET,
     viewRoute: ROUTE,
   });
-
   const { getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<chunks.ChunksPage | null>(null);
-  const [_state, setState] = useState<types.LoadState>();
-  const { error } = useErrorHandler();
-
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
@@ -45,11 +43,10 @@ export const Chunks = () => {
     [getCurrentDataFacet],
   );
 
-  const { handleError, clearError } = useErrorHandler();
+  const { error, handleError, clearError } = useErrorHandler();
   const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  // EXISTING_CODE
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
@@ -60,8 +57,6 @@ export const Chunks = () => {
   // === END SECTION 3 ===
 
   // === SECTION 4: Data Fetching Logic ===
-  // EXISTING_CODE
-
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -70,13 +65,12 @@ export const Chunks = () => {
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
-        filter ?? '',
+        filter,
       );
-      setState(result.state);
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${dataFacetRef.current}`);
+      handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
     }
   }, [
     clearError,
@@ -87,13 +81,14 @@ export const Chunks = () => {
     filter,
     setTotalItems,
     handleError,
+    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
     if (!pageData) return [];
 
-    const currentDataFacet = getCurrentDataFacet();
-    switch (currentDataFacet) {
+    const facet = getCurrentDataFacet();
+    switch (facet) {
       case types.DataFacet.STATS:
         return pageData.stats || [];
       case types.DataFacet.INDEX:
@@ -103,10 +98,9 @@ export const Chunks = () => {
       case types.DataFacet.MANIFEST:
         return pageData.manifest || [];
       default:
-        return pageData.stats || [];
+        return [];
     }
   }, [pageData, getCurrentDataFacet]);
-  // EXISTING_CODE
   // === END SECTION 4 ===
 
   // === SECTION 5: Event Handling ===

@@ -23,18 +23,18 @@ import {
 
 export const Exports = () => {
   // === SECTION 2: Hook Initialization ===
-  const createPayload = usePayload();
   // EXISTING_CODE
-  const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
+  // EXISTING_CODE
+  const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({
     facets: exportsFacets,
     defaultFacet: EXPORTS_DEFAULT_FACET,
     viewRoute: ROUTE,
   });
-
   const { getCurrentDataFacet } = activeFacetHook;
 
+  const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
@@ -47,7 +47,6 @@ export const Exports = () => {
   const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  // EXISTING_CODE
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
@@ -58,7 +57,6 @@ export const Exports = () => {
   // === END SECTION 3 ===
 
   // === SECTION 4: Data Fetching Logic ===
-  // EXISTING_CODE
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -72,7 +70,7 @@ export const Exports = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${dataFacetRef.current}`);
+      handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
     }
   }, [
     clearError,
@@ -83,19 +81,20 @@ export const Exports = () => {
     filter,
     setTotalItems,
     handleError,
+    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
     if (!pageData) return [];
 
-    const currentDataFacet = getCurrentDataFacet() as types.DataFacet;
-    switch (currentDataFacet) {
+    const facet = getCurrentDataFacet();
+    switch (facet) {
       case types.DataFacet.STATEMENTS:
         return pageData.statements || [];
-      case types.DataFacet.TRANSFERS:
-        return pageData.transfers || [];
       case types.DataFacet.BALANCES:
         return pageData.balances || [];
+      case types.DataFacet.TRANSFERS:
+        return pageData.transfers || [];
       case types.DataFacet.TRANSACTIONS:
         return pageData.transactions || [];
       case types.DataFacet.WITHDRAWALS:
@@ -112,7 +111,6 @@ export const Exports = () => {
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
-  // EXISTING_CODE
   // === END SECTION 4 ===
 
   // === SECTION 5: Event Handling ===
@@ -161,8 +159,6 @@ export const Exports = () => {
     const baseColumns = getColumns(
       pageData?.facet || (getCurrentDataFacet() as types.DataFacet),
     );
-
-    // Exports are read-only, so we filter out any actions column
     return baseColumns.filter((col) => col.key !== 'actions');
   }, [pageData?.facet, getCurrentDataFacet]);
   // EXISTING_CODE

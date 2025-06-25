@@ -26,22 +26,18 @@ import { ABIS_DEFAULT_FACET, ABIS_ROUTE as ROUTE, abisFacets } from './facets';
 
 export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
-  const createPayload = usePayload();
   // EXISTING_CODE
+  // EXISTING_CODE
+  const createPayload = usePayload();
+
   const activeFacetHook = useActiveFacet({
     facets: abisFacets,
     defaultFacet: ABIS_DEFAULT_FACET,
     viewRoute: ROUTE,
   });
-
   const { getCurrentDataFacet } = activeFacetHook;
 
-  const { emitSuccess } = useActionMsgs('abis');
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
-  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
-    new Set(),
-  );
-
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
@@ -51,10 +47,9 @@ export const Abis = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
+  const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  // EXISTING_CODE
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
@@ -65,8 +60,6 @@ export const Abis = () => {
   // === END SECTION 3 ===
 
   // === SECTION 4: Data Fetching Logic ===
-  // EXISTING_CODE
-
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -80,7 +73,7 @@ export const Abis = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${dataFacetRef.current}`);
+      handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
     }
   }, [
     clearError,
@@ -91,21 +84,26 @@ export const Abis = () => {
     filter,
     setTotalItems,
     handleError,
+    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
-    const currentDataFacet = getCurrentDataFacet();
-    // For ABI-based tabs (Downloaded, Known), use abis data
-    if (
-      currentDataFacet === types.DataFacet.DOWNLOADED ||
-      currentDataFacet === types.DataFacet.KNOWN
-    ) {
-      return pageData?.abis || [];
+    if (!pageData) return [];
+
+    const facet = getCurrentDataFacet();
+    switch (facet) {
+      case types.DataFacet.DOWNLOADED:
+        return pageData.abis || [];
+      case types.DataFacet.KNOWN:
+        return pageData.abis || [];
+      case types.DataFacet.FUNCTIONS:
+        return pageData.functions || [];
+      case types.DataFacet.EVENTS:
+        return pageData.functions || [];
+      default:
+        return [];
     }
-    // For function-based tabs (Functions, Events), use functions data
-    return pageData?.functions || [];
-  }, [pageData?.abis, pageData?.functions, getCurrentDataFacet]);
-  // EXISTING_CODE
+  }, [pageData, getCurrentDataFacet]);
   // === END SECTION 4 ===
 
   // === SECTION 5: Event Handling ===
@@ -140,6 +138,8 @@ export const Abis = () => {
 
   // === SECTION 6: CRUD Operations ===
   // EXISTING_CODE
+  const { emitSuccess } = useActionMsgs('abis');
+  const { goToPage } = usePagination(viewStateKey);
 
   // Optimistic delete action with simple last-record navigation
   const handleAction = useCallback(
@@ -277,6 +277,10 @@ export const Abis = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
+  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
+    new Set(),
+  );
+
   const handleSubmit = useCallback((_formData: Record<string, unknown>) => {
     // Log(`Table submitted: ${formData}`);
   }, []);

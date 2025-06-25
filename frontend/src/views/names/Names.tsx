@@ -52,21 +52,18 @@ function removeUndefinedProps(
 
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
-  const createPayload = usePayload();
   // EXISTING_CODE
-  const [pageData, setPageData] = useState<names.NamesPage | null>(null);
-  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
-    new Set(),
-  );
+  // EXISTING_CODE
+  const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({
     facets: namesFacets,
     defaultFacet: NAMES_DEFAULT_FACET,
     viewRoute: ROUTE,
   });
-
   const { getCurrentDataFacet } = activeFacetHook;
 
+  const [pageData, setPageData] = useState<names.NamesPage | null>(null);
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
@@ -78,9 +75,7 @@ export const Names = () => {
   const { error, handleError, clearError } = useErrorHandler();
   const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
-  const { filter, setFiltering } = useFiltering(viewStateKey);
-  const { emitSuccess, failure } = useActionMsgs('names');
-  // EXISTING_CODE
+  const { filter } = useFiltering(viewStateKey);
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
@@ -91,7 +86,6 @@ export const Names = () => {
   // === END SECTION 3 ===
 
   // === SECTION 4: Data Fetching Logic ===
-  // EXISTING_CODE
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -100,7 +94,7 @@ export const Names = () => {
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
-        filter ?? '',
+        filter,
       );
       setPageData(result);
       setTotalItems(result.totalItems || 0);
@@ -120,9 +114,24 @@ export const Names = () => {
   ]);
 
   const currentData = useMemo(() => {
-    return pageData?.names || [];
-  }, [pageData?.names]);
-  // EXISTING_CODE
+    if (!pageData) return [];
+
+    const facet = getCurrentDataFacet();
+    switch (facet) {
+      case types.DataFacet.ALL:
+        return pageData.names || [];
+      case types.DataFacet.CUSTOM:
+        return pageData.names || [];
+      case types.DataFacet.PREFUND:
+        return pageData.names || [];
+      case types.DataFacet.REGULAR:
+        return pageData.names || [];
+      case types.DataFacet.BADDRESS:
+        return pageData.names || [];
+      default:
+        return [];
+    }
+  }, [pageData, getCurrentDataFacet]);
   // === END SECTION 4 ===
 
   // === SECTION 5: Event Handling ===
@@ -157,6 +166,7 @@ export const Names = () => {
 
   // === SECTION 6: CRUD Operations ===
   // EXISTING_CODE
+  const { emitSuccess, failure } = useActionMsgs('names');
 
   // Handle CRUD actions for names
   const handleDelete = useCallback(
@@ -457,6 +467,11 @@ export const Names = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
+  const { setFiltering } = useFiltering(viewStateKey);
+  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
+    new Set(),
+  );
+
   const currentColumns = useMemo(() => {
     const handleChipClick = (chip: string) => {
       setFiltering(chip);

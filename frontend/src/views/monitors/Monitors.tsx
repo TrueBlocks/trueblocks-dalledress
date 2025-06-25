@@ -15,7 +15,7 @@ import {
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, monitors, msgs, types } from '@models';
-import { getAddressString, useEmitters, useErrorHandler } from '@utils';
+import { getAddressString, useErrorHandler } from '@utils';
 
 import { Address } from '../../types/address';
 import { getColumns } from './';
@@ -30,23 +30,18 @@ import {
 
 export const Monitors = () => {
   // === SECTION 2: Hook Initialization ===
-  const createPayload = usePayload();
   // EXISTING_CODE
+  // EXISTING_CODE
+  const createPayload = usePayload();
+
   const activeFacetHook = useActiveFacet({
     facets: monitorsFacets,
     defaultFacet: MONITORS_DEFAULT_FACET,
     viewRoute: ROUTE,
   });
-
   const { getCurrentDataFacet } = activeFacetHook;
 
-  const { emitSuccess, emitCleaningStatus, failure } =
-    useActionMsgs('monitors');
   const [pageData, setPageData] = useState<monitors.MonitorsPage | null>(null);
-  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
-    new Set(),
-  );
-
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
@@ -59,8 +54,6 @@ export const Monitors = () => {
   const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  const { emitStatus } = useEmitters();
-  // EXISTING_CODE
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
@@ -71,7 +64,6 @@ export const Monitors = () => {
   // === END SECTION 3 ===
 
   // === SECTION 4: Data Fetching Logic ===
-  // EXISTING_CODE
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -84,11 +76,8 @@ export const Monitors = () => {
       );
       setPageData(result);
       setTotalItems(result.totalItems || 0);
-
-      // Emit status message after successful data load
-      emitStatus(`Loaded ${result.totalItems || 0} monitors successfully`);
     } catch (err: unknown) {
-      handleError(err, `Failed to fetch ${dataFacetRef.current}`);
+      handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
     }
   }, [
     clearError,
@@ -99,14 +88,20 @@ export const Monitors = () => {
     filter,
     setTotalItems,
     handleError,
-    emitStatus,
+    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
-    return pageData?.monitors || [];
-  }, [pageData?.monitors]);
-  useHotkeys([['mod+shift+c', () => handleCleanAll()]]);
-  // EXISTING_CODE
+    if (!pageData) return [];
+
+    const facet = getCurrentDataFacet();
+    switch (facet) {
+      case types.DataFacet.MONITORS:
+        return pageData.monitors || [];
+      default:
+        return [];
+    }
+  }, [pageData, getCurrentDataFacet]);
   // === END SECTION 4 ===
 
   // === SECTION 5: Event Handling ===
@@ -141,6 +136,8 @@ export const Monitors = () => {
 
   // === SECTION 6: CRUD Operations ===
   // EXISTING_CODE
+  const { emitSuccess, emitCleaningStatus, failure } =
+    useActionMsgs('monitors');
 
   // Handle CRUD actions for monitors
   const handleDelete = useCallback(
@@ -421,6 +418,10 @@ export const Monitors = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
+  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
+    new Set(),
+  );
+
   const currentColumns = useMemo(() => {
     const baseColumns = getColumns(getCurrentDataFacet() as types.DataFacet);
 

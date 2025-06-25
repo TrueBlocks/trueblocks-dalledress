@@ -26,8 +26,6 @@ import { ABIS_DEFAULT_FACET, ABIS_ROUTE as ROUTE, abisFacets } from './facets';
 
 export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
-  // EXISTING_CODE
-  // EXISTING_CODE
   const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({

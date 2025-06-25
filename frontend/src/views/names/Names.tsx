@@ -52,8 +52,6 @@ function removeUndefinedProps(
 
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
-  // EXISTING_CODE
-  // EXISTING_CODE
   const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({

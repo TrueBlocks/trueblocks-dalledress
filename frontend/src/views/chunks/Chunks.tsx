@@ -53,8 +53,6 @@ export const Chunks = () => {
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
-  // EXISTING_CODE
-  // EXISTING_CODE
   const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
   useEffect(() => {
     dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
@@ -112,8 +110,6 @@ export const Chunks = () => {
   // === END SECTION 4 ===
 
   // === SECTION 5: Event Handling ===
-  // EXISTING_CODE
-  // EXISTING_CODE
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
@@ -164,8 +160,6 @@ export const Chunks = () => {
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
-  // EXISTING_CODE
-  // EXISTING_CODE
   const perTabTable = useMemo(
     () => (
       <BaseTab
@@ -199,8 +193,6 @@ export const Chunks = () => {
   // === END SECTION 8 ===
 
   // === SECTION 9: Render/JSX ===
-  // EXISTING_CODE
-  // EXISTING_CODE
   const renderCnt = useRef(0);
   // renderCnt.current++;
   return (

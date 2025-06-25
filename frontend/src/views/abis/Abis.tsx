@@ -1,9 +1,16 @@
+// === SECTION 1: Imports & Dependencies ===
+// EXISTING_CODE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action, BaseTab, FormField, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActionMsgs, useActiveFacet, useEvent } from '@hooks';
+import {
+  DataFacetConfig,
+  useActionMsgs,
+  useActiveFacet,
+  useEvent,
+} from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, crud, msgs, types } from '@models';
@@ -13,7 +20,12 @@ import { Address } from '../../types/address';
 import { getColumns } from './';
 import { ABIS_DEFAULT_FACET, ABIS_ROUTE as ROUTE, abisFacets } from './facets';
 
+// EXISTING_CODE
+// === END SECTION 1 ===
+
 export const Abis = () => {
+  // === SECTION 2: Hook Initialization ===
+  // EXISTING_CODE
   const activeFacetHook = useActiveFacet({
     facets: abisFacets,
     defaultFacet: ABIS_DEFAULT_FACET,
@@ -41,14 +53,20 @@ export const Abis = () => {
   const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
+  // EXISTING_CODE
+  // === END SECTION 2 ===
 
+  // === SECTION 3: Refs & Effects Setup ===
+  // EXISTING_CODE
   const dataFacetRef = useRef(getCurrentDataFacet());
-  const renderCnt = useRef(0);
-  // renderCnt.current++;
-
   useEffect(() => {
     dataFacetRef.current = getCurrentDataFacet();
   }, [getCurrentDataFacet]);
+  // EXISTING_CODE
+  // === END SECTION 3 ===
+
+  // === SECTION 4: Data Fetching Logic ===
+  // EXISTING_CODE
 
   const fetchData = useCallback(async () => {
     clearError();
@@ -88,7 +106,12 @@ export const Abis = () => {
     // For function-based tabs (Functions, Events), use functions data
     return pageData?.functions || [];
   }, [pageData?.abis, pageData?.functions, getCurrentDataFacet]);
+  // EXISTING_CODE
+  // === END SECTION 4 ===
 
+  // === SECTION 5: Event Handling ===
+  // EXISTING_CODE
+  // EXISTING_CODE
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
@@ -105,16 +128,20 @@ export const Abis = () => {
     fetchData();
   }, [fetchData]);
 
-  useHotkeys([
-    [
-      'mod+r',
-      () => {
-        Reload(getCurrentDataFacet() as types.DataFacet, '', '').then(() => {
-          fetchData();
-        });
-      },
-    ],
-  ]);
+  const handleReload = useCallback(async () => {
+    try {
+      await Reload(getCurrentDataFacet() as types.DataFacet, '', '');
+      await fetchData();
+    } catch (err: unknown) {
+      handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
+    }
+  }, [getCurrentDataFacet, fetchData, handleError]);
+
+  useHotkeys([['mod+r', handleReload]]);
+  // === END SECTION 5 ===
+
+  // === SECTION 6: CRUD Operations ===
+  // EXISTING_CODE
 
   // Optimistic delete action with simple last-record navigation
   const handleAction = useCallback(
@@ -251,7 +278,11 @@ export const Abis = () => {
     },
     [handleAction],
   );
+  // EXISTING_CODE
+  // === END SECTION 6 ===
 
+  // === SECTION 7: Form & UI Handlers ===
+  // EXISTING_CODE
   const handleSubmit = useCallback((_formData: Record<string, unknown>) => {
     // Log(`Table submitted: ${formData}`);
   }, []);
@@ -301,7 +332,12 @@ export const Abis = () => {
       col.key === 'actions' ? { ...col, ...actionsOverride } : col,
     );
   }, [pageData?.facet, handleRemove, processingAddresses]);
+  // EXISTING_CODE
+  // === END SECTION 7 ===
 
+  // === SECTION 8: Tab Configuration ===
+  // EXISTING_CODE
+  // EXISTING_CODE
   const perTabTable = useMemo(
     () => (
       <BaseTab
@@ -324,34 +360,23 @@ export const Abis = () => {
   );
 
   const tabs = useMemo(
-    () => [
-      {
-        label: 'Downloaded',
-        value: types.DataFacet.DOWNLOADED,
+    () =>
+      activeFacetHook.availableFacets.map((facetConfig: DataFacetConfig) => ({
+        label: facetConfig.label,
+        value: facetConfig.id,
         content: perTabTable,
-      },
-      {
-        label: 'Known',
-        value: types.DataFacet.KNOWN,
-        content: perTabTable,
-      },
-      {
-        label: 'Functions',
-        value: types.DataFacet.FUNCTIONS,
-        content: perTabTable,
-      },
-      {
-        label: 'Events',
-        value: types.DataFacet.EVENTS,
-        content: perTabTable,
-      },
-    ],
-    [perTabTable],
+      })),
+    [activeFacetHook.availableFacets, perTabTable],
   );
+  // === END SECTION 8 ===
 
+  // === SECTION 9: Render/JSX ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  const renderCnt = useRef(0);
+  // renderCnt.current++;
   return (
     <div className="mainView">
-      {(state as string) === '' && <div>{`state: ${state}`}</div>}
       <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
@@ -362,4 +387,5 @@ export const Abis = () => {
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
+  // === END SECTION 9 ===
 };

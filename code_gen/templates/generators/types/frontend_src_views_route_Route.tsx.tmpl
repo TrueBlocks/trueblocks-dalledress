@@ -1,0 +1,119 @@
+{{- $class := .Class -}}
+{{- $lower := toLower $class -}}
+{{- $single := toSingular $class -}}
+// === SECTION 1: Imports & Dependencies ===
+// EXISTING_CODE
+// EXISTING_CODE
+// === END SECTION 1 ===
+
+export const {{$class}} = () => {
+  // === SECTION 2: Hook Initialization ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  // === END SECTION 2 ===
+
+  // === SECTION 3: Refs & Effects Setup ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  // === END SECTION 3 ===
+
+  // === SECTION 4: Data Fetching Logic ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  // === END SECTION 4 ===
+
+  // === SECTION 5: Event Handling ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  useEvent(
+    msgs.EventType.DATA_LOADED,
+    (_message: string, payload?: Record<string, unknown>) => {
+      if (payload?.collection === '{{$lower}}') {
+        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        if (eventDataFacet === dataFacetRef.current) {
+          fetchData();
+        }
+      }
+    },
+  );
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleReload = useCallback(async () => {
+    try {
+      await Reload(getCurrentDataFacet() as types.DataFacet, '', '');
+      await fetchData();
+    } catch (err: unknown) {
+      handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
+    }
+  }, [getCurrentDataFacet, fetchData, handleError]);
+
+  useHotkeys([['mod+r', handleReload]]);
+  // === END SECTION 5 ===
+
+  // === SECTION 6: CRUD Operations ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  // === END SECTION 6 ===
+
+  // === SECTION 7: Form & UI Handlers ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  // === END SECTION 7 ===
+
+  // === SECTION 8: Tab Configuration ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  const perTabTable = useMemo(
+    () => (
+      <BaseTab
+        data={currentData as unknown as Record<string, unknown>[]}
+        columns={currentColumns}
+        loading={!!pageData?.isFetching}
+        error={error}
+        onSubmit={handleSubmit}
+        viewStateKey={viewStateKey}
+      />
+    ),
+    [
+      currentData,
+      currentColumns,
+      pageData?.isFetching,
+      error,
+      handleSubmit,
+      viewStateKey,
+    ],
+  );
+
+  const tabs = useMemo(
+    () =>
+      activeFacetHook.availableFacets.map((facetConfig: DataFacetConfig) => ({
+        label: facetConfig.label,
+        value: facetConfig.id,
+        content: perTabTable,
+      })),
+    [activeFacetHook.availableFacets, perTabTable],
+  );
+  // === END SECTION 8 ===
+
+  // === SECTION 9: Render/JSX ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  const renderCnt = useRef(0);
+  // renderCnt.current++;
+  return (
+    <div className="mainView">
+      <TabView tabs={tabs} route={ROUTE} />
+      {error && (
+        <div>
+          <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>
+          <p>{error.message}</p>
+        </div>
+      )}
+      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
+    </div>
+  );
+  // === END SECTION 9 ===
+};

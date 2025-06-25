@@ -1,9 +1,11 @@
+// === SECTION 1: Imports & Dependencies ===
+// EXISTING_CODE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useActiveFacet, useEvent } from '@hooks';
+import { DataFacetConfig, useActiveFacet, useEvent } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { chunks, msgs, types } from '@models';
@@ -16,7 +18,12 @@ import {
   chunksFacets,
 } from './facets';
 
+// EXISTING_CODE
+// === END SECTION 1 ===
+
 export const Chunks = () => {
+  // === SECTION 2: Hook Initialization ===
+  // EXISTING_CODE
   const activeFacetHook = useActiveFacet({
     facets: chunksFacets,
     defaultFacet: CHUNKS_DEFAULT_FACET,
@@ -27,6 +34,7 @@ export const Chunks = () => {
 
   const [pageData, setPageData] = useState<chunks.ChunksPage | null>(null);
   const [_state, setState] = useState<types.LoadState>();
+  const { error } = useErrorHandler();
 
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
@@ -40,12 +48,20 @@ export const Chunks = () => {
   const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
+  // EXISTING_CODE
+  // === END SECTION 2 ===
 
+  // === SECTION 3: Refs & Effects Setup ===
+  // EXISTING_CODE
   const dataFacetRef = useRef(getCurrentDataFacet());
-
   useEffect(() => {
     dataFacetRef.current = getCurrentDataFacet();
   }, [getCurrentDataFacet]);
+  // EXISTING_CODE
+  // === END SECTION 3 ===
+
+  // === SECTION 4: Data Fetching Logic ===
+  // EXISTING_CODE
 
   const fetchData = useCallback(async () => {
     clearError();
@@ -92,6 +108,23 @@ export const Chunks = () => {
         return pageData.stats || [];
     }
   }, [pageData, getCurrentDataFacet]);
+  // EXISTING_CODE
+  // === END SECTION 4 ===
+
+  // === SECTION 5: Event Handling ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  useEvent(
+    msgs.EventType.DATA_LOADED,
+    (_message: string, payload?: Record<string, unknown>) => {
+      if (payload?.collection === 'chunks') {
+        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        if (eventDataFacet === dataFacetRef.current) {
+          fetchData();
+        }
+      }
+    },
+  );
 
   useEffect(() => {
     fetchData();
@@ -106,65 +139,80 @@ export const Chunks = () => {
     }
   }, [getCurrentDataFacet, fetchData, handleError]);
 
-  useEvent(
-    msgs.EventType.DATA_LOADED,
-    (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'chunks') {
-        fetchData();
-      }
-    },
+  useHotkeys([['mod+r', handleReload]]);
+  // === END SECTION 5 ===
+
+  // === SECTION 6: CRUD Operations ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  // === END SECTION 6 ===
+
+  // === SECTION 7: Form & UI Handlers ===
+  // EXISTING_CODE
+
+  const handleSubmit = useCallback(
+    (_formData: Record<string, unknown>) => {},
+    [],
   );
 
-  useHotkeys([['mod+r', handleReload]]);
-
-  const columns = useMemo(
+  const currentColumns = useMemo(
     () => getColumns(getCurrentDataFacet() as types.DataFacet),
     [getCurrentDataFacet],
   );
+  // EXISTING_CODE
+  // === END SECTION 7 ===
 
+  // === SECTION 8: Tab Configuration ===
+  // EXISTING_CODE
+  // EXISTING_CODE
   const perTabTable = useMemo(
     () => (
       <BaseTab
         data={currentData as unknown as Record<string, unknown>[]}
-        columns={columns}
+        columns={currentColumns}
         loading={!!pageData?.isFetching}
-        error={null} // Chunks are read-only, no edit errors
-        onSubmit={() => {}} // No-op since chunks are read-only
+        error={error}
+        onSubmit={handleSubmit}
         viewStateKey={viewStateKey}
       />
     ),
-    [currentData, columns, pageData?.isFetching, viewStateKey],
+    [
+      currentData,
+      currentColumns,
+      pageData?.isFetching,
+      error,
+      handleSubmit,
+      viewStateKey,
+    ],
   );
 
   const tabs = useMemo(
-    () => [
-      {
-        label: 'Stats',
-        value: types.DataFacet.STATS,
+    () =>
+      activeFacetHook.availableFacets.map((facetConfig: DataFacetConfig) => ({
+        label: facetConfig.label,
+        value: facetConfig.id,
         content: perTabTable,
-      },
-      {
-        label: 'Index',
-        value: types.DataFacet.INDEX,
-        content: perTabTable,
-      },
-      {
-        label: 'Blooms',
-        value: types.DataFacet.BLOOMS,
-        content: perTabTable,
-      },
-      {
-        label: 'Manifest',
-        value: types.DataFacet.MANIFEST,
-        content: perTabTable,
-      },
-    ],
-    [perTabTable],
+      })),
+    [activeFacetHook.availableFacets, perTabTable],
   );
+  // === END SECTION 8 ===
 
+  // === SECTION 9: Render/JSX ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  const renderCnt = useRef(0);
+  // renderCnt.current++;
   return (
     <div className="mainView">
       <TabView tabs={tabs} route={ROUTE} />
+      {error && (
+        <div>
+          <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>
+          <p>{error.message}</p>
+        </div>
+      )}
+      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
+  // === END SECTION 9 ===
 };

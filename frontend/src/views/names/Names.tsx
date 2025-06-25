@@ -1,3 +1,5 @@
+// === SECTION 1: Imports & Dependencies ===
+// EXISTING_CODE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
@@ -44,7 +46,12 @@ function removeUndefinedProps(
   return result;
 }
 
+// EXISTING_CODE
+// === END SECTION 1 ===
+
 export const Names = () => {
+  // === SECTION 2: Hook Initialization ===
+  // EXISTING_CODE
   const [pageData, setPageData] = useState<names.NamesPage | null>(null);
   const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
@@ -72,22 +79,27 @@ export const Names = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter, setFiltering } = useFiltering(viewStateKey);
   const { emitSuccess, failure } = useActionMsgs('names');
+  // EXISTING_CODE
+  // === END SECTION 2 ===
 
+  // === SECTION 3: Refs & Effects Setup ===
+  // EXISTING_CODE
   // Cache the current backend DataFacet for API calls
-  const currentDataFacetRef = useRef(activeFacetHook.getCurrentDataFacet());
-  const renderCnt = useRef(0);
-  // renderCnt.current++;
-
+  const dataFacetRef = useRef(getCurrentDataFacet());
   useEffect(() => {
-    currentDataFacetRef.current = getCurrentDataFacet();
+    dataFacetRef.current = getCurrentDataFacet();
   }, [getCurrentDataFacet]);
+  // EXISTING_CODE
+  // === END SECTION 3 ===
 
+  // === SECTION 4: Data Fetching Logic ===
+  // EXISTING_CODE
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetNamesPage(
         types.Payload.createFrom({
-          dataFacet: currentDataFacetRef.current,
+          dataFacet: dataFacetRef.current,
         }),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
@@ -114,16 +126,18 @@ export const Names = () => {
   const currentData = useMemo(() => {
     return pageData?.names || [];
   }, [pageData?.names]);
+  // EXISTING_CODE
+  // === END SECTION 4 ===
 
+  // === SECTION 5: Event Handling ===
+  // EXISTING_CODE
+  // EXISTING_CODE
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'names') {
-        const eventBackendDataFacet = payload.dataFacet as
-          | types.DataFacet
-          | undefined;
-        const currentDataFacet = activeFacetHook.getCurrentDataFacet();
-        if (eventBackendDataFacet === currentDataFacet) {
+        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
       }
@@ -134,20 +148,20 @@ export const Names = () => {
     fetchData();
   }, [fetchData]);
 
-  useHotkeys([
-    [
-      'mod+r',
-      () => {
-        Reload(
-          activeFacetHook.getCurrentDataFacet() as types.DataFacet,
-          '',
-          '',
-        ).then(() => {
-          fetchData();
-        });
-      },
-    ],
-  ]);
+  const handleReload = useCallback(async () => {
+    try {
+      await Reload(getCurrentDataFacet() as types.DataFacet, '', '');
+      await fetchData();
+    } catch (err: unknown) {
+      handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
+    }
+  }, [getCurrentDataFacet, fetchData, handleError]);
+
+  useHotkeys([['mod+r', handleReload]]);
+  // === END SECTION 5 ===
+
+  // === SECTION 6: CRUD Operations ===
+  // EXISTING_CODE
 
   // Handle CRUD actions for names
   const handleDelete = useCallback(
@@ -172,7 +186,7 @@ export const Names = () => {
         });
         NamesCrud(
           types.Payload.createFrom({
-            dataFacet: currentDataFacetRef.current,
+            dataFacet: dataFacetRef.current,
             address: address,
           }),
           crud.Operation.DELETE,
@@ -181,7 +195,7 @@ export const Names = () => {
           .then(async () => {
             const result = await GetNamesPage(
               types.Payload.createFrom({
-                dataFacet: currentDataFacetRef.current,
+                dataFacet: dataFacetRef.current,
               }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -244,7 +258,7 @@ export const Names = () => {
         });
         NamesCrud(
           types.Payload.createFrom({
-            dataFacet: currentDataFacetRef.current,
+            dataFacet: dataFacetRef.current,
             address: address,
           }),
           crud.Operation.UNDELETE,
@@ -253,7 +267,7 @@ export const Names = () => {
           .then(async () => {
             const result = await GetNamesPage(
               types.Payload.createFrom({
-                dataFacet: currentDataFacetRef.current,
+                dataFacet: dataFacetRef.current,
               }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -313,7 +327,7 @@ export const Names = () => {
         });
         NamesCrud(
           types.Payload.createFrom({
-            dataFacet: currentDataFacetRef.current,
+            dataFacet: dataFacetRef.current,
             address: address,
           }),
           crud.Operation.REMOVE,
@@ -322,7 +336,7 @@ export const Names = () => {
           .then(async () => {
             const result = await GetNamesPage(
               types.Payload.createFrom({
-                dataFacet: currentDataFacetRef.current,
+                dataFacet: dataFacetRef.current,
               }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -385,7 +399,7 @@ export const Names = () => {
         });
         NamesCrud(
           types.Payload.createFrom({
-            dataFacet: currentDataFacetRef.current,
+            dataFacet: dataFacetRef.current,
             address: address,
           }),
           crud.Operation.AUTONAME,
@@ -394,7 +408,7 @@ export const Names = () => {
           .then(async () => {
             const result = await GetNamesPage(
               types.Payload.createFrom({
-                dataFacet: currentDataFacetRef.current,
+                dataFacet: dataFacetRef.current,
               }),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -471,21 +485,21 @@ export const Names = () => {
     },
     [handleDelete, handleUndelete, handleRemove, handleAutoname],
   );
+  // EXISTING_CODE
+  // === END SECTION 6 ===
 
+  // === SECTION 7: Form & UI Handlers ===
+  // EXISTING_CODE
   const currentColumns = useMemo(() => {
     const handleChipClick = (chip: string) => {
       setFiltering(chip);
-      Reload(
-        activeFacetHook.getCurrentDataFacet() as types.DataFacet,
-        '',
-        '',
-      ).then(() => {
+      Reload(getCurrentDataFacet() as types.DataFacet, '', '').then(() => {
         fetchData();
       });
     };
 
     const baseColumns = getColumns(
-      activeFacetHook.getCurrentDataFacet() as types.DataFacet,
+      getCurrentDataFacet() as types.DataFacet,
     ).map((col) =>
       col.key === 'chips'
         ? {
@@ -550,9 +564,9 @@ export const Names = () => {
       col.key === 'actions' ? { ...col, ...actionsOverride } : col,
     );
   }, [
-    activeFacetHook,
     setFiltering,
     fetchData,
+    getCurrentDataFacet,
     processingAddresses,
     handleNameAction,
   ]);
@@ -602,7 +616,7 @@ export const Names = () => {
 
       NamesCrud(
         types.Payload.createFrom({
-          dataFacet: currentDataFacetRef.current,
+          dataFacet: dataFacetRef.current,
           address: '',
         }),
         crud.Operation.UPDATE,
@@ -611,7 +625,7 @@ export const Names = () => {
         .then(async () => {
           const result = await GetNamesPage(
             types.Payload.createFrom({
-              dataFacet: currentDataFacetRef.current,
+              dataFacet: dataFacetRef.current,
             }),
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
@@ -648,7 +662,12 @@ export const Names = () => {
       failure,
     ],
   );
+  // EXISTING_CODE
+  // === END SECTION 7 ===
 
+  // === SECTION 8: Tab Configuration ===
+  // EXISTING_CODE
+  // EXISTING_CODE
   const perTabTable = useMemo(
     () => (
       <BaseTab
@@ -679,18 +698,24 @@ export const Names = () => {
       })),
     [activeFacetHook.availableFacets, perTabTable],
   );
+  // === END SECTION 8 ===
 
+  // === SECTION 9: Render/JSX ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  const renderCnt = useRef(0);
+  // renderCnt.current++;
   return (
     <div className="mainView">
-      {(state as string) === '' && <div>{`state: ${state}`}</div>}
       <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${activeFacetHook.getCurrentDataFacet()}`}</h3>
+          <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
+  // === END SECTION 9 ===
 };

@@ -1,9 +1,12 @@
+// === SECTION 1: Imports & Dependencies ===
+// EXISTING_CODE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import {
+  DataFacet,
   DataFacetConfig,
   useActiveFacet,
   useActiveProject,
@@ -21,7 +24,12 @@ import {
   exportsFacets,
 } from './facets';
 
+// EXISTING_CODE
+// === END SECTION 1 ===
+
 export const Exports = () => {
+  // === SECTION 2: Hook Initialization ===
+  // EXISTING_CODE
   const { effectiveAddress, effectiveChain } = useActiveProject();
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
   const [state, setState] = useState<types.LoadState>();
@@ -32,26 +40,34 @@ export const Exports = () => {
     viewRoute: ROUTE,
   });
 
+  const { getCurrentDataFacet } = activeFacetHook;
+
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
-      tabName: activeFacetHook.getCurrentDataFacet(),
+      tabName: getCurrentDataFacet(),
     }),
-    [activeFacetHook],
+    [getCurrentDataFacet],
   );
 
   const { error, handleError, clearError } = useErrorHandler();
   const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
+  // EXISTING_CODE
+  // === END SECTION 2 ===
 
-  const dataFacetRef = useRef(activeFacetHook.getCurrentDataFacet());
-  const renderCnt = useRef(0);
-
+  // === SECTION 3: Refs & Effects Setup ===
+  // EXISTING_CODE
+  const dataFacetRef = useRef(getCurrentDataFacet());
   useEffect(() => {
-    dataFacetRef.current = activeFacetHook.getCurrentDataFacet();
-  }, [activeFacetHook]);
+    dataFacetRef.current = getCurrentDataFacet();
+  }, [getCurrentDataFacet]);
+  // EXISTING_CODE
+  // === END SECTION 3 ===
 
+  // === SECTION 4: Data Fetching Logic ===
+  // EXISTING_CODE
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -87,8 +103,7 @@ export const Exports = () => {
   const currentData = useMemo(() => {
     if (!pageData) return [];
 
-    const currentDataFacet =
-      activeFacetHook.getCurrentDataFacet() as types.DataFacet;
+    const currentDataFacet = getCurrentDataFacet() as types.DataFacet;
     switch (currentDataFacet) {
       case types.DataFacet.STATEMENTS:
         return pageData.statements || [];
@@ -111,8 +126,13 @@ export const Exports = () => {
       default:
         return [];
     }
-  }, [pageData, activeFacetHook]);
+  }, [pageData, getCurrentDataFacet]);
+  // EXISTING_CODE
+  // === END SECTION 4 ===
 
+  // === SECTION 5: Event Handling ===
+  // EXISTING_CODE
+  // EXISTING_CODE
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
@@ -127,20 +147,37 @@ export const Exports = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData, activeFacetHook.activeFacet]);
+  }, [fetchData]);
 
-  useHotkeys([
-    [
-      'mod+r',
-      () => {
-        const currentDataFacet =
-          activeFacetHook.getCurrentDataFacet() as types.DataFacet;
-        Reload(currentDataFacet, effectiveChain, effectiveAddress).then(() => {
-          fetchData();
-        });
-      },
-    ],
+  const handleReload = useCallback(async () => {
+    try {
+      await Reload(
+        getCurrentDataFacet() as DataFacet,
+        effectiveChain,
+        effectiveAddress,
+      );
+      await fetchData();
+    } catch (err: unknown) {
+      handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
+    }
+  }, [
+    getCurrentDataFacet,
+    effectiveChain,
+    effectiveAddress,
+    fetchData,
+    handleError,
   ]);
+
+  useHotkeys([['mod+r', handleReload]]);
+  // === END SECTION 5 ===
+
+  // === SECTION 6: CRUD Operations ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  // === END SECTION 6 ===
+
+  // === SECTION 7: Form & UI Handlers ===
+  // EXISTING_CODE
 
   const handleSubmit = useCallback((_formData: Record<string, unknown>) => {
     // Exports are read-only, no submit action needed
@@ -148,14 +185,18 @@ export const Exports = () => {
 
   const currentColumns = useMemo(() => {
     const baseColumns = getColumns(
-      pageData?.facet ||
-        (activeFacetHook.getCurrentDataFacet() as types.DataFacet),
+      pageData?.facet || (getCurrentDataFacet() as types.DataFacet),
     );
 
     // Exports are read-only, so we filter out any actions column
     return baseColumns.filter((col) => col.key !== 'actions');
-  }, [pageData?.facet, activeFacetHook]);
+  }, [pageData?.facet, getCurrentDataFacet]);
+  // EXISTING_CODE
+  // === END SECTION 7 ===
 
+  // === SECTION 8: Tab Configuration ===
+  // EXISTING_CODE
+  // EXISTING_CODE
   const perTabTable = useMemo(
     () => (
       <BaseTab
@@ -186,18 +227,24 @@ export const Exports = () => {
       })),
     [activeFacetHook.availableFacets, perTabTable],
   );
+  // === END SECTION 8 ===
 
+  // === SECTION 9: Render/JSX ===
+  // EXISTING_CODE
+  // EXISTING_CODE
+  const renderCnt = useRef(0);
+  // renderCnt.current++;
   return (
     <div className="mainView">
-      {(state as string) === '' && <div>{`state: ${state}`}</div>}
       <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
-          <h3>{`Error fetching ${activeFacetHook.getCurrentDataFacet()}`}</h3>
+          <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>
           <p>{error.message}</p>
         </div>
       )}
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
+  // === END SECTION 9 ===
 };

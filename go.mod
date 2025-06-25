@@ -3,12 +3,10 @@ module github.com/TrueBlocks/trueblocks-dalledress
 // GoLang version
 go 1.23.8
 
-replace github.com/TrueBlocks/trueblocks-sdk/v5 => ../trueblocks-core/sdk
-
 require (
-	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250624120922-ab0bddc580f5
+	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250625024907-b1e20dafcc16
 	github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250504164335-8b49b03dddef
-	github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250624120843-f9924d425b80
+	github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250625024834-90e5dee285fc
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/google/go-cmp v0.7.0
 	github.com/joho/godotenv v1.5.1

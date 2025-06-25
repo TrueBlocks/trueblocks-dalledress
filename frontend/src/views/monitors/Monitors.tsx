@@ -10,6 +10,7 @@ import {
   useActionMsgs,
   useActiveFacet,
   useEvent,
+  usePayload,
 } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -29,6 +30,7 @@ import {
 
 export const Monitors = () => {
   // === SECTION 2: Hook Initialization ===
+  const createPayload = usePayload();
   // EXISTING_CODE
   const activeFacetHook = useActiveFacet({
     facets: monitorsFacets,
@@ -63,9 +65,9 @@ export const Monitors = () => {
 
   // === SECTION 3: Refs & Effects Setup ===
   // EXISTING_CODE
-  const dataFacetRef = useRef(getCurrentDataFacet());
+  const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
   useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
+    dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
   }, [getCurrentDataFacet]);
   // EXISTING_CODE
   // === END SECTION 3 ===
@@ -76,7 +78,7 @@ export const Monitors = () => {
     clearError();
     try {
       const result = await GetMonitorsPage(
-        types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
+        createPayload(dataFacetRef.current),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -92,6 +94,7 @@ export const Monitors = () => {
     }
   }, [
     clearError,
+    createPayload,
     pagination.currentPage,
     pagination.pageSize,
     sort,
@@ -115,7 +118,7 @@ export const Monitors = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'monitors') {
-        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
@@ -129,12 +132,13 @@ export const Monitors = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      await Reload(getCurrentDataFacet() as types.DataFacet, '', '');
-      await fetchData();
+      Reload(createPayload(dataFacetRef.current)).then(() => {
+        fetchData();
+      });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, fetchData, handleError]);
+  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===
@@ -163,16 +167,13 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          types.Payload.createFrom({
-            dataFacet: dataFacetRef.current,
-            address: address,
-          }),
+          createPayload(dataFacetRef.current, address),
           crud.Operation.DELETE,
           {} as types.Monitor,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
+              createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -207,6 +208,7 @@ export const Monitors = () => {
       emitSuccess,
       handleError,
       failure,
+      createPayload,
     ],
   );
 
@@ -230,16 +232,13 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          types.Payload.createFrom({
-            dataFacet: dataFacetRef.current,
-            address: address,
-          }),
+          createPayload(dataFacetRef.current, address),
           crud.Operation.UNDELETE,
           {} as types.Monitor,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
+              createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -274,6 +273,7 @@ export const Monitors = () => {
       setTotalItems,
       emitSuccess,
       failure,
+      createPayload,
     ],
   );
 
@@ -294,16 +294,13 @@ export const Monitors = () => {
           });
         });
         MonitorsCrud(
-          types.Payload.createFrom({
-            dataFacet: dataFacetRef.current,
-            address: address,
-          }),
+          createPayload(dataFacetRef.current, address),
           crud.Operation.REMOVE,
           {} as types.Monitor,
         )
           .then(async () => {
             const result = await GetMonitorsPage(
-              types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
+              createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -338,6 +335,7 @@ export const Monitors = () => {
       setTotalItems,
       emitSuccess,
       failure,
+      createPayload,
     ],
   );
 
@@ -381,10 +379,7 @@ export const Monitors = () => {
     clearError();
     try {
       emitCleaningStatus();
-      await MonitorsClean(
-        types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
-        [],
-      );
+      await MonitorsClean(createPayload(dataFacetRef.current), []);
       await fetchData();
       emitSuccess('clean', 0);
     } catch (err: unknown) {
@@ -398,6 +393,7 @@ export const Monitors = () => {
     emitSuccess,
     failure,
     handleError,
+    createPayload,
   ]);
 
   // Handle clean selected monitors
@@ -406,10 +402,7 @@ export const Monitors = () => {
       clearError();
       try {
         emitCleaningStatus(addresses.length);
-        await MonitorsClean(
-          types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
-          addresses,
-        );
+        await MonitorsClean(createPayload(dataFacetRef.current), addresses);
         await fetchData();
         emitSuccess('clean', addresses.length);
       } catch (err: unknown) {
@@ -424,6 +417,7 @@ export const Monitors = () => {
       emitSuccess,
       failure,
       handleError,
+      createPayload,
     ],
   );
   // EXISTING_CODE

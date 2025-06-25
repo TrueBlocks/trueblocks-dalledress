@@ -339,33 +339,6 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 	}, nil
 }
 
-func (a *App) Reload(dataFacet types.DataFacet, chain, address string) error {
-	lastView := a.GetAppPreferences().LastView
-
-	payload := &types.Payload{
-		DataFacet: dataFacet,
-		Chain:     chain,
-		Address:   address,
-	}
-
-	// ADD_ROUTE
-	switch lastView {
-	case "/names":
-		return a.ReloadNames(payload)
-	case "/abis":
-		return a.ReloadAbis(payload)
-	case "/exports":
-		return a.ReloadExports(payload)
-	case "/monitors":
-		return a.ReloadMonitors(payload)
-	case "/chunks":
-		return a.ReloadChunks(payload)
-	}
-	// ADD_ROUTE
-
-	return nil
-}
-
 func (a *App) CancelFetch(dataFacet types.DataFacet) {
 	storeName := ""
 

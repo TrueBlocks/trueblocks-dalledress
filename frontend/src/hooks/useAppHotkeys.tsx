@@ -129,9 +129,11 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+r',
             label: 'Reload',
             action: () => {
-              Reload(currentTab as types.DataFacet, '', '').then(() => {
-                // do nothing
-              });
+              Reload(types.Payload.createFrom({ dataFacet: currentTab })).then(
+                () => {
+                  // do nothing
+                },
+              );
             },
           },
           e,

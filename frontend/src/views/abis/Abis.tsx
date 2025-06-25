@@ -10,6 +10,7 @@ import {
   useActionMsgs,
   useActiveFacet,
   useEvent,
+  usePayload,
 } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -25,6 +26,7 @@ import { ABIS_DEFAULT_FACET, ABIS_ROUTE as ROUTE, abisFacets } from './facets';
 
 export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
+  const createPayload = usePayload();
   // EXISTING_CODE
   const activeFacetHook = useActiveFacet({
     facets: abisFacets,
@@ -57,9 +59,9 @@ export const Abis = () => {
 
   // === SECTION 3: Refs & Effects Setup ===
   // EXISTING_CODE
-  const dataFacetRef = useRef(getCurrentDataFacet());
+  const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
   useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
+    dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
   }, [getCurrentDataFacet]);
   // EXISTING_CODE
   // === END SECTION 3 ===
@@ -71,7 +73,7 @@ export const Abis = () => {
     clearError();
     try {
       const result = await GetAbisPage(
-        types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
+        createPayload(dataFacetRef.current),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -84,6 +86,7 @@ export const Abis = () => {
     }
   }, [
     clearError,
+    createPayload,
     pagination.currentPage,
     pagination.pageSize,
     sort,
@@ -114,7 +117,7 @@ export const Abis = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'abis') {
-        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
@@ -128,12 +131,13 @@ export const Abis = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      await Reload(getCurrentDataFacet() as types.DataFacet, '', '');
-      await fetchData();
+      Reload(createPayload(dataFacetRef.current)).then(() => {
+        fetchData();
+      });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, fetchData, handleError]);
+  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===
@@ -169,17 +173,14 @@ export const Abis = () => {
         setTotalItems(Math.max(0, currentTotal - 1));
 
         AbisCrud(
-          types.Payload.createFrom({
-            dataFacet: dataFacetRef.current,
-            address: address,
-          }),
+          createPayload(dataFacetRef.current, address),
           crud.Operation.REMOVE,
           {} as types.Abi,
         )
           .then(async () => {
             // Fetch fresh data to confirm the removal after successful backend operation
             const result = await GetAbisPage(
-              types.Payload.createFrom({ dataFacet: dataFacetRef.current }),
+              createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -250,6 +251,7 @@ export const Abis = () => {
       emitSuccess,
       goToPage,
       handleError,
+      createPayload,
     ],
   );
 

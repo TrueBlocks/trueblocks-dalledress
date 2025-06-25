@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { DataFacetConfig, useActiveFacet, useEvent } from '@hooks';
+import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { chunks, msgs, types } from '@models';
@@ -23,6 +23,7 @@ import {
 
 export const Chunks = () => {
   // === SECTION 2: Hook Initialization ===
+  const createPayload = usePayload();
   // EXISTING_CODE
   const activeFacetHook = useActiveFacet({
     facets: chunksFacets,
@@ -53,9 +54,9 @@ export const Chunks = () => {
 
   // === SECTION 3: Refs & Effects Setup ===
   // EXISTING_CODE
-  const dataFacetRef = useRef(getCurrentDataFacet());
+  const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
   useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
+    dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
   }, [getCurrentDataFacet]);
   // EXISTING_CODE
   // === END SECTION 3 ===
@@ -67,9 +68,7 @@ export const Chunks = () => {
     clearError();
     try {
       const result = await GetChunksPage(
-        types.Payload.createFrom({
-          dataFacet: dataFacetRef.current,
-        }),
+        createPayload(dataFacetRef.current),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -83,6 +82,7 @@ export const Chunks = () => {
     }
   }, [
     clearError,
+    createPayload,
     pagination.currentPage,
     pagination.pageSize,
     sort,
@@ -118,7 +118,7 @@ export const Chunks = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'chunks') {
-        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
@@ -132,12 +132,13 @@ export const Chunks = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      await Reload(getCurrentDataFacet() as types.DataFacet, '', '');
-      await fetchData();
+      Reload(createPayload(dataFacetRef.current)).then(() => {
+        fetchData();
+      });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, fetchData, handleError]);
+  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===

@@ -8,4 +8,5 @@ export * from './useAppReadiness';
 export * from './useDateTime';
 export * from './useEvent';
 export * from './useIcons';
+export * from './usePayload';
 export * from './useStaggeredLoading';

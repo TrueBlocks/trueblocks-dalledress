@@ -5,13 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import {
-  DataFacet,
-  DataFacetConfig,
-  useActiveFacet,
-  useActiveProject,
-  useEvent,
-} from '@hooks';
+import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { exports, msgs, types } from '@models';
@@ -29,8 +23,8 @@ import {
 
 export const Exports = () => {
   // === SECTION 2: Hook Initialization ===
+  const createPayload = usePayload();
   // EXISTING_CODE
-  const { effectiveAddress, effectiveChain } = useActiveProject();
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
 
   const activeFacetHook = useActiveFacet({
@@ -58,9 +52,9 @@ export const Exports = () => {
 
   // === SECTION 3: Refs & Effects Setup ===
   // EXISTING_CODE
-  const dataFacetRef = useRef(getCurrentDataFacet());
+  const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
   useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
+    dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
   }, [getCurrentDataFacet]);
   // EXISTING_CODE
   // === END SECTION 3 ===
@@ -71,11 +65,7 @@ export const Exports = () => {
     clearError();
     try {
       const result = await GetExportsPage(
-        types.Payload.createFrom({
-          dataFacet: dataFacetRef.current,
-          chain: effectiveChain,
-          address: effectiveAddress,
-        }),
+        createPayload(dataFacetRef.current),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -88,14 +78,13 @@ export const Exports = () => {
     }
   }, [
     clearError,
+    createPayload,
     pagination.currentPage,
     pagination.pageSize,
     sort,
     filter,
     setTotalItems,
     handleError,
-    effectiveChain,
-    effectiveAddress,
   ]);
 
   const currentData = useMemo(() => {
@@ -135,7 +124,7 @@ export const Exports = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'exports') {
-        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
@@ -149,22 +138,13 @@ export const Exports = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      await Reload(
-        getCurrentDataFacet() as DataFacet,
-        effectiveChain,
-        effectiveAddress,
-      );
-      await fetchData();
+      Reload(createPayload(dataFacetRef.current)).then(() => {
+        fetchData();
+      });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [
-    getCurrentDataFacet,
-    effectiveChain,
-    effectiveAddress,
-    fetchData,
-    handleError,
-  ]);
+  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===

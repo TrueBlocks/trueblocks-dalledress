@@ -17,6 +17,7 @@ import {
   useActionMsgs,
   useActiveFacet,
   useEvent,
+  usePayload,
 } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -51,6 +52,7 @@ function removeUndefinedProps(
 
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
+  const createPayload = usePayload();
   // EXISTING_CODE
   const [pageData, setPageData] = useState<names.NamesPage | null>(null);
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
@@ -84,9 +86,9 @@ export const Names = () => {
   // === SECTION 3: Refs & Effects Setup ===
   // EXISTING_CODE
   // Cache the current backend DataFacet for API calls
-  const dataFacetRef = useRef(getCurrentDataFacet());
+  const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
   useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
+    dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
   }, [getCurrentDataFacet]);
   // EXISTING_CODE
   // === END SECTION 3 ===
@@ -97,9 +99,7 @@ export const Names = () => {
     clearError();
     try {
       const result = await GetNamesPage(
-        types.Payload.createFrom({
-          dataFacet: dataFacetRef.current,
-        }),
+        createPayload(dataFacetRef.current),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -112,6 +112,7 @@ export const Names = () => {
     }
   }, [
     clearError,
+    createPayload,
     pagination.currentPage,
     pagination.pageSize,
     sort,
@@ -134,7 +135,7 @@ export const Names = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'names') {
-        const eventDataFacet = payload.dataFacet as types.DataFacet | undefined;
+        const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
         }
@@ -148,12 +149,13 @@ export const Names = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      await Reload(getCurrentDataFacet() as types.DataFacet, '', '');
-      await fetchData();
+      Reload(createPayload(dataFacetRef.current)).then(() => {
+        fetchData();
+      });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, fetchData, handleError]);
+  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===
@@ -182,18 +184,13 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          types.Payload.createFrom({
-            dataFacet: dataFacetRef.current,
-            address: address,
-          }),
+          createPayload(dataFacetRef.current, address),
           crud.Operation.DELETE,
           {} as types.Name,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              types.Payload.createFrom({
-                dataFacet: dataFacetRef.current,
-              }),
+              createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -228,6 +225,7 @@ export const Names = () => {
       setTotalItems,
       emitSuccess,
       failure,
+      createPayload,
     ],
   );
 
@@ -251,18 +249,13 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          types.Payload.createFrom({
-            dataFacet: dataFacetRef.current,
-            address: address,
-          }),
+          createPayload(dataFacetRef.current, address),
           crud.Operation.UNDELETE,
           {} as types.Name,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              types.Payload.createFrom({
-                dataFacet: dataFacetRef.current,
-              }),
+              createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -297,6 +290,7 @@ export const Names = () => {
       emitSuccess,
       handleError,
       failure,
+      createPayload,
     ],
   );
 
@@ -317,18 +311,13 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          types.Payload.createFrom({
-            dataFacet: dataFacetRef.current,
-            address: address,
-          }),
+          createPayload(dataFacetRef.current, address),
           crud.Operation.REMOVE,
           {} as types.Name,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              types.Payload.createFrom({
-                dataFacet: dataFacetRef.current,
-              }),
+              createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -363,6 +352,7 @@ export const Names = () => {
       emitSuccess,
       handleError,
       failure,
+      createPayload,
     ],
   );
 
@@ -386,18 +376,13 @@ export const Names = () => {
           });
         });
         NamesCrud(
-          types.Payload.createFrom({
-            dataFacet: dataFacetRef.current,
-            address: address,
-          }),
+          createPayload(dataFacetRef.current, address),
           crud.Operation.AUTONAME,
           {} as types.Name,
         )
           .then(async () => {
             const result = await GetNamesPage(
-              types.Payload.createFrom({
-                dataFacet: dataFacetRef.current,
-              }),
+              createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
               sort,
@@ -432,6 +417,7 @@ export const Names = () => {
       emitSuccess,
       handleError,
       failure,
+      createPayload,
     ],
   );
 
@@ -479,7 +465,7 @@ export const Names = () => {
   const currentColumns = useMemo(() => {
     const handleChipClick = (chip: string) => {
       setFiltering(chip);
-      Reload(getCurrentDataFacet() as types.DataFacet, '', '').then(() => {
+      Reload(createPayload(dataFacetRef.current)).then(() => {
         fetchData();
       });
     };
@@ -555,6 +541,7 @@ export const Names = () => {
     getCurrentDataFacet,
     processingAddresses,
     handleNameAction,
+    createPayload,
   ]);
 
   const handleSubmit = useCallback(
@@ -601,18 +588,13 @@ export const Names = () => {
       });
 
       NamesCrud(
-        types.Payload.createFrom({
-          dataFacet: dataFacetRef.current,
-          address: '',
-        }),
+        createPayload(dataFacetRef.current, ''), // TODO: This may not work for AddName...
         crud.Operation.UPDATE,
         submittedName as types.Name,
       )
         .then(async () => {
           const result = await GetNamesPage(
-            types.Payload.createFrom({
-              dataFacet: dataFacetRef.current,
-            }),
+            createPayload(dataFacetRef.current),
             pagination.currentPage * pagination.pageSize,
             pagination.pageSize,
             sort,
@@ -646,6 +628,7 @@ export const Names = () => {
       emitSuccess,
       handleError,
       failure,
+      createPayload,
     ],
   );
   // EXISTING_CODE

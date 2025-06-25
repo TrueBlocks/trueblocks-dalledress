@@ -30,7 +30,7 @@ export const Exports = () => {
     defaultFacet: EXPORTS_DEFAULT_FACET,
     viewRoute: ROUTE,
   });
-  const { getCurrentDataFacet } = activeFacetHook;
+  const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
   const viewStateKey = useMemo(
@@ -186,12 +186,12 @@ export const Exports = () => {
 
   const tabs = useMemo(
     () =>
-      activeFacetHook.availableFacets.map((facetConfig: DataFacetConfig) => ({
+      availableFacets.map((facetConfig: DataFacetConfig) => ({
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabTable,
       })),
-    [activeFacetHook.availableFacets, perTabTable],
+    [availableFacets, perTabTable],
   );
   // === END SECTION 8 ===
 

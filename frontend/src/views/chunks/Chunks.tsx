@@ -30,7 +30,7 @@ export const Chunks = () => {
     defaultFacet: CHUNKS_DEFAULT_FACET,
     viewRoute: ROUTE,
   });
-  const { getCurrentDataFacet } = activeFacetHook;
+  const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<chunks.ChunksPage | null>(null);
   const viewStateKey = useMemo(
@@ -175,12 +175,12 @@ export const Chunks = () => {
 
   const tabs = useMemo(
     () =>
-      activeFacetHook.availableFacets.map((facetConfig: DataFacetConfig) => ({
+      availableFacets.map((facetConfig: DataFacetConfig) => ({
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabTable,
       })),
-    [activeFacetHook.availableFacets, perTabTable],
+    [availableFacets, perTabTable],
   );
   // === END SECTION 8 ===
 

@@ -54,11 +54,11 @@ export const Chunks = () => {
 
   // === SECTION 3: Refs & Effects Setup ===
   // EXISTING_CODE
+  // EXISTING_CODE
   const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
   useEffect(() => {
     dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
   }, [getCurrentDataFacet]);
-  // EXISTING_CODE
   // === END SECTION 3 ===
 
   // === SECTION 4: Data Fetching Logic ===

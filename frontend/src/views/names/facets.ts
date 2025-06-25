@@ -5,7 +5,6 @@
  * Parts of this file were auto generated. Edit only those parts of
  * the code inside of 'EXISTING_CODE' tags.
  */
-
 import { DataFacetConfig } from '@hooks';
 import { types } from '@models';
 import { toProperCase } from 'src/utils/toProper';

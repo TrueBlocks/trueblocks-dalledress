@@ -41,7 +41,6 @@ export const Monitors = () => {
   const { emitSuccess, emitCleaningStatus, failure } =
     useActionMsgs('monitors');
   const [pageData, setPageData] = useState<monitors.MonitorsPage | null>(null);
-  const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
@@ -83,7 +82,6 @@ export const Monitors = () => {
         sort,
         filter,
       );
-      setState(result.state);
       setPageData(result);
       setTotalItems(result.totalItems || 0);
 
@@ -157,7 +155,6 @@ export const Monitors = () => {
           }
           return monitor;
         });
-        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new monitors.MonitorsPage({
@@ -181,13 +178,11 @@ export const Monitors = () => {
               sort,
               filter,
             );
-            setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
             emitSuccess('delete', address);
           })
           .catch((err) => {
-            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new monitors.MonitorsPage({
@@ -227,7 +222,6 @@ export const Monitors = () => {
           }
           return monitor;
         });
-        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new monitors.MonitorsPage({
@@ -251,13 +245,11 @@ export const Monitors = () => {
               sort,
               filter,
             );
-            setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
             emitSuccess('undelete', address);
           })
           .catch((err) => {
-            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new monitors.MonitorsPage({
@@ -294,7 +286,6 @@ export const Monitors = () => {
           const monitorAddress = getAddressString(monitor.address);
           return monitorAddress !== address;
         });
-        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new monitors.MonitorsPage({
@@ -318,13 +309,11 @@ export const Monitors = () => {
               sort,
               filter,
             );
-            setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
             emitSuccess('remove', address);
           })
           .catch((err) => {
-            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new monitors.MonitorsPage({

@@ -274,11 +274,11 @@ func (c *NamesCollection) ResetSummary() {
 }
 
 // EXISTING_CODE
-func (c *NamesCollection) getExpectedTotal(dataFacet types.DataFacet) int {
-	if count, err := GetNamesCount(&types.Payload{DataFacet: dataFacet}); err == nil && count > 0 {
-		return count
-	}
-	return c.allFacet.ExpectedCount()
-}
+// func (c *NamesCollection) getExpectedTotal(dataFacet types.DataFacet) int {
+// 	if count, err := GetNamesCount(&types.Payload{DataFacet: dataFacet}); err == nil && count > 0 {
+// 		return count
+// 	}
+// 	return c.allFacet.ExpectedCount()
+// }
 
 // EXISTING_CODE

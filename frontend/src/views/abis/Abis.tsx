@@ -36,7 +36,6 @@ export const Abis = () => {
 
   const { emitSuccess } = useActionMsgs('abis');
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
-  const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
@@ -78,7 +77,6 @@ export const Abis = () => {
         sort,
         filter,
       );
-      setState(result.state);
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
@@ -187,7 +185,6 @@ export const Abis = () => {
               sort,
               filter,
             );
-            setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
 
@@ -226,7 +223,6 @@ export const Abis = () => {
           })
           .catch((err) => {
             // Revert optimistic update on error
-            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new abis.AbisPage({

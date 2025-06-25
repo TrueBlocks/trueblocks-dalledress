@@ -53,7 +53,6 @@ export const Names = () => {
   // === SECTION 2: Hook Initialization ===
   // EXISTING_CODE
   const [pageData, setPageData] = useState<names.NamesPage | null>(null);
-  const [state, setState] = useState<types.LoadState>();
   const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
     new Set(),
   );
@@ -106,7 +105,6 @@ export const Names = () => {
         sort,
         filter ?? '',
       );
-      setState(result.state);
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
@@ -176,7 +174,6 @@ export const Names = () => {
           }
           return name;
         });
-        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new names.NamesPage({
@@ -202,13 +199,11 @@ export const Names = () => {
               sort,
               filter ?? '',
             );
-            setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
             emitSuccess('delete', address);
           })
           .catch((err) => {
-            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new names.NamesPage({
@@ -248,7 +243,6 @@ export const Names = () => {
           }
           return name;
         });
-        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new names.NamesPage({
@@ -274,13 +268,11 @@ export const Names = () => {
               sort,
               filter ?? '',
             );
-            setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
             emitSuccess('undelete', address);
           })
           .catch((err) => {
-            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new names.NamesPage({
@@ -317,7 +309,6 @@ export const Names = () => {
           const nameAddress = getAddressString(name.address);
           return nameAddress !== address;
         });
-        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new names.NamesPage({
@@ -343,13 +334,11 @@ export const Names = () => {
               sort,
               filter ?? '',
             );
-            setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
             emitSuccess('remove', address);
           })
           .catch((err) => {
-            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new names.NamesPage({
@@ -389,7 +378,6 @@ export const Names = () => {
           }
           return name;
         });
-        setState(types.LoadState.PENDING);
         setPageData((prev) => {
           if (!prev) return null;
           return new names.NamesPage({
@@ -415,13 +403,11 @@ export const Names = () => {
               sort,
               filter ?? '',
             );
-            setState(result.state);
             setPageData(result);
             setTotalItems(result.totalItems || 0);
             emitSuccess('autoname', address);
           })
           .catch((err) => {
-            setState(types.LoadState.ERROR);
             setPageData((prev) => {
               if (!prev) return null;
               return new names.NamesPage({

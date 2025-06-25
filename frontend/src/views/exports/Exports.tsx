@@ -32,7 +32,6 @@ export const Exports = () => {
   // EXISTING_CODE
   const { effectiveAddress, effectiveChain } = useActiveProject();
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
-  const [state, setState] = useState<types.LoadState>();
 
   const activeFacetHook = useActiveFacet({
     facets: exportsFacets,
@@ -82,7 +81,6 @@ export const Exports = () => {
         sort,
         filter,
       );
-      setState(result.state);
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {

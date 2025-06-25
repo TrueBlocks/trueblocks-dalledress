@@ -120,7 +120,7 @@ export function NamesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promi
 
 export function RegisterCollection(arg1:types.Collection):Promise<void>;
 
-export function Reload(arg1:types.DataFacet,arg2:string,arg3:string):Promise<void>;
+export function Reload(arg1:types.Payload):Promise<void>;
 
 export function ReloadAbis(arg1:types.Payload):Promise<void>;
 

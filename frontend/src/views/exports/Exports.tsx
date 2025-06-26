@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useActionConfig } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -12,11 +13,7 @@ import { exports, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
-import {
-  EXPORTS_DEFAULT_FACET,
-  EXPORTS_ROUTE as ROUTE,
-  exportsFacets,
-} from './facets';
+import { DEFAULT_FACET, ROUTE, exportsFacets } from './facets';
 
 // EXISTING_CODE
 // === END SECTION 1 ===
@@ -27,7 +24,7 @@ export const Exports = () => {
 
   const activeFacetHook = useActiveFacet({
     facets: exportsFacets,
-    defaultFacet: EXPORTS_DEFAULT_FACET,
+    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
@@ -143,22 +140,25 @@ export const Exports = () => {
 
   // === SECTION 6: CRUD Operations ===
   // EXISTING_CODE
+  const actionConfig = useActionConfig({
+    operations: [],
+  });
   // EXISTING_CODE
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-
-  const handleSubmit = useCallback((_formData: Record<string, unknown>) => {
-    // Exports are read-only, no submit action needed
-  }, []);
+  const handleSubmit = useCallback(
+    (_formData: Record<string, unknown>) => {},
+    [],
+  );
 
   const currentColumns = useMemo(() => {
     const baseColumns = getColumns(
       pageData?.facet || (getCurrentDataFacet() as types.DataFacet),
     );
-    return baseColumns.filter((col) => col.key !== 'actions');
-  }, [pageData?.facet, getCurrentDataFacet]);
+    return actionConfig.injectActionColumn(baseColumns, () => null);
+  }, [pageData?.facet, getCurrentDataFacet, actionConfig]);
   // EXISTING_CODE
   // === END SECTION 7 ===
 

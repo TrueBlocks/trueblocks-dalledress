@@ -3,27 +3,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
-import { Action, BaseTab, FormField, usePagination } from '@components';
+import { Action, BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import {
-  DataFacetConfig,
-  useActionMsgs,
-  useActiveFacet,
-  useEvent,
-  usePayload,
-} from '@hooks';
+import { ActionData, useActionMsgs, useActionConfig } from '@hooks';
+import { DataFacetConfig, useActiveFacet, useEvent, usePayload} from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, monitors, msgs, types } from '@models';
 import { getAddressString, useErrorHandler } from '@utils';
 
-import { Address } from '../../types/address';
 import { getColumns } from './';
-import {
-  MONITORS_DEFAULT_FACET,
-  MONITORS_ROUTE as ROUTE,
-  monitorsFacets,
-} from './facets';
+import { DEFAULT_FACET, ROUTE, monitorsFacets } from './facets';
 
 // EXISTING_CODE
 // === END SECTION 1 ===
@@ -34,7 +24,7 @@ export const Monitors = () => {
 
   const activeFacetHook = useActiveFacet({
     facets: monitorsFacets,
-    defaultFacet: MONITORS_DEFAULT_FACET,
+    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
@@ -134,13 +124,18 @@ export const Monitors = () => {
 
   // === SECTION 6: CRUD Operations ===
   // EXISTING_CODE
+  const actionConfig = useActionConfig({
+    operations: ['delete', 'undelete', 'remove'],
+  });
+
   const { emitSuccess, emitCleaningStatus, failure } =
     useActionMsgs('monitors');
 
-  // Handle CRUD actions for monitors
   const handleDelete = useCallback(
-    (address: Address) => {
+    (address: string) => {
       clearError();
+      actionConfig.startProcessing(address);
+
       try {
         const original = [...(pageData?.monitors || [])];
         const optimisticValues = original.map((monitor) => {
@@ -183,13 +178,20 @@ export const Monitors = () => {
               });
             });
             handleError(err, failure('delete', address, err.message));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
           });
       } catch (err: unknown) {
         handleError(err, `Failed to delete monitor ${address}`);
+        actionConfig.stopProcessing(address);
       }
     },
     [
       clearError,
+      actionConfig,
       pageData?.monitors,
       pagination.currentPage,
       pagination.pageSize,
@@ -204,8 +206,10 @@ export const Monitors = () => {
   );
 
   const handleUndelete = useCallback(
-    (address: Address) => {
+    (address: string) => {
       clearError();
+      actionConfig.startProcessing(address);
+
       try {
         const original = [...(pageData?.monitors || [])];
         const optimisticValues = original.map((monitor) => {
@@ -248,13 +252,20 @@ export const Monitors = () => {
               });
             });
             handleError(err, failure('undelete', address, err.message));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
           });
       } catch (err: unknown) {
         handleError(err, `Failed to undelete monitor ${address}`);
+        actionConfig.stopProcessing(address);
       }
     },
     [
       clearError,
+      actionConfig,
       pageData?.monitors,
       handleError,
       pagination.currentPage,
@@ -268,9 +279,11 @@ export const Monitors = () => {
     ],
   );
 
-  const _handleRemove = useCallback(
-    (address: Address) => {
+  const handleRemove = useCallback(
+    (address: string) => {
       clearError();
+      actionConfig.startProcessing(address);
+
       try {
         const original = [...(pageData?.monitors || [])];
         const optimisticValues = original.filter((monitor) => {
@@ -310,13 +323,20 @@ export const Monitors = () => {
               });
             });
             handleError(err, failure('remove', address, err.message));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
           });
       } catch (err: unknown) {
         handleError(err, `Failed to remove monitor ${address}`);
+        actionConfig.stopProcessing(address);
       }
     },
     [
       clearError,
+      actionConfig,
       pageData?.monitors,
       handleError,
       pagination.currentPage,
@@ -330,43 +350,7 @@ export const Monitors = () => {
     ],
   );
 
-  // Combined action handler for monitors
-  const handleMonitorAction = useCallback(
-    (
-      address: Address,
-      isDeleted: boolean,
-      actionType: 'delete' | 'undelete' | 'remove',
-    ) => {
-      // Add address to processing set
-      setProcessingAddresses((prev) => new Set(prev).add(address));
-
-      try {
-        switch (actionType) {
-          case 'delete':
-            handleDelete(address);
-            break;
-          case 'undelete':
-            handleUndelete(address);
-            break;
-          case 'remove':
-            _handleRemove(address);
-            break;
-        }
-      } finally {
-        // Clean up processing state after a delay to allow for optimistic updates
-        setTimeout(() => {
-          setProcessingAddresses((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(address);
-            return newSet;
-          });
-        }, 100);
-      }
-    },
-    [handleDelete, handleUndelete, _handleRemove],
-  );
-
-  const handleCleanAll = useCallback(async () => {
+  const _handleCleanAll = useCallback(async () => {
     clearError();
     try {
       emitCleaningStatus();
@@ -416,58 +400,6 @@ export const Monitors = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
-    new Set(),
-  );
-
-  const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(getCurrentDataFacet() as types.DataFacet);
-
-    // Add action buttons render function to the actions column
-    const actionsOverride: Partial<FormField> = {
-      sortable: false,
-      editable: false,
-      visible: true,
-      render: (row: Record<string, unknown>) => {
-        const monitor = row as unknown as types.Monitor;
-        const isDeleted = Boolean(monitor.deleted);
-        const addressStr = getAddressString(monitor.address);
-        const isProcessing = processingAddresses.has(addressStr);
-
-        return (
-          <div className="action-buttons-container">
-            <Action
-              icon={isDeleted ? 'Undelete' : 'Delete'}
-              onClick={() =>
-                handleMonitorAction(
-                  addressStr,
-                  isDeleted,
-                  isDeleted ? 'undelete' : 'delete',
-                )
-              }
-              disabled={isProcessing}
-              title={isDeleted ? 'Undelete' : 'Delete'}
-              size="sm"
-            />
-            <Action
-              icon="Remove"
-              onClick={() =>
-                handleMonitorAction(addressStr, isDeleted, 'remove')
-              }
-              disabled={isProcessing || !isDeleted}
-              title="Remove"
-              size="sm"
-            />
-          </div>
-        );
-      },
-    };
-
-    return baseColumns.map((col) =>
-      col.key === 'actions' ? { ...col, ...actionsOverride } : col,
-    );
-  }, [getCurrentDataFacet, handleMonitorAction, processingAddresses]);
-
   const handleSubmit = useCallback(
     (data: Record<string, unknown>) => {
       const monitor = data as unknown as types.Monitor;
@@ -481,6 +413,56 @@ export const Monitors = () => {
     },
     [handleDelete, handleUndelete],
   );
+
+  const currentColumns = useMemo(() => {
+    const baseColumns = getColumns(getCurrentDataFacet() as types.DataFacet);
+
+    const renderActions = (actionData: ActionData) => {
+      const isDeleted = actionData.isDeleted;
+
+      return (
+        <div className="action-buttons-container">
+          <Action
+            icon={isDeleted ? 'Undelete' : 'Delete'}
+            onClick={() => {
+              if (isDeleted) {
+                handleUndelete(actionData.addressStr);
+              } else {
+                handleDelete(actionData.addressStr);
+              }
+            }}
+            disabled={actionData.isProcessing}
+            title={isDeleted ? 'Undelete' : 'Delete'}
+            size="sm"
+          />
+          <Action
+            icon="Remove"
+            onClick={() => handleRemove(actionData.addressStr)}
+            disabled={actionData.isProcessing || !isDeleted}
+            title="Remove"
+            size="sm"
+          />
+        </div>
+      );
+    };
+
+    const getCanRemove = (row: Record<string, unknown>) => {
+      const monitor = row as unknown as types.Monitor;
+      return Boolean(monitor.deleted);
+    };
+
+    return actionConfig.injectActionColumn(
+      baseColumns,
+      renderActions,
+      getCanRemove,
+    );
+  }, [
+    getCurrentDataFacet,
+    actionConfig,
+    handleDelete,
+    handleUndelete,
+    handleRemove,
+  ]);
   // EXISTING_CODE
   // === END SECTION 7 ===
 

@@ -17,5 +17,5 @@ export const monitorsFacets: DataFacetConfig[] = [
   },
 ];
 
-export const MONITORS_DEFAULT_FACET = types.DataFacet.MONITORS;
-export const MONITORS_ROUTE = '/monitors' as const;
+export const DEFAULT_FACET = types.DataFacet.MONITORS;
+export const ROUTE = '/monitors' as const;

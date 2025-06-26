@@ -37,5 +37,5 @@ export const namesFacets: DataFacetConfig[] = [
   },
 ];
 
-export const NAMES_DEFAULT_FACET = types.DataFacet.ALL;
-export const NAMES_ROUTE = '/names' as const;
+export const DEFAULT_FACET = types.DataFacet.ALL;
+export const ROUTE = '/names' as const;

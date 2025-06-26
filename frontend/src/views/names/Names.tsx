@@ -3,38 +3,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
-import {
-  Action,
-  BaseTab,
-  Chips,
-  FormField,
-  mapNameToChips,
-  usePagination,
-} from '@components';
+import { Action, Chips } from '@components';
+import { BaseTab, mapNameToChips, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import {
-  DataFacetConfig,
-  useActionMsgs,
-  useActiveFacet,
-  useEvent,
-  usePayload,
-} from '@hooks';
+import { ActionData, useActionConfig, useActionMsgs } from '@hooks';
+import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, msgs, names, types } from '@models';
 import { getAddressString, useErrorHandler } from '@utils';
 
-import { Address } from '../../types/address';
 import { getColumns } from './columns';
-import {
-  NAMES_DEFAULT_FACET,
-  NAMES_ROUTE as ROUTE,
-  namesFacets,
-} from './facets';
+import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
 
 type IndexableName = types.Name & Record<string, unknown>;
 
-// Helper function to remove undefined properties from an object
 function removeUndefinedProps(
   obj: Record<string, unknown>,
 ): Record<string, unknown> {
@@ -56,7 +39,7 @@ export const Names = () => {
 
   const activeFacetHook = useActiveFacet({
     facets: namesFacets,
-    defaultFacet: NAMES_DEFAULT_FACET,
+    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
@@ -164,12 +147,17 @@ export const Names = () => {
 
   // === SECTION 6: CRUD Operations ===
   // EXISTING_CODE
+  const actionConfig = useActionConfig({
+    operations: ['delete', 'undelete', 'remove'],
+  });
+
   const { emitSuccess, failure } = useActionMsgs('names');
 
-  // Handle CRUD actions for names
   const handleDelete = useCallback(
-    (address: Address) => {
+    (address: string) => {
       clearError();
+      actionConfig.startProcessing(address);
+
       try {
         const original = [...(pageData?.names || [])];
         const optimisticValues = original.map((name) => {
@@ -212,13 +200,20 @@ export const Names = () => {
               });
             });
             handleError(err, failure('delete', address, err.message));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
           });
       } catch (err: unknown) {
         handleError(err, `Failed to delete name ${address}`);
+        actionConfig.stopProcessing(address);
       }
     },
     [
       clearError,
+      actionConfig,
       pageData?.names,
       handleError,
       pagination.currentPage,
@@ -233,8 +228,10 @@ export const Names = () => {
   );
 
   const handleUndelete = useCallback(
-    (address: Address) => {
+    (address: string) => {
       clearError();
+      actionConfig.startProcessing(address);
+
       try {
         const original = [...(pageData?.names || [])];
         const optimisticValues = original.map((name) => {
@@ -277,13 +274,20 @@ export const Names = () => {
               });
             });
             handleError(err, failure('undelete', address, err.message));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
           });
       } catch (err: unknown) {
         handleError(err, `Failed to undelete name ${address}`);
+        actionConfig.stopProcessing(address);
       }
     },
     [
       clearError,
+      actionConfig,
       pageData?.names,
       pagination.currentPage,
       pagination.pageSize,
@@ -298,8 +302,10 @@ export const Names = () => {
   );
 
   const handleRemove = useCallback(
-    (address: Address) => {
+    (address: string) => {
       clearError();
+      actionConfig.startProcessing(address);
+
       try {
         const original = [...(pageData?.names || [])];
         const optimisticValues = original.filter((name) => {
@@ -339,13 +345,20 @@ export const Names = () => {
               });
             });
             handleError(err, failure('remove', address, err.message));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
           });
       } catch (err: unknown) {
         handleError(err, `Failed to remove name ${address}`);
+        actionConfig.stopProcessing(address);
       }
     },
     [
       clearError,
+      actionConfig,
       pageData?.names,
       pagination.currentPage,
       pagination.pageSize,
@@ -360,8 +373,10 @@ export const Names = () => {
   );
 
   const handleAutoname = useCallback(
-    (address: Address) => {
+    (address: string) => {
       clearError();
+      actionConfig.startProcessing(address);
+
       try {
         const original = [...(pageData?.names || [])];
         const optimisticValues = original.map((name) => {
@@ -404,13 +419,20 @@ export const Names = () => {
               });
             });
             handleError(err, failure('autoname', address, err.message));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
           });
       } catch (err: unknown) {
         handleError(err, `Failed to autoname address ${address}`);
+        actionConfig.stopProcessing(address);
       }
     },
     [
       clearError,
+      actionConfig,
       pageData?.names,
       pagination.currentPage,
       pagination.pageSize,
@@ -423,135 +445,11 @@ export const Names = () => {
       createPayload,
     ],
   );
-
-  const handleNameAction = useCallback(
-    (
-      address: Address,
-      isDeleted: boolean,
-      actionType: 'delete' | 'undelete' | 'remove' | 'autoname',
-    ) => {
-      // Add address to processing set
-      setProcessingAddresses((prev) => new Set(prev).add(address));
-
-      try {
-        switch (actionType) {
-          case 'delete':
-            handleDelete(address);
-            break;
-          case 'undelete':
-            handleUndelete(address);
-            break;
-          case 'remove':
-            handleRemove(address);
-            break;
-          case 'autoname':
-            handleAutoname(address);
-            break;
-        }
-      } finally {
-        setTimeout(() => {
-          setProcessingAddresses((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(address);
-            return newSet;
-          });
-        }, 100);
-      }
-    },
-    [handleDelete, handleUndelete, handleRemove, handleAutoname],
-  );
   // EXISTING_CODE
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const { setFiltering } = useFiltering(viewStateKey);
-  const [processingAddresses, setProcessingAddresses] = useState<Set<string>>(
-    new Set(),
-  );
-
-  const currentColumns = useMemo(() => {
-    const handleChipClick = (chip: string) => {
-      setFiltering(chip);
-      Reload(createPayload(dataFacetRef.current)).then(() => {
-        fetchData();
-      });
-    };
-
-    const baseColumns = getColumns(
-      getCurrentDataFacet() as types.DataFacet,
-    ).map((col) =>
-      col.key === 'chips'
-        ? {
-            ...col,
-            render: (row: Record<string, unknown>) => {
-              const nameObject = row as unknown as types.Name;
-              const chipItems = mapNameToChips(nameObject);
-              return <Chips items={chipItems} onChipClick={handleChipClick} />;
-            },
-          }
-        : col,
-    );
-
-    // Add action buttons render function to the actions column
-    const actionsOverride: Partial<FormField> = {
-      sortable: false,
-      editable: false,
-      visible: true,
-      render: (row: Record<string, unknown>) => {
-        const name = row as unknown as types.Name;
-        const addressStr = getAddressString(name.address);
-        const isProcessing = processingAddresses.has(addressStr);
-        const isDeleted = Boolean(name.deleted);
-
-        return (
-          <div className="action-buttons-container">
-            <Action
-              icon={isDeleted ? 'Undelete' : 'Delete'}
-              onClick={() =>
-                handleNameAction(
-                  addressStr,
-                  isDeleted,
-                  isDeleted ? 'undelete' : 'delete',
-                )
-              }
-              disabled={isProcessing}
-              title={isDeleted ? 'Undelete' : 'Delete'}
-              size="sm"
-            />
-            <Action
-              icon="Remove"
-              onClick={() => handleNameAction(addressStr, isDeleted, 'remove')}
-              disabled={isProcessing || !isDeleted}
-              title="Remove"
-              size="sm"
-            />
-            <Action
-              icon="Autoname"
-              onClick={() =>
-                handleNameAction(addressStr, isDeleted, 'autoname')
-              }
-              disabled={isProcessing}
-              title="Auto-generate name"
-              size="sm"
-            />
-          </div>
-        );
-      },
-    };
-
-    return baseColumns.map((col) =>
-      col.key === 'actions' ? { ...col, ...actionsOverride } : col,
-    );
-  }, [
-    setFiltering,
-    fetchData,
-    getCurrentDataFacet,
-    processingAddresses,
-    handleNameAction,
-    createPayload,
-  ]);
-
   const handleSubmit = useCallback(
     (data: Record<string, unknown>) => {
       const submittedName = data as IndexableName;
@@ -615,7 +513,6 @@ export const Names = () => {
           emitSuccess('update', displayName);
         })
         .catch((err) => {
-          // Revert optimistic update on error
           setPageData((prev) => {
             if (!prev) return null;
             return new names.NamesPage({
@@ -639,6 +536,89 @@ export const Names = () => {
       createPayload,
     ],
   );
+
+  const { setFiltering } = useFiltering(viewStateKey);
+
+  const currentColumns = useMemo(() => {
+    const handleChipClick = (chip: string) => {
+      setFiltering(chip);
+      Reload(createPayload(dataFacetRef.current)).then(() => {
+        fetchData();
+      });
+    };
+
+    const baseColumns = getColumns(
+      getCurrentDataFacet() as types.DataFacet,
+    ).map((col) =>
+      col.key === 'chips'
+        ? {
+            ...col,
+            render: (row: Record<string, unknown>) => {
+              const nameObject = row as unknown as types.Name;
+              const chipItems = mapNameToChips(nameObject);
+              return <Chips items={chipItems} onChipClick={handleChipClick} />;
+            },
+          }
+        : col,
+    );
+
+    const renderActions = (actionData: ActionData) => {
+      const isDeleted = actionData.isDeleted;
+
+      return (
+        <div className="action-buttons-container">
+          <Action
+            icon={isDeleted ? 'Undelete' : 'Delete'}
+            onClick={() => {
+              if (isDeleted) {
+                handleUndelete(actionData.addressStr);
+              } else {
+                handleDelete(actionData.addressStr);
+              }
+            }}
+            disabled={actionData.isProcessing}
+            title={isDeleted ? 'Undelete' : 'Delete'}
+            size="sm"
+          />
+          <Action
+            icon="Remove"
+            onClick={() => handleRemove(actionData.addressStr)}
+            disabled={actionData.isProcessing || !isDeleted}
+            title="Remove"
+            size="sm"
+          />
+          <Action
+            icon="Autoname"
+            onClick={() => handleAutoname(actionData.addressStr)}
+            disabled={actionData.isProcessing}
+            title="Auto-generate name"
+            size="sm"
+          />
+        </div>
+      );
+    };
+
+    const getCanRemove = (row: Record<string, unknown>) => {
+      const name = row as unknown as types.Name;
+      return Boolean(name.deleted);
+    };
+
+    return actionConfig.injectActionColumn(
+      baseColumns,
+      renderActions,
+      getCanRemove,
+    );
+  }, [
+    setFiltering,
+    fetchData,
+    getCurrentDataFacet,
+    actionConfig,
+    handleDelete,
+    handleUndelete,
+    handleRemove,
+    handleAutoname,
+    createPayload,
+  ]);
   // EXISTING_CODE
   // === END SECTION 7 ===
 

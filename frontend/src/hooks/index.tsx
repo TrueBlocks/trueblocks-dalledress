@@ -1,4 +1,5 @@
 export * from './useActionMsgs';
+export * from './useActionConfig';
 export * from './useActiveFacet';
 export * from './useActiveProject';
 export * from './useAppHealth';

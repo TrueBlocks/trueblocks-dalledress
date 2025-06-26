@@ -32,5 +32,5 @@ export const chunksFacets: DataFacetConfig[] = [
   },
 ];
 
-export const CHUNKS_DEFAULT_FACET = types.DataFacet.STATS;
-export const CHUNKS_ROUTE = '/chunks' as const;
+export const DEFAULT_FACET = types.DataFacet.STATS;
+export const ROUTE = '/chunks' as const;

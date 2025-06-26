@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useActionConfig } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -12,11 +13,7 @@ import { chunks, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
-import {
-  CHUNKS_DEFAULT_FACET,
-  CHUNKS_ROUTE as ROUTE,
-  chunksFacets,
-} from './facets';
+import { DEFAULT_FACET, ROUTE, chunksFacets } from './facets';
 
 // EXISTING_CODE
 // === END SECTION 1 ===
@@ -27,7 +24,7 @@ export const Chunks = () => {
 
   const activeFacetHook = useActiveFacet({
     facets: chunksFacets,
-    defaultFacet: CHUNKS_DEFAULT_FACET,
+    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
@@ -133,21 +130,23 @@ export const Chunks = () => {
 
   // === SECTION 6: CRUD Operations ===
   // EXISTING_CODE
+  const actionConfig = useActionConfig({
+    operations: [],
+  });
   // EXISTING_CODE
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-
   const handleSubmit = useCallback(
     (_formData: Record<string, unknown>) => {},
     [],
   );
 
-  const currentColumns = useMemo(
-    () => getColumns(getCurrentDataFacet() as types.DataFacet),
-    [getCurrentDataFacet],
-  );
+  const currentColumns = useMemo(() => {
+    const baseColumns = getColumns(getCurrentDataFacet() as types.DataFacet);
+    return actionConfig.injectActionColumn(baseColumns, () => null);
+  }, [getCurrentDataFacet, actionConfig]);
   // EXISTING_CODE
   // === END SECTION 7 ===
 

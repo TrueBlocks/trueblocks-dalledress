@@ -32,5 +32,5 @@ export const abisFacets: DataFacetConfig[] = [
   },
 ];
 
-export const ABIS_DEFAULT_FACET = types.DataFacet.DOWNLOADED;
-export const ABIS_ROUTE = '/abis' as const;
+export const DEFAULT_FACET = types.DataFacet.DOWNLOADED;
+export const ROUTE = '/abis' as const;

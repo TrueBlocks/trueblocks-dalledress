@@ -57,5 +57,5 @@ export const exportsFacets: DataFacetConfig[] = [
   },
 ];
 
-export const EXPORTS_DEFAULT_FACET = types.DataFacet.STATEMENTS;
-export const EXPORTS_ROUTE = '/exports' as const;
+export const DEFAULT_FACET = types.DataFacet.STATEMENTS;
+export const ROUTE = '/exports' as const;

@@ -201,7 +201,201 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
     ],
   );
 
+  const handleDelete = useCallback(
+    (address: string) => {
+      clearError();
+      actionConfig.startProcessing(address);
+
+      try {
+        // Get the items from the page data
+        const items = pageData
+          ? (pageData as Record<string, unknown>)[itemsProperty] || []
+          : [];
+        const original = [...(items as TItem[])];
+
+        const optimisticValues = original.map((item: TItem) => {
+          const itemAddress = getAddressString(
+            (item as Record<string, unknown>).address,
+          );
+          if (itemAddress === address) {
+            return { ...item, deleted: true } as TItem;
+          }
+          return item;
+        });
+
+        setPageData((prev) => {
+          if (!prev) return null;
+          return new PageClass({
+            ...prev,
+            [itemsProperty]: optimisticValues,
+          }) as TPageData;
+        });
+
+        crudFunction(
+          createPayload(dataFacetRef.current, address),
+          crud.Operation.DELETE,
+          emptyItem,
+        )
+          .then(async () => {
+            const result = await getPageFunction(
+              createPayload(dataFacetRef.current),
+              pagination.currentPage * pagination.pageSize,
+              pagination.pageSize,
+              sort,
+              filter,
+            );
+            setPageData(result);
+            setTotalItems(result.totalItems || 0);
+            emitSuccess('delete', address);
+          })
+          .catch((err: unknown) => {
+            setPageData((prev) => {
+              if (!prev) return null;
+              return new PageClass({
+                ...prev,
+                [itemsProperty]: original,
+              }) as TPageData;
+            });
+            const errorMessage =
+              err instanceof Error ? err.message : String(err);
+            handleError(err, failure('delete', address, errorMessage));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
+          });
+      } catch (err: unknown) {
+        handleError(
+          err,
+          `Failed to delete ${collectionName.slice(0, -1)} ${address}`,
+        );
+        actionConfig.stopProcessing(address);
+      }
+    },
+    [
+      clearError,
+      actionConfig,
+      pageData,
+      itemsProperty,
+      setPageData,
+      PageClass,
+      crudFunction,
+      createPayload,
+      dataFacetRef,
+      emptyItem,
+      getPageFunction,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setTotalItems,
+      emitSuccess,
+      handleError,
+      failure,
+      collectionName,
+    ],
+  );
+
+  const handleUndelete = useCallback(
+    (address: string) => {
+      clearError();
+      actionConfig.startProcessing(address);
+
+      try {
+        // Get the items from the page data
+        const items = pageData
+          ? (pageData as Record<string, unknown>)[itemsProperty] || []
+          : [];
+        const original = [...(items as TItem[])];
+
+        const optimisticValues = original.map((item: TItem) => {
+          const itemAddress = getAddressString(
+            (item as Record<string, unknown>).address,
+          );
+          if (itemAddress === address) {
+            return { ...item, deleted: false } as TItem;
+          }
+          return item;
+        });
+
+        setPageData((prev) => {
+          if (!prev) return null;
+          return new PageClass({
+            ...prev,
+            [itemsProperty]: optimisticValues,
+          }) as TPageData;
+        });
+
+        crudFunction(
+          createPayload(dataFacetRef.current, address),
+          crud.Operation.UNDELETE,
+          emptyItem,
+        )
+          .then(async () => {
+            const result = await getPageFunction(
+              createPayload(dataFacetRef.current),
+              pagination.currentPage * pagination.pageSize,
+              pagination.pageSize,
+              sort,
+              filter,
+            );
+            setPageData(result);
+            setTotalItems(result.totalItems || 0);
+            emitSuccess('undelete', address);
+          })
+          .catch((err: unknown) => {
+            setPageData((prev) => {
+              if (!prev) return null;
+              return new PageClass({
+                ...prev,
+                [itemsProperty]: original,
+              }) as TPageData;
+            });
+            const errorMessage =
+              err instanceof Error ? err.message : String(err);
+            handleError(err, failure('undelete', address, errorMessage));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
+          });
+      } catch (err: unknown) {
+        handleError(
+          err,
+          `Failed to undelete ${collectionName.slice(0, -1)} ${address}`,
+        );
+        actionConfig.stopProcessing(address);
+      }
+    },
+    [
+      clearError,
+      actionConfig,
+      pageData,
+      itemsProperty,
+      setPageData,
+      PageClass,
+      crudFunction,
+      createPayload,
+      dataFacetRef,
+      emptyItem,
+      getPageFunction,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setTotalItems,
+      emitSuccess,
+      handleError,
+      failure,
+      collectionName,
+    ],
+  );
+
   return {
     handleRemove,
+    handleDelete,
+    handleUndelete,
   };
 };

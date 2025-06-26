@@ -14,7 +14,7 @@ import {
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { crud, monitors, msgs, types } from '@models';
+import { monitors, msgs, types } from '@models';
 import { getAddressString, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
@@ -135,8 +135,8 @@ export const Monitors = () => {
   const { emitSuccess, emitCleaningStatus, failure } =
     useActionMsgs('monitors');
 
-  // Use the new CRUD operations hook for handleRemove
-  const { handleRemove } = useCrudOperations({
+  // Use the new CRUD operations hook for handleRemove, handleDelete, and handleUndelete
+  const { handleRemove, handleDelete, handleUndelete } = useCrudOperations({
     collectionName: 'monitors',
     getCurrentDataFacet,
     pageData,
@@ -149,154 +149,6 @@ export const Monitors = () => {
     PageClass: monitors.MonitorsPage,
     emptyItem: types.Monitor.createFrom({}),
   });
-
-  const handleDelete = useCallback(
-    (address: string) => {
-      clearError();
-      actionConfig.startProcessing(address);
-
-      try {
-        const original = [...(pageData?.monitors || [])];
-        const optimisticValues = original.map((monitor) => {
-          const monitorAddress = getAddressString(monitor.address);
-          if (monitorAddress === address) {
-            return { ...monitor, deleted: true };
-          }
-          return monitor;
-        });
-        setPageData((prev) => {
-          if (!prev) return null;
-          return new monitors.MonitorsPage({
-            ...prev,
-            monitors: optimisticValues,
-          });
-        });
-        MonitorsCrud(
-          createPayload(dataFacetRef.current, address),
-          crud.Operation.DELETE,
-          {} as types.Monitor,
-        )
-          .then(async () => {
-            const result = await GetMonitorsPage(
-              createPayload(dataFacetRef.current),
-              pagination.currentPage * pagination.pageSize,
-              pagination.pageSize,
-              sort,
-              filter,
-            );
-            setPageData(result);
-            setTotalItems(result.totalItems || 0);
-            emitSuccess('delete', address);
-          })
-          .catch((err) => {
-            setPageData((prev) => {
-              if (!prev) return null;
-              return new monitors.MonitorsPage({
-                ...prev,
-                monitors: original,
-              });
-            });
-            handleError(err, failure('delete', address, err.message));
-          })
-          .finally(() => {
-            setTimeout(() => {
-              actionConfig.stopProcessing(address);
-            }, 100);
-          });
-      } catch (err: unknown) {
-        handleError(err, `Failed to delete monitor ${address}`);
-        actionConfig.stopProcessing(address);
-      }
-    },
-    [
-      clearError,
-      actionConfig,
-      pageData?.monitors,
-      pagination.currentPage,
-      pagination.pageSize,
-      sort,
-      filter,
-      setTotalItems,
-      emitSuccess,
-      handleError,
-      failure,
-      createPayload,
-    ],
-  );
-
-  const handleUndelete = useCallback(
-    (address: string) => {
-      clearError();
-      actionConfig.startProcessing(address);
-
-      try {
-        const original = [...(pageData?.monitors || [])];
-        const optimisticValues = original.map((monitor) => {
-          const monitorAddress = getAddressString(monitor.address);
-          if (monitorAddress === address) {
-            return { ...monitor, deleted: false };
-          }
-          return monitor;
-        });
-        setPageData((prev) => {
-          if (!prev) return null;
-          return new monitors.MonitorsPage({
-            ...prev,
-            monitors: optimisticValues,
-          });
-        });
-        MonitorsCrud(
-          createPayload(dataFacetRef.current, address),
-          crud.Operation.UNDELETE,
-          {} as types.Monitor,
-        )
-          .then(async () => {
-            const result = await GetMonitorsPage(
-              createPayload(dataFacetRef.current),
-              pagination.currentPage * pagination.pageSize,
-              pagination.pageSize,
-              sort,
-              filter,
-            );
-            setPageData(result);
-            setTotalItems(result.totalItems || 0);
-            emitSuccess('undelete', address);
-          })
-          .catch((err) => {
-            setPageData((prev) => {
-              if (!prev) return null;
-              return new monitors.MonitorsPage({
-                ...prev,
-                monitors: original,
-              });
-            });
-            handleError(err, failure('undelete', address, err.message));
-          })
-          .finally(() => {
-            setTimeout(() => {
-              actionConfig.stopProcessing(address);
-            }, 100);
-          });
-      } catch (err: unknown) {
-        handleError(err, `Failed to undelete monitor ${address}`);
-        actionConfig.stopProcessing(address);
-      }
-    },
-    [
-      clearError,
-      actionConfig,
-      pageData?.monitors,
-      handleError,
-      pagination.currentPage,
-      pagination.pageSize,
-      sort,
-      filter,
-      setTotalItems,
-      emitSuccess,
-      failure,
-      createPayload,
-    ],
-  );
 
   const _handleCleanAll = useCallback(async () => {
     clearError();

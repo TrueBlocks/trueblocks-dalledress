@@ -6,6 +6,7 @@ export * from './useAppHealth';
 export * from './useAppHotkeys';
 export * from './useAppNavigation';
 export * from './useAppReadiness';
+export * from './useCrudOperations';
 export * from './useDateTime';
 export * from './useEvent';
 export * from './useIcons';

@@ -5,7 +5,12 @@ import { GetNamesPage, NamesCrud, Reload } from '@app';
 import { Action, Chips, mapNameToChips } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionData, useActionConfig, useActionMsgs } from '@hooks';
+import {
+  ActionData,
+  useActionConfig,
+  useActionMsgs,
+  useCrudOperations,
+} from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -136,6 +141,30 @@ export const Names = () => {
   });
 
   const { emitSuccess, failure } = useActionMsgs('names');
+
+  // Use the new CRUD operations hook for handleRemove
+  const { handleRemove } = useCrudOperations({
+    pageData,
+    setPageData,
+    setTotalItems,
+    crudFunction: NamesCrud,
+    getPageFunction: GetNamesPage,
+    createPayload,
+    dataFacetRef,
+    pagination,
+    sort,
+    filter: filter ?? '',
+    goToPage,
+    clearError,
+    handleError,
+    emitSuccess,
+    failure,
+    actionConfig,
+    collectionName: 'names',
+    itemsProperty: 'names',
+    PageClass: names.NamesPage,
+    emptyItem: {} as types.Name,
+  });
 
   const handleDelete = useCallback(
     (address: string) => {
@@ -281,90 +310,6 @@ export const Names = () => {
       emitSuccess,
       handleError,
       failure,
-      createPayload,
-    ],
-  );
-
-  const handleRemove = useCallback(
-    (address: string) => {
-      clearError();
-      actionConfig.startProcessing(address);
-
-      try {
-        const original = [...(pageData?.names || [])];
-        const isOnlyRowOnPage = original.length === 1;
-        const optimisticValues = original.filter((name) => {
-          const nameAddress = getAddressString(name.address);
-          return nameAddress !== address;
-        });
-        setPageData((prev) => {
-          if (!prev) return null;
-          return new names.NamesPage({
-            ...prev,
-            names: optimisticValues,
-          });
-        });
-        NamesCrud(
-          createPayload(dataFacetRef.current, address),
-          crud.Operation.REMOVE,
-          {} as types.Name,
-        )
-          .then(async () => {
-            const result = await GetNamesPage(
-              createPayload(dataFacetRef.current),
-              pagination.currentPage * pagination.pageSize,
-              pagination.pageSize,
-              sort,
-              filter ?? '',
-            );
-            setPageData(result);
-            setTotalItems(result.totalItems || 0);
-
-            if (isOnlyRowOnPage && result.totalItems > 0) {
-              const newTotalPages = Math.ceil(
-                result.totalItems / pagination.pageSize,
-              );
-              const lastPageIndex = Math.max(0, newTotalPages - 1);
-
-              if (lastPageIndex !== pagination.currentPage) {
-                goToPage(lastPageIndex);
-              }
-            }
-            emitSuccess('remove', address);
-          })
-          .catch((err) => {
-            setPageData((prev) => {
-              if (!prev) return null;
-              return new names.NamesPage({
-                ...prev,
-                names: original,
-              });
-            });
-            handleError(err, failure('remove', address, err.message));
-          })
-          .finally(() => {
-            setTimeout(() => {
-              actionConfig.stopProcessing(address);
-            }, 100);
-          });
-      } catch (err: unknown) {
-        handleError(err, `Failed to remove name ${address}`);
-        actionConfig.stopProcessing(address);
-      }
-    },
-    [
-      clearError,
-      actionConfig,
-      pageData?.names,
-      pagination.currentPage,
-      pagination.pageSize,
-      sort,
-      filter,
-      setTotalItems,
-      emitSuccess,
-      handleError,
-      failure,
-      goToPage,
       createPayload,
     ],
   );

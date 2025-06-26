@@ -5,7 +5,12 @@ import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
 import { Action } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionData, useActionConfig, useActionMsgs } from '@hooks';
+import {
+  ActionData,
+  useActionConfig,
+  useActionMsgs,
+  useCrudOperations,
+} from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -129,6 +134,30 @@ export const Monitors = () => {
 
   const { emitSuccess, emitCleaningStatus, failure } =
     useActionMsgs('monitors');
+
+  // Use the new CRUD operations hook for handleRemove
+  const { handleRemove } = useCrudOperations({
+    pageData,
+    setPageData,
+    setTotalItems,
+    crudFunction: MonitorsCrud,
+    getPageFunction: GetMonitorsPage,
+    createPayload,
+    dataFacetRef,
+    pagination,
+    sort,
+    filter,
+    goToPage,
+    clearError,
+    handleError,
+    emitSuccess,
+    failure,
+    actionConfig,
+    collectionName: 'monitors',
+    itemsProperty: 'monitors',
+    PageClass: monitors.MonitorsPage,
+    emptyItem: {} as types.Monitor,
+  });
 
   const handleDelete = useCallback(
     (address: string) => {
@@ -274,90 +303,6 @@ export const Monitors = () => {
       setTotalItems,
       emitSuccess,
       failure,
-      createPayload,
-    ],
-  );
-
-  const handleRemove = useCallback(
-    (address: string) => {
-      clearError();
-      actionConfig.startProcessing(address);
-
-      try {
-        const original = [...(pageData?.monitors || [])];
-        const isOnlyRowOnPage = original.length === 1;
-        const optimisticValues = original.filter((monitor) => {
-          const monitorAddress = getAddressString(monitor.address);
-          return monitorAddress !== address;
-        });
-        setPageData((prev) => {
-          if (!prev) return null;
-          return new monitors.MonitorsPage({
-            ...prev,
-            monitors: optimisticValues,
-          });
-        });
-        MonitorsCrud(
-          createPayload(dataFacetRef.current, address),
-          crud.Operation.REMOVE,
-          {} as types.Monitor,
-        )
-          .then(async () => {
-            const result = await GetMonitorsPage(
-              createPayload(dataFacetRef.current),
-              pagination.currentPage * pagination.pageSize,
-              pagination.pageSize,
-              sort,
-              filter,
-            );
-            setPageData(result);
-            setTotalItems(result.totalItems || 0);
-
-            if (isOnlyRowOnPage && result.totalItems > 0) {
-              const newTotalPages = Math.ceil(
-                result.totalItems / pagination.pageSize,
-              );
-              const lastPageIndex = Math.max(0, newTotalPages - 1);
-
-              if (lastPageIndex !== pagination.currentPage) {
-                goToPage(lastPageIndex);
-              }
-            }
-            emitSuccess('remove', address);
-          })
-          .catch((err) => {
-            setPageData((prev) => {
-              if (!prev) return null;
-              return new monitors.MonitorsPage({
-                ...prev,
-                monitors: original,
-              });
-            });
-            handleError(err, failure('remove', address, err.message));
-          })
-          .finally(() => {
-            setTimeout(() => {
-              actionConfig.stopProcessing(address);
-            }, 100);
-          });
-      } catch (err: unknown) {
-        handleError(err, `Failed to remove monitor ${address}`);
-        actionConfig.stopProcessing(address);
-      }
-    },
-    [
-      clearError,
-      actionConfig,
-      pageData?.monitors,
-      handleError,
-      pagination.currentPage,
-      pagination.pageSize,
-      sort,
-      filter,
-      setTotalItems,
-      emitSuccess,
-      failure,
-      goToPage,
       createPayload,
     ],
   );

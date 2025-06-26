@@ -5,12 +5,17 @@ import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionData, useActionConfig, useActionMsgs } from '@hooks';
+import {
+  ActionData,
+  useActionConfig,
+  useActionMsgs,
+  useCrudOperations,
+} from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { abis, crud, msgs, types } from '@models';
-import { getAddressString, useErrorHandler } from '@utils';
+import { abis, msgs, types } from '@models';
+import { useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, abisFacets } from './facets';
@@ -136,95 +141,30 @@ export const Abis = () => {
   const { emitSuccess, failure } = useActionMsgs('abis');
   const { goToPage } = usePagination(viewStateKey);
 
-  const handleRemove = useCallback(
-    (address: string) => {
-      clearError();
-      actionConfig.startProcessing(address);
+  // Use the new CRUD operations hook for handleRemove
+  const { handleRemove } = useCrudOperations({
+    pageData,
+    setPageData,
+    setTotalItems,
+    crudFunction: AbisCrud,
+    getPageFunction: GetAbisPage,
+    createPayload,
+    dataFacetRef,
+    pagination,
+    sort,
+    filter,
+    goToPage,
+    clearError,
+    handleError,
+    emitSuccess,
+    failure,
+    actionConfig,
+    collectionName: 'abis',
+    itemsProperty: 'abis',
+    PageClass: abis.AbisPage,
+    emptyItem: {} as types.Abi,
+  });
 
-      try {
-        const original = [...(pageData?.abis || [])];
-        const isOnlyRowOnPage = original.length === 1;
-        const optimisticValues = original.filter((abi) => {
-          const abiAddress = getAddressString(abi.address);
-          return abiAddress !== address;
-        });
-
-        setPageData((prev) => {
-          if (!prev) return null;
-          return new abis.AbisPage({
-            ...prev,
-            abis: optimisticValues,
-          });
-        });
-        const currentTotal = pageData?.totalItems || 0;
-        setTotalItems(Math.max(0, currentTotal - 1));
-
-        AbisCrud(
-          createPayload(dataFacetRef.current, address),
-          crud.Operation.REMOVE,
-          {} as types.Abi,
-        )
-          .then(async () => {
-            const result = await GetAbisPage(
-              createPayload(dataFacetRef.current),
-              pagination.currentPage * pagination.pageSize,
-              pagination.pageSize,
-              sort,
-              filter,
-            );
-            setPageData(result);
-            setTotalItems(result.totalItems || 0);
-
-            if (isOnlyRowOnPage && result.totalItems > 0) {
-              const newTotalPages = Math.ceil(
-                result.totalItems / pagination.pageSize,
-              );
-              const lastPageIndex = Math.max(0, newTotalPages - 1);
-
-              if (lastPageIndex !== pagination.currentPage) {
-                goToPage(lastPageIndex);
-              }
-            }
-            emitSuccess('remove', address);
-          })
-          .catch((err) => {
-            setPageData((prev) => {
-              if (!prev) return null;
-              return new abis.AbisPage({
-                ...prev,
-                abis: original,
-              });
-            });
-            setTotalItems(pageData?.totalItems || 0);
-            handleError(err, failure('remove', address, err.message));
-          })
-          .finally(() => {
-            setTimeout(() => {
-              actionConfig.stopProcessing(address);
-            }, 100);
-          });
-      } catch (err: unknown) {
-        handleError(err, `Failed to remove abi ${address}`);
-        actionConfig.stopProcessing(address);
-      }
-    },
-    [
-      clearError,
-      actionConfig,
-      pageData?.abis,
-      pageData?.totalItems,
-      setTotalItems,
-      pagination.currentPage,
-      pagination.pageSize,
-      sort,
-      filter,
-      emitSuccess,
-      failure,
-      goToPage,
-      handleError,
-      createPayload,
-    ],
-  );
   // EXISTING_CODE
   // === END SECTION 6 ===
 

@@ -108,7 +108,7 @@ export const Names = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === ROUTE) {
+      if (payload?.collection === 'names') {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
@@ -142,7 +142,7 @@ export const Names = () => {
 
   // Use the new CRUD operations hook for handleRemove
   const { handleRemove } = useCrudOperations({
-    collectionName: ROUTE,
+    collectionName: 'names',
     getCurrentDataFacet,
     pageData,
     setPageData,

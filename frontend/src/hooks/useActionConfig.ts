@@ -10,6 +10,7 @@ export type ActionOperation =
   | 'remove'
   | 'autoname'
   | 'clean'
+  | 'clean-one'
   | 'explore';
 
 // Simple action configuration

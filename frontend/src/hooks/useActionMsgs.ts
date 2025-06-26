@@ -113,13 +113,5 @@ export const useActionMsgs = (entityType: EntityType) => {
         `Reloaded ${config.singularName} data. Fetching fresh data...`,
       );
     },
-
-    emitCleaningStatus: (count?: number) => {
-      if (count !== undefined) {
-        emitStatus(`Cleaning ${count} ${config.singularName}(s)...`);
-      } else {
-        emitStatus(`Cleaning all ${config.pluralName}...`);
-      }
-    },
   };
 };

@@ -137,121 +137,35 @@ export const Names = () => {
   // === SECTION 6: CRUD Operations ===
   // EXISTING_CODE
   const actionConfig = useActionConfig({
-    operations: ['delete', 'undelete', 'remove'],
+    operations: ['delete', 'undelete', 'remove', 'autoname'],
   });
 
-  // Use the new CRUD operations hook for handleRemove, handleDelete, and handleUndelete
-  const { handleRemove, handleDelete, handleUndelete } = useCrudOperations({
-    collectionName: 'names',
-    getCurrentDataFacet,
-    pageData,
-    setPageData,
-    setTotalItems,
-    crudFunction: NamesCrud,
-    getPageFunction: GetNamesPage,
-    dataFacetRef,
-    actionConfig,
-    PageClass: names.NamesPage,
-    emptyItem: types.Name.createFrom({}),
-  });
-
-  const { emitSuccess, failure } = useActionMsgs('names');
-
-  const handleAutoname = useCallback(
-    (address: string) => {
-      clearError();
-      actionConfig.startProcessing(address);
-
-      try {
-        const original = [...(pageData?.names || [])];
-        const optimisticValues = original.map((name) => {
-          const nameAddress = getAddressString(name.address);
-          if (nameAddress === address) {
-            return { ...name, name: 'Generating...' };
-          }
-          return name;
-        });
-        setPageData((prev) => {
-          if (!prev) return null;
-          return new names.NamesPage({
-            ...prev,
-            names: optimisticValues,
-          });
-        });
-        NamesCrud(
-          createPayload(dataFacetRef.current, address),
-          crud.Operation.AUTONAME,
-          {} as types.Name,
-        )
-          .then(async () => {
-            const result = await GetNamesPage(
-              createPayload(dataFacetRef.current),
-              pagination.currentPage * pagination.pageSize,
-              pagination.pageSize,
-              sort,
-              filter ?? '',
-            );
-            setPageData(result);
-            setTotalItems(result.totalItems || 0);
-            emitSuccess('autoname', address);
-          })
-          .catch((err) => {
-            setPageData((prev) => {
-              if (!prev) return null;
-              return new names.NamesPage({
-                ...prev,
-                names: original,
-              });
-            });
-            handleError(err, failure('autoname', address, err.message));
-          })
-          .finally(() => {
-            setTimeout(() => {
-              actionConfig.stopProcessing(address);
-            }, 100);
-          });
-      } catch (err: unknown) {
-        handleError(err, `Failed to autoname address ${address}`);
-        actionConfig.stopProcessing(address);
-      }
-    },
-    [
-      clearError,
-      actionConfig,
-      pageData?.names,
-      pagination.currentPage,
-      pagination.pageSize,
-      sort,
-      filter,
+  // Use the new CRUD operations hook for handleRemove, handleDelete, handleUndelete, and handleAutoname
+  const { handleRemove, handleDelete, handleUndelete, handleAutoname } =
+    useCrudOperations({
+      collectionName: 'names',
+      crudFunc: NamesCrud,
+      pageFunc: GetNamesPage,
+      pageClass: names.NamesPage,
+      emptyItem: types.Name.createFrom({}),
+      getCurrentDataFacet,
+      pageData,
+      setPageData,
       setTotalItems,
-      emitSuccess,
-      handleError,
-      failure,
-      createPayload,
-    ],
-  );
+      dataFacetRef,
+      actionConfig,
+    });
+
   // EXISTING_CODE
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  type IndexableName = types.Name & Record<string, unknown>;
-
-  function removeUndefinedProps(
-    obj: Record<string, unknown>,
-  ): Record<string, unknown> {
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(obj)) {
-      if (value !== undefined) {
-        result[key] = value;
-      }
-    }
-    return result;
-  }
+  const { emitSuccess, failure } = useActionMsgs('names');
 
   const handleSubmit = useCallback(
     (data: Record<string, unknown>) => {
-      const submittedName = data as IndexableName;
+      const submittedName = data as unknown as types.Name;
       const addressStr = getAddressString(submittedName.address);
 
       // Set default source if not provided
@@ -262,7 +176,7 @@ export const Names = () => {
       const originalNames = [...(pageData?.names || [])];
 
       // Optimistic UI Update
-      let optimisticNames: IndexableName[];
+      let optimisticNames: types.Name[];
       const existingNameIndex = originalNames.findIndex(
         (n) => getAddressString(n.address) === addressStr,
       );
@@ -273,15 +187,15 @@ export const Names = () => {
           index === existingNameIndex
             ? ({
                 ...n,
-                ...removeUndefinedProps(submittedName),
-              } as IndexableName)
-            : (n as IndexableName),
+                ...submittedName,
+              } as types.Name)
+            : (n as types.Name),
         );
       } else {
         // Add new name
         optimisticNames = [
-          submittedName as IndexableName,
-          ...(originalNames as IndexableName[]),
+          submittedName as types.Name,
+          ...(originalNames as types.Name[]),
         ];
       }
       setPageData((prev) => {

@@ -136,11 +136,6 @@ export const Chunks = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const handleSubmit = useCallback(
-    (_formData: Record<string, unknown>) => {},
-    [],
-  );
-
   const currentColumns = useMemo(() => {
     const baseColumns = getColumns(getCurrentDataFacet() as types.DataFacet);
     return actionConfig.injectActionColumn(baseColumns, () => null);
@@ -156,18 +151,10 @@ export const Chunks = () => {
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
-        onSubmit={handleSubmit}
         viewStateKey={viewStateKey}
       />
     ),
-    [
-      currentData,
-      currentColumns,
-      pageData?.isFetching,
-      error,
-      handleSubmit,
-      viewStateKey,
-    ],
+    [currentData, currentColumns, pageData?.isFetching, error, viewStateKey],
   );
 
   const tabs = useMemo(

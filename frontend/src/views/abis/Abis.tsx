@@ -136,16 +136,16 @@ export const Abis = () => {
   // Use the new CRUD operations hook for handleRemove
   const { handleRemove } = useCrudOperations({
     collectionName: 'abis',
+    crudFunc: AbisCrud,
+    pageFunc: GetAbisPage,
+    pageClass: abis.AbisPage,
+    emptyItem: types.Abi.createFrom({}),
     getCurrentDataFacet,
     pageData,
     setPageData,
     setTotalItems,
-    crudFunction: AbisCrud,
-    getPageFunction: GetAbisPage,
     dataFacetRef,
     actionConfig,
-    PageClass: abis.AbisPage,
-    emptyItem: types.Abi.createFrom({}),
   });
 
   // EXISTING_CODE
@@ -153,11 +153,6 @@ export const Abis = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const handleSubmit = useCallback(
-    (_formData: Record<string, unknown>) => {},
-    [],
-  );
-
   const currentColumns = useMemo(() => {
     const baseColumns = getColumns(
       pageData?.facet || types.DataFacet.DOWNLOADED,
@@ -209,18 +204,10 @@ export const Abis = () => {
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
-        onSubmit={handleSubmit}
         viewStateKey={viewStateKey}
       />
     ),
-    [
-      currentData,
-      currentColumns,
-      pageData?.isFetching,
-      error,
-      handleSubmit,
-      viewStateKey,
-    ],
+    [currentData, currentColumns, pageData?.isFetching, error, viewStateKey],
   );
 
   const tabs = useMemo(

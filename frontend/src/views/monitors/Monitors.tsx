@@ -5,17 +5,12 @@ import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
 import { Action } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import {
-  ActionData,
-  useActionConfig,
-  useActionMsgs,
-  useCrudOperations,
-} from '@hooks';
+import { ActionData, useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { monitors, msgs, types } from '@models';
-import { getAddressString, useErrorHandler } from '@utils';
+import { useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, monitorsFacets } from './facets';
@@ -132,88 +127,25 @@ export const Monitors = () => {
     operations: ['delete', 'undelete', 'remove'],
   });
 
-  const { emitSuccess, emitCleaningStatus, failure } =
-    useActionMsgs('monitors');
-
-  // Use the new CRUD operations hook for handleRemove, handleDelete, and handleUndelete
   const { handleRemove, handleDelete, handleUndelete } = useCrudOperations({
     collectionName: 'monitors',
+    crudFunc: MonitorsCrud,
+    pageFunc: GetMonitorsPage,
+    cleanFunc: MonitorsClean,
+    pageClass: monitors.MonitorsPage,
+    emptyItem: types.Monitor.createFrom({}),
     getCurrentDataFacet,
     pageData,
     setPageData,
     setTotalItems,
-    crudFunction: MonitorsCrud,
-    getPageFunction: GetMonitorsPage,
     dataFacetRef,
     actionConfig,
-    PageClass: monitors.MonitorsPage,
-    emptyItem: types.Monitor.createFrom({}),
   });
-
-  const _handleCleanAll = useCallback(async () => {
-    clearError();
-    try {
-      emitCleaningStatus();
-      await MonitorsClean(createPayload(dataFacetRef.current), []);
-      await fetchData();
-      emitSuccess('clean', 0);
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      handleError(err, failure('clean', undefined, errorMessage));
-    }
-  }, [
-    clearError,
-    fetchData,
-    emitCleaningStatus,
-    emitSuccess,
-    failure,
-    handleError,
-    createPayload,
-  ]);
-
-  // Handle clean selected monitors
-  const _handleCleanSelected = useCallback(
-    async (addresses: string[]) => {
-      clearError();
-      try {
-        emitCleaningStatus(addresses.length);
-        await MonitorsClean(createPayload(dataFacetRef.current), addresses);
-        await fetchData();
-        emitSuccess('clean', addresses.length);
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        handleError(err, failure('clean', undefined, errorMessage));
-      }
-    },
-    [
-      clearError,
-      fetchData,
-      emitCleaningStatus,
-      emitSuccess,
-      failure,
-      handleError,
-      createPayload,
-    ],
-  );
   // EXISTING_CODE
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const handleSubmit = useCallback(
-    (data: Record<string, unknown>) => {
-      const monitor = data as unknown as types.Monitor;
-      const address = getAddressString(monitor.address);
-
-      if (monitor.deleted) {
-        handleUndelete(address);
-      } else {
-        handleDelete(address);
-      }
-    },
-    [handleDelete, handleUndelete],
-  );
-
   const currentColumns = useMemo(() => {
     const baseColumns = getColumns(getCurrentDataFacet() as types.DataFacet);
 
@@ -274,18 +206,10 @@ export const Monitors = () => {
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
-        onSubmit={handleSubmit}
         viewStateKey={viewStateKey}
       />
     ),
-    [
-      currentData,
-      currentColumns,
-      pageData?.isFetching,
-      error,
-      handleSubmit,
-      viewStateKey,
-    ],
+    [currentData, currentColumns, pageData?.isFetching, error, viewStateKey],
   );
 
   const tabs = useMemo(

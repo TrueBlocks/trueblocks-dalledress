@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { crud, sdk, types } from '@models';
-import { getAddressString, useErrorHandler } from '@utils';
+import { getAddressString, useEmitters, useErrorHandler } from '@utils';
 
 import { EntityType, useActionMsgs } from './useActionMsgs';
 import { usePayload } from './usePayload';
@@ -28,12 +28,12 @@ export interface CrudOperationsConfig<TPageData extends PageData, TItem> {
   setTotalItems: (total: number) => void;
 
   // API functions
-  crudFunction: (
+  crudFunc: (
     payload: types.Payload,
     operation: crud.Operation,
     item: TItem,
   ) => Promise<void>;
-  getPageFunction: (
+  pageFunc: (
     payload: types.Payload,
     offset: number,
     limit: number,
@@ -51,8 +51,11 @@ export interface CrudOperationsConfig<TPageData extends PageData, TItem> {
   };
 
   // Collection-specific classes
-  PageClass: new (data: Record<string, unknown>) => TPageData;
+  pageClass: new (data: Record<string, unknown>) => TPageData;
   emptyItem: TItem;
+
+  // Optional operations for specific collections
+  cleanFunc?: (payload: types.Payload, addresses: string[]) => Promise<void>;
 }
 
 export const useCrudOperations = <TPageData extends PageData, TItem>(
@@ -64,12 +67,13 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
     pageData,
     setPageData,
     setTotalItems,
-    crudFunction,
-    getPageFunction,
+    crudFunc,
+    pageFunc,
     dataFacetRef,
     actionConfig,
-    PageClass,
+    pageClass,
     emptyItem,
+    cleanFunc,
   } = config;
 
   // Derive itemsProperty from collectionName (they're always the same)
@@ -93,6 +97,7 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
   const createPayload = usePayload();
   const { clearError, handleError } = useErrorHandler();
   const { emitSuccess, failure } = useActionMsgs(collectionName as EntityType);
+  const { emitStatus } = useEmitters();
 
   const handleRemove = useCallback(
     (address: string) => {
@@ -116,19 +121,19 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
 
         setPageData((prev) => {
           if (!prev) return null;
-          return new PageClass({
+          return new pageClass({
             ...prev,
             [itemsProperty]: optimisticValues,
           }) as TPageData;
         });
 
-        crudFunction(
+        crudFunc(
           createPayload(dataFacetRef.current, address),
           crud.Operation.REMOVE,
           emptyItem,
         )
           .then(async () => {
-            const result = await getPageFunction(
+            const result = await pageFunc(
               createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -154,7 +159,7 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
           .catch((err: unknown) => {
             setPageData((prev) => {
               if (!prev) return null;
-              return new PageClass({
+              return new pageClass({
                 ...prev,
                 [itemsProperty]: original,
               }) as TPageData;
@@ -182,12 +187,12 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
       pageData,
       itemsProperty,
       setPageData,
-      PageClass,
-      crudFunction,
+      pageClass,
+      crudFunc,
       createPayload,
       dataFacetRef,
       emptyItem,
-      getPageFunction,
+      pageFunc,
       pagination.currentPage,
       pagination.pageSize,
       sort,
@@ -225,19 +230,19 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
 
         setPageData((prev) => {
           if (!prev) return null;
-          return new PageClass({
+          return new pageClass({
             ...prev,
             [itemsProperty]: optimisticValues,
           }) as TPageData;
         });
 
-        crudFunction(
+        crudFunc(
           createPayload(dataFacetRef.current, address),
           crud.Operation.DELETE,
           emptyItem,
         )
           .then(async () => {
-            const result = await getPageFunction(
+            const result = await pageFunc(
               createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -251,7 +256,7 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
           .catch((err: unknown) => {
             setPageData((prev) => {
               if (!prev) return null;
-              return new PageClass({
+              return new pageClass({
                 ...prev,
                 [itemsProperty]: original,
               }) as TPageData;
@@ -279,12 +284,12 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
       pageData,
       itemsProperty,
       setPageData,
-      PageClass,
-      crudFunction,
+      pageClass,
+      crudFunc,
       createPayload,
       dataFacetRef,
       emptyItem,
-      getPageFunction,
+      pageFunc,
       pagination.currentPage,
       pagination.pageSize,
       sort,
@@ -321,19 +326,19 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
 
         setPageData((prev) => {
           if (!prev) return null;
-          return new PageClass({
+          return new pageClass({
             ...prev,
             [itemsProperty]: optimisticValues,
           }) as TPageData;
         });
 
-        crudFunction(
+        crudFunc(
           createPayload(dataFacetRef.current, address),
           crud.Operation.UNDELETE,
           emptyItem,
         )
           .then(async () => {
-            const result = await getPageFunction(
+            const result = await pageFunc(
               createPayload(dataFacetRef.current),
               pagination.currentPage * pagination.pageSize,
               pagination.pageSize,
@@ -347,7 +352,7 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
           .catch((err: unknown) => {
             setPageData((prev) => {
               if (!prev) return null;
-              return new PageClass({
+              return new pageClass({
                 ...prev,
                 [itemsProperty]: original,
               }) as TPageData;
@@ -375,12 +380,12 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
       pageData,
       itemsProperty,
       setPageData,
-      PageClass,
-      crudFunction,
+      pageClass,
+      crudFunc,
       createPayload,
       dataFacetRef,
       emptyItem,
-      getPageFunction,
+      pageFunc,
       pagination.currentPage,
       pagination.pageSize,
       sort,
@@ -393,9 +398,209 @@ export const useCrudOperations = <TPageData extends PageData, TItem>(
     ],
   );
 
+  const handleAutoname = useCallback(
+    (address: string) => {
+      clearError();
+      actionConfig.startProcessing(address);
+
+      try {
+        // Get the items from the page data
+        const items = pageData
+          ? (pageData as Record<string, unknown>)[itemsProperty] || []
+          : [];
+        const original = [...(items as TItem[])];
+
+        const optimisticValues = original.map((item: TItem) => {
+          const itemAddress = getAddressString(
+            (item as Record<string, unknown>).address,
+          );
+          if (itemAddress === address) {
+            return { ...item, name: 'Generating...' } as TItem;
+          }
+          return item;
+        });
+
+        setPageData((prev) => {
+          if (!prev) return null;
+          return new pageClass({
+            ...prev,
+            [itemsProperty]: optimisticValues,
+          }) as TPageData;
+        });
+
+        crudFunc(
+          createPayload(dataFacetRef.current, address),
+          crud.Operation.AUTONAME,
+          emptyItem,
+        )
+          .then(async () => {
+            const result = await pageFunc(
+              createPayload(dataFacetRef.current),
+              pagination.currentPage * pagination.pageSize,
+              pagination.pageSize,
+              sort,
+              filter,
+            );
+            setPageData(result);
+            setTotalItems(result.totalItems || 0);
+            emitSuccess('autoname', address);
+          })
+          .catch((err: unknown) => {
+            setPageData((prev) => {
+              if (!prev) return null;
+              return new pageClass({
+                ...prev,
+                [itemsProperty]: original,
+              }) as TPageData;
+            });
+            const errorMessage =
+              err instanceof Error ? err.message : String(err);
+            handleError(err, failure('autoname', address, errorMessage));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
+          });
+      } catch (err: unknown) {
+        handleError(err, `Failed to autoname address ${address}`);
+        actionConfig.stopProcessing(address);
+      }
+    },
+    [
+      clearError,
+      actionConfig,
+      pageData,
+      itemsProperty,
+      setPageData,
+      pageClass,
+      crudFunc,
+      createPayload,
+      dataFacetRef,
+      emptyItem,
+      pageFunc,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setTotalItems,
+      emitSuccess,
+      handleError,
+      failure,
+    ],
+  );
+
+  const handleClean = useCallback(async () => {
+    if (!cleanFunc) return;
+
+    clearError();
+    actionConfig.startProcessing('clean');
+
+    try {
+      // Emit cleaning status
+      if (collectionName === 'monitors') {
+        emitStatus('Cleaning all monitors...');
+      }
+      await cleanFunc(createPayload(dataFacetRef.current), []);
+      const result = await pageFunc(
+        createPayload(dataFacetRef.current),
+        pagination.currentPage * pagination.pageSize,
+        pagination.pageSize,
+        sort,
+        filter,
+      );
+      setPageData(result);
+      setTotalItems(result.totalItems || 0);
+      emitSuccess('clean', 0);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      handleError(err, failure('clean', undefined, errorMessage));
+    } finally {
+      setTimeout(() => {
+        actionConfig.stopProcessing('clean');
+      }, 100);
+    }
+  }, [
+    cleanFunc,
+    clearError,
+    collectionName,
+    createPayload,
+    dataFacetRef,
+    pageFunc,
+    pagination.currentPage,
+    pagination.pageSize,
+    sort,
+    filter,
+    setPageData,
+    setTotalItems,
+    emitSuccess,
+    handleError,
+    failure,
+    emitStatus,
+    actionConfig,
+  ]);
+
+  const handleCleanOne = useCallback(
+    async (addresses: string[]) => {
+      if (!cleanFunc) return;
+
+      clearError();
+      const firstAddress = addresses.length > 0 ? addresses[0] : null;
+      const processingKey = firstAddress || 'clean-one';
+      actionConfig.startProcessing(processingKey);
+
+      try {
+        // Emit cleaning status
+        if (collectionName === 'monitors') {
+          emitStatus(`Cleaning ${addresses.length} monitor(s)...`);
+        }
+        await cleanFunc(createPayload(dataFacetRef.current), addresses);
+        const result = await pageFunc(
+          createPayload(dataFacetRef.current),
+          pagination.currentPage * pagination.pageSize,
+          pagination.pageSize,
+          sort,
+          filter,
+        );
+        setPageData(result);
+        setTotalItems(result.totalItems || 0);
+        emitSuccess('clean', addresses.length);
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        handleError(err, failure('clean', undefined, errorMessage));
+      } finally {
+        setTimeout(() => {
+          actionConfig.stopProcessing(processingKey);
+        }, 100);
+      }
+    },
+    [
+      cleanFunc,
+      clearError,
+      collectionName,
+      createPayload,
+      dataFacetRef,
+      pageFunc,
+      pagination.currentPage,
+      pagination.pageSize,
+      sort,
+      filter,
+      setPageData,
+      setTotalItems,
+      emitSuccess,
+      handleError,
+      failure,
+      emitStatus,
+      actionConfig,
+    ],
+  );
+
   return {
     handleRemove,
     handleDelete,
     handleUndelete,
+    handleAutoname,
+    handleClean,
+    handleCleanOne,
   };
 };

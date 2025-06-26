@@ -1,12 +1,11 @@
 // === SECTION 1: Imports & Dependencies ===
-// EXISTING_CODE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionData, useActionMsgs, useActionConfig } from '@hooks';
+import { ActionData, useActionConfig, useActionMsgs } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -16,7 +15,6 @@ import { getAddressString, useErrorHandler } from '@utils';
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, abisFacets } from './facets';
 
-// EXISTING_CODE
 // === END SECTION 1 ===
 
 export const Abis = () => {
@@ -135,12 +133,14 @@ export const Abis = () => {
     operations: ['remove'],
   });
 
-  const { emitSuccess } = useActionMsgs('abis');
+  const { emitSuccess, failure } = useActionMsgs('abis');
   const { goToPage } = usePagination(viewStateKey);
 
-  const handleAction = useCallback(
+  const handleRemove = useCallback(
     (address: string) => {
       clearError();
+      actionConfig.startProcessing(address);
+
       try {
         const original = [...(pageData?.abis || [])];
         const isOnlyRowOnPage = original.length === 1;
@@ -183,21 +183,9 @@ export const Abis = () => {
 
               if (lastPageIndex !== pagination.currentPage) {
                 goToPage(lastPageIndex);
-                setTimeout(() => {
-                  const endKeyEvent = new KeyboardEvent('keydown', {
-                    key: 'End',
-                    bubbles: true,
-                    cancelable: true,
-                  });
-
-                  const tableElement = document.querySelector('.data-table');
-                  if (tableElement) {
-                    tableElement.dispatchEvent(endKeyEvent);
-                  }
-                }, 200);
               }
             }
-            emitSuccess('delete', address);
+            emitSuccess('remove', address);
           })
           .catch((err) => {
             setPageData((prev) => {
@@ -208,14 +196,21 @@ export const Abis = () => {
               });
             });
             setTotalItems(pageData?.totalItems || 0);
-            handleError(err, 'handleAction');
+            handleError(err, failure('remove', address, err.message));
+          })
+          .finally(() => {
+            setTimeout(() => {
+              actionConfig.stopProcessing(address);
+            }, 100);
           });
-      } finally {
-        // Always clean up the processing state if needed
+      } catch (err: unknown) {
+        handleError(err, `Failed to remove abi ${address}`);
+        actionConfig.stopProcessing(address);
       }
     },
     [
       clearError,
+      actionConfig,
       pageData?.abis,
       pageData?.totalItems,
       setTotalItems,
@@ -224,24 +219,11 @@ export const Abis = () => {
       sort,
       filter,
       emitSuccess,
+      failure,
       goToPage,
       handleError,
       createPayload,
     ],
-  );
-
-  const handleRemove = useCallback(
-    (address: string) => {
-      actionConfig.startProcessing(address);
-      try {
-        handleAction(address);
-      } finally {
-        setTimeout(() => {
-          actionConfig.stopProcessing(address);
-        }, 100);
-      }
-    },
-    [handleAction, actionConfig],
   );
   // EXISTING_CODE
   // === END SECTION 6 ===

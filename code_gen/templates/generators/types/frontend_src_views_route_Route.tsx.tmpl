@@ -2,9 +2,40 @@
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
 {{- $upper := toUpper $class -}}
+{{- $isAbis := eq $class "Abis" -}}
+{{- $isNames := eq $class "Names" -}}
+{{- $isMonitors := eq $class "Monitors" -}}
+{{- $hasCrud := or $isAbis (or $isNames $isMonitors) -}}
+{{- $models := printf "%s, msgs" $lower -}}
+{{- $apis := printf "Get%sPage, Reload" $class -}}
+{{- if $isAbis -}}
+  {{- $models = printf "%s, crud, msgs" $lower -}}
+  {{- $apis = printf "%sCrud, Get%sPage, Reload" $class $class -}}
+{{- else if $isNames -}}
+  {{- $models = printf "crud, msgs, %s" $lower -}}
+  {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
+{{- else if $isMonitors -}}
+  {{- $models = printf "crud, %s, msgs" $lower -}}
+  {{- $apis = printf "Get%sPage, %sClean, %sCrud, Reload" $class $class $class -}}
+{{- end -}}
 // === SECTION 1: Imports & Dependencies ===
-// EXISTING_CODE
-// EXISTING_CODE
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { {{$apis}} } from '@app';
+{{if $hasCrud}}import { Action{{if $isNames}}, Chips, mapNameToChips{{end}} } from '@components';
+{{end -}}
+import { BaseTab, usePagination } from '@components';
+import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { {{if $hasCrud}}ActionData, {{end}}useActionConfig{{if $hasCrud}}, useActionMsgs{{end}} } from '@hooks';
+import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
+import { TabView } from '@layout';
+import { useHotkeys } from '@mantine/hooks';
+import { {{$models}}, types } from '@models';
+import { {{if $hasCrud}}getAddressString, {{end}}useErrorHandler } from '@utils';
+
+import { getColumns } from './columns';
+import { DEFAULT_FACET, ROUTE, {{$lower}}Facets } from './facets';
+
 // === END SECTION 1 ===
 
 export const {{$class}} = () => {
@@ -13,7 +44,7 @@ export const {{$class}} = () => {
 
   const activeFacetHook = useActiveFacet({
     facets: {{$lower}}Facets,
-    defaultFacet: {{$upper}}_DEFAULT_FACET,
+    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;

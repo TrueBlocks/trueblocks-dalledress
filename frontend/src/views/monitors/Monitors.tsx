@@ -1,21 +1,20 @@
 // === SECTION 1: Imports & Dependencies ===
-// EXISTING_CODE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
-import { Action, BaseTab, usePagination } from '@components';
+import { Action } from '@components';
+import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionData, useActionMsgs, useActionConfig } from '@hooks';
-import { DataFacetConfig, useActiveFacet, useEvent, usePayload} from '@hooks';
+import { ActionData, useActionConfig, useActionMsgs } from '@hooks';
+import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { crud, monitors, msgs, types } from '@models';
 import { getAddressString, useErrorHandler } from '@utils';
 
-import { getColumns } from './';
+import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, monitorsFacets } from './facets';
 
-// EXISTING_CODE
 // === END SECTION 1 ===
 
 export const Monitors = () => {
@@ -39,7 +38,7 @@ export const Monitors = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
   // === END SECTION 2 ===
@@ -286,6 +285,7 @@ export const Monitors = () => {
 
       try {
         const original = [...(pageData?.monitors || [])];
+        const isOnlyRowOnPage = original.length === 1;
         const optimisticValues = original.filter((monitor) => {
           const monitorAddress = getAddressString(monitor.address);
           return monitorAddress !== address;
@@ -312,6 +312,17 @@ export const Monitors = () => {
             );
             setPageData(result);
             setTotalItems(result.totalItems || 0);
+
+            if (isOnlyRowOnPage && result.totalItems > 0) {
+              const newTotalPages = Math.ceil(
+                result.totalItems / pagination.pageSize,
+              );
+              const lastPageIndex = Math.max(0, newTotalPages - 1);
+
+              if (lastPageIndex !== pagination.currentPage) {
+                goToPage(lastPageIndex);
+              }
+            }
             emitSuccess('remove', address);
           })
           .catch((err) => {
@@ -346,6 +357,7 @@ export const Monitors = () => {
       setTotalItems,
       emitSuccess,
       failure,
+      goToPage,
       createPayload,
     ],
   );

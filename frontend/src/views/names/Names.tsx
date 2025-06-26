@@ -1,10 +1,9 @@
 // === SECTION 1: Imports & Dependencies ===
-// EXISTING_CODE
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
-import { Action, Chips } from '@components';
-import { BaseTab, mapNameToChips, usePagination } from '@components';
+import { Action, Chips, mapNameToChips } from '@components';
+import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { ActionData, useActionConfig, useActionMsgs } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
@@ -16,21 +15,6 @@ import { getAddressString, useErrorHandler } from '@utils';
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
 
-type IndexableName = types.Name & Record<string, unknown>;
-
-function removeUndefinedProps(
-  obj: Record<string, unknown>,
-): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    if (value !== undefined) {
-      result[key] = value;
-    }
-  }
-  return result;
-}
-
-// EXISTING_CODE
 // === END SECTION 1 ===
 
 export const Names = () => {
@@ -54,7 +38,7 @@ export const Names = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
   // === END SECTION 2 ===
@@ -308,6 +292,7 @@ export const Names = () => {
 
       try {
         const original = [...(pageData?.names || [])];
+        const isOnlyRowOnPage = original.length === 1;
         const optimisticValues = original.filter((name) => {
           const nameAddress = getAddressString(name.address);
           return nameAddress !== address;
@@ -334,6 +319,17 @@ export const Names = () => {
             );
             setPageData(result);
             setTotalItems(result.totalItems || 0);
+
+            if (isOnlyRowOnPage && result.totalItems > 0) {
+              const newTotalPages = Math.ceil(
+                result.totalItems / pagination.pageSize,
+              );
+              const lastPageIndex = Math.max(0, newTotalPages - 1);
+
+              if (lastPageIndex !== pagination.currentPage) {
+                goToPage(lastPageIndex);
+              }
+            }
             emitSuccess('remove', address);
           })
           .catch((err) => {
@@ -368,6 +364,7 @@ export const Names = () => {
       emitSuccess,
       handleError,
       failure,
+      goToPage,
       createPayload,
     ],
   );
@@ -450,6 +447,20 @@ export const Names = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
+  type IndexableName = types.Name & Record<string, unknown>;
+
+  function removeUndefinedProps(
+    obj: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        result[key] = value;
+      }
+    }
+    return result;
+  }
+
   const handleSubmit = useCallback(
     (data: Record<string, unknown>) => {
       const submittedName = data as IndexableName;

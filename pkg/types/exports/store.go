@@ -566,7 +566,9 @@ func GetExportsCollection(payload *types.Payload) *ExportsCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey(payload)
+	pl := *payload
+
+	key := store.GetCollectionKey(&pl)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}

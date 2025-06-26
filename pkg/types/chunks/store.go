@@ -303,7 +303,10 @@ func GetChunksCollection(payload *types.Payload) *ChunksCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey(payload)
+	pl := *payload
+	pl.Address = ""
+
+	key := store.GetCollectionKey(&pl)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}

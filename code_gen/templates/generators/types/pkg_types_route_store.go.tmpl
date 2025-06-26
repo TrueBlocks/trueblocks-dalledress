@@ -2,6 +2,7 @@
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
 {{- $isExports := eq .Class "Exports" -}}
+{{- $isNames := eq .Class "Names" -}}
 // Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
@@ -115,7 +116,16 @@ func Get{{.Class}}Collection(payload *types.Payload) *{{.Class}}Collection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey(payload)
+	pl := *payload
+	{{- if $isNames}}
+		pl.Address = ""
+		pl.Chain = ""
+	{{else}}
+		{{- if not $isExports}}
+			pl.Address = ""
+		{{end}}
+	{{end}}
+	key := store.GetCollectionKey(&pl)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}

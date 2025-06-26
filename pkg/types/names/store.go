@@ -126,7 +126,11 @@ func GetNamesCollection(payload *types.Payload) *NamesCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
-	key := store.GetCollectionKey(payload)
+	pl := *payload
+	pl.Address = ""
+	pl.Chain = ""
+
+	key := store.GetCollectionKey(&pl)
 	if collection, exists := collections[key]; exists {
 		return collection
 	}

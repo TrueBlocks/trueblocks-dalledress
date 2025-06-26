@@ -1,6 +1,6 @@
 import { useEmitters } from '@utils';
 
-type EntityType = 'names' | 'monitors' | 'abis';
+export type EntityType = 'names' | 'monitors' | 'abis';
 type ActionType =
   | 'create'
   | 'update'

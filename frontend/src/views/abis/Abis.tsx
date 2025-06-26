@@ -5,12 +5,7 @@ import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import {
-  ActionData,
-  useActionConfig,
-  useActionMsgs,
-  useCrudOperations,
-} from '@hooks';
+import { ActionData, useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -106,7 +101,7 @@ export const Abis = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'abis') {
+      if (payload?.collection === ROUTE) {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
@@ -138,31 +133,19 @@ export const Abis = () => {
     operations: ['remove'],
   });
 
-  const { emitSuccess, failure } = useActionMsgs('abis');
-  const { goToPage } = usePagination(viewStateKey);
-
   // Use the new CRUD operations hook for handleRemove
   const { handleRemove } = useCrudOperations({
+    collectionName: ROUTE,
+    getCurrentDataFacet,
     pageData,
     setPageData,
     setTotalItems,
     crudFunction: AbisCrud,
     getPageFunction: GetAbisPage,
-    createPayload,
     dataFacetRef,
-    pagination,
-    sort,
-    filter,
-    goToPage,
-    clearError,
-    handleError,
-    emitSuccess,
-    failure,
     actionConfig,
-    collectionName: 'abis',
-    itemsProperty: 'abis',
     PageClass: abis.AbisPage,
-    emptyItem: {} as types.Abi,
+    emptyItem: types.Abi.createFrom({}),
   });
 
   // EXISTING_CODE

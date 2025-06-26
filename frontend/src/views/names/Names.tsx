@@ -43,7 +43,7 @@ export const Names = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
+  const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
   // === END SECTION 2 ===
@@ -108,7 +108,7 @@ export const Names = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'names') {
+      if (payload?.collection === ROUTE) {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
@@ -140,31 +140,22 @@ export const Names = () => {
     operations: ['delete', 'undelete', 'remove'],
   });
 
-  const { emitSuccess, failure } = useActionMsgs('names');
-
   // Use the new CRUD operations hook for handleRemove
   const { handleRemove } = useCrudOperations({
+    collectionName: ROUTE,
+    getCurrentDataFacet,
     pageData,
     setPageData,
     setTotalItems,
     crudFunction: NamesCrud,
     getPageFunction: GetNamesPage,
-    createPayload,
     dataFacetRef,
-    pagination,
-    sort,
-    filter: filter ?? '',
-    goToPage,
-    clearError,
-    handleError,
-    emitSuccess,
-    failure,
     actionConfig,
-    collectionName: 'names',
-    itemsProperty: 'names',
     PageClass: names.NamesPage,
-    emptyItem: {} as types.Name,
+    emptyItem: types.Name.createFrom({}),
   });
+
+  const { emitSuccess, failure } = useActionMsgs('names');
 
   const handleDelete = useCallback(
     (address: string) => {

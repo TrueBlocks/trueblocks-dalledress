@@ -1,7 +1,12 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
+import { usePagination } from '@components';
+import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { crud, sdk, types } from '@models';
-import { getAddressString } from '@utils';
+import { getAddressString, useErrorHandler } from '@utils';
+
+import { EntityType, useActionMsgs } from './useActionMsgs';
+import { usePayload } from './usePayload';
 
 // Generic types for different page data types
 export interface PageData {
@@ -9,19 +14,14 @@ export interface PageData {
   // Add other common properties that all page data types share
 }
 
-// Action type definition
-type ActionType =
-  | 'create'
-  | 'update'
-  | 'delete'
-  | 'undelete'
-  | 'remove'
-  | 'autoname'
-  | 'clean'
-  | 'reload';
-
-// Configuration interface for the hook - now with proper typing
+// Minimal configuration interface for the hook
 export interface CrudOperationsConfig<TPageData extends PageData, TItem> {
+  // Collection identifier (e.g., 'abis', 'monitors', 'names')
+  collectionName: string;
+
+  // Function to get current data facet
+  getCurrentDataFacet: () => string;
+
   // State management
   pageData: TPageData | null;
   setPageData: React.Dispatch<React.SetStateAction<TPageData | null>>;
@@ -41,69 +41,58 @@ export interface CrudOperationsConfig<TPageData extends PageData, TItem> {
     filter: string,
   ) => Promise<TPageData>;
 
-  // Data facet (can be derived from current facet state)
+  // Data facet (keeping for now)
   dataFacetRef: React.MutableRefObject<types.DataFacet>;
 
-  // Pagination
-  pagination: { currentPage: number; pageSize: number };
-  sort: sdk.SortSpec;
-  filter: string;
-  goToPage: (page: number) => void;
-
-  // Error handling and messaging
-  clearError: () => void;
-  handleError: (error: unknown, message: string) => void;
-  emitSuccess: (operation: ActionType, address: string | number) => void;
-  failure: (
-    operation: ActionType,
-    address?: string,
-    message?: string,
-  ) => string;
-
-  // Action config
+  // Action config (keeping for now)
   actionConfig: {
     startProcessing: (address: string) => void;
     stopProcessing: (address: string) => void;
   };
 
-  // Collection-specific configuration
-  collectionName: string; // e.g., 'abis', 'monitors', 'names'
-  itemsProperty: string; // e.g., 'abis', 'monitors', 'names'
+  // Collection-specific classes
   PageClass: new (data: Record<string, unknown>) => TPageData;
   emptyItem: TItem;
-
-  // Payload creation hook
-  createPayload: (
-    dataFacet: types.DataFacet,
-    address?: string,
-  ) => types.Payload;
 }
 
 export const useCrudOperations = <TPageData extends PageData, TItem>(
   config: CrudOperationsConfig<TPageData, TItem>,
 ) => {
   const {
+    collectionName,
+    getCurrentDataFacet,
     pageData,
     setPageData,
     setTotalItems,
     crudFunction,
     getPageFunction,
-    createPayload,
     dataFacetRef,
-    pagination,
-    sort,
-    filter,
-    goToPage,
-    clearError,
-    handleError,
-    emitSuccess,
-    failure,
     actionConfig,
-    collectionName,
-    itemsProperty,
     PageClass,
     emptyItem,
   } = config;
+
+  // Derive itemsProperty from collectionName (they're always the same)
+  const itemsProperty = collectionName;
+
+  // Create viewStateKey internally
+  const viewStateKey = useMemo(
+    (): ViewStateKey => ({
+      viewName: collectionName,
+      tabName: getCurrentDataFacet(),
+    }),
+    [collectionName, getCurrentDataFacet],
+  );
+
+  // Internal hooks - derive pagination, sorting, filtering from viewStateKey
+  const { pagination, goToPage } = usePagination(viewStateKey);
+  const { sort } = useSorting(viewStateKey);
+  const { filter } = useFiltering(viewStateKey);
+
+  // Internal hooks that were previously passed as props
+  const createPayload = usePayload();
+  const { clearError, handleError } = useErrorHandler();
+  const { emitSuccess, failure } = useActionMsgs(collectionName as EntityType);
 
   const handleRemove = useCallback(
     (address: string) => {

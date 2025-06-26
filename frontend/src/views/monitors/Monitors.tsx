@@ -43,7 +43,7 @@ export const Monitors = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
+  const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
   // === END SECTION 2 ===
@@ -100,7 +100,7 @@ export const Monitors = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'monitors') {
+      if (payload?.collection === ROUTE) {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
@@ -137,26 +137,17 @@ export const Monitors = () => {
 
   // Use the new CRUD operations hook for handleRemove
   const { handleRemove } = useCrudOperations({
+    collectionName: ROUTE,
+    getCurrentDataFacet,
     pageData,
     setPageData,
     setTotalItems,
     crudFunction: MonitorsCrud,
     getPageFunction: GetMonitorsPage,
-    createPayload,
     dataFacetRef,
-    pagination,
-    sort,
-    filter,
-    goToPage,
-    clearError,
-    handleError,
-    emitSuccess,
-    failure,
     actionConfig,
-    collectionName: 'monitors',
-    itemsProperty: 'monitors',
     PageClass: monitors.MonitorsPage,
-    emptyItem: {} as types.Monitor,
+    emptyItem: types.Monitor.createFrom({}),
   });
 
   const handleDelete = useCallback(

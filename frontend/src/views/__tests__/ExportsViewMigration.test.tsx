@@ -175,7 +175,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
       };
       expect(viewStateKey).toEqual({
         viewName: '/exports',
-        tabName: 'balances',
+        tabName: types.DataFacet.BALANCES,
       });
     });
   });

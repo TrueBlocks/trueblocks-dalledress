@@ -1,4 +1,5 @@
 import { FormField, Header } from '@components';
+import { types } from '@models';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 // Mock useSorting globally for all tests
@@ -8,7 +9,10 @@ vi.mock('@contexts', () => ({
   useSorting: () => ({ sort: mockSort, setSorting: mockSetSorting }),
 }));
 
-const mockViewStateKey = { viewName: 'test', tabName: 'test' };
+const mockViewStateKey = {
+  viewName: 'test',
+  tabName: types.DataFacet.TRANSACTIONS,
+};
 describe('Header', () => {
   beforeEach(() => {
     mockSort = { fields: [], orders: [] };

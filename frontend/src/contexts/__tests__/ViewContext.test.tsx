@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { types } from '@models';
 import { act, renderHook } from '@testing-library/react';
 
 import { ViewContextProvider, useViewContext } from '../ViewContext';
@@ -14,8 +15,10 @@ const createWrapper = () => {
   return Wrapper;
 };
 
-// Helper to create mock ViewStateKey - using correct property names
-const createViewStateKey = (view: string, tab: string): ViewStateKey => ({
+const createViewStateKey = (
+  view: string,
+  tab: types.DataFacet,
+): ViewStateKey => ({
   viewName: view,
   tabName: tab,
 });
@@ -25,7 +28,10 @@ describe('ViewContext Object Identity', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useViewContext(), { wrapper });
 
-    const viewStateKey = createViewStateKey('test-view', 'test-tab');
+    const viewStateKey = createViewStateKey(
+      'test-view',
+      types.DataFacet.TRANSACTIONS,
+    );
 
     // Call getPagination multiple times with same viewStateKey
     const pagination1 = result.current.getPagination(viewStateKey);
@@ -42,8 +48,11 @@ describe('ViewContext Object Identity', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useViewContext(), { wrapper });
 
-    const viewStateKey1 = createViewStateKey('view1', 'tab1');
-    const viewStateKey2 = createViewStateKey('view2', 'tab2');
+    const viewStateKey1 = createViewStateKey(
+      'view1',
+      types.DataFacet.TRANSACTIONS,
+    );
+    const viewStateKey2 = createViewStateKey('view2', types.DataFacet.RECEIPTS);
 
     // First, update one of the keys to create actual pagination data
     act(() => {
@@ -84,8 +93,8 @@ describe('ViewContext Object Identity', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useViewContext(), { wrapper });
 
-    const viewStateKey1 = createViewStateKey('view1', 'tab1');
-    const viewStateKey2 = createViewStateKey('view2', 'tab2');
+    const viewStateKey1 = createViewStateKey('view1', types.DataFacet.BALANCES);
+    const viewStateKey2 = createViewStateKey('view2', types.DataFacet.TRACES);
 
     // Get initial pagination objects
     const pagination1Before = result.current.getPagination(viewStateKey1);
@@ -112,8 +121,14 @@ describe('ViewContext Object Identity', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useViewContext(), { wrapper });
 
-    const viewStateKey1 = createViewStateKey('new-view1', 'new-tab1');
-    const viewStateKey2 = createViewStateKey('new-view2', 'new-tab2');
+    const viewStateKey1 = createViewStateKey(
+      'new-view1',
+      types.DataFacet.BALANCES,
+    );
+    const viewStateKey2 = createViewStateKey(
+      'new-view2',
+      types.DataFacet.TRACES,
+    );
 
     // Get pagination for non-existent keys (should return initial state)
     const pagination1 = result.current.getPagination(viewStateKey1);

@@ -19,7 +19,7 @@ export interface UseActiveFacetReturn {
   getFacetConfig: (facet: DataFacet) => DataFacetConfig | undefined;
   isFacetActive: (facet: DataFacet) => boolean;
   getDefaultFacet: () => DataFacet;
-  getCurrentDataFacet: () => types.DataFacet | string;
+  getCurrentDataFacet: () => types.DataFacet;
 }
 
 export interface UseActiveFacetParams {

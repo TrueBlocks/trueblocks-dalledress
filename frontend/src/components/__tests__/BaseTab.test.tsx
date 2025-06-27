@@ -2,6 +2,7 @@ import React from 'react';
 
 import { FormField } from '@components';
 import { ViewStateKey } from '@contexts';
+import { types } from '@models';
 import { describe, expect, it, vi } from 'vitest';
 
 import { render } from '../../__tests__/mocks';
@@ -17,7 +18,10 @@ const mockData = [
   { id: '2', name: 'Item 2' },
 ];
 
-const mockViewStateKey: ViewStateKey = { viewName: 'test', tabName: 'test' };
+const mockViewStateKey: ViewStateKey = {
+  viewName: 'test',
+  tabName: types.DataFacet.ALL,
+};
 
 describe('BaseTab', () => {
   it('renders table with data', () => {
@@ -70,11 +74,11 @@ describe('BaseTab', () => {
     it('passes ViewStateKey with different tabName values correctly', () => {
       const exportsTxnKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: 'transactions',
+        tabName: types.DataFacet.TRANSACTIONS,
       };
       const exportsReceiptsKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: 'receipts',
+        tabName: types.DataFacet.RECEIPTS,
       };
 
       const { rerender } = render(
@@ -112,13 +116,16 @@ describe('BaseTab', () => {
       // Simulate the pattern used in actual views: { viewName: ROUTE, tabName: dataFacet }
       const chunksKey: ViewStateKey = {
         viewName: '/chunks',
-        tabName: 'chunk-summary',
+        tabName: types.DataFacet.INDEX,
       };
       const monitorsKey: ViewStateKey = {
         viewName: '/monitors',
-        tabName: 'txs',
+        tabName: types.DataFacet.MONITORS,
       };
-      const abisKey: ViewStateKey = { viewName: '/abis', tabName: 'get-abis' };
+      const abisKey: ViewStateKey = {
+        viewName: '/abis',
+        tabName: types.DataFacet.DOWNLOADED,
+      };
 
       // Test each key type
       [chunksKey, monitorsKey, abisKey].forEach((key) => {
@@ -140,7 +147,7 @@ describe('BaseTab', () => {
     it('properly forwards ViewStateKey to Table component', () => {
       const testKey: ViewStateKey = {
         viewName: '/names',
-        tabName: 'entity-names',
+        tabName: types.DataFacet.CUSTOM,
       };
 
       render(
@@ -163,12 +170,15 @@ describe('BaseTab', () => {
     it('handles ViewStateKey uniqueness requirements', () => {
       const key1: ViewStateKey = {
         viewName: '/exports',
-        tabName: 'transactions',
+        tabName: types.DataFacet.TRANSACTIONS,
       };
-      const key2: ViewStateKey = { viewName: '/exports', tabName: 'receipts' };
+      const key2: ViewStateKey = {
+        viewName: '/exports',
+        tabName: types.DataFacet.RECEIPTS,
+      };
       const key3: ViewStateKey = {
         viewName: '/names',
-        tabName: 'transactions',
+        tabName: types.DataFacet.REGULAR,
       }; // same tabName, different view
 
       // All keys should be valid and unique for state management

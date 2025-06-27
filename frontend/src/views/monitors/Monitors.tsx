@@ -1,10 +1,11 @@
 // === SECTION 1: Imports & Dependencies ===
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { GetMonitorsPage, MonitorsClean, MonitorsCrud, Reload } from '@app';
+import { GetMonitorsPage, MonitorsCrud, Reload } from '@app';
 import { Action } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+// prettier-ignore
 import { ActionData, useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
@@ -44,9 +45,9 @@ export const Monitors = () => {
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
-  const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
+  const dataFacetRef = useRef(getCurrentDataFacet());
   useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
+    dataFacetRef.current = getCurrentDataFacet();
   }, [getCurrentDataFacet]);
   // === END SECTION 3 ===
 
@@ -122,16 +123,15 @@ export const Monitors = () => {
   // === END SECTION 5 ===
 
   // === SECTION 6: CRUD Operations ===
-  // EXISTING_CODE
   const actionConfig = useActionConfig({
     operations: ['delete', 'undelete', 'remove'],
   });
 
-  const { handleRemove, handleDelete, handleUndelete } = useCrudOperations({
+  // prettier-ignore
+  const { handleDelete, handleUndelete, handleRemove } = useCrudOperations({
     collectionName: 'monitors',
     crudFunc: MonitorsCrud,
     pageFunc: GetMonitorsPage,
-    cleanFunc: MonitorsClean,
     pageClass: monitors.MonitorsPage,
     emptyItem: types.Monitor.createFrom({}),
     getCurrentDataFacet,
@@ -141,13 +141,12 @@ export const Monitors = () => {
     dataFacetRef,
     actionConfig,
   });
-  // EXISTING_CODE
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
   const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(getCurrentDataFacet() as types.DataFacet);
+    const baseColumns = getColumns(getCurrentDataFacet());
 
     const renderActions = (actionData: ActionData) => {
       const isDeleted = actionData.isDeleted;
@@ -209,7 +208,14 @@ export const Monitors = () => {
         viewStateKey={viewStateKey}
       />
     ),
-    [currentData, currentColumns, pageData?.isFetching, error, viewStateKey],
+    // prettier-ignore
+    [
+      currentData,
+      currentColumns,
+      pageData?.isFetching,
+      error,
+      viewStateKey,
+    ],
   );
 
   const tabs = useMemo(

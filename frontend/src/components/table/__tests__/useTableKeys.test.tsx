@@ -1,5 +1,6 @@
 import { useTableContext } from '@components';
 import { ViewStateKey } from '@contexts';
+import { types } from '@models';
 import { act, renderHook } from '@testing-library/react';
 import { Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -54,7 +55,7 @@ describe('useTableKeys', () => {
   const mockGoToPage = vi.fn();
   const viewStateKey: ViewStateKey = {
     viewName: 'test-view',
-    tabName: 'test-tab',
+    tabName: types.DataFacet.TRANSACTIONS,
   };
 
   beforeEach(() => {

@@ -1,5 +1,6 @@
 import { PerPage } from '@components';
 import { ViewStateKey } from '@contexts';
+import { types } from '@models';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -17,7 +18,7 @@ vi.mock('../usePagination', () => ({
 describe('PerPage', () => {
   const mockViewStateKey: ViewStateKey = {
     viewName: 'test-view',
-    tabName: 'test-tab',
+    tabName: types.DataFacet.TRANSACTIONS,
   };
   const mockedFocusTable = vi.fn();
   const mockedFocusControls = vi.fn();

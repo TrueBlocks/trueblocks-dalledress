@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+// prettier-ignore
 import { useActionConfig } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
@@ -43,9 +44,9 @@ export const Exports = () => {
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
-  const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
+  const dataFacetRef = useRef(getCurrentDataFacet());
   useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
+    dataFacetRef.current = getCurrentDataFacet();
   }, [getCurrentDataFacet]);
   // === END SECTION 3 ===
 
@@ -137,19 +138,15 @@ export const Exports = () => {
   // === END SECTION 5 ===
 
   // === SECTION 6: CRUD Operations ===
-  // EXISTING_CODE
   const actionConfig = useActionConfig({
     operations: [],
   });
-  // EXISTING_CODE
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
   const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(
-      pageData?.facet || (getCurrentDataFacet() as types.DataFacet),
-    );
+    const baseColumns = getColumns(pageData?.facet || getCurrentDataFacet());
     return actionConfig.injectActionColumn(baseColumns, () => null);
   }, [pageData?.facet, getCurrentDataFacet, actionConfig]);
   // EXISTING_CODE
@@ -166,7 +163,14 @@ export const Exports = () => {
         viewStateKey={viewStateKey}
       />
     ),
-    [currentData, currentColumns, pageData?.isFetching, error, viewStateKey],
+    // prettier-ignore
+    [
+      currentData,
+      currentColumns,
+      pageData?.isFetching,
+      error,
+      viewStateKey,
+    ],
   );
 
   const tabs = useMemo(

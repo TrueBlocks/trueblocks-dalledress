@@ -20,7 +20,7 @@ export interface CrudOperationsConfig<TPageData extends PageData, TItem> {
   collectionName: string;
 
   // Function to get current data facet
-  getCurrentDataFacet: () => string;
+  getCurrentDataFacet: () => types.DataFacet;
 
   // State management
   pageData: TPageData | null;

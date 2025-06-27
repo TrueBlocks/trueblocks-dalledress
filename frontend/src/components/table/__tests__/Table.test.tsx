@@ -1,6 +1,7 @@
 import { FormField, Table, TableProps } from '@components';
 import { ViewStateKey } from '@contexts';
 import { MantineProvider } from '@mantine/core';
+import { types } from '@models';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -32,7 +33,7 @@ const mockData = [
 
 const viewStateKey: ViewStateKey = {
   viewName: 'test-view',
-  tabName: 'test-tab',
+  tabName: types.DataFacet.TRANSACTIONS,
 };
 
 const defaultProps: TableProps<TestRow> = {

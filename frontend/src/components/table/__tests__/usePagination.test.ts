@@ -1,4 +1,5 @@
 import * as Contexts from '@contexts';
+import { types } from '@models';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -27,7 +28,10 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const viewStateKey = {
+      viewName: 'view',
+      tabName: types.DataFacet.TRANSACTIONS,
+    };
     const { result } = renderHook(() => usePagination(viewStateKey));
     expect(result.current.pagination).toEqual({
       currentPage: 2,
@@ -50,7 +54,10 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const viewStateKey = {
+      viewName: 'view',
+      tabName: types.DataFacet.TRANSACTIONS,
+    };
     const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
       result.current.goToPage(3);
@@ -71,13 +78,16 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const viewStateKey = {
+      viewName: 'view',
+      tabName: types.DataFacet.TRANSACTIONS,
+    };
     const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
       result.current.changePageSize(50);
     });
     expect(updatePagination).toHaveBeenCalledWith(
-      { viewName: 'view', tabName: 'tab' },
+      { viewName: 'view', tabName: types.DataFacet.TRANSACTIONS },
       { currentPage: 0, pageSize: 50 },
     );
   });
@@ -93,13 +103,16 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const viewStateKey = {
+      viewName: 'view',
+      tabName: types.DataFacet.TRANSACTIONS,
+    };
     const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
       result.current.setTotalItems(123);
     });
     expect(updatePagination).toHaveBeenCalledWith(
-      { viewName: 'view', tabName: 'tab' },
+      { viewName: 'view', tabName: types.DataFacet.TRANSACTIONS },
       { totalItems: 123 },
     );
   });
@@ -115,7 +128,10 @@ describe('usePagination', () => {
       updatePagination,
     });
 
-    const viewStateKey = { viewName: 'view', tabName: 'tab' };
+    const viewStateKey = {
+      viewName: 'view',
+      tabName: types.DataFacet.TRANSACTIONS,
+    };
     const { result, rerender } = renderHook(() => usePagination(viewStateKey));
 
     const initialGoToPage = result.current.goToPage;

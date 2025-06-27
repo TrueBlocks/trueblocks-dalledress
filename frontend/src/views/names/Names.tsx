@@ -5,12 +5,8 @@ import { GetNamesPage, NamesCrud, Reload } from '@app';
 import { Action, Chips, mapNameToChips } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import {
-  ActionData,
-  useActionConfig,
-  useActionMsgs,
-  useCrudOperations,
-} from '@hooks';
+// prettier-ignore
+import { ActionData, useActionConfig, useActionMsgs, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -49,9 +45,9 @@ export const Names = () => {
   // === END SECTION 2 ===
 
   // === SECTION 3: Refs & Effects Setup ===
-  const dataFacetRef = useRef(getCurrentDataFacet() as types.DataFacet);
+  const dataFacetRef = useRef(getCurrentDataFacet());
   useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet() as types.DataFacet;
+    dataFacetRef.current = getCurrentDataFacet();
   }, [getCurrentDataFacet]);
   // === END SECTION 3 ===
 
@@ -135,34 +131,29 @@ export const Names = () => {
   // === END SECTION 5 ===
 
   // === SECTION 6: CRUD Operations ===
-  // EXISTING_CODE
   const actionConfig = useActionConfig({
     operations: ['delete', 'undelete', 'remove', 'autoname'],
   });
 
-  // Use the new CRUD operations hook for handleRemove, handleDelete, handleUndelete, and handleAutoname
-  const { handleRemove, handleDelete, handleUndelete, handleAutoname } =
-    useCrudOperations({
-      collectionName: 'names',
-      crudFunc: NamesCrud,
-      pageFunc: GetNamesPage,
-      pageClass: names.NamesPage,
-      emptyItem: types.Name.createFrom({}),
-      getCurrentDataFacet,
-      pageData,
-      setPageData,
-      setTotalItems,
-      dataFacetRef,
-      actionConfig,
-    });
-
-  // EXISTING_CODE
+  // prettier-ignore
+  const { handleDelete, handleUndelete, handleRemove, handleAutoname } = useCrudOperations({
+    collectionName: 'names',
+    crudFunc: NamesCrud,
+    pageFunc: GetNamesPage,
+    pageClass: names.NamesPage,
+    emptyItem: types.Name.createFrom({}),
+    getCurrentDataFacet,
+    pageData,
+    setPageData,
+    setTotalItems,
+    dataFacetRef,
+    actionConfig,
+  });
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
   const { emitSuccess, failure } = useActionMsgs('names');
-
   const handleSubmit = useCallback(
     (data: Record<string, unknown>) => {
       const submittedName = data as unknown as types.Name;
@@ -260,9 +251,7 @@ export const Names = () => {
       });
     };
 
-    const baseColumns = getColumns(
-      getCurrentDataFacet() as types.DataFacet,
-    ).map((col) =>
+    const baseColumns = getColumns(getCurrentDataFacet()).map((col) =>
       col.key === 'chips'
         ? {
             ...col,
@@ -347,6 +336,7 @@ export const Names = () => {
         viewStateKey={viewStateKey}
       />
     ),
+    // prettier-ignore
     [
       currentData,
       currentColumns,

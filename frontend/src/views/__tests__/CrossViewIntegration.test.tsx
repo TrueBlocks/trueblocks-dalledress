@@ -31,8 +31,6 @@ describe('Cross-View Integration Tests (DataFacet refactor preparation)', () => 
 
   describe('ViewStateKey uniqueness', () => {
     it('should generate unique ViewStateKeys across views', () => {
-      // Test ViewStateKey patterns: { viewName: '/exports', tabName: 'transactions' }
-      // vs { viewName: '/names', tabName: 'entity-names' }
       expect(true).toBe(true);
     });
 

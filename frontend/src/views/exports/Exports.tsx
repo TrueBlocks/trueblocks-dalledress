@@ -5,7 +5,6 @@
  * Parts of this file were auto generated. Edit only those parts of
  * the code inside of 'EXISTING_CODE' tags.
  */
-
 // === SECTION 1: Imports & Dependencies ===
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 

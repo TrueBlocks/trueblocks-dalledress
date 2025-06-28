@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 
 import { FieldRenderer, FormField, usePreprocessedFields } from '@components';
 import { useFormHotkeys } from '@components';
@@ -57,6 +57,7 @@ export const Form = <
 }: FormProps<T>) => {
   const [loading, setLoading] = useState(true);
   const [mode, setMode] = useState<'display' | 'edit'>(initMode);
+  const timeoutRef = useRef<number | null>(null);
 
   // Initialize Mantine form
   const form = useForm({
@@ -77,8 +78,85 @@ export const Form = <
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fields]); // form.setInitialValues and form.setValues are stable, fields is the key dependency
 
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleEdit = () => {
     setMode('edit');
+  };
+
+  const convertFormValues = (values: Record<string, unknown>): T => {
+    const convertedValues = { ...values };
+
+    const safeStringToNumber = (value: unknown): number => {
+      if (typeof value === 'number') return value;
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed === '') return 0;
+        const parsed = Number(trimmed);
+        return isNaN(parsed) ? 0 : parsed;
+      }
+      return 0;
+    };
+
+    const safeToBoolean = (value: unknown): boolean => {
+      if (typeof value === 'boolean') return value;
+      if (typeof value === 'string') {
+        const lower = value.toLowerCase().trim();
+        return (
+          lower === 'true' || lower === '1' || lower === 'yes' || lower === 'on'
+        );
+      }
+      if (typeof value === 'number') return value !== 0;
+      return false;
+    };
+
+    const processFields = (fieldsToProcess: FormField<T>[]) => {
+      fieldsToProcess.forEach((field) => {
+        if (field.name && field.name in convertedValues) {
+          const value = convertedValues[field.name];
+
+          // Convert based on field type
+          switch (field.type) {
+            case 'number':
+            // case 'ether':
+            case 'gas':
+            case 'timestamp':
+              convertedValues[field.name] = safeStringToNumber(value);
+              break;
+
+            case 'checkbox':
+              convertedValues[field.name] = safeToBoolean(value);
+              break;
+
+            case 'text':
+            case 'password':
+            case 'textarea':
+            case 'address':
+            case 'select':
+            case 'radio':
+            case 'button':
+            default:
+              if (value !== null && value !== undefined) {
+                convertedValues[field.name] = String(value);
+              }
+              break;
+          }
+        }
+
+        if (field.fields && field.fields.length > 0) {
+          processFields(field.fields);
+        }
+      });
+    };
+
+    processFields(fields);
+    return convertedValues as T;
   };
 
   // Handle form submission
@@ -87,16 +165,26 @@ export const Form = <
     const { hasErrors } = form.validate();
     if (!hasErrors) {
       setMode('display');
-      onSubmit(form.values as T); // Changed from onSubmit(e)
+      const convertedValues = convertFormValues(
+        form.values as Record<string, unknown>,
+      );
+      onSubmit(convertedValues);
     } else {
       // Auto-focus the first field with an error
-      setTimeout(() => {
-        const firstErrorInput = document.querySelector(
-          '.mantine-TextInput-input[aria-invalid="true"]',
-        ) as HTMLInputElement;
-        if (firstErrorInput) {
-          firstErrorInput.focus();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = window.setTimeout(() => {
+        if (typeof document !== 'undefined') {
+          const firstErrorInput = document.querySelector(
+            '.mantine-TextInput-input[aria-invalid="true"]',
+          ) as HTMLInputElement;
+          if (firstErrorInput) {
+            firstErrorInput.focus();
+          }
         }
+        timeoutRef.current = null;
       }, 100);
     }
   };

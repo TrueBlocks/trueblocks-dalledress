@@ -8,6 +8,8 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250625024907-b1e20dafcc16 h1:+QvQQCe2IvmclzqH45FMiHT+O2QF88iUKyMrOyMpAuE=
 github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250625024907-b1e20dafcc16/go.mod h1:7CyEQUtzQLAvsZjUVdrA3vzQbOVyIWlr+ykbJd8ml8I=
+github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250628115635-38923288e9ae h1:uLNPMl0CgmyWaWOuxGQesJcdYkNqdScDa9557KmcTc4=
+github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250628115635-38923288e9ae/go.mod h1:7CyEQUtzQLAvsZjUVdrA3vzQbOVyIWlr+ykbJd8ml8I=
 github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250504164335-8b49b03dddef h1:FiHBAsTBGCyarve9rl/91SAyaSOgngEpLRsDCXP8slg=
 github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250504164335-8b49b03dddef/go.mod h1:F46H7Ky9ezBUTXhzH3jy0JBM7kIe8nR6Y6m+NStdg38=
 github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250625024834-90e5dee285fc h1:g6uk/KKoYxGAJjvgLkaWNqTYESEg286C1d40/xu7n6o=

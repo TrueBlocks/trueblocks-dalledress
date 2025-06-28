@@ -13,14 +13,13 @@ import (
 	"sync"
 
 	// EXISTING_CODE
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
-	// EXISTING_CODE
 )
 
 // EXISTING_CODE
@@ -141,8 +140,4 @@ func GetNamesCollection(payload *types.Payload) *NamesCollection {
 }
 
 // EXISTING_CODE
-func (c *NamesCollection) NameFromAddress(address base.Address) (*Name, bool) {
-	return namesStore.GetItemFromMap(address)
-}
-
 // EXISTING_CODE

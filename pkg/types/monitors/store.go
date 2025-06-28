@@ -13,13 +13,13 @@ import (
 	"sync"
 
 	// EXISTING_CODE
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
-	// EXISTING_CODE
 )
 
 // EXISTING_CODE
@@ -48,7 +48,7 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 			if _, _, err := listOpts.MonitorsList(); err != nil {
 				// Create structured error with proper context
 				wrappedErr := types.NewSDKError("monitors", MonitorsMonitors, "fetch", err)
-				logger.Error(fmt.Sprintf("Monitors SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Monitors SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE

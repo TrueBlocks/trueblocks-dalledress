@@ -9,13 +9,11 @@
 package app
 
 import (
-	// EXISTING_CODE
-
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 	// EXISTING_CODE
 )
 
@@ -51,9 +49,4 @@ func (a *App) ReloadNames(payload *types.Payload) error {
 }
 
 // EXISTING_CODE
-func (a *App) NameFromAddress(address string) (*names.Name, bool) {
-	collection := names.GetNamesCollection(&types.Payload{})
-	return collection.NameFromAddress(base.HexToAddress(address))
-}
-
 // EXISTING_CODE

@@ -13,13 +13,13 @@ import (
 	"sync"
 
 	// EXISTING_CODE
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
-	// EXISTING_CODE
 )
 
 // EXISTING_CODE
@@ -82,7 +82,7 @@ func (c *ExportsCollection) getAssetsStore() *store.Store[Asset] {
 			}
 			if _, _, err := exportOpts.ExportAssets(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsAssets, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports assets SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports assets SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE
@@ -132,7 +132,7 @@ func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
 			}
 			if _, _, err := exportOpts.ExportBalances(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsBalances, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports balances SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports balances SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE
@@ -182,7 +182,7 @@ func (c *ExportsCollection) getLogsStore() *store.Store[Log] {
 			}
 			if _, _, err := exportOpts.ExportLogs(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsLogs, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports logs SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports logs SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE
@@ -232,7 +232,7 @@ func (c *ExportsCollection) getReceiptsStore() *store.Store[Receipt] {
 			}
 			if _, _, err := exportOpts.ExportReceipts(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsReceipts, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports receipts SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports receipts SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE
@@ -283,7 +283,7 @@ func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
 			}
 			if _, _, err := exportOpts.ExportStatements(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsStatements, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports statements SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports statements SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE
@@ -333,7 +333,7 @@ func (c *ExportsCollection) getTracesStore() *store.Store[Trace] {
 			}
 			if _, _, err := exportOpts.ExportTraces(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsTraces, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports traces SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports traces SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE
@@ -383,7 +383,7 @@ func (c *ExportsCollection) getTransactionsStore() *store.Store[Transaction] {
 			}
 			if _, _, err := exportOpts.Export(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsTransactions, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports transactions SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports transactions SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE
@@ -434,7 +434,7 @@ func (c *ExportsCollection) getTransfersStore() *store.Store[Transfer] {
 			}
 			if _, _, err := exportOpts.ExportTransfers(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsTransfers, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports transfers SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports transfers SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE
@@ -484,7 +484,7 @@ func (c *ExportsCollection) getWithdrawalsStore() *store.Store[Withdrawal] {
 			}
 			if _, _, err := exportOpts.ExportWithdrawals(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ExportsTransfers, "fetch", err)
-				logger.Error(fmt.Sprintf("Exports transfers SDK query error: %v", wrappedErr))
+				logging.LogBackend(fmt.Sprintf("Exports transfers SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
 			// EXISTING_CODE

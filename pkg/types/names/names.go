@@ -15,10 +15,10 @@ import (
 
 	// EXISTING_CODE
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	// EXISTING_CODE
 )
 
 const (

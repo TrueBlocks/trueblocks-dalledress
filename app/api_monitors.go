@@ -9,12 +9,11 @@
 package app
 
 import (
-	// EXISTING_CODE
-
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
 	// EXISTING_CODE
 )
 
@@ -50,9 +49,4 @@ func (a *App) ReloadMonitors(payload *types.Payload) error {
 }
 
 // EXISTING_CODE
-func (a *App) MonitorsClean(payload *types.Payload, addresses []string) error {
-	collection := monitors.GetMonitorsCollection(payload)
-	return collection.Clean(addresses)
-}
-
 // EXISTING_CODE

@@ -9,11 +9,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsCrud, Reload } from '@app';
-import { Action } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useColumns } from '@hooks';
 // prettier-ignore
-import { ActionData, useActionConfig, useCrudOperations } from '@hooks';
+import { useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -152,48 +152,24 @@ export const Monitors = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(getCurrentDataFacet());
-
-    const renderActions = (actionData: ActionData) => {
-      const isDeleted = actionData.isDeleted;
-      const effectiveDeletedState = actionData.isProcessing
-        ? !isDeleted
-        : isDeleted;
-
-      return (
-        <div className="action-buttons-container">
-          <Action
-            icon="Delete"
-            iconOff="Undelete"
-            isOn={!effectiveDeletedState}
-            onClick={() => handleToggle(actionData.addressStr)}
-            disabled={actionData.isProcessing}
-            title={effectiveDeletedState ? 'Undelete' : 'Delete'}
-            size="sm"
-          />
-          <Action
-            icon="Remove"
-            onClick={() => handleRemove(actionData.addressStr)}
-            disabled={actionData.isProcessing || !effectiveDeletedState}
-            title="Remove"
-            size="sm"
-          />
-        </div>
-      );
-    };
-
-    const getCanRemove = (row: Record<string, unknown>) => {
-      const monitor = row as unknown as types.Monitor;
-      return Boolean(monitor.deleted);
-    };
-
-    return actionConfig.injectActionColumn(
-      baseColumns,
-      renderActions,
-      getCanRemove,
-    );
-  }, [getCurrentDataFacet, actionConfig, handleToggle, handleRemove]);
+  const currentColumns = useColumns(
+    getColumns(getCurrentDataFacet()),
+    {
+      showActions: true,
+      actions: ['delete', 'remove'],
+      getCanRemove: (row) => Boolean((row as unknown as types.Monitor).deleted),
+    },
+    {
+      handleToggle,
+      handleRemove,
+    },
+    pageData as unknown as {
+      facet: types.DataFacet;
+      [key: string]: unknown;
+    } | null,
+    actionConfig,
+    getCurrentDataFacet,
+  );
   // EXISTING_CODE
   // === END SECTION 7 ===
 

@@ -9,11 +9,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AbisCrud, GetAbisPage, Reload } from '@app';
-import { Action } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useColumns } from '@hooks';
 // prettier-ignore
-import { ActionData, useActionConfig, useCrudOperations } from '@hooks';
+import { useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -158,46 +158,29 @@ export const Abis = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(
-      pageData?.facet || types.DataFacet.DOWNLOADED,
-    );
-
-    const shouldShowActions =
-      (pageData?.facet || types.DataFacet.DOWNLOADED) ===
-        types.DataFacet.DOWNLOADED ||
-      (pageData?.facet || types.DataFacet.DOWNLOADED) === types.DataFacet.KNOWN;
-
-    if (!shouldShowActions) {
-      return actionConfig.injectActionColumn(baseColumns, () => null);
-    }
-
-    const renderActions = (actionData: ActionData) => {
-      const canRemove = pageData?.facet === types.DataFacet.DOWNLOADED;
-
-      return (
-        <div className="action-buttons-container">
-          <Action
-            icon="Remove"
-            onClick={() => handleRemove(actionData.addressStr)}
-            disabled={actionData.isProcessing || !canRemove}
-            title="Remove"
-            size="sm"
-          />
-        </div>
-      );
-    };
-
-    const getCanRemove = (_row: Record<string, unknown>) => {
-      return pageData?.facet === types.DataFacet.DOWNLOADED;
-    };
-
-    return actionConfig.injectActionColumn(
-      baseColumns,
-      renderActions,
-      getCanRemove,
-    );
-  }, [pageData?.facet, handleRemove, actionConfig]);
+  const currentColumns = useColumns(
+    getColumns(pageData?.facet || types.DataFacet.DOWNLOADED),
+    {
+      showActions: (pd) => {
+        const facet = pd?.facet ?? types.DataFacet.DOWNLOADED;
+        return (
+          facet === types.DataFacet.DOWNLOADED ||
+          facet === types.DataFacet.KNOWN
+        );
+      },
+      actions: ['remove'],
+      getCanRemove: () => pageData?.facet === types.DataFacet.DOWNLOADED,
+    },
+    {
+      handleRemove,
+    },
+    pageData as unknown as {
+      facet: types.DataFacet;
+      [key: string]: unknown;
+    } | null,
+    actionConfig,
+    getCurrentDataFacet,
+  );
   // EXISTING_CODE
   // === END SECTION 7 ===
 

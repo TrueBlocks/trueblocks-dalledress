@@ -36,7 +36,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { {{$apis}} } from '@app';
-{{if $hasCrud}}import { Action{{if $isNames}}, Chips, mapNameToChips{{end}} } from '@components';
+{{if $hasCrud}}import { Action{{if $isNames}}{{end}} } from '@components';
 {{end -}}
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';

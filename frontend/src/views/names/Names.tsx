@@ -9,11 +9,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
-import { Action, Chips, mapNameToChips } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useColumns } from '@hooks';
 // prettier-ignore
-import { ActionData, useActionConfig, useCrudOperations } from '@hooks';
+import { useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -170,84 +170,25 @@ export const Names = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const { setFiltering } = useFiltering(viewStateKey);
-
-  const currentColumns = useMemo(() => {
-    const handleChipClick = (chip: string) => {
-      setFiltering(chip);
-      Reload(createPayload(dataFacetRef.current)).then(() => {
-        fetchData();
-      });
-    };
-
-    const baseColumns = getColumns(getCurrentDataFacet()).map((col) =>
-      col.key === 'chips'
-        ? {
-            ...col,
-            render: (row: Record<string, unknown>) => {
-              const nameObject = row as unknown as types.Name;
-              const chipItems = mapNameToChips(nameObject);
-              return <Chips items={chipItems} onChipClick={handleChipClick} />;
-            },
-          }
-        : col,
-    );
-
-    const renderActions = (actionData: ActionData) => {
-      const isDeleted = actionData.isDeleted;
-      const effectiveDeletedState = actionData.isProcessing
-        ? !isDeleted
-        : isDeleted;
-
-      return (
-        <div className="action-buttons-container">
-          <Action
-            icon="Delete"
-            iconOff="Undelete"
-            isOn={!effectiveDeletedState}
-            onClick={() => handleToggle(actionData.addressStr)}
-            disabled={actionData.isProcessing}
-            title={effectiveDeletedState ? 'Undelete' : 'Delete'}
-            size="sm"
-          />
-          <Action
-            icon="Remove"
-            onClick={() => handleRemove(actionData.addressStr)}
-            disabled={actionData.isProcessing || !effectiveDeletedState}
-            title="Remove"
-            size="sm"
-          />
-          <Action
-            icon="Autoname"
-            onClick={() => handleAutoname(actionData.addressStr)}
-            disabled={actionData.isProcessing}
-            title="Auto-generate name"
-            size="sm"
-          />
-        </div>
-      );
-    };
-
-    const getCanRemove = (row: Record<string, unknown>) => {
-      const name = row as unknown as types.Name;
-      return Boolean(name.deleted);
-    };
-
-    return actionConfig.injectActionColumn(
-      baseColumns,
-      renderActions,
-      getCanRemove,
-    );
-  }, [
-    setFiltering,
-    fetchData,
-    getCurrentDataFacet,
+  const currentColumns = useColumns(
+    getColumns(getCurrentDataFacet()),
+    {
+      showActions: true,
+      actions: ['delete', 'remove', 'autoname'],
+      getCanRemove: (row) => Boolean((row as unknown as types.Name).deleted),
+    },
+    {
+      handleToggle,
+      handleRemove,
+      handleAutoname,
+    },
+    pageData as unknown as {
+      facet: types.DataFacet;
+      [key: string]: unknown;
+    } | null,
     actionConfig,
-    handleToggle,
-    handleRemove,
-    handleAutoname,
-    createPayload,
-  ]);
+    getCurrentDataFacet,
+  );
   // EXISTING_CODE
   // === END SECTION 7 ===
 

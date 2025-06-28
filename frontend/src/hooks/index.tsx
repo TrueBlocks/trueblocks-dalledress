@@ -12,3 +12,4 @@ export * from './useEvent';
 export * from './useIcons';
 export * from './usePayload';
 export * from './useStaggeredLoading';
+export * from './useColumns';

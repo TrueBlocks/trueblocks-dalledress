@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useColumns } from '@hooks';
 // prettier-ignore
 import { useActionConfig } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
@@ -142,10 +143,20 @@ export const Chunks = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const currentColumns = useMemo(() => {
-    const baseColumns = getColumns(getCurrentDataFacet());
-    return actionConfig.injectActionColumn(baseColumns, () => null);
-  }, [getCurrentDataFacet, actionConfig]);
+  const currentColumns = useColumns(
+    getColumns(getCurrentDataFacet()),
+    {
+      showActions: false,
+      actions: [],
+    },
+    {},
+    pageData as unknown as {
+      facet: types.DataFacet;
+      [key: string]: unknown;
+    } | null,
+    actionConfig,
+    getCurrentDataFacet,
+  );
   // EXISTING_CODE
   // === END SECTION 7 ===
 

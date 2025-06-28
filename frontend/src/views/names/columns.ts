@@ -90,15 +90,6 @@ const getNamesColumns = (): FormField[] => [
     textAlign: 'right',
   },
   {
-    key: 'chips',
-    name: 'chips',
-    header: 'Chips',
-    label: 'Chips',
-    sortable: false,
-    editable: false,
-    width: '180px',
-  },
-  {
     key: 'actions',
     name: 'actions',
     header: 'Actions',

@@ -1,7 +1,6 @@
 export * from './Action';
 export * from './BaseTab';
 export * from './ChevronButton';
-export * from './Chips';
 export * from './DashboardCard';
 export * from './LazyPanel';
 export * from './NodeStatus';

@@ -10,7 +10,6 @@ package app
 
 import (
 	// EXISTING_CODE
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -25,15 +24,6 @@ func (a *App) GetChunksPage(
 ) (*chunks.ChunksPage, error) {
 	collection := chunks.GetChunksCollection(payload)
 	return getCollectionPage[*chunks.ChunksPage](collection, payload, first, pageSize, sort, filter)
-}
-
-func (a *App) ChunksCrud(
-	payload *types.Payload,
-	op crud.Operation,
-	item interface{},
-) error {
-	collection := chunks.GetChunksCollection(payload)
-	return collection.Crud(payload, op, item)
 }
 
 func (a *App) GetChunksSummary(payload *types.Payload) types.Summary {

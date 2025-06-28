@@ -334,3 +334,22 @@ func (s *Store[T]) Reset() {
 
 	s.ChangeState(0, newState, reason)
 }
+
+func (s *Store[T]) UpdateData(updateFunc func(data []*T) []*T) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	s.data = updateFunc(s.data)
+	s.expectedTotalItems.Store(int64(len(s.data)))
+
+	if s.dataMap != nil && s.mappingFunc != nil {
+		newMap := make(map[interface{}]*T)
+		for _, item := range s.data {
+			key, includeInMap := s.mappingFunc(item)
+			if includeInMap {
+				newMap[key] = item
+			}
+		}
+		s.dataMap = &newMap
+	}
+}

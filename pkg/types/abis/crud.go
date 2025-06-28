@@ -11,7 +11,7 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-func (ac *AbisCollection) Crud(
+func (c *AbisCollection) Crud(
 	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
@@ -37,7 +37,7 @@ func (ac *AbisCollection) Crud(
 		matchFunc := func(existing *Abi) bool {
 			return existing.Address == abi.Address
 		}
-		removedCount, err := ac.downloadedFacet.ForEvery(actionFunc, matchFunc)
+		removedCount, err := c.downloadedFacet.ForEvery(actionFunc, matchFunc)
 
 		if err != nil {
 			return fmt.Errorf("failed to remove ABI from facet: %w", err)

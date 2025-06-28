@@ -156,7 +156,7 @@ func (c *AbisCollection) matchesKnownFilter(item *Abi, filter string) bool {
 	return strings.Contains(strings.ToLower(item.Name), filter)
 }
 
-func (ac *AbisCollection) matchesFunctionFilter(fn *Function, filter string) bool {
+func (c *AbisCollection) matchesFunctionFilter(fn *Function, filter string) bool {
 	if filter == "" {
 		return true
 	}

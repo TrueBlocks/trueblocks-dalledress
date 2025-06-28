@@ -31,7 +31,7 @@ func (a *App) GetMonitorsPage(
 func (a *App) MonitorsCrud(
 	payload *types.Payload,
 	op crud.Operation,
-	item interface{},
+	item *monitors.Monitor,
 ) error {
 	collection := monitors.GetMonitorsCollection(payload)
 	return collection.Crud(payload, op, item)

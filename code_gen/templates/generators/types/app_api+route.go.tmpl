@@ -1,6 +1,10 @@
 {{- $class := .Class -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
+{{- $isAbis := eq $class "Abis" -}}
+{{- $isNames := eq $class "Names" -}}
+{{- $isMonitors := eq $class "Monitors" -}}
+{{- $hasCrud := or $isAbis (or $isNames $isMonitors) -}}
 // Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
@@ -31,14 +35,14 @@ func (a *App) Get{{$class}}Page(
 	return getCollectionPage[*{{$lower}}.{{$class}}Page](collection, payload, first, pageSize, sort, filter)
 }
 
-func (a *App) {{$class}}Crud(
+{{if $hasCrud}}func (a *App) {{$class}}Crud(
 	payload *types.Payload,
 	op crud.Operation,
-	item interface{},
+	item *{{$lower}}.{{$single}},
 ) error {
 	collection := {{$lower}}.Get{{$class}}Collection(payload)
 	return collection.Crud(payload, op, item)
-}
+}{{end}}
 
 func (a *App) Get{{$class}}Summary(payload *types.Payload) types.Summary {
 	collection := {{$lower}}.Get{{$class}}Collection(payload)

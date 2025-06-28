@@ -32,7 +32,7 @@ func (a *App) GetNamesPage(
 func (a *App) NamesCrud(
 	payload *types.Payload,
 	op crud.Operation,
-	item interface{},
+	item *names.Name,
 ) error {
 	collection := names.GetNamesCollection(payload)
 	return collection.Crud(payload, op, item)

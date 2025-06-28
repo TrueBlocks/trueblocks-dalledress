@@ -22,20 +22,12 @@ export function ChangeImageStorageLocation(arg1) {
   return window['go']['app']['App']['ChangeImageStorageLocation'](arg1);
 }
 
-export function ChunksCrud(arg1, arg2, arg3) {
-  return window['go']['app']['App']['ChunksCrud'](arg1, arg2, arg3);
-}
-
 export function CloseProject(arg1) {
   return window['go']['app']['App']['CloseProject'](arg1);
 }
 
 export function ConvertToAddress(arg1) {
   return window['go']['app']['App']['ConvertToAddress'](arg1);
-}
-
-export function ExportsCrud(arg1, arg2, arg3) {
-  return window['go']['app']['App']['ExportsCrud'](arg1, arg2, arg3);
 }
 
 export function FileNew(arg1) {

@@ -269,25 +269,34 @@ func (c *ExportsCollection) matchesTransactionFilter(item *Transaction, filter s
 }
 
 func (c *ExportsCollection) matchesWithdrawalFilter(item *Withdrawal, filter string) bool {
+	_ = item // delint
 	return strings.Contains(strings.ToLower("item.Hash.Hex()"), filter)
 }
 
 func (c *ExportsCollection) matchesAssetFilter(item *Asset, filter string) bool {
+	_ = item    // delint
+	_ = filter  // delint
 	return true //strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
 	// strings.Contains(strings.ToLower(item.Name), filter) ||
 	// strings.Contains(strings.ToLower(item.Symbol), filter)
 }
 
 func (c *ExportsCollection) matchesLogFilter(item *Log, filter string) bool {
+	_ = item    // delint
+	_ = filter  // delint
 	return true // strings.Contains(strings.ToLower(item.Address.Hex()), filter) ||
 	// strings.Contains(strings.ToLower(item.Topics[0].Hex()), filter)
 }
 
 func (c *ExportsCollection) matchesTraceFilter(item *Trace, filter string) bool {
+	_ = item    // delint
+	_ = filter  // delint
 	return true // strings.Contains(strings.ToLower(item.BlockHash.Hex()), filter)
 }
 
 func (c *ExportsCollection) matchesReceiptFilter(item *Receipt, filter string) bool {
+	_ = item    // delint
+	_ = filter  // delint
 	return true // strings.Contains(strings.ToLower(item.TransactionHash.Hex()), filter) ||
 	// strings.Contains(strings.ToLower(item.ContractAddress.Hex()), filter)
 }

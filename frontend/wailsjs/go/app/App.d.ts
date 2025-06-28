@@ -16,7 +16,7 @@ import {monitors} from '../models';
 import {names} from '../models';
 import {app} from '../models';
 
-export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
+export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Abi):Promise<void>;
 
 export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
@@ -26,13 +26,9 @@ export function CancelFetch(arg1:types.DataFacet):Promise<void>;
 
 export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 
-export function ChunksCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
-
 export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
-
-export function ExportsCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function FileNew(arg1:menu.CallbackData):Promise<void>;
 
@@ -112,11 +108,11 @@ export function LogFrontend(arg1:string):Promise<void>;
 
 export function MonitorsClean(arg1:types.Payload,arg2:Array<string>):Promise<void>;
 
-export function MonitorsCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
+export function MonitorsCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Monitor):Promise<void>;
 
 export function NameFromAddress(arg1:string):Promise<types.Name|boolean>;
 
-export function NamesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
+export function NamesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Name):Promise<void>;
 
 export function RegisterCollection(arg1:types.Collection):Promise<void>;
 

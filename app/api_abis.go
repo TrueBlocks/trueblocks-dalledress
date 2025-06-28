@@ -31,7 +31,7 @@ func (a *App) GetAbisPage(
 func (a *App) AbisCrud(
 	payload *types.Payload,
 	op crud.Operation,
-	item interface{},
+	item *abis.Abi,
 ) error {
 	collection := abis.GetAbisCollection(payload)
 	return collection.Crud(payload, op, item)

@@ -90,7 +90,7 @@ func TestAbisMatchesFilter(t *testing.T) {
 	})
 }
 
-func (ac *AbisCollection) matchesAbiFilter(abi *Abi, filter string) bool {
+func (c *AbisCollection) matchesAbiFilter(abi *Abi, filter string) bool {
 	if filter == "" {
 		return true
 	}

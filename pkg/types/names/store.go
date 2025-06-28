@@ -141,7 +141,7 @@ func GetNamesCollection(payload *types.Payload) *NamesCollection {
 }
 
 // EXISTING_CODE
-func (nc *NamesCollection) NameFromAddress(address base.Address) (*Name, bool) {
+func (c *NamesCollection) NameFromAddress(address base.Address) (*Name, bool) {
 	return namesStore.GetItemFromMap(address)
 }
 

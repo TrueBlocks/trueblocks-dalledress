@@ -6,12 +6,12 @@ import { Action, Chips, mapNameToChips } from '@components';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 // prettier-ignore
-import { ActionData, useActionConfig, useActionMsgs, useCrudOperations } from '@hooks';
+import { ActionData, useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { crud, msgs, names, types } from '@models';
-import { getAddressString, useErrorHandler } from '@utils';
+import { msgs, names, types } from '@models';
+import { useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
@@ -120,12 +120,12 @@ export const Names = () => {
   const handleReload = useCallback(async () => {
     try {
       Reload(createPayload(dataFacetRef.current)).then(() => {
-        fetchData();
+        // The data will reload when the DataLoaded event is fired.
       });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
+  }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===
@@ -135,13 +135,23 @@ export const Names = () => {
     operations: ['delete', 'undelete', 'remove', 'autoname'],
   });
 
+  // EXISTING_CODE
+  const postFunc = useCallback((item: types.Name): types.Name => {
+    return types.Name.createFrom({
+      ...item,
+      source: item.source || 'TrueBlocks',
+    });
+  }, []);
+  // EXISTING_CODE
+
   // prettier-ignore
-  const { handleDelete, handleUndelete, handleRemove, handleAutoname } = useCrudOperations({
+  const { handleRemove, handleToggle, handleAutoname, handleUpdate } = useCrudOperations({
     collectionName: 'names',
     crudFunc: NamesCrud,
     pageFunc: GetNamesPage,
+    postFunc: postFunc,
     pageClass: names.NamesPage,
-    emptyItem: types.Name.createFrom({}),
+    updateItem: types.Name.createFrom({}),
     getCurrentDataFacet,
     pageData,
     setPageData,
@@ -153,94 +163,6 @@ export const Names = () => {
 
   // === SECTION 7: Form & UI Handlers ===
   // EXISTING_CODE
-  const { emitSuccess, failure } = useActionMsgs('names');
-  const handleSubmit = useCallback(
-    (data: Record<string, unknown>) => {
-      const submittedName = data as unknown as types.Name;
-      const addressStr = getAddressString(submittedName.address);
-
-      // Set default source if not provided
-      if (!submittedName.source || submittedName.source === '') {
-        submittedName.source = 'TrueBlocks';
-      }
-
-      const originalNames = [...(pageData?.names || [])];
-
-      // Optimistic UI Update
-      let optimisticNames: types.Name[];
-      const existingNameIndex = originalNames.findIndex(
-        (n) => getAddressString(n.address) === addressStr,
-      );
-
-      if (existingNameIndex !== -1) {
-        // Update existing name
-        optimisticNames = originalNames.map((n, index) =>
-          index === existingNameIndex
-            ? ({
-                ...n,
-                ...submittedName,
-              } as types.Name)
-            : (n as types.Name),
-        );
-      } else {
-        // Add new name
-        optimisticNames = [
-          submittedName as types.Name,
-          ...(originalNames as types.Name[]),
-        ];
-      }
-      setPageData((prev) => {
-        if (!prev) return null;
-        return new names.NamesPage({
-          ...prev,
-          names: optimisticNames,
-        });
-      });
-
-      NamesCrud(
-        createPayload(dataFacetRef.current, ''), // TODO: This may not work for AddName...
-        crud.Operation.UPDATE,
-        submittedName as types.Name,
-      )
-        .then(async () => {
-          const result = await GetNamesPage(
-            createPayload(dataFacetRef.current),
-            pagination.currentPage * pagination.pageSize,
-            pagination.pageSize,
-            sort,
-            filter ?? '',
-          );
-          setPageData(result);
-          setTotalItems(result.totalItems || 0);
-
-          const displayName = submittedName.name || addressStr;
-          emitSuccess('update', displayName);
-        })
-        .catch((err) => {
-          setPageData((prev) => {
-            if (!prev) return null;
-            return new names.NamesPage({
-              ...prev,
-              names: originalNames,
-            });
-          });
-          handleError(err, failure('update', '', err.message));
-        });
-    },
-    [
-      pageData?.names,
-      pagination.currentPage,
-      pagination.pageSize,
-      sort,
-      filter,
-      setTotalItems,
-      emitSuccess,
-      handleError,
-      failure,
-      createPayload,
-    ],
-  );
-
   const { setFiltering } = useFiltering(viewStateKey);
 
   const currentColumns = useMemo(() => {
@@ -266,26 +188,25 @@ export const Names = () => {
 
     const renderActions = (actionData: ActionData) => {
       const isDeleted = actionData.isDeleted;
+      const effectiveDeletedState = actionData.isProcessing
+        ? !isDeleted
+        : isDeleted;
 
       return (
         <div className="action-buttons-container">
           <Action
-            icon={isDeleted ? 'Undelete' : 'Delete'}
-            onClick={() => {
-              if (isDeleted) {
-                handleUndelete(actionData.addressStr);
-              } else {
-                handleDelete(actionData.addressStr);
-              }
-            }}
+            icon="Delete"
+            iconOff="Undelete"
+            isOn={!effectiveDeletedState}
+            onClick={() => handleToggle(actionData.addressStr)}
             disabled={actionData.isProcessing}
-            title={isDeleted ? 'Undelete' : 'Delete'}
+            title={effectiveDeletedState ? 'Undelete' : 'Delete'}
             size="sm"
           />
           <Action
             icon="Remove"
             onClick={() => handleRemove(actionData.addressStr)}
-            disabled={actionData.isProcessing || !isDeleted}
+            disabled={actionData.isProcessing || !effectiveDeletedState}
             title="Remove"
             size="sm"
           />
@@ -315,8 +236,7 @@ export const Names = () => {
     fetchData,
     getCurrentDataFacet,
     actionConfig,
-    handleDelete,
-    handleUndelete,
+    handleToggle,
     handleRemove,
     handleAutoname,
     createPayload,
@@ -332,7 +252,7 @@ export const Names = () => {
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
-        onSubmit={handleSubmit}
+        onSubmit={handleUpdate}
         viewStateKey={viewStateKey}
       />
     ),
@@ -342,7 +262,7 @@ export const Names = () => {
       currentColumns,
       pageData?.isFetching,
       error,
-      handleSubmit,
+      handleUpdate,
       viewStateKey,
     ],
   );
@@ -375,3 +295,6 @@ export const Names = () => {
   );
   // === END SECTION 9 ===
 };
+
+// EXISTING_CODE
+// EXISTING_CODE

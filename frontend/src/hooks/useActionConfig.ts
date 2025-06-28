@@ -3,6 +3,12 @@ import { useCallback, useState } from 'react';
 import { FormField } from '@components';
 import { getAddressString } from '@utils';
 
+interface ActionableItem {
+  address?: unknown;
+  deleted?: boolean;
+  processing?: boolean;
+}
+
 // Define available operations
 export type ActionOperation =
   | 'delete'
@@ -54,11 +60,11 @@ export const useActionConfig = (options: ActionConfigOptions) => {
 
   // Function to create action data for a row
   const createActionData = useCallback(
-    (row: Record<string, unknown>, canRemove = true): ActionData => {
-      const item = row as Record<string, unknown>;
-      const addressStr = getAddressString(item.address as string);
-      const isProcessing = processingAddresses.has(addressStr);
-      const isDeleted = Boolean(item.deleted);
+    (row: ActionableItem, canRemove = true): ActionData => {
+      const addressStr = getAddressString(row.address as string);
+      const isProcessing =
+        Boolean(row.processing) || processingAddresses.has(addressStr);
+      const isDeleted = Boolean(row.deleted);
 
       return {
         addressStr,
@@ -90,7 +96,7 @@ export const useActionConfig = (options: ActionConfigOptions) => {
         visible: true,
         render: (row: Record<string, unknown>) => {
           const canRemove = getCanRemove ? getCanRemove(row) : true;
-          const actionData = createActionData(row, canRemove);
+          const actionData = createActionData(row as ActionableItem, canRemove);
           return renderActions(actionData);
         },
       };

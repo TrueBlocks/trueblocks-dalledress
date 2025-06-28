@@ -118,12 +118,12 @@ export const Abis = () => {
   const handleReload = useCallback(async () => {
     try {
       Reload(createPayload(dataFacetRef.current)).then(() => {
-        fetchData();
+        // The data will reload when the DataLoaded event is fired.
       });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
+  }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===
@@ -139,7 +139,7 @@ export const Abis = () => {
     crudFunc: AbisCrud,
     pageFunc: GetAbisPage,
     pageClass: abis.AbisPage,
-    emptyItem: types.Abi.createFrom({}),
+    updateItem: types.Abi.createFrom({}),
     getCurrentDataFacet,
     pageData,
     setPageData,
@@ -243,3 +243,6 @@ export const Abis = () => {
   );
   // === END SECTION 9 ===
 };
+
+// EXISTING_CODE
+// EXISTING_CODE

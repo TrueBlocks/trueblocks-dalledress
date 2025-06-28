@@ -112,12 +112,12 @@ export const Monitors = () => {
   const handleReload = useCallback(async () => {
     try {
       Reload(createPayload(dataFacetRef.current)).then(() => {
-        fetchData();
+        // The data will reload when the DataLoaded event is fired.
       });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
+  }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===
@@ -128,12 +128,12 @@ export const Monitors = () => {
   });
 
   // prettier-ignore
-  const { handleDelete, handleUndelete, handleRemove } = useCrudOperations({
+  const { handleToggle, handleRemove } = useCrudOperations({
     collectionName: 'monitors',
     crudFunc: MonitorsCrud,
     pageFunc: GetMonitorsPage,
     pageClass: monitors.MonitorsPage,
-    emptyItem: types.Monitor.createFrom({}),
+    updateItem: types.Monitor.createFrom({}),
     getCurrentDataFacet,
     pageData,
     setPageData,
@@ -150,26 +150,25 @@ export const Monitors = () => {
 
     const renderActions = (actionData: ActionData) => {
       const isDeleted = actionData.isDeleted;
+      const effectiveDeletedState = actionData.isProcessing
+        ? !isDeleted
+        : isDeleted;
 
       return (
         <div className="action-buttons-container">
           <Action
-            icon={isDeleted ? 'Undelete' : 'Delete'}
-            onClick={() => {
-              if (isDeleted) {
-                handleUndelete(actionData.addressStr);
-              } else {
-                handleDelete(actionData.addressStr);
-              }
-            }}
+            icon="Delete"
+            iconOff="Undelete"
+            isOn={!effectiveDeletedState}
+            onClick={() => handleToggle(actionData.addressStr)}
             disabled={actionData.isProcessing}
-            title={isDeleted ? 'Undelete' : 'Delete'}
+            title={effectiveDeletedState ? 'Undelete' : 'Delete'}
             size="sm"
           />
           <Action
             icon="Remove"
             onClick={() => handleRemove(actionData.addressStr)}
-            disabled={actionData.isProcessing || !isDeleted}
+            disabled={actionData.isProcessing || !effectiveDeletedState}
             title="Remove"
             size="sm"
           />
@@ -187,13 +186,7 @@ export const Monitors = () => {
       renderActions,
       getCanRemove,
     );
-  }, [
-    getCurrentDataFacet,
-    actionConfig,
-    handleDelete,
-    handleUndelete,
-    handleRemove,
-  ]);
+  }, [getCurrentDataFacet, actionConfig, handleToggle, handleRemove]);
   // EXISTING_CODE
   // === END SECTION 7 ===
 
@@ -246,3 +239,6 @@ export const Monitors = () => {
   );
   // === END SECTION 9 ===
 };
+
+// EXISTING_CODE
+// EXISTING_CODE

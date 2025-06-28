@@ -128,7 +128,7 @@ export const Monitors = () => {
   });
 
   // prettier-ignore
-  const { handleToggle, handleRemove } = useCrudOperations({
+  const { handleRemove, handleToggle } = useCrudOperations({
     collectionName: 'monitors',
     crudFunc: MonitorsCrud,
     pageFunc: GetMonitorsPage,

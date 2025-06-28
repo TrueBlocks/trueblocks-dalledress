@@ -6,25 +6,24 @@
 {{- $isNames := eq $class "Names" -}}
 {{- $isMonitors := eq $class "Monitors" -}}
 {{- $hasCrud := or $isAbis (or $isNames $isMonitors) -}}
+{{- $hasUpdate := $isNames -}}
 {{- $models := printf "%s, msgs" $lower -}}
 {{- $apis := printf "Get%sPage, Reload" $class -}}
 {{- $cruds := printf "" -}}
 {{- $handlers := "" -}}
 {{- if $isAbis -}}
-  {{- $models = printf "%s, msgs" $lower -}}
   {{- $apis = printf "%sCrud, Get%sPage, Reload" $class $class -}}
   {{- $cruds = "'remove'" -}}
   {{- $handlers = "handleRemove" -}}
 {{- else if $isNames -}}
-  {{- $models = printf "crud, msgs, %s" $lower -}}
+  {{- $models = printf "msgs, %s" $lower -}}
   {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
   {{- $cruds = "'delete', 'undelete', 'remove', 'autoname'" -}}
-  {{- $handlers = "handleDelete, handleUndelete, handleRemove, handleAutoname" -}}
+  {{- $handlers = "handleRemove, handleToggle, handleAutoname, handleUpdate" -}}
 {{- else if $isMonitors -}}
-  {{- $models = printf "%s, msgs" $lower -}}
   {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
   {{- $cruds = "'delete', 'undelete', 'remove'" -}}
-  {{- $handlers = "handleDelete, handleUndelete, handleRemove" -}}
+  {{- $handlers = "handleRemove, handleToggle" -}}
 {{- end -}}
 // === SECTION 1: Imports & Dependencies ===
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -35,12 +34,12 @@ import { {{$apis}} } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 // prettier-ignore
-import { {{if $hasCrud}}ActionData, {{end}}useActionConfig{{if $isNames}}, useActionMsgs{{end}}{{if $hasCrud}}, useCrudOperations{{end}} } from '@hooks';
+import { {{if $hasCrud}}ActionData, {{end}}useActionConfig{{if $hasCrud}}, useCrudOperations{{end}} } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { {{$models}}, types } from '@models';
-import { {{if $isNames}}getAddressString, {{end}}useErrorHandler } from '@utils';
+import { useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, {{$lower}}Facets } from './facets';
@@ -142,12 +141,12 @@ export const {{$class}} = () => {
   const handleReload = useCallback(async () => {
     try {
       Reload(createPayload(dataFacetRef.current)).then(() => {
-        fetchData();
+        // The data will reload when the DataLoaded event is fired.
       });
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, createPayload, fetchData, handleError]);
+  }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
   // === END SECTION 5 ===
@@ -157,14 +156,22 @@ export const {{$class}} = () => {
     operations: [{{$cruds}}],
   });
 {{- if $hasCrud}}
+  {{- if $hasUpdate}}
+
+  // EXISTING_CODE
+  // EXISTING_CODE
+  {{- end}}
 
   // prettier-ignore
   const { {{$handlers}} } = useCrudOperations({
     collectionName: '{{$lower}}',
     crudFunc: {{$class}}Crud,
     pageFunc: Get{{$class}}Page,
+    {{- if $hasUpdate}}
+    postFunc: postFunc,
+    {{- end}}
     pageClass: {{$lower}}.{{$class}}Page,
-    emptyItem: types.{{toSingular $class}}.createFrom({}),
+    updateItem: types.{{toSingular $class}}.createFrom({}),
     getCurrentDataFacet,
     pageData,
     setPageData,
@@ -187,8 +194,8 @@ export const {{$class}} = () => {
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
-        {{- if $isNames }}
-        onSubmit={handleSubmit}
+        {{- if $hasUpdate }}
+        onSubmit={handleUpdate}
         {{- end }}
         viewStateKey={viewStateKey}
       />
@@ -199,8 +206,8 @@ export const {{$class}} = () => {
       currentColumns,
       pageData?.isFetching,
       error,
-      {{- if $isNames }}
-      handleSubmit,
+      {{- if $hasUpdate }}
+      handleUpdate,
       {{- end }}
       viewStateKey,
     ],
@@ -234,3 +241,6 @@ export const {{$class}} = () => {
   );
   // === END SECTION 9 ===
 };
+
+// EXISTING_CODE
+// EXISTING_CODE

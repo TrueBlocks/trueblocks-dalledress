@@ -1,22 +1,17 @@
 package chunks
 
 import (
-	"fmt"
-
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-type ChunksCrud struct{}
-
-func NewChunksCrud() *ChunksCrud {
-	return &ChunksCrud{}
-}
-
+// Crud implements CRUD operations for chunks - placeholder implementation
 func (c *ChunksCollection) Crud(
 	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
-	return fmt.Errorf("operation %s not supported for chunks", op)
+	// Placeholder implementation - no SDK interaction yet
+	// When SDK support is added, implement similar to other collections
+	return nil
 }

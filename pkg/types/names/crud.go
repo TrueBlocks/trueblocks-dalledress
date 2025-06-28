@@ -1,6 +1,7 @@
 package names
 
 import (
+	"fmt"
 	"sync/atomic"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
@@ -15,13 +16,13 @@ var namesLock atomic.Int32
 func (c *NamesCollection) Crud(
 	payload *types.Payload,
 	op crud.Operation,
-	item interface{},
+	item *Name,
 ) error {
 	dataFacet := payload.DataFacet
 
 	var name = &Name{Address: base.HexToAddress(payload.Address)}
-	if cast, ok := item.(*Name); ok && cast != nil {
-		name = cast
+	if item != nil {
+		name = item
 	}
 
 	if !namesLock.CompareAndSwap(0, 1) {
@@ -43,9 +44,97 @@ func (c *NamesCollection) Crud(
 		return err
 	}
 
-	// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-	c.Reset(dataFacet)
+	// Special handling for Autoname - it can modify many names unpredictably, so we need to reload
+	if op == crud.Autoname {
+		c.Reset(dataFacet)
+		msgs.EmitStatus(fmt.Sprintf("completed %s operation for name: %s", op, name.Address))
+		return nil
+	}
+
+	// After successful SDK call, update the appropriate facet's store and sync
+	switch dataFacet {
+	case NamesAll:
+		store := c.allFacet.GetStore()
+		store.UpdateData(func(data []*Name) []*Name {
+			return c.updateNameInData(data, name, op)
+		})
+		c.allFacet.SyncWithStore()
+	case NamesCustom:
+		store := c.customFacet.GetStore()
+		store.UpdateData(func(data []*Name) []*Name {
+			return c.updateNameInData(data, name, op)
+		})
+		c.customFacet.SyncWithStore()
+	case NamesPrefund:
+		store := c.prefundFacet.GetStore()
+		store.UpdateData(func(data []*Name) []*Name {
+			return c.updateNameInData(data, name, op)
+		})
+		c.prefundFacet.SyncWithStore()
+	case NamesRegular:
+		store := c.regularFacet.GetStore()
+		store.UpdateData(func(data []*Name) []*Name {
+			return c.updateNameInData(data, name, op)
+		})
+		c.regularFacet.SyncWithStore()
+	case NamesBaddress:
+		store := c.baddressFacet.GetStore()
+		store.UpdateData(func(data []*Name) []*Name {
+			return c.updateNameInData(data, name, op)
+		})
+		c.baddressFacet.SyncWithStore()
+	}
+
+	msgs.EmitStatus(fmt.Sprintf("completed %s operation for name: %s", op, name.Address))
 	return nil
+}
+
+// updateNameInData handles the in-memory data update logic for all CRUD operations
+func (c *NamesCollection) updateNameInData(data []*Name, name *Name, op crud.Operation) []*Name {
+	switch op {
+	case crud.Remove:
+		result := make([]*Name, 0, len(data))
+		for _, n := range data {
+			if n.Address != name.Address {
+				result = append(result, n)
+			}
+		}
+		return result
+	case crud.Create:
+		for _, n := range data {
+			if n.Address == name.Address {
+				*n = *name
+				return data
+			}
+		}
+		return append(data, name)
+	case crud.Update:
+		for _, n := range data {
+			if n.Address == name.Address {
+				*n = *name
+				break
+			}
+		}
+		return data
+	case crud.Delete:
+		for _, n := range data {
+			if n.Address == name.Address {
+				n.Deleted = true
+				break
+			}
+		}
+		return data
+	case crud.Undelete:
+		for _, n := range data {
+			if n.Address == name.Address {
+				n.Deleted = false
+				break
+			}
+		}
+		return data
+	default:
+		return data
+	}
 }
 
 // TODO: Consider adding batch operations for Names, similar to MonitorsCollection.Clean (e.g., batch delete).

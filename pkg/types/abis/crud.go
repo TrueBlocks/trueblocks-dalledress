@@ -21,39 +21,77 @@ func (c *AbisCollection) Crud(
 		abi = cast
 	}
 
+	var err error
 	switch op {
 	case crud.Remove:
 		opts := sdk.AbisOptions{
 			Addrs:   []string{abi.Address.Hex()},
 			Globals: sdk.Globals{Decache: true},
 		}
-		if _, _, err := opts.Abis(); err != nil {
-			return err
-		}
+		_, _, err = opts.Abis()
+	default:
+		logging.LogBackend(fmt.Sprintf("ABI operation %s not implemented for address: %s", op, abi.Address))
+		return fmt.Errorf("operation %s not yet implemented for ABIs", op)
+	}
 
-		actionFunc := func(itemMatched *Abi) (error, bool) {
-			return nil, true
-		}
-		matchFunc := func(existing *Abi) bool {
-			return existing.Address == abi.Address
-		}
-		removedCount, err := c.downloadedFacet.ForEvery(actionFunc, matchFunc)
+	if err != nil {
+		return err
+	}
 
-		if err != nil {
-			return fmt.Errorf("failed to remove ABI from facet: %w", err)
-		}
-
+	store := c.downloadedFacet.GetStore()
+	removedCount := 0
+	store.UpdateData(func(data []*Abi) []*Abi {
+		result, count := c.updateAbiInData(data, abi, op)
+		removedCount = count
+		return result
+	})
+	c.downloadedFacet.SyncWithStore()
+	switch op {
+	case crud.Remove:
 		if removedCount > 0 {
 			msgs.EmitStatus(fmt.Sprintf("deleted ABI for address: %s", abi.Address))
 		} else {
 			msgs.EmitStatus(fmt.Sprintf("ABI for address %s was not found in cache", abi.Address))
 		}
 		logging.LogBackend(fmt.Sprintf("Deleted ABI for address: %s", abi.Address))
-		return nil
+	}
 
+	return nil
+}
+
+func (c *AbisCollection) updateAbiInData(data []*Abi, abi *Abi, op crud.Operation) ([]*Abi, int) {
+	count := 0
+	switch op {
+	case crud.Remove:
+		result := make([]*Abi, 0, len(data))
+		for _, existing := range data {
+			if existing.Address == abi.Address {
+				count++
+			} else {
+				result = append(result, existing)
+			}
+		}
+		return result, count
+	case crud.Create:
+		for _, existing := range data {
+			if existing.Address == abi.Address {
+				// Already exists, just update it
+				*existing = *abi
+				return data, 1
+			}
+		}
+		return append(data, abi), 1
+	case crud.Update:
+		for _, existing := range data {
+			if existing.Address == abi.Address {
+				*existing = *abi
+				count = 1
+				break
+			}
+		}
+		return data, count
 	default:
-		logging.LogBackend(fmt.Sprintf("ABI operation %s not implemented for address: %s", op, abi.Address))
-		return fmt.Errorf("operation %s not yet implemented for ABIs", op)
+		return data, 0
 	}
 }
 

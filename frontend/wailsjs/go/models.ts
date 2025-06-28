@@ -700,14 +700,6 @@ export namespace sdk {
 
 export namespace types {
 	
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
-	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -732,6 +724,14 @@ export namespace types {
 	    PREFUND = "prefund",
 	    REGULAR = "regular",
 	    BADDRESS = "baddress",
+	}
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];

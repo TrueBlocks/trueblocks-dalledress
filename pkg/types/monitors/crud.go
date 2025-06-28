@@ -24,6 +24,7 @@ func (c *MonitorsCollection) Crud(
 
 	chain := preferences.GetLastChain()
 
+	var err error
 	switch op {
 	case crud.Remove:
 		opts := sdk.MonitorsOptions{
@@ -31,54 +32,80 @@ func (c *MonitorsCollection) Crud(
 			Remove:  true,
 			Globals: sdk.Globals{Chain: chain},
 		}
-		if _, _, err := opts.Monitors(); err != nil {
-			return err
-		}
-
-		msgs.EmitStatus(fmt.Sprintf("removed monitor for address: %s", monitor.Address))
-		logging.LogBackend(fmt.Sprintf("Removed monitor for address: %s", monitor.Address))
-
-		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-		c.Reset(MonitorsMonitors)
-		return nil
-
+		_, _, err = opts.Monitors()
 	case crud.Delete:
 		opts := sdk.MonitorsOptions{
 			Addrs:   []string{monitor.Address.Hex()},
 			Delete:  true,
 			Globals: sdk.Globals{Cache: true, Chain: chain},
 		}
-		if _, _, err := opts.Monitors(); err != nil {
-			return err
-		}
-
-		msgs.EmitStatus(fmt.Sprintf("deleted monitor for address: %s", monitor.Address))
-		logging.LogBackend(fmt.Sprintf("Deleted monitor for address: %s", monitor.Address))
-
-		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-		c.Reset(MonitorsMonitors)
-		return nil
-
+		_, _, err = opts.Monitors()
 	case crud.Undelete:
 		opts := sdk.MonitorsOptions{
 			Addrs:    []string{monitor.Address.Hex()},
 			Undelete: true,
 			Globals:  sdk.Globals{Cache: true, Chain: chain},
 		}
-		if _, _, err := opts.Monitors(); err != nil {
-			return err
-		}
-
-		msgs.EmitStatus(fmt.Sprintf("undeleted monitor for address: %s", monitor.Address))
-		logging.LogBackend(fmt.Sprintf("Undeleted monitor for address: %s", monitor.Address))
-
-		// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-		c.Reset(MonitorsMonitors)
-		return nil
-
+		_, _, err = opts.Monitors()
 	default:
 		logging.LogBackend(fmt.Sprintf("Monitor operation %s not implemented for address: %s", op, monitor.Address))
 		return fmt.Errorf("operation %s not yet implemented for Monitors", op)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	store := c.monitorsFacet.GetStore()
+	store.UpdateData(func(data []*Monitor) []*Monitor {
+		return c.updateMonitorInData(data, monitor, op)
+	})
+	c.monitorsFacet.SyncWithStore()
+
+	switch op {
+	case crud.Remove:
+		msgs.EmitStatus(fmt.Sprintf("removed monitor for address: %s", monitor.Address))
+		logging.LogBackend(fmt.Sprintf("Removed monitor for address: %s", monitor.Address))
+	case crud.Delete:
+		msgs.EmitStatus(fmt.Sprintf("deleted monitor for address: %s", monitor.Address))
+		logging.LogBackend(fmt.Sprintf("Deleted monitor for address: %s", monitor.Address))
+	case crud.Undelete:
+		msgs.EmitStatus(fmt.Sprintf("undeleted monitor for address: %s", monitor.Address))
+		logging.LogBackend(fmt.Sprintf("Undeleted monitor for address: %s", monitor.Address))
+	}
+
+	return nil
+}
+
+func (c *MonitorsCollection) updateMonitorInData(data []*Monitor, monitor *Monitor, op crud.Operation) []*Monitor {
+	switch op {
+	case crud.Remove:
+		result := make([]*Monitor, 0, len(data))
+		for _, m := range data {
+			if m.Address != monitor.Address {
+				result = append(result, m)
+			}
+		}
+		return result
+	case crud.Delete:
+		for _, m := range data {
+			if m.Address == monitor.Address {
+				m.Deleted = true
+				break
+			}
+		}
+		return data
+	case crud.Undelete:
+		for _, m := range data {
+			if m.Address == monitor.Address {
+				m.Deleted = false
+				break
+			}
+		}
+		return data
+	default:
+		logging.LogBackend(fmt.Sprintf("Monitor operation %s not implemented for address: %s", op, monitor.Address))
+		return data
 	}
 }
 
@@ -106,7 +133,6 @@ func (c *MonitorsCollection) Clean(addresses []string) error {
 		logging.LogBackend("Cleaned all monitors")
 	}
 
-	// TODO: See the AbisCollection for in-memory cache updating code instead of full Reset.
-	c.Reset(MonitorsMonitors)
+	c.LoadData(MonitorsMonitors)
 	return nil
 }

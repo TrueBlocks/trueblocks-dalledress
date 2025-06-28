@@ -1,22 +1,17 @@
 package exports
 
 import (
-	"fmt"
-
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-type ExportsCrud struct{}
-
-func NewExportsCrud() *ExportsCrud {
-	return &ExportsCrud{}
-}
-
+// Crud implements CRUD operations for exports - placeholder implementation
 func (c *ExportsCollection) Crud(
 	payload *types.Payload,
 	op crud.Operation,
 	item interface{},
 ) error {
-	return fmt.Errorf("operation %s not supported for exports", op)
+	// Placeholder implementation - no SDK interaction yet
+	// When SDK support is added, implement similar to other collections
+	return nil
 }

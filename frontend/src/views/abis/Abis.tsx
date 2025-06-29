@@ -140,11 +140,18 @@ export const Abis = () => {
     operations: ['remove'],
   });
 
+  const postFunc = useCallback((item: types.Abi): types.Abi => {
+    // EXISTING_CODE
+    // EXISTING_CODE
+    return item;
+  }, []);
+
   // prettier-ignore
   const { handleRemove } = useCrudOperations({
     collectionName: 'abis',
     crudFunc: AbisCrud,
     pageFunc: GetAbisPage,
+    postFunc: postFunc,
     pageClass: abis.AbisPage,
     updateItem: types.Abi.createFrom({}),
     getCurrentDataFacet,
@@ -170,7 +177,6 @@ export const Abis = () => {
       getCanRemove,
     },
     {
-      // prettier-ignore
       handleRemove,
     },
     toPageDataProp(pageData),

@@ -11,3 +11,4 @@
 [[facets]]
 name = "Monitors"
 store = "Monitors"
+cruds = ["delete", "undelete", "remove"]

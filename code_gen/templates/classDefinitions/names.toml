@@ -13,6 +13,7 @@ store = "Names"
 [[facets]]
 name = "Custom"
 store = "Names"
+cruds = ["delete", "undelete", "remove", "update", "autoname"]
 
 [[facets]]
 name = "Prefund"

@@ -1,10 +1,6 @@
 {{- $class := .Class -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
-{{- $isAbis := eq $class "Abis" -}}
-{{- $isNames := eq $class "Names" -}}
-{{- $isMonitors := eq $class "Monitors" -}}
-{{- $hasCrud := or $isAbis (or $isNames $isMonitors) -}}
 // Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
@@ -16,7 +12,7 @@
 package app
 
 import (
-	{{- if $hasCrud}}"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
+	{{- if .HasCruds}}"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	{{- end}}
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/{{$lower}}"
@@ -35,7 +31,7 @@ func (a *App) Get{{$class}}Page(
 	return getCollectionPage[*{{$lower}}.{{$class}}Page](collection, payload, first, pageSize, sort, filter)
 }
 
-{{if $hasCrud}}func (a *App) {{$class}}Crud(
+{{if .HasCruds}}func (a *App) {{$class}}Crud(
 	payload *types.Payload,
 	op crud.Operation,
 	item *{{$lower}}.{{$single}},

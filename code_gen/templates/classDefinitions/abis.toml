@@ -10,6 +10,7 @@
 [[facets]]
 name = "Downloaded"
 store = "Abis"
+cruds = ["remove"]
 
 [[facets]]
 name = "Known"

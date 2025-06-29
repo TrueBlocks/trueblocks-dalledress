@@ -5,25 +5,16 @@
 {{- $isAbis := eq $class "Abis" -}}
 {{- $isNames := eq $class "Names" -}}
 {{- $isMonitors := eq $class "Monitors" -}}
-{{- $hasCrud := or $isAbis (or $isNames $isMonitors) -}}
 {{- $hasUpdate := $isNames -}}
 {{- $models := printf "%s, msgs" $lower -}}
 {{- $apis := printf "Get%sPage, Reload" $class -}}
-{{- $cruds := printf "" -}}
-{{- $handlers := "" -}}
 {{- if $isAbis -}}
   {{- $apis = printf "%sCrud, Get%sPage, Reload" $class $class -}}
-  {{- $cruds = "'remove'" -}}
-  {{- $handlers = "handleRemove" -}}
 {{- else if $isNames -}}
   {{- $models = printf "msgs, %s" $lower -}}
   {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
-  {{- $cruds = "'delete', 'undelete', 'remove', 'autoname'" -}}
-  {{- $handlers = "handleRemove, handleToggle, handleAutoname, handleUpdate" -}}
 {{- else if $isMonitors -}}
   {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
-  {{- $cruds = "'delete', 'undelete', 'remove'" -}}
-  {{- $handlers = "handleRemove, handleToggle" -}}
 {{- end -}}
 // Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
@@ -40,7 +31,7 @@ import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
-import { useActionConfig{{if $hasCrud}}, useCrudOperations{{end}} } from '@hooks';
+import { useActionConfig{{if .HasCruds}}, useCrudOperations{{end}} } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -159,23 +150,22 @@ export const {{$class}} = () => {
 
   // === SECTION 6: CRUD Operations ===
   const actionConfig = useActionConfig({
-    operations: [{{$cruds}}],
+    operations: [{{replace .CrudStrs ", 'update'" ""}}],
   });
-{{- if $hasCrud}}
-  {{- if $hasUpdate}}
+{{- if .HasCruds}}
 
-  // EXISTING_CODE
-  // EXISTING_CODE
-  {{- end}}
+  const postFunc = useCallback((item: types.{{$single}}): types.{{$single}} => {
+    // EXISTING_CODE
+    // EXISTING_CODE
+    return item;
+  }, []);
 
   // prettier-ignore
-  const { {{$handlers}} } = useCrudOperations({
+  const { {{.Handlers}} } = useCrudOperations({
     collectionName: '{{$lower}}',
     crudFunc: {{$class}}Crud,
     pageFunc: Get{{$class}}Page,
-    {{- if $hasUpdate}}
     postFunc: postFunc,
-    {{- end}}
     pageClass: {{$lower}}.{{$class}}Page,
     updateItem: types.{{toSingular $class}}.createFrom({}),
     getCurrentDataFacet,
@@ -188,8 +178,8 @@ export const {{$class}} = () => {
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  const showActions = {{$hasCrud}};
-  const getCanRemove = ({{if or $isAbis (not $hasCrud)}}_{{end}}row: unknown): boolean => {
+  const showActions = {{if $isAbis}}getCurrentDataFacet() === types.DataFacet.DOWNLOADED{{else}}{{if $isNames}}getCurrentDataFacet() === types.DataFacet.CUSTOM{{else}}{{.HasCruds}}{{end}}{{end}};
+  const getCanRemove = ({{if or $isAbis (not .HasCruds)}}_{{end}}row: unknown): boolean => {
     {{- if $isNames }}
     return (
       Boolean((row as unknown as types.Name)?.deleted) &&
@@ -199,7 +189,7 @@ export const {{$class}} = () => {
     {{- if $isAbis }}
     return getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
     {{- else }}
-    return {{if not $hasCrud}}true{{else}}Boolean((row as unknown as types.{{$single}})?.deleted){{end}};
+    return {{if not .HasCruds}}true{{else}}Boolean((row as unknown as types.{{$single}})?.deleted){{end}};
     {{- end }}
     {{- end }}
   };
@@ -208,20 +198,19 @@ export const {{$class}} = () => {
     getColumns(getCurrentDataFacet()),
     {
       showActions,
-      actions: [{{$cruds}}],
+      actions: [{{replace .CrudStrs ", 'update'" ""}}],
       getCanRemove,
     },
-    {{- if $hasCrud}}
+    {{- if .HasCruds}}
     {
-      // prettier-ignore
-      {{replace $handlers ", handleUpdate" ""}},
+{{.HandlerStrs}}
     },
     {{- else}}
     {},
     {{- end}}
     toPageDataProp(pageData),
     actionConfig,
-    {{not $isAbis}}, /* perRowCrud */
+    {{not $isAbis}} /* perRowCrud */,
   );
   // === END SECTION 7 ===
 

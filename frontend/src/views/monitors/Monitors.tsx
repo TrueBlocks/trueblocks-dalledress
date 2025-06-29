@@ -134,11 +134,18 @@ export const Monitors = () => {
     operations: ['delete', 'undelete', 'remove'],
   });
 
+  const postFunc = useCallback((item: types.Monitor): types.Monitor => {
+    // EXISTING_CODE
+    // EXISTING_CODE
+    return item;
+  }, []);
+
   // prettier-ignore
   const { handleRemove, handleToggle } = useCrudOperations({
     collectionName: 'monitors',
     crudFunc: MonitorsCrud,
     pageFunc: GetMonitorsPage,
+    postFunc: postFunc,
     pageClass: monitors.MonitorsPage,
     updateItem: types.Monitor.createFrom({}),
     getCurrentDataFacet,
@@ -164,7 +171,6 @@ export const Monitors = () => {
       getCanRemove,
     },
     {
-      // prettier-ignore
       handleRemove,
       handleToggle,
     },

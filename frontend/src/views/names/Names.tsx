@@ -142,17 +142,18 @@ export const Names = () => {
     operations: ['delete', 'undelete', 'remove', 'autoname'],
   });
 
-  // EXISTING_CODE
   const postFunc = useCallback((item: types.Name): types.Name => {
-    return types.Name.createFrom({
+    // EXISTING_CODE
+    item = types.Name.createFrom({
       ...item,
       source: item.source || 'TrueBlocks',
     });
+    // EXISTING_CODE
+    return item;
   }, []);
-  // EXISTING_CODE
 
   // prettier-ignore
-  const { handleRemove, handleToggle, handleAutoname, handleUpdate } = useCrudOperations({
+  const { handleAutoname, handleRemove, handleToggle, handleUpdate } = useCrudOperations({
     collectionName: 'names',
     crudFunc: NamesCrud,
     pageFunc: GetNamesPage,
@@ -185,10 +186,9 @@ export const Names = () => {
       getCanRemove,
     },
     {
-      // prettier-ignore
+      handleAutoname,
       handleRemove,
       handleToggle,
-      handleAutoname,
     },
     toPageDataProp(pageData),
     actionConfig,

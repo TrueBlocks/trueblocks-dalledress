@@ -123,19 +123,25 @@
                     "facets": [
                         {
                             "name": "Downloaded",
-                            "store": "Abis"
+                            "store": "Abis",
+                            "cruds": [
+                                "remove"
+                            ]
                         },
                         {
                             "name": "Known",
-                            "store": "Abis"
+                            "store": "Abis",
+                            "cruds": null
                         },
                         {
                             "name": "Functions",
-                            "store": "Functions"
+                            "store": "Functions",
+                            "cruds": null
                         },
                         {
                             "name": "Events",
-                            "store": "Functions"
+                            "store": "Functions",
+                            "cruds": null
                         }
                     ]
                 },
@@ -363,19 +369,23 @@
                     "facets": [
                         {
                             "name": "Stats",
-                            "store": "Stats"
+                            "store": "Stats",
+                            "cruds": null
                         },
                         {
                             "name": "Index",
-                            "store": "Index"
+                            "store": "Index",
+                            "cruds": null
                         },
                         {
                             "name": "Blooms",
-                            "store": "Blooms"
+                            "store": "Blooms",
+                            "cruds": null
                         },
                         {
                             "name": "Manifest",
-                            "store": "Manifest"
+                            "store": "Manifest",
+                            "cruds": null
                         }
                     ]
                 },
@@ -462,39 +472,48 @@
                     "facets": [
                         {
                             "name": "Statements",
-                            "store": "Statements"
+                            "store": "Statements",
+                            "cruds": null
                         },
                         {
                             "name": "Balances",
-                            "store": "Balances"
+                            "store": "Balances",
+                            "cruds": null
                         },
                         {
                             "name": "Transfers",
-                            "store": "Transfers"
+                            "store": "Transfers",
+                            "cruds": null
                         },
                         {
                             "name": "Transactions",
-                            "store": "Transactions"
+                            "store": "Transactions",
+                            "cruds": null
                         },
                         {
                             "name": "Withdrawals",
-                            "store": "Withdrawals"
+                            "store": "Withdrawals",
+                            "cruds": null
                         },
                         {
                             "name": "Assets",
-                            "store": "Assets"
+                            "store": "Assets",
+                            "cruds": null
                         },
                         {
                             "name": "Logs",
-                            "store": "Logs"
+                            "store": "Logs",
+                            "cruds": null
                         },
                         {
                             "name": "Traces",
-                            "store": "Traces"
+                            "store": "Traces",
+                            "cruds": null
                         },
                         {
                             "name": "Receipts",
-                            "store": "Receipts"
+                            "store": "Receipts",
+                            "cruds": null
                         }
                     ]
                 }
@@ -588,7 +607,12 @@
                     "facets": [
                         {
                             "name": "Monitors",
-                            "store": "Monitors"
+                            "store": "Monitors",
+                            "cruds": [
+                                "delete",
+                                "undelete",
+                                "remove"
+                            ]
                         }
                     ]
                 }
@@ -712,23 +736,34 @@
                     "facets": [
                         {
                             "name": "All",
-                            "store": "Names"
+                            "store": "Names",
+                            "cruds": null
                         },
                         {
                             "name": "Custom",
-                            "store": "Names"
+                            "store": "Names",
+                            "cruds": [
+                                "delete",
+                                "undelete",
+                                "remove",
+                                "update",
+                                "autoname"
+                            ]
                         },
                         {
                             "name": "Prefund",
-                            "store": "Names"
+                            "store": "Names",
+                            "cruds": null
                         },
                         {
                             "name": "Regular",
-                            "store": "Names"
+                            "store": "Names",
+                            "cruds": null
                         },
                         {
                             "name": "Baddress",
-                            "store": "Names"
+                            "store": "Names",
+                            "cruds": null
                         }
                     ]
                 }
@@ -813,7 +848,12 @@
             "facets": [
                 {
                     "name": "Monitors",
-                    "store": "Monitors"
+                    "store": "Monitors",
+                    "cruds": [
+                        "delete",
+                        "undelete",
+                        "remove"
+                    ]
                 }
             ]
         },
@@ -924,23 +964,34 @@
             "facets": [
                 {
                     "name": "All",
-                    "store": "Names"
+                    "store": "Names",
+                    "cruds": null
                 },
                 {
                     "name": "Custom",
-                    "store": "Names"
+                    "store": "Names",
+                    "cruds": [
+                        "delete",
+                        "undelete",
+                        "remove",
+                        "update",
+                        "autoname"
+                    ]
                 },
                 {
                     "name": "Prefund",
-                    "store": "Names"
+                    "store": "Names",
+                    "cruds": null
                 },
                 {
                     "name": "Regular",
-                    "store": "Names"
+                    "store": "Names",
+                    "cruds": null
                 },
                 {
                     "name": "Baddress",
-                    "store": "Names"
+                    "store": "Names",
+                    "cruds": null
                 }
             ]
         },
@@ -1006,19 +1057,23 @@
             "facets": [
                 {
                     "name": "Stats",
-                    "store": "Stats"
+                    "store": "Stats",
+                    "cruds": null
                 },
                 {
                     "name": "Index",
-                    "store": "Index"
+                    "store": "Index",
+                    "cruds": null
                 },
                 {
                     "name": "Blooms",
-                    "store": "Blooms"
+                    "store": "Blooms",
+                    "cruds": null
                 },
                 {
                     "name": "Manifest",
-                    "store": "Manifest"
+                    "store": "Manifest",
+                    "cruds": null
                 }
             ]
         },
@@ -1084,39 +1139,48 @@
             "facets": [
                 {
                     "name": "Statements",
-                    "store": "Statements"
+                    "store": "Statements",
+                    "cruds": null
                 },
                 {
                     "name": "Balances",
-                    "store": "Balances"
+                    "store": "Balances",
+                    "cruds": null
                 },
                 {
                     "name": "Transfers",
-                    "store": "Transfers"
+                    "store": "Transfers",
+                    "cruds": null
                 },
                 {
                     "name": "Transactions",
-                    "store": "Transactions"
+                    "store": "Transactions",
+                    "cruds": null
                 },
                 {
                     "name": "Withdrawals",
-                    "store": "Withdrawals"
+                    "store": "Withdrawals",
+                    "cruds": null
                 },
                 {
                     "name": "Assets",
-                    "store": "Assets"
+                    "store": "Assets",
+                    "cruds": null
                 },
                 {
                     "name": "Logs",
-                    "store": "Logs"
+                    "store": "Logs",
+                    "cruds": null
                 },
                 {
                     "name": "Traces",
-                    "store": "Traces"
+                    "store": "Traces",
+                    "cruds": null
                 },
                 {
                     "name": "Receipts",
-                    "store": "Receipts"
+                    "store": "Receipts",
+                    "cruds": null
                 }
             ]
         },
@@ -1234,19 +1298,25 @@
             "facets": [
                 {
                     "name": "Downloaded",
-                    "store": "Abis"
+                    "store": "Abis",
+                    "cruds": [
+                        "remove"
+                    ]
                 },
                 {
                     "name": "Known",
-                    "store": "Abis"
+                    "store": "Abis",
+                    "cruds": null
                 },
                 {
                     "name": "Functions",
-                    "store": "Functions"
+                    "store": "Functions",
+                    "cruds": null
                 },
                 {
                     "name": "Events",
-                    "store": "Functions"
+                    "store": "Functions",
+                    "cruds": null
                 }
             ]
         },

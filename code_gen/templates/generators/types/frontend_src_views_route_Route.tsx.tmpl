@@ -36,12 +36,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { {{$apis}} } from '@app';
-{{if $hasCrud}}import { Action{{if $isNames}}{{end}} } from '@components';
-{{end -}}
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
-import { {{if $hasCrud}}ActionData, {{end}}useActionConfig{{if $hasCrud}}, useCrudOperations{{end}} } from '@hooks';
+import { useActionConfig{{if $hasCrud}}, useCrudOperations{{end}} } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -189,8 +188,41 @@ export const {{$class}} = () => {
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  // EXISTING_CODE
-  // EXISTING_CODE
+  const showActions = {{$hasCrud}};
+  const getCanRemove = ({{if or $isAbis (not $hasCrud)}}_{{end}}row: unknown): boolean => {
+    {{- if $isNames }}
+    return (
+      Boolean((row as unknown as types.Name)?.deleted) &&
+      getCurrentDataFacet() === types.DataFacet.CUSTOM
+    );
+    {{- else }}
+    {{- if $isAbis }}
+    return getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
+    {{- else }}
+    return {{if not $hasCrud}}true{{else}}Boolean((row as unknown as types.{{$single}})?.deleted){{end}};
+    {{- end }}
+    {{- end }}
+  };
+
+  const currentColumns = useColumns(
+    getColumns(getCurrentDataFacet()),
+    {
+      showActions,
+      actions: [{{$cruds}}],
+      getCanRemove,
+    },
+    {{- if $hasCrud}}
+    {
+      // prettier-ignore
+      {{replace $handlers ", handleUpdate" ""}},
+    },
+    {{- else}}
+    {},
+    {{- end}}
+    toPageDataProp(pageData),
+    actionConfig,
+    {{not $isAbis}}, /* perRowCrud */
+  );
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===

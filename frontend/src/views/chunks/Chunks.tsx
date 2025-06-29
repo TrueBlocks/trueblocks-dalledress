@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useColumns } from '@hooks';
+import { toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
 import { useActionConfig } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
@@ -142,22 +142,23 @@ export const Chunks = () => {
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  // EXISTING_CODE
+  const showActions = false;
+  const getCanRemove = (_row: unknown): boolean => {
+    return true;
+  };
+
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions: false,
+      showActions,
       actions: [],
+      getCanRemove,
     },
     {},
-    pageData as unknown as {
-      facet: types.DataFacet;
-      [key: string]: unknown;
-    } | null,
+    toPageDataProp(pageData),
     actionConfig,
-    getCurrentDataFacet,
+    true, /* perRowCrud */
   );
-  // EXISTING_CODE
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===

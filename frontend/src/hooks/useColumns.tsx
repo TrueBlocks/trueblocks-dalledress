@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { Action } from '@components';
 import { FormField } from '@components';
@@ -12,9 +12,16 @@ interface ColumnConfig<T extends Record<string, unknown>> {
   getCanRemove?: (row: T, pageData?: PageDataUnion) => boolean;
 }
 
-type ActionType = 'delete' | 'remove' | 'autoname';
+type ActionType = 'delete' | 'undelete' | 'remove' | 'autoname';
 
-type PageDataUnion = { facet: types.DataFacet; [key: string]: unknown } | null;
+type PageDataUnion = {
+  facet: types.DataFacet;
+  [key: string]: unknown;
+} | null;
+
+export function toPageDataProp<T>(pageData: T | null): PageDataUnion {
+  return pageData as unknown as PageDataUnion;
+}
 
 interface ActionHandlers {
   handleToggle?: (addressStr: string) => void;
@@ -28,7 +35,7 @@ export const useColumns = (
   handlers: ActionHandlers,
   pageData: PageDataUnion,
   actionConfig: ReturnType<typeof useActionConfig>,
-  getCurrentDataFacet: () => types.DataFacet,
+  perRowCrud: boolean = true,
 ) => {
   return useMemo(() => {
     // Determine if actions should be shown
@@ -49,22 +56,26 @@ export const useColumns = (
 
       return (
         <div className="action-buttons-container">
-          {config.actions.includes('delete') && handlers.handleToggle && (
-            <Action
-              icon="Delete"
-              iconOff="Undelete"
-              isOn={!effectiveDeletedState}
-              onClick={() => handlers.handleToggle?.(actionData.addressStr)}
-              disabled={actionData.isProcessing}
-              title={effectiveDeletedState ? 'Undelete' : 'Delete'}
-              size="sm"
-            />
-          )}
+          {config.actions.includes('delete') &&
+            handlers.handleToggle && ( // undelete is permitted but ignored
+              <Action
+                icon="Delete"
+                iconOff="Undelete"
+                isOn={!effectiveDeletedState}
+                onClick={() => handlers.handleToggle?.(actionData.addressStr)}
+                disabled={actionData.isProcessing}
+                title={effectiveDeletedState ? 'Undelete' : 'Delete'}
+                size="sm"
+              />
+            )}
           {config.actions.includes('remove') && handlers.handleRemove && (
             <Action
               icon="Remove"
               onClick={() => handlers.handleRemove?.(actionData.addressStr)}
-              disabled={actionData.isProcessing || !effectiveDeletedState}
+              disabled={
+                actionData.isProcessing ||
+                (perRowCrud ? !effectiveDeletedState : false)
+              }
               title="Remove"
               size="sm"
             />
@@ -87,16 +98,7 @@ export const useColumns = (
       renderActions,
       config.getCanRemove,
     );
-  }, [
-    baseColumns,
-    config,
-    handlers.handleToggle,
-    handlers.handleRemove,
-    handlers.handleAutoname,
-    pageData,
-    actionConfig,
-    getCurrentDataFacet,
-  ]);
+  }, [baseColumns, config, handlers, pageData, actionConfig, perRowCrud]);
 };
 
 export type { ColumnConfig, ActionType, ActionHandlers };

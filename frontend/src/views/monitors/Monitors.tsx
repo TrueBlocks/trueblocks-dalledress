@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetMonitorsPage, MonitorsCrud, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useColumns } from '@hooks';
+import { toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
 import { useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
@@ -151,26 +151,26 @@ export const Monitors = () => {
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  // EXISTING_CODE
+  const showActions = true;
+  const getCanRemove = (row: unknown): boolean => {
+    return Boolean((row as unknown as types.Monitor)?.deleted);
+  };
+
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions: true,
-      actions: ['delete', 'remove'],
-      getCanRemove: (row) => Boolean((row as unknown as types.Monitor).deleted),
+      showActions,
+      actions: ['delete', 'undelete', 'remove'],
+      getCanRemove,
     },
     {
-      handleToggle,
-      handleRemove,
+      // prettier-ignore
+      handleRemove, handleToggle,
     },
-    pageData as unknown as {
-      facet: types.DataFacet;
-      [key: string]: unknown;
-    } | null,
+    toPageDataProp(pageData),
     actionConfig,
-    getCurrentDataFacet,
+    true, /* perRowCrud */
   );
-  // EXISTING_CODE
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===

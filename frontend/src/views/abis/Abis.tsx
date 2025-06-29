@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { useColumns } from '@hooks';
+import { toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
 import { useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
@@ -157,31 +157,26 @@ export const Abis = () => {
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  // EXISTING_CODE
+  const showActions = getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
+  const getCanRemove = (_row: unknown): boolean => {
+    return getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
+  };
+
   const currentColumns = useColumns(
-    getColumns(pageData?.facet || types.DataFacet.DOWNLOADED),
+    getColumns(getCurrentDataFacet()),
     {
-      showActions: (pd) => {
-        const facet = pd?.facet ?? types.DataFacet.DOWNLOADED;
-        return (
-          facet === types.DataFacet.DOWNLOADED ||
-          facet === types.DataFacet.KNOWN
-        );
-      },
+      showActions,
       actions: ['remove'],
-      getCanRemove: () => pageData?.facet === types.DataFacet.DOWNLOADED,
+      getCanRemove,
     },
     {
+      // prettier-ignore
       handleRemove,
     },
-    pageData as unknown as {
-      facet: types.DataFacet;
-      [key: string]: unknown;
-    } | null,
+    toPageDataProp(pageData),
     actionConfig,
-    getCurrentDataFacet,
+    false /* perRowCrud */,
   );
-  // EXISTING_CODE
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===

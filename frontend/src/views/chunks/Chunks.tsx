@@ -157,7 +157,7 @@ export const Chunks = () => {
     {},
     toPageDataProp(pageData),
     actionConfig,
-    true, /* perRowCrud */
+    true /* perRowCrud */,
   );
   // === END SECTION 7 ===
 

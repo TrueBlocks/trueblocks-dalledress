@@ -167,7 +167,7 @@ export const Exports = () => {
     {},
     toPageDataProp(pageData),
     actionConfig,
-    true, /* perRowCrud */
+    true /* perRowCrud */,
   );
   // === END SECTION 7 ===
 

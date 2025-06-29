@@ -7,13 +7,13 @@
 {{- $isMonitors := eq $class "Monitors" -}}
 {{- $hasUpdate := $isNames -}}
 {{- $models := printf "%s, msgs" $lower -}}
+{{- if $isNames -}}
+  {{- $models = printf "msgs, %s" $lower -}}
+{{- end -}}
 {{- $apis := printf "Get%sPage, Reload" $class -}}
 {{- if $isAbis -}}
   {{- $apis = printf "%sCrud, Get%sPage, Reload" $class $class -}}
-{{- else if $isNames -}}
-  {{- $models = printf "msgs, %s" $lower -}}
-  {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
-{{- else if $isMonitors -}}
+{{- else if or $isNames $isMonitors -}}
   {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
 {{- end -}}
 // Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.

@@ -924,6 +924,7 @@
                         {
                             "name": "blockHash",
                             "type": "hash",
+                            "attributes": "noui",
                             "docOrder": 1,
                             "description": "the hash of the block containing this trace",
                             "num": 1
@@ -931,6 +932,7 @@
                         {
                             "name": "blockNumber",
                             "type": "blknum",
+                            "attributes": "noui",
                             "docOrder": 2,
                             "description": "the number of the block",
                             "num": 2
@@ -938,6 +940,7 @@
                         {
                             "name": "timestamp",
                             "type": "timestamp",
+                            "attributes": "noui",
                             "docOrder": 3,
                             "description": "the timestamp of the block",
                             "num": 3
@@ -945,7 +948,7 @@
                         {
                             "name": "date",
                             "type": "datetime",
-                            "attributes": "omitempty|calc",
+                            "attributes": "calc|width=120px",
                             "docOrder": 4,
                             "description": "the timestamp as a date",
                             "num": 4
@@ -953,6 +956,7 @@
                         {
                             "name": "transactionHash",
                             "type": "hash",
+                            "attributes": "noui",
                             "docOrder": 5,
                             "description": "the transaction's hash containing this trace",
                             "num": 5
@@ -960,6 +964,7 @@
                         {
                             "name": "transactionIndex",
                             "type": "txnum",
+                            "attributes": "noui",
                             "docOrder": 6,
                             "description": "the zero-indexed position of the transaction in the block",
                             "num": 6
@@ -967,6 +972,7 @@
                         {
                             "name": "subtraces",
                             "type": "uint64",
+                            "attributes": "noui",
                             "docOrder": 7,
                             "description": "the number of children traces that the trace hash",
                             "num": 7
@@ -974,7 +980,6 @@
                         {
                             "name": "type",
                             "type": "string",
-                            "attributes": "omitempty",
                             "docOrder": 8,
                             "description": "the type of the trace",
                             "num": 8
@@ -991,7 +996,6 @@
                         {
                             "name": "error",
                             "type": "string",
-                            "attributes": "omitempty",
                             "docOrder": 10,
                             "num": 10
                         },
@@ -1025,7 +1029,7 @@
                         {
                             "name": "articulatedTrace",
                             "type": "Function",
-                            "attributes": "noui|omitempty",
+                            "attributes": "noui",
                             "docOrder": 14,
                             "description": "human readable version of the trace action input data",
                             "num": 14,
@@ -1081,6 +1085,7 @@
                         {
                             "name": "timestamp",
                             "type": "timestamp",
+                            "attributes": "noui",
                             "docOrder": 6,
                             "description": "the timestamp for this block",
                             "num": 6
@@ -1088,6 +1093,7 @@
                         {
                             "name": "date",
                             "type": "datetime",
+                            "attributes": "calc|width=120px",
                             "docOrder": 7,
                             "description": "the timestamp as a date",
                             "num": 7
@@ -1712,6 +1718,7 @@
                 {
                     "name": "blockNumber",
                     "type": "blknum",
+                    "attributes": "noui",
                     "docOrder": 1,
                     "description": "the number of the block",
                     "num": 1
@@ -1719,6 +1726,7 @@
                 {
                     "name": "transactionIndex",
                     "type": "txnum",
+                    "attributes": "noui",
                     "docOrder": 2,
                     "description": "the zero-indexed position of the transaction in the block",
                     "num": 2
@@ -1726,6 +1734,7 @@
                 {
                     "name": "logIndex",
                     "type": "lognum",
+                    "attributes": "noui",
                     "docOrder": 3,
                     "description": "the zero-indexed position the log in the block, if applicable",
                     "num": 3
@@ -1733,6 +1742,7 @@
                 {
                     "name": "transactionHash",
                     "type": "hash",
+                    "attributes": "noui",
                     "docOrder": 4,
                     "description": "the hash of the transaction that triggered this reconciliation",
                     "num": 4
@@ -1740,6 +1750,7 @@
                 {
                     "name": "timestamp",
                     "type": "timestamp",
+                    "attributes": "noui",
                     "docOrder": 5,
                     "description": "the Unix timestamp of the object",
                     "num": 5
@@ -1747,6 +1758,7 @@
                 {
                     "name": "date",
                     "type": "datetime",
+                    "attributes": "calc|width=120px",
                     "docOrder": 6,
                     "description": "the timestamp as a date",
                     "num": 6
@@ -2047,144 +2059,152 @@
                     "num": 3
                 },
                 {
+                    "name": "date",
+                    "type": "datetime",
+                    "attributes": "calc|width=120px",
+                    "docOrder": 4,
+                    "description": "the timestamp as a date",
+                    "num": 4
+                },
+                {
                     "name": "holder",
                     "type": "address",
                     "attributes": "readOnly",
-                    "docOrder": 4,
+                    "docOrder": 5,
                     "description": "the address of the holder of the asset",
-                    "num": 4
+                    "num": 5
                 },
                 {
                     "name": "asset",
                     "type": "address",
                     "attributes": "readOnly",
-                    "docOrder": 5,
+                    "docOrder": 6,
                     "description": "0xeeee...eeee for ETH transfers, the token address otherwise",
-                    "num": 5
+                    "num": 6
                 },
                 {
                     "name": "decimals",
                     "type": "uint64",
-                    "docOrder": 6,
+                    "docOrder": 7,
                     "description": "the number of decimal places in the asset units",
-                    "num": 6
+                    "num": 7
                 },
                 {
                     "name": "sender",
                     "type": "address",
                     "attributes": "readOnly",
-                    "docOrder": 7,
+                    "docOrder": 8,
                     "description": "the initiator of the transfer (the sender)",
-                    "num": 7
+                    "num": 8
                 },
                 {
                     "name": "recipient",
                     "type": "address",
                     "attributes": "readOnly",
-                    "docOrder": 8,
+                    "docOrder": 9,
                     "description": "the receiver of the transfer (the recipient)",
-                    "num": 8
+                    "num": 9
                 },
                 {
                     "name": "amountIn",
                     "type": "int256",
-                    "docOrder": 9,
+                    "docOrder": 10,
                     "description": "the top-level value of the incoming transfer for the holder address",
-                    "num": 9
+                    "num": 10
                 },
                 {
                     "name": "internalIn",
                     "type": "int256",
-                    "docOrder": 10,
+                    "docOrder": 11,
                     "description": "the internal value of the incoming transfer for the holder address",
-                    "num": 10
+                    "num": 11
                 },
                 {
                     "name": "minerBaseRewardIn",
                     "type": "int256",
-                    "docOrder": 11,
+                    "docOrder": 12,
                     "description": "the base fee reward if the miner is the holder address",
-                    "num": 11
+                    "num": 12
                 },
                 {
                     "name": "minerNephewRewardIn",
                     "type": "int256",
-                    "docOrder": 12,
+                    "docOrder": 13,
                     "description": "the nephew reward if the miner is the holder address",
-                    "num": 12
+                    "num": 13
                 },
                 {
                     "name": "minerTxFeeIn",
                     "type": "int256",
-                    "docOrder": 13,
+                    "docOrder": 14,
                     "description": "the transaction fee reward if the miner is the holder address",
-                    "num": 13
+                    "num": 14
                 },
                 {
                     "name": "minerUncleRewardIn",
                     "type": "int256",
-                    "docOrder": 14,
+                    "docOrder": 15,
                     "description": "the uncle reward if the miner who won the uncle block is the holder address",
-                    "num": 14
+                    "num": 15
                 },
                 {
                     "name": "prefundIn",
                     "type": "int256",
-                    "docOrder": 15,
+                    "docOrder": 16,
                     "description": "at block zero (0) only, the amount of genesis income for the holder address",
-                    "num": 15
+                    "num": 16
                 },
                 {
                     "name": "selfDestructIn",
                     "type": "int256",
-                    "docOrder": 16,
+                    "docOrder": 17,
                     "description": "the incoming value of a self-destruct if recipient is the holder address",
-                    "num": 16
+                    "num": 17
                 },
                 {
                     "name": "amountOut",
                     "type": "int256",
-                    "docOrder": 17,
+                    "docOrder": 18,
                     "description": "the amount (in units of the asset) of regular outflow during this transaction",
-                    "num": 17
+                    "num": 18
                 },
                 {
                     "name": "internalOut",
                     "type": "int256",
-                    "docOrder": 18,
+                    "docOrder": 19,
                     "description": "the value of any internal value transfers out of the holder account",
-                    "num": 18
+                    "num": 19
                 },
                 {
                     "name": "gasOut",
                     "type": "int256",
-                    "docOrder": 19,
+                    "docOrder": 20,
                     "description": "if the transaction's original sender is the holder address, the amount of gas expended",
-                    "num": 19
+                    "num": 20
                 },
                 {
                     "name": "selfDestructOut",
                     "type": "int256",
-                    "docOrder": 20,
+                    "docOrder": 21,
                     "description": "the outgoing value of a self-destruct if sender is the holder address",
-                    "num": 20
+                    "num": 21
                 },
                 {
                     "name": "transaction",
                     "type": "Transaction",
                     "attributes": "noui",
-                    "docOrder": 21,
+                    "docOrder": 22,
                     "description": "the transaction that triggered the transfer",
-                    "num": 21,
+                    "num": 22,
                     "isPointer": true
                 },
                 {
                     "name": "log",
                     "type": "Log",
                     "attributes": "noui",
-                    "docOrder": 22,
+                    "docOrder": 23,
                     "description": "if a token transfer, the log that triggered the transfer",
-                    "num": 22,
+                    "num": 23,
                     "isPointer": true
                 }
             ]
@@ -2203,12 +2223,13 @@
                 {
                     "name": "chainId",
                     "type": "string",
-                    "attributes": "removed",
+                    "attributes": "noui|removed",
                     "num": 1
                 },
                 {
                     "name": "hash",
                     "type": "hash",
+                    "attributes": "noui",
                     "docOrder": 1,
                     "description": "the hash of the transaction",
                     "num": 6
@@ -2216,6 +2237,7 @@
                 {
                     "name": "blockHash",
                     "type": "hash",
+                    "attributes": "noui",
                     "docOrder": 2,
                     "description": "the hash of the block containing this transaction",
                     "num": 7
@@ -2223,6 +2245,7 @@
                 {
                     "name": "blockNumber",
                     "type": "blknum",
+                    "attributes": "noui",
                     "docOrder": 3,
                     "description": "the number of the block",
                     "num": 2
@@ -2230,6 +2253,7 @@
                 {
                     "name": "transactionIndex",
                     "type": "txnum",
+                    "attributes": "noui",
                     "docOrder": 4,
                     "description": "the zero-indexed position of the transaction in the block",
                     "num": 3
@@ -2244,6 +2268,7 @@
                 {
                     "name": "timestamp",
                     "type": "timestamp",
+                    "attributes": "noui",
                     "docOrder": 6,
                     "description": "the Unix timestamp of the object",
                     "num": 4
@@ -2251,7 +2276,7 @@
                 {
                     "name": "date",
                     "type": "datetime",
-                    "attributes": "calc",
+                    "attributes": "calc|width=120px",
                     "docOrder": 7,
                     "description": "the timestamp as a date",
                     "num": 5
@@ -2512,6 +2537,7 @@
                 {
                     "name": "blockNumber",
                     "type": "blknum",
+                    "attributes": "noui",
                     "docOrder": 1,
                     "description": "the number of the block",
                     "num": 1
@@ -2519,6 +2545,7 @@
                 {
                     "name": "transactionIndex",
                     "type": "txnum",
+                    "attributes": "noui",
                     "docOrder": 2,
                     "description": "the zero-indexed position of the transaction in the block",
                     "num": 2
@@ -2526,6 +2553,7 @@
                 {
                     "name": "logIndex",
                     "type": "lognum",
+                    "attributes": "noui",
                     "docOrder": 3,
                     "description": "the zero-indexed position of this log relative to the block",
                     "num": 3
@@ -2533,6 +2561,7 @@
                 {
                     "name": "timestamp",
                     "type": "timestamp",
+                    "attributes": "noui",
                     "docOrder": 4,
                     "description": "the timestamp of the block this log appears in",
                     "num": 4
@@ -2540,7 +2569,7 @@
                 {
                     "name": "date",
                     "type": "datetime",
-                    "attributes": "calc",
+                    "attributes": "calc|width=120px",
                     "docOrder": 5,
                     "description": "the timestamp as a date",
                     "num": 5
@@ -2571,6 +2600,7 @@
                 {
                     "name": "transactionHash",
                     "type": "hash",
+                    "attributes": "noui",
                     "docOrder": 9,
                     "description": "the hash of the transction",
                     "num": 9
@@ -2578,6 +2608,7 @@
                 {
                     "name": "blockHash",
                     "type": "hash",
+                    "attributes": "noui",
                     "docOrder": 10,
                     "description": "the hash of the block",
                     "num": 10
@@ -2800,6 +2831,7 @@
                 {
                     "name": "blockHash",
                     "type": "hash",
+                    "attributes": "noui",
                     "docOrder": 1,
                     "description": "the hash of the block containing this trace",
                     "num": 1
@@ -2807,6 +2839,7 @@
                 {
                     "name": "blockNumber",
                     "type": "blknum",
+                    "attributes": "noui",
                     "docOrder": 2,
                     "description": "the number of the block",
                     "num": 2
@@ -2814,6 +2847,7 @@
                 {
                     "name": "timestamp",
                     "type": "timestamp",
+                    "attributes": "noui",
                     "docOrder": 3,
                     "description": "the timestamp of the block",
                     "num": 3
@@ -2821,7 +2855,7 @@
                 {
                     "name": "date",
                     "type": "datetime",
-                    "attributes": "omitempty|calc",
+                    "attributes": "calc|width=120px",
                     "docOrder": 4,
                     "description": "the timestamp as a date",
                     "num": 4
@@ -2829,6 +2863,7 @@
                 {
                     "name": "transactionHash",
                     "type": "hash",
+                    "attributes": "noui",
                     "docOrder": 5,
                     "description": "the transaction's hash containing this trace",
                     "num": 5
@@ -2836,6 +2871,7 @@
                 {
                     "name": "transactionIndex",
                     "type": "txnum",
+                    "attributes": "noui",
                     "docOrder": 6,
                     "description": "the zero-indexed position of the transaction in the block",
                     "num": 6
@@ -2843,6 +2879,7 @@
                 {
                     "name": "subtraces",
                     "type": "uint64",
+                    "attributes": "noui",
                     "docOrder": 7,
                     "description": "the number of children traces that the trace hash",
                     "num": 7
@@ -2850,7 +2887,6 @@
                 {
                     "name": "type",
                     "type": "string",
-                    "attributes": "omitempty",
                     "docOrder": 8,
                     "description": "the type of the trace",
                     "num": 8
@@ -2867,7 +2903,6 @@
                 {
                     "name": "error",
                     "type": "string",
-                    "attributes": "omitempty",
                     "docOrder": 10,
                     "num": 10
                 },
@@ -2901,7 +2936,7 @@
                 {
                     "name": "articulatedTrace",
                     "type": "Function",
-                    "attributes": "noui|omitempty",
+                    "attributes": "noui",
                     "docOrder": 14,
                     "description": "human readable version of the trace action input data",
                     "num": 14,
@@ -2957,6 +2992,7 @@
                 {
                     "name": "timestamp",
                     "type": "timestamp",
+                    "attributes": "noui",
                     "docOrder": 6,
                     "description": "the timestamp for this block",
                     "num": 6
@@ -2964,6 +3000,7 @@
                 {
                     "name": "date",
                     "type": "datetime",
+                    "attributes": "calc|width=120px",
                     "docOrder": 7,
                     "description": "the timestamp as a date",
                     "num": 7

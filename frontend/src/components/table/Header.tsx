@@ -62,12 +62,8 @@ export const Header = <T extends Record<string, unknown>>({
           }
 
           const classNames = [
-            col.className || '', // Custom class from column definition
             col.sortable ? 'sortable' : '',
             isSorted ? 'sorted' : '',
-            typeof col.width === 'string' && col.width.startsWith('col-')
-              ? col.width
-              : '',
           ]
             .filter(Boolean)
             .join(' ');
@@ -76,12 +72,7 @@ export const Header = <T extends Record<string, unknown>>({
             <th
               key={col.key}
               style={{
-                ...(typeof col.width === 'string' &&
-                col.width.startsWith('col-')
-                  ? undefined
-                  : col.width
-                    ? { width: col.width }
-                    : undefined),
+                ...(col.width ? { width: col.width } : undefined),
                 textAlign: 'center',
               }}
               className={classNames}

@@ -69,6 +69,22 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
         return <>{displayValue}</>;
       }
 
+      // For date/datetime fields, split on '|' and render each part on its own line
+      if (field.type === 'datetime') {
+        const parts = String(displayValue)
+          .split('|')
+          .map((p) => p.trim());
+        return (
+          <div key={keyProp}>
+            {parts.map((part, idx) => (
+              <Text key={idx} size="sm" fw={idx === 0 ? 500 : undefined}>
+                {idx === 0 ? `${field.label}: ${part}` : part}
+              </Text>
+            ))}
+          </div>
+        );
+      }
+
       return (
         <div key={keyProp}>
           <Text

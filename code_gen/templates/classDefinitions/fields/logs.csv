@@ -1,14 +1,14 @@
-name            , type     , strDefault, attributes, upgrades     , docOrder, description
-blockNumber     , blknum   ,           ,           ,              ,        1, the number of the block
-transactionIndex, txnum    ,           ,           ,              ,        2, the zero-indexed position of the transaction in the block
-logIndex        , lognum   ,           ,           ,              ,        3, the zero-indexed position of this log relative to the block
-timestamp       , timestamp,           ,           ,              ,        4, the timestamp of the block this log appears in
-date            , datetime ,           , calc      ,              ,        5, the timestamp as a date
-address         , address  ,           , readOnly  ,              ,        6, the smart contract that emitted this log
-topics          , []topic  ,           ,           ,              ,        7, the first topic hashes event signature of the log&#44; up to 3 additional index parameters may appear
-data            , bytes    ,           ,           ,              ,        8, any remaining un-indexed parameters to the event
-transactionHash , hash     ,           ,           ,              ,        9, the hash of the transction
-blockHash       , hash     ,           ,           ,              ,       10, the hash of the block
-articulatedLog  , *Function,           , noui      ,              ,       11, a human-readable version of the topic and data fields
-compressedLog   , string   ,           , calc      , 2.5.10:string,       12, a truncated&#44; more readable version of the articulation
-isNFT           , bool     ,           ,           ,              ,       13, true if the log is an NFT transfer
+name            , type     , strDefault, attributes      , upgrades     , docOrder, description
+blockNumber     , blknum   ,           , noui            ,              ,        1, the number of the block
+transactionIndex, txnum    ,           , noui            ,              ,        2, the zero-indexed position of the transaction in the block
+logIndex        , lognum   ,           , noui            ,              ,        3, the zero-indexed position of this log relative to the block
+timestamp       , timestamp,           , noui            ,              ,        4, the timestamp of the block this log appears in
+date            , datetime ,           , calc|width=120px,              ,        5, the timestamp as a date
+address         , address  ,           , readOnly        ,              ,        6, the smart contract that emitted this log
+topics          , []topic  ,           ,                 ,              ,        7, the first topic hashes event signature of the log&#44; up to 3 additional index parameters may appear
+data            , bytes    ,           ,                 ,              ,        8, any remaining un-indexed parameters to the event
+transactionHash , hash     ,           , noui            ,              ,        9, the hash of the transction
+blockHash       , hash     ,           , noui            ,              ,       10, the hash of the block
+articulatedLog  , *Function,           , noui            ,              ,       11, a human-readable version of the topic and data fields
+compressedLog   , string   ,           , calc            , 2.5.10:string,       12, a truncated&#44; more readable version of the articulation
+isNFT           , bool     ,           ,                 ,              ,       13, true if the log is an NFT transfer

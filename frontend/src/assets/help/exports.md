@@ -165,11 +165,12 @@ This is the help file for the Exports view.
   - isError: `true` if the transaction ended in error, `false` otherwise
   - compressedTx: truncated, more readable version of the articulation
 
-- **Transfers Store (22 members):**
+- **Transfers Store (23 members):**
 
   - blockNumber: the number of the block
   - transactionIndex: the zero-indexed position of the transaction in the block
   - logIndex: the zero-indexed position the log in the block, if applicable
+  - date: the timestamp as a date
   - holder: the address of the holder of the asset
   - asset: 0xeeee...eeee for ETH transfers, the token address otherwise
   - decimals: the number of decimal places in the asset units

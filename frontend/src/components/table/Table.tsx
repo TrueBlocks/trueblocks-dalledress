@@ -9,7 +9,6 @@ import { ViewStateKey } from 'src/contexts/ViewStateKey';
 import { Body, Header, Pagination, PerPage, Stats, usePagination } from '.';
 import { SearchBox } from './SearchBox';
 import './Table.css';
-import './TableSizing.css';
 
 export interface TableProps<T extends Record<string, unknown>> {
   columns: FormField<T>[];
@@ -246,19 +245,7 @@ export const Table = <T extends Record<string, unknown>>({
         >
           <colgroup>
             {columns.map((col) => (
-              <col
-                key={col.key}
-                className={
-                  typeof col.width === 'string' && col.width.startsWith('col-')
-                    ? col.width
-                    : undefined
-                }
-                style={
-                  typeof col.width === 'string' && col.width.startsWith('col-')
-                    ? undefined
-                    : { width: col.width || 'auto' }
-                }
-              />
+              <col key={col.key} style={{ width: col.width || 'auto' }} />
             ))}
           </colgroup>
           <tbody>

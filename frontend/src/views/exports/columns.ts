@@ -218,46 +218,6 @@ const getLogsColumns = (): FormField[] => [
   // EXISTING_CODE
   // EXISTING_CODE
   {
-    key: 'blockNumber',
-    name: 'blockNumber',
-    header: 'Block Number',
-    label: 'Block Number',
-    sortable: false,
-    type: 'blknum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'transactionIndex',
-    name: 'transactionIndex',
-    header: 'Transaction Index',
-    label: 'Transaction Index',
-    sortable: false,
-    type: 'txnum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'logIndex',
-    name: 'logIndex',
-    header: 'Log Index',
-    label: 'Log Index',
-    sortable: false,
-    type: 'lognum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'timestamp',
-    name: 'timestamp',
-    header: 'Timestamp',
-    label: 'Timestamp',
-    sortable: false,
-    type: 'timestamp',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
     key: 'date',
     name: 'date',
     header: 'Date',
@@ -296,26 +256,6 @@ const getLogsColumns = (): FormField[] => [
     label: 'Data',
     sortable: false,
     type: 'bytes',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'transactionHash',
-    name: 'transactionHash',
-    header: 'Transaction Hash',
-    label: 'Transaction Hash',
-    sortable: false,
-    type: 'hash',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'blockHash',
-    name: 'blockHash',
-    header: 'Block Hash',
-    label: 'Block Hash',
-    sortable: false,
-    type: 'hash',
     width: '120px',
     textAlign: 'left',
   },
@@ -474,56 +414,6 @@ const getStatementsColumns = (): FormField[] => [
   // EXISTING_CODE
   // EXISTING_CODE
   {
-    key: 'blockNumber',
-    name: 'blockNumber',
-    header: 'Block Number',
-    label: 'Block Number',
-    sortable: false,
-    type: 'blknum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'transactionIndex',
-    name: 'transactionIndex',
-    header: 'Transaction Index',
-    label: 'Transaction Index',
-    sortable: false,
-    type: 'txnum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'logIndex',
-    name: 'logIndex',
-    header: 'Log Index',
-    label: 'Log Index',
-    sortable: false,
-    type: 'lognum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'transactionHash',
-    name: 'transactionHash',
-    header: 'Transaction Hash',
-    label: 'Transaction Hash',
-    sortable: false,
-    type: 'hash',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'timestamp',
-    name: 'timestamp',
-    header: 'Timestamp',
-    label: 'Timestamp',
-    sortable: false,
-    type: 'timestamp',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
     key: 'date',
     name: 'date',
     header: 'Date',
@@ -532,6 +422,7 @@ const getStatementsColumns = (): FormField[] => [
     type: 'datetime',
     width: '120px',
     textAlign: 'left',
+    render: renderDate,
   },
   {
     key: 'asset',
@@ -914,36 +805,6 @@ const getTracesColumns = (): FormField[] => [
   // EXISTING_CODE
   // EXISTING_CODE
   {
-    key: 'blockHash',
-    name: 'blockHash',
-    header: 'Block Hash',
-    label: 'Block Hash',
-    sortable: false,
-    type: 'hash',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'blockNumber',
-    name: 'blockNumber',
-    header: 'Block Number',
-    label: 'Block Number',
-    sortable: false,
-    type: 'blknum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'timestamp',
-    name: 'timestamp',
-    header: 'Timestamp',
-    label: 'Timestamp',
-    sortable: false,
-    type: 'timestamp',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
     key: 'date',
     name: 'date',
     header: 'Date',
@@ -953,36 +814,6 @@ const getTracesColumns = (): FormField[] => [
     width: '120px',
     textAlign: 'left',
     render: renderDate,
-  },
-  {
-    key: 'transactionHash',
-    name: 'transactionHash',
-    header: 'Transaction Hash',
-    label: 'Transaction Hash',
-    sortable: false,
-    type: 'hash',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'transactionIndex',
-    name: 'transactionIndex',
-    header: 'Transaction Index',
-    label: 'Transaction Index',
-    sortable: false,
-    type: 'txnum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'subtraces',
-    name: 'subtraces',
-    header: 'Subtraces',
-    label: 'Subtraces',
-    sortable: false,
-    type: 'number',
-    width: '120px',
-    textAlign: 'right',
   },
   {
     key: 'type',
@@ -1031,16 +862,6 @@ const getTransactionsColumns = (): FormField[] => [
     textAlign: 'left',
   },
   {
-    key: 'chainId',
-    name: 'chainId',
-    header: 'Chain Id',
-    label: 'Chain Id',
-    sortable: false,
-    type: 'text',
-    width: '200px',
-    textAlign: 'left',
-  },
-  {
     key: 'maxPriorityFeePerGas',
     name: 'maxPriorityFeePerGas',
     header: 'Max Priority Fee Per Gas',
@@ -1071,62 +892,12 @@ const getTransactionsColumns = (): FormField[] => [
     textAlign: 'left',
   },
   {
-    key: 'hash',
-    name: 'hash',
-    header: 'Hash',
-    label: 'Hash',
-    sortable: false,
-    type: 'hash',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'blockHash',
-    name: 'blockHash',
-    header: 'Block Hash',
-    label: 'Block Hash',
-    sortable: false,
-    type: 'hash',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'blockNumber',
-    name: 'blockNumber',
-    header: 'Block Number',
-    label: 'Block Number',
-    sortable: false,
-    type: 'blknum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'transactionIndex',
-    name: 'transactionIndex',
-    header: 'Transaction Index',
-    label: 'Transaction Index',
-    sortable: false,
-    type: 'txnum',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
     key: 'nonce',
     name: 'nonce',
     header: 'Nonce',
     label: 'Nonce',
     sortable: false,
     type: 'value',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
-    key: 'timestamp',
-    name: 'timestamp',
-    header: 'Timestamp',
-    label: 'Timestamp',
-    sortable: false,
-    type: 'timestamp',
     width: '120px',
     textAlign: 'left',
   },
@@ -1290,6 +1061,17 @@ const getTransfersColumns = (): FormField[] => [
     type: 'lognum',
     width: '120px',
     textAlign: 'left',
+  },
+  {
+    key: 'date',
+    name: 'date',
+    header: 'Date',
+    label: 'Date',
+    sortable: false,
+    type: 'datetime',
+    width: '120px',
+    textAlign: 'left',
+    render: renderDate,
   },
   {
     key: 'holder',
@@ -1522,16 +1304,6 @@ const getWithdrawalsColumns = (): FormField[] => [
     textAlign: 'left',
   },
   {
-    key: 'timestamp',
-    name: 'timestamp',
-    header: 'Timestamp',
-    label: 'Timestamp',
-    sortable: false,
-    type: 'timestamp',
-    width: '120px',
-    textAlign: 'left',
-  },
-  {
     key: 'date',
     name: 'date',
     header: 'Date',
@@ -1540,6 +1312,7 @@ const getWithdrawalsColumns = (): FormField[] => [
     type: 'datetime',
     width: '120px',
     textAlign: 'left',
+    render: renderDate,
   },
   {
     key: 'validatorIndex',
@@ -1596,7 +1369,41 @@ export function renderCompressedTx(row: Record<string, unknown>) {
 export function renderDate(row: Record<string, unknown>) {
   if (row != null) {
     // EXISTING_CODE
-    return 'renderDate';
+    var timestamp = row.timestamp as string | number | undefined;
+    if (timestamp === undefined) {
+      if (row.transaction) {
+        const tx = row.transaction as types.Transaction | undefined;
+        if (tx != null) {
+          timestamp = tx.timestamp as string | number | undefined;
+        }
+      }
+    }
+    const blockNumber = row.blockNumber as string | number | undefined;
+    const transactionIndex = row.transactionIndex as
+      | string
+      | number
+      | undefined;
+    const transactionHash = row.transactionHash as string | undefined;
+    const blockHash = row.blockHash as string | undefined;
+    const node = row.node as string | undefined;
+
+    // Format date
+    let dateStr = '';
+    if (timestamp) {
+      const date = new Date(Number(timestamp) * 1000);
+      dateStr = date.toISOString().replace('T', ' ').substring(0, 19);
+    }
+
+    // Compose extra info
+    const parts: string[] = [];
+    if (blockNumber !== undefined) parts.push(`Block: ${blockNumber}`);
+    if (transactionIndex !== undefined)
+      parts.push(`TxIdx: ${transactionIndex}`);
+    if (transactionHash) parts.push(`Tx: ${transactionHash.slice(0, 10)}…`);
+    if (blockHash) parts.push(`BlkHash: ${blockHash.slice(0, 10)}…`);
+    if (node) parts.push(`Node: ${node}`);
+
+    return [dateStr, ...parts].join(' | ');
     // EXISTING_CODE
   }
   return '';

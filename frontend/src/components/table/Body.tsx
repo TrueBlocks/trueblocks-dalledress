@@ -31,6 +31,7 @@ export const Body = <T extends Record<string, unknown>>({
       </tr>
     );
   }
+
   return (
     <>
       {data.map((row, rowIndex) => (
@@ -41,50 +42,29 @@ export const Body = <T extends Record<string, unknown>>({
             aria-selected={selectedRowIndex === rowIndex}
           >
             {columns.map((col) => {
-              const cellClassNames = [
-                col.className || '',
-                typeof col.width === 'string' && col.width.startsWith('col-')
-                  ? col.width
-                  : '',
-              ]
-                .filter(Boolean)
-                .join(' ');
-
               return (
                 <td
                   key={col.key}
-                  className={cellClassNames}
-                  style={
-                    typeof col.width === 'string' &&
-                    col.width.startsWith('col-')
-                      ? { textAlign: col.textAlign || 'left' }
-                      : {
-                          ...(col.width ? { width: col.width } : undefined),
-                          textAlign: col.textAlign || 'left',
-                        }
-                  }
+                  style={{
+                    ...(col.width ? { width: col.width } : undefined),
+                    textAlign: col.textAlign || 'left',
+                  }}
                 >
-                  {col.render
-                    ? col.render(row, rowIndex)
-                    : col.accessor
-                      ? (col.accessor(row) as React.ReactNode)
-                      : col.key !== undefined
-                        ? (() => {
-                            const value = row[col.key as keyof T];
-                            return (
-                              <FieldRenderer
-                                field={
-                                  {
-                                    type: col.type || 'text',
-                                    value: value as string,
-                                  } as FormField<Record<string, unknown>>
-                                }
-                                mode="display"
-                                tableCell={true}
-                              />
-                            );
-                          })()
-                        : null}
+                  <FieldRenderer
+                    field={
+                      {
+                        type: col.type || 'text',
+                        value: (col.key !== undefined
+                          ? row[col.key as keyof T]
+                          : '') as string,
+                        customRender: col.render
+                          ? col.render(row, rowIndex)
+                          : undefined,
+                      } as FormField<Record<string, unknown>>
+                    }
+                    mode="display"
+                    tableCell
+                  />
                 </td>
               );
             })}

@@ -1,7 +1,7 @@
 name    , type   , strDefault, attributes           , upgrades, docOrder, description
-address , address,           , sorts|readOnly       ,         ,        1, Address
-name    , string ,           , sorts                ,         ,        2, Name
-symbol  , string ,           , sorts                ,         ,        3, Symbol
-decimals, int64  ,           , sorts|textAlign=right,         ,        4, Decimals
-source  , string ,           , sorts                ,         ,        5, Source
-tags    , string ,           , sorts                ,         ,        6, Tags
+address , address,           , readOnly       ,         ,        1, Address
+name    , string ,           ,                 ,         ,        2, Name
+symbol  , string ,           ,                 ,         ,        3, Symbol
+decimals, int64  ,           ,                 ,         ,        4, Decimals
+source  , string ,           ,                 ,         ,        5, Source
+tags    , string ,           ,                 ,         ,        6, Tags

@@ -7,7 +7,7 @@ from             , address,           , readOnly    ,             ,         ,
 gasUsed          , gas    ,           ,             ,             ,        4, the amount of gas actually used by the transaction
 effectiveGasPrice, gas    ,           ,             ,             ,         , 
 isError          , bool   ,           ,             ,             ,        5, 
-logs             , []Log  ,           , noui|       ,             ,        6, a possibly empty array of logs
+logs             , []Log  ,           , noui        ,             ,        6, a possibly empty array of logs
 logsBloom        , string ,           , noui|removed,             ,         , 
 status           , value  ,           ,             , 2.5.9:uint32,        7, `1` on transaction suceess&#44; `null` if tx precedes Byzantium&#44; `0` otherwise
 to               , address,           , readOnly    ,             ,         , 

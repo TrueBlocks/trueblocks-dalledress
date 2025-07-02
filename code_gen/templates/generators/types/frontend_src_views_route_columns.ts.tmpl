@@ -47,10 +47,11 @@ const get{{.Name}}Columns = (): FormField[] => [
 {{- if $isRequired}}
     required: true,
 {{- end}}
-    sortable: {{ $isSortable }},
+{{- if $isSortable}}
+    sortable: true,
+{{- end}}
     type: '{{ .UiType }}',
     width: '{{ .Width }}px',
-    textAlign: '{{ .Align }}',
 {{- if $isReadOnly}}
     readOnly: true,
 {{- end}}
@@ -65,7 +66,6 @@ const get{{.Name}}Columns = (): FormField[] => [
     name: 'actions',
     header: 'Actions',
     label: 'Actions',
-    sortable: false,
     editable: false,
     visible: true,
     type: 'button',

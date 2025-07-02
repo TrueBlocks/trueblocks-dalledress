@@ -6,7 +6,15 @@ import { useFiltering } from '@contexts';
 import { Modal } from '@mantine/core';
 import { ViewStateKey } from 'src/contexts/ViewStateKey';
 
-import { Body, Header, Pagination, PerPage, Stats, usePagination } from '.';
+import {
+  Body,
+  Header,
+  Pagination,
+  PerPage,
+  Stats,
+  processColumns,
+  usePagination,
+} from '.';
 import { SearchBox } from './SearchBox';
 import './Table.css';
 
@@ -32,6 +40,8 @@ export const Table = <T extends Record<string, unknown>>({
   validate,
   onModalOpen,
 }: TableProps<T>) => {
+  const processedColumns = processColumns(columns);
+
   const { pagination } = usePagination(viewStateKey);
   const { filter, setFiltering } = useFiltering(viewStateKey);
   const { currentPage, pageSize, totalItems } = pagination;
@@ -224,7 +234,7 @@ export const Table = <T extends Record<string, unknown>>({
             className="data-table"
             style={{ width: '100%', tableLayout: 'fixed' }}
           >
-            <Header columns={columns} viewStateKey={viewStateKey} />
+            <Header columns={processedColumns} viewStateKey={viewStateKey} />
           </table>
         </div>
       </div>
@@ -244,7 +254,7 @@ export const Table = <T extends Record<string, unknown>>({
           style={{ width: '100%', tableLayout: 'fixed' }}
         >
           <colgroup>
-            {columns.map((col) => (
+            {processedColumns.map((col) => (
               <col key={col.key} style={{ width: col.width || 'auto' }} />
             ))}
           </colgroup>
@@ -252,7 +262,7 @@ export const Table = <T extends Record<string, unknown>>({
             {data.length === 0 ? (
               <tr>
                 <td
-                  colSpan={columns.length}
+                  colSpan={processedColumns.length}
                   style={{
                     textAlign: 'left',
                     padding: '20px',
@@ -265,15 +275,13 @@ export const Table = <T extends Record<string, unknown>>({
                 </td>
               </tr>
             ) : (
-              <>
-                <Body
-                  columns={columns}
-                  data={data}
-                  selectedRowIndex={selectedRowIndex}
-                  handleRowClick={handleRowClick}
-                  noDataMessage={loading ? 'Loading...' : 'No data found.'}
-                />
-              </>
+              <Body
+                columns={processColumns(columns)}
+                data={data}
+                selectedRowIndex={selectedRowIndex}
+                handleRowClick={handleRowClick}
+                noDataMessage={loading ? 'Loading...' : 'No data found.'}
+              />
             )}
           </tbody>
         </table>

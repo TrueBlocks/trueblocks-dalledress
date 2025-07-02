@@ -43,13 +43,7 @@ export const Body = <T extends Record<string, unknown>>({
           >
             {columns.map((col) => {
               return (
-                <td
-                  key={col.key}
-                  style={{
-                    ...(col.width ? { width: col.width } : undefined),
-                    textAlign: col.textAlign || 'left',
-                  }}
-                >
+                <td key={col.key} style={col.style}>
                   <FieldRenderer
                     field={
                       {

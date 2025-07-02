@@ -56,6 +56,6 @@ export interface FormField<T = Record<string, unknown>> {
   width?: string | number;
   className?: string;
   sortable?: boolean;
-  textAlign?: 'left' | 'center' | 'right';
+  style?: React.CSSProperties;
   render?: (row: T, rowIndex: number) => ReactNode;
 }

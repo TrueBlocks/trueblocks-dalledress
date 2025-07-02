@@ -9,3 +9,4 @@ export * from './Stats';
 export * from './usePagination';
 export * from './useTableKeys';
 export * from './navigationUtils';
+export * from './processColumns';

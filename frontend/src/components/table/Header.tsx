@@ -49,7 +49,6 @@ export const Header = <T extends Record<string, unknown>>({
           let sortIndicator = '';
           if (col.sortable) {
             if (isSorted) {
-              // Show direction arrow with priority subscript for active sorts
               const arrow = sortInfo.direction === 'asc' ? '↑' : '↓';
               const priority =
                 sortInfo.priority > 1

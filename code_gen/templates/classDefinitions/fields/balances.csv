@@ -1,0 +1,11 @@
+name            , type   , strDefault, attributes                , upgrades, docOrder, description
+blockNumber     , int64  ,           , sorts|textAlign=right     ,         ,        1, Block
+transactionIndex, int64  ,           , sorts|textAlign=right     ,         ,        2, Tx Index
+holder          , address,           , sorts|readOnly            ,         ,        3, Holder
+address         , address,           , sorts|readOnly            ,         ,        4, Token Address
+symbol          , string ,           , sorts                     ,         ,        5, Symbol
+name            , string ,           , sorts                     ,         ,        6, Token Name
+balance         , ether  ,           , sorts|textAlign=right     ,         ,        7, Balance
+priorBalance    , ether  ,           , sorts|calc|textAlign=right,         ,        8, Prior Balance
+decimals        , int64  ,           , sorts|textAlign=right     ,         ,        9, Decimals
+actions         , string ,           , width=120px               ,         ,       10, Actions

@@ -1,0 +1,21 @@
+# {{.Class}} View
+
+// EXISTING_CODE
+This is the help file for the {{.Class}} view.
+// EXISTING_CODE
+
+## Facets:
+
+{{- range .Facets}}
+- {{.Name}} Facet uses {{.Store}} store.
+{{- end}}
+
+## Stores:
+{{range .Stores}}
+- **{{.Name}} Store ({{.NMembers}} members):**
+{{range .Members }}
+  - {{.Name}}: {{.Description}}
+{{- end}}
+{{end}}
+// EXISTING_CODE
+// EXISTING_CODE

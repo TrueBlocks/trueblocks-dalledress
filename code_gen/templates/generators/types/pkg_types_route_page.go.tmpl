@@ -31,7 +31,7 @@ import (
 // TODO: The slices should be slices to pointers{{end}}
 type {{.Class}}Page struct {
 	Facet         types.DataFacet      `json:"facet"`
-	{{range .Stores}}{{.}} []{{if $shouldBePtr}}{{else}}*{{end}}{{toSingular .}} `json:"{{toLower .}}"`
+	{{range .Stores}}{{.Name}} []{{if $shouldBePtr}}{{else}}*{{end}}{{toSingular .Name}} `json:"{{toLower .Name}}"`
 {{end -}}
 	TotalItems    int                  `json:"totalItems"`
 	ExpectedTotal int                  `json:"expectedTotal"`

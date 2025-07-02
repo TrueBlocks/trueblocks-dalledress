@@ -69,7 +69,7 @@ func is{{toSingular .Name}}(item *{{toSingular .Store}}) bool {
 {{end}}
 
 {{range .Stores}}
-func isDup{{toSingular .}}() func(existing []*{{toSingular .}}, newItem *{{toSingular .}}) bool {
+func isDup{{toSingular .Name}}() func(existing []*{{toSingular .Name}}, newItem *{{toSingular .Name}}) bool {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }

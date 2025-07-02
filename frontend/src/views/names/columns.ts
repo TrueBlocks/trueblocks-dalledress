@@ -32,14 +32,16 @@ export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
 
 const getNamesColumns = (): FormField[] => [
   // EXISTING_CODE
+  // EXISTING_CODE
   {
     key: 'address',
     name: 'address',
     header: 'Address',
     label: 'Address',
     sortable: true,
-    type: 'text',
+    type: 'address',
     width: '340px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -47,10 +49,11 @@ const getNamesColumns = (): FormField[] => [
     name: 'name',
     header: 'Name',
     label: 'Name',
+    required: true,
     sortable: true,
     type: 'text',
     width: '200px',
-    required: true,
+    textAlign: 'left',
   },
   {
     key: 'tags',
@@ -60,6 +63,7 @@ const getNamesColumns = (): FormField[] => [
     sortable: true,
     type: 'text',
     width: '150px',
+    textAlign: 'left',
   },
   {
     key: 'source',
@@ -69,6 +73,7 @@ const getNamesColumns = (): FormField[] => [
     sortable: true,
     type: 'text',
     width: '120px',
+    textAlign: 'left',
   },
   {
     key: 'symbol',
@@ -78,6 +83,7 @@ const getNamesColumns = (): FormField[] => [
     sortable: true,
     type: 'text',
     width: '100px',
+    textAlign: 'left',
   },
   {
     key: 'decimals',
@@ -98,9 +104,8 @@ const getNamesColumns = (): FormField[] => [
     editable: false,
     visible: true,
     type: 'button',
-    width: '200px',
+    width: '80px',
   },
-  // EXISTING_CODE
 ];
 
 // EXISTING_CODE

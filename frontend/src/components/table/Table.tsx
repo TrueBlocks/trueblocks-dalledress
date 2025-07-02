@@ -46,6 +46,10 @@ export const Table = <T extends Record<string, unknown>>({
     focusControls,
   } = useTableContext();
 
+  // Refs for header and body scroll containers
+  const headerScrollRef = useRef<HTMLDivElement>(null);
+  const bodyScrollRef = useRef<HTMLDivElement>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRowData, setCurrentRowData] = useState<T | null>(null);
 
@@ -100,6 +104,21 @@ export const Table = <T extends Record<string, unknown>>({
       };
     }
   }, [handleKeyDown, tableRef]);
+
+  // Synchronize header scroll with body scroll
+  useEffect(() => {
+    const bodyScroll = bodyScrollRef.current;
+    const headerScroll = headerScrollRef.current;
+    if (!bodyScroll || !headerScroll) return;
+
+    const handleBodyScroll = () => {
+      headerScroll.scrollLeft = bodyScroll.scrollLeft;
+    };
+    bodyScroll.addEventListener('scroll', handleBodyScroll);
+    return () => {
+      bodyScroll.removeEventListener('scroll', handleBodyScroll);
+    };
+  }, []);
 
   const handleFieldChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -195,16 +214,29 @@ export const Table = <T extends Record<string, unknown>>({
         />
       </div>
 
-      <div className="table-header-container">
-        <table
-          className="data-table"
-          style={{ width: '100%', tableLayout: 'fixed' }}
-        >
-          <Header columns={columns} viewStateKey={viewStateKey} />
-        </table>
+      {/* Synchronized scrollable header */}
+      <div
+        className="table-header-scroll"
+        ref={headerScrollRef}
+        style={{ overflowX: 'auto', overflowY: 'hidden' }}
+      >
+        <div className="table-header-container" style={{ minWidth: '100%' }}>
+          <table
+            className="data-table"
+            style={{ width: '100%', tableLayout: 'fixed' }}
+          >
+            <Header columns={columns} viewStateKey={viewStateKey} />
+          </table>
+        </div>
       </div>
 
-      <div className="table-body-scroll" onClick={focusTable}>
+      {/* Synchronized scrollable body */}
+      <div
+        className="table-body-scroll"
+        ref={bodyScrollRef}
+        onClick={focusTable}
+        style={{ overflowX: 'auto', overflowY: 'auto' }}
+      >
         <table
           className="data-table"
           ref={tableRef}

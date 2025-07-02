@@ -30,14 +30,16 @@ export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
 
 const getBloomsColumns = (): FormField[] => [
   // EXISTING_CODE
+  // EXISTING_CODE
   {
     key: 'range',
     name: 'range',
     header: 'Range',
     label: 'Range',
     sortable: true,
-    type: 'text',
+    type: 'blkrange',
     width: '150px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -47,7 +49,8 @@ const getBloomsColumns = (): FormField[] => [
     label: 'Magic',
     sortable: true,
     type: 'text',
-    width: '120px',
+    width: '150px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -56,8 +59,9 @@ const getBloomsColumns = (): FormField[] => [
     header: 'Hash',
     label: 'Hash',
     sortable: true,
-    type: 'text',
-    width: '300px',
+    type: 'hash',
+    width: '150px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -67,9 +71,9 @@ const getBloomsColumns = (): FormField[] => [
     label: 'Blooms',
     sortable: true,
     type: 'number',
-    width: '100px',
-    readOnly: true,
+    width: '150px',
     textAlign: 'right',
+    readOnly: true,
   },
   {
     key: 'nInserted',
@@ -78,9 +82,9 @@ const getBloomsColumns = (): FormField[] => [
     label: 'Inserted',
     sortable: true,
     type: 'number',
-    width: '100px',
-    readOnly: true,
+    width: '150px',
     textAlign: 'right',
+    readOnly: true,
   },
   {
     key: 'size',
@@ -89,9 +93,9 @@ const getBloomsColumns = (): FormField[] => [
     label: 'Size',
     sortable: true,
     type: 'number',
-    width: '100px',
-    readOnly: true,
+    width: '150px',
     textAlign: 'right',
+    readOnly: true,
   },
   {
     key: 'byteWidth',
@@ -100,14 +104,14 @@ const getBloomsColumns = (): FormField[] => [
     label: 'Byte Width',
     sortable: true,
     type: 'number',
-    width: '110px',
-    readOnly: true,
+    width: '150px',
     textAlign: 'right',
+    readOnly: true,
   },
-  // EXISTING_CODE
 ];
 
 const getIndexColumns = (): FormField[] => [
+  // EXISTING_CODE
   // EXISTING_CODE
   {
     key: 'range',
@@ -115,8 +119,9 @@ const getIndexColumns = (): FormField[] => [
     header: 'Range',
     label: 'Range',
     sortable: true,
-    type: 'text',
+    type: 'blkrange',
     width: '150px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -126,7 +131,8 @@ const getIndexColumns = (): FormField[] => [
     label: 'Magic',
     sortable: true,
     type: 'text',
-    width: '120px',
+    width: '150px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -135,8 +141,9 @@ const getIndexColumns = (): FormField[] => [
     header: 'Hash',
     label: 'Hash',
     sortable: true,
-    type: 'text',
-    width: '300px',
+    type: 'hash',
+    width: '150px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -146,9 +153,9 @@ const getIndexColumns = (): FormField[] => [
     label: 'Addresses',
     sortable: true,
     type: 'number',
-    width: '120px',
-    readOnly: true,
+    width: '150px',
     textAlign: 'right',
+    readOnly: true,
   },
   {
     key: 'nAppearances',
@@ -157,9 +164,9 @@ const getIndexColumns = (): FormField[] => [
     label: 'Appearances',
     sortable: true,
     type: 'number',
-    width: '130px',
-    readOnly: true,
+    width: '150px',
     textAlign: 'right',
+    readOnly: true,
   },
   {
     key: 'size',
@@ -168,14 +175,14 @@ const getIndexColumns = (): FormField[] => [
     label: 'Size',
     sortable: true,
     type: 'number',
-    width: '100px',
-    readOnly: true,
+    width: '150px',
     textAlign: 'right',
+    readOnly: true,
   },
-  // EXISTING_CODE
 ];
 
 const getManifestColumns = (): FormField[] => [
+  // EXISTING_CODE
   // EXISTING_CODE
   {
     key: 'version',
@@ -185,6 +192,7 @@ const getManifestColumns = (): FormField[] => [
     sortable: true,
     type: 'text',
     width: '100px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -195,6 +203,7 @@ const getManifestColumns = (): FormField[] => [
     sortable: true,
     type: 'text',
     width: '100px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -203,14 +212,15 @@ const getManifestColumns = (): FormField[] => [
     header: 'Specification',
     label: 'Specification',
     sortable: true,
-    type: 'text',
-    width: '200px',
+    type: 'ipfshash',
+    width: '100px',
+    textAlign: 'left',
     readOnly: true,
   },
-  // EXISTING_CODE
 ];
 
 const getStatsColumns = (): FormField[] => [
+  // EXISTING_CODE
   // EXISTING_CODE
   {
     key: 'range',
@@ -218,20 +228,21 @@ const getStatsColumns = (): FormField[] => [
     header: 'Range',
     label: 'Range',
     sortable: true,
-    type: 'text',
+    type: 'blkrange',
     width: '150px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
     key: 'nAddrs',
     name: 'nAddrs',
-    header: 'Addresses',
-    label: 'Addresses',
+    header: 'Addrs',
+    label: 'Addrs',
     sortable: true,
     type: 'number',
     width: '120px',
-    readOnly: true,
     textAlign: 'right',
+    readOnly: true,
   },
   {
     key: 'nApps',
@@ -241,8 +252,8 @@ const getStatsColumns = (): FormField[] => [
     sortable: true,
     type: 'number',
     width: '100px',
-    readOnly: true,
     textAlign: 'right',
+    readOnly: true,
   },
   {
     key: 'nBlocks',
@@ -252,43 +263,97 @@ const getStatsColumns = (): FormField[] => [
     sortable: true,
     type: 'number',
     width: '120px',
-    readOnly: true,
     textAlign: 'right',
+    readOnly: true,
   },
   {
-    key: 'nBloomsHit',
-    name: 'nBloomsHit',
-    header: 'Blooms Hit',
-    label: 'Blooms Hit',
+    key: 'nBlooms',
+    name: 'nBlooms',
+    header: 'Blooms',
+    label: 'Blooms',
     sortable: true,
     type: 'number',
     width: '120px',
-    readOnly: true,
     textAlign: 'right',
+    readOnly: true,
   },
   {
-    key: 'nBloomsMiss',
-    name: 'nBloomsMiss',
-    header: 'Blooms Miss',
-    label: 'Blooms Miss',
+    key: 'recWid',
+    name: 'recWid',
+    header: 'Rec Wid',
+    label: 'Rec Wid',
     sortable: true,
     type: 'number',
     width: '120px',
-    readOnly: true,
     textAlign: 'right',
+    readOnly: true,
+  },
+  {
+    key: 'bloomSz',
+    name: 'bloomSz',
+    header: 'Bloom Sz',
+    label: 'Bloom Sz',
+    sortable: true,
+    type: 'number',
+    width: '120px',
+    textAlign: 'right',
+    readOnly: true,
+  },
+  {
+    key: 'chunkSz',
+    name: 'chunkSz',
+    header: 'Chunk Sz',
+    label: 'Chunk Sz',
+    sortable: true,
+    type: 'number',
+    width: '120px',
+    textAlign: 'right',
+    readOnly: true,
+  },
+  {
+    key: 'addrsPerBlock',
+    name: 'addrsPerBlock',
+    header: 'Addrs Per Block',
+    label: 'Addrs Per Block',
+    sortable: true,
+    type: 'float64',
+    width: '100px',
+    textAlign: 'left',
+    readOnly: true,
+  },
+  {
+    key: 'appsPerBlock',
+    name: 'appsPerBlock',
+    header: 'Apps Per Block',
+    label: 'Apps Per Block',
+    sortable: true,
+    type: 'float64',
+    width: '100px',
+    textAlign: 'left',
+    readOnly: true,
+  },
+  {
+    key: 'appsPerAddr',
+    name: 'appsPerAddr',
+    header: 'Apps Per Addr',
+    label: 'Apps Per Addr',
+    sortable: true,
+    type: 'float64',
+    width: '100px',
+    textAlign: 'left',
+    readOnly: true,
   },
   {
     key: 'ratio',
     name: 'ratio',
-    header: 'Hit Ratio',
-    label: 'Hit Ratio',
+    header: 'Ratio',
+    label: 'Ratio',
     sortable: true,
-    type: 'number',
+    type: 'float64',
     width: '100px',
+    textAlign: 'left',
     readOnly: true,
-    textAlign: 'right',
   },
-  // EXISTING_CODE
 ];
 
 // EXISTING_CODE

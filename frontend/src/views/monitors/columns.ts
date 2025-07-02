@@ -24,14 +24,16 @@ export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
 
 const getMonitorsColumns = (): FormField[] => [
   // EXISTING_CODE
+  // EXISTING_CODE
   {
     key: 'address',
     name: 'address',
     header: 'Address',
     label: 'Address',
     sortable: true,
-    type: 'text',
+    type: 'address',
     width: '340px',
+    textAlign: 'left',
     readOnly: true,
   },
   {
@@ -42,6 +44,7 @@ const getMonitorsColumns = (): FormField[] => [
     sortable: true,
     type: 'text',
     width: '200px',
+    textAlign: 'left',
   },
   {
     key: 'nRecords',
@@ -50,7 +53,7 @@ const getMonitorsColumns = (): FormField[] => [
     label: 'Records',
     sortable: true,
     type: 'number',
-    width: '100px',
+    width: '120px',
     textAlign: 'right',
   },
   {
@@ -71,6 +74,7 @@ const getMonitorsColumns = (): FormField[] => [
     sortable: true,
     type: 'checkbox',
     width: '80px',
+    textAlign: 'center',
   },
   {
     key: 'lastScanned',
@@ -78,8 +82,9 @@ const getMonitorsColumns = (): FormField[] => [
     header: 'Last Scanned',
     label: 'Last Scanned',
     sortable: true,
-    type: 'timestamp',
-    width: '140px',
+    type: 'number',
+    width: '120px',
+    textAlign: 'right',
   },
   {
     key: 'actions',
@@ -90,9 +95,8 @@ const getMonitorsColumns = (): FormField[] => [
     editable: false,
     visible: true,
     type: 'button',
-    width: '120px',
+    width: '80px',
   },
-  // EXISTING_CODE
 ];
 
 // EXISTING_CODE

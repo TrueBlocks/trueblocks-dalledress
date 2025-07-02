@@ -1,11 +1,11 @@
-name            ,type        ,strDefault ,attributes      ,docOrder ,description
-name            ,string      ,           ,sorts           ,       1 ,the name of the interface
-type            ,string      ,           ,sorts           ,       2 ,the type of the interface&#44; either 'event' or 'function'
-anonymous       ,bool        ,           ,omitempty       ,         ,
-constant        ,bool        ,           ,omitempty       ,         ,
-stateMutability ,string      ,           ,omitempty|sorts ,         ,
-signature       ,string      ,           ,omitempty|sorts ,       3 ,the canonical signature of the interface
-encoding        ,string      ,           ,sorts           ,       4 ,the signature encoded with keccak
-message         ,string      ,           ,omitempty       ,         ,
-inputs          ,[]Parameter ,           ,                ,       5 ,the input parameters to the function&#44; if any
-outputs         ,[]Parameter ,           ,                ,       6 ,the output parameters to the function&#44; if any
+name           , type       , strDefault, attributes, upgrades, docOrder, description
+encoding       , string     ,           , sorts     ,         ,        1, the signature encoded with keccak
+name           , string     ,           , sorts     ,         ,        2, the name of the interface
+type           , string     ,           , sorts     ,         ,        3, the type of the interface&#44; either 'event' or 'function'
+signature      , string     ,           , sorts     ,         ,        4, the canonical signature of the interface
+anonymous      , bool       ,           , noui      ,         ,        5, 
+constant       , bool       ,           , noui      ,         ,        6, 
+stateMutability, string     ,           , noui|sorts,         ,        7, 
+message        , string     ,           , noui      ,         ,        8, 
+inputs         , []Parameter,           , noui      ,         ,        9, the input parameters to the function&#44; if any
+outputs        , []Parameter,           , noui      ,         ,       10, the output parameters to the function&#44; if any

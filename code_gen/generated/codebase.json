@@ -27,7 +27,7 @@
                         {
                             "name": "address",
                             "type": "address",
-                            "attributes": "sorts",
+                            "attributes": "sorts|width=340|readOnly",
                             "docOrder": 1,
                             "description": "the address for the ABI",
                             "num": 1
@@ -35,70 +35,71 @@
                         {
                             "name": "name",
                             "type": "string",
-                            "attributes": "sorts",
+                            "attributes": "sorts|width=200",
                             "docOrder": 2,
                             "description": "the filename of the ABI (likely the smart contract address)",
                             "num": 2
                         },
                         {
-                            "name": "path",
-                            "type": "string",
-                            "docOrder": 3,
-                            "description": "the folder holding the abi file",
-                            "num": 3
-                        },
-                        {
                             "name": "fileSize",
                             "type": "int64",
                             "attributes": "sorts",
-                            "docOrder": 4,
+                            "docOrder": 3,
                             "description": "the size of this file on disc",
-                            "num": 4
-                        },
-                        {
-                            "name": "lastModDate",
-                            "type": "string",
-                            "attributes": "sorts",
-                            "docOrder": 5,
-                            "description": "the last update date of the file",
-                            "num": 5
-                        },
-                        {
-                            "name": "isKnown",
-                            "type": "bool",
-                            "attributes": "sorts",
-                            "docOrder": 6,
-                            "description": "true if this is the ABI for a known smart contract or protocol",
-                            "num": 6
-                        },
-                        {
-                            "name": "isEmpty",
-                            "type": "bool",
-                            "attributes": "sorts",
-                            "docOrder": 7,
-                            "description": "true if the ABI could not be found (and won't be looked for again)",
-                            "num": 7
+                            "num": 3
                         },
                         {
                             "name": "nFunctions",
                             "type": "int64",
                             "attributes": "sorts",
-                            "docOrder": 8,
-                            "description": "if verbose, the number of functions in the ABI",
-                            "num": 8
+                            "docOrder": 4,
+                            "description": "the number of functions in the ABI",
+                            "num": 4
                         },
                         {
                             "name": "nEvents",
                             "type": "int64",
                             "attributes": "sorts",
+                            "docOrder": 5,
+                            "description": "the number of events in the ABI",
+                            "num": 5
+                        },
+                        {
+                            "name": "path",
+                            "type": "string",
+                            "attributes": "noui",
+                            "docOrder": 6,
+                            "description": "the folder holding the abi file",
+                            "num": 6
+                        },
+                        {
+                            "name": "lastModDate",
+                            "type": "string",
+                            "attributes": "sorts|noui",
+                            "docOrder": 7,
+                            "description": "the last update date of the file",
+                            "num": 7
+                        },
+                        {
+                            "name": "isKnown",
+                            "type": "bool",
+                            "attributes": "sorts|noui",
+                            "docOrder": 8,
+                            "description": "true if this is the ABI for a known smart contract or protocol",
+                            "num": 8
+                        },
+                        {
+                            "name": "isEmpty",
+                            "type": "bool",
+                            "attributes": "sorts|noui",
                             "docOrder": 9,
-                            "description": "if verbose, the number of events in the ABI",
+                            "description": "true if the ABI could not be found (and won't be looked for again)",
                             "num": 9
                         },
                         {
                             "name": "hasConstructor",
                             "type": "bool",
-                            "attributes": "sorts",
+                            "attributes": "sorts|noui",
                             "docOrder": 10,
                             "description": "if verbose and the abi has a constructor, then `true`, else `false`",
                             "num": 10
@@ -106,7 +107,7 @@
                         {
                             "name": "hasFallback",
                             "type": "bool",
-                            "attributes": "sorts",
+                            "attributes": "sorts|noui",
                             "docOrder": 11,
                             "description": "if verbose and the abi has a fallback, then `true`, else `false`",
                             "num": 11
@@ -114,6 +115,7 @@
                         {
                             "name": "functions",
                             "type": "Function",
+                            "attributes": "noui",
                             "docOrder": 12,
                             "description": "the functions for this address",
                             "num": 12,
@@ -156,65 +158,70 @@
                     "disable_go": true,
                     "members": [
                         {
-                            "name": "name",
+                            "name": "encoding",
                             "type": "string",
                             "attributes": "sorts",
                             "docOrder": 1,
-                            "description": "the name of the interface",
+                            "description": "the signature encoded with keccak",
                             "num": 1
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 2,
+                            "description": "the name of the interface",
+                            "num": 2
                         },
                         {
                             "name": "type",
                             "type": "string",
                             "attributes": "sorts",
-                            "docOrder": 2,
+                            "docOrder": 3,
                             "description": "the type of the interface, either 'event' or 'function'",
-                            "num": 2
-                        },
-                        {
-                            "name": "anonymous",
-                            "type": "bool",
-                            "attributes": "omitempty",
                             "num": 3
-                        },
-                        {
-                            "name": "constant",
-                            "type": "bool",
-                            "attributes": "omitempty",
-                            "num": 4
-                        },
-                        {
-                            "name": "stateMutability",
-                            "type": "string",
-                            "attributes": "omitempty|sorts",
-                            "num": 5
                         },
                         {
                             "name": "signature",
                             "type": "string",
-                            "attributes": "omitempty|sorts",
-                            "docOrder": 3,
+                            "attributes": "sorts",
+                            "docOrder": 4,
                             "description": "the canonical signature of the interface",
+                            "num": 4
+                        },
+                        {
+                            "name": "anonymous",
+                            "type": "bool",
+                            "attributes": "noui",
+                            "docOrder": 5,
+                            "num": 5
+                        },
+                        {
+                            "name": "constant",
+                            "type": "bool",
+                            "attributes": "noui",
+                            "docOrder": 6,
                             "num": 6
                         },
                         {
-                            "name": "encoding",
+                            "name": "stateMutability",
                             "type": "string",
-                            "attributes": "sorts",
-                            "docOrder": 4,
-                            "description": "the signature encoded with keccak",
+                            "attributes": "noui|sorts",
+                            "docOrder": 7,
                             "num": 7
                         },
                         {
                             "name": "message",
                             "type": "string",
-                            "attributes": "omitempty",
+                            "attributes": "noui",
+                            "docOrder": 8,
                             "num": 8
                         },
                         {
                             "name": "inputs",
                             "type": "Parameter",
-                            "docOrder": 5,
+                            "attributes": "noui",
+                            "docOrder": 9,
                             "description": "the input parameters to the function, if any",
                             "num": 9,
                             "isArray": true
@@ -222,10 +229,63 @@
                         {
                             "name": "outputs",
                             "type": "Parameter",
-                            "docOrder": 6,
+                            "attributes": "noui",
+                            "docOrder": 10,
                             "description": "the output parameters to the function, if any",
                             "num": 10,
                             "isArray": true
+                        }
+                    ]
+                },
+                {
+                    "class": "Functions",
+                    "doc_group": "05-Other",
+                    "doc_route": "506-function",
+                    "doc_descr": "a human-readable representation of a Solidity function call or event",
+                    "produced_by": "abis,export,transactions,receipts,logs,traces,state,slurp",
+                    "contained_by": "abi, log, receipt, result, slurp, trace, transaction",
+                    "cache_type": "marshal_only",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "address",
+                            "type": "address",
+                            "attributes": "sorts|width=340px|readOnly|textAlign=left",
+                            "docOrder": 1,
+                            "description": "Address",
+                            "num": 1
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "attributes": "sorts|width=200px|textAlign=left",
+                            "docOrder": 2,
+                            "description": "Name",
+                            "num": 2
+                        },
+                        {
+                            "name": "fileSize",
+                            "type": "int64",
+                            "attributes": "sorts|width=120px|textAlign=right",
+                            "docOrder": 3,
+                            "description": "File Size",
+                            "num": 3
+                        },
+                        {
+                            "name": "nFunctions",
+                            "type": "int64",
+                            "attributes": "sorts|width=120px|textAlign=right",
+                            "docOrder": 4,
+                            "description": "Functions",
+                            "num": 4
+                        },
+                        {
+                            "name": "nEvents",
+                            "type": "int64",
+                            "attributes": "sorts|width=120px|textAlign=right",
+                            "docOrder": 5,
+                            "description": "Events",
+                            "num": 5
                         }
                     ]
                 },
@@ -256,41 +316,37 @@
                         {
                             "name": "strDefault",
                             "type": "string",
-                            "attributes": "omitempty",
                             "docOrder": 3,
                             "description": "the default value of this parameter, if any",
                             "num": 3
                         },
                         {
-                            "name": "value",
-                            "type": "string",
-                            "attributes": "omitempty",
-                            "num": 4
-                        },
-                        {
                             "name": "indexed",
                             "type": "bool",
-                            "attributes": "omitempty",
                             "docOrder": 4,
                             "description": "`true` if this parameter is indexed",
-                            "num": 5
+                            "num": 4
                         },
                         {
                             "name": "internalType",
                             "type": "string",
-                            "attributes": "omitempty",
                             "docOrder": 5,
                             "description": "for composite types, the internal type of the parameter",
-                            "num": 6
+                            "num": 5
                         },
                         {
                             "name": "components",
                             "type": "Parameter",
-                            "attributes": "omitempty",
                             "docOrder": 6,
                             "description": "for composite types, the parameters making up the composite",
-                            "num": 7,
+                            "num": 6,
                             "isArray": true
+                        },
+                        {
+                            "name": "value",
+                            "type": "string",
+                            "docOrder": 7,
+                            "num": 7
                         }
                     ]
                 }
@@ -307,6 +363,240 @@
             "capabilities": "code",
             "summary": "Chunks route",
             "productions": [
+                {
+                    "class": "Assets",
+                    "doc_group": "04-Admin",
+                    "doc_route": "409-chunkRecord",
+                    "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+                    "produced_by": "chunks,init,scrape",
+                    "contained_by": "manifest",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "address",
+                            "type": "address",
+                            "attributes": "sorts|readOnly",
+                            "docOrder": 1,
+                            "description": "Address",
+                            "num": 1
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 2,
+                            "description": "Name",
+                            "num": 2
+                        },
+                        {
+                            "name": "symbol",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 3,
+                            "description": "Symbol",
+                            "num": 3
+                        },
+                        {
+                            "name": "decimals",
+                            "type": "int64",
+                            "attributes": "sorts|textAlign=right",
+                            "docOrder": 4,
+                            "description": "Decimals",
+                            "num": 4
+                        },
+                        {
+                            "name": "source",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 5,
+                            "description": "Source",
+                            "num": 5
+                        },
+                        {
+                            "name": "tags",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 6,
+                            "description": "Tags",
+                            "num": 6
+                        }
+                    ]
+                },
+                {
+                    "class": "Balances",
+                    "doc_group": "04-Admin",
+                    "doc_route": "409-chunkRecord",
+                    "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+                    "produced_by": "chunks,init,scrape",
+                    "contained_by": "manifest",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "blockNumber",
+                            "type": "int64",
+                            "attributes": "sorts|textAlign=right",
+                            "docOrder": 1,
+                            "description": "Block",
+                            "num": 1
+                        },
+                        {
+                            "name": "transactionIndex",
+                            "type": "int64",
+                            "attributes": "sorts|textAlign=right",
+                            "docOrder": 2,
+                            "description": "Tx Index",
+                            "num": 2
+                        },
+                        {
+                            "name": "holder",
+                            "type": "address",
+                            "attributes": "sorts|readOnly",
+                            "docOrder": 3,
+                            "description": "Holder",
+                            "num": 3
+                        },
+                        {
+                            "name": "address",
+                            "type": "address",
+                            "attributes": "sorts|readOnly",
+                            "docOrder": 4,
+                            "description": "Token Address",
+                            "num": 4
+                        },
+                        {
+                            "name": "symbol",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 5,
+                            "description": "Symbol",
+                            "num": 5
+                        },
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "attributes": "sorts",
+                            "docOrder": 6,
+                            "description": "Token Name",
+                            "num": 6
+                        },
+                        {
+                            "name": "balance",
+                            "type": "ether",
+                            "attributes": "sorts|textAlign=right",
+                            "docOrder": 7,
+                            "description": "Balance",
+                            "num": 7
+                        },
+                        {
+                            "name": "priorBalance",
+                            "type": "ether",
+                            "attributes": "sorts|calc|textAlign=right",
+                            "docOrder": 8,
+                            "description": "Prior Balance",
+                            "num": 8
+                        },
+                        {
+                            "name": "decimals",
+                            "type": "int64",
+                            "attributes": "sorts|textAlign=right",
+                            "docOrder": 9,
+                            "description": "Decimals",
+                            "num": 9
+                        },
+                        {
+                            "name": "actions",
+                            "type": "string",
+                            "attributes": "width=120px",
+                            "docOrder": 10,
+                            "description": "Actions",
+                            "num": 10
+                        }
+                    ]
+                },
+                {
+                    "class": "Blooms",
+                    "doc_group": "04-Admin",
+                    "doc_route": "412-chunkIndex-blooms",
+                    "doc_descr": "Bloom filter information for a Chunks data facet.",
+                    "produced_by": "chunks",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "range",
+                            "type": "blkrange",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 1,
+                            "description": "the block range (inclusive) covered by this chunk",
+                            "num": 1
+                        },
+                        {
+                            "name": "magic",
+                            "type": "string",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 2,
+                            "description": "an internal use only magic number to indicate file format",
+                            "num": 2
+                        },
+                        {
+                            "name": "hash",
+                            "type": "hash",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 3,
+                            "description": "the hash of the specification under which this chunk was generated",
+                            "num": 3
+                        },
+                        {
+                            "name": "nBlooms",
+                            "type": "uint64",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 4,
+                            "description": "the number of individual bloom filters in this bloom file",
+                            "num": 4
+                        },
+                        {
+                            "name": "nInserted",
+                            "type": "uint64",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 5,
+                            "description": "the number of addresses inserted into the bloom file",
+                            "num": 5
+                        },
+                        {
+                            "name": "size",
+                            "type": "uint64",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 6,
+                            "description": "the size on disc in bytes of this bloom file",
+                            "num": 6
+                        },
+                        {
+                            "name": "byteWidth",
+                            "type": "uint64",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 7,
+                            "description": "the width of the bloom filter",
+                            "num": 7
+                        },
+                        {
+                            "name": "rangeDates",
+                            "type": "RangeDates",
+                            "attributes": "noui|sorts|width=150px|readOnly",
+                            "docOrder": 8,
+                            "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                            "num": 8,
+                            "isPointer": true
+                        }
+                    ]
+                },
+                {
+                    "class": "ChunkRecord",
+                    "doc_group": "04-Admin",
+                    "doc_route": "409-chunkRecord",
+                    "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+                    "produced_by": "chunks,init,scrape",
+                    "contained_by": "manifest",
+                    "disable_go": true
+                },
                 {
                     "class": "Chunks",
                     "doc_group": "04-Admin",
@@ -359,7 +649,7 @@
                         {
                             "name": "rangeDates",
                             "type": "RangeDates",
-                            "attributes": "omitempty",
+                            "attributes": "noui|omitempty",
                             "docOrder": 7,
                             "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
                             "num": 7,
@@ -390,12 +680,426 @@
                     ]
                 },
                 {
+                    "class": "Index",
+                    "doc_group": "04-Admin",
+                    "doc_route": "412-chunkIndex-index",
+                    "doc_descr": "Index information for a Chunks data facet.",
+                    "produced_by": "chunks",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "range",
+                            "type": "blkrange",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 1,
+                            "description": "the block range (inclusive) covered by this chunk",
+                            "num": 1
+                        },
+                        {
+                            "name": "magic",
+                            "type": "string",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 2,
+                            "description": "an internal use only magic number to indicate file format",
+                            "num": 2
+                        },
+                        {
+                            "name": "hash",
+                            "type": "hash",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 3,
+                            "description": "the hash of the specification under which this chunk was generated",
+                            "num": 3
+                        },
+                        {
+                            "name": "nAddresses",
+                            "type": "uint64",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 4,
+                            "description": "the number of addresses in this chunk",
+                            "num": 4
+                        },
+                        {
+                            "name": "nAppearances",
+                            "type": "uint64",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 5,
+                            "description": "the number of appearances in this chunk",
+                            "num": 5
+                        },
+                        {
+                            "name": "size",
+                            "type": "uint64",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 6,
+                            "description": "the size of the chunk in bytes",
+                            "num": 6
+                        },
+                        {
+                            "name": "rangeDates",
+                            "type": "RangeDates",
+                            "attributes": "noui|sorts|width=150px|readOnly",
+                            "docOrder": 7,
+                            "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                            "num": 7,
+                            "isPointer": true
+                        }
+                    ]
+                },
+                {
+                    "class": "Manifest",
+                    "doc_group": "04-Admin",
+                    "doc_route": "412-chunkIndex-manifest",
+                    "doc_descr": "Manifest information for a Chunks data facet.",
+                    "produced_by": "chunks",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "version",
+                            "type": "string",
+                            "attributes": "sorts|width=100px|readOnly",
+                            "docOrder": 1,
+                            "description": "the version string hashed into the chunk data",
+                            "num": 1
+                        },
+                        {
+                            "name": "chain",
+                            "type": "string",
+                            "attributes": "sorts|width=100px|readOnly",
+                            "docOrder": 2,
+                            "description": "the chain to which this manifest belongs",
+                            "num": 2
+                        },
+                        {
+                            "name": "specification",
+                            "type": "ipfshash",
+                            "attributes": "sorts|width=100px|readOnly",
+                            "docOrder": 3,
+                            "description": "IPFS cid of the specification",
+                            "num": 3
+                        },
+                        {
+                            "name": "chunks",
+                            "type": "ChunkRecord",
+                            "attributes": "noui|sorts|width=100px|readOnly",
+                            "docOrder": 4,
+                            "description": "a list of the IPFS hashes of all of the chunks in the unchained index",
+                            "num": 4,
+                            "isArray": true
+                        }
+                    ]
+                },
+                {
                     "class": "RangeDates",
                     "doc_group": "04-Admin",
                     "doc_route": "442-rangeDates",
                     "doc_descr": "shows first and last timestamps and dates for a given block range",
                     "produced_by": "chunks",
                     "disable_go": true
+                },
+                {
+                    "class": "Stats",
+                    "doc_group": "04-Admin",
+                    "doc_route": "412-chunkIndex-stats",
+                    "doc_descr": "Statistics for a Chunks data facet.",
+                    "produced_by": "chunks",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "range",
+                            "type": "blkrange",
+                            "attributes": "sorts|width=150px|readOnly",
+                            "docOrder": 1,
+                            "description": "the block range (inclusive) covered by this chunk",
+                            "num": 1
+                        },
+                        {
+                            "name": "nAddrs",
+                            "type": "uint64",
+                            "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                            "docOrder": 2,
+                            "description": "the number of addresses in the chunk",
+                            "num": 2
+                        },
+                        {
+                            "name": "nApps",
+                            "type": "uint64",
+                            "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                            "docOrder": 3,
+                            "description": "the number of appearances in the chunk",
+                            "num": 3
+                        },
+                        {
+                            "name": "nBlocks",
+                            "type": "uint64",
+                            "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                            "docOrder": 4,
+                            "description": "the number of blocks in the chunk",
+                            "num": 4
+                        },
+                        {
+                            "name": "nBlooms",
+                            "type": "uint64",
+                            "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                            "docOrder": 5,
+                            "description": "the number of bloom filters in the chunk's bloom",
+                            "num": 5
+                        },
+                        {
+                            "name": "recWid",
+                            "type": "uint64",
+                            "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                            "docOrder": 6,
+                            "description": "the record width of a single bloom filter",
+                            "num": 6
+                        },
+                        {
+                            "name": "bloomSz",
+                            "type": "uint64",
+                            "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                            "docOrder": 7,
+                            "description": "the size of the bloom filters on disc in bytes",
+                            "num": 7
+                        },
+                        {
+                            "name": "chunkSz",
+                            "type": "uint64",
+                            "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                            "docOrder": 8,
+                            "description": "the size of the chunks on disc in bytes",
+                            "num": 8
+                        },
+                        {
+                            "name": "addrsPerBlock",
+                            "type": "float64",
+                            "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                            "docOrder": 9,
+                            "description": "the average number of addresses per block",
+                            "num": 9
+                        },
+                        {
+                            "name": "appsPerBlock",
+                            "type": "float64",
+                            "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                            "docOrder": 10,
+                            "description": "the average number of appearances per block",
+                            "num": 10
+                        },
+                        {
+                            "name": "appsPerAddr",
+                            "type": "float64",
+                            "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                            "docOrder": 11,
+                            "description": "the average number of appearances per address",
+                            "num": 11
+                        },
+                        {
+                            "name": "ratio",
+                            "type": "float64",
+                            "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                            "docOrder": 12,
+                            "description": "the ratio of appearances to addresses",
+                            "num": 12
+                        },
+                        {
+                            "name": "rangeDates",
+                            "type": "RangeDates",
+                            "attributes": "noui|sorts|omitempty",
+                            "docOrder": 13,
+                            "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                            "num": 13,
+                            "isPointer": true
+                        }
+                    ]
+                },
+                {
+                    "class": "Traces",
+                    "doc_group": "04-Admin",
+                    "doc_route": "409-chunkRecord",
+                    "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+                    "produced_by": "chunks,init,scrape",
+                    "contained_by": "manifest",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "blockHash",
+                            "type": "hash",
+                            "docOrder": 1,
+                            "description": "the hash of the block containing this trace",
+                            "num": 1
+                        },
+                        {
+                            "name": "blockNumber",
+                            "type": "blknum",
+                            "docOrder": 2,
+                            "description": "the number of the block",
+                            "num": 2
+                        },
+                        {
+                            "name": "timestamp",
+                            "type": "timestamp",
+                            "docOrder": 3,
+                            "description": "the timestamp of the block",
+                            "num": 3
+                        },
+                        {
+                            "name": "date",
+                            "type": "datetime",
+                            "attributes": "omitempty|calc",
+                            "docOrder": 4,
+                            "description": "the timestamp as a date",
+                            "num": 4
+                        },
+                        {
+                            "name": "transactionHash",
+                            "type": "hash",
+                            "docOrder": 5,
+                            "description": "the transaction's hash containing this trace",
+                            "num": 5
+                        },
+                        {
+                            "name": "transactionIndex",
+                            "type": "txnum",
+                            "docOrder": 6,
+                            "description": "the zero-indexed position of the transaction in the block",
+                            "num": 6
+                        },
+                        {
+                            "name": "subtraces",
+                            "type": "uint64",
+                            "docOrder": 7,
+                            "description": "the number of children traces that the trace hash",
+                            "num": 7
+                        },
+                        {
+                            "name": "type",
+                            "type": "string",
+                            "attributes": "omitempty",
+                            "docOrder": 8,
+                            "description": "the type of the trace",
+                            "num": 8
+                        },
+                        {
+                            "name": "compressedTrace",
+                            "type": "string",
+                            "attributes": "calc",
+                            "docOrder": 9,
+                            "upgrades": "2.5.10:string",
+                            "description": "a compressed string version of the articulated trace",
+                            "num": 9
+                        },
+                        {
+                            "name": "error",
+                            "type": "string",
+                            "attributes": "omitempty",
+                            "docOrder": 10,
+                            "num": 10
+                        },
+                        {
+                            "name": "traceAddress",
+                            "type": "uint64",
+                            "attributes": "noui|",
+                            "docOrder": 11,
+                            "description": "a particular trace's address in the trace tree",
+                            "num": 11,
+                            "isArray": true
+                        },
+                        {
+                            "name": "action",
+                            "type": "TraceAction",
+                            "attributes": "noui|",
+                            "docOrder": 12,
+                            "description": "the trace action for this trace",
+                            "num": 12,
+                            "isPointer": true
+                        },
+                        {
+                            "name": "result",
+                            "type": "TraceResult",
+                            "attributes": "noui|",
+                            "docOrder": 13,
+                            "description": "the trace result of this trace",
+                            "num": 13,
+                            "isPointer": true
+                        },
+                        {
+                            "name": "articulatedTrace",
+                            "type": "Function",
+                            "attributes": "noui|omitempty",
+                            "docOrder": 14,
+                            "description": "human readable version of the trace action input data",
+                            "num": 14,
+                            "isPointer": true
+                        }
+                    ]
+                },
+                {
+                    "class": "Withdrawals",
+                    "doc_group": "04-Admin",
+                    "doc_route": "409-chunkRecord",
+                    "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+                    "produced_by": "chunks,init,scrape",
+                    "contained_by": "manifest",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "address",
+                            "type": "address",
+                            "attributes": "readOnly",
+                            "docOrder": 1,
+                            "description": "the recipient for the withdrawn ether",
+                            "num": 1
+                        },
+                        {
+                            "name": "amount",
+                            "type": "wei",
+                            "docOrder": 2,
+                            "description": "a nonzero amount of ether given in gwei (1e9 wei)",
+                            "num": 2
+                        },
+                        {
+                            "name": "ether",
+                            "type": "ether",
+                            "docOrder": 3,
+                            "description": "if --ether is specified, the amount in ether",
+                            "num": 3
+                        },
+                        {
+                            "name": "blockNumber",
+                            "type": "blknum",
+                            "docOrder": 4,
+                            "description": "the number of this block",
+                            "num": 4
+                        },
+                        {
+                            "name": "index",
+                            "type": "value",
+                            "docOrder": 5,
+                            "description": "a monotonically increasing zero-based index that increments by 1 per withdrawal to uniquely identify each withdrawal",
+                            "num": 5
+                        },
+                        {
+                            "name": "timestamp",
+                            "type": "timestamp",
+                            "docOrder": 6,
+                            "description": "the timestamp for this block",
+                            "num": 6
+                        },
+                        {
+                            "name": "date",
+                            "type": "datetime",
+                            "docOrder": 7,
+                            "description": "the timestamp as a date",
+                            "num": 7
+                        },
+                        {
+                            "name": "validatorIndex",
+                            "type": "value",
+                            "docOrder": 8,
+                            "description": "the validator_index of the validator on the consensus layer the withdrawal corresponds to",
+                            "num": 8
+                        }
+                    ]
                 }
             ]
         },
@@ -462,7 +1166,7 @@
                         {
                             "name": "rangeDates",
                             "type": "RangeDates",
-                            "attributes": "omitempty",
+                            "attributes": "noui|omitempty",
                             "docOrder": 7,
                             "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
                             "num": 7,
@@ -541,7 +1245,7 @@
                         {
                             "name": "address",
                             "type": "address",
-                            "attributes": "sorts",
+                            "attributes": "sorts|width=340|readOnly",
                             "docOrder": 1,
                             "description": "the address of this monitor",
                             "num": 1
@@ -549,9 +1253,10 @@
                         {
                             "name": "name",
                             "type": "string",
+                            "attributes": "sorts|width=200",
                             "docOrder": 2,
                             "description": "the name of this monitor (if any)",
-                            "num": 8
+                            "num": 2
                         },
                         {
                             "name": "nRecords",
@@ -559,7 +1264,7 @@
                             "attributes": "sorts",
                             "docOrder": 3,
                             "description": "the number of appearances for this monitor",
-                            "num": 7
+                            "num": 3
                         },
                         {
                             "name": "fileSize",
@@ -567,41 +1272,39 @@
                             "attributes": "sorts",
                             "docOrder": 4,
                             "description": "the size of this monitor on disc",
+                            "num": 4
+                        },
+                        {
+                            "name": "isEmpty",
+                            "type": "bool",
+                            "attributes": "sorts",
+                            "docOrder": 5,
+                            "description": "true if the monitor has no appearances",
                             "num": 5
                         },
                         {
                             "name": "lastScanned",
                             "type": "uint32",
                             "attributes": "sorts",
-                            "docOrder": 5,
+                            "docOrder": 6,
                             "description": "the last scanned block number",
                             "num": 6
                         },
                         {
-                            "name": "isEmpty",
+                            "name": "deleted",
                             "type": "bool",
-                            "attributes": "sorts",
-                            "docOrder": 6,
-                            "upgrades": "\u003e3.1.2:bool",
-                            "description": "`true` if the monitor has no appearances, `false` otherwise",
-                            "num": 3
+                            "attributes": "sorts|noui",
+                            "docOrder": 7,
+                            "description": "if this monitor has been deleted, `false` otherwise",
+                            "num": 7
                         },
                         {
                             "name": "isStaged",
                             "type": "bool",
-                            "attributes": "sorts",
-                            "docOrder": 7,
-                            "upgrades": "\u003e3.1.2:bool",
-                            "description": "`true` if the monitor file in on the stage, `false` otherwise",
-                            "num": 4
-                        },
-                        {
-                            "name": "deleted",
-                            "type": "bool",
-                            "attributes": "sorts",
+                            "attributes": "sorts|noui",
                             "docOrder": 8,
-                            "description": "`true` if this monitor has been deleted, `false` otherwise",
-                            "num": 2
+                            "description": "if the monitor file in on the stage, `false` otherwise",
+                            "num": 8
                         }
                     ],
                     "facets": [
@@ -637,100 +1340,100 @@
                     "produced_by": "names",
                     "members": [
                         {
-                            "name": "tags",
-                            "type": "string",
-                            "attributes": "sorts",
-                            "docOrder": 1,
-                            "description": "colon separated list of tags",
-                            "num": 1
-                        },
-                        {
                             "name": "address",
                             "type": "address",
-                            "attributes": "sorts",
-                            "docOrder": 2,
+                            "attributes": "sorts|width=340|readOnly",
+                            "docOrder": 1,
                             "description": "the address associated with this name",
-                            "num": 2
+                            "num": 1
                         },
                         {
                             "name": "name",
                             "type": "string",
-                            "attributes": "sorts",
-                            "docOrder": 3,
-                            "description": "the name associated with this address (retrieved from on-chain data if available)",
-                            "num": 3
+                            "attributes": "sorts|required",
+                            "docOrder": 2,
+                            "description": "the name associated with this address",
+                            "num": 2
                         },
                         {
-                            "name": "symbol",
+                            "name": "tags",
                             "type": "string",
-                            "attributes": "sorts",
-                            "docOrder": 4,
-                            "description": "the symbol for this address (retrieved from on-chain data if available)",
-                            "num": 4
+                            "attributes": "sorts|width=150",
+                            "docOrder": 3,
+                            "description": "colon separated list of tags",
+                            "num": 3
                         },
                         {
                             "name": "source",
                             "type": "string",
-                            "attributes": "sorts",
+                            "attributes": "sorts|width=120",
+                            "docOrder": 4,
+                            "description": "user supplied source of where this name was found",
+                            "num": 4
+                        },
+                        {
+                            "name": "symbol",
+                            "type": "string",
+                            "attributes": "sorts|width=100",
                             "docOrder": 5,
-                            "description": "user supplied source of where this name was found (or on-chain if name is on-chain)",
+                            "description": "the symbol for this address",
                             "num": 5
                         },
                         {
                             "name": "decimals",
                             "type": "uint64",
-                            "attributes": "sorts",
+                            "attributes": "sorts|width=100",
                             "docOrder": 6,
-                            "description": "number of decimals retrieved from an ERC20 smart contract, defaults to 18",
+                            "description": "number of decimals retrieved from an ERC20 smart contract",
                             "num": 6
                         },
                         {
                             "name": "deleted",
                             "type": "bool",
-                            "attributes": "omitempty|sorts",
+                            "attributes": "noui|sorts",
                             "docOrder": 7,
-                            "description": "`true` if deleted, `false` otherwise",
-                            "num": 12
+                            "description": "if deleted",
+                            "num": 7
                         },
                         {
                             "name": "isCustom",
                             "type": "bool",
-                            "attributes": "omitempty|sorts",
+                            "attributes": "noui|sorts",
                             "docOrder": 8,
-                            "description": "`true` if the address is a custom address, `false` otherwise",
-                            "num": 7
+                            "description": "if the address is a custom address",
+                            "num": 8
                         },
                         {
                             "name": "isPrefund",
                             "type": "bool",
-                            "attributes": "omitempty|sorts",
+                            "attributes": "noui|sorts",
                             "docOrder": 9,
-                            "description": "`true` if the address was one of the prefund addresses, `false` otherwise",
-                            "num": 8
+                            "description": "if the address was one of the prefund addresses, `false` otherwise",
+                            "num": 9
                         },
                         {
                             "name": "isContract",
                             "type": "bool",
-                            "attributes": "omitempty|sorts",
+                            "attributes": "noui|sorts",
                             "docOrder": 10,
-                            "description": "`true` if the address is a smart contract, `false` otherwise",
-                            "num": 9
+                            "description": "if the address is a smart contract",
+                            "num": 10
                         },
                         {
                             "name": "isErc20",
                             "type": "bool",
-                            "attributes": "omitempty|sorts",
+                            "attributes": "noui|sorts",
                             "docOrder": 11,
-                            "description": "`true` if the address is an ERC20, `false` otherwise",
-                            "num": 10
+                            "description": "if the address is an ERC20",
+                            "num": 11
                         },
                         {
                             "name": "isErc721",
                             "type": "bool",
-                            "attributes": "omitempty|sorts",
+                            "attributes": "noui|sorts",
                             "docOrder": 12,
-                            "description": "`true` if the address is an ERC720, `false` otherwise",
-                            "num": 11
+                            "description": "if the address is an ERC720",
+                            "num": 12
                         }
                     ],
                     "facets": [
@@ -782,7 +1485,7 @@
                 {
                     "name": "address",
                     "type": "address",
-                    "attributes": "sorts",
+                    "attributes": "sorts|width=340|readOnly",
                     "docOrder": 1,
                     "description": "the address of this monitor",
                     "num": 1
@@ -790,9 +1493,10 @@
                 {
                     "name": "name",
                     "type": "string",
+                    "attributes": "sorts|width=200",
                     "docOrder": 2,
                     "description": "the name of this monitor (if any)",
-                    "num": 8
+                    "num": 2
                 },
                 {
                     "name": "nRecords",
@@ -800,7 +1504,7 @@
                     "attributes": "sorts",
                     "docOrder": 3,
                     "description": "the number of appearances for this monitor",
-                    "num": 7
+                    "num": 3
                 },
                 {
                     "name": "fileSize",
@@ -808,41 +1512,39 @@
                     "attributes": "sorts",
                     "docOrder": 4,
                     "description": "the size of this monitor on disc",
+                    "num": 4
+                },
+                {
+                    "name": "isEmpty",
+                    "type": "bool",
+                    "attributes": "sorts",
+                    "docOrder": 5,
+                    "description": "true if the monitor has no appearances",
                     "num": 5
                 },
                 {
                     "name": "lastScanned",
                     "type": "uint32",
                     "attributes": "sorts",
-                    "docOrder": 5,
+                    "docOrder": 6,
                     "description": "the last scanned block number",
                     "num": 6
                 },
                 {
-                    "name": "isEmpty",
+                    "name": "deleted",
                     "type": "bool",
-                    "attributes": "sorts",
-                    "docOrder": 6,
-                    "upgrades": "\u003e3.1.2:bool",
-                    "description": "`true` if the monitor has no appearances, `false` otherwise",
-                    "num": 3
+                    "attributes": "sorts|noui",
+                    "docOrder": 7,
+                    "description": "if this monitor has been deleted, `false` otherwise",
+                    "num": 7
                 },
                 {
                     "name": "isStaged",
                     "type": "bool",
-                    "attributes": "sorts",
-                    "docOrder": 7,
-                    "upgrades": "\u003e3.1.2:bool",
-                    "description": "`true` if the monitor file in on the stage, `false` otherwise",
-                    "num": 4
-                },
-                {
-                    "name": "deleted",
-                    "type": "bool",
-                    "attributes": "sorts",
+                    "attributes": "sorts|noui",
                     "docOrder": 8,
-                    "description": "`true` if this monitor has been deleted, `false` otherwise",
-                    "num": 2
+                    "description": "if the monitor file in on the stage, `false` otherwise",
+                    "num": 8
                 }
             ],
             "facets": [
@@ -865,100 +1567,100 @@
             "produced_by": "names",
             "members": [
                 {
-                    "name": "tags",
-                    "type": "string",
-                    "attributes": "sorts",
-                    "docOrder": 1,
-                    "description": "colon separated list of tags",
-                    "num": 1
-                },
-                {
                     "name": "address",
                     "type": "address",
-                    "attributes": "sorts",
-                    "docOrder": 2,
+                    "attributes": "sorts|width=340|readOnly",
+                    "docOrder": 1,
                     "description": "the address associated with this name",
-                    "num": 2
+                    "num": 1
                 },
                 {
                     "name": "name",
                     "type": "string",
-                    "attributes": "sorts",
-                    "docOrder": 3,
-                    "description": "the name associated with this address (retrieved from on-chain data if available)",
-                    "num": 3
+                    "attributes": "sorts|required",
+                    "docOrder": 2,
+                    "description": "the name associated with this address",
+                    "num": 2
                 },
                 {
-                    "name": "symbol",
+                    "name": "tags",
                     "type": "string",
-                    "attributes": "sorts",
-                    "docOrder": 4,
-                    "description": "the symbol for this address (retrieved from on-chain data if available)",
-                    "num": 4
+                    "attributes": "sorts|width=150",
+                    "docOrder": 3,
+                    "description": "colon separated list of tags",
+                    "num": 3
                 },
                 {
                     "name": "source",
                     "type": "string",
-                    "attributes": "sorts",
+                    "attributes": "sorts|width=120",
+                    "docOrder": 4,
+                    "description": "user supplied source of where this name was found",
+                    "num": 4
+                },
+                {
+                    "name": "symbol",
+                    "type": "string",
+                    "attributes": "sorts|width=100",
                     "docOrder": 5,
-                    "description": "user supplied source of where this name was found (or on-chain if name is on-chain)",
+                    "description": "the symbol for this address",
                     "num": 5
                 },
                 {
                     "name": "decimals",
                     "type": "uint64",
-                    "attributes": "sorts",
+                    "attributes": "sorts|width=100",
                     "docOrder": 6,
-                    "description": "number of decimals retrieved from an ERC20 smart contract, defaults to 18",
+                    "description": "number of decimals retrieved from an ERC20 smart contract",
                     "num": 6
                 },
                 {
                     "name": "deleted",
                     "type": "bool",
-                    "attributes": "omitempty|sorts",
+                    "attributes": "noui|sorts",
                     "docOrder": 7,
-                    "description": "`true` if deleted, `false` otherwise",
-                    "num": 12
+                    "description": "if deleted",
+                    "num": 7
                 },
                 {
                     "name": "isCustom",
                     "type": "bool",
-                    "attributes": "omitempty|sorts",
+                    "attributes": "noui|sorts",
                     "docOrder": 8,
-                    "description": "`true` if the address is a custom address, `false` otherwise",
-                    "num": 7
+                    "description": "if the address is a custom address",
+                    "num": 8
                 },
                 {
                     "name": "isPrefund",
                     "type": "bool",
-                    "attributes": "omitempty|sorts",
+                    "attributes": "noui|sorts",
                     "docOrder": 9,
-                    "description": "`true` if the address was one of the prefund addresses, `false` otherwise",
-                    "num": 8
+                    "description": "if the address was one of the prefund addresses, `false` otherwise",
+                    "num": 9
                 },
                 {
                     "name": "isContract",
                     "type": "bool",
-                    "attributes": "omitempty|sorts",
+                    "attributes": "noui|sorts",
                     "docOrder": 10,
-                    "description": "`true` if the address is a smart contract, `false` otherwise",
-                    "num": 9
+                    "description": "if the address is a smart contract",
+                    "num": 10
                 },
                 {
                     "name": "isErc20",
                     "type": "bool",
-                    "attributes": "omitempty|sorts",
+                    "attributes": "noui|sorts",
                     "docOrder": 11,
-                    "description": "`true` if the address is an ERC20, `false` otherwise",
-                    "num": 10
+                    "description": "if the address is an ERC20",
+                    "num": 11
                 },
                 {
                     "name": "isErc721",
                     "type": "bool",
-                    "attributes": "omitempty|sorts",
+                    "attributes": "noui|sorts",
                     "docOrder": 12,
-                    "description": "`true` if the address is an ERC720, `false` otherwise",
-                    "num": 11
+                    "description": "if the address is an ERC720",
+                    "num": 12
                 }
             ],
             "facets": [
@@ -992,6 +1694,1286 @@
                     "name": "Baddress",
                     "store": "Names",
                     "cruds": null
+                }
+            ]
+        },
+        {
+            "class": "Statements",
+            "doc_group": "01-Accounts",
+            "doc_route": "118-statement",
+            "doc_descr": "a statement, including all inflows and outflows, for a single transfer of an asset (including ETH) to or from a given address",
+            "produced_by": "export",
+            "contained_by": "transaction",
+            "cache_as": "group",
+            "cache_by": "statement",
+            "cache_type": "cacheable",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "docOrder": 1,
+                    "description": "the number of the block",
+                    "num": 1
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "docOrder": 2,
+                    "description": "the zero-indexed position of the transaction in the block",
+                    "num": 2
+                },
+                {
+                    "name": "logIndex",
+                    "type": "lognum",
+                    "docOrder": 3,
+                    "description": "the zero-indexed position the log in the block, if applicable",
+                    "num": 3
+                },
+                {
+                    "name": "transactionHash",
+                    "type": "hash",
+                    "docOrder": 4,
+                    "description": "the hash of the transaction that triggered this reconciliation",
+                    "num": 4
+                },
+                {
+                    "name": "timestamp",
+                    "type": "timestamp",
+                    "docOrder": 5,
+                    "description": "the Unix timestamp of the object",
+                    "num": 5
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "docOrder": 6,
+                    "description": "the timestamp as a date",
+                    "num": 6
+                },
+                {
+                    "name": "asset",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 7,
+                    "description": "0xeeee...eeee for ETH reconciliations, the token address otherwise",
+                    "num": 7
+                },
+                {
+                    "name": "symbol",
+                    "type": "string",
+                    "docOrder": 8,
+                    "description": "either ETH, WEI, or the symbol of the asset being reconciled as extracted from the chain",
+                    "num": 8
+                },
+                {
+                    "name": "decimals",
+                    "type": "value",
+                    "docOrder": 9,
+                    "description": "the value of `decimals` from an ERC20 contract or, if ETH or WEI, then 18",
+                    "num": 9
+                },
+                {
+                    "name": "spotPrice",
+                    "type": "float",
+                    "docOrder": 10,
+                    "description": "the on-chain price in USD (or if a token in ETH, or zero) at the time of the transaction",
+                    "num": 10
+                },
+                {
+                    "name": "priceSource",
+                    "type": "string",
+                    "docOrder": 11,
+                    "description": "the on-chain source from which the spot price was taken",
+                    "num": 11
+                },
+                {
+                    "name": "accountedFor",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 12,
+                    "description": "the address being accounted for in this reconciliation",
+                    "num": 12
+                },
+                {
+                    "name": "sender",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 13,
+                    "description": "the initiator of the transfer (the sender)",
+                    "num": 13
+                },
+                {
+                    "name": "recipient",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 14,
+                    "description": "the receiver of the transfer (the recipient)",
+                    "num": 14
+                },
+                {
+                    "name": "begBal",
+                    "type": "int256",
+                    "docOrder": 15,
+                    "description": "the on-chain or running beginning balance prior to the transaction (see notes about intra-block reconciliations)",
+                    "num": 15
+                },
+                {
+                    "name": "amountNet",
+                    "type": "int256",
+                    "attributes": "calc",
+                    "docOrder": 16,
+                    "description": "totalIn - totalOut",
+                    "num": 16
+                },
+                {
+                    "name": "endBal",
+                    "type": "int256",
+                    "docOrder": 17,
+                    "description": "the on-chain or running balance after the transaction (see notes about intra-block reconciliations)",
+                    "num": 17
+                },
+                {
+                    "name": "reconciled",
+                    "type": "bool",
+                    "docOrder": 18,
+                    "description": "true if `endBal === endBalCalc` and `begBal === prevBal`. `false` otherwise.",
+                    "num": 18
+                },
+                {
+                    "name": "totalIn",
+                    "type": "int256",
+                    "docOrder": 19,
+                    "description": "the sum of the following `In` fields",
+                    "num": 19
+                },
+                {
+                    "name": "amountIn",
+                    "type": "int256",
+                    "docOrder": 20,
+                    "description": "the top-level value of the incoming transfer for the accountedFor address",
+                    "num": 20
+                },
+                {
+                    "name": "internalIn",
+                    "type": "int256",
+                    "docOrder": 21,
+                    "description": "the internal value of the incoming transfer for the accountedFor address",
+                    "num": 21
+                },
+                {
+                    "name": "selfDestructIn",
+                    "type": "int256",
+                    "docOrder": 22,
+                    "description": "the incoming value of a self-destruct if recipient is the accountedFor address",
+                    "num": 22
+                },
+                {
+                    "name": "minerBaseRewardIn",
+                    "type": "int256",
+                    "docOrder": 23,
+                    "description": "the base fee reward if the miner is the accountedFor address",
+                    "num": 23
+                },
+                {
+                    "name": "minerNephewRewardIn",
+                    "type": "int256",
+                    "docOrder": 24,
+                    "description": "the nephew reward if the miner is the accountedFor address",
+                    "num": 24
+                },
+                {
+                    "name": "minerTxFeeIn",
+                    "type": "int256",
+                    "docOrder": 25,
+                    "description": "the transaction fee reward if the miner is the accountedFor address",
+                    "num": 25
+                },
+                {
+                    "name": "minerUncleRewardIn",
+                    "type": "int256",
+                    "docOrder": 26,
+                    "description": "the uncle reward if the miner who won the uncle block is the accountedFor address",
+                    "num": 26
+                },
+                {
+                    "name": "correctBegBalIn",
+                    "type": "int256",
+                    "docOrder": 27,
+                    "description": "for unreconciled transfers, increase in beginning balance need to match previous balance",
+                    "num": 27
+                },
+                {
+                    "name": "correctAmountIn",
+                    "type": "int256",
+                    "docOrder": 28,
+                    "description": "for unreconciled transfers, increase in the amount of a transfer",
+                    "num": 28
+                },
+                {
+                    "name": "correctEndBalIn",
+                    "type": "int256",
+                    "docOrder": 29,
+                    "description": "for unreconciled transfers, increase in ending balance need to match running balance or block balance",
+                    "num": 29
+                },
+                {
+                    "name": "prefundIn",
+                    "type": "int256",
+                    "docOrder": 30,
+                    "description": "at block zero (0) only, the amount of genesis income for the accountedFor address",
+                    "num": 30
+                },
+                {
+                    "name": "totalOut",
+                    "type": "int256",
+                    "docOrder": 31,
+                    "description": "the sum of the following `Out` fields",
+                    "num": 31
+                },
+                {
+                    "name": "amountOut",
+                    "type": "int256",
+                    "docOrder": 32,
+                    "description": "the amount (in units of the asset) of regular outflow during this transaction",
+                    "num": 32
+                },
+                {
+                    "name": "internalOut",
+                    "type": "int256",
+                    "docOrder": 33,
+                    "description": "the value of any internal value transfers out of the accountedFor account",
+                    "num": 33
+                },
+                {
+                    "name": "correctBegBalOut",
+                    "type": "int256",
+                    "docOrder": 34,
+                    "description": "for unreconciled transfers, decrease in beginning balance need to match previous balance",
+                    "num": 34
+                },
+                {
+                    "name": "correctAmountOut",
+                    "type": "int256",
+                    "docOrder": 35,
+                    "description": "for unreconciled transfers, decrease in the amount of a transfer",
+                    "num": 35
+                },
+                {
+                    "name": "correctEndBalOut",
+                    "type": "int256",
+                    "docOrder": 36,
+                    "description": "for unreconciled transfers, decrease in ending balance need to match running balance or block balance",
+                    "num": 36
+                },
+                {
+                    "name": "selfDestructOut",
+                    "type": "int256",
+                    "docOrder": 37,
+                    "description": "the value of the self-destructed value out if the accountedFor address was self-destructed",
+                    "num": 37
+                },
+                {
+                    "name": "gasOut",
+                    "type": "int256",
+                    "docOrder": 38,
+                    "description": "if the transaction's original sender is the accountedFor address, the amount of gas expended",
+                    "num": 38
+                },
+                {
+                    "name": "prevBal",
+                    "type": "int256",
+                    "docOrder": 39,
+                    "description": "the account balance for the given asset for the previous reconciliation",
+                    "num": 39
+                },
+                {
+                    "name": "begBalDiff",
+                    "type": "int256",
+                    "docOrder": 40,
+                    "description": "difference between expected beginning balance and balance at last reconciliation, if non-zero, the reconciliation failed",
+                    "num": 40
+                },
+                {
+                    "name": "endBalDiff",
+                    "type": "int256",
+                    "docOrder": 41,
+                    "description": "endBal - endBalCalc, if non-zero, the reconciliation failed",
+                    "num": 41
+                },
+                {
+                    "name": "endBalCalc",
+                    "type": "int256",
+                    "docOrder": 42,
+                    "description": "begBal + amountNet",
+                    "num": 42
+                },
+                {
+                    "name": "correctingReasons",
+                    "type": "string",
+                    "docOrder": 43,
+                    "description": "for unreconciled transfers, the reasons for the correcting entries, if any",
+                    "num": 43
+                }
+            ]
+        },
+        {
+            "class": "Transfers",
+            "doc_group": "01-Accounts",
+            "doc_route": "121-transfer",
+            "doc_descr": "a movement of an asset from one address to another (derived from a transaction or a log)",
+            "produced_by": "export",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "docOrder": 1,
+                    "description": "the number of the block",
+                    "num": 1
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "docOrder": 2,
+                    "description": "the zero-indexed position of the transaction in the block",
+                    "num": 2
+                },
+                {
+                    "name": "logIndex",
+                    "type": "lognum",
+                    "docOrder": 3,
+                    "description": "the zero-indexed position the log in the block, if applicable",
+                    "num": 3
+                },
+                {
+                    "name": "holder",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 4,
+                    "description": "the address of the holder of the asset",
+                    "num": 4
+                },
+                {
+                    "name": "asset",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 5,
+                    "description": "0xeeee...eeee for ETH transfers, the token address otherwise",
+                    "num": 5
+                },
+                {
+                    "name": "decimals",
+                    "type": "uint64",
+                    "docOrder": 6,
+                    "description": "the number of decimal places in the asset units",
+                    "num": 6
+                },
+                {
+                    "name": "sender",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 7,
+                    "description": "the initiator of the transfer (the sender)",
+                    "num": 7
+                },
+                {
+                    "name": "recipient",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 8,
+                    "description": "the receiver of the transfer (the recipient)",
+                    "num": 8
+                },
+                {
+                    "name": "amountIn",
+                    "type": "int256",
+                    "docOrder": 9,
+                    "description": "the top-level value of the incoming transfer for the holder address",
+                    "num": 9
+                },
+                {
+                    "name": "internalIn",
+                    "type": "int256",
+                    "docOrder": 10,
+                    "description": "the internal value of the incoming transfer for the holder address",
+                    "num": 10
+                },
+                {
+                    "name": "minerBaseRewardIn",
+                    "type": "int256",
+                    "docOrder": 11,
+                    "description": "the base fee reward if the miner is the holder address",
+                    "num": 11
+                },
+                {
+                    "name": "minerNephewRewardIn",
+                    "type": "int256",
+                    "docOrder": 12,
+                    "description": "the nephew reward if the miner is the holder address",
+                    "num": 12
+                },
+                {
+                    "name": "minerTxFeeIn",
+                    "type": "int256",
+                    "docOrder": 13,
+                    "description": "the transaction fee reward if the miner is the holder address",
+                    "num": 13
+                },
+                {
+                    "name": "minerUncleRewardIn",
+                    "type": "int256",
+                    "docOrder": 14,
+                    "description": "the uncle reward if the miner who won the uncle block is the holder address",
+                    "num": 14
+                },
+                {
+                    "name": "prefundIn",
+                    "type": "int256",
+                    "docOrder": 15,
+                    "description": "at block zero (0) only, the amount of genesis income for the holder address",
+                    "num": 15
+                },
+                {
+                    "name": "selfDestructIn",
+                    "type": "int256",
+                    "docOrder": 16,
+                    "description": "the incoming value of a self-destruct if recipient is the holder address",
+                    "num": 16
+                },
+                {
+                    "name": "amountOut",
+                    "type": "int256",
+                    "docOrder": 17,
+                    "description": "the amount (in units of the asset) of regular outflow during this transaction",
+                    "num": 17
+                },
+                {
+                    "name": "internalOut",
+                    "type": "int256",
+                    "docOrder": 18,
+                    "description": "the value of any internal value transfers out of the holder account",
+                    "num": 18
+                },
+                {
+                    "name": "gasOut",
+                    "type": "int256",
+                    "docOrder": 19,
+                    "description": "if the transaction's original sender is the holder address, the amount of gas expended",
+                    "num": 19
+                },
+                {
+                    "name": "selfDestructOut",
+                    "type": "int256",
+                    "docOrder": 20,
+                    "description": "the outgoing value of a self-destruct if sender is the holder address",
+                    "num": 20
+                },
+                {
+                    "name": "transaction",
+                    "type": "Transaction",
+                    "attributes": "noui",
+                    "docOrder": 21,
+                    "description": "the transaction that triggered the transfer",
+                    "num": 21,
+                    "isPointer": true
+                },
+                {
+                    "name": "log",
+                    "type": "Log",
+                    "attributes": "noui",
+                    "docOrder": 22,
+                    "description": "if a token transfer, the log that triggered the transfer",
+                    "num": 22,
+                    "isPointer": true
+                }
+            ]
+        },
+        {
+            "class": "Transaction",
+            "doc_group": "02-Chain Data",
+            "doc_route": "206-transaction",
+            "doc_descr": "transaction data as returned from the RPC (with slight enhancements)",
+            "produced_by": "transactions,export",
+            "contained_by": "block",
+            "cache_by": "tx",
+            "cache_type": "cacheable",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "chainId",
+                    "type": "string",
+                    "attributes": "removed",
+                    "num": 1
+                },
+                {
+                    "name": "hash",
+                    "type": "hash",
+                    "docOrder": 1,
+                    "description": "the hash of the transaction",
+                    "num": 6
+                },
+                {
+                    "name": "blockHash",
+                    "type": "hash",
+                    "docOrder": 2,
+                    "description": "the hash of the block containing this transaction",
+                    "num": 7
+                },
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "docOrder": 3,
+                    "description": "the number of the block",
+                    "num": 2
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "docOrder": 4,
+                    "description": "the zero-indexed position of the transaction in the block",
+                    "num": 3
+                },
+                {
+                    "name": "nonce",
+                    "type": "value",
+                    "docOrder": 5,
+                    "description": "sequence number of the transactions sent by the sender",
+                    "num": 10
+                },
+                {
+                    "name": "timestamp",
+                    "type": "timestamp",
+                    "docOrder": 6,
+                    "description": "the Unix timestamp of the object",
+                    "num": 4
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "attributes": "calc",
+                    "docOrder": 7,
+                    "description": "the timestamp as a date",
+                    "num": 5
+                },
+                {
+                    "name": "from",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 8,
+                    "description": "address from which the transaction was sent",
+                    "num": 8
+                },
+                {
+                    "name": "to",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 9,
+                    "description": "address to which the transaction was sent",
+                    "num": 9
+                },
+                {
+                    "name": "value",
+                    "type": "wei",
+                    "docOrder": 10,
+                    "description": "the amount of wei sent with this transactions",
+                    "num": 11
+                },
+                {
+                    "name": "ether",
+                    "type": "ether",
+                    "attributes": "calc",
+                    "docOrder": 11,
+                    "description": "if --ether is specified, the value in ether",
+                    "num": 12
+                },
+                {
+                    "name": "gas",
+                    "type": "gas",
+                    "docOrder": 12,
+                    "description": "the maximum number of gas allowed for this transaction",
+                    "num": 13
+                },
+                {
+                    "name": "traces",
+                    "type": "Traces",
+                    "attributes": "noui|",
+                    "num": 22,
+                    "isArray": true
+                },
+                {
+                    "name": "gasCost",
+                    "type": "gas",
+                    "attributes": "calc",
+                    "docOrder": 13,
+                    "description": "the number of wei per unit of gas the sender is willing to spend",
+                    "num": 15
+                },
+                {
+                    "name": "maxFeePerGas",
+                    "type": "gas",
+                    "num": 16
+                },
+                {
+                    "name": "maxPriorityFeePerGas",
+                    "type": "gas",
+                    "num": 17
+                },
+                {
+                    "name": "gasPrice",
+                    "type": "gas",
+                    "docOrder": 13,
+                    "description": "the number of wei per unit of gas the sender is willing to spend",
+                    "num": 14
+                },
+                {
+                    "name": "input",
+                    "type": "bytes",
+                    "docOrder": 14,
+                    "description": "byte data either containing a message or funcational data for a smart contracts. See the --articulate",
+                    "num": 18
+                },
+                {
+                    "name": "receipt",
+                    "type": "Receipt",
+                    "attributes": "noui|",
+                    "docOrder": 15,
+                    "num": 21,
+                    "isPointer": true
+                },
+                {
+                    "name": "statements",
+                    "type": "Statements",
+                    "attributes": "noui|calc",
+                    "docOrder": 16,
+                    "description": "array of reconciliation statements",
+                    "num": 25,
+                    "isArray": true
+                },
+                {
+                    "name": "articulatedTx",
+                    "type": "Function",
+                    "attributes": "noui|",
+                    "docOrder": 17,
+                    "num": 23,
+                    "isPointer": true
+                },
+                {
+                    "name": "hasToken",
+                    "type": "bool",
+                    "docOrder": 18,
+                    "description": "`true` if the transaction is token related, `false` otherwise",
+                    "num": 20
+                },
+                {
+                    "name": "isError",
+                    "type": "bool",
+                    "docOrder": 19,
+                    "description": "`true` if the transaction ended in error, `false` otherwise",
+                    "num": 19
+                },
+                {
+                    "name": "compressedTx",
+                    "type": "string",
+                    "attributes": "calc",
+                    "docOrder": 20,
+                    "description": "truncated, more readable version of the articulation",
+                    "num": 24
+                },
+                {
+                    "name": "gasUsed",
+                    "type": "gas",
+                    "num": 26
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "num": 27
+                }
+            ]
+        },
+        {
+            "class": "Receipt",
+            "doc_group": "02-Chain Data",
+            "doc_route": "212-receipt",
+            "doc_descr": "receipt data as returned from the RPC (with slight enhancements)",
+            "produced_by": "receipts,export",
+            "contained_by": "transaction",
+            "cache_as": "group",
+            "cache_by": "block",
+            "cache_type": "cacheable",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "blockHash",
+                    "type": "hash",
+                    "docOrder": 1,
+                    "num": 1
+                },
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "docOrder": 2,
+                    "num": 2
+                },
+                {
+                    "name": "contractAddress",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 3,
+                    "description": "the address of the newly created contract, if any",
+                    "num": 3
+                },
+                {
+                    "name": "cumulativeGasUsed",
+                    "type": "gas",
+                    "upgrades": "2.5.8:string",
+                    "num": 4
+                },
+                {
+                    "name": "from",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "num": 5
+                },
+                {
+                    "name": "gasUsed",
+                    "type": "gas",
+                    "docOrder": 4,
+                    "description": "the amount of gas actually used by the transaction",
+                    "num": 6
+                },
+                {
+                    "name": "effectiveGasPrice",
+                    "type": "gas",
+                    "num": 7
+                },
+                {
+                    "name": "isError",
+                    "type": "bool",
+                    "docOrder": 5,
+                    "num": 8
+                },
+                {
+                    "name": "logs",
+                    "type": "Log",
+                    "attributes": "noui|",
+                    "docOrder": 6,
+                    "description": "a possibly empty array of logs",
+                    "num": 9,
+                    "isArray": true
+                },
+                {
+                    "name": "logsBloom",
+                    "type": "string",
+                    "attributes": "noui|removed",
+                    "num": 10
+                },
+                {
+                    "name": "status",
+                    "type": "value",
+                    "docOrder": 7,
+                    "upgrades": "2.5.9:uint32",
+                    "description": "`1` on transaction suceess, `null` if tx precedes Byzantium, `0` otherwise",
+                    "num": 11
+                },
+                {
+                    "name": "to",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "num": 12
+                },
+                {
+                    "name": "transactionHash",
+                    "type": "hash",
+                    "docOrder": 8,
+                    "num": 13
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "docOrder": 9,
+                    "num": 14
+                }
+            ]
+        },
+        {
+            "class": "Log",
+            "doc_group": "02-Chain Data",
+            "doc_route": "215-log",
+            "doc_descr": "log data as returned from the RPC (with slight enhancements)",
+            "produced_by": "logs,export,blocks,transactions",
+            "contained_by": "receipt, function",
+            "cache_as": "group",
+            "cache_by": "block",
+            "cache_type": "cacheable",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "docOrder": 1,
+                    "description": "the number of the block",
+                    "num": 1
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "docOrder": 2,
+                    "description": "the zero-indexed position of the transaction in the block",
+                    "num": 2
+                },
+                {
+                    "name": "logIndex",
+                    "type": "lognum",
+                    "docOrder": 3,
+                    "description": "the zero-indexed position of this log relative to the block",
+                    "num": 3
+                },
+                {
+                    "name": "timestamp",
+                    "type": "timestamp",
+                    "docOrder": 4,
+                    "description": "the timestamp of the block this log appears in",
+                    "num": 4
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "attributes": "calc",
+                    "docOrder": 5,
+                    "description": "the timestamp as a date",
+                    "num": 5
+                },
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 6,
+                    "description": "the smart contract that emitted this log",
+                    "num": 6
+                },
+                {
+                    "name": "topics",
+                    "type": "topic",
+                    "docOrder": 7,
+                    "description": "the first topic hashes event signature of the log, up to 3 additional index parameters may appear",
+                    "num": 7,
+                    "isArray": true
+                },
+                {
+                    "name": "data",
+                    "type": "bytes",
+                    "docOrder": 8,
+                    "description": "any remaining un-indexed parameters to the event",
+                    "num": 8
+                },
+                {
+                    "name": "transactionHash",
+                    "type": "hash",
+                    "docOrder": 9,
+                    "description": "the hash of the transction",
+                    "num": 9
+                },
+                {
+                    "name": "blockHash",
+                    "type": "hash",
+                    "docOrder": 10,
+                    "description": "the hash of the block",
+                    "num": 10
+                },
+                {
+                    "name": "articulatedLog",
+                    "type": "Function",
+                    "attributes": "noui",
+                    "docOrder": 11,
+                    "description": "a human-readable version of the topic and data fields",
+                    "num": 11,
+                    "isPointer": true
+                },
+                {
+                    "name": "compressedLog",
+                    "type": "string",
+                    "attributes": "calc",
+                    "docOrder": 12,
+                    "upgrades": "2.5.10:string",
+                    "description": "a truncated, more readable version of the articulation",
+                    "num": 12
+                },
+                {
+                    "name": "isNFT",
+                    "type": "bool",
+                    "docOrder": 13,
+                    "description": "true if the log is an NFT transfer",
+                    "num": 13
+                }
+            ]
+        },
+        {
+            "class": "TraceAction",
+            "doc_group": "02-Chain Data",
+            "doc_route": "224-traceAction",
+            "doc_descr": "trace action data as returned from the RPC (with slight enhancements)",
+            "produced_by": "traces,export,blocks",
+            "contained_by": "trace",
+            "cache_type": "marshal_only",
+            "disable_go": true
+        },
+        {
+            "class": "TraceResult",
+            "doc_group": "02-Chain Data",
+            "doc_route": "224-traceAction",
+            "doc_descr": "trace action data as returned from the RPC (with slight enhancements)",
+            "produced_by": "traces,export,blocks",
+            "contained_by": "trace",
+            "cache_type": "marshal_only",
+            "disable_go": true
+        },
+        {
+            "class": "Assets",
+            "doc_group": "04-Admin",
+            "doc_route": "409-chunkRecord",
+            "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+            "produced_by": "chunks,init,scrape",
+            "contained_by": "manifest",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "sorts|readOnly",
+                    "docOrder": 1,
+                    "description": "Address",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 2,
+                    "description": "Name",
+                    "num": 2
+                },
+                {
+                    "name": "symbol",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 3,
+                    "description": "Symbol",
+                    "num": 3
+                },
+                {
+                    "name": "decimals",
+                    "type": "int64",
+                    "attributes": "sorts|textAlign=right",
+                    "docOrder": 4,
+                    "description": "Decimals",
+                    "num": 4
+                },
+                {
+                    "name": "source",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 5,
+                    "description": "Source",
+                    "num": 5
+                },
+                {
+                    "name": "tags",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 6,
+                    "description": "Tags",
+                    "num": 6
+                }
+            ]
+        },
+        {
+            "class": "Balances",
+            "doc_group": "04-Admin",
+            "doc_route": "409-chunkRecord",
+            "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+            "produced_by": "chunks,init,scrape",
+            "contained_by": "manifest",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "blockNumber",
+                    "type": "int64",
+                    "attributes": "sorts|textAlign=right",
+                    "docOrder": 1,
+                    "description": "Block",
+                    "num": 1
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "int64",
+                    "attributes": "sorts|textAlign=right",
+                    "docOrder": 2,
+                    "description": "Tx Index",
+                    "num": 2
+                },
+                {
+                    "name": "holder",
+                    "type": "address",
+                    "attributes": "sorts|readOnly",
+                    "docOrder": 3,
+                    "description": "Holder",
+                    "num": 3
+                },
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "sorts|readOnly",
+                    "docOrder": 4,
+                    "description": "Token Address",
+                    "num": 4
+                },
+                {
+                    "name": "symbol",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 5,
+                    "description": "Symbol",
+                    "num": 5
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 6,
+                    "description": "Token Name",
+                    "num": 6
+                },
+                {
+                    "name": "balance",
+                    "type": "ether",
+                    "attributes": "sorts|textAlign=right",
+                    "docOrder": 7,
+                    "description": "Balance",
+                    "num": 7
+                },
+                {
+                    "name": "priorBalance",
+                    "type": "ether",
+                    "attributes": "sorts|calc|textAlign=right",
+                    "docOrder": 8,
+                    "description": "Prior Balance",
+                    "num": 8
+                },
+                {
+                    "name": "decimals",
+                    "type": "int64",
+                    "attributes": "sorts|textAlign=right",
+                    "docOrder": 9,
+                    "description": "Decimals",
+                    "num": 9
+                },
+                {
+                    "name": "actions",
+                    "type": "string",
+                    "attributes": "width=120px",
+                    "docOrder": 10,
+                    "description": "Actions",
+                    "num": 10
+                }
+            ]
+        },
+        {
+            "class": "ChunkRecord",
+            "doc_group": "04-Admin",
+            "doc_route": "409-chunkRecord",
+            "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+            "produced_by": "chunks,init,scrape",
+            "contained_by": "manifest",
+            "disable_go": true
+        },
+        {
+            "class": "Traces",
+            "doc_group": "04-Admin",
+            "doc_route": "409-chunkRecord",
+            "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+            "produced_by": "chunks,init,scrape",
+            "contained_by": "manifest",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "blockHash",
+                    "type": "hash",
+                    "docOrder": 1,
+                    "description": "the hash of the block containing this trace",
+                    "num": 1
+                },
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "docOrder": 2,
+                    "description": "the number of the block",
+                    "num": 2
+                },
+                {
+                    "name": "timestamp",
+                    "type": "timestamp",
+                    "docOrder": 3,
+                    "description": "the timestamp of the block",
+                    "num": 3
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "attributes": "omitempty|calc",
+                    "docOrder": 4,
+                    "description": "the timestamp as a date",
+                    "num": 4
+                },
+                {
+                    "name": "transactionHash",
+                    "type": "hash",
+                    "docOrder": 5,
+                    "description": "the transaction's hash containing this trace",
+                    "num": 5
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "docOrder": 6,
+                    "description": "the zero-indexed position of the transaction in the block",
+                    "num": 6
+                },
+                {
+                    "name": "subtraces",
+                    "type": "uint64",
+                    "docOrder": 7,
+                    "description": "the number of children traces that the trace hash",
+                    "num": 7
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "attributes": "omitempty",
+                    "docOrder": 8,
+                    "description": "the type of the trace",
+                    "num": 8
+                },
+                {
+                    "name": "compressedTrace",
+                    "type": "string",
+                    "attributes": "calc",
+                    "docOrder": 9,
+                    "upgrades": "2.5.10:string",
+                    "description": "a compressed string version of the articulated trace",
+                    "num": 9
+                },
+                {
+                    "name": "error",
+                    "type": "string",
+                    "attributes": "omitempty",
+                    "docOrder": 10,
+                    "num": 10
+                },
+                {
+                    "name": "traceAddress",
+                    "type": "uint64",
+                    "attributes": "noui|",
+                    "docOrder": 11,
+                    "description": "a particular trace's address in the trace tree",
+                    "num": 11,
+                    "isArray": true
+                },
+                {
+                    "name": "action",
+                    "type": "TraceAction",
+                    "attributes": "noui|",
+                    "docOrder": 12,
+                    "description": "the trace action for this trace",
+                    "num": 12,
+                    "isPointer": true
+                },
+                {
+                    "name": "result",
+                    "type": "TraceResult",
+                    "attributes": "noui|",
+                    "docOrder": 13,
+                    "description": "the trace result of this trace",
+                    "num": 13,
+                    "isPointer": true
+                },
+                {
+                    "name": "articulatedTrace",
+                    "type": "Function",
+                    "attributes": "noui|omitempty",
+                    "docOrder": 14,
+                    "description": "human readable version of the trace action input data",
+                    "num": 14,
+                    "isPointer": true
+                }
+            ]
+        },
+        {
+            "class": "Withdrawals",
+            "doc_group": "04-Admin",
+            "doc_route": "409-chunkRecord",
+            "doc_descr": "a single record in the manifest detailing the IPFS hases and file sizes for each bloom filter and index chunk",
+            "produced_by": "chunks,init,scrape",
+            "contained_by": "manifest",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 1,
+                    "description": "the recipient for the withdrawn ether",
+                    "num": 1
+                },
+                {
+                    "name": "amount",
+                    "type": "wei",
+                    "docOrder": 2,
+                    "description": "a nonzero amount of ether given in gwei (1e9 wei)",
+                    "num": 2
+                },
+                {
+                    "name": "ether",
+                    "type": "ether",
+                    "docOrder": 3,
+                    "description": "if --ether is specified, the amount in ether",
+                    "num": 3
+                },
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "docOrder": 4,
+                    "description": "the number of this block",
+                    "num": 4
+                },
+                {
+                    "name": "index",
+                    "type": "value",
+                    "docOrder": 5,
+                    "description": "a monotonically increasing zero-based index that increments by 1 per withdrawal to uniquely identify each withdrawal",
+                    "num": 5
+                },
+                {
+                    "name": "timestamp",
+                    "type": "timestamp",
+                    "docOrder": 6,
+                    "description": "the timestamp for this block",
+                    "num": 6
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "docOrder": 7,
+                    "description": "the timestamp as a date",
+                    "num": 7
+                },
+                {
+                    "name": "validatorIndex",
+                    "type": "value",
+                    "docOrder": 8,
+                    "description": "the validator_index of the validator on the consensus layer the withdrawal corresponds to",
+                    "num": 8
                 }
             ]
         },
@@ -1047,7 +3029,7 @@
                 {
                     "name": "rangeDates",
                     "type": "RangeDates",
-                    "attributes": "omitempty",
+                    "attributes": "noui|omitempty",
                     "docOrder": 7,
                     "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
                     "num": 7,
@@ -1129,7 +3111,7 @@
                 {
                     "name": "rangeDates",
                     "type": "RangeDates",
-                    "attributes": "omitempty",
+                    "attributes": "noui|omitempty",
                     "docOrder": 7,
                     "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
                     "num": 7,
@@ -1185,6 +3167,306 @@
             ]
         },
         {
+            "class": "Blooms",
+            "doc_group": "04-Admin",
+            "doc_route": "412-chunkIndex-blooms",
+            "doc_descr": "Bloom filter information for a Chunks data facet.",
+            "produced_by": "chunks",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "range",
+                    "type": "blkrange",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 1,
+                    "description": "the block range (inclusive) covered by this chunk",
+                    "num": 1
+                },
+                {
+                    "name": "magic",
+                    "type": "string",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 2,
+                    "description": "an internal use only magic number to indicate file format",
+                    "num": 2
+                },
+                {
+                    "name": "hash",
+                    "type": "hash",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 3,
+                    "description": "the hash of the specification under which this chunk was generated",
+                    "num": 3
+                },
+                {
+                    "name": "nBlooms",
+                    "type": "uint64",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 4,
+                    "description": "the number of individual bloom filters in this bloom file",
+                    "num": 4
+                },
+                {
+                    "name": "nInserted",
+                    "type": "uint64",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 5,
+                    "description": "the number of addresses inserted into the bloom file",
+                    "num": 5
+                },
+                {
+                    "name": "size",
+                    "type": "uint64",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 6,
+                    "description": "the size on disc in bytes of this bloom file",
+                    "num": 6
+                },
+                {
+                    "name": "byteWidth",
+                    "type": "uint64",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 7,
+                    "description": "the width of the bloom filter",
+                    "num": 7
+                },
+                {
+                    "name": "rangeDates",
+                    "type": "RangeDates",
+                    "attributes": "noui|sorts|width=150px|readOnly",
+                    "docOrder": 8,
+                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                    "num": 8,
+                    "isPointer": true
+                }
+            ]
+        },
+        {
+            "class": "Index",
+            "doc_group": "04-Admin",
+            "doc_route": "412-chunkIndex-index",
+            "doc_descr": "Index information for a Chunks data facet.",
+            "produced_by": "chunks",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "range",
+                    "type": "blkrange",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 1,
+                    "description": "the block range (inclusive) covered by this chunk",
+                    "num": 1
+                },
+                {
+                    "name": "magic",
+                    "type": "string",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 2,
+                    "description": "an internal use only magic number to indicate file format",
+                    "num": 2
+                },
+                {
+                    "name": "hash",
+                    "type": "hash",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 3,
+                    "description": "the hash of the specification under which this chunk was generated",
+                    "num": 3
+                },
+                {
+                    "name": "nAddresses",
+                    "type": "uint64",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 4,
+                    "description": "the number of addresses in this chunk",
+                    "num": 4
+                },
+                {
+                    "name": "nAppearances",
+                    "type": "uint64",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 5,
+                    "description": "the number of appearances in this chunk",
+                    "num": 5
+                },
+                {
+                    "name": "size",
+                    "type": "uint64",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 6,
+                    "description": "the size of the chunk in bytes",
+                    "num": 6
+                },
+                {
+                    "name": "rangeDates",
+                    "type": "RangeDates",
+                    "attributes": "noui|sorts|width=150px|readOnly",
+                    "docOrder": 7,
+                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                    "num": 7,
+                    "isPointer": true
+                }
+            ]
+        },
+        {
+            "class": "Manifest",
+            "doc_group": "04-Admin",
+            "doc_route": "412-chunkIndex-manifest",
+            "doc_descr": "Manifest information for a Chunks data facet.",
+            "produced_by": "chunks",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "version",
+                    "type": "string",
+                    "attributes": "sorts|width=100px|readOnly",
+                    "docOrder": 1,
+                    "description": "the version string hashed into the chunk data",
+                    "num": 1
+                },
+                {
+                    "name": "chain",
+                    "type": "string",
+                    "attributes": "sorts|width=100px|readOnly",
+                    "docOrder": 2,
+                    "description": "the chain to which this manifest belongs",
+                    "num": 2
+                },
+                {
+                    "name": "specification",
+                    "type": "ipfshash",
+                    "attributes": "sorts|width=100px|readOnly",
+                    "docOrder": 3,
+                    "description": "IPFS cid of the specification",
+                    "num": 3
+                },
+                {
+                    "name": "chunks",
+                    "type": "ChunkRecord",
+                    "attributes": "noui|sorts|width=100px|readOnly",
+                    "docOrder": 4,
+                    "description": "a list of the IPFS hashes of all of the chunks in the unchained index",
+                    "num": 4,
+                    "isArray": true
+                }
+            ]
+        },
+        {
+            "class": "Stats",
+            "doc_group": "04-Admin",
+            "doc_route": "412-chunkIndex-stats",
+            "doc_descr": "Statistics for a Chunks data facet.",
+            "produced_by": "chunks",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "range",
+                    "type": "blkrange",
+                    "attributes": "sorts|width=150px|readOnly",
+                    "docOrder": 1,
+                    "description": "the block range (inclusive) covered by this chunk",
+                    "num": 1
+                },
+                {
+                    "name": "nAddrs",
+                    "type": "uint64",
+                    "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                    "docOrder": 2,
+                    "description": "the number of addresses in the chunk",
+                    "num": 2
+                },
+                {
+                    "name": "nApps",
+                    "type": "uint64",
+                    "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                    "docOrder": 3,
+                    "description": "the number of appearances in the chunk",
+                    "num": 3
+                },
+                {
+                    "name": "nBlocks",
+                    "type": "uint64",
+                    "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                    "docOrder": 4,
+                    "description": "the number of blocks in the chunk",
+                    "num": 4
+                },
+                {
+                    "name": "nBlooms",
+                    "type": "uint64",
+                    "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                    "docOrder": 5,
+                    "description": "the number of bloom filters in the chunk's bloom",
+                    "num": 5
+                },
+                {
+                    "name": "recWid",
+                    "type": "uint64",
+                    "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                    "docOrder": 6,
+                    "description": "the record width of a single bloom filter",
+                    "num": 6
+                },
+                {
+                    "name": "bloomSz",
+                    "type": "uint64",
+                    "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                    "docOrder": 7,
+                    "description": "the size of the bloom filters on disc in bytes",
+                    "num": 7
+                },
+                {
+                    "name": "chunkSz",
+                    "type": "uint64",
+                    "attributes": "sorts|width=120px|readOnly|textAlign=right",
+                    "docOrder": 8,
+                    "description": "the size of the chunks on disc in bytes",
+                    "num": 8
+                },
+                {
+                    "name": "addrsPerBlock",
+                    "type": "float64",
+                    "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                    "docOrder": 9,
+                    "description": "the average number of addresses per block",
+                    "num": 9
+                },
+                {
+                    "name": "appsPerBlock",
+                    "type": "float64",
+                    "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                    "docOrder": 10,
+                    "description": "the average number of appearances per block",
+                    "num": 10
+                },
+                {
+                    "name": "appsPerAddr",
+                    "type": "float64",
+                    "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                    "docOrder": 11,
+                    "description": "the average number of appearances per address",
+                    "num": 11
+                },
+                {
+                    "name": "ratio",
+                    "type": "float64",
+                    "attributes": "sorts|width=100px|readOnly|textAlign=right",
+                    "docOrder": 12,
+                    "description": "the ratio of appearances to addresses",
+                    "num": 12
+                },
+                {
+                    "name": "rangeDates",
+                    "type": "RangeDates",
+                    "attributes": "noui|sorts|omitempty",
+                    "docOrder": 13,
+                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                    "num": 13,
+                    "isPointer": true
+                }
+            ]
+        },
+        {
             "class": "RangeDates",
             "doc_group": "04-Admin",
             "doc_route": "442-rangeDates",
@@ -1202,7 +3484,7 @@
                 {
                     "name": "address",
                     "type": "address",
-                    "attributes": "sorts",
+                    "attributes": "sorts|width=340|readOnly",
                     "docOrder": 1,
                     "description": "the address for the ABI",
                     "num": 1
@@ -1210,70 +3492,71 @@
                 {
                     "name": "name",
                     "type": "string",
-                    "attributes": "sorts",
+                    "attributes": "sorts|width=200",
                     "docOrder": 2,
                     "description": "the filename of the ABI (likely the smart contract address)",
                     "num": 2
                 },
                 {
-                    "name": "path",
-                    "type": "string",
-                    "docOrder": 3,
-                    "description": "the folder holding the abi file",
-                    "num": 3
-                },
-                {
                     "name": "fileSize",
                     "type": "int64",
                     "attributes": "sorts",
-                    "docOrder": 4,
+                    "docOrder": 3,
                     "description": "the size of this file on disc",
-                    "num": 4
-                },
-                {
-                    "name": "lastModDate",
-                    "type": "string",
-                    "attributes": "sorts",
-                    "docOrder": 5,
-                    "description": "the last update date of the file",
-                    "num": 5
-                },
-                {
-                    "name": "isKnown",
-                    "type": "bool",
-                    "attributes": "sorts",
-                    "docOrder": 6,
-                    "description": "true if this is the ABI for a known smart contract or protocol",
-                    "num": 6
-                },
-                {
-                    "name": "isEmpty",
-                    "type": "bool",
-                    "attributes": "sorts",
-                    "docOrder": 7,
-                    "description": "true if the ABI could not be found (and won't be looked for again)",
-                    "num": 7
+                    "num": 3
                 },
                 {
                     "name": "nFunctions",
                     "type": "int64",
                     "attributes": "sorts",
-                    "docOrder": 8,
-                    "description": "if verbose, the number of functions in the ABI",
-                    "num": 8
+                    "docOrder": 4,
+                    "description": "the number of functions in the ABI",
+                    "num": 4
                 },
                 {
                     "name": "nEvents",
                     "type": "int64",
                     "attributes": "sorts",
+                    "docOrder": 5,
+                    "description": "the number of events in the ABI",
+                    "num": 5
+                },
+                {
+                    "name": "path",
+                    "type": "string",
+                    "attributes": "noui",
+                    "docOrder": 6,
+                    "description": "the folder holding the abi file",
+                    "num": 6
+                },
+                {
+                    "name": "lastModDate",
+                    "type": "string",
+                    "attributes": "sorts|noui",
+                    "docOrder": 7,
+                    "description": "the last update date of the file",
+                    "num": 7
+                },
+                {
+                    "name": "isKnown",
+                    "type": "bool",
+                    "attributes": "sorts|noui",
+                    "docOrder": 8,
+                    "description": "true if this is the ABI for a known smart contract or protocol",
+                    "num": 8
+                },
+                {
+                    "name": "isEmpty",
+                    "type": "bool",
+                    "attributes": "sorts|noui",
                     "docOrder": 9,
-                    "description": "if verbose, the number of events in the ABI",
+                    "description": "true if the ABI could not be found (and won't be looked for again)",
                     "num": 9
                 },
                 {
                     "name": "hasConstructor",
                     "type": "bool",
-                    "attributes": "sorts",
+                    "attributes": "sorts|noui",
                     "docOrder": 10,
                     "description": "if verbose and the abi has a constructor, then `true`, else `false`",
                     "num": 10
@@ -1281,7 +3564,7 @@
                 {
                     "name": "hasFallback",
                     "type": "bool",
-                    "attributes": "sorts",
+                    "attributes": "sorts|noui",
                     "docOrder": 11,
                     "description": "if verbose and the abi has a fallback, then `true`, else `false`",
                     "num": 11
@@ -1289,6 +3572,7 @@
                 {
                     "name": "functions",
                     "type": "Function",
+                    "attributes": "noui",
                     "docOrder": 12,
                     "description": "the functions for this address",
                     "num": 12,
@@ -1331,65 +3615,70 @@
             "disable_go": true,
             "members": [
                 {
-                    "name": "name",
+                    "name": "encoding",
                     "type": "string",
                     "attributes": "sorts",
                     "docOrder": 1,
-                    "description": "the name of the interface",
+                    "description": "the signature encoded with keccak",
                     "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "sorts",
+                    "docOrder": 2,
+                    "description": "the name of the interface",
+                    "num": 2
                 },
                 {
                     "name": "type",
                     "type": "string",
                     "attributes": "sorts",
-                    "docOrder": 2,
+                    "docOrder": 3,
                     "description": "the type of the interface, either 'event' or 'function'",
-                    "num": 2
-                },
-                {
-                    "name": "anonymous",
-                    "type": "bool",
-                    "attributes": "omitempty",
                     "num": 3
-                },
-                {
-                    "name": "constant",
-                    "type": "bool",
-                    "attributes": "omitempty",
-                    "num": 4
-                },
-                {
-                    "name": "stateMutability",
-                    "type": "string",
-                    "attributes": "omitempty|sorts",
-                    "num": 5
                 },
                 {
                     "name": "signature",
                     "type": "string",
-                    "attributes": "omitempty|sorts",
-                    "docOrder": 3,
+                    "attributes": "sorts",
+                    "docOrder": 4,
                     "description": "the canonical signature of the interface",
+                    "num": 4
+                },
+                {
+                    "name": "anonymous",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 5,
+                    "num": 5
+                },
+                {
+                    "name": "constant",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 6,
                     "num": 6
                 },
                 {
-                    "name": "encoding",
+                    "name": "stateMutability",
                     "type": "string",
-                    "attributes": "sorts",
-                    "docOrder": 4,
-                    "description": "the signature encoded with keccak",
+                    "attributes": "noui|sorts",
+                    "docOrder": 7,
                     "num": 7
                 },
                 {
                     "name": "message",
                     "type": "string",
-                    "attributes": "omitempty",
+                    "attributes": "noui",
+                    "docOrder": 8,
                     "num": 8
                 },
                 {
                     "name": "inputs",
                     "type": "Parameter",
-                    "docOrder": 5,
+                    "attributes": "noui",
+                    "docOrder": 9,
                     "description": "the input parameters to the function, if any",
                     "num": 9,
                     "isArray": true
@@ -1397,10 +3686,63 @@
                 {
                     "name": "outputs",
                     "type": "Parameter",
-                    "docOrder": 6,
+                    "attributes": "noui",
+                    "docOrder": 10,
                     "description": "the output parameters to the function, if any",
                     "num": 10,
                     "isArray": true
+                }
+            ]
+        },
+        {
+            "class": "Functions",
+            "doc_group": "05-Other",
+            "doc_route": "506-function",
+            "doc_descr": "a human-readable representation of a Solidity function call or event",
+            "produced_by": "abis,export,transactions,receipts,logs,traces,state,slurp",
+            "contained_by": "abi, log, receipt, result, slurp, trace, transaction",
+            "cache_type": "marshal_only",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "sorts|width=340px|readOnly|textAlign=left",
+                    "docOrder": 1,
+                    "description": "Address",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "sorts|width=200px|textAlign=left",
+                    "docOrder": 2,
+                    "description": "Name",
+                    "num": 2
+                },
+                {
+                    "name": "fileSize",
+                    "type": "int64",
+                    "attributes": "sorts|width=120px|textAlign=right",
+                    "docOrder": 3,
+                    "description": "File Size",
+                    "num": 3
+                },
+                {
+                    "name": "nFunctions",
+                    "type": "int64",
+                    "attributes": "sorts|width=120px|textAlign=right",
+                    "docOrder": 4,
+                    "description": "Functions",
+                    "num": 4
+                },
+                {
+                    "name": "nEvents",
+                    "type": "int64",
+                    "attributes": "sorts|width=120px|textAlign=right",
+                    "docOrder": 5,
+                    "description": "Events",
+                    "num": 5
                 }
             ]
         },
@@ -1431,41 +3773,37 @@
                 {
                     "name": "strDefault",
                     "type": "string",
-                    "attributes": "omitempty",
                     "docOrder": 3,
                     "description": "the default value of this parameter, if any",
                     "num": 3
                 },
                 {
-                    "name": "value",
-                    "type": "string",
-                    "attributes": "omitempty",
-                    "num": 4
-                },
-                {
                     "name": "indexed",
                     "type": "bool",
-                    "attributes": "omitempty",
                     "docOrder": 4,
                     "description": "`true` if this parameter is indexed",
-                    "num": 5
+                    "num": 4
                 },
                 {
                     "name": "internalType",
                     "type": "string",
-                    "attributes": "omitempty",
                     "docOrder": 5,
                     "description": "for composite types, the internal type of the parameter",
-                    "num": 6
+                    "num": 5
                 },
                 {
                     "name": "components",
                     "type": "Parameter",
-                    "attributes": "omitempty",
                     "docOrder": 6,
                     "description": "for composite types, the parameters making up the composite",
-                    "num": 7,
+                    "num": 6,
                     "isArray": true
+                },
+                {
+                    "name": "value",
+                    "type": "string",
+                    "docOrder": 7,
+                    "num": 7
                 }
             ]
         }

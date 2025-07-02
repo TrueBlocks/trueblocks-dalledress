@@ -1,5 +1,33 @@
-<!-- ADD_ROUTE -->
+# Names View
 
+// EXISTING_CODE
+// EXISTING_CODE
+
+## Facets:
+- All Facet uses Names store.
+- Custom Facet uses Names store.
+- Prefund Facet uses Names store.
+- Regular Facet uses Names store.
+- Baddress Facet uses Names store.
+
+## Stores:
+
+- **Names Store (12 members):**
+
+  - address: the address associated with this name
+  - name: the name associated with this address
+  - tags: colon separated list of tags
+  - source: user supplied source of where this name was found
+  - symbol: the symbol for this address
+  - decimals: number of decimals retrieved from an ERC20 smart contract
+  - deleted: if deleted
+  - isCustom: if the address is a custom address
+  - isPrefund: if the address was one of the prefund addresses, `false` otherwise
+  - isContract: if the address is a smart contract
+  - isErc20: if the address is an ERC20
+  - isErc721: if the address is an ERC720
+
+// EXISTING_CODE
 # Names Management
 
 Welcome to the **Names** view! This section allows you to manage address names and their associated metadata in the TrueBlocks system.
@@ -60,4 +88,4 @@ Use the action buttons to manage names:
 
 For further assistance, please contact support.
 
-<!-- ADD_ROUTE -->
+// EXISTING_CODE

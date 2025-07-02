@@ -55,7 +55,23 @@ export interface FormField<T = Record<string, unknown>> {
     | 'ether'
     | 'address'
     | 'timestamp'
-    | 'gas';
+    | 'gas'
+    | 'button'
+    | 'wei'
+    | 'int256'
+    | 'lognum'
+    | 'txnum'
+    | 'hash'
+    | 'value'
+    | 'bytes'
+    | 'blknum'
+    | 'blkrange'
+    | 'ipfshash'
+    | 'float64'
+    | 'float'
+    | 'topic'
+    | 'ipfsHash'
+    | 'datetime';
   fields?: FormField<T>[];
   isButtonGroup?: boolean;
   buttonAlignment?: 'left' | 'center' | 'right';

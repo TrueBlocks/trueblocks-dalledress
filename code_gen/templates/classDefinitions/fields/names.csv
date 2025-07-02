@@ -1,13 +1,13 @@
-name       ,type    ,strDefault ,attributes      ,docOrder ,description
-tags       ,string  ,           ,sorts           ,       1 ,colon separated list of tags
-address    ,address ,           ,sorts           ,       2 ,the address associated with this name
-name       ,string  ,           ,sorts           ,       3 ,the name associated with this address (retrieved from on-chain data if available)
-symbol     ,string  ,           ,sorts           ,       4 ,the symbol for this address (retrieved from on-chain data if available)
-source     ,string  ,           ,sorts           ,       5 ,user supplied source of where this name was found (or on-chain if name is on-chain)
-decimals   ,uint64  ,           ,sorts           ,       6 ,number of decimals retrieved from an ERC20 smart contract&#44; defaults to 18
-isCustom   ,bool    ,           ,omitempty|sorts ,       8 ,`true` if the address is a custom address&#44; `false` otherwise
-isPrefund  ,bool    ,           ,omitempty|sorts ,       9 ,`true` if the address was one of the prefund addresses&#44; `false` otherwise
-isContract ,bool    ,           ,omitempty|sorts ,      10 ,`true` if the address is a smart contract&#44; `false` otherwise
-isErc20    ,bool    ,           ,omitempty|sorts ,      11 ,`true` if the address is an ERC20&#44; `false` otherwise
-isErc721   ,bool    ,           ,omitempty|sorts ,      12 ,`true` if the address is an ERC720&#44; `false` otherwise
-deleted    ,bool    ,           ,omitempty|sorts ,       7 ,`true` if deleted&#44; `false` otherwise
+name      , type   , strDefault, attributes              , upgrades, docOrder, description
+address   , address,           , sorts|width=340|readOnly,         ,        1, the address associated with this name
+name      , string ,           , sorts|required          ,         ,        2, the name associated with this address
+tags      , string ,           , sorts|width=150         ,         ,        3, colon separated list of tags
+source    , string ,           , sorts|width=120         ,         ,        4, user supplied source of where this name was found
+symbol    , string ,           , sorts|width=100         ,         ,        5, the symbol for this address
+decimals  , uint64 ,           , sorts|width=100         ,         ,        6, number of decimals retrieved from an ERC20 smart contract
+deleted   , bool   ,           , noui|sorts              ,         ,        7, if deleted
+isCustom  , bool   ,           , noui|sorts              ,         ,        8, if the address is a custom address
+isPrefund , bool   ,           , noui|sorts              ,         ,        9, if the address was one of the prefund addresses&#44; `false` otherwise
+isContract, bool   ,           , noui|sorts              ,         ,       10, if the address is a smart contract
+isErc20   , bool   ,           , noui|sorts              ,         ,       11, if the address is an ERC20
+isErc721  , bool   ,           , noui|sorts              ,         ,       12, if the address is an ERC720

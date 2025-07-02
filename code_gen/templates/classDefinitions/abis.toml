@@ -1,11 +1,12 @@
 [settings]
-    class = "Abis"
-    doc_group = "05-Other"
-    doc_descr = "a human-readable representation of a Solidity smart contract"
-    doc_route = "503-abi"
-    attributes = ""
-    produced_by = "abis"
-    contains = "function"
+class = "Abis"
+doc_group = "05-Other"
+doc_descr = "a human-readable representation of a Solidity smart contract"
+doc_route = "503-abi"
+attributes = ""
+produced_by = "abis"
+contains = "function"
+disable_go = false
 
 [[facets]]
 name = "Downloaded"
@@ -23,3 +24,4 @@ store = "Functions"
 [[facets]]
 name = "Events"
 store = "Functions"
+

@@ -1,4 +1,4 @@
-name      , type   , strDefault, attributes              , upgrades, docOrder, description
+name      , type   , strDefault, attributes        , upgrades, docOrder, description
 address   , address,           , width=340|readOnly,         ,        1, the address associated with this name
 name      , string ,           , required          ,         ,        2, the name associated with this address
 tags      , string ,           , width=150         ,         ,        3, colon separated list of tags

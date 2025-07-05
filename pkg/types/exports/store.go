@@ -90,8 +90,6 @@ func (c *ExportsCollection) getAssetsStore(facet types.DataFacet) *store.Store[A
 		}
 
 		processFunc := func(item interface{}) *Asset {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Asset); ok {
 				return it
 			}
@@ -138,8 +136,6 @@ func (c *ExportsCollection) getBalancesStore(facet types.DataFacet) *store.Store
 		}
 
 		processFunc := func(item interface{}) *Balance {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Balance); ok {
 				return it
 			}
@@ -187,8 +183,6 @@ func (c *ExportsCollection) getLogsStore(facet types.DataFacet) *store.Store[Log
 		}
 
 		processFunc := func(item interface{}) *Log {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Log); ok {
 				return it
 			}
@@ -235,8 +229,6 @@ func (c *ExportsCollection) getReceiptsStore(facet types.DataFacet) *store.Store
 		}
 
 		processFunc := func(item interface{}) *Receipt {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Receipt); ok {
 				return it
 			}
@@ -284,8 +276,6 @@ func (c *ExportsCollection) getStatementsStore(facet types.DataFacet) *store.Sto
 		}
 
 		processFunc := func(item interface{}) *Statement {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Statement); ok {
 				return it
 			}
@@ -332,8 +322,6 @@ func (c *ExportsCollection) getTracesStore(facet types.DataFacet) *store.Store[T
 		}
 
 		processFunc := func(item interface{}) *Trace {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Trace); ok {
 				return it
 			}
@@ -380,8 +368,6 @@ func (c *ExportsCollection) getTransactionsStore(facet types.DataFacet) *store.S
 		}
 
 		processFunc := func(item interface{}) *Transaction {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Transaction); ok {
 				return it
 			}
@@ -429,8 +415,6 @@ func (c *ExportsCollection) getTransfersStore(facet types.DataFacet) *store.Stor
 		}
 
 		processFunc := func(item interface{}) *Transfer {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Transfer); ok {
 				return it
 			}
@@ -477,8 +461,6 @@ func (c *ExportsCollection) getWithdrawalsStore(facet types.DataFacet) *store.St
 		}
 
 		processFunc := func(item interface{}) *Withdrawal {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Withdrawal); ok {
 				return it
 			}

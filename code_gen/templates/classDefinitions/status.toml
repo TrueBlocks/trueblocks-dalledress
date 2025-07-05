@@ -1,8 +1,8 @@
 [settings]
 class = "Status"
-doc_group = "05-Status"
+doc_group = "001-Route"
 doc_descr = "data model for various status facets"
-doc_route = "status"
+doc_route = "600-status"
 attributes = ""
 produced_by = "status"
 disable_go = false
@@ -19,3 +19,4 @@ store = "Caches"
 [[facets]]
 name = "Chains"
 store = "Chains"
+

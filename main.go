@@ -53,11 +53,11 @@ func main() {
 		Bind: []interface{}{
 			a,
 			&project.Project{},
+			&exports.ExportsCollection{},
 			&monitors.MonitorsCollection{},
+			&abis.AbisCollection{},
 			&names.NamesCollection{},
 			&chunks.ChunksCollection{},
-			&exports.ExportsCollection{},
-			&abis.AbisCollection{},
 			&status.StatusCollection{},
 		},
 		EnumBind: []interface{}{

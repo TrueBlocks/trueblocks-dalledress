@@ -73,8 +73,6 @@ func (c *ChunksCollection) getBloomsStore(facet types.DataFacet) *store.Store[Bl
 		}
 
 		processFunc := func(item interface{}) *Bloom {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Bloom); ok {
 				return it
 			}
@@ -83,9 +81,6 @@ func (c *ChunksCollection) getBloomsStore(facet types.DataFacet) *store.Store[Bl
 
 		mappingFunc := func(item *Bloom) (key interface{}, includeInMap bool) {
 			// EXISTING_CODE
-			if item != nil {
-				return item.Range, true
-			}
 			// EXISTING_CODE
 			return nil, false
 		}
@@ -127,8 +122,6 @@ func (c *ChunksCollection) getIndexStore(facet types.DataFacet) *store.Store[Ind
 		}
 
 		processFunc := func(item interface{}) *Index {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Index); ok {
 				return it
 			}
@@ -182,8 +175,6 @@ func (c *ChunksCollection) getManifestStore(facet types.DataFacet) *store.Store[
 		}
 
 		processFunc := func(item interface{}) *Manifest {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Manifest); ok {
 				return it
 			}
@@ -192,9 +183,6 @@ func (c *ChunksCollection) getManifestStore(facet types.DataFacet) *store.Store[
 
 		mappingFunc := func(item *Manifest) (key interface{}, includeInMap bool) {
 			// EXISTING_CODE
-			if item != nil {
-				return item.Chain, true
-			}
 			// EXISTING_CODE
 			return nil, false
 		}
@@ -236,8 +224,6 @@ func (c *ChunksCollection) getStatsStore(facet types.DataFacet) *store.Store[Sta
 		}
 
 		processFunc := func(item interface{}) *Stats {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Stats); ok {
 				return it
 			}
@@ -246,9 +232,6 @@ func (c *ChunksCollection) getStatsStore(facet types.DataFacet) *store.Store[Sta
 
 		mappingFunc := func(item *Stats) (key interface{}, includeInMap bool) {
 			// EXISTING_CODE
-			if item != nil {
-				return item.Range, true
-			}
 			// EXISTING_CODE
 			return nil, false
 		}

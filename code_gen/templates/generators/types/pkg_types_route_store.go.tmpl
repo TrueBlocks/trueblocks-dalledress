@@ -59,8 +59,6 @@ func (c *{{$class}}Collection) get{{.Name}}Store(facet types.DataFacet) *store.S
 		}
 
 		processFunc := func(item interface{}) *{{toSingular .Name}} {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*{{toSingular .Name}}); ok {
 				return it
 			}

@@ -5,11 +5,11 @@ import { IconType } from 'react-icons';
 import * as Icons from './Icons';
 
 export type IconSet = {
+  Exports: IconType;
   Monitors: IconType;
+  Abis: IconType;
   Names: IconType;
   Chunks: IconType;
-  Exports: IconType;
-  Abis: IconType;
   Status: IconType;
 
   Home: IconType;
@@ -44,11 +44,11 @@ export type IconSet = {
 
 const faIcons: IconSet = {
   // Collections
+  Exports: Icons.FaExports,
   Monitors: Icons.FaMonitors,
+  Abis: Icons.FaAbis,
   Names: Icons.FaNames,
   Chunks: Icons.FaChunks,
-  Exports: Icons.FaExports,
-  Abis: Icons.FaAbis,
   Status: Icons.FaStatus,
 
   // App navigation
@@ -89,11 +89,11 @@ const faIcons: IconSet = {
 
 const biIcons: IconSet = {
   // Collections
+  Exports: Icons.BiExports,
   Monitors: Icons.BiMonitors,
+  Abis: Icons.BiAbis,
   Names: Icons.BiNames,
   Chunks: Icons.BiChunks,
-  Exports: Icons.BiExports,
-  Abis: Icons.BiAbis,
   Status: Icons.BiStatus,
 
   // App navigation
@@ -161,16 +161,16 @@ export const useIconSets = (
   const iconSet = getIconSet(iconSetName);
 
   return useMemo(() => {
+    const Exports: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Exports, { size, ...props });
     const Monitors: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Monitors, { size, ...props });
+    const Abis: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Abis, { size, ...props });
     const Names: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Names, { size, ...props });
     const Chunks: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Chunks, { size, ...props });
-    const Exports: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Exports, { size, ...props });
-    const Abis: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Abis, { size, ...props });
     const Status: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Status, { size, ...props });
 
@@ -226,11 +226,11 @@ export const useIconSets = (
       createElement(iconSet.Dark, { size, ...props });
 
     return {
+      Exports,
       Monitors,
+      Abis,
       Names,
       Chunks,
-      Exports,
-      Abis,
       Status,
 
       Home,

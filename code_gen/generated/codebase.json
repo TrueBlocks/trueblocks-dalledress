@@ -19,8 +19,8 @@
             "productions": [
                 {
                     "class": "Abis",
-                    "doc_group": "05-Other",
-                    "doc_route": "503-abi",
+                    "doc_group": "001-Route",
+                    "doc_route": "300-abis",
                     "doc_descr": "a human-readable representation of a Solidity smart contract",
                     "produced_by": "abis",
                     "members": [
@@ -585,8 +585,8 @@
                 },
                 {
                     "class": "Chunks",
-                    "doc_group": "04-Admin",
-                    "doc_route": "412-chunkIndex",
+                    "doc_group": "001-Route",
+                    "doc_route": "500-chunks",
                     "doc_descr": "internal-use only data model detailing a single index chunk file",
                     "produced_by": "chunks",
                     "members": [
@@ -1112,8 +1112,8 @@
             "productions": [
                 {
                     "class": "Exports",
-                    "doc_group": "04-Admin",
-                    "doc_route": "412-chunkIndex",
+                    "doc_group": "001-Route",
+                    "doc_route": "100-exports",
                     "doc_descr": "internal-use only data model detailing a single index chunk file",
                     "produced_by": "exports",
                     "members": [
@@ -1241,8 +1241,8 @@
             "productions": [
                 {
                     "class": "Monitors",
-                    "doc_group": "01-Accounts",
-                    "doc_route": "106-monitor",
+                    "doc_group": "001-Route",
+                    "doc_route": "200-monitors",
                     "doc_descr": "a local file indicating a user's interest in an address. Includes caches for reconicilations, transactions, and appearances as well as an optional association to named account",
                     "produced_by": "monitors,list,export,slurp",
                     "cache_type": "marshal_only",
@@ -1336,8 +1336,8 @@
             "productions": [
                 {
                     "class": "Names",
-                    "doc_group": "01-Accounts",
-                    "doc_route": "109-name",
+                    "doc_group": "001-Route",
+                    "doc_route": "400-names",
                     "doc_descr": "an association between a human-readable name and an address used throughout TrueBlocks",
                     "produced_by": "names",
                     "members": [
@@ -1581,225 +1581,116 @@
             ]
         },
         {
-            "class": "Monitors",
-            "doc_group": "01-Accounts",
-            "doc_route": "106-monitor",
-            "doc_descr": "a local file indicating a user's interest in an address. Includes caches for reconicilations, transactions, and appearances as well as an optional association to named account",
-            "produced_by": "monitors,list,export,slurp",
-            "cache_type": "marshal_only",
+            "class": "Exports",
+            "doc_group": "001-Route",
+            "doc_route": "100-exports",
+            "doc_descr": "internal-use only data model detailing a single index chunk file",
+            "produced_by": "exports",
             "members": [
                 {
-                    "name": "address",
-                    "type": "address",
-                    "attributes": "width=340|readOnly",
+                    "name": "range",
+                    "type": "blkrange",
                     "docOrder": 1,
-                    "description": "the address of this monitor",
+                    "description": "the block range (inclusive) covered by this chunk",
                     "num": 1
                 },
                 {
-                    "name": "name",
+                    "name": "magic",
                     "type": "string",
-                    "attributes": "width=200",
                     "docOrder": 2,
-                    "description": "the name of this monitor (if any)",
+                    "description": "an internal use only magic number to indicate file format",
                     "num": 2
                 },
                 {
-                    "name": "nRecords",
-                    "type": "int64",
+                    "name": "hash",
+                    "type": "hash",
                     "docOrder": 3,
-                    "description": "the number of appearances for this monitor",
+                    "description": "the hash of the specification under which this chunk was generated",
                     "num": 3
                 },
                 {
-                    "name": "fileSize",
-                    "type": "int64",
-                    "docOrder": 4,
-                    "description": "the size of this monitor on disc",
-                    "num": 4
-                },
-                {
-                    "name": "isEmpty",
-                    "type": "bool",
-                    "docOrder": 5,
-                    "description": "true if the monitor has no appearances",
-                    "num": 5
-                },
-                {
-                    "name": "lastScanned",
-                    "type": "uint32",
-                    "docOrder": 6,
-                    "description": "the last scanned block number",
-                    "num": 6
-                },
-                {
-                    "name": "deleted",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 7,
-                    "description": "if this monitor has been deleted, `false` otherwise",
-                    "num": 7
-                },
-                {
-                    "name": "isStaged",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 8,
-                    "description": "if the monitor file in on the stage, `false` otherwise",
-                    "num": 8
-                }
-            ],
-            "facets": [
-                {
-                    "name": "Monitors",
-                    "store": "Monitors",
-                    "cruds": [
-                        "delete",
-                        "undelete",
-                        "remove"
-                    ],
-                    "viewType": ""
-                }
-            ]
-        },
-        {
-            "class": "Names",
-            "doc_group": "01-Accounts",
-            "doc_route": "109-name",
-            "doc_descr": "an association between a human-readable name and an address used throughout TrueBlocks",
-            "produced_by": "names",
-            "members": [
-                {
-                    "name": "address",
-                    "type": "address",
-                    "attributes": "width=340|readOnly",
-                    "docOrder": 1,
-                    "description": "the address associated with this name",
-                    "num": 1
-                },
-                {
-                    "name": "name",
-                    "type": "string",
-                    "attributes": "required",
-                    "docOrder": 2,
-                    "description": "the name associated with this address",
-                    "num": 2
-                },
-                {
-                    "name": "tags",
-                    "type": "string",
-                    "attributes": "width=150",
-                    "docOrder": 3,
-                    "description": "colon separated list of tags",
-                    "num": 3
-                },
-                {
-                    "name": "source",
-                    "type": "string",
-                    "attributes": "width=120",
-                    "docOrder": 4,
-                    "description": "user supplied source of where this name was found",
-                    "num": 4
-                },
-                {
-                    "name": "symbol",
-                    "type": "string",
-                    "attributes": "width=100",
-                    "docOrder": 5,
-                    "description": "the symbol for this address",
-                    "num": 5
-                },
-                {
-                    "name": "decimals",
+                    "name": "nAddresses",
                     "type": "uint64",
-                    "attributes": "width=100",
+                    "docOrder": 4,
+                    "description": "the number of addresses in this chunk",
+                    "num": 4
+                },
+                {
+                    "name": "nAppearances",
+                    "type": "uint64",
+                    "docOrder": 5,
+                    "description": "the number of appearances in this chunk",
+                    "num": 5
+                },
+                {
+                    "name": "size",
+                    "type": "uint64",
                     "docOrder": 6,
-                    "description": "number of decimals retrieved from an ERC20 smart contract",
+                    "description": "the size of the chunk in bytes",
                     "num": 6
                 },
                 {
-                    "name": "deleted",
-                    "type": "bool",
-                    "attributes": "noui",
+                    "name": "rangeDates",
+                    "type": "RangeDates",
+                    "attributes": "noui|omitempty",
                     "docOrder": 7,
-                    "description": "if deleted",
-                    "num": 7
-                },
-                {
-                    "name": "isCustom",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 8,
-                    "description": "if the address is a custom address",
-                    "num": 8
-                },
-                {
-                    "name": "isPrefund",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 9,
-                    "description": "if the address was one of the prefund addresses, `false` otherwise",
-                    "num": 9
-                },
-                {
-                    "name": "isContract",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 10,
-                    "description": "if the address is a smart contract",
-                    "num": 10
-                },
-                {
-                    "name": "isErc20",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 11,
-                    "description": "if the address is an ERC20",
-                    "num": 11
-                },
-                {
-                    "name": "isErc721",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 12,
-                    "description": "if the address is an ERC720",
-                    "num": 12
+                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                    "num": 7,
+                    "isPointer": true
                 }
             ],
             "facets": [
                 {
-                    "name": "All",
-                    "store": "Names",
+                    "name": "Statements",
+                    "store": "Statements",
                     "cruds": null,
                     "viewType": ""
                 },
                 {
-                    "name": "Custom",
-                    "store": "Names",
-                    "cruds": [
-                        "delete",
-                        "undelete",
-                        "remove",
-                        "update",
-                        "autoname"
-                    ],
-                    "viewType": ""
-                },
-                {
-                    "name": "Prefund",
-                    "store": "Names",
+                    "name": "Balances",
+                    "store": "Balances",
                     "cruds": null,
                     "viewType": ""
                 },
                 {
-                    "name": "Regular",
-                    "store": "Names",
+                    "name": "Transfers",
+                    "store": "Transfers",
                     "cruds": null,
                     "viewType": ""
                 },
                 {
-                    "name": "Baddress",
-                    "store": "Names",
+                    "name": "Transactions",
+                    "store": "Transactions",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Withdrawals",
+                    "store": "Withdrawals",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Assets",
+                    "store": "Assets",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Logs",
+                    "store": "Logs",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Traces",
+                    "store": "Traces",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Receipts",
+                    "store": "Receipts",
                     "cruds": null,
                     "viewType": ""
                 }
@@ -2312,6 +2203,88 @@
             ]
         },
         {
+            "class": "Monitors",
+            "doc_group": "001-Route",
+            "doc_route": "200-monitors",
+            "doc_descr": "a local file indicating a user's interest in an address. Includes caches for reconicilations, transactions, and appearances as well as an optional association to named account",
+            "produced_by": "monitors,list,export,slurp",
+            "cache_type": "marshal_only",
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "width=340|readOnly",
+                    "docOrder": 1,
+                    "description": "the address of this monitor",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "width=200",
+                    "docOrder": 2,
+                    "description": "the name of this monitor (if any)",
+                    "num": 2
+                },
+                {
+                    "name": "nRecords",
+                    "type": "int64",
+                    "docOrder": 3,
+                    "description": "the number of appearances for this monitor",
+                    "num": 3
+                },
+                {
+                    "name": "fileSize",
+                    "type": "int64",
+                    "docOrder": 4,
+                    "description": "the size of this monitor on disc",
+                    "num": 4
+                },
+                {
+                    "name": "isEmpty",
+                    "type": "bool",
+                    "docOrder": 5,
+                    "description": "true if the monitor has no appearances",
+                    "num": 5
+                },
+                {
+                    "name": "lastScanned",
+                    "type": "uint32",
+                    "docOrder": 6,
+                    "description": "the last scanned block number",
+                    "num": 6
+                },
+                {
+                    "name": "deleted",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 7,
+                    "description": "if this monitor has been deleted, `false` otherwise",
+                    "num": 7
+                },
+                {
+                    "name": "isStaged",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 8,
+                    "description": "if the monitor file in on the stage, `false` otherwise",
+                    "num": 8
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Monitors",
+                    "store": "Monitors",
+                    "cruds": [
+                        "delete",
+                        "undelete",
+                        "remove"
+                    ],
+                    "viewType": ""
+                }
+            ]
+        },
+        {
             "class": "Transaction",
             "doc_group": "02-Chain Data",
             "doc_route": "206-transaction",
@@ -2763,6 +2736,280 @@
             "disable_go": true
         },
         {
+            "class": "Abis",
+            "doc_group": "001-Route",
+            "doc_route": "300-abis",
+            "doc_descr": "a human-readable representation of a Solidity smart contract",
+            "produced_by": "abis",
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "width=340|readOnly",
+                    "docOrder": 1,
+                    "description": "the address for the ABI",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "width=200",
+                    "docOrder": 2,
+                    "description": "the filename of the ABI (likely the smart contract address)",
+                    "num": 2
+                },
+                {
+                    "name": "fileSize",
+                    "type": "int64",
+                    "docOrder": 3,
+                    "description": "the size of this file on disc",
+                    "num": 3
+                },
+                {
+                    "name": "nFunctions",
+                    "type": "int64",
+                    "docOrder": 4,
+                    "description": "the number of functions in the ABI",
+                    "num": 4
+                },
+                {
+                    "name": "nEvents",
+                    "type": "int64",
+                    "docOrder": 5,
+                    "description": "the number of events in the ABI",
+                    "num": 5
+                },
+                {
+                    "name": "path",
+                    "type": "string",
+                    "attributes": "noui",
+                    "docOrder": 6,
+                    "description": "the folder holding the abi file",
+                    "num": 6
+                },
+                {
+                    "name": "lastModDate",
+                    "type": "string",
+                    "attributes": "noui",
+                    "docOrder": 7,
+                    "description": "the last update date of the file",
+                    "num": 7
+                },
+                {
+                    "name": "isKnown",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 8,
+                    "description": "true if this is the ABI for a known smart contract or protocol",
+                    "num": 8
+                },
+                {
+                    "name": "isEmpty",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 9,
+                    "description": "true if the ABI could not be found (and won't be looked for again)",
+                    "num": 9
+                },
+                {
+                    "name": "hasConstructor",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 10,
+                    "description": "if verbose and the abi has a constructor, then `true`, else `false`",
+                    "num": 10
+                },
+                {
+                    "name": "hasFallback",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 11,
+                    "description": "if verbose and the abi has a fallback, then `true`, else `false`",
+                    "num": 11
+                },
+                {
+                    "name": "functions",
+                    "type": "Function",
+                    "attributes": "noui",
+                    "docOrder": 12,
+                    "description": "the functions for this address",
+                    "num": 12,
+                    "isArray": true
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Downloaded",
+                    "store": "Abis",
+                    "cruds": [
+                        "remove"
+                    ],
+                    "viewType": ""
+                },
+                {
+                    "name": "Known",
+                    "store": "Abis",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Functions",
+                    "store": "Functions",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Events",
+                    "store": "Functions",
+                    "cruds": null,
+                    "viewType": ""
+                }
+            ]
+        },
+        {
+            "class": "Names",
+            "doc_group": "001-Route",
+            "doc_route": "400-names",
+            "doc_descr": "an association between a human-readable name and an address used throughout TrueBlocks",
+            "produced_by": "names",
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "width=340|readOnly",
+                    "docOrder": 1,
+                    "description": "the address associated with this name",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "required",
+                    "docOrder": 2,
+                    "description": "the name associated with this address",
+                    "num": 2
+                },
+                {
+                    "name": "tags",
+                    "type": "string",
+                    "attributes": "width=150",
+                    "docOrder": 3,
+                    "description": "colon separated list of tags",
+                    "num": 3
+                },
+                {
+                    "name": "source",
+                    "type": "string",
+                    "attributes": "width=120",
+                    "docOrder": 4,
+                    "description": "user supplied source of where this name was found",
+                    "num": 4
+                },
+                {
+                    "name": "symbol",
+                    "type": "string",
+                    "attributes": "width=100",
+                    "docOrder": 5,
+                    "description": "the symbol for this address",
+                    "num": 5
+                },
+                {
+                    "name": "decimals",
+                    "type": "uint64",
+                    "attributes": "width=100",
+                    "docOrder": 6,
+                    "description": "number of decimals retrieved from an ERC20 smart contract",
+                    "num": 6
+                },
+                {
+                    "name": "deleted",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 7,
+                    "description": "if deleted",
+                    "num": 7
+                },
+                {
+                    "name": "isCustom",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 8,
+                    "description": "if the address is a custom address",
+                    "num": 8
+                },
+                {
+                    "name": "isPrefund",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 9,
+                    "description": "if the address was one of the prefund addresses, `false` otherwise",
+                    "num": 9
+                },
+                {
+                    "name": "isContract",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 10,
+                    "description": "if the address is a smart contract",
+                    "num": 10
+                },
+                {
+                    "name": "isErc20",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 11,
+                    "description": "if the address is an ERC20",
+                    "num": 11
+                },
+                {
+                    "name": "isErc721",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 12,
+                    "description": "if the address is an ERC720",
+                    "num": 12
+                }
+            ],
+            "facets": [
+                {
+                    "name": "All",
+                    "store": "Names",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Custom",
+                    "store": "Names",
+                    "cruds": [
+                        "delete",
+                        "undelete",
+                        "remove",
+                        "update",
+                        "autoname"
+                    ],
+                    "viewType": ""
+                },
+                {
+                    "name": "Prefund",
+                    "store": "Names",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Regular",
+                    "store": "Names",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Baddress",
+                    "store": "Names",
+                    "cruds": null,
+                    "viewType": ""
+                }
+            ]
+        },
+        {
             "class": "Assets",
             "doc_group": "04-Admin",
             "doc_route": "409-chunkRecord",
@@ -3106,208 +3353,6 @@
             ]
         },
         {
-            "class": "Chunks",
-            "doc_group": "04-Admin",
-            "doc_route": "412-chunkIndex",
-            "doc_descr": "internal-use only data model detailing a single index chunk file",
-            "produced_by": "chunks",
-            "members": [
-                {
-                    "name": "range",
-                    "type": "blkrange",
-                    "docOrder": 1,
-                    "description": "the block range (inclusive) covered by this chunk",
-                    "num": 1
-                },
-                {
-                    "name": "magic",
-                    "type": "string",
-                    "docOrder": 2,
-                    "description": "an internal use only magic number to indicate file format",
-                    "num": 2
-                },
-                {
-                    "name": "hash",
-                    "type": "hash",
-                    "docOrder": 3,
-                    "description": "the hash of the specification under which this chunk was generated",
-                    "num": 3
-                },
-                {
-                    "name": "nAddresses",
-                    "type": "uint64",
-                    "docOrder": 4,
-                    "description": "the number of addresses in this chunk",
-                    "num": 4
-                },
-                {
-                    "name": "nAppearances",
-                    "type": "uint64",
-                    "docOrder": 5,
-                    "description": "the number of appearances in this chunk",
-                    "num": 5
-                },
-                {
-                    "name": "size",
-                    "type": "uint64",
-                    "docOrder": 6,
-                    "description": "the size of the chunk in bytes",
-                    "num": 6
-                },
-                {
-                    "name": "rangeDates",
-                    "type": "RangeDates",
-                    "attributes": "noui|omitempty",
-                    "docOrder": 7,
-                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
-                    "num": 7,
-                    "isPointer": true
-                }
-            ],
-            "facets": [
-                {
-                    "name": "Stats",
-                    "store": "Stats",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Index",
-                    "store": "Index",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Blooms",
-                    "store": "Blooms",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Manifest",
-                    "store": "Manifest",
-                    "cruds": null,
-                    "viewType": ""
-                }
-            ]
-        },
-        {
-            "class": "Exports",
-            "doc_group": "04-Admin",
-            "doc_route": "412-chunkIndex",
-            "doc_descr": "internal-use only data model detailing a single index chunk file",
-            "produced_by": "exports",
-            "members": [
-                {
-                    "name": "range",
-                    "type": "blkrange",
-                    "docOrder": 1,
-                    "description": "the block range (inclusive) covered by this chunk",
-                    "num": 1
-                },
-                {
-                    "name": "magic",
-                    "type": "string",
-                    "docOrder": 2,
-                    "description": "an internal use only magic number to indicate file format",
-                    "num": 2
-                },
-                {
-                    "name": "hash",
-                    "type": "hash",
-                    "docOrder": 3,
-                    "description": "the hash of the specification under which this chunk was generated",
-                    "num": 3
-                },
-                {
-                    "name": "nAddresses",
-                    "type": "uint64",
-                    "docOrder": 4,
-                    "description": "the number of addresses in this chunk",
-                    "num": 4
-                },
-                {
-                    "name": "nAppearances",
-                    "type": "uint64",
-                    "docOrder": 5,
-                    "description": "the number of appearances in this chunk",
-                    "num": 5
-                },
-                {
-                    "name": "size",
-                    "type": "uint64",
-                    "docOrder": 6,
-                    "description": "the size of the chunk in bytes",
-                    "num": 6
-                },
-                {
-                    "name": "rangeDates",
-                    "type": "RangeDates",
-                    "attributes": "noui|omitempty",
-                    "docOrder": 7,
-                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
-                    "num": 7,
-                    "isPointer": true
-                }
-            ],
-            "facets": [
-                {
-                    "name": "Statements",
-                    "store": "Statements",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Balances",
-                    "store": "Balances",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Transfers",
-                    "store": "Transfers",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Transactions",
-                    "store": "Transactions",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Withdrawals",
-                    "store": "Withdrawals",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Assets",
-                    "store": "Assets",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Logs",
-                    "store": "Logs",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Traces",
-                    "store": "Traces",
-                    "cruds": null,
-                    "viewType": ""
-                },
-                {
-                    "name": "Receipts",
-                    "store": "Receipts",
-                    "cruds": null,
-                    "viewType": ""
-                }
-            ]
-        },
-        {
             "class": "Blooms",
             "doc_group": "04-Admin",
             "doc_route": "412-chunkIndex-blooms",
@@ -3616,131 +3661,86 @@
             "disable_go": true
         },
         {
-            "class": "Abis",
-            "doc_group": "05-Other",
-            "doc_route": "503-abi",
-            "doc_descr": "a human-readable representation of a Solidity smart contract",
-            "produced_by": "abis",
+            "class": "Chunks",
+            "doc_group": "001-Route",
+            "doc_route": "500-chunks",
+            "doc_descr": "internal-use only data model detailing a single index chunk file",
+            "produced_by": "chunks",
             "members": [
                 {
-                    "name": "address",
-                    "type": "address",
-                    "attributes": "width=340|readOnly",
+                    "name": "range",
+                    "type": "blkrange",
                     "docOrder": 1,
-                    "description": "the address for the ABI",
+                    "description": "the block range (inclusive) covered by this chunk",
                     "num": 1
                 },
                 {
-                    "name": "name",
+                    "name": "magic",
                     "type": "string",
-                    "attributes": "width=200",
                     "docOrder": 2,
-                    "description": "the filename of the ABI (likely the smart contract address)",
+                    "description": "an internal use only magic number to indicate file format",
                     "num": 2
                 },
                 {
-                    "name": "fileSize",
-                    "type": "int64",
+                    "name": "hash",
+                    "type": "hash",
                     "docOrder": 3,
-                    "description": "the size of this file on disc",
+                    "description": "the hash of the specification under which this chunk was generated",
                     "num": 3
                 },
                 {
-                    "name": "nFunctions",
-                    "type": "int64",
+                    "name": "nAddresses",
+                    "type": "uint64",
                     "docOrder": 4,
-                    "description": "the number of functions in the ABI",
+                    "description": "the number of addresses in this chunk",
                     "num": 4
                 },
                 {
-                    "name": "nEvents",
-                    "type": "int64",
+                    "name": "nAppearances",
+                    "type": "uint64",
                     "docOrder": 5,
-                    "description": "the number of events in the ABI",
+                    "description": "the number of appearances in this chunk",
                     "num": 5
                 },
                 {
-                    "name": "path",
-                    "type": "string",
-                    "attributes": "noui",
+                    "name": "size",
+                    "type": "uint64",
                     "docOrder": 6,
-                    "description": "the folder holding the abi file",
+                    "description": "the size of the chunk in bytes",
                     "num": 6
                 },
                 {
-                    "name": "lastModDate",
-                    "type": "string",
-                    "attributes": "noui",
+                    "name": "rangeDates",
+                    "type": "RangeDates",
+                    "attributes": "noui|omitempty",
                     "docOrder": 7,
-                    "description": "the last update date of the file",
-                    "num": 7
-                },
-                {
-                    "name": "isKnown",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 8,
-                    "description": "true if this is the ABI for a known smart contract or protocol",
-                    "num": 8
-                },
-                {
-                    "name": "isEmpty",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 9,
-                    "description": "true if the ABI could not be found (and won't be looked for again)",
-                    "num": 9
-                },
-                {
-                    "name": "hasConstructor",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 10,
-                    "description": "if verbose and the abi has a constructor, then `true`, else `false`",
-                    "num": 10
-                },
-                {
-                    "name": "hasFallback",
-                    "type": "bool",
-                    "attributes": "noui",
-                    "docOrder": 11,
-                    "description": "if verbose and the abi has a fallback, then `true`, else `false`",
-                    "num": 11
-                },
-                {
-                    "name": "functions",
-                    "type": "Function",
-                    "attributes": "noui",
-                    "docOrder": 12,
-                    "description": "the functions for this address",
-                    "num": 12,
-                    "isArray": true
+                    "description": "if verbose, the block and timestamp bounds of the chunk (may be null)",
+                    "num": 7,
+                    "isPointer": true
                 }
             ],
             "facets": [
                 {
-                    "name": "Downloaded",
-                    "store": "Abis",
-                    "cruds": [
-                        "remove"
-                    ],
-                    "viewType": ""
-                },
-                {
-                    "name": "Known",
-                    "store": "Abis",
+                    "name": "Stats",
+                    "store": "Stats",
                     "cruds": null,
                     "viewType": ""
                 },
                 {
-                    "name": "Functions",
-                    "store": "Functions",
+                    "name": "Index",
+                    "store": "Index",
                     "cruds": null,
                     "viewType": ""
                 },
                 {
-                    "name": "Events",
-                    "store": "Functions",
+                    "name": "Blooms",
+                    "store": "Blooms",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Manifest",
+                    "store": "Manifest",
                     "cruds": null,
                     "viewType": ""
                 }
@@ -3947,8 +3947,8 @@
         },
         {
             "class": "Status",
-            "doc_group": "05-Status",
-            "doc_route": "status",
+            "doc_group": "001-Route",
+            "doc_route": "600-status",
             "doc_descr": "data model for various status facets",
             "produced_by": "status",
             "members": [

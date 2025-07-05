@@ -22,16 +22,16 @@ func (a *App) Reload(payload *types.Payload) error {
 	lastView := a.GetAppPreferences().LastView
 
 	switch lastView {
+	case "/exports":
+		return a.ReloadExports(payload)
 	case "/monitors":
 		return a.ReloadMonitors(payload)
+	case "/abis":
+		return a.ReloadAbis(payload)
 	case "/names":
 		return a.ReloadNames(payload)
 	case "/chunks":
 		return a.ReloadChunks(payload)
-	case "/exports":
-		return a.ReloadExports(payload)
-	case "/abis":
-		return a.ReloadAbis(payload)
 	case "/status":
 		return a.ReloadStatus(payload)
 	}

@@ -61,8 +61,6 @@ func (c *AbisCollection) getAbisStore(facet types.DataFacet) *store.Store[Abi] {
 		}
 
 		processFunc := func(item interface{}) *Abi {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Abi); ok {
 				return it
 			}
@@ -108,8 +106,6 @@ func (c *AbisCollection) getFunctionsStore(facet types.DataFacet) *store.Store[F
 		}
 
 		processFunc := func(item interface{}) *Function {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Function); ok {
 				return it
 			}

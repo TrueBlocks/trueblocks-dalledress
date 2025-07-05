@@ -16,11 +16,11 @@ beforeEach(() => {
 const iconNames = [
   'Home',
   'Khedra',
+  'Exports',
   'Monitors',
+  'Abis',
   'Names',
   'Chunks',
-  'Exports',
-  'Abis',
   'Status',
   'DalleDress',
   'Settings',

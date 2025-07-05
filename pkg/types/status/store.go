@@ -64,8 +64,6 @@ func (c *StatusCollection) getCachesStore(facet types.DataFacet) *store.Store[Ca
 		}
 
 		processFunc := func(item interface{}) *Cache {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Cache); ok {
 				return it
 			}
@@ -110,8 +108,6 @@ func (c *StatusCollection) getChainsStore(facet types.DataFacet) *store.Store[Ch
 		}
 
 		processFunc := func(item interface{}) *Chain {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Chain); ok {
 				return it
 			}
@@ -156,8 +152,6 @@ func (c *StatusCollection) getStatusStore(facet types.DataFacet) *store.Store[St
 		}
 
 		processFunc := func(item interface{}) *Status {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Status); ok {
 				return it
 			}

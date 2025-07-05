@@ -57,8 +57,6 @@ func (c *MonitorsCollection) getMonitorsStore(facet types.DataFacet) *store.Stor
 		}
 
 		processFunc := func(item interface{}) *Monitor {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Monitor); ok {
 				return it
 			}

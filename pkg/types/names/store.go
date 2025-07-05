@@ -59,8 +59,6 @@ func (c *NamesCollection) getNamesStore(facet types.DataFacet) *store.Store[Name
 		}
 
 		processFunc := func(item interface{}) *Name {
-			// EXISTING_CODE
-			// EXISTING_CODE
 			if it, ok := item.(*Name); ok {
 				return it
 			}

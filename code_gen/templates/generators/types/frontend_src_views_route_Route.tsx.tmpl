@@ -6,8 +6,10 @@
 {{- $isNames := eq $class "Names" -}}
 {{- $isMonitors := eq $class "Monitors" -}}
 {{- $hasUpdate := $isNames -}}
+{{- $hasForms := .HasForms -}}
+{{- $isStatus := eq $class "Status" -}}
 {{- $models := printf "%s, msgs" $lower -}}
-{{- if $isNames -}}
+{{- if or $isNames $isStatus -}}
   {{- $models = printf "msgs, %s" $lower -}}
 {{- end -}}
 {{- $apis := printf "Get%sPage, Reload" $class -}}
@@ -33,7 +35,7 @@ import { toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
 import { useActionConfig{{if .HasCruds}}, useCrudOperations{{end}} } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
-import { TabView } from '@layout';
+import { {{if $hasForms}}FormView, {{end}}TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { {{$models}}, types } from '@models';
 import { useErrorHandler } from '@utils';
@@ -215,40 +217,92 @@ export const {{$class}} = () => {
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
-  const perTabTable = useMemo(
-    () => (
+  {{- if $hasForms }}
+  const isForm = useCallback((facet: types.DataFacet) => {
+    switch (facet) {
+      {{range .Facets}}{{if or .IsForm .IsDashboard}}case types.DataFacet.{{toUpper .Name}}:
+        return true;
+      {{end}}{{end}}default:
+        return false;
+    }
+  }, []);
+
+  {{- end }}
+  const perTabContent = useMemo(() => {
+    {{- if $hasForms }}
+    const facet = getCurrentDataFacet();
+    if (isForm(facet)) {
+      const {{$lower}}Data = currentData[0] as unknown as Record<string, unknown>;
+      if (!{{$lower}}Data) {
+        return <div>No {{$lower}} data available</div>;
+      }
+      const fieldsWithValues = getColumns(getCurrentDataFacet()).map(
+        (field) => ({
+          ...field,
+          value:
+            ({{$lower}}Data?.[field.name as string] as
+              | string
+              | number
+              | boolean
+              | undefined) || field.value,
+          readOnly: true,
+        }),
+      );
+      return (
+        <FormView
+          title="{{toProper $lower}} Information"
+          formFields={fieldsWithValues}
+          onSubmit={() => {}}
+        />
+      );
+    } else {
+      return (
+        <BaseTab
+          data={currentData as unknown as Record<string, unknown>[]}
+          columns={currentColumns}
+          loading={!!pageData?.isFetching}
+          error={error}
+          viewStateKey={viewStateKey}
+        />
+      );
+    }
+    {{- else}}
+    return (
       <BaseTab
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
+        viewStateKey={viewStateKey}
         {{- if $hasUpdate }}
         onSubmit={handleUpdate}
         {{- end }}
-        viewStateKey={viewStateKey}
       />
-    ),
-    // prettier-ignore
-    [
-      currentData,
-      currentColumns,
-      pageData?.isFetching,
-      error,
-      {{- if $hasUpdate }}
-      handleUpdate,
-      {{- end }}
-      viewStateKey,
-    ],
-  );
+    );
+    {{- end}}
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    {{- if $hasUpdate }}
+    handleUpdate,
+    {{- end }}
+    viewStateKey,
+    {{- if $hasForms}}
+    isForm,
+    getCurrentDataFacet,
+    {{- end}}
+  ]);
 
   const tabs = useMemo(
     () =>
       availableFacets.map((facetConfig: DataFacetConfig) => ({
         label: facetConfig.label,
         value: facetConfig.id,
-        content: perTabTable,
+        content: perTabContent,
       })),
-    [availableFacets, perTabTable],
+    [availableFacets, perTabContent],
   );
   // === END SECTION 8 ===
 

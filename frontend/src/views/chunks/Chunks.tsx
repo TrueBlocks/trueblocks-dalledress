@@ -162,8 +162,8 @@ export const Chunks = () => {
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
-  const perTabTable = useMemo(
-    () => (
+  const perTabContent = useMemo(() => {
+    return (
       <BaseTab
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
@@ -171,25 +171,17 @@ export const Chunks = () => {
         error={error}
         viewStateKey={viewStateKey}
       />
-    ),
-    // prettier-ignore
-    [
-      currentData,
-      currentColumns,
-      pageData?.isFetching,
-      error,
-      viewStateKey,
-    ],
-  );
+    );
+  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
 
   const tabs = useMemo(
     () =>
       availableFacets.map((facetConfig: DataFacetConfig) => ({
         label: facetConfig.label,
         value: facetConfig.id,
-        content: perTabTable,
+        content: perTabContent,
       })),
-    [availableFacets, perTabTable],
+    [availableFacets, perTabContent],
   );
   // === END SECTION 8 ===
 

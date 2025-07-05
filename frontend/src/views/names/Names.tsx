@@ -197,36 +197,34 @@ export const Names = () => {
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
-  const perTabTable = useMemo(
-    () => (
+  const perTabContent = useMemo(() => {
+    return (
       <BaseTab
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
-        onSubmit={handleUpdate}
         viewStateKey={viewStateKey}
+        onSubmit={handleUpdate}
       />
-    ),
-    // prettier-ignore
-    [
-      currentData,
-      currentColumns,
-      pageData?.isFetching,
-      error,
-      handleUpdate,
-      viewStateKey,
-    ],
-  );
+    );
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    handleUpdate,
+    viewStateKey,
+  ]);
 
   const tabs = useMemo(
     () =>
       availableFacets.map((facetConfig: DataFacetConfig) => ({
         label: facetConfig.label,
         value: facetConfig.id,
-        content: perTabTable,
+        content: perTabContent,
       })),
-    [availableFacets, perTabTable],
+    [availableFacets, perTabContent],
   );
   // === END SECTION 8 ===
 

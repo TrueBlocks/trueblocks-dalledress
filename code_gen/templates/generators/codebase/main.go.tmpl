@@ -17,12 +17,11 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/status"
+    {{- range .Structures }}
+    {{- if and (ne .Class "") (not .DisableGo) }}
+        "github.com/TrueBlocks/trueblocks-dalledress/pkg/types/{{ toLower .Class }}"
+    {{- end }}
+    {{- end }}
 	"github.com/wailsapp/wails/v2"
 	wLogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -53,12 +52,11 @@ func main() {
 		Bind: []interface{}{
 			a,
 			&project.Project{},
-			&monitors.MonitorsCollection{},
-			&names.NamesCollection{},
-			&chunks.ChunksCollection{},
-			&exports.ExportsCollection{},
-			&abis.AbisCollection{},
-			&status.StatusCollection{},
+            {{- range .Structures }}
+            {{- if and (ne .Class "") (not .DisableGo) }}
+			    &{{toLower .Class}}.{{.Class}}Collection{},
+            {{- end }}
+            {{- end }}
 		},
 		EnumBind: []interface{}{
 			msgs.AllMessages,

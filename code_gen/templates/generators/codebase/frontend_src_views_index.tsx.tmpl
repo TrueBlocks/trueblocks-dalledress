@@ -9,10 +9,8 @@ export { Home } from './home';
 export { DalleDress } from './DalleDress';
 export { Khedra } from './Khedra';
 export * from './settings';
-
-export { Monitors } from './monitors';
-export { Names } from './names';
-export { Chunks } from './chunks';
-export { Exports } from './exports';
-export { Abis } from './abis';
-export { Status } from './status';
+{{range .Structures -}}
+  {{- if and (not .DisableGo) (ne .Class "") }}
+export { {{.Class}} } from './{{ toLower .Class }}';
+  {{- end }}
+{{- end }}

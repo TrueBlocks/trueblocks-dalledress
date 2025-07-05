@@ -2,8 +2,7 @@
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
 /*
- * Parts of this file were auto generated. Edit only those parts of
- * the code inside of 'EXISTING_CODE' tags.
+ * This file was auto generated. Do not edit.
  */
 import { DataFacetConfig } from '@hooks';
 import { types } from '@models';

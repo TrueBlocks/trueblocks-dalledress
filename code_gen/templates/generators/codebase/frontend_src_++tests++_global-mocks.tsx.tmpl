@@ -16,12 +16,11 @@ beforeEach(() => {
 const iconNames = [
   'Home',
   'Khedra',
-  'Monitors',
-  'Names',
-  'Chunks',
-  'Exports',
-  'Abis',
-  'Status',
+  {{- range .Structures }}
+    {{- if and (not .DisableGo) (ne .Class "") }}
+  '{{ .Class }}',
+    {{- end }}
+  {{- end }}
   'DalleDress',
   'Settings',
   'Wizard',

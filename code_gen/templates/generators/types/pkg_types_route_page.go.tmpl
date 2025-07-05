@@ -85,7 +85,7 @@ func (c *{{.Class}}Collection) GetPage(
 			}
 		}
 		sortFunc := func(items []{{$sing2}}, sort sdk.SortSpec) error {
-			return {{if $isExports}}nil // {{end}}sdk.Sort{{.Store}}(items, sort)
+			return sdk.Sort{{.Store}}(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("{{toLower $class}}", dataFacet, "GetPage", err)

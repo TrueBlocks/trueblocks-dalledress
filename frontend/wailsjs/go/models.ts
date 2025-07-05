@@ -698,8 +698,65 @@ export namespace sdk {
 
 }
 
+export namespace status {
+	
+	export class StatusPage {
+	    facet: types.DataFacet;
+	    caches: types.CacheItem[];
+	    chains: types.Chain[];
+	    status: types.Status[];
+	    totalItems: number;
+	    expectedTotal: number;
+	    isFetching: boolean;
+	    state: types.LoadState;
+	
+	    static createFrom(source: any = {}) {
+	        return new StatusPage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.facet = source["facet"];
+	        this.caches = this.convertValues(source["caches"], types.CacheItem);
+	        this.chains = this.convertValues(source["chains"], types.Chain);
+	        this.status = this.convertValues(source["status"], types.Status);
+	        this.totalItems = source["totalItems"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isFetching = source["isFetching"];
+	        this.state = source["state"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
 export namespace types {
 	
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
+	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -724,14 +781,9 @@ export namespace types {
 	    PREFUND = "prefund",
 	    REGULAR = "regular",
 	    BADDRESS = "baddress",
-	}
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
+	    STATUS = "status",
+	    CACHES = "caches",
+	    CHAINS = "chains",
 	}
 	export class Parameter {
 	    components?: Parameter[];
@@ -874,6 +926,54 @@ export namespace types {
 		    }
 		    return a;
 		}
+	}
+	export class CacheItem {
+	    items: any[];
+	    lastCached?: string;
+	    nFiles: number;
+	    nFolders: number;
+	    path: string;
+	    sizeInBytes: number;
+	    type: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new CacheItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.items = source["items"];
+	        this.lastCached = source["lastCached"];
+	        this.nFiles = source["nFiles"];
+	        this.nFolders = source["nFolders"];
+	        this.path = source["path"];
+	        this.sizeInBytes = source["sizeInBytes"];
+	        this.type = source["type"];
+	    }
+	}
+	export class Chain {
+	    chain: string;
+	    chainId: number;
+	    ipfsGateway: string;
+	    localExplorer: string;
+	    remoteExplorer: string;
+	    rpcProvider: string;
+	    symbol: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Chain(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.chain = source["chain"];
+	        this.chainId = source["chainId"];
+	        this.ipfsGateway = source["ipfsGateway"];
+	        this.localExplorer = source["localExplorer"];
+	        this.remoteExplorer = source["remoteExplorer"];
+	        this.rpcProvider = source["rpcProvider"];
+	        this.symbol = source["symbol"];
+	    }
 	}
 	export class RangeDates {
 	    firstDate?: string;
@@ -1505,6 +1605,78 @@ export namespace types {
 	        this.correctionId = source["correctionId"];
 	        this.holder = this.convertValues(source["holder"], base.Address);
 	        this.statementId = source["statementId"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Status {
+	    cachePath?: string;
+	    caches: CacheItem[];
+	    chain?: string;
+	    chainConfig?: string;
+	    chainId?: string;
+	    chains: Chain[];
+	    clientVersion?: string;
+	    hasEsKey?: boolean;
+	    hasPinKey?: boolean;
+	    indexPath?: string;
+	    isApi?: boolean;
+	    isArchive?: boolean;
+	    isScraping?: boolean;
+	    isTesting?: boolean;
+	    isTracing?: boolean;
+	    networkId?: string;
+	    progress?: string;
+	    rootConfig?: string;
+	    rpcProvider?: string;
+	    version?: string;
+	    meta?: MetaData;
+	    diffs?: MetaData;
+	
+	    static createFrom(source: any = {}) {
+	        return new Status(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.cachePath = source["cachePath"];
+	        this.caches = this.convertValues(source["caches"], CacheItem);
+	        this.chain = source["chain"];
+	        this.chainConfig = source["chainConfig"];
+	        this.chainId = source["chainId"];
+	        this.chains = this.convertValues(source["chains"], Chain);
+	        this.clientVersion = source["clientVersion"];
+	        this.hasEsKey = source["hasEsKey"];
+	        this.hasPinKey = source["hasPinKey"];
+	        this.indexPath = source["indexPath"];
+	        this.isApi = source["isApi"];
+	        this.isArchive = source["isArchive"];
+	        this.isScraping = source["isScraping"];
+	        this.isTesting = source["isTesting"];
+	        this.isTracing = source["isTracing"];
+	        this.networkId = source["networkId"];
+	        this.progress = source["progress"];
+	        this.rootConfig = source["rootConfig"];
+	        this.rpcProvider = source["rpcProvider"];
+	        this.version = source["version"];
+	        this.meta = this.convertValues(source["meta"], MetaData);
+	        this.diffs = this.convertValues(source["diffs"], MetaData);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

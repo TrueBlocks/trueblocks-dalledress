@@ -14,6 +14,7 @@ import {exports} from '../models';
 import {project} from '../models';
 import {monitors} from '../models';
 import {names} from '../models';
+import {status} from '../models';
 import {app} from '../models';
 
 export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Abi):Promise<void>;
@@ -90,6 +91,10 @@ export function GetOrgPreferences():Promise<preferences.OrgPreferences>;
 
 export function GetProjectAddress():Promise<base.Address>;
 
+export function GetStatusPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<status.StatusPage>;
+
+export function GetStatusSummary(arg1:types.Payload):Promise<types.Summary>;
+
 export function GetTheme():Promise<string>;
 
 export function GetUserInfoStatus():Promise<app.UserInfoStatus>;
@@ -127,6 +132,8 @@ export function ReloadExports(arg1:types.Payload):Promise<void>;
 export function ReloadMonitors(arg1:types.Payload):Promise<void>;
 
 export function ReloadNames(arg1:types.Payload):Promise<void>;
+
+export function ReloadStatus(arg1:types.Payload):Promise<void>;
 
 export function ResetStore(arg1:string):Promise<void>;
 

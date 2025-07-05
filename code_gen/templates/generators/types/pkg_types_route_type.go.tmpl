@@ -51,7 +51,7 @@ func New{{.Class}}Collection() *{{.Class}}Collection {
 
 func (c *{{.Class}}Collection) initializeFacets() {
 	{{- range .Facets}}
-	c.{{toLower .Name}}Facet = facets.NewFacetWithSummary(
+	c.{{toLower .Name}}Facet = facets.NewFacet(
 		{{$class}}{{.Name}},
 		is{{toSingular .Name}},
 		isDup{{.SingleStore}}(),

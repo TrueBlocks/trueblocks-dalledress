@@ -150,6 +150,14 @@ export function GetProjectAddress() {
   return window['go']['app']['App']['GetProjectAddress']();
 }
 
+export function GetStatusPage(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['app']['App']['GetStatusPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function GetStatusSummary(arg1) {
+  return window['go']['app']['App']['GetStatusSummary'](arg1);
+}
+
 export function GetTheme() {
   return window['go']['app']['App']['GetTheme']();
 }
@@ -224,6 +232,10 @@ export function ReloadMonitors(arg1) {
 
 export function ReloadNames(arg1) {
   return window['go']['app']['App']['ReloadNames'](arg1);
+}
+
+export function ReloadStatus(arg1) {
+  return window['go']['app']['App']['ReloadStatus'](arg1);
 }
 
 export function ResetStore(arg1) {

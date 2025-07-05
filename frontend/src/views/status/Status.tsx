@@ -8,35 +8,35 @@
 // === SECTION 1: Imports & Dependencies ===
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { AbisCrud, GetAbisPage, Reload } from '@app';
+import { GetStatusPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
-import { useActionConfig, useCrudOperations } from '@hooks';
+import { useActionConfig } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
-import { TabView } from '@layout';
+import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { abis, msgs, types } from '@models';
+import { msgs, status, types } from '@models';
 import { useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
-import { DEFAULT_FACET, ROUTE, abisFacets } from './facets';
+import { DEFAULT_FACET, ROUTE, statusFacets } from './facets';
 
 // === END SECTION 1 ===
 
-export const Abis = () => {
+export const Status = () => {
   // === SECTION 2: Hook Initialization ===
   const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({
-    facets: abisFacets,
+    facets: statusFacets,
     defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
-  const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
+  const [pageData, setPageData] = useState<status.StatusPage | null>(null);
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
@@ -62,7 +62,7 @@ export const Abis = () => {
   const fetchData = useCallback(async () => {
     clearError();
     try {
-      const result = await GetAbisPage(
+      const result = await GetStatusPage(
         createPayload(dataFacetRef.current),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
@@ -91,14 +91,12 @@ export const Abis = () => {
 
     const facet = getCurrentDataFacet();
     switch (facet) {
-      case types.DataFacet.DOWNLOADED:
-        return pageData.abis || [];
-      case types.DataFacet.KNOWN:
-        return pageData.abis || [];
-      case types.DataFacet.FUNCTIONS:
-        return pageData.functions || [];
-      case types.DataFacet.EVENTS:
-        return pageData.functions || [];
+      case types.DataFacet.STATUS:
+        return pageData.status || [];
+      case types.DataFacet.CACHES:
+        return pageData.caches || [];
+      case types.DataFacet.CHAINS:
+        return pageData.chains || [];
       default:
         return [];
     }
@@ -109,7 +107,7 @@ export const Abis = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'abis') {
+      if (payload?.collection === 'status') {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === dataFacetRef.current) {
           fetchData();
@@ -137,66 +135,85 @@ export const Abis = () => {
 
   // === SECTION 6: CRUD Operations ===
   const actionConfig = useActionConfig({
-    operations: ['remove'],
-  });
-
-  const postFunc = useCallback((item: types.Abi): types.Abi => {
-    // EXISTING_CODE
-    // EXISTING_CODE
-    return item;
-  }, []);
-
-  // prettier-ignore
-  const { handleRemove } = useCrudOperations({
-    collectionName: 'abis',
-    crudFunc: AbisCrud,
-    pageFunc: GetAbisPage,
-    postFunc: postFunc,
-    pageClass: abis.AbisPage,
-    updateItem: types.Abi.createFrom({}),
-    getCurrentDataFacet,
-    pageData,
-    setPageData,
-    setTotalItems,
-    dataFacetRef,
-    actionConfig,
+    operations: [],
   });
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  const showActions = getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
+  const showActions = false;
   const getCanRemove = (_row: unknown): boolean => {
-    return getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
+    return true;
   };
 
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
       showActions,
-      actions: ['remove'],
+      actions: [],
       getCanRemove,
     },
-    {
-      handleRemove,
-    },
+    {},
     toPageDataProp(pageData),
     actionConfig,
-    false /* perRowCrud */,
+    true /* perRowCrud */,
   );
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
+  const isForm = useCallback((facet: types.DataFacet) => {
+    switch (facet) {
+      case types.DataFacet.STATUS:
+        return true;
+      default:
+        return false;
+    }
+  }, []);
   const perTabContent = useMemo(() => {
-    return (
-      <BaseTab
-        data={currentData as unknown as Record<string, unknown>[]}
-        columns={currentColumns}
-        loading={!!pageData?.isFetching}
-        error={error}
-        viewStateKey={viewStateKey}
-      />
-    );
-  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
+    const facet = getCurrentDataFacet();
+    if (isForm(facet)) {
+      const statusData = currentData[0] as unknown as Record<string, unknown>;
+      if (!statusData) {
+        return <div>No status data available</div>;
+      }
+      const fieldsWithValues = getColumns(getCurrentDataFacet()).map(
+        (field) => ({
+          ...field,
+          value:
+            (statusData?.[field.name as string] as
+              | string
+              | number
+              | boolean
+              | undefined) || field.value,
+          readOnly: true,
+        }),
+      );
+      return (
+        <FormView
+          title="Status Information"
+          formFields={fieldsWithValues}
+          onSubmit={() => {}}
+        />
+      );
+    } else {
+      return (
+        <BaseTab
+          data={currentData as unknown as Record<string, unknown>[]}
+          columns={currentColumns}
+          loading={!!pageData?.isFetching}
+          error={error}
+          viewStateKey={viewStateKey}
+        />
+      );
+    }
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    viewStateKey,
+    isForm,
+    getCurrentDataFacet,
+  ]);
 
   const tabs = useMemo(
     () =>

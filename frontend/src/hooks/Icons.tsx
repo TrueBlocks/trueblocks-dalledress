@@ -29,7 +29,7 @@ Fa6: Font Awesome 6
 */
 // A type called IconSet that has Home, Settings, and Khedra keys, all strings
 import { IconType } from 'react-icons';
-// Import BoxIcons (bi)
+
 import {
   BiBot,
   BiBuildings,
@@ -58,7 +58,7 @@ import {
   BiUser,
   BiX,
 } from 'react-icons/bi';
-// A function that returns an IconSet using icons from react-icons/fa
+
 import {
   FaAngleDoubleDown,
   FaAngleDoubleLeft,
@@ -89,34 +89,27 @@ import {
   FaUser,
 } from 'react-icons/fa';
 
-// An IconSet using icons from react-icons/fa to represent Home, Settings, and Khedra
 export type IconSet = {
-  // Menu options
+  Names: IconType;
+  ABIs: IconType;
+  Monitors: IconType;
+  Chunks: IconType;
+  Exports: IconType;
+
   Home: IconType;
   Khedra: IconType;
   DalleDress: IconType;
   Settings: IconType;
   Wizard: IconType;
 
-  // ADD_ROUTE
-  Names: IconType;
-  ABIs: IconType;
-  Monitors: IconType;
-  Chunks: IconType;
-  Exports: IconType;
-  // ADD_ROUTE
-
-  // File operations
   Switch: IconType;
   File: IconType;
 
-  // Social media icons
   Twitter: IconType;
   Github: IconType;
   Website: IconType;
   Email: IconType;
 
-  // Editing operations
   Add: IconType;
   Edit: IconType;
   Delete: IconType;
@@ -124,32 +117,28 @@ export type IconSet = {
   Remove: IconType;
   Autoname: IconType;
 
-  // Chevrons
   ChevronLeft: IconType;
   ChevronRight: IconType;
   ChevronUp: IconType;
   ChevronDown: IconType;
 
-  // Color modes
   Light: IconType;
   Dark: IconType;
 };
 
 // An IconSet using icons from fa react to represent Home, Settings, and Khedra
 const faIcons: IconSet = {
-  Home: FaHome,
-  Khedra: FaIndustry,
-  DalleDress: FaPalette,
-  Settings: FaCog,
-  Wizard: FaHatWizard,
-
-  // ADD_ROUTE
   Names: FaUser,
   ABIs: FaListAlt,
   Monitors: FaDesktop,
   Chunks: FaIndustry,
   Exports: FaHistory,
-  // ADD_ROUTE
+
+  Home: FaHome,
+  Khedra: FaIndustry,
+  DalleDress: FaPalette,
+  Settings: FaCog,
+  Wizard: FaHatWizard,
 
   Switch: FaRandom,
   File: FaFile,
@@ -174,21 +163,18 @@ const faIcons: IconSet = {
   Dark: FaMoon,
 };
 
-// An IconSet using icons from bi react to represent Home, Settings, and Khedra
 const biIcons: IconSet = {
-  Home: BiHome,
-  Khedra: BiBuildings,
-  DalleDress: BiPalette,
-  Settings: BiCog,
-  Wizard: BiCog,
-
-  // ADD_ROUTE
   Names: BiUser,
   ABIs: BiListUl,
   Monitors: BiDesktop,
   Chunks: BiBuildings,
   Exports: BiHistory,
-  // ADD_ROUTE
+
+  Home: BiHome,
+  Khedra: BiBuildings,
+  DalleDress: BiPalette,
+  Settings: BiCog,
+  Wizard: BiCog,
 
   Switch: BiTransfer,
   File: BiFile,

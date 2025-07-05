@@ -125,22 +125,26 @@
                             "store": "Abis",
                             "cruds": [
                                 "remove"
-                            ]
+                            ],
+                            "viewType": ""
                         },
                         {
                             "name": "Known",
                             "store": "Abis",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Functions",
                             "store": "Functions",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Events",
                             "store": "Functions",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         }
                     ]
                 },
@@ -642,22 +646,26 @@
                         {
                             "name": "Stats",
                             "store": "Stats",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Index",
                             "store": "Index",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Blooms",
                             "store": "Blooms",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Manifest",
                             "store": "Manifest",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         }
                     ]
                 },
@@ -1165,47 +1173,56 @@
                         {
                             "name": "Statements",
                             "store": "Statements",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Balances",
                             "store": "Balances",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Transfers",
                             "store": "Transfers",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Transactions",
                             "store": "Transactions",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Withdrawals",
                             "store": "Withdrawals",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Assets",
                             "store": "Assets",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Logs",
                             "store": "Logs",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Traces",
                             "store": "Traces",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Receipts",
                             "store": "Receipts",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         }
                     ]
                 }
@@ -1299,7 +1316,8 @@
                                 "delete",
                                 "undelete",
                                 "remove"
-                            ]
+                            ],
+                            "viewType": ""
                         }
                     ]
                 }
@@ -1424,7 +1442,8 @@
                         {
                             "name": "All",
                             "store": "Names",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Custom",
@@ -1435,22 +1454,26 @@
                                 "remove",
                                 "update",
                                 "autoname"
-                            ]
+                            ],
+                            "viewType": ""
                         },
                         {
                             "name": "Prefund",
                             "store": "Names",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Regular",
                             "store": "Names",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         },
                         {
                             "name": "Baddress",
                             "store": "Names",
-                            "cruds": null
+                            "cruds": null,
+                            "viewType": ""
                         }
                     ]
                 }
@@ -1458,6 +1481,105 @@
         }
     ],
     "structures": [
+        {
+            "members": [
+                {
+                    "name": "chain",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "the chain identifier",
+                    "num": 1
+                },
+                {
+                    "name": "chainId",
+                    "type": "uint64",
+                    "docOrder": 2,
+                    "description": "the chain ID",
+                    "num": 2
+                },
+                {
+                    "name": "ipfsGateway",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "the IPFS gateway URL",
+                    "num": 3
+                },
+                {
+                    "name": "localExplorer",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "the local block explorer URL",
+                    "num": 4
+                },
+                {
+                    "name": "remoteExplorer",
+                    "type": "string",
+                    "docOrder": 5,
+                    "description": "the remote block explorer URL",
+                    "num": 5
+                },
+                {
+                    "name": "rpcProvider",
+                    "type": "string",
+                    "docOrder": 6,
+                    "description": "the RPC provider URL",
+                    "num": 6
+                },
+                {
+                    "name": "symbol",
+                    "type": "string",
+                    "docOrder": 7,
+                    "description": "the chain's native token symbol",
+                    "num": 7
+                }
+            ]
+        },
+        {
+            "members": [
+                {
+                    "name": "lastCached",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "the last time this cache was updated",
+                    "num": 1
+                },
+                {
+                    "name": "nFiles",
+                    "type": "uint64",
+                    "docOrder": 2,
+                    "description": "the number of files in the cache",
+                    "num": 2
+                },
+                {
+                    "name": "nFolders",
+                    "type": "uint64",
+                    "docOrder": 3,
+                    "description": "the number of folders in the cache",
+                    "num": 3
+                },
+                {
+                    "name": "path",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "the path to the cache",
+                    "num": 4
+                },
+                {
+                    "name": "sizeInBytes",
+                    "type": "uint64",
+                    "docOrder": 5,
+                    "description": "the size of the cache in bytes",
+                    "num": 5
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "docOrder": 6,
+                    "description": "the type of cache",
+                    "num": 6
+                }
+            ]
+        },
         {
             "class": "Monitors",
             "doc_group": "01-Accounts",
@@ -1535,7 +1657,8 @@
                         "delete",
                         "undelete",
                         "remove"
-                    ]
+                    ],
+                    "viewType": ""
                 }
             ]
         },
@@ -1647,7 +1770,8 @@
                 {
                     "name": "All",
                     "store": "Names",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Custom",
@@ -1658,22 +1782,26 @@
                         "remove",
                         "update",
                         "autoname"
-                    ]
+                    ],
+                    "viewType": ""
                 },
                 {
                     "name": "Prefund",
                     "store": "Names",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Regular",
                     "store": "Names",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Baddress",
                     "store": "Names",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 }
             ]
         },
@@ -3040,22 +3168,26 @@
                 {
                     "name": "Stats",
                     "store": "Stats",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Index",
                     "store": "Index",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Blooms",
                     "store": "Blooms",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Manifest",
                     "store": "Manifest",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 }
             ]
         },
@@ -3122,47 +3254,56 @@
                 {
                     "name": "Statements",
                     "store": "Statements",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Balances",
                     "store": "Balances",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Transfers",
                     "store": "Transfers",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Transactions",
                     "store": "Transactions",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Withdrawals",
                     "store": "Withdrawals",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Assets",
                     "store": "Assets",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Logs",
                     "store": "Logs",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Traces",
                     "store": "Traces",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Receipts",
                     "store": "Receipts",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 }
             ]
         },
@@ -3582,22 +3723,26 @@
                     "store": "Abis",
                     "cruds": [
                         "remove"
-                    ]
+                    ],
+                    "viewType": ""
                 },
                 {
                     "name": "Known",
                     "store": "Abis",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Functions",
                     "store": "Functions",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 },
                 {
                     "name": "Events",
                     "store": "Functions",
-                    "cruds": null
+                    "cruds": null,
+                    "viewType": ""
                 }
             ]
         },
@@ -3797,6 +3942,161 @@
                     "type": "string",
                     "docOrder": 7,
                     "num": 7
+                }
+            ]
+        },
+        {
+            "class": "Status",
+            "doc_group": "05-Status",
+            "doc_route": "status",
+            "doc_descr": "data model for various status facets",
+            "produced_by": "status",
+            "members": [
+                {
+                    "name": "cachePath",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "path to the cache directory",
+                    "num": 1
+                },
+                {
+                    "name": "chain",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "the chain identifier",
+                    "num": 2
+                },
+                {
+                    "name": "chainConfig",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "path to chain configuration",
+                    "num": 3
+                },
+                {
+                    "name": "chainId",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "the chain ID",
+                    "num": 4
+                },
+                {
+                    "name": "clientVersion",
+                    "type": "string",
+                    "docOrder": 5,
+                    "description": "version of the client",
+                    "num": 5
+                },
+                {
+                    "name": "hasEsKey",
+                    "type": "bool",
+                    "docOrder": 6,
+                    "description": "whether Etherscan API key is available",
+                    "num": 6
+                },
+                {
+                    "name": "hasPinKey",
+                    "type": "bool",
+                    "docOrder": 7,
+                    "description": "whether Pinata API key is available",
+                    "num": 7
+                },
+                {
+                    "name": "indexPath",
+                    "type": "string",
+                    "docOrder": 8,
+                    "description": "path to the index directory",
+                    "num": 8
+                },
+                {
+                    "name": "isApi",
+                    "type": "bool",
+                    "docOrder": 9,
+                    "description": "whether running in API mode",
+                    "num": 9
+                },
+                {
+                    "name": "isArchive",
+                    "type": "bool",
+                    "docOrder": 10,
+                    "description": "whether node is archive node",
+                    "num": 10
+                },
+                {
+                    "name": "isScraping",
+                    "type": "bool",
+                    "docOrder": 11,
+                    "description": "whether scraper is running",
+                    "num": 11
+                },
+                {
+                    "name": "isTesting",
+                    "type": "bool",
+                    "docOrder": 12,
+                    "description": "whether in testing mode",
+                    "num": 12
+                },
+                {
+                    "name": "isTracing",
+                    "type": "bool",
+                    "docOrder": 13,
+                    "description": "whether tracing is enabled",
+                    "num": 13
+                },
+                {
+                    "name": "networkId",
+                    "type": "string",
+                    "docOrder": 14,
+                    "description": "the network ID",
+                    "num": 14
+                },
+                {
+                    "name": "progress",
+                    "type": "string",
+                    "docOrder": 15,
+                    "description": "progress information",
+                    "num": 15
+                },
+                {
+                    "name": "rootConfig",
+                    "type": "string",
+                    "docOrder": 16,
+                    "description": "path to root configuration",
+                    "num": 16
+                },
+                {
+                    "name": "rpcProvider",
+                    "type": "string",
+                    "docOrder": 17,
+                    "description": "RPC provider URL",
+                    "num": 17
+                },
+                {
+                    "name": "version",
+                    "type": "string",
+                    "docOrder": 18,
+                    "description": "TrueBlocks version",
+                    "num": 18
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Status",
+                    "store": "Status",
+                    "cruds": null,
+                    "viewType": "dashboard"
+                },
+                {
+                    "name": "Caches",
+                    "store": "Caches",
+                    "cruds": null,
+                    "viewType": ""
+                },
+                {
+                    "name": "Chains",
+                    "store": "Chains",
+                    "cruds": null,
+                    "viewType": ""
                 }
             ]
         }

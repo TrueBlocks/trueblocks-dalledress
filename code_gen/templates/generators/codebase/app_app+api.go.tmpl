@@ -15,39 +15,23 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 )
-
 // EXISTING_CODE
 
 func (a *App) Reload(payload *types.Payload) error {
 	lastView := a.GetAppPreferences().LastView
 
 	switch lastView {
-	case "/monitors":
-		return a.ReloadMonitors(payload)
-	case "/names":
-		return a.ReloadNames(payload)
-	case "/chunks":
-		return a.ReloadChunks(payload)
-	case "/exports":
-		return a.ReloadExports(payload)
-	case "/abis":
-		return a.ReloadAbis(payload)
-	case "/status":
-		return a.ReloadStatus(payload)
+	{{- range .Structures }}
+	{{- if and (not (eq .Class "")) (not .DisableGo) }}
+			case "/{{ toLower .Class }}":
+				return a.Reload{{ .Class }}(payload)
+	{{- end }}
+	{{- end }}
 	}
 
 	return nil
 }
 
 // EXISTING_CODE
-func (a *App) NameFromAddress(address string) (*names.Name, bool) {
-	collection := names.GetNamesCollection(&types.Payload{})
-	return collection.NameFromAddress(base.HexToAddress(address))
-}
-
-func (a *App) MonitorsClean(payload *types.Payload, addresses []string) error {
-	collection := monitors.GetMonitorsCollection(payload)
-	return collection.Clean(addresses)
-}
-
 // EXISTING_CODE
+

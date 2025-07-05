@@ -27,8 +27,6 @@ Vsc: VS Code Icons
 Wi: Weather Icons
 Fa6: Font Awesome 6
 */
-// A type called IconSet that has Home, Settings, and Khedra keys, all strings
-import { IconType } from 'react-icons';
 
 import {
   BiBot,
@@ -89,6 +87,8 @@ import {
   FaUser,
 } from 'react-icons/fa';
 
+import { IconType } from 'react-icons';
+
 export type IconSet = {
   Names: IconType;
   ABIs: IconType;
@@ -126,7 +126,6 @@ export type IconSet = {
   Dark: IconType;
 };
 
-// An IconSet using icons from fa react to represent Home, Settings, and Khedra
 const faIcons: IconSet = {
   Names: FaUser,
   ABIs: FaListAlt,
@@ -199,13 +198,11 @@ const biIcons: IconSet = {
   Dark: BiMoon,
 };
 
-// A map keyed by the name of the icon set, with values being the icon set itself
 const iconSets: Record<string, IconSet> = {
   fa: faIcons,
   bi: biIcons,
 };
 
-// An exported routine that, given the name of an icon set, returns the icon set from the map
 export const getIconSet = (name: string): IconSet => {
   const iconSet = iconSets[name];
   if (!iconSet) {

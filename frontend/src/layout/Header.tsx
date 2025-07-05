@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
 import { useActiveProject } from '@hooks';
-import { useIcons } from '@hooks';
+import { useIconSets } from '@hooks';
 import {
   ActionIcon,
   AppShell,
@@ -15,7 +15,7 @@ export const Header = () => {
   const [appName, setAppName] = useState('AppName');
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const { toggleDarkMode, isDarkMode } = useActiveProject();
-  const { Light, Dark } = useIcons();
+  const { Light, Dark } = useIconSets();
 
   useEffect(() => {
     GetAppId().then((id) => {

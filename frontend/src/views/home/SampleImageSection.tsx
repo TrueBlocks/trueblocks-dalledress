@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { GetImageURL } from '@app';
-import { useEvent, useIcons } from '@hooks';
+import { useEvent, useIconSets } from '@hooks';
 import { ActionIcon, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { msgs } from '@models';
 import { Log } from '@utils';
@@ -19,7 +19,7 @@ export const SampleImageSection = ({
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { Edit, DalleDress, Add } = useIcons();
+  const { Edit, DalleDress, Add } = useIconSets();
 
   const loadSampleImage = async () => {
     try {

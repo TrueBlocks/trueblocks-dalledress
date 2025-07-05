@@ -85,16 +85,15 @@ vi.mock('@hooks', () => ({
       };
     }, [onCancel]);
   },
-  useIcons: () => ({
-    Home: () => null,
-    Khedra: () => null,
-    // ADD_ROUTE
+  useIconSets: () => ({
     Abis: () => null,
     Chuncks: () => null,
     Export: () => null,
     Monitors: () => null,
     Names: () => null,
-    // ADD_ROUTE
+
+    Home: () => null,
+    Khedra: () => null,
     DalleDress: () => null,
     Settings: () => null,
     Wizard: () => null,
@@ -202,80 +201,4 @@ describe('Wizard', () => {
       ).toBeInTheDocument();
     });
   });
-
-  // test('can navigate to next step and then back', async () => {
-  //   render(
-  //     <MantineProvider>
-  //       <Wizard />
-  //     </MantineProvider>,
-  //   );
-
-  //   // Fill in required fields
-  //   const nameInput = screen.getByPlaceholderText('Enter your name');
-  //   const emailInput = screen.getByPlaceholderText('Enter your email');
-
-  //   fireEvent.change(nameInput, { target: { value: 'Test User' } });
-  //   fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-
-  //   // Click Next button
-  //   const nextButton = screen.getByRole('button', { name: 'Next' });
-  //   fireEvent.click(nextButton);
-
-  //   // Wait for active step to update
-  //   await waitFor(() => {
-  //     expect(activeStep).toBe(1);
-  //   });
-
-  //   // Look for Chain Configuration in the Stepper label
-  //   await waitFor(() => {
-  //     const stepLabel = screen.getByText('Chain Configuration', {
-  //       selector: 'span.mantine-Stepper-stepLabel',
-  //     });
-  //     expect(stepLabel).toBeInTheDocument();
-  //   });
-
-  //   // Check that Back button now exists and click it
-  //   const backButton = screen.getByRole('button', { name: 'Back' });
-  //   expect(backButton).toBeInTheDocument();
-
-  //   fireEvent.click(backButton);
-
-  //   // Verify we navigate back to User Information step
-  //   await waitFor(() => {
-  //     expect(activeStep).toBe(0);
-  //   });
-
-  //   await waitFor(() => {
-  //     expect(
-  //       screen.getByText('User Information', {
-  //         selector: 'span.mantine-Stepper-stepLabel',
-  //       }),
-  //     ).toBeInTheDocument();
-  //   });
-  // });
-
-  // test.skip('escape key closes the wizard', async () => {
-  //   render(
-  //     <MantineProvider>
-  //       <Wizard />
-  //     </MantineProvider>,
-  //   );
-
-  //   // First, ensure the component is fully mounted
-  //   await waitFor(() => {
-  //     expect(
-  //       screen.getByText('User Information', {
-  //         selector: 'span.mantine-Stepper-stepLabel',
-  //       }),
-  //     ).toBeInTheDocument();
-  //   });
-
-  //   // Now trigger the ESC key on the document - this should call our mocked event listener
-  //   fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
-
-  //   // Verify navigation was called
-  //   await waitFor(() => {
-  //     expect(mockNavigate).toHaveBeenCalled();
-  //   });
-  // });
 });

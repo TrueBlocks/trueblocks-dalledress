@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { GetNamesSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
-import { useEvent, useIcons } from '@hooks';
+import { useIconSets, useEvent } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
 import { Log } from '@utils';
@@ -26,7 +26,7 @@ export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { Names } = useIcons();
+  const { Names } = useIconSets();
 
   const fetchNamesSummary = async (showLoading = true) => {
     try {

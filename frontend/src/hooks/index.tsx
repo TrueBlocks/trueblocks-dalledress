@@ -9,7 +9,7 @@ export * from './useAppReadiness';
 export * from './useCrudOperations';
 export * from './useDateTime';
 export * from './useEvent';
-export * from './useIcons';
+export * from './useIconSets';
 export * from './usePayload';
 export * from './useStaggeredLoading';
 export * from './useColumns';

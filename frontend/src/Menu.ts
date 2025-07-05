@@ -1,13 +1,11 @@
 import { SetInitialized } from '@app';
 import { DalleDress, Home, Khedra, Settings } from '@views';
 import {
-  // ADD_ROUTE
   Abis,
   Chunks,
   Exports,
   Monitors,
   Names,
-  // ADD_ROUTE
 } from '@views';
 import { Wizard } from '@wizards';
 

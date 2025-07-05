@@ -1,5 +1,5 @@
 import { ChevronButton, getBarWidth } from '@components';
-import { useActiveProject, useIcons } from '@hooks';
+import { useActiveProject, useIconSets } from '@hooks';
 import { AppShell, Button, Stack } from '@mantine/core';
 import { MenuItem, MenuItems } from 'src/Menu';
 import { useLocation } from 'wouter';
@@ -14,7 +14,7 @@ export const MenuBar = ({ disabled = false }: MenuBarProps) => {
 
   const topMenuItems = MenuItems.filter((item) => item.position === 'top');
   const botMenuItems = MenuItems.filter((item) => item.position === 'bottom');
-  const icons = useIcons();
+  const icons = useIconSets();
 
   const renderMenuItem = ({ label, path }: MenuItem) => {
     const Icon = icons[label as keyof typeof icons];

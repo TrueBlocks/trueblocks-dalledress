@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { GetOpenProjects } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
-import { useEvent, useIcons } from '@hooks';
+import { useEvent, useIconSets } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs } from '@models';
 import { Log } from '@utils';
@@ -29,7 +29,7 @@ export const ProjectsPanel = ({
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { File } = useIcons();
+  const { File } = useIconSets();
 
   const fetchProjects = async (showLoading = true) => {
     try {

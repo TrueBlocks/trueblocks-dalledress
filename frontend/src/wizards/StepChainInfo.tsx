@@ -9,7 +9,7 @@ import {
 
 import { GetUserPreferences, SetUserPreferences } from '@app';
 import { FormField, WizardForm } from '@components';
-import { useIcons } from '@hooks';
+import { useIconSets } from '@hooks';
 import { ActionIcon, Card, Group, Tabs, Text } from '@mantine/core';
 import { preferences } from '@models';
 import { useEmitters } from '@utils';
@@ -27,7 +27,7 @@ export const StepChainInfo = ({
 }: WizardStepProps) => {
   const { rpcUrl, chainName, chainId, symbol, remoteExplorer } = state.data;
   const { rpcError, chainError } = state.validation;
-  const { Add, Delete } = useIcons();
+  const { Add, Delete } = useIconSets();
   const [chains, setChains] = useState<preferences.Chain[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>('new');
   const firstInputRef = useRef<HTMLInputElement>(null);

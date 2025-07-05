@@ -1,7 +1,7 @@
-import { useIcons } from '@hooks';
+import { useIconSets } from '@hooks';
 import { ActionIcon, ActionIconProps } from '@mantine/core';
 
-type IconName = keyof ReturnType<typeof useIcons>;
+type IconName = keyof ReturnType<typeof useIconSets>;
 
 interface ActionProps extends Omit<ActionIconProps, 'children' | 'onClick'> {
   icon: IconName;
@@ -23,7 +23,7 @@ export const Action = ({
   title,
   ...mantineProps
 }: ActionProps) => {
-  const icons = useIcons();
+  const icons = useIconSets();
 
   const currentIcon = iconOff && !isOn ? iconOff : icon;
   const IconComponent = icons[currentIcon];

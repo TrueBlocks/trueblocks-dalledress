@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { GetMonitorsSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
-import { useEvent, useIcons } from '@hooks';
+import { useIconSets, useEvent } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
 import { Log } from '@utils';
@@ -29,7 +29,7 @@ export const MonitorsPanel = ({
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { Monitors } = useIcons();
+  const { Monitors } = useIconSets();
 
   const fetchMonitorsSummary = async (showLoading = true) => {
     try {

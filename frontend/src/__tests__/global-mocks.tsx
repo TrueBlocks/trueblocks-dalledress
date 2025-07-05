@@ -70,7 +70,14 @@ vi.mock('@hooks', async (importOriginal) => {
   const original = await importOriginal();
   return {
     ...(original as object),
-    useIcons: () => iconMocks,
+    useIconSets: () => iconMocks,
+    useCollectionIcons: () => ({
+      Names: iconMocks.Names,
+      ABIs: iconMocks.ABIs,
+      Monitors: iconMocks.Monitors,
+      Chunks: iconMocks.Chunks,
+      Exports: iconMocks.Exports,
+    }),
   };
 });
 

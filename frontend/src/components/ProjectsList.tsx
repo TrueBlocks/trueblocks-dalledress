@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { CloseProject, GetOpenProjects, SwitchToProject } from '@app';
 import { Action } from '@components';
-import { useEvent, useIcons } from '@hooks';
+import { useEvent, useIconSets } from '@hooks';
 import { Group, List, Paper, Text, ThemeIcon, Title } from '@mantine/core';
 import { msgs } from '@models';
 import { Log } from '@utils';
@@ -20,7 +20,7 @@ interface Project {
 
 export const ProjectsList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const { File } = useIcons();
+  const { File } = useIconSets();
 
   const refreshProjects = async () => {
     try {

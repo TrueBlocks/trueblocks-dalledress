@@ -5,25 +5,19 @@ import { getIconSet } from './Icons';
 const DEFAULT_SIZE = 16;
 const DEFAULT_ICON_SET = 'fa';
 
-// Define types for icon components - use proper SVG element props
+// Define types for icon components
 type IconProps = React.SVGAttributes<SVGElement> & {
   style?: React.CSSProperties;
   size?: number;
 };
 
-/**
- * Hook that provides access to all icons with consistent size
- */
-export const useIcons = (
+export const useIconSets = (
   iconSetName = DEFAULT_ICON_SET,
   size = DEFAULT_SIZE,
 ) => {
   const iconSet = getIconSet(iconSetName);
 
-  // Return all the components memoized to prevent unnecessary re-renders
   return useMemo(() => {
-    // Create explicit named components for each icon to preserve component names in React DevTools
-    // This properly types the components as React components that can be used in JSX
     const Home: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Home, { size, ...props });
     const Khedra: FC<IconProps> = (props = {}) =>
@@ -89,19 +83,17 @@ export const useIcons = (
       createElement(iconSet.Dark, { size, ...props });
 
     return {
-      Home,
-      Khedra,
-      DalleDress,
-      Settings,
-      Wizard,
-
-      // ADD_ROUTE
       Names,
       ABIs,
       Monitors,
       Chunks,
       Exports,
-      // ADD_ROUTE
+
+      Home,
+      Khedra,
+      DalleDress,
+      Settings,
+      Wizard,
 
       Switch,
       File,

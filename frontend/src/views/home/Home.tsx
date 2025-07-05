@@ -201,7 +201,7 @@ const PanelAbis = () => {
     <Grid.Col span={{ base: 12, sm: 6 }}>
       <div className={styles.panelCard}>
         <LazyPanel priority="low">
-          <Suspense fallback={<PanelSkeleton title="ABIs" />}>
+          <Suspense fallback={<PanelSkeleton title="Abis" />}>
             <LazyAbisPanel
               onViewAll={() => {
                 navigate('/abis');

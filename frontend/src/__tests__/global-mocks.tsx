@@ -71,13 +71,6 @@ vi.mock('@hooks', async (importOriginal) => {
   return {
     ...(original as object),
     useIconSets: () => iconMocks,
-    useCollectionIcons: () => ({
-      Names: iconMocks.Names,
-      ABIs: iconMocks.ABIs,
-      Monitors: iconMocks.Monitors,
-      Chunks: iconMocks.Chunks,
-      Exports: iconMocks.Exports,
-    }),
   };
 });
 

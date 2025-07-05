@@ -31,7 +31,7 @@ func (c *AbisCollection) Crud(
 		_, _, err = opts.Abis()
 	default:
 		logging.LogBackend(fmt.Sprintf("ABI operation %s not implemented for address: %s", op, abi.Address))
-		return fmt.Errorf("operation %s not yet implemented for ABIs", op)
+		return fmt.Errorf("operation %s not yet implemented for Abis", op)
 	}
 
 	if err != nil {

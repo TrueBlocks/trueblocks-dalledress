@@ -15,7 +15,7 @@
             "return_type": "string",
             "attributes": "visible|docs",
             "capabilities": "code",
-            "summary": "ABIs route",
+            "summary": "Abis route",
             "productions": [
                 {
                     "class": "Abis",

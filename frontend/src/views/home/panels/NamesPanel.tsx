@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { GetNamesSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
-import { useIconSets, useEvent } from '@hooks';
+import { useEvent, useIconSets } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
 import { Log } from '@utils';

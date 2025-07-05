@@ -24,60 +24,21 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+1',
     type: 'navigation',
   },
+{{- $hotkey := 2 -}}
+{{- range .Structures }}
+{{- if and (ne .Class "") (not .DisableGo) }}
   {
-    label: 'Monitors',
-    path: '/monitors',
+    label: '{{ .Class }}',
+    path: '/{{ toLower .Class }}',
     position: 'top',
-    component: Monitors,
-    hotkey: 'mod+2',
-    altHotkey: 'alt+2',
+    component: {{ .Class }},
+    hotkey: 'mod+{{ $hotkey }}',
+    altHotkey: 'alt+{{ $hotkey }}',
     type: 'navigation',
   },
-  {
-    label: 'Names',
-    path: '/names',
-    position: 'top',
-    component: Names,
-    hotkey: 'mod+3',
-    altHotkey: 'alt+3',
-    type: 'navigation',
-  },
-  {
-    label: 'Chunks',
-    path: '/chunks',
-    position: 'top',
-    component: Chunks,
-    hotkey: 'mod+4',
-    altHotkey: 'alt+4',
-    type: 'navigation',
-  },
-  {
-    label: 'Exports',
-    path: '/exports',
-    position: 'top',
-    component: Exports,
-    hotkey: 'mod+5',
-    altHotkey: 'alt+5',
-    type: 'navigation',
-  },
-  {
-    label: 'Abis',
-    path: '/abis',
-    position: 'top',
-    component: Abis,
-    hotkey: 'mod+6',
-    altHotkey: 'alt+6',
-    type: 'navigation',
-  },
-  {
-    label: 'Status',
-    path: '/status',
-    position: 'top',
-    component: Status,
-    hotkey: 'mod+7',
-    altHotkey: 'alt+7',
-    type: 'navigation',
-  },
+{{- $hotkey = add $hotkey 1 }}
+{{- end }}
+{{- end }}
   {
     label: 'DalleDress',
     path: '/dalledress',

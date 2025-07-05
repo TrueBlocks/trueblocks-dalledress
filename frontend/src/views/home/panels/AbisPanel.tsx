@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { GetAbisSummary } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
-import { useIconSets, useEvent } from '@hooks';
+import { useEvent, useIconSets } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
 import { Log } from '@utils';
@@ -26,7 +26,7 @@ export const AbisPanel = ({ onViewAll, onAddAbi }: AbisPanelProps) => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { ABIs } = useIconSets();
+  const { Abis } = useIconSets();
 
   const fetchAbisSummary = async (showLoading = true) => {
     try {
@@ -41,8 +41,8 @@ export const AbisPanel = ({ onViewAll, onAddAbi }: AbisPanelProps) => {
       }
       setError(null);
     } catch (err) {
-      Log(`Error fetching ABIs summary: ${err}`);
-      setError('Failed to load ABIs');
+      Log(`Error fetching Abis summary: ${err}`);
+      setError('Failed to load Abis');
     } finally {
       if (showLoading) setLoading(false);
     }
@@ -81,9 +81,9 @@ export const AbisPanel = ({ onViewAll, onAddAbi }: AbisPanelProps) => {
 
   return (
     <DashboardCard
-      title="ABIs"
+      title="Abis"
       subtitle={`${summary.totalCount} contracts`}
-      icon={<ABIs size={20} />}
+      icon={<Abis size={20} />}
       loading={loading}
       error={error}
       onClick={onViewAll}

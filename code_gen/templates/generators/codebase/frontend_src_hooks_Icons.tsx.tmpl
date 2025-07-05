@@ -6,32 +6,14 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // EXISTING_CODE
-import {
-  BiBuildings,
-  BiCog,
-  BiHistory,
-  BiHome,
-  BiListUl,
-  BiUser,
-} from 'react-icons/bi';
-import {
-  FaCircleNotch,
-  FaDesktop,
-  FaHistory,
-  FaIndustry,
-  FaListAlt,
-  FaUser,
-} from 'react-icons/fa';
-
 // EXISTING_CODE
 
 // Add to the above imports
-// Monitors
-// Names
-// Chunks
-// Exports
-// Abis
-// Status
+{{- range .Structures }}
+{{- if and (ne .Class "") (not .DisableGo) }}
+// {{ .Class }}
+{{- end }}
+{{- end }}
 
 /*
 List of other icons sets
@@ -124,26 +106,11 @@ export {
 } from 'react-icons/fa';
 
 // EXISTING_CODE
-export const FaStatus = FaCircleNotch;
-export const FaMonitors = FaDesktop;
-export const FaExports = FaHistory;
-export const FaChunks = FaIndustry;
-export const FaAbis = FaListAlt;
-export const FaNames = FaUser;
-
-export const BiStatus = BiCog;
-export const BiMonitors = BiHome;
-export const BiExports = BiHistory;
-export const BiChunks = BiBuildings;
-export const BiAbis = BiListUl;
-export const BiNames = BiUser;
-
 // EXISTING_CODE
 
 // Add to the above exports
-// Monitors
-// Names
-// Chunks
-// Exports
-// Abis
-// Status
+{{- range .Structures }}
+{{- if and (ne .Class "") (not .DisableGo) }}
+// {{ .Class }}
+{{- end }}
+{{- end }}

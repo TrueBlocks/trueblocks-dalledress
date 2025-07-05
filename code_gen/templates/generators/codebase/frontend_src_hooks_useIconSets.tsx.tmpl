@@ -5,12 +5,11 @@ import { IconType } from 'react-icons';
 import * as Icons from './Icons';
 
 export type IconSet = {
-  Monitors: IconType;
-  Names: IconType;
-  Chunks: IconType;
-  Exports: IconType;
-  Abis: IconType;
-  Status: IconType;
+{{- range .Structures }}
+{{- if and .Class (not .DisableGo) }}
+  {{ .Class }}: IconType;
+{{- end }}
+{{- end }}
 
   Home: IconType;
   Khedra: IconType;
@@ -44,12 +43,11 @@ export type IconSet = {
 
 const faIcons: IconSet = {
   // Collections
-  Monitors: Icons.FaMonitors,
-  Names: Icons.FaNames,
-  Chunks: Icons.FaChunks,
-  Exports: Icons.FaExports,
-  Abis: Icons.FaAbis,
-  Status: Icons.FaStatus,
+{{- range .Structures }}
+{{- if and .Class (not .DisableGo) }}
+  {{ .Class }}: Icons.Fa{{ .Class }},
+{{- end }}
+{{- end }}
 
   // App navigation
   Home: Icons.FaHome,
@@ -89,12 +87,11 @@ const faIcons: IconSet = {
 
 const biIcons: IconSet = {
   // Collections
-  Monitors: Icons.BiMonitors,
-  Names: Icons.BiNames,
-  Chunks: Icons.BiChunks,
-  Exports: Icons.BiExports,
-  Abis: Icons.BiAbis,
-  Status: Icons.BiStatus,
+{{- range .Structures }}
+{{- if and .Class (not .DisableGo) }}
+  {{ .Class }}: Icons.Bi{{ .Class }},
+{{- end }}
+{{- end }}
 
   // App navigation
   Home: Icons.BiHome,
@@ -161,18 +158,12 @@ export const useIconSets = (
   const iconSet = getIconSet(iconSetName);
 
   return useMemo(() => {
-    const Monitors: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Monitors, { size, ...props });
-    const Names: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Names, { size, ...props });
-    const Chunks: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Chunks, { size, ...props });
-    const Exports: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Exports, { size, ...props });
-    const Abis: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Abis, { size, ...props });
-    const Status: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Status, { size, ...props });
+{{- range .Structures }}
+{{- if and .Class (not .DisableGo) }}
+    const {{ .Class }}: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.{{ .Class }}, { size, ...props });
+{{- end }}
+{{- end }}
 
     const Home: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Home, { size, ...props });
@@ -226,12 +217,11 @@ export const useIconSets = (
       createElement(iconSet.Dark, { size, ...props });
 
     return {
-      Monitors,
-      Names,
-      Chunks,
-      Exports,
-      Abis,
-      Status,
+{{- range .Structures }}
+{{- if and .Class (not .DisableGo) }}
+    {{ .Class }},
+{{- end }}
+{{- end }}
 
       Home,
       Khedra,

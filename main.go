@@ -1,3 +1,11 @@
+// Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package main
 
 import (
@@ -11,6 +19,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	"github.com/wailsapp/wails/v2"
@@ -43,12 +52,11 @@ func main() {
 		Bind: []interface{}{
 			a,
 			&project.Project{},
-			// ADD_ROUTE
-			&names.NamesCollection{},
-			&abis.AbisCollection{},
 			&monitors.MonitorsCollection{},
+			&names.NamesCollection{},
 			&chunks.ChunksCollection{},
-			// ADD_ROUTE
+			&exports.ExportsCollection{},
+			&abis.AbisCollection{},
 		},
 		EnumBind: []interface{}{
 			msgs.AllMessages,

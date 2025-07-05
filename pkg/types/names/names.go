@@ -55,7 +55,7 @@ func NewNamesCollection() *NamesCollection {
 }
 
 func (c *NamesCollection) initializeFacets() {
-	c.allFacet = facets.NewFacetWithSummary(
+	c.allFacet = facets.NewFacet(
 		NamesAll,
 		isAll,
 		isDupName(),
@@ -64,7 +64,7 @@ func (c *NamesCollection) initializeFacets() {
 		c,
 	)
 
-	c.customFacet = facets.NewFacetWithSummary(
+	c.customFacet = facets.NewFacet(
 		NamesCustom,
 		isCustom,
 		isDupName(),
@@ -73,7 +73,7 @@ func (c *NamesCollection) initializeFacets() {
 		c,
 	)
 
-	c.prefundFacet = facets.NewFacetWithSummary(
+	c.prefundFacet = facets.NewFacet(
 		NamesPrefund,
 		isPrefund,
 		isDupName(),
@@ -82,7 +82,7 @@ func (c *NamesCollection) initializeFacets() {
 		c,
 	)
 
-	c.regularFacet = facets.NewFacetWithSummary(
+	c.regularFacet = facets.NewFacet(
 		NamesRegular,
 		isRegular,
 		isDupName(),
@@ -91,7 +91,7 @@ func (c *NamesCollection) initializeFacets() {
 		c,
 	)
 
-	c.baddressFacet = facets.NewFacetWithSummary(
+	c.baddressFacet = facets.NewFacet(
 		NamesBaddress,
 		isBaddress,
 		isDupName(),

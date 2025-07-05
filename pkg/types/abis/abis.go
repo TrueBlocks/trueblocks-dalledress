@@ -51,7 +51,7 @@ func NewAbisCollection() *AbisCollection {
 }
 
 func (c *AbisCollection) initializeFacets() {
-	c.downloadedFacet = facets.NewFacetWithSummary(
+	c.downloadedFacet = facets.NewFacet(
 		AbisDownloaded,
 		isDownloaded,
 		isDupAbi(),
@@ -60,7 +60,7 @@ func (c *AbisCollection) initializeFacets() {
 		c,
 	)
 
-	c.knownFacet = facets.NewFacetWithSummary(
+	c.knownFacet = facets.NewFacet(
 		AbisKnown,
 		isKnown,
 		isDupAbi(),
@@ -69,7 +69,7 @@ func (c *AbisCollection) initializeFacets() {
 		c,
 	)
 
-	c.functionsFacet = facets.NewFacetWithSummary(
+	c.functionsFacet = facets.NewFacet(
 		AbisFunctions,
 		isFunction,
 		isDupFunction(),
@@ -78,7 +78,7 @@ func (c *AbisCollection) initializeFacets() {
 		c,
 	)
 
-	c.eventsFacet = facets.NewFacetWithSummary(
+	c.eventsFacet = facets.NewFacet(
 		AbisEvents,
 		isEvent,
 		isDupFunction(),

@@ -9,7 +9,11 @@
   "prettier.configPath": "./frontend/.prettierrc",
   "[go]": {
     "editor.defaultFormatter": "golang.go",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    }
   },
   "[javascript]": {
     "editor.formatOnSave": true

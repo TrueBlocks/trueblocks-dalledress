@@ -23,11 +23,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -69,14 +65,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	app.exports = nil
 	// ADD_ROUTE
 
-	emptyPayload := &types.Payload{}
-
 	app.collections = make([]types.Collection, 0, 4)
-	app.RegisterCollection(abis.GetAbisCollection(emptyPayload))
-	app.RegisterCollection(chunks.GetChunksCollection(emptyPayload))
-	// app.RegisterCollection(exports.GetExportsCollection(emptyPayload))
-	app.RegisterCollection(monitors.GetMonitorsCollection(emptyPayload))
-	app.RegisterCollection(names.GetNamesCollection(emptyPayload))
 
 	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
 

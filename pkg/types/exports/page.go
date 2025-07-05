@@ -79,7 +79,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Statement, sort sdk.SortSpec) error {
-			return nil // sdk.SortStatements(items, sort)
+			return sdk.SortStatements(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
@@ -98,7 +98,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Balance, sort sdk.SortSpec) error {
-			return nil // sdk.SortBalances(items, sort)
+			return sdk.SortBalances(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
@@ -117,7 +117,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Transfer, sort sdk.SortSpec) error {
-			return nil // sdk.SortTransfers(items, sort)
+			return sdk.SortTransfers(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
@@ -136,7 +136,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Transaction, sort sdk.SortSpec) error {
-			return nil // sdk.SortTransactions(items, sort)
+			return sdk.SortTransactions(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
@@ -155,7 +155,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Withdrawal, sort sdk.SortSpec) error {
-			return nil // sdk.SortWithdrawals(items, sort)
+			return sdk.SortWithdrawals(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
@@ -174,7 +174,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Asset, sort sdk.SortSpec) error {
-			return nil // sdk.SortAssets(items, sort)
+			return sdk.SortAssets(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
@@ -193,7 +193,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Log, sort sdk.SortSpec) error {
-			return nil // sdk.SortLogs(items, sort)
+			return sdk.SortLogs(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
@@ -212,7 +212,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Trace, sort sdk.SortSpec) error {
-			return nil // sdk.SortTraces(items, sort)
+			return sdk.SortTraces(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
@@ -231,7 +231,7 @@ func (c *ExportsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Receipt, sort sdk.SortSpec) error {
-			return nil // sdk.SortReceipts(items, sort)
+			return sdk.SortReceipts(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)

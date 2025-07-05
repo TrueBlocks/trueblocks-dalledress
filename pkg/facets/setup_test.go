@@ -74,6 +74,8 @@ func createTestFacet(store *store.Store[TestItem]) *Facet[TestItem] {
 		nil,
 		nil,
 		store,
+		"test",
+		nil,
 	)
 }
 
@@ -85,6 +87,8 @@ func createFilteredFacet(store *store.Store[TestItem], minValue int) *Facet[Test
 		},
 		nil,
 		store,
+		"test",
+		nil,
 	)
 }
 
@@ -101,6 +105,8 @@ func createDedupedFacet(store *store.Store[TestItem]) *Facet[TestItem] {
 			return false
 		},
 		store,
+		"test",
+		nil,
 	)
 }
 

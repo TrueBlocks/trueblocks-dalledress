@@ -15,6 +15,7 @@ export function processColumns<T>(columns: FormField<T>[]): FormField<T>[] {
       'int256',
       'int64',
       'lognum',
+      'number',
       'timestamp',
       'txnum',
       'uint32',

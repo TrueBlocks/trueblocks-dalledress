@@ -51,7 +51,7 @@ func NewChunksCollection() *ChunksCollection {
 }
 
 func (c *ChunksCollection) initializeFacets() {
-	c.statsFacet = facets.NewFacetWithSummary(
+	c.statsFacet = facets.NewFacet(
 		ChunksStats,
 		isStats,
 		isDupStats(),
@@ -60,7 +60,7 @@ func (c *ChunksCollection) initializeFacets() {
 		c,
 	)
 
-	c.indexFacet = facets.NewFacetWithSummary(
+	c.indexFacet = facets.NewFacet(
 		ChunksIndex,
 		isIndex,
 		isDupIndex(),
@@ -69,7 +69,7 @@ func (c *ChunksCollection) initializeFacets() {
 		c,
 	)
 
-	c.bloomsFacet = facets.NewFacetWithSummary(
+	c.bloomsFacet = facets.NewFacet(
 		ChunksBlooms,
 		isBloom,
 		isDupBloom(),
@@ -78,7 +78,7 @@ func (c *ChunksCollection) initializeFacets() {
 		c,
 	)
 
-	c.manifestFacet = facets.NewFacetWithSummary(
+	c.manifestFacet = facets.NewFacet(
 		ChunksManifest,
 		isManifest,
 		isDupManifest(),

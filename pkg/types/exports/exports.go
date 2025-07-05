@@ -66,7 +66,7 @@ func NewExportsCollection() *ExportsCollection {
 }
 
 func (c *ExportsCollection) initializeFacets() {
-	c.statementsFacet = facets.NewFacetWithSummary(
+	c.statementsFacet = facets.NewFacet(
 		ExportsStatements,
 		isStatement,
 		isDupStatement(),
@@ -75,7 +75,7 @@ func (c *ExportsCollection) initializeFacets() {
 		c,
 	)
 
-	c.balancesFacet = facets.NewFacetWithSummary(
+	c.balancesFacet = facets.NewFacet(
 		ExportsBalances,
 		isBalance,
 		isDupBalance(),
@@ -84,7 +84,7 @@ func (c *ExportsCollection) initializeFacets() {
 		c,
 	)
 
-	c.transfersFacet = facets.NewFacetWithSummary(
+	c.transfersFacet = facets.NewFacet(
 		ExportsTransfers,
 		isTransfer,
 		isDupTransfer(),
@@ -93,7 +93,7 @@ func (c *ExportsCollection) initializeFacets() {
 		c,
 	)
 
-	c.transactionsFacet = facets.NewFacetWithSummary(
+	c.transactionsFacet = facets.NewFacet(
 		ExportsTransactions,
 		isTransaction,
 		isDupTransaction(),
@@ -102,7 +102,7 @@ func (c *ExportsCollection) initializeFacets() {
 		c,
 	)
 
-	c.withdrawalsFacet = facets.NewFacetWithSummary(
+	c.withdrawalsFacet = facets.NewFacet(
 		ExportsWithdrawals,
 		isWithdrawal,
 		isDupWithdrawal(),
@@ -111,7 +111,7 @@ func (c *ExportsCollection) initializeFacets() {
 		c,
 	)
 
-	c.assetsFacet = facets.NewFacetWithSummary(
+	c.assetsFacet = facets.NewFacet(
 		ExportsAssets,
 		isAsset,
 		isDupAsset(),
@@ -120,7 +120,7 @@ func (c *ExportsCollection) initializeFacets() {
 		c,
 	)
 
-	c.logsFacet = facets.NewFacetWithSummary(
+	c.logsFacet = facets.NewFacet(
 		ExportsLogs,
 		isLog,
 		isDupLog(),
@@ -129,7 +129,7 @@ func (c *ExportsCollection) initializeFacets() {
 		c,
 	)
 
-	c.tracesFacet = facets.NewFacetWithSummary(
+	c.tracesFacet = facets.NewFacet(
 		ExportsTraces,
 		isTrace,
 		isDupTrace(),
@@ -138,7 +138,7 @@ func (c *ExportsCollection) initializeFacets() {
 		c,
 	)
 
-	c.receiptsFacet = facets.NewFacetWithSummary(
+	c.receiptsFacet = facets.NewFacet(
 		ExportsReceipts,
 		isReceipt,
 		isDupReceipt(),

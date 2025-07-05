@@ -42,7 +42,7 @@ func NewMonitorsCollection() *MonitorsCollection {
 }
 
 func (c *MonitorsCollection) initializeFacets() {
-	c.monitorsFacet = facets.NewFacetWithSummary(
+	c.monitorsFacet = facets.NewFacet(
 		MonitorsMonitors,
 		isMonitor,
 		isDupMonitor(),

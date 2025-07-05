@@ -38,29 +38,7 @@ type Facet[T any] struct {
 	collectionName  string
 }
 
-// NewFacet creates a new facet that uses a store for data fetching
 func NewFacet[T any](
-	dataFacet types.DataFacet,
-	filterFunc FilterFunc[T],
-	isDupFunc DupFunc[T],
-	store *store.Store[T],
-) *Facet[T] {
-	facet := &Facet[T]{
-		store:       store,
-		view:        make([]*T, 0),
-		expectedCnt: 0,
-		dataFacet:   dataFacet,
-		filterFunc:  filterFunc,
-		isDupFunc:   isDupFunc,
-		progress:    progress.NewProgress(dataFacet, nil),
-	}
-	facet.state.Store(types.StateStale)
-	store.RegisterObserver(facet)
-
-	return facet
-}
-
-func NewFacetWithSummary[T any](
 	dataFacet types.DataFacet,
 	filterFunc FilterFunc[T],
 	isDupFunc DupFunc[T],

@@ -55,7 +55,7 @@ func (c *{{.Class}}Collection) initializeFacets() {
 		{{$class}}{{.Name}},
 		is{{toSingular .Name}},
 		isDup{{.SingleStore}}(),
-		c.get{{.Store}}Store(),
+		c.get{{.Store}}Store({{$class}}{{.Name}}),
 		"{{toLower $class}}",
 		c,
 	)

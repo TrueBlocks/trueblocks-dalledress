@@ -64,7 +64,7 @@ var (
 	withdrawalsStoreMu sync.Mutex
 )
 
-func (c *ExportsCollection) getAssetsStore() *store.Store[Asset] {
+func (c *ExportsCollection) getAssetsStore(facet types.DataFacet) *store.Store[Asset] {
 	assetsStoreMu.Lock()
 	defer assetsStoreMu.Unlock()
 
@@ -105,8 +105,8 @@ func (c *ExportsCollection) getAssetsStore() *store.Store[Asset] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_assets_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		assetsStore[storeKey] = theStore
 	}
@@ -114,7 +114,7 @@ func (c *ExportsCollection) getAssetsStore() *store.Store[Asset] {
 	return theStore
 }
 
-func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
+func (c *ExportsCollection) getBalancesStore(facet types.DataFacet) *store.Store[Balance] {
 	balancesStoreMu.Lock()
 	defer balancesStoreMu.Unlock()
 
@@ -155,8 +155,8 @@ func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_balances_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		balancesStore[storeKey] = theStore
 	}
@@ -164,7 +164,7 @@ func (c *ExportsCollection) getBalancesStore() *store.Store[Balance] {
 	return theStore
 }
 
-func (c *ExportsCollection) getLogsStore() *store.Store[Log] {
+func (c *ExportsCollection) getLogsStore(facet types.DataFacet) *store.Store[Log] {
 	logsStoreMu.Lock()
 	defer logsStoreMu.Unlock()
 
@@ -206,8 +206,8 @@ func (c *ExportsCollection) getLogsStore() *store.Store[Log] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_logs_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		logsStore[storeKey] = theStore
 	}
@@ -215,7 +215,7 @@ func (c *ExportsCollection) getLogsStore() *store.Store[Log] {
 	return theStore
 }
 
-func (c *ExportsCollection) getReceiptsStore() *store.Store[Receipt] {
+func (c *ExportsCollection) getReceiptsStore(facet types.DataFacet) *store.Store[Receipt] {
 	receiptsStoreMu.Lock()
 	defer receiptsStoreMu.Unlock()
 
@@ -256,8 +256,8 @@ func (c *ExportsCollection) getReceiptsStore() *store.Store[Receipt] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_receipts_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		receiptsStore[storeKey] = theStore
 	}
@@ -265,7 +265,7 @@ func (c *ExportsCollection) getReceiptsStore() *store.Store[Receipt] {
 	return theStore
 }
 
-func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
+func (c *ExportsCollection) getStatementsStore(facet types.DataFacet) *store.Store[Statement] {
 	statementsStoreMu.Lock()
 	defer statementsStoreMu.Unlock()
 
@@ -307,8 +307,8 @@ func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_statements_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		statementsStore[storeKey] = theStore
 	}
@@ -316,7 +316,7 @@ func (c *ExportsCollection) getStatementsStore() *store.Store[Statement] {
 	return theStore
 }
 
-func (c *ExportsCollection) getTracesStore() *store.Store[Trace] {
+func (c *ExportsCollection) getTracesStore(facet types.DataFacet) *store.Store[Trace] {
 	tracesStoreMu.Lock()
 	defer tracesStoreMu.Unlock()
 
@@ -357,8 +357,8 @@ func (c *ExportsCollection) getTracesStore() *store.Store[Trace] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_traces_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		tracesStore[storeKey] = theStore
 	}
@@ -366,7 +366,7 @@ func (c *ExportsCollection) getTracesStore() *store.Store[Trace] {
 	return theStore
 }
 
-func (c *ExportsCollection) getTransactionsStore() *store.Store[Transaction] {
+func (c *ExportsCollection) getTransactionsStore(facet types.DataFacet) *store.Store[Transaction] {
 	transactionsStoreMu.Lock()
 	defer transactionsStoreMu.Unlock()
 
@@ -407,8 +407,8 @@ func (c *ExportsCollection) getTransactionsStore() *store.Store[Transaction] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_transactions_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		transactionsStore[storeKey] = theStore
 	}
@@ -416,7 +416,7 @@ func (c *ExportsCollection) getTransactionsStore() *store.Store[Transaction] {
 	return theStore
 }
 
-func (c *ExportsCollection) getTransfersStore() *store.Store[Transfer] {
+func (c *ExportsCollection) getTransfersStore(facet types.DataFacet) *store.Store[Transfer] {
 	transfersStoreMu.Lock()
 	defer transfersStoreMu.Unlock()
 
@@ -458,8 +458,8 @@ func (c *ExportsCollection) getTransfersStore() *store.Store[Transfer] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_transfers_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		transfersStore[storeKey] = theStore
 	}
@@ -467,7 +467,7 @@ func (c *ExportsCollection) getTransfersStore() *store.Store[Transfer] {
 	return theStore
 }
 
-func (c *ExportsCollection) getWithdrawalsStore() *store.Store[Withdrawal] {
+func (c *ExportsCollection) getWithdrawalsStore(facet types.DataFacet) *store.Store[Withdrawal] {
 	withdrawalsStoreMu.Lock()
 	defer withdrawalsStoreMu.Unlock()
 
@@ -508,8 +508,8 @@ func (c *ExportsCollection) getWithdrawalsStore() *store.Store[Withdrawal] {
 		}
 
 		// EXISTING_CODE
-		storeName := fmt.Sprintf("exports_withdrawals_%s_%s", chain, address)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		withdrawalsStore[storeKey] = theStore
 	}
@@ -517,29 +517,32 @@ func (c *ExportsCollection) getWithdrawalsStore() *store.Store[Withdrawal] {
 	return theStore
 }
 
-func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet) string {
+func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
+	name := ""
 	switch dataFacet {
 	case ExportsStatements:
-		return "exports-statements"
+		name = "exports-statements"
 	case ExportsBalances:
-		return "exports-balances"
+		name = "exports-balances"
 	case ExportsTransfers:
-		return "exports-transfers"
+		name = "exports-transfers"
 	case ExportsTransactions:
-		return "exports-transactions"
+		name = "exports-transactions"
 	case ExportsWithdrawals:
-		return "exports-withdrawals"
+		name = "exports-withdrawals"
 	case ExportsAssets:
-		return "exports-assets"
+		name = "exports-assets"
 	case ExportsLogs:
-		return "exports-logs"
+		name = "exports-logs"
 	case ExportsTraces:
-		return "exports-traces"
+		name = "exports-traces"
 	case ExportsReceipts:
-		return "exports-receipts"
+		name = "exports-receipts"
 	default:
 		return ""
 	}
+	name = fmt.Sprintf("%s-%s-%s", name, chain, address)
+	return name
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS

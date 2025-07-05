@@ -41,13 +41,13 @@ var (
 )
 
 {{range .Stores}}
-func (c *{{$class}}Collection) get{{.Name}}Store() *store.Store[{{toSingular .Name}}] {
+func (c *{{$class}}Collection) get{{.Name}}Store(facet types.DataFacet) *store.Store[{{toSingular .Name}}] {
 	{{toLower .Name}}StoreMu.Lock()
 	defer {{toLower .Name}}StoreMu.Unlock()
 
-{{if $isExports}}	chain := preferences.GetLastChain()
+	chain := preferences.GetLastChain()
 	address := preferences.GetLastAddress()
-	storeKey := getStoreKey(chain, address)
+{{if $isExports}}	storeKey := getStoreKey(chain, address)
 	theStore := {{toLower .Name}}Store[storeKey]
 {{else}}	theStore := {{toLower .Name}}Store
 {{end -}}
@@ -75,6 +75,7 @@ func (c *{{$class}}Collection) get{{.Name}}Store() *store.Store[{{toSingular .Na
 
 		// EXISTING_CODE
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		{{toLower .Name}}Store{{if $isExports}}[storeKey]{{end}} = theStore
 	}
@@ -83,14 +84,23 @@ func (c *{{$class}}Collection) get{{.Name}}Store() *store.Store[{{toSingular .Na
 }
 {{end}}
 
-func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet) string {
+func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
+	{{- if not $isExports}}
+	_ = chain
+	_ = address
+	{{- end}}
+	name := ""
 	switch dataFacet {
 	{{range .Facets}}case {{$class}}{{.Name}}:
-		return "{{toLower $class}}-{{toLower .Store}}"
+		name = "{{toLower $class}}-{{toLower .Store}}"
 	{{end -}}
 	default:
 		return ""
 	}
+	{{- if $isExports}}
+	name = fmt.Sprintf("%s-%s-%s", name, chain, address)
+	{{- end}}
+	return name
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS

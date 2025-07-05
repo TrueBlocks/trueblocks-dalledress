@@ -44,15 +44,16 @@ var (
 	statsStoreMu sync.Mutex
 )
 
-func (c *ChunksCollection) getBloomsStore() *store.Store[Bloom] {
+func (c *ChunksCollection) getBloomsStore(facet types.DataFacet) *store.Store[Bloom] {
 	bloomsStoreMu.Lock()
 	defer bloomsStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := bloomsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
 					Verbose: false, // Set to false to avoid weird output issues
@@ -90,8 +91,8 @@ func (c *ChunksCollection) getBloomsStore() *store.Store[Bloom] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(ChunksBlooms)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		bloomsStore = theStore
 	}
@@ -99,15 +100,16 @@ func (c *ChunksCollection) getBloomsStore() *store.Store[Bloom] {
 	return theStore
 }
 
-func (c *ChunksCollection) getIndexStore() *store.Store[Index] {
+func (c *ChunksCollection) getIndexStore(facet types.DataFacet) *store.Store[Index] {
 	indexStoreMu.Lock()
 	defer indexStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := indexStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
 					Verbose: true,
@@ -146,8 +148,8 @@ func (c *ChunksCollection) getIndexStore() *store.Store[Index] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(ChunksIndex)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		indexStore = theStore
 	}
@@ -155,15 +157,16 @@ func (c *ChunksCollection) getIndexStore() *store.Store[Index] {
 	return theStore
 }
 
-func (c *ChunksCollection) getManifestStore() *store.Store[Manifest] {
+func (c *ChunksCollection) getManifestStore(facet types.DataFacet) *store.Store[Manifest] {
 	manifestStoreMu.Lock()
 	defer manifestStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := manifestStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
 					Verbose: true,
@@ -201,8 +204,8 @@ func (c *ChunksCollection) getManifestStore() *store.Store[Manifest] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(ChunksManifest)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		manifestStore = theStore
 	}
@@ -210,15 +213,16 @@ func (c *ChunksCollection) getManifestStore() *store.Store[Manifest] {
 	return theStore
 }
 
-func (c *ChunksCollection) getStatsStore() *store.Store[Stats] {
+func (c *ChunksCollection) getStatsStore(facet types.DataFacet) *store.Store[Stats] {
 	statsStoreMu.Lock()
 	defer statsStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := statsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			opts := sdk.ChunksOptions{
 				Globals: sdk.Globals{
 					Verbose: true,
@@ -256,8 +260,8 @@ func (c *ChunksCollection) getStatsStore() *store.Store[Stats] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(ChunksStats)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		statsStore = theStore
 	}
@@ -265,19 +269,23 @@ func (c *ChunksCollection) getStatsStore() *store.Store[Stats] {
 	return theStore
 }
 
-func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet) string {
+func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
+	_ = chain
+	_ = address
+	name := ""
 	switch dataFacet {
 	case ChunksStats:
-		return "chunks-stats"
+		name = "chunks-stats"
 	case ChunksIndex:
-		return "chunks-index"
+		name = "chunks-index"
 	case ChunksBlooms:
-		return "chunks-blooms"
+		name = "chunks-blooms"
 	case ChunksManifest:
-		return "chunks-manifest"
+		name = "chunks-manifest"
 	default:
 		return ""
 	}
+	return name
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS

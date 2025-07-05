@@ -14,8 +14,8 @@ export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['chunks']['ChunksCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
-export function GetStoreName(arg1) {
-  return window['go']['chunks']['ChunksCollection']['GetStoreName'](arg1);
+export function GetStoreName(arg1, arg2, arg3) {
+  return window['go']['chunks']['ChunksCollection']['GetStoreName'](arg1, arg2, arg3);
 }
 
 export function GetSummary() {

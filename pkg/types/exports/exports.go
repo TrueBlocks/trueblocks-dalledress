@@ -70,7 +70,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsStatements,
 		isStatement,
 		isDupStatement(),
-		c.getStatementsStore(),
+		c.getStatementsStore(ExportsStatements),
 		"exports",
 		c,
 	)
@@ -79,7 +79,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsBalances,
 		isBalance,
 		isDupBalance(),
-		c.getBalancesStore(),
+		c.getBalancesStore(ExportsBalances),
 		"exports",
 		c,
 	)
@@ -88,7 +88,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsTransfers,
 		isTransfer,
 		isDupTransfer(),
-		c.getTransfersStore(),
+		c.getTransfersStore(ExportsTransfers),
 		"exports",
 		c,
 	)
@@ -97,7 +97,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsTransactions,
 		isTransaction,
 		isDupTransaction(),
-		c.getTransactionsStore(),
+		c.getTransactionsStore(ExportsTransactions),
 		"exports",
 		c,
 	)
@@ -106,7 +106,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsWithdrawals,
 		isWithdrawal,
 		isDupWithdrawal(),
-		c.getWithdrawalsStore(),
+		c.getWithdrawalsStore(ExportsWithdrawals),
 		"exports",
 		c,
 	)
@@ -115,7 +115,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsAssets,
 		isAsset,
 		isDupAsset(),
-		c.getAssetsStore(),
+		c.getAssetsStore(ExportsAssets),
 		"exports",
 		c,
 	)
@@ -124,7 +124,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsLogs,
 		isLog,
 		isDupLog(),
-		c.getLogsStore(),
+		c.getLogsStore(ExportsLogs),
 		"exports",
 		c,
 	)
@@ -133,7 +133,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsTraces,
 		isTrace,
 		isDupTrace(),
-		c.getTracesStore(),
+		c.getTracesStore(ExportsTraces),
 		"exports",
 		c,
 	)
@@ -142,7 +142,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsReceipts,
 		isReceipt,
 		isDupReceipt(),
-		c.getReceiptsStore(),
+		c.getReceiptsStore(ExportsReceipts),
 		"exports",
 		c,
 	)

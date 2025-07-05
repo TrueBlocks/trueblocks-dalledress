@@ -32,15 +32,16 @@ var (
 	monitorsStoreMu sync.Mutex
 )
 
-func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
+func (c *MonitorsCollection) getMonitorsStore(facet types.DataFacet) *store.Store[Monitor] {
 	monitorsStoreMu.Lock()
 	defer monitorsStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := monitorsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			listOpts := sdk.MonitorsOptions{
 				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
 				RenderCtx: ctx,
@@ -71,8 +72,8 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(MonitorsMonitors)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		monitorsStore = theStore
 	}
@@ -80,13 +81,17 @@ func (c *MonitorsCollection) getMonitorsStore() *store.Store[Monitor] {
 	return theStore
 }
 
-func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet) string {
+func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
+	_ = chain
+	_ = address
+	name := ""
 	switch dataFacet {
 	case MonitorsMonitors:
-		return "monitors-monitors"
+		name = "monitors-monitors"
 	default:
 		return ""
 	}
+	return name
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS

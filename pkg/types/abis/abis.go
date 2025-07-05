@@ -55,7 +55,7 @@ func (c *AbisCollection) initializeFacets() {
 		AbisDownloaded,
 		isDownloaded,
 		isDupAbi(),
-		c.getAbisStore(),
+		c.getAbisStore(AbisDownloaded),
 		"abis",
 		c,
 	)
@@ -64,7 +64,7 @@ func (c *AbisCollection) initializeFacets() {
 		AbisKnown,
 		isKnown,
 		isDupAbi(),
-		c.getAbisStore(),
+		c.getAbisStore(AbisKnown),
 		"abis",
 		c,
 	)
@@ -73,7 +73,7 @@ func (c *AbisCollection) initializeFacets() {
 		AbisFunctions,
 		isFunction,
 		isDupFunction(),
-		c.getFunctionsStore(),
+		c.getFunctionsStore(AbisFunctions),
 		"abis",
 		c,
 	)
@@ -82,7 +82,7 @@ func (c *AbisCollection) initializeFacets() {
 		AbisEvents,
 		isEvent,
 		isDupFunction(),
-		c.getFunctionsStore(),
+		c.getFunctionsStore(AbisEvents),
 		"abis",
 		c,
 	)

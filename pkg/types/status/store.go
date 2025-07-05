@@ -40,15 +40,16 @@ var (
 	statusStoreMu sync.Mutex
 )
 
-func (c *StatusCollection) getCachesStore() *store.Store[Cache] {
+func (c *StatusCollection) getCachesStore(facet types.DataFacet) *store.Store[Cache] {
 	cachesStoreMu.Lock()
 	defer cachesStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := cachesStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			opts := sdk.StatusOptions{
 				Globals:   sdk.Globals{Chain: chain},
 				RenderCtx: ctx,
@@ -78,8 +79,8 @@ func (c *StatusCollection) getCachesStore() *store.Store[Cache] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(StatusCaches)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		cachesStore = theStore
 	}
@@ -87,15 +88,16 @@ func (c *StatusCollection) getCachesStore() *store.Store[Cache] {
 	return theStore
 }
 
-func (c *StatusCollection) getChainsStore() *store.Store[Chain] {
+func (c *StatusCollection) getChainsStore(facet types.DataFacet) *store.Store[Chain] {
 	chainsStoreMu.Lock()
 	defer chainsStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := chainsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			opts := sdk.StatusOptions{
 				Globals:   sdk.Globals{Chain: chain},
 				RenderCtx: ctx,
@@ -125,8 +127,8 @@ func (c *StatusCollection) getChainsStore() *store.Store[Chain] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(StatusChains)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		chainsStore = theStore
 	}
@@ -134,15 +136,16 @@ func (c *StatusCollection) getChainsStore() *store.Store[Chain] {
 	return theStore
 }
 
-func (c *StatusCollection) getStatusStore() *store.Store[Status] {
+func (c *StatusCollection) getStatusStore(facet types.DataFacet) *store.Store[Status] {
 	statusStoreMu.Lock()
 	defer statusStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := statusStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			opts := sdk.StatusOptions{
 				Globals:   sdk.Globals{Chain: chain},
 				RenderCtx: ctx,
@@ -172,8 +175,8 @@ func (c *StatusCollection) getStatusStore() *store.Store[Status] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(StatusStatus)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		statusStore = theStore
 	}
@@ -181,17 +184,21 @@ func (c *StatusCollection) getStatusStore() *store.Store[Status] {
 	return theStore
 }
 
-func (c *StatusCollection) GetStoreName(dataFacet types.DataFacet) string {
+func (c *StatusCollection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
+	_ = chain
+	_ = address
+	name := ""
 	switch dataFacet {
 	case StatusStatus:
-		return "status-status"
+		name = "status-status"
 	case StatusCaches:
-		return "status-caches"
+		name = "status-caches"
 	case StatusChains:
-		return "status-chains"
+		name = "status-chains"
 	default:
 		return ""
 	}
+	return name
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS

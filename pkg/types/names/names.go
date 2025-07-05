@@ -59,7 +59,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesAll,
 		isAll,
 		isDupName(),
-		c.getNamesStore(),
+		c.getNamesStore(NamesAll),
 		"names",
 		c,
 	)
@@ -68,7 +68,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesCustom,
 		isCustom,
 		isDupName(),
-		c.getNamesStore(),
+		c.getNamesStore(NamesCustom),
 		"names",
 		c,
 	)
@@ -77,7 +77,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesPrefund,
 		isPrefund,
 		isDupName(),
-		c.getNamesStore(),
+		c.getNamesStore(NamesPrefund),
 		"names",
 		c,
 	)
@@ -86,7 +86,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesRegular,
 		isRegular,
 		isDupName(),
-		c.getNamesStore(),
+		c.getNamesStore(NamesRegular),
 		"names",
 		c,
 	)
@@ -95,7 +95,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesBaddress,
 		isBaddress,
 		isDupName(),
-		c.getNamesStore(),
+		c.getNamesStore(NamesBaddress),
 		"names",
 		c,
 	)

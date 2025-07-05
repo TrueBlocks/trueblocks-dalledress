@@ -32,15 +32,16 @@ var (
 	namesStoreMu sync.Mutex
 )
 
-func (c *NamesCollection) getNamesStore() *store.Store[Name] {
+func (c *NamesCollection) getNamesStore(facet types.DataFacet) *store.Store[Name] {
 	namesStoreMu.Lock()
 	defer namesStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := namesStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			listOpts := sdk.NamesOptions{
 				Globals:   sdk.Globals{Verbose: true, Chain: chain},
 				RenderCtx: ctx,
@@ -76,8 +77,8 @@ func (c *NamesCollection) getNamesStore() *store.Store[Name] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(NamesAll)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		namesStore = theStore
 	}
@@ -85,21 +86,25 @@ func (c *NamesCollection) getNamesStore() *store.Store[Name] {
 	return theStore
 }
 
-func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet) string {
+func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
+	_ = chain
+	_ = address
+	name := ""
 	switch dataFacet {
 	case NamesAll:
-		return "names-names"
+		name = "names-names"
 	case NamesCustom:
-		return "names-names"
+		name = "names-names"
 	case NamesPrefund:
-		return "names-names"
+		name = "names-names"
 	case NamesRegular:
-		return "names-names"
+		name = "names-names"
 	case NamesBaddress:
-		return "names-names"
+		name = "names-names"
 	default:
 		return ""
 	}
+	return name
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS

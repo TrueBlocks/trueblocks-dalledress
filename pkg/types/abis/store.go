@@ -36,15 +36,16 @@ var (
 	functionsStoreMu sync.Mutex
 )
 
-func (c *AbisCollection) getAbisStore() *store.Store[Abi] {
+func (c *AbisCollection) getAbisStore(facet types.DataFacet) *store.Store[Abi] {
 	abisStoreMu.Lock()
 	defer abisStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := abisStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			listOpts := sdk.AbisOptions{
 				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
 				RenderCtx: ctx,
@@ -75,8 +76,8 @@ func (c *AbisCollection) getAbisStore() *store.Store[Abi] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(AbisDownloaded)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		abisStore = theStore
 	}
@@ -84,15 +85,16 @@ func (c *AbisCollection) getAbisStore() *store.Store[Abi] {
 	return theStore
 }
 
-func (c *AbisCollection) getFunctionsStore() *store.Store[Function] {
+func (c *AbisCollection) getFunctionsStore(facet types.DataFacet) *store.Store[Function] {
 	functionsStoreMu.Lock()
 	defer functionsStoreMu.Unlock()
 
+	chain := preferences.GetLastChain()
+	address := preferences.GetLastAddress()
 	theStore := functionsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			chain := preferences.GetLastChain()
 			detailOpts := sdk.AbisOptions{
 				Globals:   sdk.Globals{Cache: true, Chain: chain},
 				RenderCtx: ctx,
@@ -123,8 +125,8 @@ func (c *AbisCollection) getFunctionsStore() *store.Store[Function] {
 		}
 
 		// EXISTING_CODE
-		storeName := c.GetStoreName(AbisFunctions)
 		// EXISTING_CODE
+		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		functionsStore = theStore
 	}
@@ -132,19 +134,23 @@ func (c *AbisCollection) getFunctionsStore() *store.Store[Function] {
 	return theStore
 }
 
-func (c *AbisCollection) GetStoreName(dataFacet types.DataFacet) string {
+func (c *AbisCollection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
+	_ = chain
+	_ = address
+	name := ""
 	switch dataFacet {
 	case AbisDownloaded:
-		return "abis-abis"
+		name = "abis-abis"
 	case AbisKnown:
-		return "abis-abis"
+		name = "abis-abis"
 	case AbisFunctions:
-		return "abis-functions"
+		name = "abis-functions"
 	case AbisEvents:
-		return "abis-functions"
+		name = "abis-functions"
 	default:
 		return ""
 	}
+	return name
 }
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS

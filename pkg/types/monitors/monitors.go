@@ -46,7 +46,7 @@ func (c *MonitorsCollection) initializeFacets() {
 		MonitorsMonitors,
 		isMonitor,
 		isDupMonitor(),
-		c.getMonitorsStore(),
+		c.getMonitorsStore(MonitorsMonitors),
 		"monitors",
 		c,
 	)

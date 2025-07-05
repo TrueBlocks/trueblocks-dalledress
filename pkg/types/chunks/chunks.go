@@ -55,7 +55,7 @@ func (c *ChunksCollection) initializeFacets() {
 		ChunksStats,
 		isStats,
 		isDupStats(),
-		c.getStatsStore(),
+		c.getStatsStore(ChunksStats),
 		"chunks",
 		c,
 	)
@@ -64,7 +64,7 @@ func (c *ChunksCollection) initializeFacets() {
 		ChunksIndex,
 		isIndex,
 		isDupIndex(),
-		c.getIndexStore(),
+		c.getIndexStore(ChunksIndex),
 		"chunks",
 		c,
 	)
@@ -73,7 +73,7 @@ func (c *ChunksCollection) initializeFacets() {
 		ChunksBlooms,
 		isBloom,
 		isDupBloom(),
-		c.getBloomsStore(),
+		c.getBloomsStore(ChunksBlooms),
 		"chunks",
 		c,
 	)
@@ -82,7 +82,7 @@ func (c *ChunksCollection) initializeFacets() {
 		ChunksManifest,
 		isManifest,
 		isDupManifest(),
-		c.getManifestStore(),
+		c.getManifestStore(ChunksManifest),
 		"chunks",
 		c,
 	)

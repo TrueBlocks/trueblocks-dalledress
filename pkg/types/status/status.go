@@ -52,7 +52,7 @@ func (c *StatusCollection) initializeFacets() {
 		StatusStatus,
 		isStatus,
 		isDupStatus(),
-		c.getStatusStore(),
+		c.getStatusStore(StatusStatus),
 		"status",
 		c,
 	)
@@ -61,7 +61,7 @@ func (c *StatusCollection) initializeFacets() {
 		StatusCaches,
 		isCache,
 		isDupCache(),
-		c.getCachesStore(),
+		c.getCachesStore(StatusCaches),
 		"status",
 		c,
 	)
@@ -70,7 +70,7 @@ func (c *StatusCollection) initializeFacets() {
 		StatusChains,
 		isChain,
 		isDupChain(),
-		c.getChainsStore(),
+		c.getChainsStore(StatusChains),
 		"status",
 		c,
 	)

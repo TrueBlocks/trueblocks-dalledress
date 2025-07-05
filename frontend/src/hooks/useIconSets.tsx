@@ -1,6 +1,149 @@
 import { FC, createElement, useMemo } from 'react';
 
-import { getIconSet } from './Icons';
+import { IconType } from 'react-icons';
+
+import * as Icons from './Icons';
+
+export type IconSet = {
+  Names: IconType;
+  ABIs: IconType;
+  Monitors: IconType;
+  Chunks: IconType;
+  Exports: IconType;
+  Status: IconType;
+
+  Home: IconType;
+  Khedra: IconType;
+  DalleDress: IconType;
+  Settings: IconType;
+  Wizard: IconType;
+
+  Switch: IconType;
+  File: IconType;
+
+  Twitter: IconType;
+  Github: IconType;
+  Website: IconType;
+  Email: IconType;
+
+  Add: IconType;
+  Edit: IconType;
+  Delete: IconType;
+  Undelete: IconType;
+  Remove: IconType;
+  Autoname: IconType;
+
+  ChevronLeft: IconType;
+  ChevronRight: IconType;
+  ChevronUp: IconType;
+  ChevronDown: IconType;
+
+  Light: IconType;
+  Dark: IconType;
+};
+
+const faIcons: IconSet = {
+  // Collections
+  Names: Icons.FaUser,
+  ABIs: Icons.FaListAlt,
+  Monitors: Icons.FaDesktop,
+  Chunks: Icons.FaIndustry,
+  Exports: Icons.FaHistory,
+  Status: Icons.FaCircleNotch,
+
+  // App navigation
+  Home: Icons.FaHome,
+  Khedra: Icons.FaIndustry,
+  DalleDress: Icons.FaPalette,
+  Settings: Icons.FaCog,
+  Wizard: Icons.FaHatWizard,
+
+  // General
+  Switch: Icons.FaRandom,
+  File: Icons.FaFile,
+
+  // Social
+  Twitter: Icons.FaTwitter,
+  Github: Icons.FaGithub,
+  Website: Icons.FaGlobe,
+  Email: Icons.FaEnvelope,
+
+  // Actions
+  Add: Icons.FaPlus,
+  Edit: Icons.FaEdit,
+  Delete: Icons.FaTimes,
+  Undelete: Icons.FaUndo,
+  Remove: Icons.FaEraser,
+  Autoname: Icons.FaMagic,
+
+  // Navigation
+  ChevronLeft: Icons.FaAngleDoubleLeft,
+  ChevronRight: Icons.FaAngleDoubleRight,
+  ChevronUp: Icons.FaAngleDoubleUp,
+  ChevronDown: Icons.FaAngleDoubleDown,
+
+  // Theme
+  Light: Icons.FaSun,
+  Dark: Icons.FaMoon,
+};
+
+const biIcons: IconSet = {
+  // Collections
+  Names: Icons.BiUser,
+  ABIs: Icons.BiListUl,
+  Monitors: Icons.BiDesktop,
+  Chunks: Icons.BiBuildings,
+  Exports: Icons.BiHistory,
+  Status: Icons.BiCog,
+
+  // App navigation
+  Home: Icons.BiHome,
+  Khedra: Icons.BiBuildings,
+  DalleDress: Icons.BiPalette,
+  Settings: Icons.BiCog,
+  Wizard: Icons.BiCog,
+
+  // General
+  Switch: Icons.BiTransfer,
+  File: Icons.BiFile,
+
+  // Social
+  Twitter: Icons.BiLogoTwitter,
+  Github: Icons.BiLogoGithub,
+  Website: Icons.BiGlobe,
+  Email: Icons.BiEnvelope,
+
+  // Actions
+  Add: Icons.BiPlus,
+  Edit: Icons.BiPencil,
+  Delete: Icons.BiX,
+  Undelete: Icons.BiUndo,
+  Remove: Icons.BiTrash,
+  Autoname: Icons.BiBot,
+
+  // Navigation
+  ChevronLeft: Icons.BiChevronsLeft,
+  ChevronRight: Icons.BiChevronsRight,
+  ChevronUp: Icons.BiChevronsUp,
+  ChevronDown: Icons.BiChevronsDown,
+
+  // Theme
+  Light: Icons.BiSun,
+  Dark: Icons.BiMoon,
+};
+
+const iconSets: Record<string, IconSet> = {
+  fa: faIcons,
+  bi: biIcons,
+};
+
+export const getIconSet = (name: string): IconSet => {
+  const iconSet = iconSets[name];
+  if (!iconSet) {
+    throw new Error(`Icon set "${name}" not found`);
+  }
+  return iconSet;
+};
 
 const DEFAULT_SIZE = 16;
 const DEFAULT_ICON_SET = 'fa';

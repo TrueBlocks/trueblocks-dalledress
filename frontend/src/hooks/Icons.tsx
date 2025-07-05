@@ -27,8 +27,8 @@ Vsc: VS Code Icons
 Wi: Weather Icons
 Fa6: Font Awesome 6
 */
-import { IconType } from 'react-icons';
-import {
+
+export {
   BiBot,
   BiBuildings,
   BiChevronsDown,
@@ -56,7 +56,8 @@ import {
   BiUser,
   BiX,
 } from 'react-icons/bi';
-import {
+
+export {
   FaAngleDoubleDown,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
@@ -86,128 +87,3 @@ import {
   FaUndo,
   FaUser,
 } from 'react-icons/fa';
-
-export type IconSet = {
-  Names: IconType;
-  ABIs: IconType;
-  Monitors: IconType;
-  Chunks: IconType;
-  Exports: IconType;
-  Status: IconType;
-
-  Home: IconType;
-  Khedra: IconType;
-  DalleDress: IconType;
-  Settings: IconType;
-  Wizard: IconType;
-
-  Switch: IconType;
-  File: IconType;
-
-  Twitter: IconType;
-  Github: IconType;
-  Website: IconType;
-  Email: IconType;
-
-  Add: IconType;
-  Edit: IconType;
-  Delete: IconType;
-  Undelete: IconType;
-  Remove: IconType;
-  Autoname: IconType;
-
-  ChevronLeft: IconType;
-  ChevronRight: IconType;
-  ChevronUp: IconType;
-  ChevronDown: IconType;
-
-  Light: IconType;
-  Dark: IconType;
-};
-
-const faIcons: IconSet = {
-  Names: FaUser,
-  ABIs: FaListAlt,
-  Monitors: FaDesktop,
-  Chunks: FaIndustry,
-  Exports: FaHistory,
-  Status: FaCircleNotch,
-
-  Home: FaHome,
-  Khedra: FaIndustry,
-  DalleDress: FaPalette,
-  Settings: FaCog,
-  Wizard: FaHatWizard,
-
-  Switch: FaRandom,
-  File: FaFile,
-
-  Twitter: FaTwitter,
-  Github: FaGithub,
-  Website: FaGlobe,
-  Email: FaEnvelope,
-
-  Add: FaPlus,
-  Edit: FaEdit,
-  Delete: FaTimes,
-  Undelete: FaUndo,
-  Remove: FaEraser,
-  Autoname: FaMagic,
-
-  ChevronLeft: FaAngleDoubleLeft,
-  ChevronRight: FaAngleDoubleRight,
-  ChevronUp: FaAngleDoubleUp,
-  ChevronDown: FaAngleDoubleDown,
-  Light: FaSun,
-  Dark: FaMoon,
-};
-
-const biIcons: IconSet = {
-  Names: BiUser,
-  ABIs: BiListUl,
-  Monitors: BiDesktop,
-  Chunks: BiBuildings,
-  Exports: BiHistory,
-  Status: BiCog,
-
-  Home: BiHome,
-  Khedra: BiBuildings,
-  DalleDress: BiPalette,
-  Settings: BiCog,
-  Wizard: BiCog,
-
-  Switch: BiTransfer,
-  File: BiFile,
-
-  Twitter: BiLogoTwitter,
-  Github: BiLogoGithub,
-  Website: BiGlobe,
-  Email: BiEnvelope,
-
-  Add: BiPlus,
-  Edit: BiPencil,
-  Delete: BiX,
-  Undelete: BiUndo,
-  Remove: BiTrash,
-  Autoname: BiBot,
-
-  ChevronLeft: BiChevronsLeft,
-  ChevronRight: BiChevronsRight,
-  ChevronUp: BiChevronsUp,
-  ChevronDown: BiChevronsDown,
-  Light: BiSun,
-  Dark: BiMoon,
-};
-
-const iconSets: Record<string, IconSet> = {
-  fa: faIcons,
-  bi: biIcons,
-};
-
-export const getIconSet = (name: string): IconSet => {
-  const iconSet = iconSets[name];
-  if (!iconSet) {
-    throw new Error(`Icon set "${name}" not found`);
-  }
-  return iconSet;
-};

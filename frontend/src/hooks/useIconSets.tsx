@@ -18,18 +18,6 @@ export const useIconSets = (
   const iconSet = getIconSet(iconSetName);
 
   return useMemo(() => {
-    const Home: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Home, { size, ...props });
-    const Khedra: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Khedra, { size, ...props });
-    const DalleDress: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.DalleDress, { size, ...props });
-    const Settings: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Settings, { size, ...props });
-    const Wizard: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Wizard, { size, ...props });
-
-    // ADD_ROUTE
     const Names: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Names, { size, ...props });
     const ABIs: FC<IconProps> = (props = {}) =>
@@ -40,7 +28,19 @@ export const useIconSets = (
       createElement(iconSet.Chunks, { size, ...props });
     const Exports: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Exports, { size, ...props });
-    // ADD_ROUTE
+    const Status: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Status, { size, ...props });
+
+    const Home: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Home, { size, ...props });
+    const Khedra: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Khedra, { size, ...props });
+    const DalleDress: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.DalleDress, { size, ...props });
+    const Settings: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Settings, { size, ...props });
+    const Wizard: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Wizard, { size, ...props });
 
     const Switch: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Switch, { size, ...props });
@@ -88,6 +88,7 @@ export const useIconSets = (
       Monitors,
       Chunks,
       Exports,
+      Status,
 
       Home,
       Khedra,

@@ -27,7 +27,7 @@ Vsc: VS Code Icons
 Wi: Weather Icons
 Fa6: Font Awesome 6
 */
-
+import { IconType } from 'react-icons';
 import {
   BiBot,
   BiBuildings,
@@ -56,12 +56,12 @@ import {
   BiUser,
   BiX,
 } from 'react-icons/bi';
-
 import {
   FaAngleDoubleDown,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
   FaAngleDoubleUp,
+  FaCircleNotch,
   FaCog,
   FaDesktop,
   FaEdit,
@@ -87,14 +87,13 @@ import {
   FaUser,
 } from 'react-icons/fa';
 
-import { IconType } from 'react-icons';
-
 export type IconSet = {
   Names: IconType;
   ABIs: IconType;
   Monitors: IconType;
   Chunks: IconType;
   Exports: IconType;
+  Status: IconType;
 
   Home: IconType;
   Khedra: IconType;
@@ -132,6 +131,7 @@ const faIcons: IconSet = {
   Monitors: FaDesktop,
   Chunks: FaIndustry,
   Exports: FaHistory,
+  Status: FaCircleNotch,
 
   Home: FaHome,
   Khedra: FaIndustry,
@@ -168,6 +168,7 @@ const biIcons: IconSet = {
   Monitors: BiDesktop,
   Chunks: BiBuildings,
   Exports: BiHistory,
+  Status: BiCog,
 
   Home: BiHome,
   Khedra: BiBuildings,

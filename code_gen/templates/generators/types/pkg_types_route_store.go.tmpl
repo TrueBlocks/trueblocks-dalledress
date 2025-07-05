@@ -73,8 +73,6 @@ func (c *{{$class}}Collection) get{{.Name}}Store(facet types.DataFacet) *store.S
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		{{toLower .Name}}Store{{if $isExports}}[storeKey]{{end}} = theStore

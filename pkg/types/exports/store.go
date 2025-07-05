@@ -104,8 +104,6 @@ func (c *ExportsCollection) getAssetsStore(facet types.DataFacet) *store.Store[A
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		assetsStore[storeKey] = theStore
@@ -154,8 +152,6 @@ func (c *ExportsCollection) getBalancesStore(facet types.DataFacet) *store.Store
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		balancesStore[storeKey] = theStore
@@ -205,8 +201,6 @@ func (c *ExportsCollection) getLogsStore(facet types.DataFacet) *store.Store[Log
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		logsStore[storeKey] = theStore
@@ -255,8 +249,6 @@ func (c *ExportsCollection) getReceiptsStore(facet types.DataFacet) *store.Store
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		receiptsStore[storeKey] = theStore
@@ -306,8 +298,6 @@ func (c *ExportsCollection) getStatementsStore(facet types.DataFacet) *store.Sto
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		statementsStore[storeKey] = theStore
@@ -356,8 +346,6 @@ func (c *ExportsCollection) getTracesStore(facet types.DataFacet) *store.Store[T
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		tracesStore[storeKey] = theStore
@@ -406,8 +394,6 @@ func (c *ExportsCollection) getTransactionsStore(facet types.DataFacet) *store.S
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		transactionsStore[storeKey] = theStore
@@ -457,8 +443,6 @@ func (c *ExportsCollection) getTransfersStore(facet types.DataFacet) *store.Stor
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		transfersStore[storeKey] = theStore
@@ -507,8 +491,6 @@ func (c *ExportsCollection) getWithdrawalsStore(facet types.DataFacet) *store.St
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		withdrawalsStore[storeKey] = theStore

@@ -90,8 +90,6 @@ func (c *ChunksCollection) getBloomsStore(facet types.DataFacet) *store.Store[Bl
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		bloomsStore = theStore
@@ -147,8 +145,6 @@ func (c *ChunksCollection) getIndexStore(facet types.DataFacet) *store.Store[Ind
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		indexStore = theStore
@@ -203,8 +199,6 @@ func (c *ChunksCollection) getManifestStore(facet types.DataFacet) *store.Store[
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		manifestStore = theStore
@@ -259,8 +253,6 @@ func (c *ChunksCollection) getStatsStore(facet types.DataFacet) *store.Store[Sta
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		statsStore = theStore

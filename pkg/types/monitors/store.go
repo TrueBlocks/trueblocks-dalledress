@@ -71,8 +71,6 @@ func (c *MonitorsCollection) getMonitorsStore(facet types.DataFacet) *store.Stor
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		monitorsStore = theStore

@@ -76,8 +76,6 @@ func (c *NamesCollection) getNamesStore(facet types.DataFacet) *store.Store[Name
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		namesStore = theStore

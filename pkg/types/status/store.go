@@ -78,8 +78,6 @@ func (c *StatusCollection) getCachesStore(facet types.DataFacet) *store.Store[Ca
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		cachesStore = theStore
@@ -126,8 +124,6 @@ func (c *StatusCollection) getChainsStore(facet types.DataFacet) *store.Store[Ch
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		chainsStore = theStore
@@ -174,8 +170,6 @@ func (c *StatusCollection) getStatusStore(facet types.DataFacet) *store.Store[St
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		statusStore = theStore

@@ -75,8 +75,6 @@ func (c *AbisCollection) getAbisStore(facet types.DataFacet) *store.Store[Abi] {
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		abisStore = theStore
@@ -124,8 +122,6 @@ func (c *AbisCollection) getFunctionsStore(facet types.DataFacet) *store.Store[F
 			return nil, false
 		}
 
-		// EXISTING_CODE
-		// EXISTING_CODE
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 		functionsStore = theStore

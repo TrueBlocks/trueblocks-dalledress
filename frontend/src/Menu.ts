@@ -6,6 +6,7 @@ import {
   Exports,
   Monitors,
   Names,
+  Status,
 } from '@views';
 import { Wizard } from '@wizards';
 
@@ -67,14 +68,23 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+5',
     type: 'navigation',
   },
+  {
+    label: 'Status',
+    path: '/status',
+    position: 'top',
+    component: Status,
+    hotkey: 'mod+6',
+    altHotkey: 'alt+6',
+    type: 'navigation',
+  },
   // ADD_ROUTE
   {
     label: 'DalleDress',
     path: '/dalledress',
     position: 'top',
     component: DalleDress,
-    hotkey: 'mod+6',
-    altHotkey: 'alt+6',
+    hotkey: 'mod+7',
+    altHotkey: 'alt+7',
     type: 'navigation',
   },
   {
@@ -82,8 +92,8 @@ export const MenuItems: MenuItem[] = [
     path: '/khedra',
     position: 'bottom',
     component: Khedra,
-    hotkey: 'mod+7',
-    altHotkey: 'alt+7',
+    hotkey: 'mod+8',
+    altHotkey: 'alt+8',
     type: 'navigation',
   },
   // ADD_ROUTE
@@ -92,8 +102,8 @@ export const MenuItems: MenuItem[] = [
     path: '/chunks',
     position: 'bottom',
     component: Chunks,
-    hotkey: 'mod+8',
-    altHotkey: 'alt+8',
+    hotkey: 'mod+9',
+    altHotkey: 'alt+9',
     type: 'navigation',
   },
   // ADD_ROUTE
@@ -102,8 +112,8 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+9',
-    altHotkey: 'alt+9',
+    hotkey: 'mod+0',
+    altHotkey: 'alt+0',
     type: 'navigation',
   },
   {

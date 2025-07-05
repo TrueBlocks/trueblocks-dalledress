@@ -5,7 +5,6 @@
  * Parts of this file were auto generated. Edit only those parts of
  * the code inside of 'EXISTING_CODE' tags.
  */
-
 package main
 
 import (

@@ -12,7 +12,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 
-package {{toLower .Class}}
+package {{$lower}}
 
 import (
 	"fmt"
@@ -35,21 +35,22 @@ func init() {
 {{range .Facets}}types.RegisterDataFacet({{$class}}{{.Name}})
 {{end}}}
 
-type {{.Class}}Collection struct {
-{{range .Facets}}{{toLower .Name}}Facet *facets.Facet[{{toSingular .Store}}]
-{{end -}}
+type {{$class}}Collection struct {
+	{{- range .Facets}}
+	{{toLower .Name}}Facet *facets.Facet[{{toSingular .Store}}]
+	{{- end}}
 	summary         types.Summary
 	summaryMutex    sync.RWMutex
 }
 
-func New{{.Class}}Collection() *{{.Class}}Collection {
-	c := &{{.Class}}Collection{}
+func New{{$class}}Collection() *{{$class}}Collection {
+	c := &{{$class}}Collection{}
 	c.ResetSummary()
 	c.initializeFacets()
 	return c
 }
 
-func (c *{{.Class}}Collection) initializeFacets() {
+func (c *{{$class}}Collection) initializeFacets() {
 	{{- range .Facets}}
 	c.{{toLower .Name}}Facet = facets.NewFacet(
 		{{$class}}{{.Name}},
@@ -75,58 +76,62 @@ func isDup{{toSingular .Name}}() func(existing []*{{toSingular .Name}}, newItem 
 }
 {{end}}
 
-func (c *{{.Class}}Collection) LoadData(dataFacet types.DataFacet) {
+func (c *{{$class}}Collection) LoadData(dataFacet types.DataFacet) {
 	if !c.NeedsUpdate(dataFacet) {
 		return
 	}
 
 	go func() {
 		switch dataFacet {
-		{{range .Facets}}case {{$class}}{{.Name}}:
+		{{- range .Facets}}
+		case {{$class}}{{.Name}}:
 			if err := c.{{toLower .Name}}Facet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
 			}
-		{{end}}default:
+		{{- end}}
+		default:
 			logging.LogError("LoadData: unexpected dataFacet: %v", fmt.Errorf("invalid dataFacet: %s", dataFacet), nil)
 			return
 		}
 	}()
 }
 
-func (c *{{.Class}}Collection) Reset(dataFacet types.DataFacet) {
+func (c *{{$class}}Collection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
-	{{- range .Facets -}}
+	{{- range .Facets}}
 	case {{$class}}{{.Name}}:
 		c.{{toLower .Name}}Facet.GetStore().Reset()
-	{{end -}}default:
+	{{- end}}
+	default:
 		return
 	}
 }
 
-func (c *{{.Class}}Collection) NeedsUpdate(dataFacet types.DataFacet) bool {
+func (c *{{$class}}Collection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	switch dataFacet {
-	{{- range .Facets -}}
+	{{- range .Facets}}
 	case {{$class}}{{.Name}}:
 		return c.{{toLower .Name}}Facet.NeedsUpdate()
-	{{end -}}
+	{{- end}}
 	default:
 		return false
 	}
 }
 
-func (c *{{.Class}}Collection) GetSupportedFacets() []types.DataFacet {
+func (c *{{$class}}Collection) GetSupportedFacets() []types.DataFacet {
 	return []types.DataFacet{
-		{{range .Facets}}{{$class}}{{.Name}},
-{{end}}
+		{{- range .Facets}}
+		{{$class}}{{.Name}},
+		{{- end}}
 	}
 }
 
-func (c *{{.Class}}Collection) AccumulateItem(item interface{}, summary *types.Summary) {
+func (c *{{$class}}Collection) AccumulateItem(item interface{}, summary *types.Summary) {
 	// EXISTING_CODE
 	// EXISTING_CODE
 }
 
-func (c *{{.Class}}Collection) GetSummary() types.Summary {
+func (c *{{$class}}Collection) GetSummary() types.Summary {
 	c.summaryMutex.RLock()
 	defer c.summaryMutex.RUnlock()
 
@@ -146,7 +151,7 @@ func (c *{{.Class}}Collection) GetSummary() types.Summary {
 	return summary
 }
 
-func (c *{{.Class}}Collection) ResetSummary() {
+func (c *{{$class}}Collection) ResetSummary() {
 	c.summaryMutex.Lock()
 	defer c.summaryMutex.Unlock()
 	c.summary = types.Summary{

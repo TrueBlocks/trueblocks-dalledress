@@ -105,7 +105,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       const { result } = renderHook(() => useActiveProject());
 
       const testCases: Array<[string, types.DataFacet]> = [
-        ['/exports', types.DataFacet.TRANSACTIONS],
+        ['/exports', types.DataFacet.ALL],
         ['/exports', 'receipts' as types.DataFacet],
         ['/chunks', 'chunk-summary' as types.DataFacet],
         ['/monitors', 'txs' as types.DataFacet],

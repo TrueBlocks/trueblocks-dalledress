@@ -198,7 +198,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
         }),
       );
 
-      expect(result.current.activeFacet).toBe('transactions'); // fallback
+      expect(result.current.activeFacet).toBe('all'); // fallback
       expect(result.current.availableFacets).toEqual([]);
     });
 

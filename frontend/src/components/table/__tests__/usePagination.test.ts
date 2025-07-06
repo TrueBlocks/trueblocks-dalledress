@@ -30,7 +30,7 @@ describe('usePagination', () => {
 
     const viewStateKey = {
       viewName: 'view',
-      tabName: types.DataFacet.TRANSACTIONS,
+      tabName: types.DataFacet.ALL,
     };
     const { result } = renderHook(() => usePagination(viewStateKey));
     expect(result.current.pagination).toEqual({
@@ -56,7 +56,7 @@ describe('usePagination', () => {
 
     const viewStateKey = {
       viewName: 'view',
-      tabName: types.DataFacet.TRANSACTIONS,
+      tabName: types.DataFacet.ALL,
     };
     const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
@@ -80,14 +80,14 @@ describe('usePagination', () => {
 
     const viewStateKey = {
       viewName: 'view',
-      tabName: types.DataFacet.TRANSACTIONS,
+      tabName: types.DataFacet.ALL,
     };
     const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
       result.current.changePageSize(50);
     });
     expect(updatePagination).toHaveBeenCalledWith(
-      { viewName: 'view', tabName: types.DataFacet.TRANSACTIONS },
+      { viewName: 'view', tabName: types.DataFacet.ALL },
       { currentPage: 0, pageSize: 50 },
     );
   });
@@ -105,14 +105,14 @@ describe('usePagination', () => {
 
     const viewStateKey = {
       viewName: 'view',
-      tabName: types.DataFacet.TRANSACTIONS,
+      tabName: types.DataFacet.ALL,
     };
     const { result } = renderHook(() => usePagination(viewStateKey));
     act(() => {
       result.current.setTotalItems(123);
     });
     expect(updatePagination).toHaveBeenCalledWith(
-      { viewName: 'view', tabName: types.DataFacet.TRANSACTIONS },
+      { viewName: 'view', tabName: types.DataFacet.ALL },
       { totalItems: 123 },
     );
   });
@@ -130,7 +130,7 @@ describe('usePagination', () => {
 
     const viewStateKey = {
       viewName: 'view',
-      tabName: types.DataFacet.TRANSACTIONS,
+      tabName: types.DataFacet.ALL,
     };
     const { result, rerender } = renderHook(() => usePagination(viewStateKey));
 

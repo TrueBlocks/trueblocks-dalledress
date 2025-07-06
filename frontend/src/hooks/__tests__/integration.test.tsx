@@ -21,11 +21,11 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     it('creates unique pagination state for different ViewStateKey combinations', () => {
       const exportsTransactionsKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.TRANSACTIONS,
+        tabName: types.DataFacet.ALL,
       };
       const exportsReceiptsKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.RECEIPTS,
+        tabName: types.DataFacet.CUSTOM,
       };
 
       // Test that different tabName values create separate pagination states
@@ -45,12 +45,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
     it('handles ViewStateKey patterns used across all views', () => {
       const testKeys: ViewStateKey[] = [
-        { viewName: '/exports', tabName: types.DataFacet.TRANSACTIONS },
-        { viewName: '/exports', tabName: types.DataFacet.RECEIPTS },
-        { viewName: '/chunks', tabName: types.DataFacet.INDEX },
-        { viewName: '/monitors', tabName: types.DataFacet.MONITORS },
         { viewName: '/names', tabName: types.DataFacet.ALL },
-        { viewName: '/abis', tabName: types.DataFacet.DOWNLOADED },
       ];
 
       testKeys.forEach((key) => {
@@ -66,11 +61,11 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
       // Test case where different views might use the same tabName (DataFacet value)
       const exportsKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.TRANSACTIONS,
+        tabName: types.DataFacet.ALL,
       };
       const namesKey: ViewStateKey = {
         viewName: '/names',
-        tabName: types.DataFacet.TRANSACTIONS,
+        tabName: types.DataFacet.CUSTOM,
       };
 
       const { result: exportsResult } = renderHook(() =>
@@ -121,7 +116,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     it('validates ViewStateKey structure required by hooks', () => {
       const validKey: ViewStateKey = {
         viewName: '/test-view',
-        tabName: types.DataFacet.TRANSACTIONS,
+        tabName: types.DataFacet.ALL,
       };
 
       const { result } = renderHook(() => usePagination(validKey));
@@ -138,7 +133,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     it('tests ViewStateKey sharing between pagination, sorting, and filtering hooks', () => {
       const testKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.TRANSACTIONS,
+        tabName: types.DataFacet.ALL,
       };
 
       // This simulates the pattern used in actual views where the same ViewStateKey
@@ -154,11 +149,11 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
       // Verify the key structure is maintained
       expect(testKey.viewName).toBe('/exports');
-      expect(testKey.tabName).toBe('transactions');
+      expect(testKey.tabName).toBe('all');
     });
 
     it('handles ViewStateKey memoization patterns from views', () => {
-      let currentDataFacet = types.DataFacet.TRANSACTIONS;
+      let currentDataFacet = types.DataFacet.ALL;
       const getMemoizedKey = (): ViewStateKey => ({
         viewName: '/exports',
         tabName: currentDataFacet,
@@ -170,7 +165,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
       expect(result1.current.pagination).toBeDefined();
 
-      currentDataFacet = types.DataFacet.RECEIPTS;
+      currentDataFacet = types.DataFacet.ALL;
       rerender();
 
       expect(result1.current.pagination).toBeDefined();

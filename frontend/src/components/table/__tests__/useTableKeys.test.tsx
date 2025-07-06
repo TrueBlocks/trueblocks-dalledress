@@ -55,7 +55,7 @@ describe('useTableKeys', () => {
   const mockGoToPage = vi.fn();
   const viewStateKey: ViewStateKey = {
     viewName: 'test-view',
-    tabName: types.DataFacet.TRANSACTIONS,
+    tabName: types.DataFacet.ALL,
   };
 
   beforeEach(() => {

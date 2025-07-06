@@ -28,10 +28,7 @@ describe('ViewContext Object Identity', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useViewContext(), { wrapper });
 
-    const viewStateKey = createViewStateKey(
-      'test-view',
-      types.DataFacet.TRANSACTIONS,
-    );
+    const viewStateKey = createViewStateKey('test-view', types.DataFacet.ALL);
 
     // Call getPagination multiple times with same viewStateKey
     const pagination1 = result.current.getPagination(viewStateKey);
@@ -48,11 +45,8 @@ describe('ViewContext Object Identity', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useViewContext(), { wrapper });
 
-    const viewStateKey1 = createViewStateKey(
-      'view1',
-      types.DataFacet.TRANSACTIONS,
-    );
-    const viewStateKey2 = createViewStateKey('view2', types.DataFacet.RECEIPTS);
+    const viewStateKey1 = createViewStateKey('view1', types.DataFacet.ALL);
+    const viewStateKey2 = createViewStateKey('view2', types.DataFacet.CUSTOM);
 
     // First, update one of the keys to create actual pagination data
     act(() => {
@@ -93,8 +87,8 @@ describe('ViewContext Object Identity', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useViewContext(), { wrapper });
 
-    const viewStateKey1 = createViewStateKey('view1', types.DataFacet.BALANCES);
-    const viewStateKey2 = createViewStateKey('view2', types.DataFacet.TRACES);
+    const viewStateKey1 = createViewStateKey('view1', types.DataFacet.PREFUND);
+    const viewStateKey2 = createViewStateKey('view2', types.DataFacet.REGULAR);
 
     // Get initial pagination objects
     const pagination1Before = result.current.getPagination(viewStateKey1);
@@ -123,11 +117,11 @@ describe('ViewContext Object Identity', () => {
 
     const viewStateKey1 = createViewStateKey(
       'new-view1',
-      types.DataFacet.BALANCES,
+      types.DataFacet.PREFUND,
     );
     const viewStateKey2 = createViewStateKey(
       'new-view2',
-      types.DataFacet.TRACES,
+      types.DataFacet.REGULAR,
     );
 
     // Get pagination for non-existent keys (should return initial state)

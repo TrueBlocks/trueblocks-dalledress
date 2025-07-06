@@ -54,7 +54,7 @@ export const useActiveFacet = (
     if (defaultConfig) return defaultConfig.id;
 
     // Fallback to first facet
-    return facets[0]?.id || types.DataFacet.TRANSACTIONS;
+    return facets[0]?.id || types.DataFacet.ALL;
   }, [defaultFacet, facets]);
 
   // Get the currently active facet from preferences or default

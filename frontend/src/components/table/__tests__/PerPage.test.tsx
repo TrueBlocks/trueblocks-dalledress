@@ -18,7 +18,7 @@ vi.mock('../usePagination', () => ({
 describe('PerPage', () => {
   const mockViewStateKey: ViewStateKey = {
     viewName: 'test-view',
-    tabName: types.DataFacet.TRANSACTIONS,
+    tabName: types.DataFacet.ALL,
   };
   const mockedFocusTable = vi.fn();
   const mockedFocusControls = vi.fn();

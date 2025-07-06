@@ -11,7 +11,7 @@ vi.mock('@contexts', () => ({
 
 const mockViewStateKey = {
   viewName: 'test',
-  tabName: types.DataFacet.TRANSACTIONS,
+  tabName: types.DataFacet.ALL,
 };
 describe('Header', () => {
   beforeEach(() => {

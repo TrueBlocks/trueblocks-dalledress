@@ -33,7 +33,7 @@ const mockData = [
 
 const viewStateKey: ViewStateKey = {
   viewName: 'test-view',
-  tabName: types.DataFacet.TRANSACTIONS,
+  tabName: types.DataFacet.ALL,
 };
 
 const defaultProps: TableProps<TestRow> = {

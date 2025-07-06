@@ -10,21 +10,26 @@ disable_go = false
 [[facets]]
 name = "All"
 store = "Names"
+viewType = ""
 
 [[facets]]
 name = "Custom"
 store = "Names"
 cruds = ["delete", "undelete", "remove", "update", "autoname"]
+viewType = ""
 
 [[facets]]
 name = "Prefund"
 store = "Names"
+viewType = ""
 
 [[facets]]
 name = "Regular"
 store = "Names"
+viewType = ""
 
 [[facets]]
 name = "Baddress"
 store = "Names"
+viewType = ""
 

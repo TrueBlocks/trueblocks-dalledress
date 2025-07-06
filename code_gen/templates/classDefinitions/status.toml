@@ -15,8 +15,10 @@ viewType = "dashboard"
 [[facets]]
 name = "Caches"
 store = "Caches"
+viewType = ""
 
 [[facets]]
 name = "Chains"
 store = "Chains"
+viewType = ""
 

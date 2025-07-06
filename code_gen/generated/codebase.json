@@ -665,7 +665,7 @@
                             "name": "Manifest",
                             "store": "Manifest",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "dashboard"
                         }
                     ]
                 },
@@ -3742,7 +3742,7 @@
                     "name": "Manifest",
                     "store": "Manifest",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "dashboard"
                 }
             ]
         },

@@ -10,36 +10,45 @@ disable_go = false
 [[facets]]
 name = "Statements"
 store = "Statements"
+viewType = ""
 
 [[facets]]
 name = "Balances"
 store = "Balances"
+viewType = ""
 
 [[facets]]
 name = "Transfers"
 store = "Transfers"
+viewType = ""
 
 [[facets]]
 name = "Transactions"
 store = "Transactions"
+viewType = ""
 
 [[facets]]
 name = "Withdrawals"
 store = "Withdrawals"
+viewType = ""
 
 [[facets]]
 name = "Assets"
 store = "Assets"
+viewType = ""
 
 [[facets]]
 name = "Logs"
 store = "Logs"
+viewType = ""
 
 [[facets]]
 name = "Traces"
 store = "Traces"
+viewType = ""
 
 [[facets]]
 name = "Receipts"
 store = "Receipts"
+viewType = ""
 

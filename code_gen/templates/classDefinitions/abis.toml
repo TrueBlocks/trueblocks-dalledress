@@ -12,16 +12,20 @@ disable_go = false
 name = "Downloaded"
 store = "Abis"
 cruds = ["remove"]
+viewType = ""
 
 [[facets]]
 name = "Known"
 store = "Abis"
+viewType = ""
 
 [[facets]]
 name = "Functions"
 store = "Functions"
+viewType = ""
 
 [[facets]]
 name = "Events"
 store = "Functions"
+viewType = ""
 

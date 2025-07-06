@@ -15,7 +15,7 @@ import { toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
 import { useActionConfig } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
-import { TabView } from '@layout';
+import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { chunks, msgs, types } from '@models';
 import { useErrorHandler } from '@utils';
@@ -162,17 +162,60 @@ export const Chunks = () => {
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
+  const isForm = useCallback((facet: types.DataFacet) => {
+    switch (facet) {
+      case types.DataFacet.MANIFEST:
+        return true;
+      default:
+        return false;
+    }
+  }, []);
   const perTabContent = useMemo(() => {
-    return (
-      <BaseTab
-        data={currentData as unknown as Record<string, unknown>[]}
-        columns={currentColumns}
-        loading={!!pageData?.isFetching}
-        error={error}
-        viewStateKey={viewStateKey}
-      />
-    );
-  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
+    const facet = getCurrentDataFacet();
+    if (isForm(facet)) {
+      const chunksData = currentData[0] as unknown as Record<string, unknown>;
+      if (!chunksData) {
+        return <div>No chunks data available</div>;
+      }
+      const fieldsWithValues = getColumns(getCurrentDataFacet()).map(
+        (field) => ({
+          ...field,
+          value:
+            (chunksData?.[field.name as string] as
+              | string
+              | number
+              | boolean
+              | undefined) || field.value,
+          readOnly: true,
+        }),
+      );
+      return (
+        <FormView
+          title="Chunks Information"
+          formFields={fieldsWithValues}
+          onSubmit={() => {}}
+        />
+      );
+    } else {
+      return (
+        <BaseTab
+          data={currentData as unknown as Record<string, unknown>[]}
+          columns={currentColumns}
+          loading={!!pageData?.isFetching}
+          error={error}
+          viewStateKey={viewStateKey}
+        />
+      );
+    }
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    viewStateKey,
+    isForm,
+    getCurrentDataFacet,
+  ]);
 
   const tabs = useMemo(
     () =>

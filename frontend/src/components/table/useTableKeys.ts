@@ -12,6 +12,9 @@ interface UseTableKeysProps {
   totalPages: number;
   viewStateKey: ViewStateKey;
   onEnter?: () => void;
+  onDelete?: () => void;
+  onCmdDelete?: () => void;
+  onAutoname?: () => void;
   onEscape?: () => void;
 }
 
@@ -22,6 +25,9 @@ export const useTableKeys = ({
   totalPages,
   viewStateKey,
   onEnter,
+  onDelete,
+  onCmdDelete,
+  onAutoname,
   onEscape,
 }: UseTableKeysProps) => {
   const { focusState, selectedRowIndex, setSelectedRowIndex, focusTable } =
@@ -92,6 +98,28 @@ export const useTableKeys = ({
           e.preventDefault();
           onEnter?.();
           break;
+        case 'Delete':
+        case 'Backspace':
+          if (!e.metaKey && !e.ctrlKey) {
+            e.preventDefault();
+            if (onDelete) {
+              onDelete();
+            }
+          } else {
+            e.preventDefault();
+            if (onCmdDelete) {
+              onCmdDelete();
+            }
+          }
+          break;
+        case 'a':
+          if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+            e.preventDefault();
+            if (onAutoname) {
+              onAutoname();
+            }
+          }
+          break;
         case 'Escape':
           e.preventDefault();
           if (onEscape) onEscape();
@@ -107,6 +135,9 @@ export const useTableKeys = ({
       setSelectedRowIndex,
       goToPage,
       onEnter,
+      onDelete,
+      onCmdDelete,
+      onAutoname,
       onEscape,
     ],
   );

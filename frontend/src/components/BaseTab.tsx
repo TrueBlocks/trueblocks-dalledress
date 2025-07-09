@@ -11,8 +11,12 @@ interface BaseTabProps<T extends Record<string, unknown>> {
   viewStateKey: ViewStateKey;
   loading: boolean;
   error: Error | null;
-  onSubmit?: (formData: Record<string, unknown>) => void;
-  onAction?: (item: T) => void;
+  onSubmit?: (formData: T) => void;
+  onDelete?: (rowData: T) => void;
+  onRemove?: (rowData: T) => void;
+  onAutoname?: (rowData: T) => void;
+  headerActions?: React.ReactNode;
+  debugComponent?: React.ReactNode;
 }
 
 export function BaseTab<T extends Record<string, unknown>>({
@@ -21,19 +25,28 @@ export function BaseTab<T extends Record<string, unknown>>({
   loading,
   error: _error,
   onSubmit,
-  onAction: _onAction,
+  onDelete,
+  onRemove,
+  onAutoname,
   viewStateKey,
+  headerActions,
+  debugComponent,
 }: BaseTabProps<T>) {
   // Always render table structure - let Table component handle all states
   return (
     <TableProvider>
       <div className="tableContainer">
         <Table
-          data={data as Record<string, unknown>[]}
-          columns={columns as FormField<Record<string, unknown>>[]}
+          data={data}
+          columns={columns}
           viewStateKey={viewStateKey}
           loading={loading}
           onSubmit={onSubmit || (() => {})}
+          onDelete={onDelete}
+          onRemove={onRemove}
+          onAutoname={onAutoname}
+          headerActions={headerActions}
+          debugComponent={debugComponent}
         />
       </div>
     </TableProvider>

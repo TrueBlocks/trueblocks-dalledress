@@ -3,16 +3,16 @@ import { useMemo } from 'react';
 import { Action } from '@components';
 import { FormField } from '@components';
 import { types } from '@models';
+import { getAddressString } from '@utils';
+import { ActionType } from 'src/hooks/useActions';
 
-import { ActionData, useActionConfig } from '.';
+import type { ActionData } from './useActionConfig';
 
 interface ColumnConfig<T extends Record<string, unknown>> {
   showActions?: boolean | ((pageData: PageDataUnion) => boolean);
   actions: ActionType[];
   getCanRemove?: (row: T, pageData?: PageDataUnion) => boolean;
 }
-
-type ActionType = 'delete' | 'undelete' | 'remove' | 'autoname';
 
 type PageDataUnion = {
   facet: types.DataFacet;
@@ -29,12 +29,22 @@ interface ActionHandlers {
   handleAutoname?: (addressStr: string) => void;
 }
 
+interface ActionConfig {
+  rowActions: Array<{
+    type: string;
+    icon: string;
+    title: string;
+    requiresWallet: boolean;
+  }>;
+  isWalletConnected?: boolean;
+}
+
 export const useColumns = (
   baseColumns: FormField<Record<string, unknown>>[],
   config: ColumnConfig<Record<string, unknown>>,
   handlers: ActionHandlers,
   pageData: PageDataUnion,
-  actionConfig: ReturnType<typeof useActionConfig>,
+  actionConfig: ActionConfig,
   perRowCrud: boolean = true,
 ) => {
   return useMemo(() => {
@@ -44,61 +54,94 @@ export const useColumns = (
         ? config.showActions(pageData)
         : (config.showActions ?? true);
 
-    if (!shouldShow || config.actions.length === 0) {
-      return actionConfig.injectActionColumn(baseColumns, () => null);
+    if (!shouldShow || actionConfig.rowActions.length === 0) {
+      return baseColumns.filter((col) => col.key !== 'actions');
     }
 
     const renderActions = (actionData: ActionData) => {
       const isDeleted = actionData.isDeleted;
-      const effectiveDeletedState = actionData.isProcessing
-        ? !isDeleted
-        : isDeleted;
+      const newState = actionData.isProcessing ? !isDeleted : isDeleted;
 
       return (
         <div className="action-buttons-container">
-          {config.actions.includes('delete') &&
-            handlers.handleToggle && ( // undelete is permitted but ignored
-              <Action
-                icon="Delete"
-                iconOff="Undelete"
-                isOn={!effectiveDeletedState}
-                onClick={() => handlers.handleToggle?.(actionData.addressStr)}
-                disabled={actionData.isProcessing}
-                title={effectiveDeletedState ? 'Undelete' : 'Delete'}
-                size="sm"
-              />
-            )}
-          {config.actions.includes('remove') && handlers.handleRemove && (
-            <Action
-              icon="Remove"
-              onClick={() => handlers.handleRemove?.(actionData.addressStr)}
-              disabled={
-                actionData.isProcessing ||
-                (perRowCrud ? !effectiveDeletedState : false)
-              }
-              title="Remove"
-              size="sm"
-            />
-          )}
-          {config.actions.includes('autoname') && handlers.handleAutoname && (
-            <Action
-              icon="Autoname"
-              onClick={() => handlers.handleAutoname?.(actionData.addressStr)}
-              disabled={actionData.isProcessing}
-              title="Auto-generate name"
-              size="sm"
-            />
-          )}
+          {actionConfig.rowActions.map((action) => {
+            if (action.type === 'delete' && handlers.handleToggle) {
+              return (
+                <Action
+                  key={action.type}
+                  icon="Delete"
+                  iconOff="Undelete"
+                  isOn={!newState}
+                  onClick={() => handlers.handleToggle?.(actionData.addressStr)}
+                  disabled={actionData.isProcessing}
+                  title={newState ? 'Undelete' : 'Delete'}
+                  size="sm"
+                />
+              );
+            }
+
+            if (action.type === 'remove' && handlers.handleRemove) {
+              return (
+                <Action
+                  key={action.type}
+                  icon="Remove"
+                  onClick={() => handlers.handleRemove?.(actionData.addressStr)}
+                  disabled={
+                    actionData.isProcessing || (perRowCrud ? !newState : false)
+                  }
+                  title="Remove"
+                  size="sm"
+                />
+              );
+            }
+
+            if (action.type === 'autoname' && handlers.handleAutoname) {
+              return (
+                <Action
+                  key={action.type}
+                  icon="Autoname"
+                  onClick={() =>
+                    handlers.handleAutoname?.(actionData.addressStr)
+                  }
+                  disabled={actionData.isProcessing}
+                  title="Auto-generate name"
+                  size="sm"
+                />
+              );
+            }
+
+            return null;
+          })}
         </div>
       );
     };
 
-    return actionConfig.injectActionColumn(
-      baseColumns,
-      renderActions,
-      config.getCanRemove,
+    const actionsOverride: Partial<FormField<Record<string, unknown>>> = {
+      sortable: false,
+      editable: false,
+      visible: true,
+      render: (row: Record<string, unknown>) => {
+        const canRemove = config.getCanRemove ? config.getCanRemove(row) : true;
+        const addressStr = getAddressString(row.address as string);
+        const isProcessing = Boolean(row.processing);
+        const isDeleted = Boolean(row.deleted);
+        const actionData = {
+          addressStr,
+          isProcessing,
+          isDeleted,
+          operations: config.actions as unknown as ActionData['operations'],
+          canRemove,
+        };
+
+        return renderActions(actionData);
+      },
+    };
+
+    // Replace actions column with our override
+    return baseColumns.map((col) =>
+      col.key === 'actions' ? { ...col, ...actionsOverride } : col,
     );
   }, [baseColumns, config, handlers, pageData, actionConfig, perRowCrud]);
 };
 
-export type { ColumnConfig, ActionType, ActionHandlers };
+export type { ColumnConfig, ActionHandlers, ActionConfig };

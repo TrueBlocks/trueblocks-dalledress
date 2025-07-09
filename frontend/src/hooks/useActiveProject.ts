@@ -32,8 +32,6 @@ export interface UseActiveProjectReturn {
   // Computed values
   hasActiveProject: boolean;
   canExport: boolean;
-  effectiveAddress: string;
-  effectiveChain: string;
 }
 
 export const useActiveProject = (): UseActiveProjectReturn => {
@@ -71,7 +69,5 @@ export const useActiveProject = (): UseActiveProjectReturn => {
     isDarkMode: appPreferencesStore.isDarkMode,
     hasActiveProject: appPreferencesStore.hasActiveProject,
     canExport: appPreferencesStore.canExport,
-    effectiveAddress: appPreferencesStore.effectiveAddress,
-    effectiveChain: appPreferencesStore.effectiveChain,
   };
 };

@@ -7,12 +7,12 @@
  */
 import { SetInitialized } from '@app';
 import { DalleDress, Home, Khedra, Settings } from '@views';
-import { {{- $first := true -}}
+import { {{ $first := true -}}
 {{- range .Structures -}}
 {{- if and (ne .Class "") (not .DisableGo) -}}
 {{- if not $first }}, {{ end }}{{ .Class }}{{- $first = false -}}
 {{- end -}}
-{{- end -}} } from '@views';
+{{- end}} } from '@views';
 import { Wizard } from '@wizards';
 
 export interface MenuItem {
@@ -36,7 +36,7 @@ export const MenuItems: MenuItem[] = [
     altHotkey: 'alt+1',
     type: 'navigation',
   },
-{{- $hotkey := 2 -}}
+{{- $n := 2 -}}
 {{- range .Structures }}
 {{- if and (ne .Class "") (not .DisableGo) }}
   {
@@ -44,11 +44,11 @@ export const MenuItems: MenuItem[] = [
     path: '/{{ toLower .Class }}',
     position: 'top',
     component: {{ .Class }},
-    hotkey: 'mod+{{ $hotkey }}',
-    altHotkey: 'alt+{{ $hotkey }}',
+    hotkey: 'mod+{{ $n }}',
+    altHotkey: 'alt+{{ $n }}',
     type: 'navigation',
   },
-{{- $hotkey = add $hotkey 1 }}
+{{- $n = add $n 1 }}
 {{- end }}
 {{- end }}
   {
@@ -56,8 +56,9 @@ export const MenuItems: MenuItem[] = [
     path: '/dalledress',
     position: 'top',
     component: DalleDress,
-    hotkey: 'mod+8',
-    altHotkey: 'alt+8',
+    hotkey: 'mod+{{ $n }}',
+    altHotkey: 'alt+{{ $n }}',
+  {{- $n = add $n 1 }}
     type: 'navigation',
   },
   {
@@ -65,8 +66,13 @@ export const MenuItems: MenuItem[] = [
     path: '/khedra',
     position: 'bottom',
     component: Khedra,
-    hotkey: 'mod+9',
-    altHotkey: 'alt+9',
+    hotkey: 'mod+{{ $n }}',
+    altHotkey: 'alt+{{ $n }}',
+  {{- if eq $n 9 }}
+    {{- $n = 0 }}
+  {{- else }}
+    {{- $n = add $n 1 }}
+  {{- end }}
     type: 'navigation',
   },
   {
@@ -74,8 +80,9 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+0',
-    altHotkey: 'alt+0',
+    hotkey: 'mod+{{ $n }}',
+    altHotkey: 'alt+{{ $n }}',
+  {{- $n = add $n 1 }}
     type: 'navigation',
   },
   {

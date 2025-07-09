@@ -10,6 +10,7 @@ export interface DataFacetConfig {
   id: DataFacet;
   label: string;
   isDefault?: boolean;
+  dividerBefore?: boolean;
 }
 
 export interface UseActiveFacetReturn {

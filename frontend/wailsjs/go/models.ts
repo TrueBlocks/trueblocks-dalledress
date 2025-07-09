@@ -484,6 +484,7 @@ export namespace preferences {
 	    menuCollapsed?: boolean;
 	    name?: string;
 	    recentProjects: string[];
+	    silencedDialogs: Record<string, boolean>;
 	    version: string;
 	
 	    static createFrom(source: any = {}) {
@@ -505,6 +506,7 @@ export namespace preferences {
 	        this.menuCollapsed = source["menuCollapsed"];
 	        this.name = source["name"];
 	        this.recentProjects = source["recentProjects"];
+	        this.silencedDialogs = source["silencedDialogs"];
 	        this.version = source["version"];
 	    }
 	

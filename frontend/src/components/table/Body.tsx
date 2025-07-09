@@ -10,7 +10,7 @@ interface BodyProps<T extends Record<string, unknown>> {
   selectedRowIndex: number;
   handleRowClick: (index: number) => void;
   noDataMessage?: string;
-  onSubmit?: (data: Record<string, unknown>) => void;
+  onSubmit?: (data: T) => void;
 }
 
 export const Body = <T extends Record<string, unknown>>({

@@ -18,7 +18,8 @@ export const {{$lower}}Facets: DataFacetConfig[] = [
   {
     id: types.DataFacet.{{toUpper .Name}},
     label: toProperCase(types.DataFacet.{{toUpper .Name}}),
-    {{if eq $default (toUpper .Name)}}isDefault: true,{{else}}isDefault: false,{{end}}
+    {{if eq $default (toUpper .Name)}}isDefault: true,{{else}}isDefault: false,{{end}}{{if .HasDivider}}
+    divider{{if eq .Divider "dividerBefore"}}Before{{else}}After{{end}}: true,{{end}}
   },{{end}}
 ];
 

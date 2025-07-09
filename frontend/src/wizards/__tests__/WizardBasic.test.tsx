@@ -142,8 +142,6 @@ vi.mock('@hooks', () => ({
     isDarkMode: false,
     hasActiveProject: true,
     canExport: true,
-    effectiveAddress: '0x1234567890abcdef1234567890abcdef12345678',
-    effectiveChain: 'mainnet',
   }),
 }));
 

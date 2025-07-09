@@ -49,8 +49,6 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
       menuCollapsed: false,
       helpCollapsed: false,
       loading: false,
-      effectiveAddress: '0x123',
-      effectiveChain: 'mainnet',
     } as any);
   });
 

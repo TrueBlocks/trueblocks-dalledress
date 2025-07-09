@@ -126,25 +126,29 @@
                             "cruds": [
                                 "remove"
                             ],
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Known",
                             "store": "Abis",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Functions",
                             "store": "Functions",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Events",
                             "store": "Functions",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         }
                     ]
                 },
@@ -647,25 +651,29 @@
                             "name": "Stats",
                             "store": "Stats",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Index",
                             "store": "Index",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Blooms",
                             "store": "Blooms",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Manifest",
                             "store": "Manifest",
                             "cruds": null,
-                            "viewType": "dashboard"
+                            "viewType": "dashboard",
+                            "attributes": ""
                         }
                     ]
                 },
@@ -1174,55 +1182,64 @@
                             "name": "Statements",
                             "store": "Statements",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Balances",
                             "store": "Balances",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Transfers",
                             "store": "Transfers",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Transactions",
                             "store": "Transactions",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Withdrawals",
                             "store": "Withdrawals",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Assets",
                             "store": "Assets",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Logs",
                             "store": "Logs",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Traces",
                             "store": "Traces",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Receipts",
                             "store": "Receipts",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         }
                     ]
                 }
@@ -1317,7 +1334,8 @@
                                 "undelete",
                                 "remove"
                             ],
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         }
                     ]
                 }
@@ -1443,7 +1461,8 @@
                             "name": "All",
                             "store": "Names",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Custom",
@@ -1455,25 +1474,29 @@
                                 "update",
                                 "autoname"
                             ],
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Prefund",
                             "store": "Names",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": "dividerBefore"
                         },
                         {
                             "name": "Regular",
                             "store": "Names",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         },
                         {
                             "name": "Baddress",
                             "store": "Names",
                             "cruds": null,
-                            "viewType": ""
+                            "viewType": "",
+                            "attributes": ""
                         }
                     ]
                 }
@@ -1644,55 +1667,64 @@
                     "name": "Statements",
                     "store": "Statements",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Balances",
                     "store": "Balances",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Transfers",
                     "store": "Transfers",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Transactions",
                     "store": "Transactions",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Withdrawals",
                     "store": "Withdrawals",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Assets",
                     "store": "Assets",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Logs",
                     "store": "Logs",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Traces",
                     "store": "Traces",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Receipts",
                     "store": "Receipts",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 }
             ]
         },
@@ -2280,7 +2312,8 @@
                         "undelete",
                         "remove"
                     ],
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 }
             ]
         },
@@ -2844,25 +2877,29 @@
                     "cruds": [
                         "remove"
                     ],
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Known",
                     "store": "Abis",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Functions",
                     "store": "Functions",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Events",
                     "store": "Functions",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 }
             ]
         },
@@ -2975,7 +3012,8 @@
                     "name": "All",
                     "store": "Names",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Custom",
@@ -2987,25 +3025,29 @@
                         "update",
                         "autoname"
                     ],
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Prefund",
                     "store": "Names",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": "dividerBefore"
                 },
                 {
                     "name": "Regular",
                     "store": "Names",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Baddress",
                     "store": "Names",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 }
             ]
         },
@@ -3724,25 +3766,29 @@
                     "name": "Stats",
                     "store": "Stats",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Index",
                     "store": "Index",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Blooms",
                     "store": "Blooms",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Manifest",
                     "store": "Manifest",
                     "cruds": null,
-                    "viewType": "dashboard"
+                    "viewType": "dashboard",
+                    "attributes": ""
                 }
             ]
         },
@@ -4084,19 +4130,22 @@
                     "name": "Status",
                     "store": "Status",
                     "cruds": null,
-                    "viewType": "dashboard"
+                    "viewType": "dashboard",
+                    "attributes": ""
                 },
                 {
                     "name": "Caches",
                     "store": "Caches",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 },
                 {
                     "name": "Chains",
                     "store": "Chains",
                     "cruds": null,
-                    "viewType": ""
+                    "viewType": "",
+                    "attributes": ""
                 }
             ]
         }

@@ -22,8 +22,6 @@ vi.mock('@stores', () => ({
     isDarkMode: false,
     hasActiveProject: true,
     canExport: true,
-    effectiveAddress: '0x123',
-    effectiveChain: 'mainnet',
   },
 }));
 

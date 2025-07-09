@@ -39,6 +39,8 @@ export type IconSet = {
   Undelete: IconType;
   Remove: IconType;
   Autoname: IconType;
+  Publish: IconType;
+  Pin: IconType;
 
   ChevronLeft: IconType;
   ChevronRight: IconType;
@@ -82,6 +84,8 @@ const faIcons: IconSet = {
   Undelete: Icons.FaUndo,
   Remove: Icons.FaEraser,
   Autoname: Icons.FaMagic,
+  Publish: Icons.FaGlobe,
+  Pin: Icons.FaListAlt,
 
   // Navigation
   ChevronLeft: Icons.FaAngleDoubleLeft,
@@ -127,6 +131,8 @@ const biIcons: IconSet = {
   Undelete: Icons.BiUndo,
   Remove: Icons.BiTrash,
   Autoname: Icons.BiBot,
+  Publish: Icons.BiGlobe,
+  Pin: Icons.BiListUl,
 
   // Navigation
   ChevronLeft: Icons.BiChevronsLeft,
@@ -218,6 +224,10 @@ export const useIconSets = (
       createElement(iconSet.Remove, { size, ...props });
     const Autoname: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Autoname, { size, ...props });
+    const Publish: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Publish, { size, ...props });
+    const Pin: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Pin, { size, ...props });
 
     const ChevronLeft: FC<IconProps> = (props = {}) =>
       createElement(iconSet.ChevronLeft, { size, ...props });
@@ -260,6 +270,8 @@ export const useIconSets = (
       Undelete,
       Remove,
       Autoname,
+      Publish,
+      Pin,
 
       ChevronLeft,
       ChevronRight,

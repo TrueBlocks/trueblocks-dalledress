@@ -9,16 +9,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
-import { BaseTab, usePagination } from '@components';
+import { Action, BaseTab, ConfirmModal, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { toPageDataProp, useColumns } from '@hooks';
+import { ActionType } from '@hooks';
+import {
+  toPageDataProp,
+  useActionMsgs,
+  useActions,
+  useColumns,
+  useSilencedDialog,
+} from '@hooks';
 // prettier-ignore
-import { useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
+import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { msgs, names, types } from '@models';
-import { useErrorHandler } from '@utils';
+import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
@@ -26,7 +33,7 @@ import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
 // === END SECTION 1 ===
 
 export const Names = () => {
-  // === SECTION 2: Hook Initialization ===
+  // === SECTION 2.2: Hook Initialization ===
   const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({
@@ -46,24 +53,36 @@ export const Names = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  // === END SECTION 2 ===
+  // === SECTION 2.1: Modal State ===
+  const { emitSuccess } = useActionMsgs('names');
+  const [confirmModal, setConfirmModal] = useState<{
+    opened: boolean;
+    address: string;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    opened: false,
+    address: '',
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
-  // === SECTION 3: Refs & Effects Setup ===
-  const dataFacetRef = useRef(getCurrentDataFacet());
-  useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
-  }, [getCurrentDataFacet]);
-  // === END SECTION 3 ===
+  const { isSilenced } = useSilencedDialog('createCustomName');
+  // === END SECTION 2.1 ===
 
-  // === SECTION 4: Data Fetching Logic ===
+  // === END SECTION 2.2 ===
+
+  // === SECTION 3: Data Fetching Logic ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetNamesPage(
-        createPayload(dataFacetRef.current),
+        createPayload(getCurrentDataFacet()),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -77,13 +96,13 @@ export const Names = () => {
   }, [
     clearError,
     createPayload,
+    getCurrentDataFacet,
     pagination.currentPage,
     pagination.pageSize,
     sort,
     filter,
     setTotalItems,
     handleError,
-    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
@@ -107,13 +126,13 @@ export const Names = () => {
   }, [pageData, getCurrentDataFacet]);
   // === END SECTION 4 ===
 
-  // === SECTION 5: Event Handling ===
+  // === SECTION 4: Event Handling ===
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'names') {
         const eventDataFacet = payload.dataFacet;
-        if (eventDataFacet === dataFacetRef.current) {
+        if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
         }
       }
@@ -126,7 +145,7 @@ export const Names = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      Reload(createPayload(dataFacetRef.current)).then(() => {
+      Reload(createPayload(getCurrentDataFacet())).then(() => {
         // The data will reload when the DataLoaded event is fired.
       });
     } catch (err: unknown) {
@@ -135,13 +154,9 @@ export const Names = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 5 ===
+  // === END SECTION 4 ===
 
-  // === SECTION 6: CRUD Operations ===
-  const actionConfig = useActionConfig({
-    operations: ['delete', 'undelete', 'remove', 'autoname'],
-  });
-
+  // === SECTION 6: Actions ===
   const postFunc = useCallback((item: types.Name): types.Name => {
     // EXISTING_CODE
     item = types.Name.createFrom({
@@ -152,37 +167,146 @@ export const Names = () => {
     return item;
   }, []);
 
+  const enabledActions = useMemo(() => {
+    // EXISTING_CODE
+    const currentFacet = getCurrentDataFacet();
+    if (currentFacet === types.DataFacet.CUSTOM) {
+      return [
+        'add',
+        'publish',
+        'pin',
+        'delete',
+        'remove',
+        'autoname',
+        'update',
+      ] as ActionType[];
+    }
+    if (currentFacet === types.DataFacet.BADDRESS) {
+      return ['add'] as ActionType[];
+    }
+    return ['add', 'autoname', 'update'] as ActionType[];
+    // EXISTING_CODE
+  }, [getCurrentDataFacet]);
+
   // prettier-ignore
-  const { handleAutoname, handleRemove, handleToggle, handleUpdate } = useCrudOperations({
-    collectionName: 'names',
-    crudFunc: NamesCrud,
-    pageFunc: GetNamesPage,
-    postFunc: postFunc,
-    pageClass: names.NamesPage,
-    updateItem: types.Name.createFrom({}),
-    getCurrentDataFacet,
+  const { handlers, config } = useActions({
+    collection: 'names',
+    viewStateKey,
+    pagination,
+    goToPage,
+    sort,
+    filter,
+    enabledActions,
     pageData,
     setPageData,
     setTotalItems,
-    dataFacetRef,
-    actionConfig,
+    crudFunc: NamesCrud,
+    pageFunc: GetNamesPage,
+    postFunc,
+    pageClass: names.NamesPage,
+    updateItem: types.Name.createFrom({}),
+    createPayload,
+    getCurrentDataFacet,
   });
+
+  const {
+    handleAutoname: originalHandleAutoname,
+    handleRemove,
+    handleToggle,
+    handleUpdate,
+  } = handlers;
+
+  // EXISTING_CODE
+  const handleAutoname = useCallback(
+    (address: string) => {
+      const currentFacet = getCurrentDataFacet();
+      if (currentFacet === types.DataFacet.CUSTOM || isSilenced) {
+        originalHandleAutoname(address);
+        return;
+      }
+      setConfirmModal({
+        opened: true,
+        address,
+        title: 'Create Custom Name',
+        message:
+          'This will create a custom name for this address. The new custom name will be available in the Custom tab.',
+        onConfirm: () => {
+          originalHandleAutoname(address);
+          emitSuccess('autoname', address);
+          activeFacetHook.setActiveFacet(types.DataFacet.CUSTOM);
+        },
+      });
+    },
+    [
+      getCurrentDataFacet,
+      isSilenced,
+      originalHandleAutoname,
+      emitSuccess,
+      activeFacetHook,
+    ],
+  );
+
+  const handleCloseModal = useCallback(() => {
+    setConfirmModal((prev) => ({ ...prev, opened: false }));
+  }, []);
+  // EXISTING_CODE
+
+  const headerActions = useMemo(() => {
+    if (config.headerActions.length === 0) return null;
+    return (
+      <Group gap="xs" style={{ flexShrink: 0 }}>
+        {config.headerActions.map((action) => {
+          const handlerKey =
+            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
+          const handler = handlers[handlerKey] as () => void;
+          return (
+            <Action
+              key={action.type}
+              icon={
+                action.icon as keyof ReturnType<
+                  typeof import('@hooks').useIconSets
+                >
+              }
+              onClick={handler}
+              title={
+                action.requiresWallet && false
+                  ? `${action.title} (requires wallet connection)`
+                  : action.title
+              }
+              size="sm"
+              isSubdued={action.requiresWallet && false}
+            />
+          );
+        })}
+      </Group>
+    );
+  }, [config.headerActions, handlers]);
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  const showActions = getCurrentDataFacet() === types.DataFacet.CUSTOM;
-  const getCanRemove = (row: unknown): boolean => {
+  const showActions = useMemo(() => {
     return (
-      Boolean((row as unknown as types.Name)?.deleted) &&
-      getCurrentDataFacet() === types.DataFacet.CUSTOM
+      enabledActions.includes('delete' as ActionType) ||
+      enabledActions.includes('remove' as ActionType) ||
+      enabledActions.includes('autoname' as ActionType)
     );
-  };
+  }, [enabledActions]);
+
+  const getCanRemove = useCallback(
+    (row: unknown): boolean => {
+      return (
+        Boolean((row as unknown as types.Name)?.deleted) &&
+        enabledActions.includes('remove' as ActionType)
+      );
+    },
+    [enabledActions],
+  );
 
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
       showActions,
-      actions: ['delete', 'undelete', 'remove', 'autoname'],
+      actions: ['delete', 'remove', 'autoname'],
       getCanRemove,
     },
     {
@@ -191,30 +315,74 @@ export const Names = () => {
       handleToggle,
     },
     toPageDataProp(pageData),
-    actionConfig,
+    config,
     true /* perRowCrud */,
   );
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
+  const canUpdate =
+    enabledActions.includes('update' as ActionType) ||
+    enabledActions.includes('add' as ActionType);
+
   const perTabContent = useMemo(() => {
+    const actionDebugger = (
+      <ActionDebugger
+        enabledActions={enabledActions}
+        setActiveFacet={activeFacetHook.setActiveFacet}
+      />
+    );
+
     return (
-      <BaseTab
+      <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        onSubmit={handleUpdate}
+        onSubmit={canUpdate ? handleUpdate : undefined}
+        headerActions={headerActions}
+        debugComponent={actionDebugger}
+        onDelete={
+          enabledActions.includes('delete' as ActionType)
+            ? (rowData: Record<string, unknown>) => {
+                const address = String(rowData.address || '');
+                handleToggle(address);
+              }
+            : undefined
+        }
+        onRemove={
+          enabledActions.includes('remove' as ActionType)
+            ? (rowData: Record<string, unknown>) => {
+                const address = String(rowData.address || '');
+                handleRemove(address);
+              }
+            : undefined
+        }
+        onAutoname={
+          enabledActions.includes('autoname' as ActionType)
+            ? (rowData: Record<string, unknown>) => {
+                const address = String(rowData.address || '');
+                handleAutoname(address);
+              }
+            : undefined
+        }
       />
     );
   }, [
+    enabledActions,
+    activeFacetHook.setActiveFacet,
     currentData,
     currentColumns,
     pageData?.isFetching,
     error,
-    handleUpdate,
     viewStateKey,
+    canUpdate,
+    handleUpdate,
+    headerActions,
+    handleToggle,
+    handleRemove,
+    handleAutoname,
   ]);
 
   const tabs = useMemo(
@@ -223,6 +391,7 @@ export const Names = () => {
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabContent,
+        dividerBefore: facetConfig.dividerBefore,
       })),
     [availableFacets, perTabContent],
   );
@@ -241,6 +410,14 @@ export const Names = () => {
         </div>
       )}
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
+      <ConfirmModal
+        opened={confirmModal.opened}
+        onClose={handleCloseModal}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        dialogKey="confirmNamesModal"
+      />
     </div>
   );
   // === END SECTION 9 ===

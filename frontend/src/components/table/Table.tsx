@@ -23,12 +23,17 @@ export interface TableProps<T extends Record<string, unknown>> {
   data: T[];
   loading: boolean;
   viewStateKey: ViewStateKey;
-  onSubmit: (data: Record<string, unknown>) => void;
+  onSubmit: (data: T) => void;
+  onDelete?: (rowData: T) => void;
+  onRemove?: (rowData: T) => void;
+  onAutoname?: (rowData: T) => void;
   validate?: Record<
     string,
     (value: unknown, values: Record<string, unknown>) => string | null
   >;
   onModalOpen?: (openModal: (data: T) => void) => void;
+  headerActions?: React.ReactNode;
+  debugComponent?: React.ReactNode;
 }
 
 export const Table = <T extends Record<string, unknown>>({
@@ -37,8 +42,13 @@ export const Table = <T extends Record<string, unknown>>({
   loading,
   viewStateKey,
   onSubmit,
+  onDelete,
+  onRemove,
+  onAutoname,
   validate,
   onModalOpen,
+  headerActions,
+  debugComponent,
 }: TableProps<T>) => {
   const processedColumns = processColumns(columns);
 
@@ -94,6 +104,42 @@ export const Table = <T extends Record<string, unknown>>({
     onEscape: () => {
       setIsModalOpen(false);
     },
+    onDelete: () => {
+      if (selectedRowIndex >= 0 && selectedRowIndex < data.length) {
+        const rowData = data[selectedRowIndex];
+        if (rowData) {
+          const isDeleted = Boolean(rowData.deleted);
+          if (!isDeleted && onDelete) {
+            onDelete(rowData);
+          } else if (isDeleted && onRemove) {
+            onRemove(rowData);
+          }
+        }
+      }
+    },
+    onCmdDelete: () => {
+      if (selectedRowIndex >= 0 && selectedRowIndex < data.length) {
+        const rowData = data[selectedRowIndex];
+        if (rowData) {
+          const isDeleted = Boolean(rowData.deleted);
+          if (isDeleted && onDelete) {
+            onDelete(rowData);
+          }
+        }
+      }
+    },
+    onAutoname: () => {
+      if (
+        selectedRowIndex >= 0 &&
+        selectedRowIndex < data.length &&
+        onAutoname
+      ) {
+        const rowData = data[selectedRowIndex];
+        if (rowData) {
+          onAutoname(rowData);
+        }
+      }
+    },
   });
 
   useEffect(() => {
@@ -102,6 +148,10 @@ export const Table = <T extends Record<string, unknown>>({
       const nativeKeyDownHandler = (e: KeyboardEvent) => {
         handleKeyDown({
           key: e.key,
+          metaKey: e.metaKey,
+          ctrlKey: e.ctrlKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey,
           preventDefault: () => e.preventDefault(),
           stopPropagation: () => e.stopPropagation(),
         } as React.KeyboardEvent);
@@ -221,7 +271,10 @@ export const Table = <T extends Record<string, unknown>>({
           viewStateKey={viewStateKey}
           focusControls={focusControls}
         />
+        {headerActions}
       </div>
+
+      {debugComponent}
 
       {/* Synchronized scrollable header */}
       <div

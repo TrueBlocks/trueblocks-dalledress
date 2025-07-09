@@ -9,16 +9,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsCrud, Reload } from '@app';
-import { BaseTab, usePagination } from '@components';
+import { Action, BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { toPageDataProp, useColumns } from '@hooks';
+import { ActionType } from '@hooks';
+import { toPageDataProp, useActions, useColumns } from '@hooks';
 // prettier-ignore
-import { useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
+import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { monitors, msgs, types } from '@models';
-import { useErrorHandler } from '@utils';
+import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, monitorsFacets } from './facets';
@@ -26,7 +27,7 @@ import { DEFAULT_FACET, ROUTE, monitorsFacets } from './facets';
 // === END SECTION 1 ===
 
 export const Monitors = () => {
-  // === SECTION 2: Hook Initialization ===
+  // === SECTION 2.2: Hook Initialization ===
   const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({
@@ -46,24 +47,18 @@ export const Monitors = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  // === END SECTION 2 ===
 
-  // === SECTION 3: Refs & Effects Setup ===
-  const dataFacetRef = useRef(getCurrentDataFacet());
-  useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
-  }, [getCurrentDataFacet]);
-  // === END SECTION 3 ===
+  // === END SECTION 2.2 ===
 
-  // === SECTION 4: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching Logic ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetMonitorsPage(
-        createPayload(dataFacetRef.current),
+        createPayload(getCurrentDataFacet()),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -77,13 +72,13 @@ export const Monitors = () => {
   }, [
     clearError,
     createPayload,
+    getCurrentDataFacet,
     pagination.currentPage,
     pagination.pageSize,
     sort,
     filter,
     setTotalItems,
     handleError,
-    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
@@ -99,13 +94,13 @@ export const Monitors = () => {
   }, [pageData, getCurrentDataFacet]);
   // === END SECTION 4 ===
 
-  // === SECTION 5: Event Handling ===
+  // === SECTION 4: Event Handling ===
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'monitors') {
         const eventDataFacet = payload.dataFacet;
-        if (eventDataFacet === dataFacetRef.current) {
+        if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
         }
       }
@@ -118,7 +113,7 @@ export const Monitors = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      Reload(createPayload(dataFacetRef.current)).then(() => {
+      Reload(createPayload(getCurrentDataFacet())).then(() => {
         // The data will reload when the DataLoaded event is fired.
       });
     } catch (err: unknown) {
@@ -127,47 +122,102 @@ export const Monitors = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 5 ===
+  // === END SECTION 4 ===
 
-  // === SECTION 6: CRUD Operations ===
-  const actionConfig = useActionConfig({
-    operations: ['delete', 'undelete', 'remove'],
-  });
-
+  // === SECTION 6: Actions ===
   const postFunc = useCallback((item: types.Monitor): types.Monitor => {
     // EXISTING_CODE
     // EXISTING_CODE
     return item;
   }, []);
 
+  const enabledActions = useMemo(() => {
+    // EXISTING_CODE
+    return ['delete', 'remove'] as ActionType[];
+    // EXISTING_CODE
+  }, []);
+
   // prettier-ignore
-  const { handleRemove, handleToggle } = useCrudOperations({
-    collectionName: 'monitors',
-    crudFunc: MonitorsCrud,
-    pageFunc: GetMonitorsPage,
-    postFunc: postFunc,
-    pageClass: monitors.MonitorsPage,
-    updateItem: types.Monitor.createFrom({}),
-    getCurrentDataFacet,
+  const { handlers, config } = useActions({
+    collection: 'monitors',
+    viewStateKey,
+    pagination,
+    goToPage,
+    sort,
+    filter,
+    enabledActions,
     pageData,
     setPageData,
     setTotalItems,
-    dataFacetRef,
-    actionConfig,
+    crudFunc: MonitorsCrud,
+    pageFunc: GetMonitorsPage,
+    postFunc,
+    pageClass: monitors.MonitorsPage,
+    updateItem: types.Monitor.createFrom({}),
+    createPayload,
+    getCurrentDataFacet,
   });
+
+  const { handleRemove, handleToggle } = handlers;
+
+  // EXISTING_CODE
+  // EXISTING_CODE
+
+  const headerActions = useMemo(() => {
+    if (config.headerActions.length === 0) return null;
+    return (
+      <Group gap="xs" style={{ flexShrink: 0 }}>
+        {config.headerActions.map((action) => {
+          const handlerKey =
+            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
+          const handler = handlers[handlerKey] as () => void;
+          return (
+            <Action
+              key={action.type}
+              icon={
+                action.icon as keyof ReturnType<
+                  typeof import('@hooks').useIconSets
+                >
+              }
+              onClick={handler}
+              title={
+                action.requiresWallet && false
+                  ? `${action.title} (requires wallet connection)`
+                  : action.title
+              }
+              size="sm"
+              isSubdued={action.requiresWallet && false}
+            />
+          );
+        })}
+      </Group>
+    );
+  }, [config.headerActions, handlers]);
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  const showActions = true;
-  const getCanRemove = (row: unknown): boolean => {
-    return Boolean((row as unknown as types.Monitor)?.deleted);
-  };
+  const showActions = useMemo(() => {
+    return (
+      enabledActions.includes('delete' as ActionType) ||
+      enabledActions.includes('remove' as ActionType)
+    );
+  }, [enabledActions]);
+
+  const getCanRemove = useCallback(
+    (row: unknown): boolean => {
+      return (
+        Boolean((row as unknown as types.Monitor)?.deleted) &&
+        enabledActions.includes('remove' as ActionType)
+      );
+    },
+    [enabledActions],
+  );
 
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
       showActions,
-      actions: ['delete', 'undelete', 'remove'],
+      actions: ['delete', 'remove'],
       getCanRemove,
     },
     {
@@ -175,23 +225,59 @@ export const Monitors = () => {
       handleToggle,
     },
     toPageDataProp(pageData),
-    actionConfig,
+    config,
     true /* perRowCrud */,
   );
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
   const perTabContent = useMemo(() => {
+    const actionDebugger = (
+      <ActionDebugger
+        enabledActions={enabledActions}
+        setActiveFacet={activeFacetHook.setActiveFacet}
+      />
+    );
+
     return (
-      <BaseTab
+      <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
+        debugComponent={actionDebugger}
+        headerActions={headerActions}
+        onDelete={
+          enabledActions.includes('delete' as ActionType)
+            ? (rowData: Record<string, unknown>) => {
+                const address = String(rowData.address || '');
+                handleToggle(address);
+              }
+            : undefined
+        }
+        onRemove={
+          enabledActions.includes('remove' as ActionType)
+            ? (rowData: Record<string, unknown>) => {
+                const address = String(rowData.address || '');
+                handleRemove(address);
+              }
+            : undefined
+        }
       />
     );
-  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
+  }, [
+    enabledActions,
+    activeFacetHook.setActiveFacet,
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    viewStateKey,
+    headerActions,
+    handleToggle,
+    handleRemove,
+  ]);
 
   const tabs = useMemo(
     () =>
@@ -199,6 +285,7 @@ export const Monitors = () => {
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabContent,
+        dividerBefore: facetConfig.dividerBefore,
       })),
     [availableFacets, perTabContent],
   );

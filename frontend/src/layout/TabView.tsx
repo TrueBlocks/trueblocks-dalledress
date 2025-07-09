@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { TabDivider } from '@components';
 import { useActiveProject, useEvent } from '@hooks';
 import { Tabs } from '@mantine/core';
 import { msgs, types } from '@models';
@@ -10,6 +11,7 @@ interface Tab {
   label: string;
   value: string;
   content: React.ReactNode;
+  dividerBefore?: boolean;
 }
 
 interface TabViewProps {
@@ -30,6 +32,13 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   };
 
   const [activeTab, setActiveTab] = useState<string>(getInitialTab());
+
+  useEffect(() => {
+    const savedTab = lastTab[route];
+    if (savedTab && savedTab !== activeTab) {
+      setActiveTab(savedTab);
+    }
+  }, [lastTab, route, activeTab]);
 
   useEffect(() => {
     if (activeTab && !lastTab[route]) {
@@ -84,10 +93,13 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
         }}
       >
         <Tabs.List>
-          {tabs.map((tab) => (
-            <Tabs.Tab key={tab.value} value={tab.value}>
-              {tab.label}
-            </Tabs.Tab>
+          {tabs.map((tab, index) => (
+            <>
+              {tab.dividerBefore && <TabDivider key={`divider-${index}`} />}
+              <Tabs.Tab key={tab.value} value={tab.value}>
+                {tab.label}
+              </Tabs.Tab>
+            </>
           ))}
         </Tabs.List>
 

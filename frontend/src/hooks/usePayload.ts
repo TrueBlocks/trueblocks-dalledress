@@ -5,15 +5,15 @@ import { types } from '@models';
 import { useActiveProject } from './useActiveProject';
 
 export const usePayload = () => {
-  const { effectiveAddress, effectiveChain } = useActiveProject();
+  const { lastAddress, lastChain } = useActiveProject();
   return useCallback(
     (dataFacet: types.DataFacet, address?: string) => {
       return types.Payload.createFrom({
         dataFacet,
-        chain: effectiveChain,
-        address: address || effectiveAddress,
+        chain: lastChain,
+        address: address || lastAddress,
       });
     },
-    [effectiveChain, effectiveAddress],
+    [lastChain, lastAddress],
   );
 };

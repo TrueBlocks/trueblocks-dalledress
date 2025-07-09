@@ -11,9 +11,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetStatusPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { toPageDataProp, useColumns } from '@hooks';
+import { ActionConfig, toPageDataProp, useColumns } from '@hooks';
 // prettier-ignore
-import { useActionConfig } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -26,7 +25,7 @@ import { DEFAULT_FACET, ROUTE, statusFacets } from './facets';
 // === END SECTION 1 ===
 
 export const Status = () => {
-  // === SECTION 2: Hook Initialization ===
+  // === SECTION 2.2: Hook Initialization ===
   const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({
@@ -49,21 +48,15 @@ export const Status = () => {
   const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  // === END SECTION 2 ===
 
-  // === SECTION 3: Refs & Effects Setup ===
-  const dataFacetRef = useRef(getCurrentDataFacet());
-  useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
-  }, [getCurrentDataFacet]);
-  // === END SECTION 3 ===
+  // === END SECTION 2.2 ===
 
-  // === SECTION 4: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching Logic ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetStatusPage(
-        createPayload(dataFacetRef.current),
+        createPayload(getCurrentDataFacet()),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -77,13 +70,13 @@ export const Status = () => {
   }, [
     clearError,
     createPayload,
+    getCurrentDataFacet,
     pagination.currentPage,
     pagination.pageSize,
     sort,
     filter,
     setTotalItems,
     handleError,
-    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
@@ -103,13 +96,13 @@ export const Status = () => {
   }, [pageData, getCurrentDataFacet]);
   // === END SECTION 4 ===
 
-  // === SECTION 5: Event Handling ===
+  // === SECTION 4: Event Handling ===
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'status') {
         const eventDataFacet = payload.dataFacet;
-        if (eventDataFacet === dataFacetRef.current) {
+        if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
         }
       }
@@ -122,7 +115,7 @@ export const Status = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      Reload(createPayload(dataFacetRef.current)).then(() => {
+      Reload(createPayload(getCurrentDataFacet())).then(() => {
         // The data will reload when the DataLoaded event is fired.
       });
     } catch (err: unknown) {
@@ -131,19 +124,16 @@ export const Status = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 5 ===
+  // === END SECTION 4 ===
 
-  // === SECTION 6: CRUD Operations ===
-  const actionConfig = useActionConfig({
-    operations: [],
-  });
+  // === SECTION 6: Actions ===
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
   const showActions = false;
-  const getCanRemove = (_row: unknown): boolean => {
-    return true;
-  };
+  const getCanRemove = useCallback((_row: unknown): boolean => {
+    return false;
+  }, []);
 
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
@@ -154,7 +144,7 @@ export const Status = () => {
     },
     {},
     toPageDataProp(pageData),
-    actionConfig,
+    {} as ActionConfig,
     true /* perRowCrud */,
   );
   // === END SECTION 7 ===
@@ -168,6 +158,7 @@ export const Status = () => {
         return false;
     }
   }, []);
+
   const perTabContent = useMemo(() => {
     const facet = getCurrentDataFacet();
     if (isForm(facet)) {
@@ -196,7 +187,7 @@ export const Status = () => {
       );
     } else {
       return (
-        <BaseTab
+        <BaseTab<Record<string, unknown>>
           data={currentData as unknown as Record<string, unknown>[]}
           columns={currentColumns}
           loading={!!pageData?.isFetching}
@@ -221,6 +212,7 @@ export const Status = () => {
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabContent,
+        dividerBefore: facetConfig.dividerBefore,
       })),
     [availableFacets, perTabContent],
   );

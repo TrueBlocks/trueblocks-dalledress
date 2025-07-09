@@ -49,6 +49,7 @@ type AppPreferences struct {
 	MenuCollapsed    bool              `json:"menuCollapsed,omitempty"`
 	Name             string            `json:"name,omitempty"`
 	RecentProjects   []string          `json:"recentProjects"`
+	SilencedDialogs  map[string]bool   `json:"silencedDialogs"`
 	Version          string            `json:"version"`
 }
 
@@ -70,6 +71,7 @@ func NewAppPreferences() *AppPreferences {
 		LastViewNoWizard: "/",
 		MenuCollapsed:    false,
 		RecentProjects:   []string{},
+		SilencedDialogs:  make(map[string]bool),
 		Version:          "1.0",
 	}
 }
@@ -110,6 +112,10 @@ func GetAppPreferences() (AppPreferences, error) {
 	}
 	if appPrefs.RecentProjects == nil {
 		appPrefs.RecentProjects = []string{}
+		needsSave = true
+	}
+	if appPrefs.SilencedDialogs == nil {
+		appPrefs.SilencedDialogs = make(map[string]bool)
 		needsSave = true
 	}
 	if appPrefs.Version == "" {

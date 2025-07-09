@@ -51,8 +51,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       lastProject: 'test-project',
       lastChain: 'mainnet',
       lastAddress: '0x123',
-      effectiveChain: 'mainnet',
-      effectiveAddress: '0x123',
       projects: [],
       currentProject: { name: 'test-project', chain: 'mainnet' },
     } as any);

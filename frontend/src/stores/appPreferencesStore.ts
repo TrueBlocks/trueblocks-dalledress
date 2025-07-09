@@ -232,16 +232,6 @@ class AppPreferencesStore {
   get canExport(): boolean {
     return Boolean(this.state.lastProject && this.state.lastAddress);
   }
-
-  get effectiveAddress(): string {
-    return (
-      this.state.lastAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b'
-    );
-  }
-
-  get effectiveChain(): string {
-    return this.state.lastChain || 'mainnet';
-  }
 }
 
 // Create and export a singleton instance

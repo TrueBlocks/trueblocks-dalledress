@@ -9,16 +9,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AbisCrud, GetAbisPage, Reload } from '@app';
-import { BaseTab, usePagination } from '@components';
+import { Action, BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { toPageDataProp, useColumns } from '@hooks';
+import { ActionType } from '@hooks';
+import { toPageDataProp, useActions, useColumns } from '@hooks';
 // prettier-ignore
-import { useActionConfig, useCrudOperations } from '@hooks';
 import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
+import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { abis, msgs, types } from '@models';
-import { useErrorHandler } from '@utils';
+import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, abisFacets } from './facets';
@@ -26,7 +27,7 @@ import { DEFAULT_FACET, ROUTE, abisFacets } from './facets';
 // === END SECTION 1 ===
 
 export const Abis = () => {
-  // === SECTION 2: Hook Initialization ===
+  // === SECTION 2.2: Hook Initialization ===
   const createPayload = usePayload();
 
   const activeFacetHook = useActiveFacet({
@@ -46,24 +47,18 @@ export const Abis = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  // === END SECTION 2 ===
 
-  // === SECTION 3: Refs & Effects Setup ===
-  const dataFacetRef = useRef(getCurrentDataFacet());
-  useEffect(() => {
-    dataFacetRef.current = getCurrentDataFacet();
-  }, [getCurrentDataFacet]);
-  // === END SECTION 3 ===
+  // === END SECTION 2.2 ===
 
-  // === SECTION 4: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching Logic ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
       const result = await GetAbisPage(
-        createPayload(dataFacetRef.current),
+        createPayload(getCurrentDataFacet()),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -77,13 +72,13 @@ export const Abis = () => {
   }, [
     clearError,
     createPayload,
+    getCurrentDataFacet,
     pagination.currentPage,
     pagination.pageSize,
     sort,
     filter,
     setTotalItems,
     handleError,
-    getCurrentDataFacet,
   ]);
 
   const currentData = useMemo(() => {
@@ -105,13 +100,13 @@ export const Abis = () => {
   }, [pageData, getCurrentDataFacet]);
   // === END SECTION 4 ===
 
-  // === SECTION 5: Event Handling ===
+  // === SECTION 4: Event Handling ===
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === 'abis') {
         const eventDataFacet = payload.dataFacet;
-        if (eventDataFacet === dataFacetRef.current) {
+        if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
         }
       }
@@ -124,7 +119,7 @@ export const Abis = () => {
 
   const handleReload = useCallback(async () => {
     try {
-      Reload(createPayload(dataFacetRef.current)).then(() => {
+      Reload(createPayload(getCurrentDataFacet())).then(() => {
         // The data will reload when the DataLoaded event is fired.
       });
     } catch (err: unknown) {
@@ -133,41 +128,90 @@ export const Abis = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 5 ===
+  // === END SECTION 4 ===
 
-  // === SECTION 6: CRUD Operations ===
-  const actionConfig = useActionConfig({
-    operations: ['remove'],
-  });
-
+  // === SECTION 6: Actions ===
   const postFunc = useCallback((item: types.Abi): types.Abi => {
     // EXISTING_CODE
     // EXISTING_CODE
     return item;
   }, []);
 
+  const enabledActions = useMemo(() => {
+    // EXISTING_CODE
+    return ['remove'] as ActionType[];
+    // EXISTING_CODE
+  }, []);
+
   // prettier-ignore
-  const { handleRemove } = useCrudOperations({
-    collectionName: 'abis',
-    crudFunc: AbisCrud,
-    pageFunc: GetAbisPage,
-    postFunc: postFunc,
-    pageClass: abis.AbisPage,
-    updateItem: types.Abi.createFrom({}),
-    getCurrentDataFacet,
+  const { handlers, config } = useActions({
+    collection: 'abis',
+    viewStateKey,
+    pagination,
+    goToPage,
+    sort,
+    filter,
+    enabledActions,
     pageData,
     setPageData,
     setTotalItems,
-    dataFacetRef,
-    actionConfig,
+    crudFunc: AbisCrud,
+    pageFunc: GetAbisPage,
+    postFunc,
+    pageClass: abis.AbisPage,
+    updateItem: types.Abi.createFrom({}),
+    createPayload,
+    getCurrentDataFacet,
   });
+
+  const { handleRemove } = handlers;
+
+  // EXISTING_CODE
+  // EXISTING_CODE
+
+  const headerActions = useMemo(() => {
+    if (config.headerActions.length === 0) return null;
+    return (
+      <Group gap="xs" style={{ flexShrink: 0 }}>
+        {config.headerActions.map((action) => {
+          const handlerKey =
+            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
+          const handler = handlers[handlerKey] as () => void;
+          return (
+            <Action
+              key={action.type}
+              icon={
+                action.icon as keyof ReturnType<
+                  typeof import('@hooks').useIconSets
+                >
+              }
+              onClick={handler}
+              title={
+                action.requiresWallet && false
+                  ? `${action.title} (requires wallet connection)`
+                  : action.title
+              }
+              size="sm"
+              isSubdued={action.requiresWallet && false}
+            />
+          );
+        })}
+      </Group>
+    );
+  }, [config.headerActions, handlers]);
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
-  const showActions = getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
-  const getCanRemove = (_row: unknown): boolean => {
-    return getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
-  };
+  const showActions = useMemo(() => {
+    return enabledActions.includes('remove' as ActionType);
+  }, [enabledActions]);
+
+  const getCanRemove = useCallback(
+    (_row: unknown): boolean => {
+      return getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
+    },
+    [getCurrentDataFacet],
+  );
 
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
@@ -180,23 +224,50 @@ export const Abis = () => {
       handleRemove,
     },
     toPageDataProp(pageData),
-    actionConfig,
+    config,
     false /* perRowCrud */,
   );
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
   const perTabContent = useMemo(() => {
+    const actionDebugger = (
+      <ActionDebugger
+        enabledActions={enabledActions}
+        setActiveFacet={activeFacetHook.setActiveFacet}
+      />
+    );
+
     return (
-      <BaseTab
+      <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
+        debugComponent={actionDebugger}
+        headerActions={headerActions}
+        onRemove={
+          enabledActions.includes('remove' as ActionType)
+            ? (rowData: Record<string, unknown>) => {
+                const address = String(rowData.address || '');
+                handleRemove(address);
+              }
+            : undefined
+        }
       />
     );
-  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    viewStateKey,
+    headerActions,
+    handleRemove,
+    enabledActions,
+    activeFacetHook.setActiveFacet,
+  ]);
 
   const tabs = useMemo(
     () =>
@@ -204,6 +275,7 @@ export const Abis = () => {
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabContent,
+        dividerBefore: facetConfig.dividerBefore,
       })),
     [availableFacets, perTabContent],
   );

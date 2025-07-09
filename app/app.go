@@ -36,6 +36,7 @@ type App struct {
 	Projects    *project.Manager
 	chainList   *utils.ChainList
 	// ADD_ROUTE
+	// QUESTION: DO WE ACTUALLY NEED THIS?
 	exports *exports.ExportsCollection
 	// ADD_ROUTE
 	collections []types.Collection
@@ -61,6 +62,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		ensMap:  make(map[string]base.Address),
 	}
 	// ADD_ROUTE
+	// QUESTION: DO WE ACTUALLY NEED THIS?
 	// Note: exports created on-demand per chain/address when needed
 	app.exports = nil
 	// ADD_ROUTE

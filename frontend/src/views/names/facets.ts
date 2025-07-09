@@ -23,6 +23,7 @@ export const namesFacets: DataFacetConfig[] = [
     id: types.DataFacet.PREFUND,
     label: toProperCase(types.DataFacet.PREFUND),
     isDefault: false,
+    dividerBefore: true,
   },
   {
     id: types.DataFacet.REGULAR,

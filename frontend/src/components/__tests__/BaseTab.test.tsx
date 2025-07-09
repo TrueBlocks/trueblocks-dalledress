@@ -211,25 +211,6 @@ describe('BaseTab', () => {
       ).toBeInTheDocument();
     });
 
-    it('passes onAction callback correctly', () => {
-      const mockOnAction = vi.fn();
-
-      render(
-        <BaseTab
-          data={mockData}
-          columns={mockColumns}
-          loading={false}
-          error={null}
-          viewStateKey={mockViewStateKey}
-          onAction={mockOnAction}
-        />,
-      );
-
-      expect(
-        document.querySelector('[data-testid="mock-table"]'),
-      ).toBeInTheDocument();
-    });
-
     it('handles error prop without breaking render', () => {
       const mockError = new Error('Test error');
 

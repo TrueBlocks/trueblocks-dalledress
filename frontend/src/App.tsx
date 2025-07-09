@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { NodeStatus, getBarWidth } from '@components';
-import { ViewContextProvider } from '@contexts';
+import { ViewContextProvider, WalletConnectProvider } from '@contexts';
 import {
   useActiveProject,
   useAppHealth,
@@ -10,6 +10,7 @@ import {
 } from '@hooks';
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
+import { WalletConnectModalSign } from '@walletconnect/modal-sign-react';
 import { Router } from 'wouter';
 
 import { useGlobalEscape } from './hooks/useGlobalEscape';
@@ -77,39 +78,59 @@ export const App = () => {
 
   return (
     <Router>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100vh',
-        }}
-      >
-        <AppShell
-          layout="default"
-          header={header}
-          footer={footer}
-          navbar={navbar}
-          aside={aside}
+      <WalletConnectProvider>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100vh',
+          }}
         >
-          <Header />
-          <MenuBar disabled={isWizard} />
-          <ViewContextProvider>
-            <MainView />
-          </ViewContextProvider>
-          <HelpBar />
-          <div
-            style={{
-              position: 'absolute',
-              top: '84px',
-              right: `${getBarWidth(helpCollapsed, 2) + 0}px`,
-              zIndex: 1000,
-            }}
+          <AppShell
+            layout="default"
+            header={header}
+            footer={footer}
+            navbar={navbar}
+            aside={aside}
           >
-            <NodeStatus />
-          </div>
-          <Footer />
-        </AppShell>
-      </div>
+            <Header />
+            <MenuBar disabled={isWizard} />
+            <ViewContextProvider>
+              <MainView />
+            </ViewContextProvider>
+            <HelpBar />
+            <div
+              style={{
+                position: 'absolute',
+                top: '84px',
+                right: `${getBarWidth(helpCollapsed, 2) + 0}px`,
+                zIndex: 1000,
+              }}
+            >
+              <NodeStatus />
+            </div>
+            <Footer />
+          </AppShell>
+          <WalletConnectModalSign
+            projectId={
+              import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ||
+              (() => {
+                console.error(
+                  'VITE_WALLETCONNECT_PROJECT_ID not set in environment variables',
+                );
+                return 'MISSING_PROJECT_ID';
+              })()
+            }
+            metadata={{
+              name: 'TrueBlocks Namester',
+              description:
+                'A TrueBlocks desktop application for naming addresses',
+              url: 'https://trueblocks.io',
+              icons: ['https://trueblocks.io/favicon.ico'],
+            }}
+          />
+        </div>
+      </WalletConnectProvider>
     </Router>
   );
 };

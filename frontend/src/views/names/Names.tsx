@@ -13,6 +13,7 @@ import { Action, BaseTab, ConfirmModal, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { ActionType } from '@hooks';
 import {
+  DataFacetConfig,
   toPageDataProp,
   useActionMsgs,
   useActions,
@@ -20,7 +21,7 @@ import {
   useSilencedDialog,
 } from '@hooks';
 // prettier-ignore
-import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
+import { useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
@@ -269,18 +270,18 @@ export const Names = () => {
               }
               onClick={handler}
               title={
-                action.requiresWallet && false
+                action.requiresWallet && !config.isWalletConnected
                   ? `${action.title} (requires wallet connection)`
                   : action.title
               }
               size="sm"
-              isSubdued={action.requiresWallet && false}
+              isSubdued={action.requiresWallet && !config.isWalletConnected}
             />
           );
         })}
       </Group>
     );
-  }, [config.headerActions, handlers]);
+  }, [config.headerActions, config.isWalletConnected, handlers]);
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
@@ -332,7 +333,6 @@ export const Names = () => {
         setActiveFacet={activeFacetHook.setActiveFacet}
       />
     );
-
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -341,8 +341,8 @@ export const Names = () => {
         error={error}
         viewStateKey={viewStateKey}
         onSubmit={canUpdate ? handleUpdate : undefined}
-        headerActions={headerActions}
         debugComponent={actionDebugger}
+        headerActions={headerActions}
         onDelete={
           enabledActions.includes('delete' as ActionType)
             ? (rowData: Record<string, unknown>) => {
@@ -370,19 +370,19 @@ export const Names = () => {
       />
     );
   }, [
-    enabledActions,
-    activeFacetHook.setActiveFacet,
     currentData,
     currentColumns,
     pageData?.isFetching,
     error,
-    viewStateKey,
-    canUpdate,
     handleUpdate,
+    canUpdate,
+    viewStateKey,
     headerActions,
     handleToggle,
     handleRemove,
     handleAutoname,
+    enabledActions,
+    activeFacetHook.setActiveFacet,
   ]);
 
   const tabs = useMemo(

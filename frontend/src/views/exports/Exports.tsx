@@ -11,13 +11,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionConfig, toPageDataProp, useColumns } from '@hooks';
+import {
+  ActionConfig,
+  DataFacetConfig,
+  toPageDataProp,
+  useColumns,
+} from '@hooks';
 // prettier-ignore
-import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
+import { useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { exports, msgs, types } from '@models';
-import { useErrorHandler } from '@utils';
+import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, exportsFacets } from './facets';
@@ -164,6 +169,12 @@ export const Exports = () => {
   // === SECTION 8: Tab Configuration ===
 
   const perTabContent = useMemo(() => {
+    const actionDebugger = (
+      <ActionDebugger
+        enabledActions={[]}
+        setActiveFacet={activeFacetHook.setActiveFacet}
+      />
+    );
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -171,9 +182,18 @@ export const Exports = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
+        debugComponent={actionDebugger}
+        headerActions={[]}
       />
     );
-  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    viewStateKey,
+    activeFacetHook.setActiveFacet,
+  ]);
 
   const tabs = useMemo(
     () =>

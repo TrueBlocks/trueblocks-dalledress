@@ -11,13 +11,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionConfig, toPageDataProp, useColumns } from '@hooks';
+import {
+  ActionConfig,
+  DataFacetConfig,
+  toPageDataProp,
+  useColumns,
+} from '@hooks';
 // prettier-ignore
-import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
+import { useActiveFacet, useEvent, usePayload } from '@hooks';
 import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { chunks, msgs, types } from '@models';
-import { useErrorHandler } from '@utils';
+import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, chunksFacets } from './facets';
@@ -162,6 +167,12 @@ export const Chunks = () => {
   }, []);
 
   const perTabContent = useMemo(() => {
+    const actionDebugger = (
+      <ActionDebugger
+        enabledActions={[]}
+        setActiveFacet={activeFacetHook.setActiveFacet}
+      />
+    );
     const facet = getCurrentDataFacet();
     if (isForm(facet)) {
       const chunksData = currentData[0] as unknown as Record<string, unknown>;
@@ -194,6 +205,8 @@ export const Chunks = () => {
           columns={currentColumns}
           loading={!!pageData?.isFetching}
           error={error}
+          debugComponent={actionDebugger}
+          headerActions={[]}
           viewStateKey={viewStateKey}
         />
       );
@@ -206,6 +219,7 @@ export const Chunks = () => {
     viewStateKey,
     isForm,
     getCurrentDataFacet,
+    activeFacetHook.setActiveFacet,
   ]);
 
   const tabs = useMemo(

@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { ViewStateKey } from '@contexts';
+import { useWalletGatedAction } from '@hooks';
 import { crud, sdk, types } from '@models';
 import { Log, isDebugMode, useErrorHandler } from '@utils';
 
@@ -18,9 +19,9 @@ const getAddressString = (address: unknown): string => {
 };
 
 export type ActionType =
-  | 'add'
   | 'publish'
   | 'pin'
+  | 'add'
   | 'delete'
   | 'remove'
   | 'autoname'
@@ -88,13 +89,6 @@ export interface CollectionActionsConfig<TPageData, TItem> {
 
 // Predefined action definitions
 const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
-  add: {
-    type: 'add',
-    level: 'header',
-    requiresWallet: false,
-    title: 'Add',
-    icon: 'Add',
-  },
   publish: {
     type: 'publish',
     level: 'header',
@@ -105,9 +99,16 @@ const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
   pin: {
     type: 'pin',
     level: 'header',
-    requiresWallet: true,
+    requiresWallet: false,
     title: 'Pin',
     icon: 'Pin',
+  },
+  add: {
+    type: 'add',
+    level: 'header',
+    requiresWallet: false,
+    title: 'Add',
+    icon: 'Add',
   },
   delete: {
     type: 'delete',
@@ -169,6 +170,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     cleanFunc,
   } = config;
 
+  const { isWalletConnected, createWalletGatedAction } = useWalletGatedAction();
   const { emitSuccess } = useActionMsgs(
     collection as 'names' | 'monitors' | 'abis',
   );
@@ -219,14 +221,14 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     // TODO: Implement add functionality
   }, [collection]);
 
-  const handlePublish = useCallback(() => {
-    Log(`Publishing ${collection} with wallet:`); // , walletAddress);
+  const handlePublish = createWalletGatedAction((walletAddress: string) => {
+    Log(`Publishing ${collection} with wallet:`, walletAddress);
     // TODO: Implement publish functionality with connected wallet
-  }, [collection]);
+  }, collection);
 
   const handlePin = useCallback(() => {
-    Log(`Pinning ${collection} with wallet:`); // , walletAddress);
-    // TODO: Implement pin functionality with connected wallet
+    Log(`Pinning ${collection}`);
+    // TODO: Implement pin functionality
   }, [collection]);
 
   const handleToggle = useCallback(
@@ -740,7 +742,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       rowActions,
       collection,
       getCurrentDataFacet,
-      isWalletConnected: true,
+      isWalletConnected,
     },
   };
 };

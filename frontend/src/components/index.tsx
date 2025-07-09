@@ -11,6 +11,7 @@ export * from './Socials';
 export * from './StatusIndicator';
 export * from './TabDivider';
 export * from './ThemeProvider';
+export * from './WalletConnectButton';
 
 export * from './form';
 export * from './table';

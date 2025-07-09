@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
+import { WalletConnectButton } from '@components';
 import { useActiveProject } from '@hooks';
 import { useIconSets } from '@hooks';
 import {
@@ -46,7 +47,7 @@ export const Header = () => {
           >
             {colorScheme === 'dark' ? <Light size={18} /> : <Dark size={18} />}
           </ActionIcon>
-          <Text>Header Content</Text>
+          <WalletConnectButton />
         </Group>
       </Group>
     </AppShell.Header>

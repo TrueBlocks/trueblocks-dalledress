@@ -11,13 +11,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetStatusPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionConfig, toPageDataProp, useColumns } from '@hooks';
+import {
+  ActionConfig,
+  DataFacetConfig,
+  toPageDataProp,
+  useColumns,
+} from '@hooks';
 // prettier-ignore
-import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
+import { useActiveFacet, useEvent, usePayload } from '@hooks';
 import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { msgs, status, types } from '@models';
-import { useErrorHandler } from '@utils';
+import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, statusFacets } from './facets';
@@ -160,6 +165,12 @@ export const Status = () => {
   }, []);
 
   const perTabContent = useMemo(() => {
+    const actionDebugger = (
+      <ActionDebugger
+        enabledActions={[]}
+        setActiveFacet={activeFacetHook.setActiveFacet}
+      />
+    );
     const facet = getCurrentDataFacet();
     if (isForm(facet)) {
       const statusData = currentData[0] as unknown as Record<string, unknown>;
@@ -192,6 +203,8 @@ export const Status = () => {
           columns={currentColumns}
           loading={!!pageData?.isFetching}
           error={error}
+          debugComponent={actionDebugger}
+          headerActions={[]}
           viewStateKey={viewStateKey}
         />
       );
@@ -204,6 +217,7 @@ export const Status = () => {
     viewStateKey,
     isForm,
     getCurrentDataFacet,
+    activeFacetHook.setActiveFacet,
   ]);
 
   const tabs = useMemo(

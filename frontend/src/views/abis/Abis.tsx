@@ -12,9 +12,14 @@ import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { Action, BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import { ActionType } from '@hooks';
-import { toPageDataProp, useActions, useColumns } from '@hooks';
+import {
+  DataFacetConfig,
+  toPageDataProp,
+  useActions,
+  useColumns,
+} from '@hooks';
 // prettier-ignore
-import { DataFacetConfig, useActiveFacet, useEvent, usePayload } from '@hooks';
+import { useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
@@ -187,18 +192,18 @@ export const Abis = () => {
               }
               onClick={handler}
               title={
-                action.requiresWallet && false
+                action.requiresWallet && !config.isWalletConnected
                   ? `${action.title} (requires wallet connection)`
                   : action.title
               }
               size="sm"
-              isSubdued={action.requiresWallet && false}
+              isSubdued={action.requiresWallet && !config.isWalletConnected}
             />
           );
         })}
       </Group>
     );
-  }, [config.headerActions, handlers]);
+  }, [config.headerActions, config.isWalletConnected, handlers]);
   // === END SECTION 6 ===
 
   // === SECTION 7: Form & UI Handlers ===
@@ -230,6 +235,7 @@ export const Abis = () => {
   // === END SECTION 7 ===
 
   // === SECTION 8: Tab Configuration ===
+
   const perTabContent = useMemo(() => {
     const actionDebugger = (
       <ActionDebugger
@@ -237,7 +243,6 @@ export const Abis = () => {
         setActiveFacet={activeFacetHook.setActiveFacet}
       />
     );
-
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}

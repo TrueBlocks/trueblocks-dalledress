@@ -50,7 +50,6 @@ export type IconSet = {
   Light: IconType;
   Dark: IconType;
 
-  // Debug
   DebugOn: IconType;
   DebugOff: IconType;
 };

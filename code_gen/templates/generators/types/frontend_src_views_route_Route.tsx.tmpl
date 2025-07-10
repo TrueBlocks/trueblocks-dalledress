@@ -1,27 +1,26 @@
 {{- $class := .Class -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
-{{- $upper := toUpper $class -}}
-{{- $isAbis := eq $class "Abis" -}}
+
+{{/* Determine View Type */}}
+{{- $isReadOnly := or (or (eq $class "Chunks") (eq $class "Exports")) (eq $class "Status") -}}
 {{- $isNames := eq $class "Names" -}}
+{{- $isAbis := eq $class "Abis" -}}
 {{- $isMonitors := eq $class "Monitors" -}}
-{{- $hasUpdate := $isNames -}}
-{{- $hasDelete := contains .CrudStrs "delete" -}}
-{{- $hasActions := or (or $isNames $isAbis) $isMonitors -}}
+{{- $isAction := or $isAbis $isMonitors -}}
+
+{{/* Determine Features */}}
+{{- $hasCrud := or $isNames $isAction -}}
 {{- $hasForms := .HasForms -}}
-{{- $isStatus := eq $class "Status" -}}
-{{- $actions := replace .CrudStrs ", 'update'" "" -}}
-{{- $actions := replace $actions ", 'undelete'" "" -}}
-{{- $models := printf "%s, msgs" $lower -}}
-{{- if or $isNames $isStatus -}}
-  {{- $models = printf "msgs, %s" $lower -}}
-{{- end -}}
+{{- $hasDelete := contains .CrudStrs "delete" -}}
+{{- $cruds := replace .CrudStrs ", 'undelete'" "" -}}
+
+{{/* Build API imports based on view type */}}
 {{- $apis := printf "Get%sPage, Reload" $class -}}
-{{- if $isAbis -}}
-  {{- $apis = printf "%sCrud, Get%sPage, Reload" $class $class -}}
-{{- else if or $isNames $isMonitors -}}
+{{- if $hasCrud -}}
   {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
 {{- end -}}
+
 // Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
@@ -29,49 +28,33 @@
  * Parts of this file were auto generated. Edit only those parts of
  * the code inside of 'EXISTING_CODE' tags.
  */
+
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { {{$apis}} } from '@app';
-import { {{if $hasActions}}Action, {{end}}BaseTab, {{if $isNames}}ConfirmModal, {{end}}usePagination } from '@components';
+import { BaseTab, usePagination } from '@components';
+{{- if $hasCrud}}
+import { Action{{if $isNames}}, ConfirmModal{{end}} } from '@components';
+{{- end}}
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-{{- if $hasActions }}
-import { ActionType } from '@hooks';
-{{- end }}
-import {
-  DataFacetConfig, 
-  {{if not .HasCruds}}ActionConfig, {{end}}
-  toPageDataProp,
-  {{- if $isNames }}
-  useActionMsgs,
-  {{- end }}
-  {{- if .HasCruds}}
-  useActions,
-  {{- end}}
-  {{- if $isNames }}
-  useSilencedDialog,
-  {{- end }}
-  useColumns,
-} from '@hooks';
-// prettier-ignore
-import { useActiveFacet, useEvent, usePayload } from '@hooks';
+import { DataFacetConfig, toPageDataProp, useActiveFacet, useColumns, useEvent, usePayload } from '@hooks';
+{{- if $hasCrud}}
+import { {{if $isNames}}ActionType, useActionMsgs, {{end}}useActions{{if $isNames}}, useSilencedDialog{{end}} } from '@hooks';
+{{- end}}
 import { {{if $hasForms}}FormView, {{end}}TabView } from '@layout';
-{{- if .HasCruds }}
-import { Group } from '@mantine/core';
-{{- end }}
 import { useHotkeys } from '@mantine/hooks';
-import { {{$models}}, types } from '@models';
+import { {{$lower}} } from '@models';
+import { msgs, types } from '@models';
 import { ActionDebugger, useErrorHandler } from '@utils';
-
+{{- if $hasCrud}}
+import { Group } from '@mantine/core';
+{{- end}}
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, {{$lower}}Facets } from './facets';
 
-// === END SECTION 1 ===
-
 export const {{$class}} = () => {
-  // === SECTION 2.2: Hook Initialization ===
+  // === SECTION 2: Hook Initialization ===
   const createPayload = usePayload();
-
   const activeFacetHook = useActiveFacet({
     facets: {{$lower}}Facets,
     defaultFacet: DEFAULT_FACET,
@@ -89,11 +72,12 @@ export const {{$class}} = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems{{if .HasCruds}}, goToPage{{end}} } = usePagination(viewStateKey);
+  const { pagination, setTotalItems{{if $hasCrud}}, goToPage{{end}} } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  {{- if $isNames }}
-  // === SECTION 2.1: Modal State ===
+
+  {{if $isNames}}
+  // Names-specific state
   const { emitSuccess } = useActionMsgs('names');
   const [confirmModal, setConfirmModal] = useState<{
     opened: boolean;
@@ -108,14 +92,10 @@ export const {{$class}} = () => {
     message: '',
     onConfirm: () => {},
   });
-
   const { isSilenced } = useSilencedDialog('createCustomName');
-  // === END SECTION 2.1 ===
-  {{- end }}
+  {{end}}
 
-  // === END SECTION 2.2 ===
-
-  // === SECTION 3: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -145,7 +125,6 @@ export const {{$class}} = () => {
 
   const currentData = useMemo(() => {
     if (!pageData) return [];
-
     const facet = getCurrentDataFacet();
     switch (facet) {
       {{range .Facets}}case types.DataFacet.{{toUpper .Name}}:
@@ -155,7 +134,6 @@ export const {{$class}} = () => {
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
-  // === END SECTION 4 ===
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -185,22 +163,23 @@ export const {{$class}} = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 4 ===
 
-  // === SECTION 6: Actions ===
-{{- if .HasCruds}}
-  const postFunc = useCallback((item: types.{{$single}}): types.{{$single}} => {
-    // EXISTING_CODE
-    // EXISTING_CODE
-    return item;
-  }, []);
+  {{- if $hasCrud}}
 
+  // === SECTION 5: CRUD Operations ===
+  {{if $isNames -}}
   const enabledActions = useMemo(() => {
-    // EXISTING_CODE
-    // EXISTING_CODE
-  }, [{{if not (or $isAbis $isMonitors)}}getCurrentDataFacet{{end}}]);
+    const currentFacet = getCurrentDataFacet();
+    if (currentFacet === types.DataFacet.CUSTOM) {
+      return ['add', 'publish', 'pin', 'delete', 'remove', 'autoname', 'update'] as ActionType[];
+    }
+    if (currentFacet === types.DataFacet.BADDRESS) {
+      return ['add'] as ActionType[];
+    }
+    return ['add', 'autoname', 'update'] as ActionType[];
+  }, [getCurrentDataFacet]);
+  {{end -}}
 
-  // prettier-ignore
   const { handlers, config } = useActions({
     collection: '{{$lower}}',
     viewStateKey,
@@ -208,46 +187,78 @@ export const {{$class}} = () => {
     goToPage,
     sort,
     filter,
-    enabledActions,
+    enabledActions{{if not $isNames}}: [{{$cruds}}]{{end}},
     pageData,
     setPageData,
     setTotalItems,
     crudFunc: {{$class}}Crud,
     pageFunc: Get{{$class}}Page,
-    postFunc,
     pageClass: {{$lower}}.{{$class}}Page,
-    updateItem: types.{{toSingular $class}}.createFrom({}),
+    updateItem: types.{{$single}}.createFrom({}),
+    {{- if $isNames}}
+    postFunc: useCallback((item: types.Name): types.Name => {
+      item = types.Name.createFrom({
+        ...item,
+        source: item.source || 'TrueBlocks',
+      });
+      return item;
+    }, []),
+    {{end -}}
     createPayload,
     getCurrentDataFacet,
   });
 
-  const { {{ .Handlers }} } = handlers;
+  {{if $isNames}}
+  const { handleAutoname: originalHandleAutoname, handleRemove, handleToggle, handleUpdate } = handlers;
 
-  // EXISTING_CODE
-  // EXISTING_CODE
+  const handleAutoname = useCallback(
+    (address: string) => {
+      const currentFacet = getCurrentDataFacet();
+      if (currentFacet === types.DataFacet.CUSTOM || isSilenced) {
+        originalHandleAutoname(address);
+        emitSuccess('autoname', 'Successfully created custom name for ${address}');
+        if (currentFacet === types.DataFacet.CUSTOM) {
+          fetchData();
+        } else {
+          activeFacetHook.setActiveFacet(types.DataFacet.CUSTOM);
+        }
+        return;
+      }
+      setConfirmModal({
+        opened: true,
+        address,
+        title: 'Create Custom Name',
+        message:
+          'This will create a custom name for this address. The new custom name will be available in the Custom tab.',
+        onConfirm: () => {
+          originalHandleAutoname(address);
+          emitSuccess('autoname', 'Successfully created custom name for ${address}');
+          activeFacetHook.setActiveFacet(types.DataFacet.CUSTOM);
+          setConfirmModal((prev) => ({ ...prev, opened: false }));
+        },
+      });
+    },
+    [getCurrentDataFacet, isSilenced, originalHandleAutoname, emitSuccess, activeFacetHook, fetchData],
+  );
+  {{- else}}
+  const { {{.Handlers}} } = handlers;
+  {{- end}}
 
   const headerActions = useMemo(() => {
-    if (config.headerActions.length === 0) return null;
+    if (!config.headerActions?.length) return null;
     return (
       <Group gap="xs" style={ { flexShrink: 0 } }>
         {config.headerActions.map((action) => {
-          const handlerKey =
-            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
+          const handlerKey = `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
           const handler = handlers[handlerKey] as () => void;
           return (
             <Action
               key={action.type}
-              icon={
-                action.icon as keyof ReturnType<
-                  typeof import('@hooks').useIconSets
-                >
-              }
+              icon={action.icon as keyof ReturnType<typeof import('@hooks').useIconSets>}
               onClick={handler}
-              title={
-                action.requiresWallet && !config.isWalletConnected
-                  ? `${action.title} (requires wallet connection)`
-                  : action.title
-              }
+              title={action.requiresWallet && !config.isWalletConnected
+                ? `${action.title} (requires wallet connection)`
+                : action.title}
               size="sm"
               isSubdued={action.requiresWallet && !config.isWalletConnected}
             />
@@ -256,87 +267,33 @@ export const {{$class}} = () => {
       </Group>
     );
   }, [config.headerActions, config.isWalletConnected, handlers]);
-  {{- end }}
-  // === END SECTION 6 ===
+  {{end}}
 
-  // === SECTION 7: Form & UI Handlers ===
-  {{- if $hasActions }}
-  const showActions = useMemo(() => {
-    return (
-      {{- if $hasDelete }}
-      enabledActions.includes('delete' as ActionType) ||
-      {{- end }}
-      enabledActions.includes('remove' as ActionType) {{- if $isNames }}||
-      enabledActions.includes('autoname' as ActionType)
-      {{- end }}
-    );
-  }, [enabledActions]);
-
-  const getCanRemove = useCallback(
-    {{- if or $isNames $isMonitors }}
-    (row: unknown): boolean => {
-      return (
-        Boolean((row as unknown as types.{{toSingular $class}})?.deleted) &&
-        enabledActions.includes('remove' as ActionType)
-      );
-    },
-    {{- else }}
-      {{- if $isAbis }}
-    (_row: unknown): boolean => {
-      return getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
-    },
-      {{- else }}
-        {{- if not .HasCruds }}
-          (_row: unknown): boolean => {
-            return false;
-          },
-        {{- else }}
-          (row: unknown): boolean => {
-            return Boolean((row as unknown as types.{{$single}})?.deleted);
-          },
-        {{- end }}
-      {{- end }}
-    {{- end }}
-    [{{if or $isNames $isMonitors}}enabledActions{{end}}{{if $isAbis}}getCurrentDataFacet{{end}}],
-  );
-  {{- else }}
-  const showActions = false;
-  const getCanRemove = useCallback(
-    (_row: unknown): boolean => {
-      return false;
-    },
-    [],
-  );
-  {{- end }}
-
+  // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions,
-      actions: [{{$actions}}],
-      getCanRemove,
+      showActions: {{if $hasCrud}}true{{else}}false{{end}},
+      actions: [{{if $hasCrud}}{{$cruds}}{{end}}],
+      getCanRemove: useCallback(
+        {{- if or $isNames $isMonitors }}
+        (row: unknown) => Boolean((row as unknown as types.{{$single}})?.deleted),
+        {{- else if $isAbis }}
+        (_row: unknown) => getCurrentDataFacet() === types.DataFacet.DOWNLOADED,
+        {{- else}}
+        (_row: unknown) => false,
+        {{- end}}
+        [{{if $isNames}}{{end}}{{if $isAbis}}getCurrentDataFacet{{end}}]
+      ),
     },
-    {{- if .HasCruds}}
-    {
-{{.HandlerStrs}}
-    },
-    {{- else}}
-    {},
-    {{- end}}
+    {{if $hasCrud}}{
+      {{.HandlerStrs}}
+    }{{else}}{}{{end}},
     toPageDataProp(pageData),
-    {{if .HasCruds}}config{{else}}{} as ActionConfig{{end}},
-    {{not $isAbis}} /* perRowCrud */,
+    {{if $hasCrud}}config{{else}}{ rowActions: [] }{{end}},
   );
-  // === END SECTION 7 ===
 
-  // === SECTION 8: Tab Configuration ===
-  {{- if $hasUpdate }}
-  const canUpdate =
-    enabledActions.includes('update' as ActionType) ||
-    enabledActions.includes('add' as ActionType);
-  {{- end}}
-
-  {{- if $hasForms }}
+  {{if $hasForms}}
   const isForm = useCallback((facet: types.DataFacet) => {
     switch (facet) {
       {{range .Facets}}{{if or .IsForm .IsDashboard}}case types.DataFacet.{{toUpper .Name}}:
@@ -345,56 +302,52 @@ export const {{$class}} = () => {
         return false;
     }
   }, []);
-  {{- end}}
+  {{end}}
 
   const perTabContent = useMemo(() => {
     const actionDebugger = (
       <ActionDebugger
-        enabledActions={ {{if $hasActions}}enabledActions{{else}}[]{{end}} }
+        enabledActions={ {{if $hasCrud}}config.rowActions{{else}}[]{{end}} }
         setActiveFacet={activeFacetHook.setActiveFacet}
       />
     );
 
-    {{- if $hasForms }}
+    {{if $hasForms}}
     const facet = getCurrentDataFacet();
     if (isForm(facet)) {
       const {{$lower}}Data = currentData[0] as unknown as Record<string, unknown>;
       if (!{{$lower}}Data) {
         return <div>No {{$lower}} data available</div>;
       }
-      const fieldsWithValues = getColumns(getCurrentDataFacet()).map(
-        (field) => ({
-          ...field,
-          value:
-            ({{$lower}}Data?.[field.name as string] as
-              | string
-              | number
-              | boolean
-              | undefined) || field.value,
-          readOnly: true,
-        }),
-      );
       return (
         <FormView
           title="{{toProper $lower}} Information"
-          formFields={fieldsWithValues}
+          formFields={getColumns(getCurrentDataFacet()).map((field) => {
+            let value = {{$lower}}Data?.[field.name as string] ?? field.value;
+            if (value !== undefined && 
+                typeof value !== 'string' && 
+                typeof value !== 'number' && 
+                typeof value !== 'boolean') {
+              value = JSON.stringify(value);
+            }
+            if (value !== undefined && 
+                typeof value !== 'string' && 
+                typeof value !== 'number' && 
+                typeof value !== 'boolean') {
+              value = undefined;
+            }
+            return {
+              ...field,
+              value,
+              readOnly: true,
+            };
+          })}
           onSubmit={() => {}}
         />
       );
-    } else {
-      return (
-        <BaseTab<Record<string, unknown>>
-          data={currentData as unknown as Record<string, unknown>[]}
-          columns={currentColumns}
-          loading={!!pageData?.isFetching}
-          error={error}
-          debugComponent={actionDebugger}
-          headerActions={ {{if .HasCruds}}headerActions{{else}}[]{{end}} }
-          viewStateKey={viewStateKey}
-        />
-      );
     }
-    {{- else}}
+    {{end}}
+
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -402,71 +355,42 @@ export const {{$class}} = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        {{- if $hasUpdate }}
-        onSubmit={canUpdate ? handleUpdate : undefined}
-        {{- end }}
         debugComponent={actionDebugger}
-        headerActions={ {{if .HasCruds}}headerActions{{else}}[]{{end}} }
-        {{- if .HasCruds }}
-        {{- if $hasDelete }}
-        onDelete={
-          enabledActions.includes('delete' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleToggle(address);
-              }
-            : undefined
-        }
-        {{- end }}
-        onRemove={
-          enabledActions.includes('remove' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleRemove(address);
-              }
-            : undefined
-        }
-        {{- if $isNames }}
-        onAutoname={
-          enabledActions.includes('autoname' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleAutoname(address);
-              }
-            : undefined
-        }
-        {{- end }}
-        {{- end }}
+        headerActions={ {{if $hasCrud}}headerActions{{else}}[]{{end}} }
+        {{if $hasCrud}}
+        {{if $hasDelete}}
+        onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
+        {{end}}
+        onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
+        {{if $isNames}}
+        onAutoname={(rowData) => handleAutoname(String(rowData.address || ''))}
+        onSubmit={handleUpdate}
+        {{end}}
+        {{end}}
       />
     );
-    {{- end}}
   }, [
     currentData,
     currentColumns,
     pageData?.isFetching,
     error,
-    {{- if $hasUpdate }}
-    handleUpdate,
-    canUpdate,
-    {{- end }}
     viewStateKey,
     {{- if $hasForms}}
     isForm,
     getCurrentDataFacet,
     {{- end}}
-    {{- if .HasCruds }}
+    {{- if $hasCrud}}
     headerActions,
-    {{- if $hasDelete }}
+    {{- if $hasDelete}}
     handleToggle,
-    {{- end }}
+    {{- end}}
     handleRemove,
-    {{- if $isNames }}
+    {{- if $isNames}}
     handleAutoname,
-    {{- end }}
-    {{- end }}
-    {{- if $hasActions }}
-    enabledActions,
-    {{- end }}
+    handleUpdate,
+    {{- end}}
+    config.rowActions,
+    {{- end}}
     activeFacetHook.setActiveFacet,
   ]);
 
@@ -480,9 +404,8 @@ export const {{$class}} = () => {
       })),
     [availableFacets, perTabContent],
   );
-  // === END SECTION 8 ===
 
-  // === SECTION 9: Render/JSX ===
+  // === SECTION 7: Render ===
   const renderCnt = useRef(0);
   // renderCnt.current++;
   return (
@@ -495,19 +418,20 @@ export const {{$class}} = () => {
         </div>
       )}
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
-      {{- if $isNames }}
-      <ConfirmModal
+      {{if $isNames}}<ConfirmModal
         opened={confirmModal.opened}
-        onClose={handleCloseModal}
+        onClose={useCallback(
+          () => setConfirmModal((prev) => ({ ...prev, opened: false })),
+          [],
+        )}
         onConfirm={confirmModal.onConfirm}
         title={confirmModal.title}
         message={confirmModal.message}
         dialogKey="confirm{{$class}}Modal"
       />
-      {{- end }}
+      {{end}}
     </div>
   );
-  // === END SECTION 9 ===
 };
 
 // EXISTING_CODE

@@ -6,37 +6,39 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
-import { Action, BaseTab, ConfirmModal, usePagination } from '@components';
+import { BaseTab, usePagination } from '@components';
+import { Action, ConfirmModal } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionType } from '@hooks';
 import {
   DataFacetConfig,
   toPageDataProp,
+  useActiveFacet,
+  useColumns,
+  useEvent,
+  usePayload,
+} from '@hooks';
+import {
+  ActionType,
   useActionMsgs,
   useActions,
-  useColumns,
   useSilencedDialog,
 } from '@hooks';
-// prettier-ignore
-import { useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { msgs, names, types } from '@models';
+import { names } from '@models';
+import { msgs, types } from '@models';
 import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
 
-// === END SECTION 1 ===
-
 export const Names = () => {
-  // === SECTION 2.2: Hook Initialization ===
+  // === SECTION 2: Hook Initialization ===
   const createPayload = usePayload();
-
   const activeFacetHook = useActiveFacet({
     facets: namesFacets,
     defaultFacet: DEFAULT_FACET,
@@ -57,7 +59,8 @@ export const Names = () => {
   const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
-  // === SECTION 2.1: Modal State ===
+
+  // Names-specific state
   const { emitSuccess } = useActionMsgs('names');
   const [confirmModal, setConfirmModal] = useState<{
     opened: boolean;
@@ -72,13 +75,9 @@ export const Names = () => {
     message: '',
     onConfirm: () => {},
   });
-
   const { isSilenced } = useSilencedDialog('createCustomName');
-  // === END SECTION 2.1 ===
 
-  // === END SECTION 2.2 ===
-
-  // === SECTION 3: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -108,7 +107,6 @@ export const Names = () => {
 
   const currentData = useMemo(() => {
     if (!pageData) return [];
-
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.ALL:
@@ -125,7 +123,6 @@ export const Names = () => {
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
-  // === END SECTION 4 ===
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -155,21 +152,9 @@ export const Names = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 4 ===
 
-  // === SECTION 6: Actions ===
-  const postFunc = useCallback((item: types.Name): types.Name => {
-    // EXISTING_CODE
-    item = types.Name.createFrom({
-      ...item,
-      source: item.source || 'TrueBlocks',
-    });
-    // EXISTING_CODE
-    return item;
-  }, []);
-
+  // === SECTION 5: CRUD Operations ===
   const enabledActions = useMemo(() => {
-    // EXISTING_CODE
     const currentFacet = getCurrentDataFacet();
     if (currentFacet === types.DataFacet.CUSTOM) {
       return [
@@ -186,10 +171,7 @@ export const Names = () => {
       return ['add'] as ActionType[];
     }
     return ['add', 'autoname', 'update'] as ActionType[];
-    // EXISTING_CODE
   }, [getCurrentDataFacet]);
-
-  // prettier-ignore
   const { handlers, config } = useActions({
     collection: 'names',
     viewStateKey,
@@ -203,9 +185,15 @@ export const Names = () => {
     setTotalItems,
     crudFunc: NamesCrud,
     pageFunc: GetNamesPage,
-    postFunc,
     pageClass: names.NamesPage,
     updateItem: types.Name.createFrom({}),
+    postFunc: useCallback((item: types.Name): types.Name => {
+      item = types.Name.createFrom({
+        ...item,
+        source: item.source || 'TrueBlocks',
+      });
+      return item;
+    }, []),
     createPayload,
     getCurrentDataFacet,
   });
@@ -217,12 +205,20 @@ export const Names = () => {
     handleUpdate,
   } = handlers;
 
-  // EXISTING_CODE
   const handleAutoname = useCallback(
     (address: string) => {
       const currentFacet = getCurrentDataFacet();
       if (currentFacet === types.DataFacet.CUSTOM || isSilenced) {
         originalHandleAutoname(address);
+        emitSuccess(
+          'autoname',
+          'Successfully created custom name for ${address}',
+        );
+        if (currentFacet === types.DataFacet.CUSTOM) {
+          fetchData();
+        } else {
+          activeFacetHook.setActiveFacet(types.DataFacet.CUSTOM);
+        }
         return;
       }
       setConfirmModal({
@@ -233,8 +229,12 @@ export const Names = () => {
           'This will create a custom name for this address. The new custom name will be available in the Custom tab.',
         onConfirm: () => {
           originalHandleAutoname(address);
-          emitSuccess('autoname', address);
+          emitSuccess(
+            'autoname',
+            'Successfully created custom name for ${address}',
+          );
           activeFacetHook.setActiveFacet(types.DataFacet.CUSTOM);
+          setConfirmModal((prev) => ({ ...prev, opened: false }));
         },
       });
     },
@@ -244,16 +244,12 @@ export const Names = () => {
       originalHandleAutoname,
       emitSuccess,
       activeFacetHook,
+      fetchData,
     ],
   );
 
-  const handleCloseModal = useCallback(() => {
-    setConfirmModal((prev) => ({ ...prev, opened: false }));
-  }, []);
-  // EXISTING_CODE
-
   const headerActions = useMemo(() => {
-    if (config.headerActions.length === 0) return null;
+    if (!config.headerActions?.length) return null;
     return (
       <Group gap="xs" style={{ flexShrink: 0 }}>
         {config.headerActions.map((action) => {
@@ -282,33 +278,17 @@ export const Names = () => {
       </Group>
     );
   }, [config.headerActions, config.isWalletConnected, handlers]);
-  // === END SECTION 6 ===
 
-  // === SECTION 7: Form & UI Handlers ===
-  const showActions = useMemo(() => {
-    return (
-      enabledActions.includes('delete' as ActionType) ||
-      enabledActions.includes('remove' as ActionType) ||
-      enabledActions.includes('autoname' as ActionType)
-    );
-  }, [enabledActions]);
-
-  const getCanRemove = useCallback(
-    (row: unknown): boolean => {
-      return (
-        Boolean((row as unknown as types.Name)?.deleted) &&
-        enabledActions.includes('remove' as ActionType)
-      );
-    },
-    [enabledActions],
-  );
-
+  // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions,
-      actions: ['delete', 'remove', 'autoname'],
-      getCanRemove,
+      showActions: true,
+      actions: ['delete', 'remove', 'update', 'autoname'],
+      getCanRemove: useCallback(
+        (row: unknown) => Boolean((row as unknown as types.Name)?.deleted),
+        [],
+      ),
     },
     {
       handleAutoname,
@@ -317,22 +297,16 @@ export const Names = () => {
     },
     toPageDataProp(pageData),
     config,
-    true /* perRowCrud */,
   );
-  // === END SECTION 7 ===
-
-  // === SECTION 8: Tab Configuration ===
-  const canUpdate =
-    enabledActions.includes('update' as ActionType) ||
-    enabledActions.includes('add' as ActionType);
 
   const perTabContent = useMemo(() => {
     const actionDebugger = (
       <ActionDebugger
-        enabledActions={enabledActions}
+        enabledActions={config.rowActions}
         setActiveFacet={activeFacetHook.setActiveFacet}
       />
     );
+
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -340,33 +314,12 @@ export const Names = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        onSubmit={canUpdate ? handleUpdate : undefined}
         debugComponent={actionDebugger}
         headerActions={headerActions}
-        onDelete={
-          enabledActions.includes('delete' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleToggle(address);
-              }
-            : undefined
-        }
-        onRemove={
-          enabledActions.includes('remove' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleRemove(address);
-              }
-            : undefined
-        }
-        onAutoname={
-          enabledActions.includes('autoname' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleAutoname(address);
-              }
-            : undefined
-        }
+        onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
+        onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
+        onAutoname={(rowData) => handleAutoname(String(rowData.address || ''))}
+        onSubmit={handleUpdate}
       />
     );
   }, [
@@ -374,14 +327,13 @@ export const Names = () => {
     currentColumns,
     pageData?.isFetching,
     error,
-    handleUpdate,
-    canUpdate,
     viewStateKey,
     headerActions,
     handleToggle,
     handleRemove,
     handleAutoname,
-    enabledActions,
+    handleUpdate,
+    config.rowActions,
     activeFacetHook.setActiveFacet,
   ]);
 
@@ -395,9 +347,8 @@ export const Names = () => {
       })),
     [availableFacets, perTabContent],
   );
-  // === END SECTION 8 ===
 
-  // === SECTION 9: Render/JSX ===
+  // === SECTION 7: Render ===
   const renderCnt = useRef(0);
   // renderCnt.current++;
   return (
@@ -412,7 +363,10 @@ export const Names = () => {
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
       <ConfirmModal
         opened={confirmModal.opened}
-        onClose={handleCloseModal}
+        onClose={useCallback(
+          () => setConfirmModal((prev) => ({ ...prev, opened: false })),
+          [],
+        )}
         onConfirm={confirmModal.onConfirm}
         title={confirmModal.title}
         message={confirmModal.message}
@@ -420,8 +374,6 @@ export const Names = () => {
       />
     </div>
   );
-  // === END SECTION 9 ===
 };
 
-// EXISTING_CODE
 // EXISTING_CODE

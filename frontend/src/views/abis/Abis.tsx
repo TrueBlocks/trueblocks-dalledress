@@ -6,35 +6,34 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AbisCrud, GetAbisPage, Reload } from '@app';
-import { Action, BaseTab, usePagination } from '@components';
+import { BaseTab, usePagination } from '@components';
+import { Action } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionType } from '@hooks';
 import {
   DataFacetConfig,
   toPageDataProp,
-  useActions,
+  useActiveFacet,
   useColumns,
+  useEvent,
+  usePayload,
 } from '@hooks';
-// prettier-ignore
-import { useActiveFacet, useEvent, usePayload } from '@hooks';
+import { useActions } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { abis, msgs, types } from '@models';
+import { abis } from '@models';
+import { msgs, types } from '@models';
 import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, abisFacets } from './facets';
 
-// === END SECTION 1 ===
-
 export const Abis = () => {
-  // === SECTION 2.2: Hook Initialization ===
+  // === SECTION 2: Hook Initialization ===
   const createPayload = usePayload();
-
   const activeFacetHook = useActiveFacet({
     facets: abisFacets,
     defaultFacet: DEFAULT_FACET,
@@ -56,9 +55,7 @@ export const Abis = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  // === END SECTION 2.2 ===
-
-  // === SECTION 3: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -88,7 +85,6 @@ export const Abis = () => {
 
   const currentData = useMemo(() => {
     if (!pageData) return [];
-
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.DOWNLOADED:
@@ -103,7 +99,6 @@ export const Abis = () => {
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
-  // === END SECTION 4 ===
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -133,22 +128,8 @@ export const Abis = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 4 ===
 
-  // === SECTION 6: Actions ===
-  const postFunc = useCallback((item: types.Abi): types.Abi => {
-    // EXISTING_CODE
-    // EXISTING_CODE
-    return item;
-  }, []);
-
-  const enabledActions = useMemo(() => {
-    // EXISTING_CODE
-    return ['remove'] as ActionType[];
-    // EXISTING_CODE
-  }, []);
-
-  // prettier-ignore
+  // === SECTION 5: CRUD Operations ===
   const { handlers, config } = useActions({
     collection: 'abis',
     viewStateKey,
@@ -156,13 +137,12 @@ export const Abis = () => {
     goToPage,
     sort,
     filter,
-    enabledActions,
+    enabledActions: ['remove'],
     pageData,
     setPageData,
     setTotalItems,
     crudFunc: AbisCrud,
     pageFunc: GetAbisPage,
-    postFunc,
     pageClass: abis.AbisPage,
     updateItem: types.Abi.createFrom({}),
     createPayload,
@@ -171,11 +151,8 @@ export const Abis = () => {
 
   const { handleRemove } = handlers;
 
-  // EXISTING_CODE
-  // EXISTING_CODE
-
   const headerActions = useMemo(() => {
-    if (config.headerActions.length === 0) return null;
+    if (!config.headerActions?.length) return null;
     return (
       <Group gap="xs" style={{ flexShrink: 0 }}>
         {config.headerActions.map((action) => {
@@ -204,45 +181,33 @@ export const Abis = () => {
       </Group>
     );
   }, [config.headerActions, config.isWalletConnected, handlers]);
-  // === END SECTION 6 ===
 
-  // === SECTION 7: Form & UI Handlers ===
-  const showActions = useMemo(() => {
-    return enabledActions.includes('remove' as ActionType);
-  }, [enabledActions]);
-
-  const getCanRemove = useCallback(
-    (_row: unknown): boolean => {
-      return getCurrentDataFacet() === types.DataFacet.DOWNLOADED;
-    },
-    [getCurrentDataFacet],
-  );
-
+  // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions,
+      showActions: true,
       actions: ['remove'],
-      getCanRemove,
+      getCanRemove: useCallback(
+        (_row: unknown) => getCurrentDataFacet() === types.DataFacet.DOWNLOADED,
+        [getCurrentDataFacet],
+      ),
     },
     {
       handleRemove,
     },
     toPageDataProp(pageData),
     config,
-    false /* perRowCrud */,
   );
-  // === END SECTION 7 ===
-
-  // === SECTION 8: Tab Configuration ===
 
   const perTabContent = useMemo(() => {
     const actionDebugger = (
       <ActionDebugger
-        enabledActions={enabledActions}
+        enabledActions={config.rowActions}
         setActiveFacet={activeFacetHook.setActiveFacet}
       />
     );
+
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -252,14 +217,7 @@ export const Abis = () => {
         viewStateKey={viewStateKey}
         debugComponent={actionDebugger}
         headerActions={headerActions}
-        onRemove={
-          enabledActions.includes('remove' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleRemove(address);
-              }
-            : undefined
-        }
+        onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
       />
     );
   }, [
@@ -270,7 +228,7 @@ export const Abis = () => {
     viewStateKey,
     headerActions,
     handleRemove,
-    enabledActions,
+    config.rowActions,
     activeFacetHook.setActiveFacet,
   ]);
 
@@ -284,9 +242,8 @@ export const Abis = () => {
       })),
     [availableFacets, perTabContent],
   );
-  // === END SECTION 8 ===
 
-  // === SECTION 9: Render/JSX ===
+  // === SECTION 7: Render ===
   const renderCnt = useRef(0);
   // renderCnt.current++;
   return (
@@ -301,8 +258,6 @@ export const Abis = () => {
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
-  // === END SECTION 9 ===
 };
 
-// EXISTING_CODE
 // EXISTING_CODE

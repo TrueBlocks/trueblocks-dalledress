@@ -6,35 +6,34 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsCrud, Reload } from '@app';
-import { Action, BaseTab, usePagination } from '@components';
+import { BaseTab, usePagination } from '@components';
+import { Action } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
-import { ActionType } from '@hooks';
 import {
   DataFacetConfig,
   toPageDataProp,
-  useActions,
+  useActiveFacet,
   useColumns,
+  useEvent,
+  usePayload,
 } from '@hooks';
-// prettier-ignore
-import { useActiveFacet, useEvent, usePayload } from '@hooks';
+import { useActions } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { monitors, msgs, types } from '@models';
+import { monitors } from '@models';
+import { msgs, types } from '@models';
 import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, monitorsFacets } from './facets';
 
-// === END SECTION 1 ===
-
 export const Monitors = () => {
-  // === SECTION 2.2: Hook Initialization ===
+  // === SECTION 2: Hook Initialization ===
   const createPayload = usePayload();
-
   const activeFacetHook = useActiveFacet({
     facets: monitorsFacets,
     defaultFacet: DEFAULT_FACET,
@@ -56,9 +55,7 @@ export const Monitors = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  // === END SECTION 2.2 ===
-
-  // === SECTION 3: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -88,7 +85,6 @@ export const Monitors = () => {
 
   const currentData = useMemo(() => {
     if (!pageData) return [];
-
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.MONITORS:
@@ -97,7 +93,6 @@ export const Monitors = () => {
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
-  // === END SECTION 4 ===
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -127,22 +122,8 @@ export const Monitors = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 4 ===
 
-  // === SECTION 6: Actions ===
-  const postFunc = useCallback((item: types.Monitor): types.Monitor => {
-    // EXISTING_CODE
-    // EXISTING_CODE
-    return item;
-  }, []);
-
-  const enabledActions = useMemo(() => {
-    // EXISTING_CODE
-    return ['delete', 'remove'] as ActionType[];
-    // EXISTING_CODE
-  }, []);
-
-  // prettier-ignore
+  // === SECTION 5: CRUD Operations ===
   const { handlers, config } = useActions({
     collection: 'monitors',
     viewStateKey,
@@ -150,13 +131,12 @@ export const Monitors = () => {
     goToPage,
     sort,
     filter,
-    enabledActions,
+    enabledActions: ['delete', 'remove'],
     pageData,
     setPageData,
     setTotalItems,
     crudFunc: MonitorsCrud,
     pageFunc: GetMonitorsPage,
-    postFunc,
     pageClass: monitors.MonitorsPage,
     updateItem: types.Monitor.createFrom({}),
     createPayload,
@@ -165,11 +145,8 @@ export const Monitors = () => {
 
   const { handleRemove, handleToggle } = handlers;
 
-  // EXISTING_CODE
-  // EXISTING_CODE
-
   const headerActions = useMemo(() => {
-    if (config.headerActions.length === 0) return null;
+    if (!config.headerActions?.length) return null;
     return (
       <Group gap="xs" style={{ flexShrink: 0 }}>
         {config.headerActions.map((action) => {
@@ -198,32 +175,17 @@ export const Monitors = () => {
       </Group>
     );
   }, [config.headerActions, config.isWalletConnected, handlers]);
-  // === END SECTION 6 ===
 
-  // === SECTION 7: Form & UI Handlers ===
-  const showActions = useMemo(() => {
-    return (
-      enabledActions.includes('delete' as ActionType) ||
-      enabledActions.includes('remove' as ActionType)
-    );
-  }, [enabledActions]);
-
-  const getCanRemove = useCallback(
-    (row: unknown): boolean => {
-      return (
-        Boolean((row as unknown as types.Monitor)?.deleted) &&
-        enabledActions.includes('remove' as ActionType)
-      );
-    },
-    [enabledActions],
-  );
-
+  // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions,
+      showActions: true,
       actions: ['delete', 'remove'],
-      getCanRemove,
+      getCanRemove: useCallback(
+        (row: unknown) => Boolean((row as unknown as types.Monitor)?.deleted),
+        [],
+      ),
     },
     {
       handleRemove,
@@ -231,19 +193,16 @@ export const Monitors = () => {
     },
     toPageDataProp(pageData),
     config,
-    true /* perRowCrud */,
   );
-  // === END SECTION 7 ===
-
-  // === SECTION 8: Tab Configuration ===
 
   const perTabContent = useMemo(() => {
     const actionDebugger = (
       <ActionDebugger
-        enabledActions={enabledActions}
+        enabledActions={config.rowActions}
         setActiveFacet={activeFacetHook.setActiveFacet}
       />
     );
+
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -253,22 +212,8 @@ export const Monitors = () => {
         viewStateKey={viewStateKey}
         debugComponent={actionDebugger}
         headerActions={headerActions}
-        onDelete={
-          enabledActions.includes('delete' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleToggle(address);
-              }
-            : undefined
-        }
-        onRemove={
-          enabledActions.includes('remove' as ActionType)
-            ? (rowData: Record<string, unknown>) => {
-                const address = String(rowData.address || '');
-                handleRemove(address);
-              }
-            : undefined
-        }
+        onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
+        onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
       />
     );
   }, [
@@ -280,7 +225,7 @@ export const Monitors = () => {
     headerActions,
     handleToggle,
     handleRemove,
-    enabledActions,
+    config.rowActions,
     activeFacetHook.setActiveFacet,
   ]);
 
@@ -294,9 +239,8 @@ export const Monitors = () => {
       })),
     [availableFacets, perTabContent],
   );
-  // === END SECTION 8 ===
 
-  // === SECTION 9: Render/JSX ===
+  // === SECTION 7: Render ===
   const renderCnt = useRef(0);
   // renderCnt.current++;
   return (
@@ -311,8 +255,6 @@ export const Monitors = () => {
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
-  // === END SECTION 9 ===
 };
 
-// EXISTING_CODE
 // EXISTING_CODE

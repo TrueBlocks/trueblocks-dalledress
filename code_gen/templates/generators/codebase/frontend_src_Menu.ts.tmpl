@@ -7,12 +7,7 @@
  */
 import { SetInitialized } from '@app';
 import { DalleDress, Home, Khedra, Settings } from '@views';
-import { {{ $first := true -}}
-{{- range .Structures -}}
-{{- if and (ne .Class "") (not .DisableGo) -}}
-{{- if not $first }}, {{ end }}{{ .Class }}{{- $first = false -}}
-{{- end -}}
-{{- end}} } from '@views';
+import { {{ .Views }} } from '@views';
 import { Wizard } from '@wizards';
 
 export interface MenuItem {

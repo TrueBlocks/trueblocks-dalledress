@@ -6,33 +6,31 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { GetChunksPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import {
-  ActionConfig,
   DataFacetConfig,
   toPageDataProp,
+  useActiveFacet,
   useColumns,
+  useEvent,
+  usePayload,
 } from '@hooks';
-// prettier-ignore
-import { useActiveFacet, useEvent, usePayload } from '@hooks';
 import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { chunks, msgs, types } from '@models';
+import { chunks } from '@models';
+import { msgs, types } from '@models';
 import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, chunksFacets } from './facets';
 
-// === END SECTION 1 ===
-
 export const Chunks = () => {
-  // === SECTION 2.2: Hook Initialization ===
+  // === SECTION 2: Hook Initialization ===
   const createPayload = usePayload();
-
   const activeFacetHook = useActiveFacet({
     facets: chunksFacets,
     defaultFacet: DEFAULT_FACET,
@@ -54,9 +52,7 @@ export const Chunks = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  // === END SECTION 2.2 ===
-
-  // === SECTION 3: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -86,7 +82,6 @@ export const Chunks = () => {
 
   const currentData = useMemo(() => {
     if (!pageData) return [];
-
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.STATS:
@@ -101,7 +96,6 @@ export const Chunks = () => {
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
-  // === END SECTION 4 ===
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -131,32 +125,20 @@ export const Chunks = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 4 ===
 
-  // === SECTION 6: Actions ===
-  // === END SECTION 6 ===
-
-  // === SECTION 7: Form & UI Handlers ===
-  const showActions = false;
-  const getCanRemove = useCallback((_row: unknown): boolean => {
-    return false;
-  }, []);
-
+  // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions,
+      showActions: false,
       actions: [],
-      getCanRemove,
+      getCanRemove: useCallback((_row: unknown) => false, []),
     },
     {},
     toPageDataProp(pageData),
-    {} as ActionConfig,
-    true /* perRowCrud */,
+    { rowActions: [] },
   );
-  // === END SECTION 7 ===
 
-  // === SECTION 8: Tab Configuration ===
   const isForm = useCallback((facet: types.DataFacet) => {
     switch (facet) {
       case types.DataFacet.MANIFEST:
@@ -173,44 +155,56 @@ export const Chunks = () => {
         setActiveFacet={activeFacetHook.setActiveFacet}
       />
     );
+
     const facet = getCurrentDataFacet();
     if (isForm(facet)) {
       const chunksData = currentData[0] as unknown as Record<string, unknown>;
       if (!chunksData) {
         return <div>No chunks data available</div>;
       }
-      const fieldsWithValues = getColumns(getCurrentDataFacet()).map(
-        (field) => ({
-          ...field,
-          value:
-            (chunksData?.[field.name as string] as
-              | string
-              | number
-              | boolean
-              | undefined) || field.value,
-          readOnly: true,
-        }),
-      );
       return (
         <FormView
           title="Chunks Information"
-          formFields={fieldsWithValues}
+          formFields={getColumns(getCurrentDataFacet()).map((field) => {
+            let value = chunksData?.[field.name as string] ?? field.value;
+            if (
+              value !== undefined &&
+              typeof value !== 'string' &&
+              typeof value !== 'number' &&
+              typeof value !== 'boolean'
+            ) {
+              value = JSON.stringify(value);
+            }
+            if (
+              value !== undefined &&
+              typeof value !== 'string' &&
+              typeof value !== 'number' &&
+              typeof value !== 'boolean'
+            ) {
+              value = undefined;
+            }
+            return {
+              ...field,
+              value,
+              readOnly: true,
+            };
+          })}
           onSubmit={() => {}}
         />
       );
-    } else {
-      return (
-        <BaseTab<Record<string, unknown>>
-          data={currentData as unknown as Record<string, unknown>[]}
-          columns={currentColumns}
-          loading={!!pageData?.isFetching}
-          error={error}
-          debugComponent={actionDebugger}
-          headerActions={[]}
-          viewStateKey={viewStateKey}
-        />
-      );
     }
+
+    return (
+      <BaseTab<Record<string, unknown>>
+        data={currentData as unknown as Record<string, unknown>[]}
+        columns={currentColumns}
+        loading={!!pageData?.isFetching}
+        error={error}
+        viewStateKey={viewStateKey}
+        debugComponent={actionDebugger}
+        headerActions={[]}
+      />
+    );
   }, [
     currentData,
     currentColumns,
@@ -232,9 +226,8 @@ export const Chunks = () => {
       })),
     [availableFacets, perTabContent],
   );
-  // === END SECTION 8 ===
 
-  // === SECTION 9: Render/JSX ===
+  // === SECTION 7: Render ===
   const renderCnt = useRef(0);
   // renderCnt.current++;
   return (
@@ -249,8 +242,6 @@ export const Chunks = () => {
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
-  // === END SECTION 9 ===
 };
 
-// EXISTING_CODE
 // EXISTING_CODE

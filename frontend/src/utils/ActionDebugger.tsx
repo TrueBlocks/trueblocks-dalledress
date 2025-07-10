@@ -1,10 +1,11 @@
 import React from 'react';
 
+import { ActionDefinition } from '@hooks';
 import { types } from '@models';
 import { isDebugMode } from '@utils';
 
 interface ActionDebuggerProps {
-  enabledActions: string[];
+  enabledActions: ActionDefinition[];
   setActiveFacet: (facet: types.DataFacet) => void;
 }
 
@@ -47,19 +48,19 @@ export const ActionDebugger: React.FC<ActionDebuggerProps> = ({
             let bgColor = '#3498db'; // Default blue
             let textColor = 'white';
 
-            if (action === 'delete' || action === 'remove') {
+            if (action.type === 'delete' || action.type === 'remove') {
               bgColor = '#e74c3c'; // Red for destructive actions
-            } else if (action === 'add' || action === 'update') {
+            } else if (action.type === 'add' || action.type === 'update') {
               bgColor = '#2ecc71'; // Green for constructive actions
-            } else if (action === 'autoname') {
+            } else if (action.type === 'autoname') {
               bgColor = '#f39c12'; // Orange for automation
-            } else if (action === 'publish' || action === 'pin') {
+            } else if (action.type === 'publish' || action.type === 'pin') {
               bgColor = '#9b59b6'; // Purple for publishing actions
             }
 
             return (
               <span
-                key={action}
+                key={action.type}
                 style={{
                   display: 'inline-block',
                   backgroundColor: bgColor,
@@ -71,7 +72,7 @@ export const ActionDebugger: React.FC<ActionDebuggerProps> = ({
                   boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                 }}
               >
-                {action}
+                {action.type}
               </span>
             );
           })

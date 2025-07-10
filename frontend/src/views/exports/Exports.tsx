@@ -6,33 +6,31 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import {
-  ActionConfig,
   DataFacetConfig,
   toPageDataProp,
+  useActiveFacet,
   useColumns,
+  useEvent,
+  usePayload,
 } from '@hooks';
-// prettier-ignore
-import { useActiveFacet, useEvent, usePayload } from '@hooks';
 import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
-import { exports, msgs, types } from '@models';
+import { exports } from '@models';
+import { msgs, types } from '@models';
 import { ActionDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, exportsFacets } from './facets';
 
-// === END SECTION 1 ===
-
 export const Exports = () => {
-  // === SECTION 2.2: Hook Initialization ===
+  // === SECTION 2: Hook Initialization ===
   const createPayload = usePayload();
-
   const activeFacetHook = useActiveFacet({
     facets: exportsFacets,
     defaultFacet: DEFAULT_FACET,
@@ -54,9 +52,7 @@ export const Exports = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  // === END SECTION 2.2 ===
-
-  // === SECTION 3: Data Fetching Logic ===
+  // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
@@ -86,7 +82,6 @@ export const Exports = () => {
 
   const currentData = useMemo(() => {
     if (!pageData) return [];
-
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.STATEMENTS:
@@ -111,7 +106,6 @@ export const Exports = () => {
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
-  // === END SECTION 4 ===
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -141,32 +135,19 @@ export const Exports = () => {
   }, [getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
-  // === END SECTION 4 ===
 
-  // === SECTION 6: Actions ===
-  // === END SECTION 6 ===
-
-  // === SECTION 7: Form & UI Handlers ===
-  const showActions = false;
-  const getCanRemove = useCallback((_row: unknown): boolean => {
-    return false;
-  }, []);
-
+  // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions,
+      showActions: false,
       actions: [],
-      getCanRemove,
+      getCanRemove: useCallback((_row: unknown) => false, []),
     },
     {},
     toPageDataProp(pageData),
-    {} as ActionConfig,
-    true /* perRowCrud */,
+    { rowActions: [] },
   );
-  // === END SECTION 7 ===
-
-  // === SECTION 8: Tab Configuration ===
 
   const perTabContent = useMemo(() => {
     const actionDebugger = (
@@ -175,6 +156,7 @@ export const Exports = () => {
         setActiveFacet={activeFacetHook.setActiveFacet}
       />
     );
+
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -205,9 +187,8 @@ export const Exports = () => {
       })),
     [availableFacets, perTabContent],
   );
-  // === END SECTION 8 ===
 
-  // === SECTION 9: Render/JSX ===
+  // === SECTION 7: Render ===
   const renderCnt = useRef(0);
   // renderCnt.current++;
   return (
@@ -222,8 +203,6 @@ export const Exports = () => {
       {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
     </div>
   );
-  // === END SECTION 9 ===
 };
 
-// EXISTING_CODE
 // EXISTING_CODE

@@ -45,7 +45,6 @@ export const useColumns = (
   handlers: ActionHandlers,
   pageData: PageDataUnion,
   actionConfig: ActionConfig,
-  perRowCrud: boolean = true,
 ) => {
   return useMemo(() => {
     // Determine if actions should be shown
@@ -86,9 +85,7 @@ export const useColumns = (
                   key={action.type}
                   icon="Remove"
                   onClick={() => handlers.handleRemove?.(actionData.addressStr)}
-                  disabled={
-                    actionData.isProcessing || (perRowCrud ? !newState : false)
-                  }
+                  disabled={actionData.isProcessing || !newState}
                   title="Remove"
                   size="sm"
                 />
@@ -141,7 +138,7 @@ export const useColumns = (
     return baseColumns.map((col) =>
       col.key === 'actions' ? { ...col, ...actionsOverride } : col,
     );
-  }, [baseColumns, config, handlers, pageData, actionConfig, perRowCrud]);
+  }, [baseColumns, config, handlers, pageData, actionConfig]);
 };
 
-export type { ColumnConfig, ActionHandlers, ActionConfig };
+export type { ColumnConfig, ActionHandlers };

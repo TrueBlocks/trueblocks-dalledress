@@ -16,6 +16,9 @@ interface AppPreferencesState {
   helpCollapsed: boolean;
   lastTab: Record<string, types.DataFacet>;
 
+  // Debug state
+  debugMode: boolean;
+
   // Loading state
   loading: boolean;
 }
@@ -31,6 +34,7 @@ const initialState: AppPreferencesState = {
   menuCollapsed: true,
   helpCollapsed: true,
   lastTab: {},
+  debugMode: false,
   loading: true,
 };
 
@@ -133,6 +137,7 @@ class AppPreferencesStore {
               menuCollapsed: false,
               helpCollapsed: false,
               lastTab: {},
+              debugMode: false,
               loading: false,
             });
             return;
@@ -153,6 +158,9 @@ class AppPreferencesStore {
           menuCollapsed: prefs.menuCollapsed || false,
           helpCollapsed: prefs.helpCollapsed || false,
           lastTab: (prefs.lastTab || {}) as Record<string, types.DataFacet>,
+          debugMode:
+            (prefs as preferences.AppPreferences & { debugMode?: boolean })
+              .debugMode || false,
           loading: false,
         });
       }
@@ -218,6 +226,14 @@ class AppPreferencesStore {
     const newTheme = this.state.lastTheme === 'dark' ? 'light' : 'dark';
     await this.updatePreferences({ lastTheme: newTheme });
     this.setState({ lastTheme: newTheme });
+  };
+
+  toggleDebugMode = async (): Promise<void> => {
+    const newDebugMode = !this.state.debugMode;
+    await this.updatePreferences({
+      debugMode: newDebugMode,
+    } as Partial<preferences.AppPreferences & { debugMode: boolean }>);
+    this.setState({ debugMode: newDebugMode });
   };
 
   // Computed getters

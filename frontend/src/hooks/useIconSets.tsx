@@ -49,6 +49,10 @@ export type IconSet = {
 
   Light: IconType;
   Dark: IconType;
+
+  // Debug
+  DebugOn: IconType;
+  DebugOff: IconType;
 };
 
 const faIcons: IconSet = {
@@ -96,6 +100,10 @@ const faIcons: IconSet = {
   // Theme
   Light: Icons.FaSun,
   Dark: Icons.FaMoon,
+
+  // Debug
+  DebugOn: Icons.FaEye,
+  DebugOff: Icons.FaEyeSlash,
 };
 
 const biIcons: IconSet = {
@@ -143,6 +151,10 @@ const biIcons: IconSet = {
   // Theme
   Light: Icons.BiSun,
   Dark: Icons.BiMoon,
+
+  // Debug
+  DebugOn: Icons.BiShow,
+  DebugOff: Icons.BiHide,
 };
 
 const iconSets: Record<string, IconSet> = {
@@ -241,6 +253,10 @@ export const useIconSets = (
       createElement(iconSet.Light, { size, ...props });
     const Dark: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Dark, { size, ...props });
+    const DebugOn: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.DebugOn, { size, ...props });
+    const DebugOff: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.DebugOff, { size, ...props });
 
     return {
       Exports,
@@ -279,6 +295,8 @@ export const useIconSets = (
       ChevronDown,
       Light,
       Dark,
+      DebugOn,
+      DebugOff,
     };
   }, [iconSet, size]);
 };

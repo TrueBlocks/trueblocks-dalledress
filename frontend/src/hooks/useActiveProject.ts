@@ -14,6 +14,7 @@ export interface UseActiveProjectReturn {
   menuCollapsed: boolean;
   helpCollapsed: boolean;
   lastTab: Record<string, types.DataFacet>;
+  debugMode: boolean;
   loading: boolean;
 
   // Actions
@@ -28,6 +29,7 @@ export interface UseActiveProjectReturn {
   setLastView: (view: string) => Promise<void>;
   isDarkMode: boolean;
   toggleDarkMode: () => Promise<void>;
+  toggleDebugMode: () => Promise<void>;
 
   // Computed values
   hasActiveProject: boolean;
@@ -51,6 +53,7 @@ export const useActiveProject = (): UseActiveProjectReturn => {
     menuCollapsed: state.menuCollapsed,
     helpCollapsed: state.helpCollapsed,
     lastTab: state.lastTab,
+    debugMode: state.debugMode,
     loading: state.loading,
 
     // Actions - these are bound methods from the store
@@ -64,6 +67,7 @@ export const useActiveProject = (): UseActiveProjectReturn => {
     setLastTab: appPreferencesStore.setLastTab,
     setLastView: appPreferencesStore.setLastView,
     toggleDarkMode: appPreferencesStore.toggleDarkMode,
+    toggleDebugMode: appPreferencesStore.toggleDebugMode,
 
     // Computed values - these are getters from the store
     isDarkMode: appPreferencesStore.isDarkMode,

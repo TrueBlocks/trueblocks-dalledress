@@ -10,7 +10,8 @@
     "test:watch": "vitest watch",
     "test": "vitest run",
     "lint": "yarn eslint .  --max-warnings=0",
-    "lint:check": "lint"
+    "lint:check": "lint",
+    "CONVENTIONS": "echo 'See copilot.md for development conventions'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

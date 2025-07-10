@@ -131,3 +131,19 @@ func (a *App) SetTheme(theme string) {
 	a.Preferences.App.LastTheme = theme
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
+
+// GetDebugMode returns the current debug mode setting
+func (a *App) GetDebugMode() bool {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	return a.Preferences.App.DebugMode
+}
+
+// SetDebugMode sets the debug mode setting
+func (a *App) SetDebugMode(debugMode bool) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+
+	a.Preferences.App.DebugMode = debugMode
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}

@@ -57,6 +57,8 @@ export function GetChunksSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetContext():Promise<context.Context>;
 
+export function GetDebugMode():Promise<boolean>;
+
 export function GetExportsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<exports.ExportsPage>;
 
 export function GetExportsSummary(arg1:types.Payload):Promise<types.Summary>;
@@ -142,6 +144,8 @@ export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Prom
 export function SetAppPreferences(arg1:preferences.AppPreferences):Promise<void>;
 
 export function SetChain(arg1:preferences.Chain):Promise<void>;
+
+export function SetDebugMode(arg1:boolean):Promise<void>;
 
 export function SetHelpCollapsed(arg1:boolean):Promise<void>;
 

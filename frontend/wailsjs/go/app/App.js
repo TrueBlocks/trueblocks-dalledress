@@ -82,6 +82,10 @@ export function GetContext() {
   return window['go']['app']['App']['GetContext']();
 }
 
+export function GetDebugMode() {
+  return window['go']['app']['App']['GetDebugMode']();
+}
+
 export function GetExportsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetExportsPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -252,6 +256,10 @@ export function SetAppPreferences(arg1) {
 
 export function SetChain(arg1) {
   return window['go']['app']['App']['SetChain'](arg1);
+}
+
+export function SetDebugMode(arg1) {
+  return window['go']['app']['App']['SetDebugMode'](arg1);
 }
 
 export function SetHelpCollapsed(arg1) {

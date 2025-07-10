@@ -472,6 +472,7 @@ export namespace preferences {
 	}
 	export class AppPreferences {
 	    bounds?: Bounds;
+	    debugMode?: boolean;
 	    helpCollapsed?: boolean;
 	    lastAddress?: string;
 	    lastChain?: string;
@@ -494,6 +495,7 @@ export namespace preferences {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.bounds = this.convertValues(source["bounds"], Bounds);
+	        this.debugMode = source["debugMode"];
 	        this.helpCollapsed = source["helpCollapsed"];
 	        this.lastAddress = source["lastAddress"];
 	        this.lastChain = source["lastChain"];

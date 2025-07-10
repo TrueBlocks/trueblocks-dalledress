@@ -37,6 +37,7 @@ func (b *Bounds) IsValid() bool {
 
 type AppPreferences struct {
 	Bounds           Bounds            `json:"bounds,omitempty"`
+	DebugMode        bool              `json:"debugMode,omitempty"`
 	HelpCollapsed    bool              `json:"helpCollapsed,omitempty"`
 	LastAddress      string            `json:"lastAddress,omitempty"`
 	LastChain        string            `json:"lastChain,omitempty"`
@@ -62,6 +63,7 @@ func (p *AppPreferences) String() string {
 func NewAppPreferences() *AppPreferences {
 	return &AppPreferences{
 		Bounds:           NewBounds(),
+		DebugMode:        false,
 		HelpCollapsed:    false,
 		LastAddress:      "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
 		LastLanguage:     "en",
@@ -135,6 +137,17 @@ func GetAppPreferences() (AppPreferences, error) {
 		logging.LogBackend("App preferences had missing fields, saving corrected version")
 		if err := SetAppPreferences(&appPrefs); err != nil {
 			logging.LogBackend(fmt.Sprintf("Warning: Could not save corrected app preferences: %v", err))
+		}
+	}
+
+	if tbDebug := os.Getenv("TB_DEBUG"); tbDebug != "" {
+		envDebugMode := tbDebug == "true" || tbDebug == "1" || tbDebug == "on"
+		if appPrefs.DebugMode != envDebugMode {
+			logging.LogBackend(fmt.Sprintf("TB_DEBUG environment variable (%s) overriding stored debug mode (%t) with %t", tbDebug, appPrefs.DebugMode, envDebugMode))
+			appPrefs.DebugMode = envDebugMode
+			if err := SetAppPreferences(&appPrefs); err != nil {
+				logging.LogBackend(fmt.Sprintf("Warning: Could not save debug mode from TB_DEBUG: %v", err))
+			}
 		}
 	}
 

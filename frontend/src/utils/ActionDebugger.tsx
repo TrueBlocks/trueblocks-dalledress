@@ -1,25 +1,20 @@
 import React from 'react';
 
 import { ActionDefinition } from '@hooks';
-import { types } from '@models';
 import { isDebugMode } from '@utils';
 
 interface ActionDebuggerProps {
-  enabledActions: ActionDefinition[];
-  setActiveFacet: (facet: types.DataFacet) => void;
+  rowActions: ActionDefinition[];
+  headerActions: ActionDefinition[];
 }
 
 export const ActionDebugger: React.FC<ActionDebuggerProps> = ({
-  enabledActions,
-  setActiveFacet,
+  rowActions,
+  headerActions,
 }) => {
   if (!isDebugMode()) {
     return <></>;
   }
-
-  const handleGoToCustom = () => {
-    setActiveFacet(types.DataFacet.CUSTOM);
-  };
 
   return (
     <div
@@ -39,60 +34,61 @@ export const ActionDebugger: React.FC<ActionDebuggerProps> = ({
       }}
     >
       <div>
-        <strong style={{ color: '#ecf0f1' }}>Enabled Actions:</strong>{' '}
-        {enabledActions.length === 0 ? (
-          <span style={{ color: '#e74c3c', fontStyle: 'italic' }}>None</span>
-        ) : (
-          enabledActions.map((action) => {
-            // Different colors for different action types
-            let bgColor = '#3498db'; // Default blue
-            let textColor = 'white';
-
-            if (action.type === 'delete' || action.type === 'remove') {
-              bgColor = '#e74c3c'; // Red for destructive actions
-            } else if (action.type === 'add' || action.type === 'update') {
-              bgColor = '#2ecc71'; // Green for constructive actions
-            } else if (action.type === 'autoname') {
-              bgColor = '#f39c12'; // Orange for automation
-            } else if (action.type === 'publish' || action.type === 'pin') {
-              bgColor = '#9b59b6'; // Purple for publishing actions
-            }
-
-            return (
-              <span
-                key={action.type}
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: bgColor,
-                  color: textColor,
-                  padding: '3px 8px',
-                  margin: '0 5px',
-                  borderRadius: '3px',
-                  fontWeight: 'bold',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                }}
-              >
-                {action.type}
-              </span>
-            );
-          })
-        )}
+        <ActionsList prompt="Row Actions:" actions={rowActions} />
+        <ActionsList prompt="Header Actions:" actions={headerActions} />
       </div>
-      <button
-        onClick={handleGoToCustom}
-        style={{
-          backgroundColor: '#16a085',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          padding: '5px 10px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-        }}
-      >
-        Go to Custom Facet
-      </button>
     </div>
+  );
+};
+
+const ActionsList: React.FC<{
+  prompt: string;
+  actions: ActionDefinition[];
+}> = ({ prompt, actions }) => {
+  return (
+    <>
+      <strong style={{ color: '#ecf0f1' }}>{prompt}:</strong>{' '}
+      {actions.length === 0 ? (
+        <span style={{ color: '#e74c3c', fontStyle: 'italic' }}>None</span>
+      ) : (
+        actions.map((action) => {
+          const actionTypeStyles: Record<
+            string,
+            { bgColor: string; textColor: string }
+          > = {
+            delete: { bgColor: '#e74c3c', textColor: 'white' },
+            remove: { bgColor: '#e74c3c', textColor: 'white' },
+            add: { bgColor: '#2ecc71', textColor: 'white' },
+            update: { bgColor: '#2ecc71', textColor: 'white' },
+            autoname: { bgColor: '#f39c12', textColor: 'white' },
+            publish: { bgColor: '#9b59b6', textColor: 'white' },
+            pin: { bgColor: '#9b59b6', textColor: 'white' },
+          };
+
+          const { bgColor, textColor } = actionTypeStyles[action.type] || {
+            bgColor: '#3498db',
+            textColor: 'white',
+          };
+
+          return (
+            <span
+              key={action.type}
+              style={{
+                display: 'inline-block',
+                backgroundColor: bgColor,
+                color: textColor,
+                padding: '3px 8px',
+                margin: '0 5px',
+                borderRadius: '3px',
+                fontWeight: 'bold',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }}
+            >
+              {action.type}
+            </span>
+          );
+        })
+      )}
+    </>
   );
 };

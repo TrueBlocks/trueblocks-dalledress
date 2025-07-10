@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
@@ -23,13 +23,14 @@ import { TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { exports } from '@models';
 import { msgs, types } from '@models';
-import { ActionDebugger, useErrorHandler } from '@utils';
+import { ActionDebugger, RenderCountDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, exportsFacets } from './facets';
 
 export const Exports = () => {
   // === SECTION 2: Hook Initialization ===
+  const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: exportsFacets,
@@ -150,13 +151,6 @@ export const Exports = () => {
   );
 
   const perTabContent = useMemo(() => {
-    const actionDebugger = (
-      <ActionDebugger
-        enabledActions={[]}
-        setActiveFacet={activeFacetHook.setActiveFacet}
-      />
-    );
-
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -164,18 +158,10 @@ export const Exports = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        debugComponent={actionDebugger}
         headerActions={[]}
       />
     );
-  }, [
-    currentData,
-    currentColumns,
-    pageData?.isFetching,
-    error,
-    viewStateKey,
-    activeFacetHook.setActiveFacet,
-  ]);
+  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
 
   const tabs = useMemo(
     () =>
@@ -189,8 +175,6 @@ export const Exports = () => {
   );
 
   // === SECTION 7: Render ===
-  const renderCnt = useRef(0);
-  // renderCnt.current++;
   return (
     <div className="mainView">
       <TabView tabs={tabs} route={ROUTE} />
@@ -200,7 +184,8 @@ export const Exports = () => {
           <p>{error.message}</p>
         </div>
       )}
-      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
+      <ActionDebugger rowActions={[]} headerActions={[]} />
+      <RenderCountDebugger count={++renderCnt.current} />
     </div>
   );
 };

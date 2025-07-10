@@ -30,7 +30,7 @@
  */
 
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { {{$apis}} } from '@app';
 import { BaseTab, usePagination } from '@components';
 {{- if $hasCrud}}
@@ -45,7 +45,7 @@ import { {{if $hasForms}}FormView, {{end}}TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { {{$lower}} } from '@models';
 import { msgs, types } from '@models';
-import { ActionDebugger, useErrorHandler } from '@utils';
+import { ActionDebugger, RenderCountDebugger, useErrorHandler } from '@utils';
 {{- if $hasCrud}}
 import { Group } from '@mantine/core';
 {{- end}}
@@ -54,6 +54,7 @@ import { DEFAULT_FACET, ROUTE, {{$lower}}Facets } from './facets';
 
 export const {{$class}} = () => {
   // === SECTION 2: Hook Initialization ===
+  const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: {{$lower}}Facets,
@@ -305,13 +306,6 @@ export const {{$class}} = () => {
   {{end}}
 
   const perTabContent = useMemo(() => {
-    const actionDebugger = (
-      <ActionDebugger
-        enabledActions={ {{if $hasCrud}}config.rowActions{{else}}[]{{end}} }
-        setActiveFacet={activeFacetHook.setActiveFacet}
-      />
-    );
-
     {{if $hasForms}}
     const facet = getCurrentDataFacet();
     if (isForm(facet)) {
@@ -355,7 +349,6 @@ export const {{$class}} = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        debugComponent={actionDebugger}
         headerActions={ {{if $hasCrud}}headerActions{{else}}[]{{end}} }
         {{if $hasCrud}}
         {{if $hasDelete}}
@@ -389,9 +382,7 @@ export const {{$class}} = () => {
     handleAutoname,
     handleUpdate,
     {{- end}}
-    config.rowActions,
     {{- end}}
-    activeFacetHook.setActiveFacet,
   ]);
 
   const tabs = useMemo(
@@ -406,8 +397,6 @@ export const {{$class}} = () => {
   );
 
   // === SECTION 7: Render ===
-  const renderCnt = useRef(0);
-  // renderCnt.current++;
   return (
     <div className="mainView">
       <TabView tabs={tabs} route={ROUTE} />
@@ -417,7 +406,11 @@ export const {{$class}} = () => {
           <p>{error.message}</p>
         </div>
       )}
-      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
+      <ActionDebugger
+        rowActions={ {{if $hasCrud}}config.rowActions{{else}}[]{{end}} }
+        headerActions={ {{if $hasCrud}}config.headerActions{{else}}[]{{end}} }
+      />
+      <RenderCountDebugger count={++renderCnt.current} />
       {{if $isNames}}<ConfirmModal
         opened={confirmModal.opened}
         onClose={useCallback(

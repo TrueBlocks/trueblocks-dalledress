@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetStatusPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
@@ -23,13 +23,14 @@ import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { status } from '@models';
 import { msgs, types } from '@models';
-import { ActionDebugger, useErrorHandler } from '@utils';
+import { ActionDebugger, RenderCountDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, statusFacets } from './facets';
 
 export const Status = () => {
   // === SECTION 2: Hook Initialization ===
+  const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: statusFacets,
@@ -147,13 +148,6 @@ export const Status = () => {
   }, []);
 
   const perTabContent = useMemo(() => {
-    const actionDebugger = (
-      <ActionDebugger
-        enabledActions={[]}
-        setActiveFacet={activeFacetHook.setActiveFacet}
-      />
-    );
-
     const facet = getCurrentDataFacet();
     if (isForm(facet)) {
       const statusData = currentData[0] as unknown as Record<string, unknown>;
@@ -199,7 +193,6 @@ export const Status = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        debugComponent={actionDebugger}
         headerActions={[]}
       />
     );
@@ -211,7 +204,6 @@ export const Status = () => {
     viewStateKey,
     isForm,
     getCurrentDataFacet,
-    activeFacetHook.setActiveFacet,
   ]);
 
   const tabs = useMemo(
@@ -226,8 +218,6 @@ export const Status = () => {
   );
 
   // === SECTION 7: Render ===
-  const renderCnt = useRef(0);
-  // renderCnt.current++;
   return (
     <div className="mainView">
       <TabView tabs={tabs} route={ROUTE} />
@@ -237,7 +227,8 @@ export const Status = () => {
           <p>{error.message}</p>
         </div>
       )}
-      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
+      <ActionDebugger rowActions={[]} headerActions={[]} />
+      <RenderCountDebugger count={++renderCnt.current} />
     </div>
   );
 };

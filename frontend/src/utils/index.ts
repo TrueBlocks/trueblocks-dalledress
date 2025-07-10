@@ -1,4 +1,5 @@
 export * from './ActionDebugger';
+export * from './RenderCountDebugger';
 export * from './addresses';
 export * from './debugMode';
 export * from './ether';

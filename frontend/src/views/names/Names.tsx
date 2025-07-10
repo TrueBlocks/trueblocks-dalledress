@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
@@ -31,13 +31,14 @@ import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { names } from '@models';
 import { msgs, types } from '@models';
-import { ActionDebugger, useErrorHandler } from '@utils';
+import { ActionDebugger, RenderCountDebugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
 
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
+  const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: namesFacets,
@@ -300,13 +301,6 @@ export const Names = () => {
   );
 
   const perTabContent = useMemo(() => {
-    const actionDebugger = (
-      <ActionDebugger
-        enabledActions={config.rowActions}
-        setActiveFacet={activeFacetHook.setActiveFacet}
-      />
-    );
-
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -314,7 +308,6 @@ export const Names = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        debugComponent={actionDebugger}
         headerActions={headerActions}
         onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
@@ -333,8 +326,6 @@ export const Names = () => {
     handleRemove,
     handleAutoname,
     handleUpdate,
-    config.rowActions,
-    activeFacetHook.setActiveFacet,
   ]);
 
   const tabs = useMemo(
@@ -349,8 +340,6 @@ export const Names = () => {
   );
 
   // === SECTION 7: Render ===
-  const renderCnt = useRef(0);
-  // renderCnt.current++;
   return (
     <div className="mainView">
       <TabView tabs={tabs} route={ROUTE} />
@@ -360,7 +349,11 @@ export const Names = () => {
           <p>{error.message}</p>
         </div>
       )}
-      {renderCnt.current > 0 && <div>{`renderCnt: ${renderCnt.current}`}</div>}
+      <ActionDebugger
+        rowActions={config.rowActions}
+        headerActions={config.headerActions}
+      />
+      <RenderCountDebugger count={++renderCnt.current} />
       <ConfirmModal
         opened={confirmModal.opened}
         onClose={useCallback(

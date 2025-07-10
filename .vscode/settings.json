@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsdk": "./frontend/node_modules/typescript/lib",
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
@@ -7,6 +7,9 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "prettier.configPath": "./frontend/.prettierrc",
+  "prettier.resolveGlobalModules": false,
+  "prettier.requireConfig": true,
+  "prettier.prettierPath": "./frontend/node_modules/prettier",
   "[go]": {
     "editor.defaultFormatter": "golang.go",
     "editor.formatOnSave": true,

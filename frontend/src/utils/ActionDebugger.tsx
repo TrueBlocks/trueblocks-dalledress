@@ -34,7 +34,7 @@ export const ActionDebugger: React.FC<ActionDebuggerProps> = ({
       }}
     >
       <div>
-        <ActionsList prompt="Row Actions:" actions={rowActions} />
+        <ActionsList prompt="Row Actions:" actions={rowActions} />{' '}
         <ActionsList prompt="Header Actions:" actions={headerActions} />
       </div>
     </div>

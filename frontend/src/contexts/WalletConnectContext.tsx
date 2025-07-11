@@ -52,7 +52,7 @@ export const WalletConnectProvider = ({
     isConnected: isWalletConnected,
   };
 
-  Log('WalletConnect Context: Current session state:', JSON.stringify(session));
+  // Log('WalletConnect Context: Current session state:', JSON.stringify(session));
 
   const { connect } = useConnect({
     requiredNamespaces: {

@@ -14,5 +14,8 @@
     "test": "export $(grep -v '^#' ./.env | xargs) >/dev/null && yarn test-go && yarn test-tsx && yarn test-dalle",
     "test-detail": "export $(grep -v '^#' ./.env | xargs) >/dev/null && yarn test-go-detail",
     "CONVENTIONS": "echo 'See copilot.md for development conventions'"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
   }
 }

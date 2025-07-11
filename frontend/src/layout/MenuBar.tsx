@@ -17,7 +17,8 @@ export const MenuBar = ({ disabled = false }: MenuBarProps) => {
   const icons = useIconSets();
 
   const renderMenuItem = ({ label, path }: MenuItem) => {
-    const Icon = icons[label as keyof typeof icons];
+    const Icon = icons[label as keyof typeof icons] || icons.Missing;
+
     return (
       <Button
         key={path}

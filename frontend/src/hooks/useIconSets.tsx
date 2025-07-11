@@ -52,6 +52,8 @@ export type IconSet = {
 
   DebugOn: IconType;
   DebugOff: IconType;
+
+  Missing: IconType;
 };
 
 const faIcons: IconSet = {
@@ -103,6 +105,9 @@ const faIcons: IconSet = {
   // Debug
   DebugOn: Icons.FaEye,
   DebugOff: Icons.FaEyeSlash,
+
+  // Fallback
+  Missing: Icons.FaMissing,
 };
 
 const biIcons: IconSet = {
@@ -154,6 +159,9 @@ const biIcons: IconSet = {
   // Debug
   DebugOn: Icons.BiShow,
   DebugOff: Icons.BiHide,
+
+  // Fallback
+  Missing: Icons.BiMissing,
 };
 
 const iconSets: Record<string, IconSet> = {
@@ -256,6 +264,8 @@ export const useIconSets = (
       createElement(iconSet.DebugOn, { size, ...props });
     const DebugOff: FC<IconProps> = (props = {}) =>
       createElement(iconSet.DebugOff, { size, ...props });
+    const Missing: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Missing, { size, ...props });
 
     return {
       Exports,
@@ -296,6 +306,7 @@ export const useIconSets = (
       Dark,
       DebugOn,
       DebugOff,
+      Missing,
     };
   }, [iconSet, size]);
 };

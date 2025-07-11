@@ -12,6 +12,7 @@ import {
   BiHistory,
   BiHome,
   BiListUl,
+  BiQuestionMark,
   BiUser,
 } from 'react-icons/bi';
 import {
@@ -20,6 +21,7 @@ import {
   FaHistory,
   FaIndustry,
   FaListAlt,
+  FaQuestionCircle,
   FaUser,
 } from 'react-icons/fa';
 
@@ -85,6 +87,7 @@ export {
   BiPalette,
   BiPencil,
   BiPlus,
+  BiQuestionMark,
   BiShow,
   BiSun,
   BiTransfer,
@@ -119,6 +122,7 @@ export {
   FaMoon,
   FaPalette,
   FaPlus,
+  FaQuestionCircle,
   FaRandom,
   FaSun,
   FaTimes,
@@ -134,6 +138,7 @@ export const FaExports = FaHistory;
 export const FaChunks = FaIndustry;
 export const FaAbis = FaListAlt;
 export const FaNames = FaUser;
+export const FaMissing = FaQuestionCircle;
 
 export const BiStatus = BiCog;
 export const BiMonitors = BiHome;
@@ -141,6 +146,7 @@ export const BiExports = BiHistory;
 export const BiChunks = BiBuildings;
 export const BiAbis = BiListUl;
 export const BiNames = BiUser;
+export const BiMissing = BiQuestionMark;
 
 // EXISTING_CODE
 

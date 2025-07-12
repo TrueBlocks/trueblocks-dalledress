@@ -7,14 +7,7 @@
  */
 import { SetInitialized } from '@app';
 import { DalleDress, Home, Khedra, Settings } from '@views';
-import {
-  Abis,
-  Chunks,
-  Exports,
-  Monitors,
-  Names,
-  Status,
-} from '@views';
+import { Abis, Chunks, Exports, Monitors, Names, Status } from '@views';
 import { Wizard } from '@wizards';
 
 export interface MenuItem {

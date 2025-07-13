@@ -41,6 +41,7 @@ type AppPreferences struct {
 	HelpCollapsed    bool              `json:"helpCollapsed,omitempty"`
 	LastAddress      string            `json:"lastAddress,omitempty"`
 	LastChain        string            `json:"lastChain,omitempty"`
+	LastContract     string            `json:"lastContract,omitempty"`
 	LastLanguage     string            `json:"lastLanguage,omitempty"`
 	LastProject      string            `json:"lastProject,omitempty"`
 	LastTab          map[string]string `json:"lastTab"`
@@ -66,6 +67,7 @@ func NewAppPreferences() *AppPreferences {
 		DebugMode:        false,
 		HelpCollapsed:    false,
 		LastAddress:      "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
+		LastContract:     "0x52df6e4d9989e7cf4739d687c765e75323a1b14c",
 		LastLanguage:     "en",
 		LastTab:          make(map[string]string),
 		LastTheme:        "dark",

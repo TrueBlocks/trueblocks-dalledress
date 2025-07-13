@@ -7,6 +7,7 @@ interface AppPreferencesState {
   lastProject: string;
   lastChain: string;
   lastAddress: string;
+  lastContract: string;
 
   // UI state
   lastTheme: string;
@@ -28,6 +29,7 @@ const initialState: AppPreferencesState = {
   lastProject: '',
   lastChain: '',
   lastAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
+  lastContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
   lastTheme: 'dark',
   lastLanguage: 'en',
   lastView: '/',
@@ -152,6 +154,8 @@ class AppPreferencesStore {
           lastChain: prefs.lastChain || '',
           lastAddress:
             prefs.lastAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
+          lastContract:
+            prefs.lastContract || '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
           lastTheme: prefs.lastTheme || 'dark',
           lastLanguage: prefs.lastLanguage || 'en',
           lastView: prefs.lastView || '/',
@@ -179,6 +183,14 @@ class AppPreferencesStore {
   setActiveChain = async (chain: string): Promise<void> => {
     await this.updatePreferences({ lastChain: chain });
     this.setState({ lastChain: chain });
+  };
+
+  setActiveContract = async (contract: string): Promise<void> => {
+    // Skip backend calls in test mode
+    if (!this.isTestMode) {
+      await App.SetLastContract(contract);
+    }
+    this.setState({ lastContract: contract });
   };
 
   switchProject = async (project: string): Promise<void> => {

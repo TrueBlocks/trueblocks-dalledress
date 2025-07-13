@@ -48,6 +48,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
       lastProject: 'test-project',
       lastChain: 'mainnet',
       lastAddress: '0x123',
+      lastContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
       lastTheme: 'dark',
       lastLanguage: 'en',
       lastView: '/exports',

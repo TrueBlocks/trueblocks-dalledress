@@ -51,7 +51,10 @@ export const useAppHotkeys = (): void => {
     try {
       switch (hkType.type) {
         case 'navigation':
-          if (currentLocation === hkType.path) {
+          if (
+            currentLocation === hkType.path ||
+            currentLocation.startsWith(hkType.path + '/')
+          ) {
             emitEvent(msgs.EventType.TAB_CYCLE, 'Tab cycle triggered', {
               route: hkType.path,
               key: hkType.hotkey,

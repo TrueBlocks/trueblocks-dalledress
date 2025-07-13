@@ -73,6 +73,8 @@ export function GetLastAddress():Promise<string>;
 
 export function GetLastChain():Promise<string>;
 
+export function GetLastContract():Promise<string>;
+
 export function GetLastTab(arg1:string):Promise<types.DataFacet>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
@@ -156,6 +158,8 @@ export function SetLanguage(arg1:string):Promise<void>;
 export function SetLastAddress(arg1:string):Promise<void>;
 
 export function SetLastChain(arg1:string):Promise<void>;
+
+export function SetLastContract(arg1:string):Promise<void>;
 
 export function SetLastTab(arg1:string,arg2:types.DataFacet):Promise<void>;
 

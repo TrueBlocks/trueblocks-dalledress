@@ -114,6 +114,10 @@ export function GetLastChain() {
   return window['go']['app']['App']['GetLastChain']();
 }
 
+export function GetLastContract() {
+  return window['go']['app']['App']['GetLastContract']();
+}
+
 export function GetLastTab(arg1) {
   return window['go']['app']['App']['GetLastTab'](arg1);
 }
@@ -280,6 +284,10 @@ export function SetLastAddress(arg1) {
 
 export function SetLastChain(arg1) {
   return window['go']['app']['App']['SetLastChain'](arg1);
+}
+
+export function SetLastContract(arg1) {
+  return window['go']['app']['App']['SetLastContract'](arg1);
 }
 
 export function SetLastTab(arg1, arg2) {

@@ -8,6 +8,7 @@ export interface UseActiveProjectReturn {
   lastProject: string;
   lastChain: string;
   lastAddress: string;
+  lastContract: string;
   lastTheme: string;
   lastLanguage: string;
   lastView: string;
@@ -20,6 +21,7 @@ export interface UseActiveProjectReturn {
   // Actions
   setActiveAddress: (address: string) => Promise<void>;
   setActiveChain: (chain: string) => Promise<void>;
+  setActiveContract: (contract: string) => Promise<void>;
   switchProject: (project: string) => Promise<void>;
   toggleTheme: () => Promise<void>;
   changeLanguage: (language: string) => Promise<void>;
@@ -47,6 +49,7 @@ export const useActiveProject = (): UseActiveProjectReturn => {
     lastProject: state.lastProject,
     lastChain: state.lastChain,
     lastAddress: state.lastAddress,
+    lastContract: state.lastContract,
     lastTheme: state.lastTheme,
     lastLanguage: state.lastLanguage,
     lastView: state.lastView,
@@ -59,6 +62,7 @@ export const useActiveProject = (): UseActiveProjectReturn => {
     // Actions - these are bound methods from the store
     setActiveAddress: appPreferencesStore.setActiveAddress,
     setActiveChain: appPreferencesStore.setActiveChain,
+    setActiveContract: appPreferencesStore.setActiveContract,
     switchProject: appPreferencesStore.switchProject,
     toggleTheme: appPreferencesStore.toggleTheme,
     changeLanguage: appPreferencesStore.changeLanguage,

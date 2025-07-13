@@ -39,8 +39,7 @@ export const MenuItems: MenuItem[] = [
     path: '/{{ toLower .Class }}',
     position: 'top',
     component: {{ .Class }},
-    hotkey: 'mod+{{ $n }}',
-    altHotkey: 'alt+{{ $n }}',
+    {{ hotkey $n }}
     type: 'navigation',
   },
 {{- $n = add $n 1 }}
@@ -51,8 +50,7 @@ export const MenuItems: MenuItem[] = [
     path: '/dalledress',
     position: 'top',
     component: DalleDress,
-    hotkey: 'mod+{{ $n }}',
-    altHotkey: 'alt+{{ $n }}',
+    {{ hotkey $n }}
   {{- $n = add $n 1 }}
     type: 'navigation',
   },
@@ -61,13 +59,8 @@ export const MenuItems: MenuItem[] = [
     path: '/khedra',
     position: 'bottom',
     component: Khedra,
-    hotkey: 'mod+{{ $n }}',
-    altHotkey: 'alt+{{ $n }}',
-  {{- if eq $n 9 }}
-    {{- $n = 0 }}
-  {{- else }}
-    {{- $n = add $n 1 }}
-  {{- end }}
+    {{ hotkey $n }}
+  {{- $n = add $n 1 }}
     type: 'navigation',
   },
   {
@@ -75,8 +68,7 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+{{ $n }}',
-    altHotkey: 'alt+{{ $n }}',
+    {{ hotkey $n }}
   {{- $n = add $n 1 }}
     type: 'navigation',
   },
@@ -85,7 +77,8 @@ export const MenuItems: MenuItem[] = [
     label: 'Wizard',
     position: 'hidden',
     component: Wizard,
-    hotkey: 'mod+shift+w',
+    {{ hotkey $n }}
+  {{- $n = add $n 1 }}
     type: 'dev',
     action: async () => {
       await SetInitialized(false);

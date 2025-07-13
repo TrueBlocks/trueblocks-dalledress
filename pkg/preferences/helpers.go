@@ -23,3 +23,13 @@ func GetLastAddress() string {
 	// TODO: Is this really what we want to do?
 	return "0xf503017d7baf7fbc0fff7492b751025c6a78179b"
 }
+
+func GetLastContract() string {
+	if appPreferences, err := GetAppPreferences(); err == nil {
+		if len(appPreferences.LastContract) > 0 {
+			return appPreferences.LastContract
+		}
+	}
+	// Default contract address
+	return "0x52df6e4d9989e7cf4739d687c765e75323a1b14c"
+}

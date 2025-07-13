@@ -79,6 +79,22 @@ func (a *App) SetLastChain(chain string) {
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
+// GetLastContract returns the last contract setting
+func (a *App) GetLastContract() string {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	return a.Preferences.App.LastContract
+}
+
+// SetLastContract sets the last contract setting
+func (a *App) SetLastContract(contract string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+
+	a.Preferences.App.LastContract = contract
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
 // GetLastTab returns the last tab for a given route
 func (a *App) GetLastTab(route string) types.DataFacet {
 	a.prefsMu.RLock()

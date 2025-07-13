@@ -476,6 +476,7 @@ export namespace preferences {
 	    helpCollapsed?: boolean;
 	    lastAddress?: string;
 	    lastChain?: string;
+	    lastContract?: string;
 	    lastLanguage?: string;
 	    lastProject?: string;
 	    lastTab: Record<string, string>;
@@ -499,6 +500,7 @@ export namespace preferences {
 	        this.helpCollapsed = source["helpCollapsed"];
 	        this.lastAddress = source["lastAddress"];
 	        this.lastChain = source["lastChain"];
+	        this.lastContract = source["lastContract"];
 	        this.lastLanguage = source["lastLanguage"];
 	        this.lastProject = source["lastProject"];
 	        this.lastTab = source["lastTab"];

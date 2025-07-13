@@ -9,6 +9,7 @@
 import {
   BiBuildings,
   BiCog,
+  BiFile,
   BiHistory,
   BiHome,
   BiListUl,
@@ -18,6 +19,7 @@ import {
 import {
   FaCircleNotch,
   FaDesktop,
+  FaFileContract,
   FaHistory,
   FaIndustry,
   FaListAlt,
@@ -33,6 +35,7 @@ import {
 // Abis
 // Names
 // Chunks
+// Contracts
 // Status
 
 /*
@@ -111,6 +114,7 @@ export {
   FaEye,
   FaEyeSlash,
   FaFile,
+  FaFileContract,
   FaGithub,
   FaGlobe,
   FaHatWizard,
@@ -136,6 +140,7 @@ export const FaStatus = FaCircleNotch;
 export const FaMonitors = FaDesktop;
 export const FaExports = FaHistory;
 export const FaChunks = FaIndustry;
+export const FaContracts = FaFileContract;
 export const FaAbis = FaListAlt;
 export const FaNames = FaUser;
 export const FaMissing = FaQuestionCircle;
@@ -144,6 +149,7 @@ export const BiStatus = BiCog;
 export const BiMonitors = BiHome;
 export const BiExports = BiHistory;
 export const BiChunks = BiBuildings;
+export const BiContracts = BiFile;
 export const BiAbis = BiListUl;
 export const BiNames = BiUser;
 export const BiMissing = BiQuestionMark;
@@ -156,4 +162,5 @@ export const BiMissing = BiQuestionMark;
 // Abis
 // Names
 // Chunks
+// Contracts
 // Status

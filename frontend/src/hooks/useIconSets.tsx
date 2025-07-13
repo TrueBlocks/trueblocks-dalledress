@@ -17,6 +17,7 @@ export type IconSet = {
   Abis: IconType;
   Names: IconType;
   Chunks: IconType;
+  Contracts: IconType;
   Status: IconType;
 
   Home: IconType;
@@ -63,6 +64,7 @@ const faIcons: IconSet = {
   Abis: Icons.FaAbis,
   Names: Icons.FaNames,
   Chunks: Icons.FaChunks,
+  Contracts: Icons.FaContracts,
   Status: Icons.FaStatus,
 
   // App navigation
@@ -117,6 +119,7 @@ const biIcons: IconSet = {
   Abis: Icons.BiAbis,
   Names: Icons.BiNames,
   Chunks: Icons.BiChunks,
+  Contracts: Icons.BiContracts,
   Status: Icons.BiStatus,
 
   // App navigation
@@ -203,6 +206,8 @@ export const useIconSets = (
       createElement(iconSet.Names, { size, ...props });
     const Chunks: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Chunks, { size, ...props });
+    const Contracts: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Contracts, { size, ...props });
     const Status: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Status, { size, ...props });
 
@@ -273,6 +278,7 @@ export const useIconSets = (
       Abis,
       Names,
       Chunks,
+      Contracts,
       Status,
 
       Home,

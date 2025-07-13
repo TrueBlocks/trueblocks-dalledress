@@ -120,6 +120,7 @@ vi.mock('@hooks', () => ({
     lastProject: '',
     lastChain: 'mainnet',
     lastAddress: '0x1234567890abcdef1234567890abcdef12345678',
+    lastContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
     lastTheme: 'light',
     lastLanguage: 'en',
     lastView: 'home',

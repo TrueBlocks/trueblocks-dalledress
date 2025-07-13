@@ -45,7 +45,7 @@ import { {{if $hasForms}}FormView, {{end}}TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { {{$lower}} } from '@models';
 import { msgs, types } from '@models';
-import { ActionDebugger, RenderCountDebugger, useErrorHandler } from '@utils';
+import { Debugger, useErrorHandler } from '@utils';
 {{- if $hasCrud}}
 import { Group } from '@mantine/core';
 {{- end}}
@@ -154,6 +154,7 @@ export const {{$class}} = () => {
   }, [fetchData]);
 
   const handleReload = useCallback(async () => {
+    clearError();
     try {
       Reload(createPayload(getCurrentDataFacet())).then(() => {
         // The data will reload when the DataLoaded event is fired.
@@ -161,7 +162,7 @@ export const {{$class}} = () => {
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, createPayload, handleError]);
+  }, [clearError, getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
 
@@ -388,6 +389,7 @@ export const {{$class}} = () => {
   const tabs = useMemo(
     () =>
       availableFacets.map((facetConfig: DataFacetConfig) => ({
+        key: facetConfig.id,
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabContent,
@@ -406,11 +408,11 @@ export const {{$class}} = () => {
           <p>{error.message}</p>
         </div>
       )}
-      <ActionDebugger
+      <Debugger
         rowActions={ {{if $hasCrud}}config.rowActions{{else}}[]{{end}} }
         headerActions={ {{if $hasCrud}}config.headerActions{{else}}[]{{end}} }
+        count={++renderCnt.current}
       />
-      <RenderCountDebugger count={++renderCnt.current} />
       {{if $isNames}}<ConfirmModal
         opened={confirmModal.opened}
         onClose={useCallback(

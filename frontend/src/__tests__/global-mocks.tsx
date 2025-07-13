@@ -21,6 +21,7 @@ const iconNames = [
   'Abis',
   'Names',
   'Chunks',
+  'Contracts',
   'Status',
   'DalleDress',
   'Settings',

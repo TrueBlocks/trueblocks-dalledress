@@ -31,7 +31,7 @@ import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { names } from '@models';
 import { msgs, types } from '@models';
-import { ActionDebugger, RenderCountDebugger, useErrorHandler } from '@utils';
+import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
@@ -143,6 +143,7 @@ export const Names = () => {
   }, [fetchData]);
 
   const handleReload = useCallback(async () => {
+    clearError();
     try {
       Reload(createPayload(getCurrentDataFacet())).then(() => {
         // The data will reload when the DataLoaded event is fired.
@@ -150,7 +151,7 @@ export const Names = () => {
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, createPayload, handleError]);
+  }, [clearError, getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
 
@@ -331,6 +332,7 @@ export const Names = () => {
   const tabs = useMemo(
     () =>
       availableFacets.map((facetConfig: DataFacetConfig) => ({
+        key: facetConfig.id,
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabContent,
@@ -349,11 +351,11 @@ export const Names = () => {
           <p>{error.message}</p>
         </div>
       )}
-      <ActionDebugger
+      <Debugger
         rowActions={config.rowActions}
         headerActions={config.headerActions}
+        count={++renderCnt.current}
       />
-      <RenderCountDebugger count={++renderCnt.current} />
       <ConfirmModal
         opened={confirmModal.opened}
         onClose={useCallback(

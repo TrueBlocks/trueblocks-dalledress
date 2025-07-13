@@ -144,6 +144,53 @@ export namespace chunks {
 
 }
 
+export namespace contracts {
+	
+	export class ContractsPage {
+	    facet: types.DataFacet;
+	    contracts: types.Contract[];
+	    logs: types.Log[];
+	    totalItems: number;
+	    expectedTotal: number;
+	    isFetching: boolean;
+	    state: types.LoadState;
+	
+	    static createFrom(source: any = {}) {
+	        return new ContractsPage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.facet = source["facet"];
+	        this.contracts = this.convertValues(source["contracts"], types.Contract);
+	        this.logs = this.convertValues(source["logs"], types.Log);
+	        this.totalItems = source["totalItems"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isFetching = source["isFetching"];
+	        this.state = source["state"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
 export namespace crud {
 	
 	export enum Operation {
@@ -764,6 +811,8 @@ export namespace types {
 	    INDEX = "index",
 	    BLOOMS = "blooms",
 	    MANIFEST = "manifest",
+	    DASHBOARD = "dashboard",
+	    DYNAMIC = "dynamic",
 	    STATEMENTS = "statements",
 	    BALANCES = "balances",
 	    TRANSFERS = "transfers",
@@ -1159,6 +1208,50 @@ export namespace types {
 	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
 	        this.ratio = source["ratio"];
 	        this.recWid = source["recWid"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Contract {
+	    abi?: Abi;
+	    address: base.Address;
+	    date: string;
+	    errorCount: number;
+	    lastError: string;
+	    lastUpdated: number;
+	    name: string;
+	    readResults: Record<string, any>;
+	
+	    static createFrom(source: any = {}) {
+	        return new Contract(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.abi = this.convertValues(source["abi"], Abi);
+	        this.address = this.convertValues(source["address"], base.Address);
+	        this.date = source["date"];
+	        this.errorCount = source["errorCount"];
+	        this.lastError = source["lastError"];
+	        this.lastUpdated = source["lastUpdated"];
+	        this.name = source["name"];
+	        this.readResults = source["readResults"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

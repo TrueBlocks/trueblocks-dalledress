@@ -23,7 +23,7 @@ import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { status } from '@models';
 import { msgs, types } from '@models';
-import { ActionDebugger, RenderCountDebugger, useErrorHandler } from '@utils';
+import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, statusFacets } from './facets';
@@ -114,6 +114,7 @@ export const Status = () => {
   }, [fetchData]);
 
   const handleReload = useCallback(async () => {
+    clearError();
     try {
       Reload(createPayload(getCurrentDataFacet())).then(() => {
         // The data will reload when the DataLoaded event is fired.
@@ -121,7 +122,7 @@ export const Status = () => {
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
-  }, [getCurrentDataFacet, createPayload, handleError]);
+  }, [clearError, getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
 
@@ -209,6 +210,7 @@ export const Status = () => {
   const tabs = useMemo(
     () =>
       availableFacets.map((facetConfig: DataFacetConfig) => ({
+        key: facetConfig.id,
         label: facetConfig.label,
         value: facetConfig.id,
         content: perTabContent,
@@ -227,8 +229,11 @@ export const Status = () => {
           <p>{error.message}</p>
         </div>
       )}
-      <ActionDebugger rowActions={[]} headerActions={[]} />
-      <RenderCountDebugger count={++renderCnt.current} />
+      <Debugger
+        rowActions={[]}
+        headerActions={[]}
+        count={++renderCnt.current}
+      />
     </div>
   );
 };

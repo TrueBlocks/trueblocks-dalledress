@@ -8,9 +8,8 @@
 // === SECTION 1: Imports & Dependencies ===
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { GetMonitorsPage, MonitorsCrud, Reload } from '@app';
+import { GetContractsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { Action } from '@components';
 import { ViewStateKey, useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
@@ -20,29 +19,29 @@ import {
   useEvent,
   usePayload,
 } from '@hooks';
-import { useActions } from '@hooks';
 import { TabView } from '@layout';
-import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { monitors } from '@models';
+import { contracts } from '@models';
 import { msgs, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
-import { DEFAULT_FACET, ROUTE, monitorsFacets } from './facets';
+import { DEFAULT_FACET, ROUTE, contractsFacets } from './facets';
 
-export const Monitors = () => {
+export const Contracts = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
-    facets: monitorsFacets,
+    facets: contractsFacets,
     defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
-  const [pageData, setPageData] = useState<monitors.MonitorsPage | null>(null);
+  const [pageData, setPageData] = useState<contracts.ContractsPage | null>(
+    null,
+  );
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
@@ -52,7 +51,7 @@ export const Monitors = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
+  const { pagination, setTotalItems } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
@@ -60,7 +59,7 @@ export const Monitors = () => {
   const fetchData = useCallback(async () => {
     clearError();
     try {
-      const result = await GetMonitorsPage(
+      const result = await GetContractsPage(
         createPayload(getCurrentDataFacet()),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
@@ -88,8 +87,12 @@ export const Monitors = () => {
     if (!pageData) return [];
     const facet = getCurrentDataFacet();
     switch (facet) {
-      case types.DataFacet.MONITORS:
-        return pageData.monitors || [];
+      case types.DataFacet.DASHBOARD:
+        return pageData.contracts || [];
+      case types.DataFacet.DYNAMIC:
+        return pageData.contracts || [];
+      case types.DataFacet.EVENTS:
+        return pageData.logs || [];
       default:
         return [];
     }
@@ -99,7 +102,7 @@ export const Monitors = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'monitors') {
+      if (payload?.collection === 'contracts') {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
@@ -125,76 +128,17 @@ export const Monitors = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: CRUD Operations ===
-  const { handlers, config } = useActions({
-    collection: 'monitors',
-    viewStateKey,
-    pagination,
-    goToPage,
-    sort,
-    filter,
-    enabledActions: ['delete', 'remove'],
-    pageData,
-    setPageData,
-    setTotalItems,
-    crudFunc: MonitorsCrud,
-    pageFunc: GetMonitorsPage,
-    pageClass: monitors.MonitorsPage,
-    updateItem: types.Monitor.createFrom({}),
-    createPayload,
-    getCurrentDataFacet,
-  });
-
-  const { handleRemove, handleToggle } = handlers;
-
-  const headerActions = useMemo(() => {
-    if (!config.headerActions?.length) return null;
-    return (
-      <Group gap="xs" style={{ flexShrink: 0 }}>
-        {config.headerActions.map((action) => {
-          const handlerKey =
-            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
-          const handler = handlers[handlerKey] as () => void;
-          return (
-            <Action
-              key={action.type}
-              icon={
-                action.icon as keyof ReturnType<
-                  typeof import('@hooks').useIconSets
-                >
-              }
-              onClick={handler}
-              title={
-                action.requiresWallet && !config.isWalletConnected
-                  ? `${action.title} (requires wallet connection)`
-                  : action.title
-              }
-              size="sm"
-              isSubdued={action.requiresWallet && !config.isWalletConnected}
-            />
-          );
-        })}
-      </Group>
-    );
-  }, [config.headerActions, config.isWalletConnected, handlers]);
-
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
-      showActions: true,
-      actions: ['delete', 'remove'],
-      getCanRemove: useCallback(
-        (row: unknown) => Boolean((row as unknown as types.Monitor)?.deleted),
-        [],
-      ),
+      showActions: false,
+      actions: [],
+      getCanRemove: useCallback((_row: unknown) => false, []),
     },
-    {
-      handleRemove,
-      handleToggle,
-    },
+    {},
     toPageDataProp(pageData),
-    config,
+    { rowActions: [] },
   );
 
   const perTabContent = useMemo(() => {
@@ -205,21 +149,10 @@ export const Monitors = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        headerActions={headerActions}
-        onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
-        onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
+        headerActions={[]}
       />
     );
-  }, [
-    currentData,
-    currentColumns,
-    pageData?.isFetching,
-    error,
-    viewStateKey,
-    headerActions,
-    handleToggle,
-    handleRemove,
-  ]);
+  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
 
   const tabs = useMemo(
     () =>
@@ -244,12 +177,13 @@ export const Monitors = () => {
         </div>
       )}
       <Debugger
-        rowActions={config.rowActions}
-        headerActions={config.headerActions}
+        rowActions={[]}
+        headerActions={[]}
         count={++renderCnt.current}
       />
     </div>
   );
 };
 
+// EXISTING_CODE
 // EXISTING_CODE

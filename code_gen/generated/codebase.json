@@ -3872,7 +3872,7 @@
                     "attributes": ""
                 },
                 {
-                    "name": "Functions",
+                    "name": "Dynamic",
                     "store": "Contracts",
                     "cruds": null,
                     "viewType": "",

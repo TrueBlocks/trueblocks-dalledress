@@ -7,7 +7,7 @@
  */
 import { SetInitialized } from '@app';
 import { DalleDress, Home, Khedra, Settings } from '@views';
-import { Abis, Chunks, Exports, Monitors, Names, Status } from '@views';
+import { Abis, Chunks, Contracts, Exports, Monitors, Names, Status } from '@views';
 import { Wizard } from '@wizards';
 
 export interface MenuItem {
@@ -77,12 +77,21 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
+    label: 'Contracts',
+    path: '/contracts',
+    position: 'top',
+    component: Contracts,
+    hotkey: 'mod+7',
+    altHotkey: 'alt+7',
+    type: 'navigation',
+  },
+  {
     label: 'Status',
     path: '/status',
     position: 'top',
     component: Status,
-    hotkey: 'mod+7',
-    altHotkey: 'alt+7',
+    hotkey: 'mod+8',
+    altHotkey: 'alt+8',
     type: 'navigation',
   },
   {
@@ -90,8 +99,8 @@ export const MenuItems: MenuItem[] = [
     path: '/dalledress',
     position: 'top',
     component: DalleDress,
-    hotkey: 'mod+8',
-    altHotkey: 'alt+8',
+    hotkey: 'mod+9',
+    altHotkey: 'alt+9',
     type: 'navigation',
   },
   {
@@ -99,8 +108,8 @@ export const MenuItems: MenuItem[] = [
     path: '/khedra',
     position: 'bottom',
     component: Khedra,
-    hotkey: 'mod+9',
-    altHotkey: 'alt+9',
+    hotkey: 'mod+0',
+    altHotkey: 'alt+0',
     type: 'navigation',
   },
   {
@@ -108,8 +117,8 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+0',
-    altHotkey: 'alt+0',
+    hotkey: 'mod+shift+1',
+    altHotkey: 'alt+shift+1',
     type: 'navigation',
   },
   {
@@ -117,7 +126,8 @@ export const MenuItems: MenuItem[] = [
     label: 'Wizard',
     position: 'hidden',
     component: Wizard,
-    hotkey: 'mod+shift+w',
+    hotkey: 'mod+shift+2',
+    altHotkey: 'alt+shift+2',
     type: 'dev',
     action: async () => {
       await SetInitialized(false);

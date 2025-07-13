@@ -13,7 +13,7 @@ var (
 
 type ContextManager struct {
 	renderCtxs      map[string]*output.RenderCtx
-	renderCtxsMutex sync.Mutex
+	renderCtxsMutex sync.RWMutex
 }
 
 // GetContextManager returns the singleton context manager
@@ -90,8 +90,8 @@ func CancelAllFetches() int {
 
 func ctxCount(key string) int {
 	cm := GetContextManager()
-	cm.renderCtxsMutex.Lock()
-	defer cm.renderCtxsMutex.Unlock()
+	cm.renderCtxsMutex.RLock()
+	defer cm.renderCtxsMutex.RUnlock()
 
 	if ctx, exists := cm.renderCtxs[key]; exists && ctx != nil {
 		return 1
@@ -101,7 +101,7 @@ func ctxCount(key string) int {
 
 func ctxCountTotal() int {
 	cm := GetContextManager()
-	cm.renderCtxsMutex.Lock()
-	defer cm.renderCtxsMutex.Unlock()
+	cm.renderCtxsMutex.RLock()
+	defer cm.renderCtxsMutex.RUnlock()
 	return len(cm.renderCtxs)
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/contracts"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
@@ -57,6 +58,7 @@ func main() {
 			&abis.AbisCollection{},
 			&names.NamesCollection{},
 			&chunks.ChunksCollection{},
+			&contracts.ContractsCollection{},
 			&status.StatusCollection{},
 		},
 		EnumBind: []interface{}{

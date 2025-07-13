@@ -14,7 +14,7 @@ store = "Contracts"
 viewType = ""
 
 [[facets]]
-name = "Functions"
+name = "Dynamic"
 store = "Contracts"
 viewType = ""
 

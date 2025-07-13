@@ -10,6 +10,7 @@ import {preferences} from '../models';
 import {utils} from '../models';
 import {chunks} from '../models';
 import {context} from '../models';
+import {contracts} from '../models';
 import {exports} from '../models';
 import {project} from '../models';
 import {monitors} from '../models';
@@ -57,7 +58,15 @@ export function GetChunksSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetContext():Promise<context.Context>;
 
+export function GetContract(arg1:string,arg2:types.Abi):Promise<types.Contract>;
+
+export function GetContractsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<contracts.ContractsPage>;
+
+export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
+
 export function GetDebugMode():Promise<boolean>;
+
+export function GetEvents(arg1:types.Payload,arg2:string,arg3:number):Promise<Array<types.Log>>;
 
 export function GetExportsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<exports.ExportsPage>;
 
@@ -123,6 +132,8 @@ export function NameFromAddress(arg1:string):Promise<types.Name|boolean>;
 
 export function NamesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Name):Promise<void>;
 
+export function RefreshContract(arg1:types.Contract):Promise<void>;
+
 export function RegisterCollection(arg1:types.Collection):Promise<void>;
 
 export function Reload(arg1:types.Payload):Promise<void>;
@@ -130,6 +141,8 @@ export function Reload(arg1:types.Payload):Promise<void>;
 export function ReloadAbis(arg1:types.Payload):Promise<void>;
 
 export function ReloadChunks(arg1:types.Payload):Promise<void>;
+
+export function ReloadContracts(arg1:types.Payload):Promise<void>;
 
 export function ReloadExports(arg1:types.Payload):Promise<void>;
 

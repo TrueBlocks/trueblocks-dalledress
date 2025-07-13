@@ -32,6 +32,8 @@ func (a *App) Reload(payload *types.Payload) error {
 		return a.ReloadNames(payload)
 	case "/chunks":
 		return a.ReloadChunks(payload)
+	case "/contracts":
+		return a.ReloadContracts(payload)
 	case "/status":
 		return a.ReloadStatus(payload)
 	}

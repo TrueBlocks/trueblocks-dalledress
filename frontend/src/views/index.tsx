@@ -15,4 +15,5 @@ export { Monitors } from './monitors';
 export { Abis } from './abis';
 export { Names } from './names';
 export { Chunks } from './chunks';
+export { Contracts } from './contracts';
 export { Status } from './status';

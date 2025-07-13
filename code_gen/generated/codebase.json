@@ -18,6 +18,14 @@
             "summary": "Abis route",
             "productions": [
                 {
+                    "class": "Abi",
+                    "doc_group": "05-Other",
+                    "doc_route": "503-abi",
+                    "doc_descr": "a human-readable representation of a Solidity smart contract",
+                    "produced_by": "abis",
+                    "disable_go": true
+                },
+                {
                     "class": "Abis",
                     "doc_group": "001-Route",
                     "doc_route": "300-abis",
@@ -3791,6 +3799,101 @@
                     "attributes": ""
                 }
             ]
+        },
+        {
+            "class": "Contracts",
+            "doc_group": "001-Route",
+            "doc_route": "500-contracts",
+            "doc_descr": "smart contract state and interaction data including read function results, write function forms, and event history",
+            "produced_by": "contracts",
+            "members": [
+                {
+                    "name": "address",
+                    "type": "address",
+                    "attributes": "width=340|readOnly",
+                    "docOrder": 1,
+                    "description": "the address of this smart contract",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "width=200",
+                    "docOrder": 2,
+                    "description": "the name of this contract (if available)",
+                    "num": 2
+                },
+                {
+                    "name": "abi",
+                    "type": "Abi",
+                    "attributes": "noui",
+                    "docOrder": 3,
+                    "description": "the ABI for this contract",
+                    "num": 3,
+                    "isPointer": true
+                },
+                {
+                    "name": "lastUpdated",
+                    "type": "timestamp",
+                    "docOrder": 4,
+                    "description": "timestamp when this contract state was last updated",
+                    "num": 4
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "docOrder": 5,
+                    "description": "date when this contract state was last updated",
+                    "num": 5
+                },
+                {
+                    "name": "errorCount",
+                    "type": "int64",
+                    "attributes": "width=80",
+                    "docOrder": 6,
+                    "description": "number of errors encountered when calling read functions",
+                    "num": 6
+                },
+                {
+                    "name": "lastError",
+                    "type": "string",
+                    "attributes": "noui",
+                    "docOrder": 7,
+                    "description": "the most recent error message when calling functions",
+                    "num": 7
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Dashboard",
+                    "store": "Contracts",
+                    "cruds": null,
+                    "viewType": "",
+                    "attributes": ""
+                },
+                {
+                    "name": "Functions",
+                    "store": "Contracts",
+                    "cruds": null,
+                    "viewType": "",
+                    "attributes": ""
+                },
+                {
+                    "name": "Events",
+                    "store": "Logs",
+                    "cruds": null,
+                    "viewType": "",
+                    "attributes": ""
+                }
+            ]
+        },
+        {
+            "class": "Abi",
+            "doc_group": "05-Other",
+            "doc_route": "503-abi",
+            "doc_descr": "a human-readable representation of a Solidity smart contract",
+            "produced_by": "abis",
+            "disable_go": true
         },
         {
             "class": "Function",

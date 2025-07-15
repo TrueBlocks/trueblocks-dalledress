@@ -264,7 +264,6 @@ export const {{$class}} = () => {
                 ? `${action.title} (requires wallet connection)`
                 : action.title}
               size="sm"
-              isSubdued={action.requiresWallet && !config.isWalletConnected}
             />
           );
         })}

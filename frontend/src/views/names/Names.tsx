@@ -273,7 +273,6 @@ export const Names = () => {
                   : action.title
               }
               size="sm"
-              isSubdued={action.requiresWallet && !config.isWalletConnected}
             />
           );
         })}

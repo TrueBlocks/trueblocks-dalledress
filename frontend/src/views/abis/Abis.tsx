@@ -176,7 +176,6 @@ export const Abis = () => {
                   : action.title
               }
               size="sm"
-              isSubdued={action.requiresWallet && !config.isWalletConnected}
             />
           );
         })}

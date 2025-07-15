@@ -170,7 +170,6 @@ export const Monitors = () => {
                   : action.title
               }
               size="sm"
-              isSubdued={action.requiresWallet && !config.isWalletConnected}
             />
           );
         })}

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"embed"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
@@ -398,4 +399,12 @@ func (a *App) ResetStore(storeName string) {
 			}
 		}
 	}
+}
+
+func (a *App) Encode(fn sdk.Function, params []interface{}) (string, error) {
+	packed, err := fn.Pack(params)
+	if err != nil {
+		return "", fmt.Errorf("failed to pack function call: %w", err)
+	}
+	return "0x" + hex.EncodeToString(packed), nil
 }

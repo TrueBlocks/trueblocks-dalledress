@@ -30,6 +30,10 @@ export function ConvertToAddress(arg1) {
   return window['go']['app']['App']['ConvertToAddress'](arg1);
 }
 
+export function Encode(arg1, arg2) {
+  return window['go']['app']['App']['Encode'](arg1, arg2);
+}
+
 export function FileNew(arg1) {
   return window['go']['app']['App']['FileNew'](arg1);
 }

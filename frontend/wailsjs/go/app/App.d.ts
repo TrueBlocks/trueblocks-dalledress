@@ -32,6 +32,8 @@ export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
 
+export function Encode(arg1:types.Function,arg2:Array<any>):Promise<string>;
+
 export function FileNew(arg1:menu.CallbackData):Promise<void>;
 
 export function FileOpen(arg1:menu.CallbackData):Promise<void>;

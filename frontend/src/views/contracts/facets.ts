@@ -15,8 +15,8 @@ export const contractsFacets: DataFacetConfig[] = [
     isDefault: true,
   },
   {
-    id: types.DataFacet.DYNAMIC,
-    label: toProperCase(types.DataFacet.DYNAMIC),
+    id: types.DataFacet.EXECUTE,
+    label: toProperCase(types.DataFacet.EXECUTE),
     isDefault: false,
   },
   {

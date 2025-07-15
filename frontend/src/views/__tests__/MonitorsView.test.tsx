@@ -8,7 +8,7 @@ vi.mock('../monitors/Monitors', () => ({
   Monitors: () => <div data-testid="monitors-view">Monitors View</div>,
 }));
 
-// Dynamically import after mocking
+// Import after mocking
 const { Monitors } = await import('../monitors/Monitors');
 
 describe('Monitors View Integration Tests (DataFacet architecture)', () => {

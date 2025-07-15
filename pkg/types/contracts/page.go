@@ -71,7 +71,7 @@ func (c *ContractsCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Contract, sort sdk.SortSpec) error {
-			return nil // sdk.SortContracts(items, sort)
+			return sdk.SortContracts(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("contracts", dataFacet, "GetPage", err)
@@ -84,28 +84,28 @@ func (c *ContractsCollection) GetPage(
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
-	case ContractsDynamic:
-		// facet := c.dynamicFacets
-		// var filterFunc func(*Contract) bool
-		// if filter != "" {
-		// 	filterFunc = func(item *Contract) bool {
-		// 		return c.matchesDynamicFilter(item, filter)
-		// 	}
-		// }
-		// sortFunc := func(items []Contract, sort sdk.SortSpec) error {
-		// 	return nil // sdk.SortContracts(items, sort)
-		// }
-		// if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-		// 	return nil, types.NewStoreError("contracts", dataFacet, "GetPage", err)
-		// } else {
-		// 	dynamic := make([]*Contract, 0, len(result.Items))
-		// 	for i := range result.Items {
-		// 		dynamic = append(dynamic, &result.Items[i])
-		// 	}
-		// 	page.Contracts, page.TotalItems, page.State = dynamic, result.TotalItems, result.State
-		// }
-		// page.IsFetching = facet.IsFetching()
-		// page.ExpectedTotal = facet.ExpectedCount()
+	case ContractsExecute:
+		facet := c.executeFacet
+		var filterFunc func(*Contract) bool
+		if filter != "" {
+			filterFunc = func(item *Contract) bool {
+				return c.matchesExecuteFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Contract, sort sdk.SortSpec) error {
+			return sdk.SortContracts(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("contracts", dataFacet, "GetPage", err)
+		} else {
+			execute := make([]*Contract, 0, len(result.Items))
+			for i := range result.Items {
+				execute = append(execute, &result.Items[i])
+			}
+			page.Contracts, page.TotalItems, page.State = execute, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
 	case ContractsEvents:
 		facet := c.eventsFacet
 		var filterFunc func(*Log) bool
@@ -120,12 +120,28 @@ func (c *ContractsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("contracts", dataFacet, "GetPage", err)
 		} else {
-			event := make([]*Log, 0, len(result.Items))
+			events := make([]*Log, 0, len(result.Items))
 			for i := range result.Items {
-				event = append(event, &result.Items[i])
+				events = append(events, &result.Items[i])
 			}
-			page.Logs, page.TotalItems, page.State = event, result.TotalItems, result.State
+			page.Logs, page.TotalItems, page.State = events, result.TotalItems, result.State
 		}
+
+		// Get contract information from the dashboard facet
+		dashboardFacet := c.dashboardFacet
+		if dashboardResult, err := dashboardFacet.GetPage(0, 10, nil, sortSpec, nil); err != nil {
+			// Failed to get contract info - continue without it
+		} else {
+			// Find the specific contract
+			for i := range dashboardResult.Items {
+				contract := &dashboardResult.Items[i]
+				if contract.Address.Hex() == payload.Address {
+					page.Contracts = []*Contract{contract}
+					break
+				}
+			}
+		}
+
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
 	default:
@@ -144,7 +160,7 @@ func (c *ContractsCollection) matchesDashboardFilter(item *Contract, filter stri
 	// strings.Contains(strings.ToLower(item.ContractAddress.Hex()), filter)
 }
 
-func (c *ContractsCollection) matchesDynamicFilter(item *Contract, filter string) bool {
+func (c *ContractsCollection) matchesExecuteFilter(item *Contract, filter string) bool {
 	_ = item    // delint
 	_ = filter  // delint
 	return true // strings.Contains(strings.ToLower(item.TransactionHash.Hex()), filter) ||

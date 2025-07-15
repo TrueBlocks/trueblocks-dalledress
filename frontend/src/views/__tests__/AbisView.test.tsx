@@ -8,7 +8,7 @@ vi.mock('../abis/Abis', () => ({
   Abis: () => <div data-testid="abis-view">Abis View</div>,
 }));
 
-// Dynamically import after mocking
+// Import after mocking
 const { Abis } = await import('../abis/Abis');
 
 describe('Abis View Integration Tests (DataFacet refactor preparation)', () => {

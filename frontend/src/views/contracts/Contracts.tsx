@@ -15,20 +15,66 @@ import {
   DataFacetConfig,
   toPageDataProp,
   useActiveFacet,
+  useActiveProject,
   useColumns,
   useEvent,
   usePayload,
 } from '@hooks';
 import { TabView } from '@layout';
+import { Alert, Container, Loader, Stack, Text, Title } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { contracts } from '@models';
 import { msgs, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
+import { ContractDashboard, ContractExecute } from './components';
 import { DEFAULT_FACET, ROUTE, contractsFacets } from './facets';
 
+// Tiny component for consistent facet titles
+interface FacetTitleProps {
+  facet: types.DataFacet;
+  contractName?: string;
+  contractAddress?: string;
+}
+
+const FacetTitle: React.FC<FacetTitleProps> = ({
+  facet,
+  contractName,
+  contractAddress,
+}) => {
+  const getTitleForFacet = (facet: types.DataFacet): string => {
+    switch (facet) {
+      case types.DataFacet.DASHBOARD:
+        return 'Contract Dashboard';
+      case types.DataFacet.EXECUTE:
+        return 'Contract Interactions';
+      case types.DataFacet.EVENTS:
+        return 'Contract Events';
+      default:
+        return 'Contract';
+    }
+  };
+
+  return (
+    <div>
+      <Title order={3}>{getTitleForFacet(facet)}</Title>
+      <Text size="sm" c="dimmed">
+        {contractName || 'Unknown Contract'} {'·'} {contractAddress}
+      </Text>
+    </div>
+  );
+};
+
 export const Contracts = () => {
+  // === SECTION 2: Contract Detail Detection ===
+  const { lastContract } = useActiveProject();
+
+  // === SECTION 3: Contract Detail State ===
+  const [contractAbi, setContractAbi] = useState<types.Contract | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
@@ -38,6 +84,7 @@ export const Contracts = () => {
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
+  const isForm = getCurrentDataFacet() !== types.DataFacet.EVENTS;
 
   const [pageData, setPageData] = useState<contracts.ContractsPage | null>(
     null,
@@ -59,8 +106,13 @@ export const Contracts = () => {
   const fetchData = useCallback(async () => {
     clearError();
     try {
+      const payload = createPayload(getCurrentDataFacet());
+      if (isForm && lastContract) {
+        payload.address = lastContract;
+      }
+
       const result = await GetContractsPage(
-        createPayload(getCurrentDataFacet()),
+        payload,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -81,6 +133,8 @@ export const Contracts = () => {
     filter,
     setTotalItems,
     handleError,
+    isForm,
+    lastContract,
   ]);
 
   const currentData = useMemo(() => {
@@ -89,10 +143,31 @@ export const Contracts = () => {
     switch (facet) {
       case types.DataFacet.DASHBOARD:
         return pageData.contracts || [];
-      case types.DataFacet.DYNAMIC:
+      case types.DataFacet.EXECUTE:
         return pageData.contracts || [];
       case types.DataFacet.EVENTS:
-        return pageData.logs || [];
+        if (pageData.logs && Array.isArray(pageData.logs)) {
+          const processedLogs = pageData.logs.map((event) => ({
+            ...event,
+            // Add contract info if available
+            compressedLog: (() => {
+              const anyEvent = event as unknown as Record<string, unknown>;
+              if (
+                anyEvent.articulatedLog &&
+                typeof anyEvent.articulatedLog === 'object'
+              ) {
+                const artLog = anyEvent.articulatedLog as Record<
+                  string,
+                  unknown
+                >;
+                return artLog.name ? `${artLog.name}()` : '';
+              }
+              return '';
+            })(),
+          }));
+          return processedLogs;
+        }
+        return [];
       default:
         return [];
     }
@@ -142,6 +217,25 @@ export const Contracts = () => {
   );
 
   const perTabContent = useMemo(() => {
+    const currentFacet = getCurrentDataFacet();
+    if (lastContract) {
+      return (
+        <div style={{ padding: '20px' }}>
+          <Stack gap="md">
+            <FacetTitle facet={currentFacet} contractAddress={lastContract} />
+            <BaseTab<Record<string, unknown>>
+              data={currentData as unknown as Record<string, unknown>[]}
+              columns={currentColumns}
+              loading={!!pageData?.isFetching}
+              error={error}
+              viewStateKey={viewStateKey}
+              headerActions={[]}
+            />
+          </Stack>
+        </div>
+      );
+    }
+
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -152,7 +246,15 @@ export const Contracts = () => {
         headerActions={[]}
       />
     );
-  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    viewStateKey,
+    getCurrentDataFacet,
+    lastContract,
+  ]);
 
   const tabs = useMemo(
     () =>
@@ -165,6 +267,144 @@ export const Contracts = () => {
       })),
     [availableFacets, perTabContent],
   );
+
+  // === SECTION 6.5: Contract Detail Loading Effect ===
+  useEffect(() => {
+    const loadContractDetail = async () => {
+      if (!isForm || !lastContract) {
+        return;
+      }
+
+      try {
+        setDetailLoading(true);
+        setDetailError(null);
+
+        if (pageData?.isFetching) {
+          return;
+        }
+
+        const contractData = pageData?.contracts?.find(
+          (contract: types.Contract) =>
+            String(contract.address)?.toLowerCase() ===
+            lastContract.toLowerCase(),
+        );
+
+        if (contractData) {
+          setContractAbi(contractData);
+          setDetailLoading(false);
+        } else {
+          setDetailLoading(false);
+        }
+      } catch (err) {
+        setDetailError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to load contract details',
+        );
+        setDetailLoading(false);
+      }
+    };
+
+    loadContractDetail();
+  }, [isForm, lastContract, pageData]); // Removed currentData and getCurrentDataFacet since we use pageData.contracts directly
+
+  // === SECTION 6.6: Early Return for Detail View ===
+  if (isForm) {
+    if (detailLoading || !contractAbi || pageData?.isFetching) {
+      return (
+        <Container size="lg" py="xl">
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '200px',
+            }}
+          >
+            <Loader size="lg" />
+            <Text ml="md">Loading contract details...</Text>
+          </div>
+        </Container>
+      );
+    }
+
+    if (detailError) {
+      return (
+        <Container size="lg" py="xl">
+          <Alert color="red" title="Error loading contract">
+            {detailError}
+          </Alert>
+        </Container>
+      );
+    }
+
+    if (!contractAbi.abi) {
+      return (
+        <Container size="lg" py="xl">
+          <Alert color="yellow" title="No ABI found">
+            No ABI found for contract address: {lastContract}
+          </Alert>
+        </Container>
+      );
+    }
+
+    // Generate facets from the ABI
+    return (
+      <div className="mainView">
+        <TabView
+          tabs={contractsFacets.map((facetConfig: DataFacetConfig) => ({
+            key: facetConfig.id,
+            label: facetConfig.label,
+            value: facetConfig.id,
+            content: (
+              <div style={{ padding: '20px' }}>
+                <Stack gap="md">
+                  <FacetTitle
+                    facet={facetConfig.id}
+                    contractName={contractAbi.name}
+                    contractAddress={String(contractAbi.address)}
+                  />
+                  {facetConfig.id === types.DataFacet.DASHBOARD ? (
+                    <ContractDashboard
+                      contractState={contractAbi}
+                      onRefresh={() => {
+                        // TODO: Implement refresh logic for contract state
+                      }}
+                    />
+                  ) : facetConfig.id === types.DataFacet.EXECUTE ? (
+                    <ContractExecute
+                      contractState={contractAbi}
+                      functionName="all" // Pass a special value to indicate all functions
+                      onTransaction={(_txData) => {
+                        // TODO: Implement transaction handling
+                      }}
+                    />
+                  ) : (
+                    <Alert
+                      color="blue"
+                      title={`Contract: ${contractAbi.name || 'Unknown'}`}
+                    >
+                      Address: {lastContract}
+                      <br />
+                      Facet: {facetConfig.label} (ID: {facetConfig.id})
+                      <br />
+                      ABI Functions: {contractAbi.abi?.functions?.length || 0}
+                    </Alert>
+                  )}
+                </Stack>
+              </div>
+            ),
+          }))}
+          route={ROUTE}
+        />
+        <Debugger
+          rowActions={[]}
+          headerActions={[]}
+          count={++renderCnt.current}
+        />
+      </div>
+    );
+  }
 
   // === SECTION 7: Render ===
   return (

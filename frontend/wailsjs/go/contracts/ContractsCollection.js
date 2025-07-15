@@ -6,14 +6,6 @@ export function AccumulateItem(arg1, arg2) {
   return window['go']['contracts']['ContractsCollection']['AccumulateItem'](arg1, arg2);
 }
 
-export function GetContract(arg1, arg2) {
-  return window['go']['contracts']['ContractsCollection']['GetContract'](arg1, arg2);
-}
-
-export function GetEvents(arg1, arg2) {
-  return window['go']['contracts']['ContractsCollection']['GetEvents'](arg1, arg2);
-}
-
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['contracts']['ContractsCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -36,10 +28,6 @@ export function LoadData(arg1) {
 
 export function NeedsUpdate(arg1) {
   return window['go']['contracts']['ContractsCollection']['NeedsUpdate'](arg1);
-}
-
-export function RefreshContract(arg1) {
-  return window['go']['contracts']['ContractsCollection']['RefreshContract'](arg1);
 }
 
 export function Reset(arg1) {

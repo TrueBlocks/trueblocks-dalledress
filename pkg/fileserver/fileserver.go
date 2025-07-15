@@ -16,7 +16,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 )
 
-// FileServer handles serving dynamically generated images via HTTP
+// FileServer handles serving generated images via HTTP
 type FileServer struct {
 	server    *http.Server
 	basePath  string
@@ -30,7 +30,7 @@ type FileServer struct {
 func NewFileServer() *FileServer {
 	return &FileServer{
 		basePath:  "", // Will be set in Start() method
-		port:      0,  // Will be determined dynamically
+		port:      0,  // Will be determined
 		running:   false,
 		urlPrefix: "/images/",
 	}

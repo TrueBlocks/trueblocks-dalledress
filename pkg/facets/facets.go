@@ -186,10 +186,24 @@ func (r *Facet[T]) GetPage(
 	state := r.GetState()
 	r.mutex.RUnlock()
 
-	if len(data) == 0 && r.NeedsUpdate() {
-		go func() {
-			_ = r.Load()
-		}()
+	if len(data) == 0 {
+		if r.store != nil && r.store.Count() > 0 {
+			// Store has data, sync with it
+			r.SyncWithStore()
+			// Re-read the data after sync
+			r.mutex.RLock()
+			data = make([]T, len(r.view))
+			for i, ptr := range r.view {
+				data[i] = *ptr
+			}
+			state = r.GetState()
+			r.mutex.RUnlock()
+		} else if r.NeedsUpdate() {
+			// No data in store, trigger load
+			go func() {
+				_ = r.Load()
+			}()
+		}
 	}
 
 	var filteredData []T

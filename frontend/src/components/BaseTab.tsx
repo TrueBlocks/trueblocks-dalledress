@@ -30,7 +30,6 @@ export function BaseTab<T extends Record<string, unknown>>({
   viewStateKey,
   headerActions,
 }: BaseTabProps<T>) {
-  // Always render table structure - let Table component handle all states
   return (
     <TableProvider>
       <div className="tableContainer">

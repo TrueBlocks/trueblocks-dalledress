@@ -812,7 +812,7 @@ export namespace types {
 	    BLOOMS = "blooms",
 	    MANIFEST = "manifest",
 	    DASHBOARD = "dashboard",
-	    DYNAMIC = "dynamic",
+	    EXECUTE = "execute",
 	    STATEMENTS = "statements",
 	    BALANCES = "balances",
 	    TRANSFERS = "transfers",

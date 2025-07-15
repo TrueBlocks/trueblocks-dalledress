@@ -17,7 +17,7 @@ export const getColumns = (dataFacet: types.DataFacet): FormField[] => {
   switch (dataFacet) {
     case types.DataFacet.DASHBOARD:
       return getContractsColumns();
-    case types.DataFacet.DYNAMIC:
+    case types.DataFacet.EXECUTE:
       return getContractsColumns();
     case types.DataFacet.EVENTS:
       return getLogsColumns();
@@ -76,38 +76,44 @@ const getLogsColumns = (): FormField[] => [
   // EXISTING_CODE
   // EXISTING_CODE
   {
-    key: 'date',
-    name: 'date',
-    header: 'Date',
-    label: 'Date',
-    type: 'datetime',
+    key: 'blockNumber',
+    name: 'blockNumber',
+    header: 'Block',
+    label: 'Block',
+    type: 'number',
     width: '120px',
-    render: renderDate,
+  },
+  {
+    key: 'articulatedLog.name',
+    name: 'articulatedLog.name',
+    header: 'Event',
+    label: 'Event',
+    type: 'text',
+    width: '150px',
+  },
+  {
+    key: 'transactionHash',
+    name: 'transactionHash',
+    header: 'Transaction',
+    label: 'Transaction',
+    type: 'hash',
+    width: '200px',
   },
   {
     key: 'address',
     name: 'address',
-    header: 'Address',
-    label: 'Address',
+    header: 'Contract',
+    label: 'Contract',
     type: 'address',
-    width: '340px',
-    readOnly: true,
+    width: '200px',
   },
   {
-    key: 'topics',
-    name: 'topics',
-    header: 'Topics',
-    label: 'Topics',
-    type: 'topic',
-    width: '120px',
-  },
-  {
-    key: 'data',
-    name: 'data',
-    header: 'Data',
-    label: 'Data',
-    type: 'bytes',
-    width: '120px',
+    key: 'contractName',
+    name: 'contractName',
+    header: 'Name',
+    label: 'Name',
+    type: 'text',
+    width: '150px',
   },
   {
     key: 'compressedLog',
@@ -115,22 +121,27 @@ const getLogsColumns = (): FormField[] => [
     header: 'Compressed Log',
     label: 'Compressed Log',
     type: 'text',
-    width: '200px',
+    width: '300px',
     render: renderCompressedLog,
-  },
-  {
-    key: 'isNFT',
-    name: 'isNFT',
-    header: 'N F T',
-    label: 'N F T',
-    type: 'checkbox',
-    width: '80px',
   },
 ];
 
 export function renderCompressedLog(row: Record<string, unknown>) {
   if (row != null) {
     // EXISTING_CODE
+    // For SDK Log type, the CompressedLog would be provided by the backend
+    // This function can access the compressedLog field or fall back to articulatedLog
+    if (row.compressedLog && typeof row.compressedLog === 'string') {
+      return row.compressedLog;
+    }
+
+    // Fallback: try to render from articulatedLog if available
+    if (row.articulatedLog && typeof row.articulatedLog === 'object') {
+      const articulated = row.articulatedLog as Record<string, unknown>;
+      if (articulated.name) {
+        return `${articulated.name}()`;
+      }
+    }
     // EXISTING_CODE
   }
   return '';

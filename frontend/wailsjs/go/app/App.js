@@ -82,10 +82,6 @@ export function GetContext() {
   return window['go']['app']['App']['GetContext']();
 }
 
-export function GetContract(arg1, arg2) {
-  return window['go']['app']['App']['GetContract'](arg1, arg2);
-}
-
 export function GetContractsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetContractsPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -96,10 +92,6 @@ export function GetContractsSummary(arg1) {
 
 export function GetDebugMode() {
   return window['go']['app']['App']['GetDebugMode']();
-}
-
-export function GetEvents(arg1, arg2, arg3) {
-  return window['go']['app']['App']['GetEvents'](arg1, arg2, arg3);
 }
 
 export function GetExportsPage(arg1, arg2, arg3, arg4, arg5) {
@@ -228,10 +220,6 @@ export function NameFromAddress(arg1) {
 
 export function NamesCrud(arg1, arg2, arg3) {
   return window['go']['app']['App']['NamesCrud'](arg1, arg2, arg3);
-}
-
-export function RefreshContract(arg1) {
-  return window['go']['app']['App']['RefreshContract'](arg1);
 }
 
 export function RegisterCollection(arg1) {

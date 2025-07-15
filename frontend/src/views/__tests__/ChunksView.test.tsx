@@ -8,7 +8,7 @@ vi.mock('../chunks/Chunks', () => ({
   Chunks: () => <div data-testid="chunks-view">Chunks View</div>,
 }));
 
-// Dynamically import after mocking
+// Import after mocking
 const { Chunks } = await import('../chunks/Chunks');
 
 describe('Chunks View Integration Tests (DataFacet refactor preparation)', () => {

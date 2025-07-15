@@ -6,14 +6,16 @@ be found in the LICENSE file.
 Parts of this file were auto generated. Edit only those parts of
 the code inside of 'EXISTING_CODE' tags.
 -->
+
 # Contracts View
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 ## Facets:
+
 - Dashboard Facet uses Contracts store.
-- Dynamic Facet uses Contracts store.
+- Execute Facet uses Contracts store.
 - Events Facet uses Logs store.
 
 ## Stores:

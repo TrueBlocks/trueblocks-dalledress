@@ -25,6 +25,7 @@ import (
 // EXISTING_CODE
 type Abi = sdk.Abi
 type Function = sdk.Function
+type Parameter = sdk.Parameter
 
 // EXISTING_CODE
 
@@ -45,12 +46,12 @@ func (c *ContractsCollection) getContractsStore(facet types.DataFacet) *store.St
 
 	chain := preferences.GetLastChain()
 	address := preferences.GetLastAddress()
-	contract := preferences.GetLastContract()
-	logging.LogBackend(fmt.Sprintf("getContractsStore: %s %s %s", chain, address, contract))
+	// contract := preferences.GetLastContract()
 	theStore := contractsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
+			// Real SDK calls would go here
 			// EXISTING_CODE
 			return nil
 		}
@@ -70,6 +71,14 @@ func (c *ContractsCollection) getContractsStore(facet types.DataFacet) *store.St
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// Add mock data to store
+		mockContracts := sdk.CreateContracts()
+		for i, contract := range mockContracts {
+			theStore.AddItem(contract, i)
+		}
+		theStore.ChangeState(0, store.StateLoaded, "Mock data loaded")
+
 		contractsStore = theStore
 	}
 
@@ -82,10 +91,23 @@ func (c *ContractsCollection) getLogsStore(facet types.DataFacet) *store.Store[L
 
 	chain := preferences.GetLastChain()
 	address := preferences.GetLastAddress()
+	contract := "0x8fbea07446ddf4518b1a7ba2b4f11bd140a8df41"
 	theStore := logsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
+			exportOpts := sdk.ExportOptions{
+				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
+				RenderCtx: ctx,
+				Addrs:     []string{address},
+				Emitter:   []string{contract},
+				// Articulate: true,
+			}
+			if _, _, err := exportOpts.ExportLogs(); err != nil {
+				wrappedErr := types.NewSDKError("exports", ContractsEvents, "fetch", err)
+				logging.LogBackend(fmt.Sprintf("Exports logs SDK query error: %v", wrappedErr))
+				return wrappedErr
+			}
 			// EXISTING_CODE
 			return nil
 		}
@@ -118,7 +140,7 @@ func (c *ContractsCollection) GetStoreName(dataFacet types.DataFacet, chain, add
 	switch dataFacet {
 	case ContractsDashboard:
 		name = "contracts-contracts"
-	case ContractsDynamic:
+	case ContractsExecute:
 		name = "contracts-contracts"
 	case ContractsEvents:
 		name = "contracts-logs"

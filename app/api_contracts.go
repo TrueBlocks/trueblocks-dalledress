@@ -9,6 +9,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/contracts"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -23,7 +25,16 @@ func (a *App) GetContractsPage(
 	filter string,
 ) (*contracts.ContractsPage, error) {
 	collection := contracts.GetContractsCollection(payload)
-	return getCollectionPage[*contracts.ContractsPage](collection, payload, first, pageSize, sort, filter)
+
+	page, err := collection.GetPage(payload, first, pageSize, sort, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if contractsPage, ok := page.(*contracts.ContractsPage); ok {
+		return contractsPage, nil
+	}
+	return nil, fmt.Errorf("unexpected page type")
 }
 
 func (a *App) GetContractsSummary(payload *types.Payload) types.Summary {
@@ -39,21 +50,4 @@ func (a *App) ReloadContracts(payload *types.Payload) error {
 }
 
 // EXISTING_CODE
-func (a *App) GetContract(address string, abi *contracts.Abi) (*contracts.Contract, error) {
-	collection := contracts.NewContractsCollection()
-	return collection.GetContract(address, abi)
-}
-
-func (a *App) RefreshContract(contractState *contracts.Contract) error {
-	collection := contracts.NewContractsCollection()
-	return collection.RefreshContract(contractState)
-}
-
-// TODO: QUESTION - THIS SHOULD USE GETPAGE
-// GetEvents retrieves events for a specific contract
-func (a *App) GetEvents(payload *types.Payload, address string, count int) ([]*sdk.Log, error) {
-	collection := contracts.GetContractsCollection(payload)
-	return collection.GetEvents(address, count)
-}
-
 // EXISTING_CODE

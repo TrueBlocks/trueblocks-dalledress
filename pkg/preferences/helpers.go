@@ -30,6 +30,6 @@ func GetLastContract() string {
 			return appPreferences.LastContract
 		}
 	}
-	// Default contract address
+	// TODO: Is this really what we want to do?
 	return "0x52df6e4d9989e7cf4739d687c765e75323a1b14c"
 }

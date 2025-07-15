@@ -47,7 +47,7 @@ This is the help file for the Exports view.
   - decimals: Decimals
   - actions: Actions
 
-- **Logs Store (13 members):**
+- **Logs Store (14 members):**
 
   - blockNumber: the number of the block
   - transactionIndex: the zero-indexed position of the transaction in the block
@@ -55,6 +55,7 @@ This is the help file for the Exports view.
   - timestamp: the timestamp of the block this log appears in
   - date: the timestamp as a date
   - address: the smart contract that emitted this log
+  - name: the name of the smart contract if any
   - topics: the first topic hashes event signature of the log, up to 3 additional index parameters may appear
   - data: any remaining un-indexed parameters to the event
   - transactionHash: the hash of the transction

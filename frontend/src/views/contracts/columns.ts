@@ -76,72 +76,47 @@ const getLogsColumns = (): FormField[] => [
   // EXISTING_CODE
   // EXISTING_CODE
   {
-    key: 'blockNumber',
-    name: 'blockNumber',
-    header: 'Block',
-    label: 'Block',
-    type: 'number',
+    key: 'date',
+    name: 'date',
+    header: 'Date',
+    label: 'Date',
+    type: 'datetime',
     width: '120px',
-  },
-  {
-    key: 'articulatedLog.name',
-    name: 'articulatedLog.name',
-    header: 'Event',
-    label: 'Event',
-    type: 'text',
-    width: '150px',
-  },
-  {
-    key: 'transactionHash',
-    name: 'transactionHash',
-    header: 'Transaction',
-    label: 'Transaction',
-    type: 'hash',
-    width: '200px',
+    render: renderDate,
   },
   {
     key: 'address',
     name: 'address',
-    header: 'Contract',
-    label: 'Contract',
+    header: 'Address',
+    label: 'Address',
     type: 'address',
-    width: '200px',
+    width: '340px',
   },
   {
-    key: 'contractName',
-    name: 'contractName',
+    key: 'name',
+    name: 'name',
     header: 'Name',
     label: 'Name',
     type: 'text',
-    width: '150px',
+    width: '200px',
+    render: renderName,
   },
   {
-    key: 'compressedLog',
-    name: 'compressedLog',
-    header: 'Compressed Log',
-    label: 'Compressed Log',
-    type: 'text',
-    width: '300px',
-    render: renderCompressedLog,
+    key: 'articulatedLog',
+    name: 'articulatedLog',
+    header: 'Articulated Log',
+    label: 'Articulated Log',
+    type: 'Function',
+    width: '120px',
+    render: renderArticulatedLog,
   },
 ];
 
-export function renderCompressedLog(row: Record<string, unknown>) {
+export function renderArticulatedLog(row: Record<string, unknown>) {
   if (row != null) {
     // EXISTING_CODE
-    // For SDK Log type, the CompressedLog would be provided by the backend
-    // This function can access the compressedLog field or fall back to articulatedLog
-    if (row.compressedLog && typeof row.compressedLog === 'string') {
-      return row.compressedLog;
-    }
-
-    // Fallback: try to render from articulatedLog if available
-    if (row.articulatedLog && typeof row.articulatedLog === 'object') {
-      const articulated = row.articulatedLog as Record<string, unknown>;
-      if (articulated.name) {
-        return `${articulated.name}()`;
-      }
-    }
+    const log = row['articulatedLog'] as unknown as types.Function;
+    return log?.name;
     // EXISTING_CODE
   }
   return '';
@@ -150,10 +125,50 @@ export function renderCompressedLog(row: Record<string, unknown>) {
 export function renderDate(row: Record<string, unknown>) {
   if (row != null) {
     // EXISTING_CODE
+    var timestamp = row.timestamp as string | number | undefined;
+    if (timestamp === undefined) {
+      if (row.transaction) {
+        const tx = row.transaction as types.Transaction | undefined;
+        if (tx != null) {
+          timestamp = tx.timestamp as string | number | undefined;
+        }
+      }
+    }
+    const blockNumber = row.blockNumber as string | number | undefined;
+    const transactionIndex = row.transactionIndex as
+      | string
+      | number
+      | undefined;
+    const transactionHash = row.transactionHash as string | undefined;
+    const blockHash = row.blockHash as string | undefined;
+    const node = row.node as string | undefined;
+
+    // Format date
+    let dateStr = '';
+    if (timestamp) {
+      const date = new Date(Number(timestamp) * 1000);
+      dateStr = date.toISOString().replace('T', ' ').substring(0, 19);
+    }
+
+    // Compose extra info
+    const parts: string[] = [];
+    if (blockNumber !== undefined) parts.push(` ${blockNumber}`);
+    if (transactionIndex !== undefined) parts.push(`${transactionIndex}`);
+    if (transactionHash) parts.push(`${transactionHash.slice(0, 10)}…`);
+    if (blockHash) parts.push(`${blockHash.slice(0, 10)}…`);
+    if (node) parts.push(`${node}`);
+    return [dateStr, ...parts].join(' | ');
     // EXISTING_CODE
   }
   return '';
 }
 
-// EXISTING_CODE
+export function renderName(row: Record<string, unknown>) {
+  if (row != null) {
+    // EXISTING_CODE
+    // EXISTING_CODE
+  }
+  return '';
+}
+
 // EXISTING_CODE

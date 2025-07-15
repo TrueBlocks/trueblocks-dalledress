@@ -6,14 +6,12 @@ be found in the LICENSE file.
 Parts of this file were auto generated. Edit only those parts of
 the code inside of 'EXISTING_CODE' tags.
 -->
-
 # Contracts View
 
 // EXISTING_CODE
 // EXISTING_CODE
 
 ## Facets:
-
 - Dashboard Facet uses Contracts store.
 - Execute Facet uses Contracts store.
 - Events Facet uses Logs store.
@@ -30,7 +28,7 @@ the code inside of 'EXISTING_CODE' tags.
   - errorCount: number of errors encountered when calling read functions
   - lastError: the most recent error message when calling functions
 
-- **Logs Store (13 members):**
+- **Logs Store (14 members):**
 
   - blockNumber: the number of the block
   - transactionIndex: the zero-indexed position of the transaction in the block
@@ -38,6 +36,7 @@ the code inside of 'EXISTING_CODE' tags.
   - timestamp: the timestamp of the block this log appears in
   - date: the timestamp as a date
   - address: the smart contract that emitted this log
+  - name: the name of the smart contract if any
   - topics: the first topic hashes event signature of the log, up to 3 additional index parameters may appear
   - data: any remaining un-indexed parameters to the event
   - transactionHash: the hash of the transction

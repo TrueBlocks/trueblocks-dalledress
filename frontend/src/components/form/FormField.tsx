@@ -43,7 +43,8 @@ export interface FormField<T = Record<string, unknown>> {
     | 'float'
     | 'topic'
     | 'ipfsHash'
-    | 'datetime';
+    | 'datetime'
+    | 'Function';
   fields?: FormField<T>[];
   isButtonGroup?: boolean;
   buttonAlignment?: 'left' | 'center' | 'right';

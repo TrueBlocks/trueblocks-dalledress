@@ -201,40 +201,24 @@ const getLogsColumns = (): FormField[] => [
     label: 'Address',
     type: 'address',
     width: '340px',
-    readOnly: true,
   },
   {
-    key: 'topics',
-    name: 'topics',
-    header: 'Topics',
-    label: 'Topics',
-    type: 'topic',
-    width: '120px',
-  },
-  {
-    key: 'data',
-    name: 'data',
-    header: 'Data',
-    label: 'Data',
-    type: 'bytes',
-    width: '120px',
-  },
-  {
-    key: 'compressedLog',
-    name: 'compressedLog',
-    header: 'Compressed Log',
-    label: 'Compressed Log',
+    key: 'name',
+    name: 'name',
+    header: 'Name',
+    label: 'Name',
     type: 'text',
     width: '200px',
-    render: renderCompressedLog,
+    render: renderName,
   },
   {
-    key: 'isNFT',
-    name: 'isNFT',
-    header: 'N F T',
-    label: 'N F T',
-    type: 'checkbox',
-    width: '80px',
+    key: 'articulatedLog',
+    name: 'articulatedLog',
+    header: 'Articulated Log',
+    label: 'Articulated Log',
+    type: 'Function',
+    width: '120px',
+    render: renderArticulatedLog,
   },
 ];
 
@@ -1096,7 +1080,7 @@ export function renderAmountNet(row: Record<string, unknown>) {
   return '';
 }
 
-export function renderCompressedLog(row: Record<string, unknown>) {
+export function renderArticulatedLog(row: Record<string, unknown>) {
   if (row != null) {
     // EXISTING_CODE
     const log = row['articulatedLog'] as unknown as types.Function;
@@ -1188,6 +1172,14 @@ export function renderGasCost(row: Record<string, unknown>) {
   return '';
 }
 
+export function renderName(row: Record<string, unknown>) {
+  if (row != null) {
+    // EXISTING_CODE
+    // EXISTING_CODE
+  }
+  return '';
+}
+
 export function renderPriorBalance(row: Record<string, unknown>) {
   if (row != null) {
     // EXISTING_CODE
@@ -1207,5 +1199,4 @@ export function renderStatements(row: Record<string, unknown>) {
   return '';
 }
 
-// EXISTING_CODE
 // EXISTING_CODE

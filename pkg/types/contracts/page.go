@@ -120,28 +120,12 @@ func (c *ContractsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("contracts", dataFacet, "GetPage", err)
 		} else {
-			events := make([]*Log, 0, len(result.Items))
+			event := make([]*Log, 0, len(result.Items))
 			for i := range result.Items {
-				events = append(events, &result.Items[i])
+				event = append(event, &result.Items[i])
 			}
-			page.Logs, page.TotalItems, page.State = events, result.TotalItems, result.State
+			page.Logs, page.TotalItems, page.State = event, result.TotalItems, result.State
 		}
-
-		// Get contract information from the dashboard facet
-		dashboardFacet := c.dashboardFacet
-		if dashboardResult, err := dashboardFacet.GetPage(0, 10, nil, sortSpec, nil); err != nil {
-			// Failed to get contract info - continue without it
-		} else {
-			// Find the specific contract
-			for i := range dashboardResult.Items {
-				contract := &dashboardResult.Items[i]
-				if contract.Address.Hex() == payload.Address {
-					page.Contracts = []*Contract{contract}
-					break
-				}
-			}
-		}
-
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
 	default:

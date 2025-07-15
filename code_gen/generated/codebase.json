@@ -2685,7 +2685,7 @@
                 {
                     "name": "date",
                     "type": "datetime",
-                    "attributes": "calc|width=120px",
+                    "attributes": "calc",
                     "docOrder": 5,
                     "description": "the timestamp as a date",
                     "num": 5
@@ -2693,66 +2693,76 @@
                 {
                     "name": "address",
                     "type": "address",
-                    "attributes": "readOnly",
                     "docOrder": 6,
                     "description": "the smart contract that emitted this log",
                     "num": 6
                 },
                 {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "calc",
+                    "docOrder": 7,
+                    "description": "the name of the smart contract if any",
+                    "num": 7
+                },
+                {
                     "name": "topics",
                     "type": "topic",
-                    "docOrder": 7,
+                    "attributes": "noui",
+                    "docOrder": 8,
                     "description": "the first topic hashes event signature of the log, up to 3 additional index parameters may appear",
-                    "num": 7,
+                    "num": 8,
                     "isArray": true
                 },
                 {
                     "name": "data",
                     "type": "bytes",
-                    "docOrder": 8,
+                    "attributes": "noui",
+                    "docOrder": 9,
                     "description": "any remaining un-indexed parameters to the event",
-                    "num": 8
+                    "num": 9
                 },
                 {
                     "name": "transactionHash",
                     "type": "hash",
                     "attributes": "noui",
-                    "docOrder": 9,
+                    "docOrder": 10,
                     "description": "the hash of the transction",
-                    "num": 9
+                    "num": 10
                 },
                 {
                     "name": "blockHash",
                     "type": "hash",
                     "attributes": "noui",
-                    "docOrder": 10,
+                    "docOrder": 11,
                     "description": "the hash of the block",
-                    "num": 10
+                    "num": 11
                 },
                 {
                     "name": "articulatedLog",
                     "type": "Function",
-                    "attributes": "noui",
-                    "docOrder": 11,
+                    "attributes": "calc",
+                    "docOrder": 12,
                     "description": "a human-readable version of the topic and data fields",
-                    "num": 11,
+                    "num": 12,
                     "isPointer": true
                 },
                 {
                     "name": "compressedLog",
                     "type": "string",
-                    "attributes": "calc",
-                    "docOrder": 12,
+                    "attributes": "noui",
+                    "docOrder": 13,
                     "upgrades": "2.5.10:string",
                     "description": "a truncated, more readable version of the articulation",
-                    "num": 12
+                    "num": 13
                 },
                 {
                     "name": "isNFT",
                     "type": "bool",
-                    "docOrder": 13,
+                    "attributes": "noui",
+                    "docOrder": 14,
                     "description": "true if the log is an NFT transfer",
-                    "num": 13
+                    "num": 14
                 }
             ]
         },

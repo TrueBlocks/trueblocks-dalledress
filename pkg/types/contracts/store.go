@@ -74,8 +74,8 @@ func (c *ContractsCollection) getContractsStore(facet types.DataFacet) *store.St
 
 		// Add mock data to store
 		mockContracts := sdk.CreateContracts()
-		for i, contract := range mockContracts {
-			theStore.AddItem(contract, i)
+		for i, c := range mockContracts {
+			theStore.AddItem(c, i)
 		}
 		theStore.ChangeState(0, store.StateLoaded, "Mock data loaded")
 
@@ -97,11 +97,11 @@ func (c *ContractsCollection) getLogsStore(facet types.DataFacet) *store.Store[L
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			exportOpts := sdk.ExportOptions{
-				Globals:   sdk.Globals{Cache: true, Verbose: true, Chain: chain},
-				RenderCtx: ctx,
-				Addrs:     []string{address},
-				Emitter:   []string{contract},
-				// Articulate: true,
+				Globals:    sdk.Globals{Cache: true, Verbose: true, Chain: chain},
+				RenderCtx:  ctx,
+				Addrs:      []string{address},
+				Emitter:    []string{contract},
+				Articulate: true,
 			}
 			if _, _, err := exportOpts.ExportLogs(); err != nil {
 				wrappedErr := types.NewSDKError("exports", ContractsEvents, "fetch", err)

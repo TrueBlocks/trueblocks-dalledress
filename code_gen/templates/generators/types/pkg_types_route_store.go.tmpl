@@ -1,4 +1,6 @@
 {{- $class := .Class -}}
+{{/* TODO: remove this */}}
+{{- if ne $class "Contracts" -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
 {{- $isExports := eq .Class "Exports" -}}
@@ -149,3 +151,4 @@ func Get{{.Class}}Collection(payload *types.Payload) *{{.Class}}Collection {
 
 // EXISTING_CODE
 // EXISTING_CODE
+{{- end -}}

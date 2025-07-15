@@ -15,6 +15,7 @@ export interface WalletSession {
   address?: string;
   chainId?: number;
   isConnected: boolean;
+  walletConnectSession?: Record<string, unknown>;
 }
 
 interface WalletConnectContextType {
@@ -37,6 +38,9 @@ export const WalletConnectProvider = ({
   children,
 }: WalletConnectProviderProps) => {
   const [isConnecting, setIsConnecting] = useState(false);
+  const [walletConnectSession, setWalletConnectSession] = useState<
+    Record<string, unknown> | undefined
+  >(undefined);
   const {
     connectWallet,
     disconnectWallet,
@@ -50,6 +54,7 @@ export const WalletConnectProvider = ({
     address: walletAddress,
     chainId: walletChainId,
     isConnected: isWalletConnected,
+    walletConnectSession,
   };
 
   // Log('WalletConnect Context: Current session state:', JSON.stringify(session));
@@ -84,6 +89,10 @@ export const WalletConnectProvider = ({
       Log('Extracted address:', address || 'none');
       Log('Extracted chainId:', String(chainId));
 
+      setWalletConnectSession(
+        walletSession as unknown as Record<string, unknown>,
+      );
+
       // Update global state instead of local state
       if (address && chainId) {
         await connectWallet(address, chainId);
@@ -101,6 +110,7 @@ export const WalletConnectProvider = ({
 
   const handleDisconnect = useCallback(async () => {
     try {
+      setWalletConnectSession(undefined);
       await disconnectWallet();
       Log('Wallet disconnected from global state');
     } catch (err) {

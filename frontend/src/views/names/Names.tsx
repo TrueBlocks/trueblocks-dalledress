@@ -31,8 +31,12 @@ import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { names } from '@models';
 import { msgs, types } from '@models';
-import { Debugger, useErrorHandler } from '@utils';
+import { Debugger, Log, useErrorHandler } from '@utils';
 
+import { TransactionReviewModal } from '../contracts/components/TransactionReviewModal';
+// Transaction modal imports
+import { PreparedTransaction } from '../contracts/components/transactionBuilder';
+import { useWalletConnection } from '../contracts/components/walletConnection';
 import { getColumns } from './columns';
 import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
 
@@ -158,8 +162,9 @@ export const Names = () => {
   // === SECTION 5: CRUD Operations ===
   const enabledActions = useMemo(() => {
     const currentFacet = getCurrentDataFacet();
+    Log('Current facet:', currentFacet);
     if (currentFacet === types.DataFacet.CUSTOM) {
-      return [
+      const actions = [
         'add',
         'publish',
         'pin',
@@ -168,13 +173,19 @@ export const Names = () => {
         'autoname',
         'update',
       ] as ActionType[];
+      Log('Enabled actions for CUSTOM facet:', JSON.stringify(actions));
+      return actions;
     }
     if (currentFacet === types.DataFacet.BADDRESS) {
-      return ['add'] as ActionType[];
+      const actions = ['add'] as ActionType[];
+      Log('Enabled actions for BADDRESS facet:', JSON.stringify(actions));
+      return actions;
     }
-    return ['add', 'autoname', 'update'] as ActionType[];
+    const actions = ['add', 'autoname', 'update'] as ActionType[];
+    Log('Enabled actions for other facets:', JSON.stringify(actions));
+    return actions;
   }, [getCurrentDataFacet]);
-  const { handlers, config } = useActions({
+  const { handlers, config, transactionModal } = useActions({
     collection: 'names',
     viewStateKey,
     pagination,
@@ -199,6 +210,41 @@ export const Names = () => {
     createPayload,
     getCurrentDataFacet,
   });
+
+  // Wallet connection for transaction signing
+  const { sendTransaction } = useWalletConnection({
+    onTransactionSigned: (txHash) => {
+      Log(`Transaction signed successfully: ${txHash}`);
+      emitSuccess('publish', `Transaction signed: ${txHash}`);
+    },
+    onError: (error) => {
+      Log(`Transaction failed: ${error}`);
+      handleError(new Error(error), 'Transaction failed');
+    },
+  });
+
+  // Handle transaction confirmation
+  const handleTransactionConfirm = useCallback(
+    async (preparedTx: PreparedTransaction) => {
+      try {
+        await sendTransaction(preparedTx);
+      } catch (error) {
+        handleError(error as Error, 'Failed to send transaction');
+      }
+    },
+    [sendTransaction, handleError],
+  );
+
+  // Debug: Log transaction modal state changes
+  useEffect(() => {
+    Log(
+      'Transaction modal state changed:',
+      JSON.stringify({
+        opened: transactionModal.opened,
+        hasTransactionData: !!transactionModal.transactionData,
+      }),
+    );
+  }, [transactionModal]);
 
   const {
     handleAutoname: originalHandleAutoname,
@@ -365,6 +411,12 @@ export const Names = () => {
         title={confirmModal.title}
         message={confirmModal.message}
         dialogKey="confirmNamesModal"
+      />
+      <TransactionReviewModal
+        opened={transactionModal.opened}
+        onClose={transactionModal.onClose}
+        transactionData={transactionModal.transactionData}
+        onConfirm={handleTransactionConfirm}
       />
     </div>
   );

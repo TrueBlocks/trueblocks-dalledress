@@ -9,6 +9,8 @@ type ActionType =
   | 'remove'
   | 'autoname'
   | 'clean'
+  | 'publish'
+  | 'pin'
   | 'reload';
 
 interface EntityConfig {

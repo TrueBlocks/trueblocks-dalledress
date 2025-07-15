@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { useWalletGatedAction } from '@hooks';
 import {
   Alert,
   Badge,
@@ -163,6 +164,12 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
     },
   });
 
+  // Wallet gated action hook
+  const { isWalletConnected, createWalletGatedAction } = useWalletGatedAction();
+
+  // Track pending transaction submission
+  const [pendingSubmission, setPendingSubmission] = useState(false);
+
   const writeFunctions = useMemo(
     () => (contractState.abi ? getWriteFunctions(contractState.abi) : []),
     [contractState.abi],
@@ -170,6 +177,81 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
 
   // Handle the "all" case by showing all write functions
   const showAllFunctions = functionName === 'all';
+
+  const currentFunction: types.Function | undefined = showAllFunctions
+    ? writeFunctions.find((func) => func.name === selectedFunction)
+    : writeFunctions.find((func) => func.name === functionName);
+
+  // Check if form is valid
+  const isFormValid = useCallback((): boolean => {
+    if (!currentFunction) return false;
+
+    const requiredFields = currentFunction.inputs.filter(
+      (input) => !input.name.startsWith('_'),
+    );
+
+    return requiredFields.every((input) => {
+      const fieldState = formState[input.name];
+      return fieldState && fieldState.value.trim() && !fieldState.error;
+    });
+  }, [currentFunction, formState]);
+
+  // Execute transaction logic (extracted for reuse)
+  const executeTransaction = useCallback(async () => {
+    if (!currentFunction || !isFormValid()) return;
+
+    setIsSubmitting(true);
+    setTransactionResult(null);
+
+    try {
+      // Prepare transaction data
+      const inputValues = currentFunction.inputs.map((input) => {
+        const fieldState = formState[input.name];
+        return {
+          name: input.name,
+          type: input.type,
+          value: fieldState?.value || '',
+        };
+      });
+
+      // Build transaction data
+      const txData = buildTransaction(
+        String(contractState.address),
+        currentFunction,
+        inputValues,
+      );
+
+      // Validate inputs
+      const validation = validateTransactionInputs(
+        currentFunction,
+        inputValues,
+      );
+      if (!validation.isValid) {
+        setTransactionResult(
+          `Validation failed: ${validation.errors.join(', ')}`,
+        );
+        return;
+      }
+
+      // Store transaction data and open review modal
+      setTransactionData(txData);
+      setReviewModalOpened(true);
+
+      onTransaction?.(txData);
+    } catch (error) {
+      setTransactionResult(
+        `Error preparing transaction: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [
+    currentFunction,
+    formState,
+    contractState.address,
+    onTransaction,
+    isFormValid,
+  ]);
 
   // Set default selected function if showing all
   useEffect(() => {
@@ -179,9 +261,21 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
     setLoading(false);
   }, [showAllFunctions, writeFunctions, selectedFunction]);
 
-  const currentFunction: types.Function | undefined = showAllFunctions
-    ? writeFunctions.find((func) => func.name === selectedFunction)
-    : writeFunctions.find((func) => func.name === functionName);
+  // Auto-execute transaction when wallet connects after pending submission
+  useEffect(() => {
+    if (pendingSubmission && isWalletConnected) {
+      setPendingSubmission(false);
+      // Execute the transaction logic directly
+      executeTransaction();
+    }
+  }, [pendingSubmission, isWalletConnected, executeTransaction]);
+
+  // Compute if button should be disabled (only for form validation, not wallet state)
+  const isButtonDisabled = useMemo(() => {
+    return (
+      currentFunction && currentFunction.inputs.length > 0 && !isFormValid()
+    );
+  }, [currentFunction, isFormValid]);
 
   // Show loading state while data is being processed
   if (loading) {
@@ -233,67 +327,18 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
     }));
   };
 
-  // Check if form is valid
-  const isFormValid = (): boolean => {
-    const requiredFields = currentFunction.inputs.filter(
-      (input) => !input.name.startsWith('_'),
-    );
-
-    return requiredFields.every((input) => {
-      const fieldState = formState[input.name];
-      return fieldState && fieldState.value.trim() && !fieldState.error;
-    });
-  };
-
-  // Submit the transaction
-  const handleSubmit = async () => {
-    if (!isFormValid()) return;
-
-    setIsSubmitting(true);
-    setTransactionResult(null);
-
-    try {
-      // Prepare transaction data
-      const inputValues = currentFunction.inputs.map((input) => {
-        const fieldState = formState[input.name];
-        return {
-          name: input.name,
-          type: input.type,
-          value: fieldState?.value || '',
-        };
-      });
-
-      // Build transaction data
-      const txData = buildTransaction(
-        String(contractState.address),
-        currentFunction,
-        inputValues,
-      );
-
-      // Validate inputs
-      const validation = validateTransactionInputs(
-        currentFunction,
-        inputValues,
-      );
-      if (!validation.isValid) {
-        setTransactionResult(
-          `Validation failed: ${validation.errors.join(', ')}`,
-        );
-        return;
-      }
-
-      // Store transaction data and open review modal
-      setTransactionData(txData);
-      setReviewModalOpened(true);
-
-      onTransaction?.(txData);
-    } catch (error) {
-      setTransactionResult(
-        `Error preparing transaction: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
-    } finally {
-      setIsSubmitting(false);
+  // Submit the transaction - now handles wallet gating with pending execution
+  const handleSubmit = () => {
+    if (!isWalletConnected) {
+      // Set pending flag and trigger wallet connection
+      setPendingSubmission(true);
+      // Use the wallet gated action to trigger connection
+      createWalletGatedAction(() => {}, 'Send Transaction')();
+      return;
     }
+
+    // Wallet is connected, execute immediately
+    executeTransaction();
   };
 
   // Handle transaction confirmation from modal
@@ -452,12 +497,14 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
         <Button
           onClick={handleSubmit}
           loading={isSubmitting}
-          disabled={currentFunction.inputs.length > 0 && !isFormValid()}
+          disabled={isButtonDisabled}
           color="orange"
         >
-          {currentFunction.stateMutability === 'payable'
-            ? 'Send Transaction (with ETH)'
-            : 'Send Transaction'}
+          {!isWalletConnected
+            ? 'Send Transaction'
+            : currentFunction.stateMutability === 'payable'
+              ? 'Send Transaction (with ETH)'
+              : 'Send Transaction'}
         </Button>
       </Group>
 

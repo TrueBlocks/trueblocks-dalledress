@@ -40,15 +40,6 @@ export const TransactionReviewModal: React.FC<TransactionReviewModalProps> = ({
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
-    if (opened && transactionData) {
-      prepareTx();
-    } else {
-      setPreparedTx(null);
-      setError(null);
-    }
-  }, [opened, transactionData]);
-
   const prepareTx = useCallback(async () => {
     if (!transactionData) return;
 
@@ -67,7 +58,16 @@ export const TransactionReviewModal: React.FC<TransactionReviewModalProps> = ({
     }
   }, [transactionData]);
 
-  const handleConfirm = async () => {
+  React.useEffect(() => {
+    if (opened && transactionData) {
+      prepareTx();
+    } else {
+      setPreparedTx(null);
+      setError(null);
+    }
+  }, [opened, transactionData, prepareTx]);
+
+  const handleConfirm = useCallback(async () => {
     if (!preparedTx) return;
 
     setConfirming(true);
@@ -81,7 +81,7 @@ export const TransactionReviewModal: React.FC<TransactionReviewModalProps> = ({
     } finally {
       setConfirming(false);
     }
-  };
+  }, [preparedTx, onConfirm, onClose]);
 
   const formatParameter = (input: {
     name: string;

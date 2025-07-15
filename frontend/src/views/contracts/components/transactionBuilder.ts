@@ -1,4 +1,6 @@
 import { types } from '@models';
+import { Encode } from '@app';
+import { Log } from '@utils';
 
 export interface TransactionData {
   to: string;
@@ -22,64 +24,83 @@ export interface PreparedTransaction {
 }
 
 /**
- * Encodes function parameters for contract calls
+ * Encodes function parameters for contract calls using the TrueBlocks backend
+ * This leverages the robust Go implementation that uses go-ethereum's ABI encoding
  */
-export const encodeParameters = (
+export const encodeParameters = async (
   functionAbi: types.Function,
   inputs: TransactionInput[],
-): string => {
-  // TODO: Implement actual ABI encoding
-  // This is a placeholder that would use ethers.js or web3.js for encoding
+): Promise<string> => {
+  try {
+    Log('Encoding transaction parameters via TrueBlocks backend...');
 
-  const encodedParams = inputs
-    .map((input) => {
-      return encodeParameter(input.type, input.value);
-    })
-    .join('');
+    // Convert inputs to the format expected by the backend
+    const callArguments = inputs.map((input) => {
+      // The Go backend expects proper types, not strings
+      return convertInputValue(input.type, input.value);
+    });
 
-  // Function selector (first 4 bytes of keccak256 hash of function signature)
-  const _functionSignature = `${functionAbi.name}(${functionAbi.inputs
-    .map((i) => i.type)
-    .join(',')})`;
-  // TODO: Calculate actual keccak256 hash
-  const selector = '0x12345678'; // Placeholder
+    Log('Function ABI:', JSON.stringify(functionAbi));
+    Log('Call arguments:', JSON.stringify(callArguments));
 
-  return selector + encodedParams;
+    // Call the TrueBlocks backend Encode function which uses Function.Pack
+    const encodedData = await Encode(functionAbi, callArguments);
+
+    Log('Successfully encoded transaction data:', encodedData);
+    return encodedData;
+  } catch (error) {
+    let errorMsg = 'Unknown error';
+    if (error instanceof Error) {
+      errorMsg = error.message;
+    } else if (typeof error === 'string') {
+      errorMsg = error;
+    } else if (error && typeof error === 'object') {
+      // Try to extract meaningful error information
+      errorMsg = JSON.stringify(error);
+    }
+
+    Log('Error encoding parameters:', errorMsg);
+    Log('Function ABI that failed:', JSON.stringify(functionAbi));
+    Log('Inputs that failed:', JSON.stringify(inputs));
+
+    throw new Error(`Failed to encode transaction parameters: ${errorMsg}`);
+  }
 };
 
 /**
- * Encodes a single parameter value
+ * Convert string input values to proper types for the Go backend
  */
-export const encodeParameter = (type: string, value: string): string => {
-  // TODO: Implement actual parameter encoding based on type
-  // This is a placeholder implementation
-
+const convertInputValue = (type: string, value: string): unknown => {
   if (type === 'address') {
-    return value.replace('0x', '').padStart(64, '0');
+    return value; // Keep as string
   }
 
   if (type.startsWith('uint') || type.startsWith('int')) {
-    const numValue = BigInt(value);
-    return numValue.toString(16).padStart(64, '0');
+    return value; // Go backend can handle string numbers
   }
 
   if (type === 'bool') {
-    return value.toLowerCase() === 'true'
-      ? '1'.padStart(64, '0')
-      : '0'.padStart(64, '0');
+    return value.toLowerCase() === 'true';
   }
 
   if (type === 'string') {
-    // TODO: Implement proper string encoding
-    return new TextEncoder()
-      .encode(value)
-      .toString()
-      .replace(/[^0-9a-fA-F]/g, '')
-      .padStart(64, '0');
+    return value;
   }
 
-  // For arrays and complex types, this would need more sophisticated encoding
-  return value.replace(/[^0-9a-fA-F]/g, '').padStart(64, '0');
+  if (type.startsWith('bytes')) {
+    return value; // Keep as hex string
+  }
+
+  // For arrays and complex types, try to parse as JSON
+  if (type.includes('[') || type.includes('(')) {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  }
+
+  return value;
 };
 
 /**
@@ -106,7 +127,7 @@ export const prepareTransaction = async (
   transactionData: TransactionData,
 ): Promise<PreparedTransaction> => {
   try {
-    const encodedData = encodeParameters(
+    const encodedData = await encodeParameters(
       transactionData.function,
       transactionData.inputs,
     );

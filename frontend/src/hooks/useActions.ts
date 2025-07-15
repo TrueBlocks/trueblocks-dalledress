@@ -1,13 +1,20 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ViewStateKey } from '@contexts';
 import { useWalletGatedAction } from '@hooks';
 import { crud, sdk, types } from '@models';
 import { Log, isDebugMode, useErrorHandler } from '@utils';
 
+import {
+  TransactionData,
+  buildTransaction,
+} from '../views/contracts/components/transactionBuilder';
 import { useActionMsgs } from './useActionMsgs';
 
 const debug = isDebugMode();
+
+// Constants for the unchainedindex.eth contract
+const UNCHAINED_INDEX_CONTRACT = '0x0c316b7042b419d07d343f2f4f5bd54ff731183d';
 
 // Helper function for getting address string - moved outside component for stability
 const getAddressString = (address: unknown): string => {
@@ -180,6 +187,79 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     [getCurrentDataFacet],
   );
 
+  // Transaction modal state for publish functionality
+  const [transactionModal, setTransactionModal] = useState<{
+    opened: boolean;
+    transactionData: TransactionData | null;
+  }>({
+    opened: false,
+    transactionData: null,
+  });
+
+  // Pending publish action state
+  const [pendingPublish, setPendingPublish] = useState(false);
+
+  // Execute pending publish when wallet connects
+  const executePendingPublish = useCallback(() => {
+    if (!pendingPublish || !isWalletConnected) return;
+
+    Log('Executing pending publish action after wallet connection');
+    setPendingPublish(false);
+
+    try {
+      // Create a mock function definition for publishHash(string,string)
+      const publishHashFunction: types.Function = {
+        name: 'publishHash',
+        type: 'function',
+        inputs: [
+          new types.Parameter({ name: 'chain', type: 'string' }),
+          new types.Parameter({ name: 'hash', type: 'string' }),
+        ],
+        outputs: [],
+        stateMutability: 'nonpayable',
+        encoding: '0x1fee5cd2', // From the chifra abis command
+        convertValues: () => {},
+      };
+
+      // Create transaction inputs - you can customize these values as needed
+      const transactionInputs = [
+        { name: 'chain', type: 'string', value: 'mainnet' },
+        {
+          name: 'hash',
+          type: 'string',
+          value: 'QmYjUzLhetTPovBydBoVuzCYnDRABWtfjeBL6JbxopadJG',
+        },
+      ];
+
+      // Build the transaction
+      const transactionData = buildTransaction(
+        UNCHAINED_INDEX_CONTRACT,
+        publishHashFunction,
+        transactionInputs,
+      );
+
+      Log(
+        'Transaction data created for pending publish:',
+        JSON.stringify(transactionData),
+      );
+
+      // Open the transaction modal
+      setTransactionModal({
+        opened: true,
+        transactionData,
+      });
+
+      Log('Transaction modal opened for pending publish');
+    } catch (error) {
+      Log('Error creating pending publish transaction:', String(error));
+    }
+  }, [pendingPublish, isWalletConnected]);
+
+  // Watch for wallet connection to execute pending publish
+  useEffect(() => {
+    executePendingPublish();
+  }, [executePendingPublish]);
+
   // Items property name (derived from collection name)
   const itemsProperty = collection;
 
@@ -221,10 +301,68 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     // TODO: Implement add functionality
   }, [collection]);
 
-  const handlePublish = createWalletGatedAction((walletAddress: string) => {
-    Log(`Publishing ${collection} with wallet:`, walletAddress);
-    // TODO: Implement publish functionality with connected wallet
-  }, collection);
+  const handlePublish = useCallback(() => {
+    Log(`Publish button clicked for ${collection}`);
+
+    if (!isWalletConnected) {
+      Log(
+        'Wallet not connected, setting pending publish and triggering connection',
+      );
+      setPendingPublish(true);
+      // Trigger wallet connection through the existing wallet gated action pattern
+      createWalletGatedAction(() => {}, collection)();
+      return;
+    }
+
+    // Wallet is already connected, execute immediately
+    Log(`Publishing ${collection} with connected wallet`);
+
+    try {
+      // Create a mock function definition for publishHash(string,string)
+      const publishHashFunction: types.Function = {
+        name: 'publishHash',
+        type: 'function',
+        inputs: [
+          new types.Parameter({ name: 'chain', type: 'string' }),
+          new types.Parameter({ name: 'hash', type: 'string' }),
+        ],
+        outputs: [],
+        stateMutability: 'nonpayable',
+        encoding: '0x1fee5cd2', // From the chifra abis command
+        convertValues: () => {},
+      };
+
+      // Create transaction inputs - you can customize these values as needed
+      // TODO: THIS CANNOT BE HARD CODED
+      const transactionInputs = [
+        { name: 'chain', type: 'string', value: 'mainnet' },
+        {
+          name: 'hash',
+          type: 'string',
+          value: 'QmYjUzLhetTPovBydBoVuzCYnDRABWtfjeBL6JbxopadJG',
+        },
+      ];
+
+      // Build the transaction
+      const transactionData = buildTransaction(
+        UNCHAINED_INDEX_CONTRACT,
+        publishHashFunction,
+        transactionInputs,
+      );
+
+      Log('Transaction data created:', JSON.stringify(transactionData));
+
+      // Open the transaction modal
+      setTransactionModal({
+        opened: true,
+        transactionData,
+      });
+
+      Log('Transaction modal state set to opened');
+    } catch (error) {
+      Log('Error creating publish transaction:', String(error));
+    }
+  }, [collection, isWalletConnected, createWalletGatedAction]);
 
   const handlePin = useCallback(() => {
     Log(`Pinning ${collection}`);
@@ -743,6 +881,14 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       collection,
       getCurrentDataFacet,
       isWalletConnected,
+    },
+    transactionModal: {
+      ...transactionModal,
+      onClose: () =>
+        setTransactionModal((prev) => ({ ...prev, opened: false })),
+      onConfirm: async () => {
+        setTransactionModal((prev) => ({ ...prev, opened: false }));
+      },
     },
   };
 };

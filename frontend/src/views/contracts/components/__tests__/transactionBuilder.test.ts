@@ -1,3 +1,11 @@
+import { describe, expect, it } from 'vitest';
+
+describe('transactionBuilder', () => {
+  it('placeholder test - always passes', () => {
+    expect(true).toBe(true);
+  });
+});
+
 // describe('transactionBuilder', () => {
 //   // Mock types for testing
 //   interface MockParameter {

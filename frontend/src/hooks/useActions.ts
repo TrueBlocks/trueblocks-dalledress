@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ViewStateKey } from '@contexts';
 import { useWalletGatedAction } from '@hooks';
 import { crud, sdk, types } from '@models';
-import { Log, isDebugMode, useErrorHandler } from '@utils';
+import { Log, useErrorHandler } from '@utils';
 
 import {
   TransactionData,
@@ -11,7 +11,7 @@ import {
 } from '../views/contracts/components/transactionBuilder';
 import { useActionMsgs } from './useActionMsgs';
 
-const debug = isDebugMode();
+const debug = false; // isDebugMode();
 
 // Constants for the unchainedindex.eth contract
 const UNCHAINED_INDEX_CONTRACT = '0x0c316b7042b419d07d343f2f4f5bd54ff731183d';

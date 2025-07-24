@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { types } from '@models';
+import { Log } from '@utils';
 
 import { getReadFunctions } from './facetGeneration';
 
@@ -33,6 +34,20 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
   contractState,
   onRefresh,
 }) => {
+  Log(
+    `🎯 ContractDashboard rendered with contractState: ${JSON.stringify({
+      address: contractState.address,
+      name: contractState.name,
+      hasAbi: !!contractState.abi,
+      abiLength: contractState.abi?.functions?.length || 0,
+      hasReadResults: !!contractState.readResults,
+      readResultsKeys: contractState.readResults
+        ? Object.keys(contractState.readResults)
+        : [],
+      lastUpdated: contractState.lastUpdated,
+    })}`,
+  );
+
   const [functionResults, setFunctionResults] = useState<
     Record<string, FunctionResult>
   >({});
@@ -43,16 +58,54 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
     const functions = contractState.abi
       ? getReadFunctions(contractState.abi)
       : [];
+    Log(`📋 Read functions computed: ${functions.length} functions found`);
     return functions;
   }, [contractState.abi]);
 
   // Initialize function results state
   useEffect(() => {
+    Log('🔄 Initializing function results state');
+
     const initialResults: Record<string, FunctionResult> = {};
     readFunctions.forEach((func) => {
       let functionWithResults = func;
       if (contractState.readResults?.[func.name] !== undefined) {
         const result = contractState.readResults[func.name];
+
+        Log(
+          `📊 Processing read result for ${func.name}: ${JSON.stringify(result)}`,
+        );
+
+        // DINGLEBERRY: USE THE PARAMETER VALUES SINCE THIS NEVER IS NOT TRUE
+        // Compare readResults with ABI output values
+        // Find the matching function in the ABI by name
+        const abiFunctions = contractState.abi?.functions || [];
+        const matchingAbiFunction = abiFunctions.find(
+          (abiFunc) => abiFunc.name === func.name,
+        );
+
+        if (
+          matchingAbiFunction &&
+          matchingAbiFunction.outputs &&
+          matchingAbiFunction.outputs.length > 0
+        ) {
+          matchingAbiFunction.outputs.forEach((output, index) => {
+            const abiOutputValue = output.value;
+            const readResultValue = Array.isArray(result)
+              ? result[index]
+              : result;
+
+            const isMatch =
+              JSON.stringify(abiOutputValue) ===
+              JSON.stringify(readResultValue);
+            const status = isMatch ? '✅' : '❌';
+
+            Log(
+              `${status} Function '${func.name}' output[${index}]: readResults=${JSON.stringify(readResultValue)} vs abi.outputs[${index}].value=${JSON.stringify(abiOutputValue)}`,
+            );
+          });
+        }
+
         if (func.outputs && func.outputs.length > 0) {
           const updatedOutputs = func.outputs.map((output, index) => {
             const outputValue =
@@ -82,6 +135,9 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
       };
     });
 
+    Log(
+      `✅ Function results state initialized with ${Object.keys(initialResults).length} functions`,
+    );
     setFunctionResults(initialResults);
     setLoading(false);
   }, [contractState, readFunctions]);
@@ -234,6 +290,7 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
 
   // Show loading state while data is being processed
   if (loading) {
+    Log('⏳ ContractDashboard showing loading state');
     return (
       <Stack gap="md" align="center" style={{ padding: '2rem' }}>
         <Loader size="lg" />
@@ -243,6 +300,7 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
   }
 
   if (!hasReadFunctions) {
+    Log('❌ ContractDashboard: No read functions available');
     return (
       <Alert color="blue">
         This contract has no read functions (view/pure) to display
@@ -250,9 +308,222 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
     );
   }
 
+  Log('✅ ContractDashboard rendering main content');
+
   return (
     <Stack gap="md">
-      <Group justify="flex-end" align="center">
+      <Group align="flex-start" gap="md" style={{ width: '100%' }}>
+        {/* Sidebar for functions with no inputs */}
+        <Card
+          shadow="sm"
+          padding="md"
+          radius="md"
+          withBorder
+          style={{ minWidth: '280px', maxWidth: '320px', flex: '0 0 auto' }}
+        >
+          <Stack gap="xs">
+            <Text fw={600} size="sm" c="dimmed">
+              Read Functions (No Input)
+            </Text>
+            {Object.entries(functionResults)
+              .filter(
+                ([, result]) =>
+                  !result.function.inputs ||
+                  result.function.inputs.length === 0,
+              )
+              .map(([functionName, result]) => {
+                const func = result.function;
+                return (
+                  <div
+                    key={functionName}
+                    style={{
+                      borderBottom: '1px solid var(--mantine-color-gray-3)',
+                      paddingBottom: '8px',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    <Group justify="space-between" align="center" gap="xs">
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <Text
+                          fw={500}
+                          size="xs"
+                          style={{ lineHeight: 1.2, marginBottom: '2px' }}
+                        >
+                          {functionName}
+                        </Text>
+                        <Badge
+                          size="xs"
+                          variant="light"
+                          color="blue"
+                          style={{ fontSize: '10px', height: '16px' }}
+                        >
+                          {func.outputs && func.outputs.length > 0
+                            ? func.outputs.length === 1
+                              ? func.outputs[0]?.type || 'unknown'
+                              : `(${func.outputs.map((output) => output.type).join(', ')})`
+                            : 'void'}
+                        </Badge>
+                      </div>
+                      <Tooltip label="Refresh this function">
+                        <Button
+                          size="xs"
+                          variant="subtle"
+                          onClick={() => {
+                            // TODO: Implement actual function calling when API is ready
+                          }}
+                          loading={result?.loading}
+                          style={{
+                            minWidth: 'auto',
+                            width: '20px',
+                            height: '20px',
+                            padding: 0,
+                          }}
+                        >
+                          ↻
+                        </Button>
+                      </Tooltip>
+                    </Group>
+                    <div style={{ marginTop: '4px' }}>
+                      {result?.loading ? (
+                        <Group gap="xs">
+                          <Loader size="xs" />
+                          <Text size="xs" c="dimmed">
+                            Loading...
+                          </Text>
+                        </Group>
+                      ) : result && getFunctionError(result) ? (
+                        <Text size="xs" c="red">
+                          Error: {getFunctionError(result)}
+                        </Text>
+                      ) : (
+                        <Text
+                          size="xs"
+                          style={{
+                            fontFamily: 'monospace',
+                            wordBreak: 'break-all',
+                            background: 'var(--mantine-color-gray-1)',
+                            color: 'var(--mantine-color-dark-7)',
+                            padding: '4px',
+                            borderRadius: '2px',
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {result
+                            ? formatResult(getFunctionResult(result))
+                            : 'No result'}
+                        </Text>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+          </Stack>
+        </Card>
+
+        {/* Main content area for functions with inputs */}
+        <div style={{ flex: 1 }}>
+          <Grid>
+            {Object.entries(functionResults)
+              .filter(
+                ([, result]) =>
+                  result.function.inputs && result.function.inputs.length > 0,
+              )
+              .map(([functionName, result]) => {
+                const func = result.function;
+                return (
+                  <Grid.Col
+                    key={functionName}
+                    span={{ base: 12, md: 6, lg: 4 }}
+                  >
+                    <Card shadow="sm" padding="md" radius="md" withBorder>
+                      <Stack gap="xs">
+                        <Group justify="space-between" align="flex-start">
+                          <div style={{ flex: 1 }}>
+                            <Text fw={500} size="sm">
+                              {functionName}
+                              <Text
+                                component="span"
+                                c="dimmed"
+                                size="xs"
+                                ml="xs"
+                              >
+                                (input)
+                              </Text>
+                            </Text>
+                            <Badge size="xs" variant="light" color="blue">
+                              {func.outputs && func.outputs.length > 0
+                                ? func.outputs.length === 1
+                                  ? func.outputs[0]?.type || 'unknown'
+                                  : `(${func.outputs.map((output) => output.type).join(', ')})`
+                                : 'void'}
+                            </Badge>
+                          </div>
+                          <Tooltip label="Refresh this function">
+                            <Button
+                              size="xs"
+                              variant="subtle"
+                              onClick={() => {
+                                // TODO: Implement actual function calling when API is ready
+                              }}
+                              loading={result?.loading}
+                            >
+                              ↻
+                            </Button>
+                          </Tooltip>
+                        </Group>
+
+                        <div>
+                          {result?.loading ? (
+                            <Group gap="xs">
+                              <Loader size="xs" />
+                              <Text size="xs" c="dimmed">
+                                Loading...
+                              </Text>
+                            </Group>
+                          ) : result && getFunctionError(result) ? (
+                            <Alert color="red">
+                              <Text size="xs">{getFunctionError(result)}</Text>
+                            </Alert>
+                          ) : (
+                            <div>
+                              <Text
+                                size="sm"
+                                style={{
+                                  fontFamily: 'monospace',
+                                  wordBreak: 'break-all',
+                                  background: 'var(--mantine-color-dark-6)',
+                                  color: 'var(--mantine-color-gray-0)',
+                                  padding: '8px',
+                                  borderRadius: '4px',
+                                  border:
+                                    '1px solid var(--mantine-color-gray-4)',
+                                }}
+                              >
+                                {result
+                                  ? formatResult(getFunctionResult(result))
+                                  : 'No result'}
+                              </Text>
+                              {result?.lastUpdated && (
+                                <Text size="xs" c="dimmed" mt="xs">
+                                  Updated:{' '}
+                                  {new Date(
+                                    result.lastUpdated,
+                                  ).toLocaleTimeString()}
+                                </Text>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </Stack>
+                    </Card>
+                  </Grid.Col>
+                );
+              })}
+          </Grid>
+        </div>
+      </Group>
+
+      <Group justify="center" align="center">
         <Button
           variant="light"
           onClick={refreshAllFunctions}
@@ -261,87 +532,6 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
           Refresh All
         </Button>
       </Group>
-
-      <Grid>
-        {Object.entries(functionResults).map(([functionName, result]) => {
-          const func = result.function;
-          return (
-            <Grid.Col key={functionName} span={{ base: 12, md: 6, lg: 4 }}>
-              <Card shadow="sm" padding="md" radius="md" withBorder>
-                <Stack gap="xs">
-                  <Group justify="space-between" align="flex-start">
-                    <div style={{ flex: 1 }}>
-                      <Text fw={500} size="sm">
-                        {functionName}
-                      </Text>
-                      <Badge size="xs" variant="light" color="blue">
-                        {func.outputs && func.outputs.length > 0
-                          ? func.outputs.length === 1
-                            ? func.outputs[0]?.type || 'unknown'
-                            : `(${func.outputs.map((output) => output.type).join(', ')})`
-                          : 'void'}
-                      </Badge>
-                    </div>
-                    <Tooltip label="Refresh this function">
-                      <Button
-                        size="xs"
-                        variant="subtle"
-                        onClick={() => {
-                          // For now, we'll just refresh the display since we have static mock data
-                          // TODO: Implement actual function calling when API is ready
-                        }}
-                        loading={result?.loading}
-                      >
-                        ↻
-                      </Button>
-                    </Tooltip>
-                  </Group>
-
-                  <div>
-                    {result?.loading ? (
-                      <Group gap="xs">
-                        <Loader size="xs" />
-                        <Text size="xs" c="dimmed">
-                          Loading...
-                        </Text>
-                      </Group>
-                    ) : result && getFunctionError(result) ? (
-                      <Alert color="red">
-                        <Text size="xs">{getFunctionError(result)}</Text>
-                      </Alert>
-                    ) : (
-                      <div>
-                        <Text
-                          size="sm"
-                          style={{
-                            fontFamily: 'monospace',
-                            wordBreak: 'break-all',
-                            background: 'var(--mantine-color-dark-6)',
-                            color: 'var(--mantine-color-gray-0)',
-                            padding: '8px',
-                            borderRadius: '4px',
-                            border: '1px solid var(--mantine-color-gray-4)',
-                          }}
-                        >
-                          {result
-                            ? formatResult(getFunctionResult(result))
-                            : 'No result'}
-                        </Text>
-                        {result?.lastUpdated && (
-                          <Text size="xs" c="dimmed" mt="xs">
-                            Updated:{' '}
-                            {new Date(result.lastUpdated).toLocaleTimeString()}
-                          </Text>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </Stack>
-              </Card>
-            </Grid.Col>
-          );
-        })}
-      </Grid>
     </Stack>
   );
 };

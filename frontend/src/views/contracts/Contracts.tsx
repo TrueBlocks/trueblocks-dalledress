@@ -2,7 +2,14 @@
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
 /*
- * Parts of this file were auto generated. Edit only those parts of
+ * Parts of this file were au      Log(
+        `📦 GetContractsPage result: ${JSON.stringify({
+          hasResult: !!result,
+          totalItems: result.totalItems,
+          contractsCount: result.contracts?.length || 0,
+          isFetching: result.isFetching,
+        })}`,
+      );erated. Edit only those parts of
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
@@ -21,11 +28,19 @@ import {
   usePayload,
 } from '@hooks';
 import { TabView } from '@layout';
-import { Alert, Container, Loader, Stack, Text, Title } from '@mantine/core';
+import {
+  Alert,
+  Container,
+  Loader,
+  Select,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { contracts } from '@models';
 import { msgs, types } from '@models';
-import { Debugger, useErrorHandler } from '@utils';
+import { Debugger, Log, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { ContractDashboard, ContractExecute } from './components';
@@ -36,12 +51,21 @@ interface FacetTitleProps {
   facet: types.DataFacet;
   contractName?: string;
   contractAddress?: string;
+  onContractChange?: (address: string) => void;
+  availableContracts?: Array<{
+    value: string;
+    label: string;
+    name: string;
+    address: string;
+  }>;
 }
 
 const FacetTitle: React.FC<FacetTitleProps> = ({
   facet,
   contractName,
   contractAddress,
+  onContractChange,
+  availableContracts = [],
 }) => {
   const getTitleForFacet = (facet: types.DataFacet): string => {
     switch (facet) {
@@ -59,16 +83,46 @@ const FacetTitle: React.FC<FacetTitleProps> = ({
   return (
     <div>
       <Title order={3}>{getTitleForFacet(facet)}</Title>
-      <Text size="sm" c="dimmed">
-        {contractName || 'Unknown Contract'} {'·'} {contractAddress}
-      </Text>
+      {onContractChange ? (
+        <Select
+          data={availableContracts}
+          value={contractAddress}
+          onChange={(value) => {
+            if (value && onContractChange) {
+              onContractChange(value);
+            }
+          }}
+          variant="unstyled"
+          styles={{
+            input: {
+              fontSize: '14px',
+              color: 'var(--mantine-color-dimmed)',
+              padding: 0,
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+            },
+            dropdown: {
+              fontSize: '14px',
+            },
+          }}
+          comboboxProps={{
+            position: 'bottom-start',
+            middlewares: { flip: false, shift: false },
+          }}
+        />
+      ) : (
+        <Text size="sm" c="dimmed">
+          {contractName || 'Unknown Contract'} {'·'} {contractAddress}
+        </Text>
+      )}
     </div>
   );
 };
 
 export const Contracts = () => {
   // === SECTION 2: Contract Detail Detection ===
-  const { lastContract } = useActiveProject();
+  const { lastContract, setActiveContract } = useActiveProject();
 
   // === SECTION 3: Contract Detail State ===
   const [contractAbi, setContractAbi] = useState<types.Contract | null>(null);
@@ -85,6 +139,10 @@ export const Contracts = () => {
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
   const isForm = getCurrentDataFacet() !== types.DataFacet.EVENTS;
+
+  Log(
+    `🎯 Contracts component - lastContract: ${lastContract}, isForm: ${isForm}, currentFacet: ${getCurrentDataFacet()}`,
+  );
 
   const [pageData, setPageData] = useState<contracts.ContractsPage | null>(
     null,
@@ -104,12 +162,23 @@ export const Contracts = () => {
 
   // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
+    Log('🚀 fetchData called');
     clearError();
     try {
       const payload = createPayload(getCurrentDataFacet());
       if (isForm && lastContract) {
         payload.address = lastContract;
       }
+
+      Log(
+        `📡 Calling GetContractsPage with payload: ${JSON.stringify({
+          payload,
+          currentPage: pagination.currentPage,
+          pageSize: pagination.pageSize,
+          isForm,
+          lastContract,
+        })}`,
+      );
 
       const result = await GetContractsPage(
         payload,
@@ -118,9 +187,22 @@ export const Contracts = () => {
         sort,
         filter,
       );
+
+      Log(
+        `📦 GetContractsPage result: ${JSON.stringify({
+          hasResult: !!result,
+          totalItems: result.totalItems,
+          contractsCount: result.contracts?.length || 0,
+          isFetching: result.isFetching,
+        })}`,
+      );
+
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
+      Log(
+        `❌ fetchData error: ${err instanceof Error ? err.message : String(err)}`,
+      );
       handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
     }
   }, [
@@ -172,6 +254,18 @@ export const Contracts = () => {
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
+
+  // Generate dynamic contract list from backend data
+  const availableContracts = useMemo(() => {
+    if (!pageData?.contracts) return [];
+
+    return pageData.contracts.map((contract: types.Contract) => ({
+      value: String(contract.address),
+      label: `${contract.name || 'Unknown'} · ${String(contract.address)}`,
+      name: contract.name || 'Unknown',
+      address: String(contract.address),
+    }));
+  }, [pageData?.contracts]);
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -271,31 +365,108 @@ export const Contracts = () => {
   // === SECTION 6.5: Contract Detail Loading Effect ===
   useEffect(() => {
     const loadContractDetail = async () => {
+      Log(
+        `🔍 loadContractDetail called - isForm: ${isForm}, lastContract: ${lastContract}`,
+      );
+
       if (!isForm || !lastContract) {
+        Log(
+          `❌ Early return - isForm: ${isForm}, lastContract: ${lastContract}`,
+        );
         return;
       }
 
       try {
+        Log('⏳ Setting detail loading to true');
         setDetailLoading(true);
         setDetailError(null);
 
         if (pageData?.isFetching) {
+          Log('🔄 pageData is fetching, returning early');
           return;
         }
 
-        const contractData = pageData?.contracts?.find(
+        Log(
+          `📊 pageData available: ${JSON.stringify({
+            hasPageData: !!pageData,
+            hasContracts: !!pageData?.contracts,
+            contractsCount: pageData?.contracts?.length || 0,
+            isFetching: pageData?.isFetching,
+          })}`,
+        );
+
+        // Log all contract addresses for debugging
+        if (pageData?.contracts) {
+          const contractAddresses = pageData.contracts.map(
+            (contract: types.Contract, index: number) => ({
+              index,
+              address: String(contract.address),
+              addressLower: String(contract.address)?.toLowerCase(),
+              name: contract.name,
+              hasAbi: !!contract.abi,
+            }),
+          );
+          Log(
+            `📋 All contracts in response: ${JSON.stringify(contractAddresses, null, 2)}`,
+          );
+        }
+
+        let contractData = pageData?.contracts?.find(
           (contract: types.Contract) =>
             String(contract.address)?.toLowerCase() ===
             lastContract.toLowerCase(),
         );
 
+        Log(
+          `🔍 Contract search result: ${JSON.stringify({
+            targetAddress: lastContract.toLowerCase(),
+            foundContract: !!contractData,
+            contractAddress: contractData?.address,
+            contractName: contractData?.name,
+            hasAbi: !!contractData?.abi,
+          })}`,
+        );
+
+        // If the lastContract is not found, fall back to the first available contract
+        if (
+          !contractData &&
+          pageData?.contracts &&
+          pageData.contracts.length > 0
+        ) {
+          Log(
+            '🔄 Contract not found, falling back to first available contract',
+          );
+          contractData = pageData.contracts[0];
+          if (contractData) {
+            const newAddress = String(contractData.address);
+
+            Log(
+              `🆕 Updating lastContract from ${lastContract} to ${newAddress}`,
+            );
+
+            // Update the active contract in the system
+            await setActiveContract(newAddress);
+
+            Log('✅ Updated lastContract, will reload on next render');
+            setDetailLoading(false);
+            return; // Exit early, the component will re-render with the new lastContract
+          }
+        }
+
         if (contractData) {
+          Log('✅ Setting contract ABI and clearing loading state');
           setContractAbi(contractData);
           setDetailLoading(false);
         } else {
+          Log(
+            '❌ No contract found and no fallback available, clearing loading state',
+          );
           setDetailLoading(false);
         }
       } catch (err) {
+        Log(
+          `💥 Error in loadContractDetail: ${err instanceof Error ? err.message : String(err)}`,
+        );
         setDetailError(
           err instanceof Error
             ? err.message
@@ -306,11 +477,16 @@ export const Contracts = () => {
     };
 
     loadContractDetail();
-  }, [isForm, lastContract, pageData]); // Removed currentData and getCurrentDataFacet since we use pageData.contracts directly
+  }, [isForm, lastContract, pageData, setActiveContract]);
 
   // === SECTION 6.6: Early Return for Detail View ===
   if (isForm) {
+    Log(
+      `🎭 Detail view conditions - detailLoading: ${detailLoading}, contractAbi: ${!!contractAbi}, pageData.isFetching: ${pageData?.isFetching}`,
+    );
+
     if (detailLoading || !contractAbi || pageData?.isFetching) {
+      Log('⏳ Showing loading spinner');
       return (
         <Container size="lg" py="xl">
           <div
@@ -363,6 +539,10 @@ export const Contracts = () => {
                     facet={facetConfig.id}
                     contractName={contractAbi.name}
                     contractAddress={String(contractAbi.address)}
+                    availableContracts={availableContracts}
+                    onContractChange={async (address: string) => {
+                      await setActiveContract(address);
+                    }}
                   />
                   {facetConfig.id === types.DataFacet.DASHBOARD ? (
                     <ContractDashboard

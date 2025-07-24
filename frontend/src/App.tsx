@@ -122,7 +122,7 @@ export const App = () => {
               })()
             }
             metadata={{
-              name: 'TrueBlocks Namester',
+              name: 'TrueBlocks Dalledress',
               description:
                 'A TrueBlocks desktop application for naming addresses',
               url: 'https://trueblocks.io',

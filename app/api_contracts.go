@@ -9,6 +9,9 @@
 package app
 
 import (
+	"fmt"
+
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/contracts"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -22,8 +25,22 @@ func (a *App) GetContractsPage(
 	sort sdk.SortSpec,
 	filter string,
 ) (*contracts.ContractsPage, error) {
+	logging.LogBackend(fmt.Sprintf("🚀 GetContractsPage called with payload: DataFacet=%s, Address=%s, first=%d, pageSize=%d",
+		payload.DataFacet, payload.Address, first, pageSize))
+
 	collection := contracts.GetContractsCollection(payload)
-	return getCollectionPage[*contracts.ContractsPage](collection, payload, first, pageSize, sort, filter)
+	logging.LogBackend(fmt.Sprintf("📚 Collection retrieved: %T", collection))
+
+	result, err := getCollectionPage[*contracts.ContractsPage](collection, payload, first, pageSize, sort, filter)
+	if err != nil {
+		logging.LogBackend(fmt.Sprintf("❌ GetContractsPage error: %v", err))
+		return nil, err
+	}
+
+	logging.LogBackend(fmt.Sprintf("✅ GetContractsPage success: totalItems=%d, contracts=%d, isFetching=%v",
+		result.TotalItems, len(result.Contracts), result.IsFetching))
+
+	return result, nil
 }
 
 func (a *App) GetContractsSummary(payload *types.Payload) types.Summary {

@@ -11,18 +11,24 @@ the code inside of 'EXISTING_CODE' tags.
 // EXISTING_CODE
 // EXISTING_CODE
 
-## Facets:
+## Facets
 
+{{- if .Facets}}
 {{- range .Facets}}
 - {{.Name}} Facet uses {{.Store}} store.
 {{- end}}
 
-## Stores:
+{{- end}}
+## Stores
+
+{{- if .Stores}}
 {{range .Stores}}
-- **{{.Name}} Store ({{.NMembers}} members):**
+- **{{.Name}} Store ({{.NMembers}} members)**
 {{range .Members }}
   - {{.Name}}: {{.Description}}
 {{- end}}
+
 {{end}}
+{{- end}}
 // EXISTING_CODE
 // EXISTING_CODE

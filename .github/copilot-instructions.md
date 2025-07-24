@@ -1,0 +1,147 @@
+# TrueBlocks Dalledress - AI Development Instructions
+
+## Project Architecture
+
+This is a **Wails desktop application** with Go backend (`app/`) and React frontend (`frontend/src/`). The app interfaces with TrueBlocks Core SDK for blockchain data analysis and uses auto-generated TypeScript bindings from Go models.
+
+### Core Components
+- **Backend**: Go app in `app/` with API handlers (`api_*.go`) exposing TrueBlocks functionality
+- **Frontend**: React/TypeScript with Mantine UI, organized by Views (`views/`) with Facets pattern
+- **Models**: Auto-generated TypeScript types in `frontend/wailsjs/go/models.ts` from Go structs
+- **Data Flow**: Frontend → Wails bindings → Go backend → TrueBlocks Core SDK
+
+## ABSOLUTE REQUIREMENTS - ZERO TOLERANCE
+
+### Package Management
+- **YARN ONLY** - Never use `npm` or `npx`
+- Run commands from repo root: `yarn start`, `yarn build`, `yarn test`
+- Frontend commands run through root package.json, not `frontend/` directory
+
+### Development Workflow
+- **Always use `yarn start`** (Wails dev mode) - never browser mode or localhost:5173
+- **Use `Log` from `@utils`** instead of console.log (console.log is invisible in Wails)
+- **Read file contents first** before editing - files change between requests
+
+### Code Patterns
+- **Use existing patterns**: BaseTab, Table components, DataFacet enums, Collection/Store/Page architecture
+- **Follow established architecture**: Import from `@models`, `@components`, `@utils`, `@hooks`
+- **No React imports** (implicitly available)
+- **No comments** in production code
+
+## View Architecture Pattern
+
+Each view follows this structure:
+```
+views/[viewname]/
+├── [ViewName].tsx     # Main component with sections: Imports, Hooks, Handlers, Render
+├── facets.ts          # DataFacet configurations and routing
+├── columns.ts         # Table column definitions per facet
+└── index.ts           # Exports
+```
+
+### Key Patterns
+- **DataFacet enum**: Use `types.DataFacet.*` values, never custom strings
+- **ViewStateKey**: `{ viewName: string, tabName: types.DataFacet }`
+- **Page Data**: Auto-generated types like `monitors.MonitorsPage` with `facet`, `data[]`, `state`
+- **BaseTab component**: Handles tables with `data`, `columns`, `viewStateKey`, `loading`, `error`
+
+## Backend Integration
+
+### API Endpoints
+- Backend functions in `app/api_*.go` are auto-bound to frontend as `@app` imports
+- Page data fetched via functions like `GetMonitorsPage(payload)`
+- CRUD operations via `*Crud(action, data)` functions
+- Error handling through `types.LoadState` enum
+
+### Auto-Generated Models
+- TypeScript types generated from Go structs in `frontend/wailsjs/go/models.ts`
+- Import namespaced: `{ monitors, types, msgs } from '@models'`
+- Never duplicate these types - always use generated ones
+
+## Development Commands
+
+```bash
+# Development (from root)
+yarn start              # Wails dev mode (NOT yarn dev)
+yarn build             # Production build
+yarn test              # Run all tests (Go + TypeScript + Dalle)
+yarn lint              # Lint Go and TypeScript
+
+# Testing specific components
+yarn test-go           # Go backend tests
+yarn test-tsx          # Frontend tests
+yarn test-dalle        # Dalle module tests
+```
+
+## Component Usage
+
+### Tables
+```tsx
+import { BaseTab } from '@components';
+import { getColumns } from './columns';
+
+<BaseTab
+  data={pageData?.monitors || []}
+  columns={getColumns(getCurrentDataFacet())}
+  viewStateKey={viewStateKey}
+  loading={pageData?.isFetching || false}
+  error={error}
+  onSubmit={handleSubmit}
+  onDelete={handleDelete}
+/>
+```
+
+### Hooks
+- `useActiveFacet()`: Manages view facets and routing
+- `usePayload()`: Creates API request payloads
+- `useActions()`: CRUD operations with error handling
+- `useFiltering()`, `useSorting()`, `usePagination()`: Table state management
+
+### Logging
+```tsx
+import { Log } from '@utils';
+Log('Debug message here'); // Single string parameter only
+```
+
+## Error Handling Protocol
+
+### Stop Conditions
+- **Test failures**: Stop, report exact error, await instructions
+- **Lint errors**: Stop, report issues, await fixes  
+- **Build failures**: Stop, provide full output, await guidance
+- **Unclear requirements**: Stop, ask specific questions
+
+### Don't Guess
+- Ask "Please clarify: [specific question]" instead of assuming
+- Be honest about mock vs. real implementations
+- Acknowledge when you don't understand something
+
+## File Structure Context
+
+```
+app/                    # Go backend with TrueBlocks integration
+├── api_*.go           # API handlers for each data collection
+├── app.go             # Main Wails app struct and lifecycle
+└── *.go               # Business logic and utilities
+
+frontend/src/
+├── components/        # Reusable UI components (BaseTab, Table, etc.)
+├── views/            # Main application views with Facets pattern
+├── hooks/            # Custom React hooks for data and state
+├── contexts/         # React context providers
+├── stores/           # Application state management
+├── utils/            # Utilities including Log function
+└── wailsjs/          # Auto-generated Wails bindings and types
+
+pkg/                   # Go packages for backend functionality
+dalle/                 # Separate Go module for AI/image generation
+```
+
+## Integration Points
+
+- **TrueBlocks Core**: Backend integrates via SDK for blockchain data
+- **Wails Bindings**: Auto-generated TypeScript/Go bridge
+- **External APIs**: OpenAI integration in `dalle/` module
+- **File System**: Project management and preferences via Go backend
+
+Follow these patterns precisely. When in doubt, examine existing views like `monitors/` or `status/` for reference implementations.

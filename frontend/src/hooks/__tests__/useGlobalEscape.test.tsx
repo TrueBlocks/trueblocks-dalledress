@@ -3,17 +3,6 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { useGlobalEscape } from '../useGlobalEscape';
 
-// Mock the dependencies
-vi.mock('@utils', () => ({
-  useEmitters: () => ({
-    emitStatus: vi.fn(),
-  }),
-}));
-
-vi.mock('../../../wailsjs/go/app/App', () => ({
-  CancelAllFetches: vi.fn().mockResolvedValue(3),
-}));
-
 vi.mock('react-hotkeys-hook', () => ({
   useHotkeys: vi.fn(),
 }));

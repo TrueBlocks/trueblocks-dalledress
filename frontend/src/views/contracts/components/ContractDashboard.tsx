@@ -17,8 +17,6 @@ import { Log } from '@utils';
 
 import { getReadFunctions } from './facetGeneration';
 
-// Adjust the import path as necessary
-
 interface ContractDashboardProps {
   contractState: types.Contract;
   onRefresh?: () => void;
@@ -307,8 +305,6 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
       </Alert>
     );
   }
-
-  Log('✅ ContractDashboard rendering main content');
 
   return (
     <Stack gap="md">

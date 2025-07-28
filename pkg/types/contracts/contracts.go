@@ -41,19 +41,19 @@ type ContractsCollection struct {
 	summaryMutex   sync.RWMutex
 }
 
-func NewContractsCollection() *ContractsCollection {
+func NewContractsCollection(payload *types.Payload) *ContractsCollection {
 	c := &ContractsCollection{}
 	c.ResetSummary()
-	c.initializeFacets()
+	c.initializeFacets(payload)
 	return c
 }
 
-func (c *ContractsCollection) initializeFacets() {
+func (c *ContractsCollection) initializeFacets(payload *types.Payload) {
 	c.dashboardFacet = facets.NewFacet(
 		ContractsDashboard,
 		isDashboard,
 		isDupContract(),
-		c.getContractsStore(ContractsDashboard),
+		c.getContractsStore(payload, ContractsDashboard),
 		"contracts",
 		c,
 	)
@@ -62,7 +62,7 @@ func (c *ContractsCollection) initializeFacets() {
 		ContractsExecute,
 		isExecute,
 		isDupContract(),
-		c.getContractsStore(ContractsExecute),
+		c.getContractsStore(payload, ContractsExecute),
 		"contracts",
 		c,
 	)
@@ -71,7 +71,7 @@ func (c *ContractsCollection) initializeFacets() {
 		ContractsEvents,
 		isEvent,
 		isDupLog(),
-		c.getLogsStore(ContractsEvents),
+		c.getLogsStore(payload, ContractsEvents),
 		"contracts",
 		c,
 	)

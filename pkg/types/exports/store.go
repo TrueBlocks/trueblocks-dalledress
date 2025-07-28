@@ -16,7 +16,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -64,12 +63,12 @@ var (
 	withdrawalsStoreMu sync.Mutex
 )
 
-func (c *ExportsCollection) getAssetsStore(facet types.DataFacet) *store.Store[Asset] {
+func (c *ExportsCollection) getAssetsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Asset] {
 	assetsStoreMu.Lock()
 	defer assetsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := assetsStore[storeKey]
 	if theStore == nil {
@@ -110,12 +109,12 @@ func (c *ExportsCollection) getAssetsStore(facet types.DataFacet) *store.Store[A
 	return theStore
 }
 
-func (c *ExportsCollection) getBalancesStore(facet types.DataFacet) *store.Store[Balance] {
+func (c *ExportsCollection) getBalancesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Balance] {
 	balancesStoreMu.Lock()
 	defer balancesStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := balancesStore[storeKey]
 	if theStore == nil {
@@ -156,12 +155,12 @@ func (c *ExportsCollection) getBalancesStore(facet types.DataFacet) *store.Store
 	return theStore
 }
 
-func (c *ExportsCollection) getLogsStore(facet types.DataFacet) *store.Store[Log] {
+func (c *ExportsCollection) getLogsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Log] {
 	logsStoreMu.Lock()
 	defer logsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := logsStore[storeKey]
 	if theStore == nil {
@@ -203,12 +202,12 @@ func (c *ExportsCollection) getLogsStore(facet types.DataFacet) *store.Store[Log
 	return theStore
 }
 
-func (c *ExportsCollection) getReceiptsStore(facet types.DataFacet) *store.Store[Receipt] {
+func (c *ExportsCollection) getReceiptsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Receipt] {
 	receiptsStoreMu.Lock()
 	defer receiptsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := receiptsStore[storeKey]
 	if theStore == nil {
@@ -249,12 +248,12 @@ func (c *ExportsCollection) getReceiptsStore(facet types.DataFacet) *store.Store
 	return theStore
 }
 
-func (c *ExportsCollection) getStatementsStore(facet types.DataFacet) *store.Store[Statement] {
+func (c *ExportsCollection) getStatementsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Statement] {
 	statementsStoreMu.Lock()
 	defer statementsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := statementsStore[storeKey]
 	if theStore == nil {
@@ -296,12 +295,12 @@ func (c *ExportsCollection) getStatementsStore(facet types.DataFacet) *store.Sto
 	return theStore
 }
 
-func (c *ExportsCollection) getTracesStore(facet types.DataFacet) *store.Store[Trace] {
+func (c *ExportsCollection) getTracesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Trace] {
 	tracesStoreMu.Lock()
 	defer tracesStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := tracesStore[storeKey]
 	if theStore == nil {
@@ -342,12 +341,12 @@ func (c *ExportsCollection) getTracesStore(facet types.DataFacet) *store.Store[T
 	return theStore
 }
 
-func (c *ExportsCollection) getTransactionsStore(facet types.DataFacet) *store.Store[Transaction] {
+func (c *ExportsCollection) getTransactionsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Transaction] {
 	transactionsStoreMu.Lock()
 	defer transactionsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := transactionsStore[storeKey]
 	if theStore == nil {
@@ -388,12 +387,12 @@ func (c *ExportsCollection) getTransactionsStore(facet types.DataFacet) *store.S
 	return theStore
 }
 
-func (c *ExportsCollection) getTransfersStore(facet types.DataFacet) *store.Store[Transfer] {
+func (c *ExportsCollection) getTransfersStore(payload *types.Payload, facet types.DataFacet) *store.Store[Transfer] {
 	transfersStoreMu.Lock()
 	defer transfersStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := transfersStore[storeKey]
 	if theStore == nil {
@@ -435,12 +434,12 @@ func (c *ExportsCollection) getTransfersStore(facet types.DataFacet) *store.Stor
 	return theStore
 }
 
-func (c *ExportsCollection) getWithdrawalsStore(facet types.DataFacet) *store.Store[Withdrawal] {
+func (c *ExportsCollection) getWithdrawalsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Withdrawal] {
 	withdrawalsStoreMu.Lock()
 	defer withdrawalsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 	theStore := withdrawalsStore[storeKey]
 	if theStore == nil {
@@ -511,8 +510,8 @@ func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet, chain, addre
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetExportsCount(payload *types.Payload) (int, error) {
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	countOpts := sdk.ExportOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 		Addrs:   []string{address},
@@ -541,35 +540,33 @@ func GetExportsCollection(payload *types.Payload) *ExportsCollection {
 		return collection
 	}
 
-	collection := NewExportsCollection()
+	collection := NewExportsCollection(payload)
 	collections[key] = collection
 	return collection
 }
 
 // EXISTING_CODE
-func GetExportsCount2(dataFacet string) (int, error) {
+func GetExportsCount2(dataFacet string, payload *types.Payload) (int, error) {
 	switch types.DataFacet(dataFacet) {
 	case ExportsTransactions:
-		return getExportsTransactionsCount()
+		return getExportsTransactionsCount(payload)
 	case ExportsStatements:
-		return getExportsStatementsCount()
+		return getExportsStatementsCount(payload)
 	case ExportsTransfers:
-		return getExportsTransfersCount()
+		return getExportsTransfersCount(payload)
 	case ExportsBalances:
-		return getExportsBalancesCount()
+		return getExportsBalancesCount(payload)
 	case ExportsWithdrawals:
-		return getExportsWithdrawalsCount()
+		return getExportsWithdrawalsCount(payload)
 	default:
 		return 0, fmt.Errorf("unknown dataFacet: %s", dataFacet)
 	}
 }
 
-func getExportsTransactionsCount() (int, error) {
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+func getExportsTransactionsCount(payload *types.Payload) (int, error) {
 	listOpts := sdk.ListOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chain},
-		Addrs:   []string{address},
+		Globals: sdk.Globals{Cache: true, Chain: payload.Chain},
+		Addrs:   []string{payload.Address},
 	}
 
 	// Use ExportCount for optimized counting
@@ -580,27 +577,25 @@ func getExportsTransactionsCount() (int, error) {
 	}
 }
 
-func getExportsStatementsCount() (int, error) {
-	return getExportsTransactionsCount()
+func getExportsStatementsCount(payload *types.Payload) (int, error) {
+	return getExportsTransactionsCount(payload)
 }
 
-func getExportsTransfersCount() (int, error) {
-	return getExportsTransactionsCount()
+func getExportsTransfersCount(payload *types.Payload) (int, error) {
+	return getExportsTransactionsCount(payload)
 }
 
-func getExportsBalancesCount() (int, error) {
-	return getExportsTransactionsCount()
+func getExportsBalancesCount(payload *types.Payload) (int, error) {
+	return getExportsTransactionsCount(payload)
 }
 
-func getExportsWithdrawalsCount() (int, error) {
-	return getExportsTransactionsCount()
+func getExportsWithdrawalsCount(payload *types.Payload) (int, error) {
+	return getExportsTransactionsCount(payload)
 }
 
 // ResetExportsStore resets a specific store for a given chain, address, and dataFacet
-func ResetExportsStore(dataFacet types.DataFacet) {
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
-	storeKey := getStoreKey(chain, address)
+func ResetExportsStore(payload *types.Payload, dataFacet types.DataFacet) {
+	storeKey := getStoreKey(payload.Chain, payload.Address)
 
 	switch dataFacet {
 	case ExportsTransactions:
@@ -637,9 +632,9 @@ func ResetExportsStore(dataFacet types.DataFacet) {
 }
 
 // ClearExportsStores clears all cached stores for a given chain and address
-func ClearExportsStores() {
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+func ClearExportsStores(payload *types.Payload) {
+	chain := payload.Chain
+	address := payload.Address
 	storeKey := getStoreKey(chain, address)
 
 	transactionsStoreMu.Lock()

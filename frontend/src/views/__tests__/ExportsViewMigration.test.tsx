@@ -31,7 +31,6 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     {
       id: types.DataFacet.TRANSACTIONS,
       label: 'Transactions',
-      isDefault: true,
     },
   ];
 
@@ -66,17 +65,13 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         useActiveFacet({
           viewRoute: '/exports',
           facets: exportsFacets,
-          defaultFacet: types.DataFacet.TRANSACTIONS,
         }),
       );
 
-      expect(result.current.activeFacet).toBe(types.DataFacet.TRANSACTIONS);
+      expect(result.current.activeFacet).toBe(types.DataFacet.STATEMENTS);
       expect(
         result.current.getFacetConfig(types.DataFacet.TRANSACTIONS)?.label,
       ).toBe('Transactions');
-      expect(
-        result.current.getFacetConfig(types.DataFacet.TRANSACTIONS)?.isDefault,
-      ).toBe(true);
     });
 
     it('should restore saved facet from preferences', () => {
@@ -86,7 +81,6 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         useActiveFacet({
           viewRoute: '/exports',
           facets: exportsFacets,
-          defaultFacet: types.DataFacet.TRANSACTIONS,
         }),
       );
 
@@ -101,7 +95,6 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         useActiveFacet({
           viewRoute: '/exports',
           facets: exportsFacets,
-          defaultFacet: types.DataFacet.TRANSACTIONS,
         }),
       );
 
@@ -123,26 +116,11 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
       expect(mockSetLastTab).toHaveBeenCalledTimes(2);
     });
 
-    it('should provide correct DataFacet backward compatibility', () => {
-      mockLastTab['/exports'] = 'STATEMENTS';
-
-      const { result } = renderHook(() =>
-        useActiveFacet({
-          viewRoute: '/exports',
-          facets: exportsFacets,
-          defaultFacet: types.DataFacet.TRANSACTIONS,
-        }),
-      );
-
-      expect(result.current.getCurrentDataFacet()).toBe('transactions');
-    });
-
     it('should provide all available facets', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           viewRoute: '/exports',
           facets: exportsFacets,
-          defaultFacet: types.DataFacet.TRANSACTIONS,
         }),
       );
 
@@ -162,7 +140,6 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         useActiveFacet({
           viewRoute: '/exports',
           facets: exportsFacets,
-          defaultFacet: types.DataFacet.TRANSACTIONS,
         }),
       );
 
@@ -190,7 +167,6 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         useActiveFacet({
           viewRoute: '/exports',
           facets: exportsFacets,
-          defaultFacet: types.DataFacet.TRANSACTIONS,
         }),
       );
 
@@ -205,11 +181,10 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         useActiveFacet({
           viewRoute: '/exports',
           facets: exportsFacets,
-          defaultFacet: types.DataFacet.TRANSACTIONS,
         }),
       );
 
-      expect(result.current.activeFacet).toBe('transactions');
+      expect(result.current.activeFacet).toBe('statements');
     });
   });
 });

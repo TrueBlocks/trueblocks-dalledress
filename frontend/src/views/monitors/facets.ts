@@ -12,9 +12,5 @@ export const monitorsFacets: DataFacetConfig[] = [
   {
     id: types.DataFacet.MONITORS,
     label: toProperCase(types.DataFacet.MONITORS),
-    isDefault: true,
   },
 ];
-
-export const DEFAULT_FACET = types.DataFacet.MONITORS;
-export const ROUTE = '/monitors' as const;

@@ -1,10 +1,6 @@
 import { FormField, usePreprocessedFields } from '@components';
+import { AllTheProviders, resetAllCentralMocks } from '@mocks';
 import { renderHook } from '@testing-library/react';
-
-import {
-  AllTheProviders,
-  resetAllCentralMocks,
-} from '../../../__tests__/mocks';
 
 describe('usePreprocessedFields Hook', () => {
   beforeEach(() => {

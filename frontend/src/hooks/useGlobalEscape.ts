@@ -1,9 +1,8 @@
 import { useCallback } from 'react';
 
+import { CancelAllFetches } from '@app';
 import { Log, useEmitters } from '@utils';
 import { useHotkeys } from 'react-hotkeys-hook';
-
-import { CancelAllFetches } from '../../wailsjs/go/app/App';
 
 interface UseGlobalEscapeProps {
   enabled?: boolean;

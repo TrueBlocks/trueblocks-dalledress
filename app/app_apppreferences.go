@@ -2,7 +2,6 @@ package app
 
 import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 // GetAppPreferences returns the current AppPreferences
@@ -47,68 +46,22 @@ func (a *App) SetLanguage(language string) {
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-func (a *App) GetLastAddress() string {
+/*
+func (a *App) GetActiveProjectPath() string {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
-	return a.Preferences.App.LastAddress
-}
-
-func (a *App) SetLastAddress(address string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastAddress = address
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) GetLastChain() string {
-	a.prefsMu.RLock()
-	defer a.prefsMu.RUnlock()
-	return a.Preferences.App.LastChain
-}
-
-func (a *App) SetLastChain(chain string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-
-	a.Preferences.App.LastChain = chain
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) GetLastContract() string {
-	a.prefsMu.RLock()
-	defer a.prefsMu.RUnlock()
-	return a.Preferences.App.LastContract
-}
-
-func (a *App) SetLastContract(contract string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastContract = contract
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) GetLastTab(route string) types.DataFacet {
-	a.prefsMu.RLock()
-	defer a.prefsMu.RUnlock()
-	return types.DataFacet(a.Preferences.App.LastTab[route])
-}
-
-func (a *App) SetLastTab(route string, tab types.DataFacet) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastTab[route] = string(tab)
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) SetLastView(view string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastView = view
-	if view != "/wizard" {
-		a.Preferences.App.LastViewNoWizard = view
+	if len(a.Preferences.App.RecentProjects) == 0 {
+		return ""
 	}
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+	return a.Preferences.App.RecentProjects[0]
 }
+
+func (a *App) SetActiveProjectPath(path string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	_ = a.Preferences.AddRecentProject(path)
+}
+*/
 
 // SetMenuCollapsed sets the menu collapsed state
 func (a *App) SetMenuCollapsed(collapse bool) {

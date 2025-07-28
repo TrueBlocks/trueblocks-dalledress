@@ -24,7 +24,8 @@ func assertMonitorsPage(t *testing.T, page types.Page) *MonitorsPage {
 // Domain-specific CRUD and business logic tests for Monitors collection
 
 func TestMonitorsMatchesFilter(t *testing.T) {
-	collection := NewMonitorsCollection()
+	var payload types.Payload
+	collection := NewMonitorsCollection(&payload)
 	testMonitor := &Monitor{
 		Address:     base.HexToAddress("0x1234567890123456789012345678901234567890"),
 		Name:        "Test Monitor",
@@ -57,7 +58,8 @@ func TestMonitorsMatchesFilter(t *testing.T) {
 }
 
 func TestMonitorsCollectionDomainSpecific(t *testing.T) {
-	collection := NewMonitorsCollection()
+	var payload types.Payload
+	collection := NewMonitorsCollection(&payload)
 
 	t.Run("CrudOperationsSpecific", func(t *testing.T) {
 		// Test domain-specific CRUD functionality

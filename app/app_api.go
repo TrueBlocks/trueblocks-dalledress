@@ -49,7 +49,7 @@ func (a *App) NameFromAddress(address string) (*names.Name, bool) {
 
 func (a *App) MonitorsClean(payload *types.Payload, addresses []string) error {
 	collection := monitors.GetMonitorsCollection(payload)
-	return collection.Clean(addresses)
+	return collection.Clean(payload, addresses)
 }
 
 // EXISTING_CODE

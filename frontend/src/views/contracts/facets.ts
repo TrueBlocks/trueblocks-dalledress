@@ -12,19 +12,13 @@ export const contractsFacets: DataFacetConfig[] = [
   {
     id: types.DataFacet.DASHBOARD,
     label: toProperCase(types.DataFacet.DASHBOARD),
-    isDefault: true,
   },
   {
     id: types.DataFacet.EXECUTE,
     label: toProperCase(types.DataFacet.EXECUTE),
-    isDefault: false,
   },
   {
     id: types.DataFacet.EVENTS,
     label: toProperCase(types.DataFacet.EVENTS),
-    isDefault: false,
   },
 ];
-
-export const DEFAULT_FACET = types.DataFacet.DASHBOARD;
-export const ROUTE = '/contracts' as const;

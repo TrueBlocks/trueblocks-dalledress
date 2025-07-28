@@ -1,9 +1,9 @@
 import React from 'react';
 
+import { setupComponentHookMocks } from '@mocks';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { setupComponentHookMocks } from '../../../__tests__/mocks';
 import { SearchBox } from '../SearchBox';
 
 // Use a variable for the focusControls mock overridden by central mocks

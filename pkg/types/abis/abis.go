@@ -43,19 +43,19 @@ type AbisCollection struct {
 	summaryMutex    sync.RWMutex
 }
 
-func NewAbisCollection() *AbisCollection {
+func NewAbisCollection(payload *types.Payload) *AbisCollection {
 	c := &AbisCollection{}
 	c.ResetSummary()
-	c.initializeFacets()
+	c.initializeFacets(payload)
 	return c
 }
 
-func (c *AbisCollection) initializeFacets() {
+func (c *AbisCollection) initializeFacets(payload *types.Payload) {
 	c.downloadedFacet = facets.NewFacet(
 		AbisDownloaded,
 		isDownloaded,
 		isDupAbi(),
-		c.getAbisStore(AbisDownloaded),
+		c.getAbisStore(payload, AbisDownloaded),
 		"abis",
 		c,
 	)
@@ -64,7 +64,7 @@ func (c *AbisCollection) initializeFacets() {
 		AbisKnown,
 		isKnown,
 		isDupAbi(),
-		c.getAbisStore(AbisKnown),
+		c.getAbisStore(payload, AbisKnown),
 		"abis",
 		c,
 	)
@@ -73,7 +73,7 @@ func (c *AbisCollection) initializeFacets() {
 		AbisFunctions,
 		isFunction,
 		isDupFunction(),
-		c.getFunctionsStore(AbisFunctions),
+		c.getFunctionsStore(payload, AbisFunctions),
 		"abis",
 		c,
 	)
@@ -82,7 +82,7 @@ func (c *AbisCollection) initializeFacets() {
 		AbisEvents,
 		isEvent,
 		isDupFunction(),
-		c.getFunctionsStore(AbisEvents),
+		c.getFunctionsStore(payload, AbisEvents),
 		"abis",
 		c,
 	)

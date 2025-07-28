@@ -18,7 +18,6 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     {
       id: 'transactions' as DataFacet,
       label: 'Transactions',
-      isDefault: true,
     },
     {
       id: 'receipts' as DataFacet,
@@ -71,11 +70,10 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
         useActiveFacet({
           viewRoute: '/exports',
           facets: sampleFacets,
-          defaultFacet: 'statements' as DataFacet,
         }),
       );
 
-      expect(result.current.activeFacet).toBe('statements');
+      expect(result.current.activeFacet).toBe('transactions');
     });
 
     it('should restore saved preference via backend API mapping', () => {

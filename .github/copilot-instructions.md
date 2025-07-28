@@ -77,6 +77,7 @@ yarn lint              # Lint Go and TypeScript
 # Testing specific components
 yarn test-go           # Go backend tests
 yarn test-tsx          # Frontend tests
+yarn test-tsx <filename> # Run a single frontend test file
 yarn test-dalle        # Dalle module tests
 ```
 

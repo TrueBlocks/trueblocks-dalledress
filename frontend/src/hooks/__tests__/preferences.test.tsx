@@ -4,22 +4,6 @@ import { appPreferencesStore } from '@stores';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock the utils module to prevent debugMode issues at module load time
-vi.mock('@utils', async () => {
-  const actual = await vi.importActual('@utils');
-  return {
-    ...actual,
-    isDebugMode: vi.fn(() => false),
-    useErrorHandler: vi.fn(() => vi.fn()),
-    Log: {
-      debug: vi.fn(),
-      info: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-    },
-  };
-});
-
 // Mock the store dependency
 vi.mock('@stores', () => ({
   appPreferencesStore: {

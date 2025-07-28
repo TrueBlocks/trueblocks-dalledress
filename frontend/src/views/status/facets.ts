@@ -12,19 +12,13 @@ export const statusFacets: DataFacetConfig[] = [
   {
     id: types.DataFacet.STATUS,
     label: toProperCase(types.DataFacet.STATUS),
-    isDefault: true,
   },
   {
     id: types.DataFacet.CACHES,
     label: toProperCase(types.DataFacet.CACHES),
-    isDefault: false,
   },
   {
     id: types.DataFacet.CHAINS,
     label: toProperCase(types.DataFacet.CHAINS),
-    isDefault: false,
   },
 ];
-
-export const DEFAULT_FACET = types.DataFacet.STATUS;
-export const ROUTE = '/status' as const;

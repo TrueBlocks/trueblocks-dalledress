@@ -40,19 +40,19 @@ type StatusCollection struct {
 	summaryMutex sync.RWMutex
 }
 
-func NewStatusCollection() *StatusCollection {
+func NewStatusCollection(payload *types.Payload) *StatusCollection {
 	c := &StatusCollection{}
 	c.ResetSummary()
-	c.initializeFacets()
+	c.initializeFacets(payload)
 	return c
 }
 
-func (c *StatusCollection) initializeFacets() {
+func (c *StatusCollection) initializeFacets(payload *types.Payload) {
 	c.statusFacet = facets.NewFacet(
 		StatusStatus,
 		isStatus,
 		isDupStatus(),
-		c.getStatusStore(StatusStatus),
+		c.getStatusStore(payload, StatusStatus),
 		"status",
 		c,
 	)
@@ -61,7 +61,7 @@ func (c *StatusCollection) initializeFacets() {
 		StatusCaches,
 		isCache,
 		isDupCache(),
-		c.getCachesStore(StatusCaches),
+		c.getCachesStore(payload, StatusCaches),
 		"status",
 		c,
 	)
@@ -70,7 +70,7 @@ func (c *StatusCollection) initializeFacets() {
 		StatusChains,
 		isChain,
 		isDupChain(),
-		c.getChainsStore(StatusChains),
+		c.getChainsStore(payload, StatusChains),
 		"status",
 		c,
 	)

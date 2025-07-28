@@ -43,19 +43,19 @@ type ChunksCollection struct {
 	summaryMutex  sync.RWMutex
 }
 
-func NewChunksCollection() *ChunksCollection {
+func NewChunksCollection(payload *types.Payload) *ChunksCollection {
 	c := &ChunksCollection{}
 	c.ResetSummary()
-	c.initializeFacets()
+	c.initializeFacets(payload)
 	return c
 }
 
-func (c *ChunksCollection) initializeFacets() {
+func (c *ChunksCollection) initializeFacets(payload *types.Payload) {
 	c.statsFacet = facets.NewFacet(
 		ChunksStats,
 		isStats,
 		isDupStats(),
-		c.getStatsStore(ChunksStats),
+		c.getStatsStore(payload, ChunksStats),
 		"chunks",
 		c,
 	)
@@ -64,7 +64,7 @@ func (c *ChunksCollection) initializeFacets() {
 		ChunksIndex,
 		isIndex,
 		isDupIndex(),
-		c.getIndexStore(ChunksIndex),
+		c.getIndexStore(payload, ChunksIndex),
 		"chunks",
 		c,
 	)
@@ -73,7 +73,7 @@ func (c *ChunksCollection) initializeFacets() {
 		ChunksBlooms,
 		isBloom,
 		isDupBloom(),
-		c.getBloomsStore(ChunksBlooms),
+		c.getBloomsStore(payload, ChunksBlooms),
 		"chunks",
 		c,
 	)
@@ -82,7 +82,7 @@ func (c *ChunksCollection) initializeFacets() {
 		ChunksManifest,
 		isManifest,
 		isDupManifest(),
-		c.getManifestStore(ChunksManifest),
+		c.getManifestStore(payload, ChunksManifest),
 		"chunks",
 		c,
 	)

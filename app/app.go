@@ -298,9 +298,74 @@ func (a *App) SetProjectAddress(addr base.Address) {
 	}
 }
 
-func (a *App) GetViewState(key project.ViewStateKey) (project.ViewState, error) {
+// GetLastFacet returns the last visited facet for a specific view from the active project
+func (a *App) GetLastTab(view string) types.DataFacet {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	return types.DataFacet(a.Preferences.App.LastTab[view])
+}
+
+// SetLastFacet sets the last visited facet for a specific view in the active project
+func (a *App) SetLastTab(view string, tab types.DataFacet) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	a.Preferences.App.LastTab[view] = string(tab)
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) SetLastView(view string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	a.Preferences.App.LastView = view
+	if view != "/wizard" {
+		a.Preferences.App.LastViewNoWizard = view
+	}
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) GetViewState(key project.ViewStateKey) (project.FilterState, error) {
 	_ = key
-	return project.ViewState{}, nil
+	return project.FilterState{}, nil
+}
+
+func (a *App) GetLastAddress() string {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	return a.Preferences.App.LastAddress
+}
+
+func (a *App) SetLastAddress(address string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	a.Preferences.App.LastAddress = address
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) GetLastChain() string {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	return a.Preferences.App.LastChain
+}
+
+func (a *App) SetLastChain(chain string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+
+	a.Preferences.App.LastChain = chain
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+func (a *App) GetLastContract() string {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	return a.Preferences.App.LastContract
+}
+
+func (a *App) SetLastContract(contract string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	a.Preferences.App.LastContract = contract
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
 func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
@@ -413,4 +478,3 @@ func (a *App) Encode(fn sdk.Function, params []interface{}) (string, error) {
 	}
 	return "0x" + hex.EncodeToString(packed), nil
 }
-

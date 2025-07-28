@@ -16,17 +16,12 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 // EXISTING_CODE
-type Abi = sdk.Abi
-type Function = sdk.Function
-type Parameter = sdk.Parameter
-
 // EXISTING_CODE
 
 type Contract = sdk.Contract
@@ -40,13 +35,13 @@ var (
 	logsStoreMu sync.Mutex
 )
 
-func (c *ContractsCollection) getContractsStore(facet types.DataFacet) *store.Store[Contract] {
+func (c *ContractsCollection) getContractsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Contract] {
 	contractsStoreMu.Lock()
 	defer contractsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
-	// contract := preferences.GetLastContract()
+	chain := payload.Chain
+	address := payload.Address
+	// contract := payload.Contract
 	theStore := contractsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -85,12 +80,13 @@ func (c *ContractsCollection) getContractsStore(facet types.DataFacet) *store.St
 	return theStore
 }
 
-func (c *ContractsCollection) getLogsStore(facet types.DataFacet) *store.Store[Log] {
+func (c *ContractsCollection) getLogsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Log] {
 	logsStoreMu.Lock()
 	defer logsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
+	// contract := payload.Contract
 	contract := "0x8fbea07446ddf4518b1a7ba2b4f11bd140a8df41"
 	theStore := logsStore
 	if theStore == nil {
@@ -152,7 +148,7 @@ func (c *ContractsCollection) GetStoreName(dataFacet types.DataFacet, chain, add
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetContractsCount(payload *types.Payload) (int, error) {
-	// chain := preferences.GetLastChain()
+	// chain := payload.Chain
 	// countOpts := sdk.ContractsOptions{
 	// 	Globals: sdk.Globals{Cache: true, Chain: chain},
 	// }
@@ -181,7 +177,7 @@ func GetContractsCollection(payload *types.Payload) *ContractsCollection {
 		return collection
 	}
 
-	collection := NewContractsCollection()
+	collection := NewContractsCollection(payload)
 	collections[key] = collection
 	return collection
 }

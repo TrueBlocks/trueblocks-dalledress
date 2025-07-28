@@ -18,7 +18,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
     {
       id: 'all' as DataFacet,
       label: 'All',
-      isDefault: true,
     },
     {
       id: 'custom' as DataFacet,
@@ -62,7 +61,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          defaultFacet: 'all' as DataFacet,
           viewRoute: '/names',
         }),
       );
@@ -72,23 +70,10 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       expect(result.current.availableFacets).toHaveLength(5);
     });
 
-    it('correctly maps facet IDs to DataFacet values', () => {
-      const { result } = renderHook(() =>
-        useActiveFacet({
-          facets: namesFacets,
-          defaultFacet: 'custom' as DataFacet,
-          viewRoute: '/names',
-        }),
-      );
-
-      expect(result.current.getCurrentDataFacet()).toBe('custom');
-    });
-
     it('maintains facet consistency across state changes', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          defaultFacet: 'all' as DataFacet,
           viewRoute: '/names',
         }),
       );
@@ -111,7 +96,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result: result2 } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          defaultFacet: 'all' as DataFacet,
           viewRoute: '/names',
         }),
       );
@@ -126,7 +110,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          defaultFacet: 'all' as DataFacet,
           viewRoute: '/names',
         }),
       );
@@ -139,7 +122,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          defaultFacet: 'all' as DataFacet,
           viewRoute: '/names',
         }),
       );
@@ -168,7 +150,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         const { result } = renderHook(() =>
           useActiveFacet({
             facets: namesFacets,
-            defaultFacet: 'all' as DataFacet,
             viewRoute: '/names',
           }),
         );
@@ -184,7 +165,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          defaultFacet: 'all' as DataFacet,
           viewRoute: '/names',
         }),
       );
@@ -196,20 +176,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       // Should remain on default facet
       expect(result.current.activeFacet).toBe('all');
     });
-
-    it('handles missing default facet gracefully', () => {
-      const { result } = renderHook(() =>
-        useActiveFacet({
-          facets: namesFacets.filter((f) => !f.isDefault),
-          defaultFacet: 'all' as DataFacet,
-          viewRoute: '/names',
-        }),
-      );
-
-      // Should fall back to first available facet
-      expect(result.current.availableFacets.length).toBeGreaterThan(0);
-      expect(result.current.activeFacet).toBeTruthy();
-    });
   });
 
   describe('integration with Names view constants and patterns', () => {
@@ -217,7 +183,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          defaultFacet: 'all' as DataFacet,
           viewRoute: '/names',
         }),
       );
@@ -245,7 +210,6 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          defaultFacet: 'all' as DataFacet,
           viewRoute: '/names',
         }),
       );

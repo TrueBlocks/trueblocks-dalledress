@@ -43,12 +43,12 @@ var (
 )
 
 {{range .Stores}}
-func (c *{{$class}}Collection) get{{.Name}}Store(facet types.DataFacet) *store.Store[{{toSingular .Name}}] {
+func (c *{{$class}}Collection) get{{.Name}}Store(payload *types.Payload, facet types.DataFacet) *store.Store[{{toSingular .Name}}] {
 	{{toLower .Name}}StoreMu.Lock()
 	defer {{toLower .Name}}StoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 {{if $isExports}}	storeKey := getStoreKey(chain, address)
 	theStore := {{toLower .Name}}Store[storeKey]
 {{else}}	theStore := {{toLower .Name}}Store
@@ -105,8 +105,8 @@ func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet, chain, ad
 {{- $val := .Class}}
 {{if $isExports}}{{$val = toSingular .Class}}{{end -}}
 func Get{{.Class}}Count(payload *types.Payload) (int, error) {
-	chain := preferences.GetLastChain()
-	{{if $isExports}}address := preferences.GetLastAddress()
+	chain := payload.Chain
+	{{if $isExports}}address := payload.Address
 	{{end -}}
 	countOpts := sdk.{{$val}}Options{
 		Globals: sdk.Globals{Cache: true, Chain: chain},

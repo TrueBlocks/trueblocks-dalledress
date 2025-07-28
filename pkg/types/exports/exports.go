@@ -58,19 +58,19 @@ type ExportsCollection struct {
 	summaryMutex      sync.RWMutex
 }
 
-func NewExportsCollection() *ExportsCollection {
+func NewExportsCollection(payload *types.Payload) *ExportsCollection {
 	c := &ExportsCollection{}
 	c.ResetSummary()
-	c.initializeFacets()
+	c.initializeFacets(payload)
 	return c
 }
 
-func (c *ExportsCollection) initializeFacets() {
+func (c *ExportsCollection) initializeFacets(payload *types.Payload) {
 	c.statementsFacet = facets.NewFacet(
 		ExportsStatements,
 		isStatement,
 		isDupStatement(),
-		c.getStatementsStore(ExportsStatements),
+		c.getStatementsStore(payload, ExportsStatements),
 		"exports",
 		c,
 	)
@@ -79,7 +79,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsBalances,
 		isBalance,
 		isDupBalance(),
-		c.getBalancesStore(ExportsBalances),
+		c.getBalancesStore(payload, ExportsBalances),
 		"exports",
 		c,
 	)
@@ -88,7 +88,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsTransfers,
 		isTransfer,
 		isDupTransfer(),
-		c.getTransfersStore(ExportsTransfers),
+		c.getTransfersStore(payload, ExportsTransfers),
 		"exports",
 		c,
 	)
@@ -97,7 +97,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsTransactions,
 		isTransaction,
 		isDupTransaction(),
-		c.getTransactionsStore(ExportsTransactions),
+		c.getTransactionsStore(payload, ExportsTransactions),
 		"exports",
 		c,
 	)
@@ -106,7 +106,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsWithdrawals,
 		isWithdrawal,
 		isDupWithdrawal(),
-		c.getWithdrawalsStore(ExportsWithdrawals),
+		c.getWithdrawalsStore(payload, ExportsWithdrawals),
 		"exports",
 		c,
 	)
@@ -115,7 +115,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsAssets,
 		isAsset,
 		isDupAsset(),
-		c.getAssetsStore(ExportsAssets),
+		c.getAssetsStore(payload, ExportsAssets),
 		"exports",
 		c,
 	)
@@ -124,7 +124,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsLogs,
 		isLog,
 		isDupLog(),
-		c.getLogsStore(ExportsLogs),
+		c.getLogsStore(payload, ExportsLogs),
 		"exports",
 		c,
 	)
@@ -133,7 +133,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsTraces,
 		isTrace,
 		isDupTrace(),
-		c.getTracesStore(ExportsTraces),
+		c.getTracesStore(payload, ExportsTraces),
 		"exports",
 		c,
 	)
@@ -142,7 +142,7 @@ func (c *ExportsCollection) initializeFacets() {
 		ExportsReceipts,
 		isReceipt,
 		isDupReceipt(),
-		c.getReceiptsStore(ExportsReceipts),
+		c.getReceiptsStore(payload, ExportsReceipts),
 		"exports",
 		c,
 	)

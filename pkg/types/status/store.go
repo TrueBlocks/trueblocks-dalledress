@@ -16,7 +16,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -40,12 +39,12 @@ var (
 	statusStoreMu sync.Mutex
 )
 
-func (c *StatusCollection) getCachesStore(facet types.DataFacet) *store.Store[Cache] {
+func (c *StatusCollection) getCachesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Cache] {
 	cachesStoreMu.Lock()
 	defer cachesStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := cachesStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -84,12 +83,12 @@ func (c *StatusCollection) getCachesStore(facet types.DataFacet) *store.Store[Ca
 	return theStore
 }
 
-func (c *StatusCollection) getChainsStore(facet types.DataFacet) *store.Store[Chain] {
+func (c *StatusCollection) getChainsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Chain] {
 	chainsStoreMu.Lock()
 	defer chainsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := chainsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -128,12 +127,12 @@ func (c *StatusCollection) getChainsStore(facet types.DataFacet) *store.Store[Ch
 	return theStore
 }
 
-func (c *StatusCollection) getStatusStore(facet types.DataFacet) *store.Store[Status] {
+func (c *StatusCollection) getStatusStore(payload *types.Payload, facet types.DataFacet) *store.Store[Status] {
 	statusStoreMu.Lock()
 	defer statusStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := statusStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -191,7 +190,7 @@ func (c *StatusCollection) GetStoreName(dataFacet types.DataFacet, chain, addres
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetStatusCount(payload *types.Payload) (int, error) {
-	chain := preferences.GetLastChain()
+	chain := payload.Chain
 	countOpts := sdk.StatusOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
@@ -220,7 +219,7 @@ func GetStatusCollection(payload *types.Payload) *StatusCollection {
 		return collection
 	}
 
-	collection := NewStatusCollection()
+	collection := NewStatusCollection(payload)
 	collections[key] = collection
 	return collection
 }

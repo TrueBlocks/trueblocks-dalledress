@@ -11,6 +11,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { Log } from '@utils';
 
 interface UploadAddressesDialogProps {
   opened: boolean;
@@ -47,7 +48,7 @@ export const UploadAddressesDialog = ({
       const addresses = parseAddresses(text);
       setTextAddresses(addresses.join('\n'));
     } catch (error) {
-      console.error('Error reading file:', error);
+      Log('ERROR: Error reading file:', JSON.stringify(error));
     }
   };
 
@@ -65,7 +66,7 @@ export const UploadAddressesDialog = ({
       setFile(null);
       onClose();
     } catch (error) {
-      console.error('Error uploading addresses:', error);
+      Log('ERROR: Error uploading addresses:', JSON.stringify(error));
     } finally {
       setLoading(false);
     }

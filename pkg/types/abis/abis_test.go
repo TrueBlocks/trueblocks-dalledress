@@ -25,7 +25,8 @@ func assertAbisPage(t *testing.T, page types.Page) *AbisPage {
 // Domain-specific filtering and ABI logic tests for Abis collection
 
 func TestAbisMatchesFilter(t *testing.T) {
-	collection := NewAbisCollection()
+	var payload types.Payload
+	collection := NewAbisCollection(&payload)
 	testAbi := &Abi{
 		Address:  base.HexToAddress("0x1234567890123456789012345678901234567890"),
 		Name:     "Test ABI",
@@ -99,7 +100,8 @@ func (c *AbisCollection) matchesAbiFilter(abi *Abi, filter string) bool {
 }
 
 func TestAbisCollectionDomainSpecific(t *testing.T) {
-	collection := NewAbisCollection()
+	var payload types.Payload
+	collection := NewAbisCollection(&payload)
 
 	t.Run("GetPageMultiFacetFiltering", func(t *testing.T) {
 		// Test ABI list filtering

@@ -45,7 +45,6 @@ type AppPreferences struct {
 	RecentProjects   []string          `json:"recentProjects"`
 	SilencedDialogs  map[string]bool   `json:"silencedDialogs"`
 	Version          string            `json:"version"`
-
 	LastLanguage     string            `json:"lastLanguage,omitempty"`
 	LastAddress      string            `json:"lastAddress,omitempty"`
 	LastChain        string            `json:"lastChain,omitempty"`
@@ -73,7 +72,6 @@ func NewAppPreferences() *AppPreferences {
 		RecentProjects:  []string{},
 		SilencedDialogs: make(map[string]bool),
 		Version:         "1.0",
-
 		LastAddress:      "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
 		LastContract:     "0x52df6e4d9989e7cf4739d687c765e75323a1b14c",
 		LastTab:          make(map[string]string),

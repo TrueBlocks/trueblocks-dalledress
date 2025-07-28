@@ -12,24 +12,17 @@ export const abisFacets: DataFacetConfig[] = [
   {
     id: types.DataFacet.DOWNLOADED,
     label: toProperCase(types.DataFacet.DOWNLOADED),
-    isDefault: true,
   },
   {
     id: types.DataFacet.KNOWN,
     label: toProperCase(types.DataFacet.KNOWN),
-    isDefault: false,
   },
   {
     id: types.DataFacet.FUNCTIONS,
     label: toProperCase(types.DataFacet.FUNCTIONS),
-    isDefault: false,
   },
   {
     id: types.DataFacet.EVENTS,
     label: toProperCase(types.DataFacet.EVENTS),
-    isDefault: false,
   },
 ];
-
-export const DEFAULT_FACET = types.DataFacet.DOWNLOADED;
-export const ROUTE = '/abis' as const;

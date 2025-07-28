@@ -183,7 +183,14 @@ func TestFileOpen(t *testing.T) {
 			Version: "1.0",
 			Name:    strings.ToLower(preferences.GetAppId().OrgName) + "-project",
 		}
-		bytes, _ := json.Marshal(proj)
+		serializableProj := struct {
+			Version string `json:"version"`
+			Name    string `json:"name"`
+		}{
+			Version: proj.Version,
+			Name:    proj.Name,
+		}
+		bytes, _ := json.Marshal(serializableProj)
 		_ = os.WriteFile(filePath, bytes, 0644)
 
 		err := app.fileOpen(filePath)
@@ -225,7 +232,14 @@ func TestFileOpen(t *testing.T) {
 			Version: "1.0",
 			Name:    strings.ToLower(preferences.GetAppId().OrgName) + "-project",
 		}
-		bytes, _ := json.Marshal(proj)
+		serializableProj := struct {
+			Version string `json:"version"`
+			Name    string `json:"name"`
+		}{
+			Version: proj.Version,
+			Name:    proj.Name,
+		}
+		bytes, _ := json.Marshal(serializableProj)
 		_ = os.WriteFile(filePath, bytes, 0644)
 
 		// Open the file

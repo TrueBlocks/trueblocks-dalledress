@@ -1,10 +1,6 @@
+import { mockUseHotkeys, resetAllCentralMocks, triggerHotkey } from '@mocks';
 import { vi } from 'vitest';
 
-import {
-  mockUseHotkeys,
-  resetAllCentralMocks,
-  triggerHotkey,
-} from '../../__tests__/mocks';
 import { registerHotkeys } from '../registerHotkeys';
 import type { RegisterHotkeyOptions } from '../registerHotkeys';
 

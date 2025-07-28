@@ -26,15 +26,15 @@ import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
-import { DEFAULT_FACET, ROUTE, chunksFacets } from './facets';
+import { chunksFacets } from './facets';
 
+export const ROUTE = '/chunks' as const;
 export const Chunks = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: chunksFacets,
-    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;

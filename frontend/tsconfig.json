@@ -23,18 +23,19 @@
     ],
     "baseUrl": ".",
     "paths": {
+      "@app": ["wailsjs/go/app/App"],
       "@components": ["src/components"],
       "@contexts": ["src/contexts"],
       "@hooks": ["src/hooks"],
       "@layout": ["src/layout"],
-      "@views": ["src/views"],
-      "@wizards": ["src/wizards"],
-      "@utils": ["src/utils"],
-      "@stores": ["src/stores"],
-      "@runtime": ["wailsjs/runtime"],
-      "@app": ["wailsjs/go/app/App"],
+      "@mocks": ["src/__tests__/mocks"],
+      "@models": ["wailsjs/go/models"],
       "@names": ["wailsjs/go/names/NamesCollection"],
-      "@models": ["wailsjs/go/models"]
+      "@runtime": ["wailsjs/runtime"],
+      "@stores": ["src/stores"],
+      "@utils": ["src/utils"],
+      "@views": ["src/views"],
+      "@wizards": ["src/wizards"]
     }
   },
   "include": ["src", "wailsjs", "tests"],

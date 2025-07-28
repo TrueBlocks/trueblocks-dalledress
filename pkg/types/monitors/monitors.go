@@ -34,19 +34,19 @@ type MonitorsCollection struct {
 	summaryMutex  sync.RWMutex
 }
 
-func NewMonitorsCollection() *MonitorsCollection {
+func NewMonitorsCollection(payload *types.Payload) *MonitorsCollection {
 	c := &MonitorsCollection{}
 	c.ResetSummary()
-	c.initializeFacets()
+	c.initializeFacets(payload)
 	return c
 }
 
-func (c *MonitorsCollection) initializeFacets() {
+func (c *MonitorsCollection) initializeFacets(payload *types.Payload) {
 	c.monitorsFacet = facets.NewFacet(
 		MonitorsMonitors,
 		isMonitor,
 		isDupMonitor(),
-		c.getMonitorsStore(MonitorsMonitors),
+		c.getMonitorsStore(payload, MonitorsMonitors),
 		"monitors",
 		c,
 	)

@@ -26,15 +26,15 @@ import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
-import { DEFAULT_FACET, ROUTE, statusFacets } from './facets';
+import { statusFacets } from './facets';
 
+export const ROUTE = '/status' as const;
 export const Status = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: statusFacets,
-    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;

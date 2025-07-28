@@ -1,21 +1,13 @@
 import { useEffect } from 'react';
 
 import { MantineProvider } from '@mantine/core';
+import { setupWailsMocks } from '@mocks';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
 import { Wizard } from '../Wizard';
 
-vi.mock('@app', () => ({
-  GetAppId: () => Promise.resolve({ appName: 'Test App' }),
-  GetWizardReturn: () => Promise.resolve('/'),
-  GetUserPreferences: () => Promise.resolve({ name: '', email: '' }),
-  SetUserPreferences: () => Promise.resolve({}),
-  IsReady: () => Promise.resolve(true),
-  GetAppPreferences: () =>
-    Promise.resolve({ lastView: '/', menuCollapsed: false }),
-  SetLastView: () => Promise.resolve(),
-}));
+setupWailsMocks();
 
 const mockNavigate = vi.fn();
 const mockCompleteWizard = vi.fn().mockResolvedValue(undefined);
@@ -117,10 +109,6 @@ vi.mock('@hooks', () => ({
   }),
   useActiveProject: () => ({
     // State
-    lastProject: '',
-    lastChain: 'mainnet',
-    lastAddress: '0x1234567890abcdef1234567890abcdef12345678',
-    lastContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
     lastTheme: 'light',
     lastLanguage: 'en',
     lastView: 'home',

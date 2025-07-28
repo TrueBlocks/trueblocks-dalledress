@@ -13,40 +13,50 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-type ViewState struct {
+//------------------------------------------------------------------------------------
+type FilterState struct {
 	Sorting   map[string]interface{} `json:"sorting,omitempty"`
 	Filtering map[string]interface{} `json:"filtering,omitempty"`
 	Other     map[string]interface{} `json:"other,omitempty"`
 }
 
+//------------------------------------------------------------------------------------
 type ViewStateKey struct {
 	ViewName  string          `json:"viewName"`
 	FacetName types.DataFacet `json:"facetName"`
 }
 
+//------------------------------------------------------------------------------------
 // Project represents a single project with its metadata and data.
 type Project struct {
-	Version    string       `json:"version"`
-	Name       string       `json:"name"`
-	LastOpened string       `json:"last_opened"`
-	Dirty      bool         `json:"dirty"`
-	Address    base.Address `json:"address"`
-	Path       string       `json:"-"`
+	Dirty          bool                         `json:"dirty,omitempty"`
+	Version        string                       `json:"version"`
+	Name           string                       `json:"name"`
+	LastOpened     string                       `json:"last_opened"`
+	ActiveAddress  base.Address                 `json:"address"`
+	Path           string                       `json:"-"`
 }
 
-// New creates a new project with default values
-func New(name string, address base.Address) *Project {
+//------------------------------------------------------------------------------------
+// New creates a new project with default values and required active address
+func New(name string, activeAddress base.Address) *Project {
 	return &Project{
-		Version:    "1.0",
-		Name:       name,
-		LastOpened: time.Now().Format(time.RFC3339),
-		Dirty:      true,
-		Address:    address,
+		Version:        "1.0",
+		Name:           name,
+		LastOpened:     time.Now().Format(time.RFC3339),
+		Dirty:          true,
+		ActiveAddress:  activeAddress,
 	}
 }
 
+//------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------
 var ErrProjectRecoveryIncomplete = fmt.Errorf("failed to parse project file, recovery attempted but may not be complete")
 
+//------------------------------------------------------------------------------------
 // Load loads a project from the specified file path with optimized deserialization
 func Load(path string) (*Project, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -81,10 +91,10 @@ func Load(path string) (*Project, error) {
 	// Set in-memory fields
 	project.Path = path
 	project.Dirty = false
-
 	return &project, nil
 }
 
+//------------------------------------------------------------------------------------
 // Save persists the project to its file path
 func (p *Project) Save() error {
 	if p.Path == "" {
@@ -93,6 +103,7 @@ func (p *Project) Save() error {
 	return p.SaveAs(p.Path)
 }
 
+//------------------------------------------------------------------------------------
 // SaveAs saves the project to a new file path and updates the project's path
 // with optimized serialization for better performance
 func (p *Project) SaveAs(path string) error {
@@ -136,26 +147,31 @@ func (p *Project) SaveAs(path string) error {
 	return nil
 }
 
+//------------------------------------------------------------------------------------
 // IsDirty returns whether the project has unsaved changes
 func (p *Project) IsDirty() bool {
 	return p.Dirty
 }
 
+//------------------------------------------------------------------------------------
 // SetDirty marks the project as having unsaved changes
 func (p *Project) SetDirty(dirty bool) {
 	p.Dirty = dirty
 }
 
+//------------------------------------------------------------------------------------
 // GetPath returns the file path of the project
 func (p *Project) GetPath() string {
 	return p.Path
 }
 
+//------------------------------------------------------------------------------------
 // GetName returns the name of the project
 func (p *Project) GetName() string {
 	return p.Name
 }
 
+//------------------------------------------------------------------------------------
 // SetName updates the project name and marks it as dirty
 func (p *Project) SetName(name string) {
 	if p.Name != name {
@@ -164,15 +180,89 @@ func (p *Project) SetName(name string) {
 	}
 }
 
-// GetAddress returns the project's main address
+//------------------------------------------------------------------------------------
+// GetAddress returns the project's active address (backward compatibility)
 func (p *Project) GetAddress() base.Address {
-	return p.Address
+	return p.ActiveAddress
 }
 
-// SetAddress sets the project's main address and marks as dirty
+//------------------------------------------------------------------------------------
+// SetAddress sets the project's active address and adds it to addresses if not present (backward compatibility)
 func (p *Project) SetAddress(addr base.Address) {
-	if p.Address != addr {
-		p.Address = addr
+	if p.ActiveAddress != addr {
+		p.ActiveAddress = addr
 		p.Dirty = true
 	}
 }
+
+//------------------------------------------------------------------------------------
+// GetActiveAddress returns the currently selected address
+
+//------------------------------------------------------------------------------------
+// SetActiveAddress sets the currently selected address (must be in project)
+
+//------------------------------------------------------------------------------------
+// AddAddress adds a new address to the project
+
+//------------------------------------------------------------------------------------
+// GetAddresses returns all addresses in the project
+
+//------------------------------------------------------------------------------------
+// GetLastView returns the last visited view/route
+
+//------------------------------------------------------------------------------------
+// SetLastView updates the last visited view/route and saves immediately (session state)
+
+//------------------------------------------------------------------------------------
+// GetLastFacet returns the last visited facet for a specific view
+
+//------------------------------------------------------------------------------------
+// SetLastFacet updates the last visited facet for a specific view and saves immediately (session state)
+
+//------------------------------------------------------------------------------------
+// RemoveAddress removes an address from the project
+
+//------------------------------------------------------------------------------------
+// GetChains returns all chains in the project
+
+//------------------------------------------------------------------------------------
+// GetActiveChain returns the currently selected chain
+
+//------------------------------------------------------------------------------------
+// SetActiveChain sets the currently selected chain (must be in project)
+
+//------------------------------------------------------------------------------------
+// AddChain adds a new chain to the project
+
+//------------------------------------------------------------------------------------
+// RemoveChain removes a chain from the project
+
+//------------------------------------------------------------------------------------
+// GetContracts returns all contracts in the project
+
+//------------------------------------------------------------------------------------
+// GetActiveContract returns the currently selected contract
+
+//------------------------------------------------------------------------------------
+// SetActiveContract sets the currently selected contract (must be in project or empty)
+
+//------------------------------------------------------------------------------------
+// AddContract adds a new contract to the project
+
+//------------------------------------------------------------------------------------
+// RemoveContract removes a contract from the project
+
+//------------------------------------------------------------------------------------
+// ViewStateKeyToString converts a ViewStateKey to a string for map indexing
+
+//------------------------------------------------------------------------------------
+// GetFilterState retrieves filter state for a given key
+
+//------------------------------------------------------------------------------------
+// SetFilterState sets filter state for a given key and saves immediately (session state)
+
+//------------------------------------------------------------------------------------
+// ClearFilterState removes view state for a given key and saves immediately (session state)
+
+//------------------------------------------------------------------------------------
+// ClearAllViewStates removes all filter states and saves immediately (session state)

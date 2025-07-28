@@ -111,12 +111,14 @@ const createInitialMockAppBridge = (): AppBridgeFunctions => ({
     menuCollapsed: false,
   }),
   SetLastView: vi.fn().mockResolvedValue(undefined),
+  SetViewState: vi.fn().mockResolvedValue(undefined),
+  CancelAllFetches: vi.fn().mockResolvedValue(3),
 });
 
 export let mockAppBridge = createInitialMockAppBridge();
 export let mockRuntimeBridge = createInitialMockRuntimeBridge();
 
-vi.mock('../../wailsjs/go/app/App', () => mockAppBridge);
+vi.mock('@app', () => mockAppBridge);
 vi.mock('../../wailsjs/runtime/runtime', () => mockRuntimeBridge);
 
 export const setupWailsMocks = ({
@@ -309,8 +311,6 @@ export function setupComponentHookMocks({
   } else {
     mockTableContextDefaultValue = newDefaults;
   }
-  // mockUseTableContext will automatically return the updated mockTableContextDefaultValue
-  // No longer need the vi.mock('@components', ...) here as it's top-level.
 }
 // --- End Context Mocking --- //
 

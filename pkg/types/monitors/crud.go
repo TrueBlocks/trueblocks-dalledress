@@ -7,7 +7,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -22,7 +21,7 @@ func (c *MonitorsCollection) Crud(
 		monitor = cast
 	}
 
-	chain := preferences.GetLastChain()
+	chain := payload.Chain
 
 	var err error
 	switch op {
@@ -109,9 +108,8 @@ func (c *MonitorsCollection) updateMonitorInData(data []*Monitor, monitor *Monit
 	}
 }
 
-func (c *MonitorsCollection) Clean(addresses []string) error {
-	chain := preferences.GetLastChain()
-
+func (c *MonitorsCollection) Clean(payload *types.Payload, addresses []string) error {
+	chain := payload.Chain
 	opts := sdk.MonitorsOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}

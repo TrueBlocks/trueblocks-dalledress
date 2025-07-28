@@ -29,15 +29,15 @@ import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
-import { DEFAULT_FACET, ROUTE, abisFacets } from './facets';
+import { abisFacets } from './facets';
 
+export const ROUTE = '/abis' as const;
 export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: abisFacets,
-    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;

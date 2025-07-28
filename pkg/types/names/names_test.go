@@ -25,7 +25,8 @@ func assertNamesPage(t *testing.T, page types.Page) *NamesPage {
 // Domain-specific filtering tests for Names collection
 
 func TestNamesMatchesFilter(t *testing.T) {
-	collection := NewNamesCollection()
+	var payload types.Payload
+	collection := NewNamesCollection(&payload)
 	testName := &Name{
 		Address:    base.HexToAddress("0x1234567890123456789012345678901234567890"),
 		Name:       "Test Name",
@@ -71,7 +72,8 @@ func TestNamesMatchesFilter(t *testing.T) {
 }
 
 func TestNamesCollectionDomainSpecificFiltering(t *testing.T) {
-	collection := NewNamesCollection()
+	var payload types.Payload
+	collection := NewNamesCollection(&payload)
 
 	t.Run("GetPageWithDomainSpecificFilter", func(t *testing.T) {
 		payload := &types.Payload{DataFacet: NamesAll}

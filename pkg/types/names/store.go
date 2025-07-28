@@ -16,7 +16,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -32,12 +31,12 @@ var (
 	namesStoreMu sync.Mutex
 )
 
-func (c *NamesCollection) getNamesStore(facet types.DataFacet) *store.Store[Name] {
+func (c *NamesCollection) getNamesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Name] {
 	namesStoreMu.Lock()
 	defer namesStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := namesStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -105,7 +104,7 @@ func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet, chain, address
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetNamesCount(payload *types.Payload) (int, error) {
-	chain := preferences.GetLastChain()
+	chain := payload.Chain
 	countOpts := sdk.NamesOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
@@ -135,7 +134,7 @@ func GetNamesCollection(payload *types.Payload) *NamesCollection {
 		return collection
 	}
 
-	collection := NewNamesCollection()
+	collection := NewNamesCollection(payload)
 	collections[key] = collection
 	return collection
 }

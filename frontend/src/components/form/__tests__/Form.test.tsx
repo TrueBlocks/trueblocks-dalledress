@@ -1,9 +1,8 @@
 import { Form } from '@components';
 import { MantineProvider } from '@mantine/core';
+import { resetAllCentralMocks, triggerHotkey } from '@mocks';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { vi } from 'vitest';
-
-import { resetAllCentralMocks, triggerHotkey } from '../../../__tests__/mocks';
 
 vi.mock('react-hotkeys-hook', async () => {
   const mocks = await import('../../../__tests__/mocks');

@@ -10,23 +10,48 @@ vi.mock('@components', () => ({
   useTableContext: vi.fn(),
 }));
 
+vi.mock('@contexts', async () => {
+  const actual = await vi.importActual('@contexts');
+  return {
+    ...actual,
+    usePagination: vi.fn(() => ({
+      page: 1,
+      perPage: 10,
+      setPagination: vi.fn(),
+    })),
+    useSorting: vi.fn(() => ({
+      fields: [],
+      orders: [],
+      setSorting: vi.fn(),
+    })),
+    useFiltering: vi.fn(() => ({
+      filters: {},
+      setFilter: vi.fn(),
+    })),
+    useViewState: vi.fn(() => ({
+      setViewState: vi.fn(),
+      getViewState: vi.fn(),
+      clearViewState: vi.fn(),
+    })),
+  };
+});
+
 vi.mock('../usePagination', () => ({
   usePagination: vi.fn(),
 }));
 
-// Helper function to create mock keyboard events
-function mockEvent(
-  key: string,
-  extra: Partial<React.KeyboardEvent> = {},
-): React.KeyboardEvent {
-  return {
-    key,
-    preventDefault: vi.fn(),
-    ...extra,
-  } as unknown as React.KeyboardEvent;
-}
-
 describe('useTableKeys', () => {
+  function mockEvent(
+    key: string,
+    extra: Partial<React.KeyboardEvent> = {},
+  ): React.KeyboardEvent {
+    return {
+      key,
+      preventDefault: vi.fn(),
+      ...extra,
+    } as unknown as React.KeyboardEvent;
+  }
+
   const createMockTableContext = (
     overrides: Partial<ReturnType<typeof useTableContext>> = {},
   ) => ({

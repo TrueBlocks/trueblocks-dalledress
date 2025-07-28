@@ -47,19 +47,19 @@ type NamesCollection struct {
 	summaryMutex  sync.RWMutex
 }
 
-func NewNamesCollection() *NamesCollection {
+func NewNamesCollection(payload *types.Payload) *NamesCollection {
 	c := &NamesCollection{}
 	c.ResetSummary()
-	c.initializeFacets()
+	c.initializeFacets(payload)
 	return c
 }
 
-func (c *NamesCollection) initializeFacets() {
+func (c *NamesCollection) initializeFacets(payload *types.Payload) {
 	c.allFacet = facets.NewFacet(
 		NamesAll,
 		isAll,
 		isDupName(),
-		c.getNamesStore(NamesAll),
+		c.getNamesStore(payload, NamesAll),
 		"names",
 		c,
 	)
@@ -68,7 +68,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesCustom,
 		isCustom,
 		isDupName(),
-		c.getNamesStore(NamesCustom),
+		c.getNamesStore(payload, NamesCustom),
 		"names",
 		c,
 	)
@@ -77,7 +77,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesPrefund,
 		isPrefund,
 		isDupName(),
-		c.getNamesStore(NamesPrefund),
+		c.getNamesStore(payload, NamesPrefund),
 		"names",
 		c,
 	)
@@ -86,7 +86,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesRegular,
 		isRegular,
 		isDupName(),
-		c.getNamesStore(NamesRegular),
+		c.getNamesStore(payload, NamesRegular),
 		"names",
 		c,
 	)
@@ -95,7 +95,7 @@ func (c *NamesCollection) initializeFacets() {
 		NamesBaddress,
 		isBaddress,
 		isDupName(),
-		c.getNamesStore(NamesBaddress),
+		c.getNamesStore(payload, NamesBaddress),
 		"names",
 		c,
 	)

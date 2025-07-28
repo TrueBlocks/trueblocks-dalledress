@@ -12,24 +12,17 @@ export const chunksFacets: DataFacetConfig[] = [
   {
     id: types.DataFacet.STATS,
     label: toProperCase(types.DataFacet.STATS),
-    isDefault: true,
   },
   {
     id: types.DataFacet.INDEX,
     label: toProperCase(types.DataFacet.INDEX),
-    isDefault: false,
   },
   {
     id: types.DataFacet.BLOOMS,
     label: toProperCase(types.DataFacet.BLOOMS),
-    isDefault: false,
   },
   {
     id: types.DataFacet.MANIFEST,
     label: toProperCase(types.DataFacet.MANIFEST),
-    isDefault: false,
   },
 ];
-
-export const DEFAULT_FACET = types.DataFacet.STATS;
-export const ROUTE = '/chunks' as const;

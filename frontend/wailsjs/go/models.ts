@@ -687,11 +687,27 @@ export namespace preferences {
 
 export namespace project {
 	
+	export class FilterState {
+	    sorting?: Record<string, any>;
+	    filtering?: Record<string, any>;
+	    other?: Record<string, any>;
+	
+	    static createFrom(source: any = {}) {
+	        return new FilterState(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.sorting = source["sorting"];
+	        this.filtering = source["filtering"];
+	        this.other = source["other"];
+	    }
+	}
 	export class Project {
+	    dirty?: boolean;
 	    version: string;
 	    name: string;
 	    last_opened: string;
-	    dirty: boolean;
 	    address: base.Address;
 	
 	    static createFrom(source: any = {}) {
@@ -700,10 +716,10 @@ export namespace project {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.dirty = source["dirty"];
 	        this.version = source["version"];
 	        this.name = source["name"];
 	        this.last_opened = source["last_opened"];
-	        this.dirty = source["dirty"];
 	        this.address = this.convertValues(source["address"], base.Address);
 	    }
 	
@@ -724,22 +740,6 @@ export namespace project {
 		    }
 		    return a;
 		}
-	}
-	export class ViewState {
-	    sorting?: Record<string, any>;
-	    filtering?: Record<string, any>;
-	    other?: Record<string, any>;
-	
-	    static createFrom(source: any = {}) {
-	        return new ViewState(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.sorting = source["sorting"];
-	        this.filtering = source["filtering"];
-	        this.other = source["other"];
-	    }
 	}
 	export class ViewStateKey {
 	    viewName: string;

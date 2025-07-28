@@ -52,15 +52,15 @@ import { Debugger, useErrorHandler } from '@utils';
 import { Group } from '@mantine/core';
 {{- end}}
 import { getColumns } from './columns';
-import { DEFAULT_FACET, ROUTE, {{$lower}}Facets } from './facets';
+import { {{$lower}}Facets } from './facets';
 
+export const ROUTE = '/{{$lower}}' as const;
 export const {{$class}} = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: {{$lower}}Facets,
-    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;

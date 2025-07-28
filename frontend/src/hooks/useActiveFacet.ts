@@ -9,7 +9,6 @@ export type DataFacet = types.DataFacet;
 export interface DataFacetConfig {
   id: DataFacet;
   label: string;
-  isDefault?: boolean;
   dividerBefore?: boolean;
 }
 
@@ -26,7 +25,6 @@ export interface UseActiveFacetReturn {
 export interface UseActiveFacetParams {
   viewRoute: string;
   facets: DataFacetConfig[];
-  defaultFacet?: DataFacet;
 }
 
 /**
@@ -44,19 +42,13 @@ export interface UseActiveFacetParams {
 export const useActiveFacet = (
   params: UseActiveFacetParams,
 ): UseActiveFacetReturn => {
-  const { viewRoute, facets, defaultFacet } = params;
+  const { viewRoute, facets } = params;
   const { lastTab, setLastTab } = useActiveProject();
 
   // Determine the default facet for this view
   const computedDefaultFacet = useMemo((): DataFacet => {
-    if (defaultFacet) return defaultFacet;
-
-    const defaultConfig = facets.find((f) => f.isDefault);
-    if (defaultConfig) return defaultConfig.id;
-
-    // Fallback to first facet
     return facets[0]?.id || types.DataFacet.ALL;
-  }, [defaultFacet, facets]);
+  }, [facets]);
 
   // Get the currently active facet from preferences or default
   const activeFacet = useMemo((): DataFacet => {

@@ -1,7 +1,6 @@
+import { render as customRender } from '@mocks';
 import { screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-
-import { render as customRender } from '../../__tests__/mocks';
 
 // Mock the Names component to avoid complex dependencies
 vi.mock('../names/Names', () => ({

@@ -38,15 +38,15 @@ import { TransactionReviewModal } from '../contracts/components/TransactionRevie
 import { PreparedTransaction } from '../contracts/components/transactionBuilder';
 import { useWalletConnection } from '../contracts/components/walletConnection';
 import { getColumns } from './columns';
-import { DEFAULT_FACET, ROUTE, namesFacets } from './facets';
+import { namesFacets } from './facets';
 
+export const ROUTE = '/names' as const;
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: namesFacets,
-    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;

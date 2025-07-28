@@ -44,7 +44,7 @@ import { Debugger, Log, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { ContractDashboard, ContractExecute } from './components';
-import { DEFAULT_FACET, ROUTE, contractsFacets } from './facets';
+import { contractsFacets } from './facets';
 
 // Tiny component for consistent facet titles
 interface FacetTitleProps {
@@ -120,6 +120,7 @@ const FacetTitle: React.FC<FacetTitleProps> = ({
   );
 };
 
+export const ROUTE = '/contracts' as const;
 export const Contracts = () => {
   // === SECTION 2: Contract Detail Detection ===
   const { lastContract, setActiveContract } = useActiveProject();
@@ -134,7 +135,6 @@ export const Contracts = () => {
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
     facets: contractsFacets,
-    defaultFacet: DEFAULT_FACET,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;

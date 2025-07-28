@@ -16,7 +16,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -44,12 +43,12 @@ var (
 	statsStoreMu sync.Mutex
 )
 
-func (c *ChunksCollection) getBloomsStore(facet types.DataFacet) *store.Store[Bloom] {
+func (c *ChunksCollection) getBloomsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Bloom] {
 	bloomsStoreMu.Lock()
 	defer bloomsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := bloomsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -93,12 +92,12 @@ func (c *ChunksCollection) getBloomsStore(facet types.DataFacet) *store.Store[Bl
 	return theStore
 }
 
-func (c *ChunksCollection) getIndexStore(facet types.DataFacet) *store.Store[Index] {
+func (c *ChunksCollection) getIndexStore(payload *types.Payload, facet types.DataFacet) *store.Store[Index] {
 	indexStoreMu.Lock()
 	defer indexStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := indexStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -146,12 +145,12 @@ func (c *ChunksCollection) getIndexStore(facet types.DataFacet) *store.Store[Ind
 	return theStore
 }
 
-func (c *ChunksCollection) getManifestStore(facet types.DataFacet) *store.Store[Manifest] {
+func (c *ChunksCollection) getManifestStore(payload *types.Payload, facet types.DataFacet) *store.Store[Manifest] {
 	manifestStoreMu.Lock()
 	defer manifestStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := manifestStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -195,12 +194,12 @@ func (c *ChunksCollection) getManifestStore(facet types.DataFacet) *store.Store[
 	return theStore
 }
 
-func (c *ChunksCollection) getStatsStore(facet types.DataFacet) *store.Store[Stats] {
+func (c *ChunksCollection) getStatsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Stats] {
 	statsStoreMu.Lock()
 	defer statsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := statsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -265,7 +264,7 @@ func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet, chain, addres
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetChunksCount(payload *types.Payload) (int, error) {
-	chain := preferences.GetLastChain()
+	chain := payload.Chain
 	countOpts := sdk.ChunksOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
@@ -294,7 +293,7 @@ func GetChunksCollection(payload *types.Payload) *ChunksCollection {
 		return collection
 	}
 
-	collection := NewChunksCollection()
+	collection := NewChunksCollection(payload)
 	collections[key] = collection
 	return collection
 }

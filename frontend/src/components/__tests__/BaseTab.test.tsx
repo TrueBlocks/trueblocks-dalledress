@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { FormField } from '@components';
+import { render } from '@mocks';
 import { project, types } from '@models';
 import { describe, expect, it, vi } from 'vitest';
 
-import { render } from '../../__tests__/mocks';
 import { BaseTab } from '../BaseTab';
 
 const mockColumns: FormField<{ id: string; name: string }>[] = [
@@ -112,7 +112,7 @@ describe('BaseTab', () => {
     });
 
     it('handles ViewStateKey creation patterns used in views', () => {
-      // Simulate the pattern used in actual views: { viewName: ROUTE, facetName: dataFacet }
+      // Simulate the pattern used in actual views: { viewName: /route, facetName: dataFacet }
       const chunksKey: project.ViewStateKey = {
         viewName: '/chunks',
         facetName: types.DataFacet.ALL,

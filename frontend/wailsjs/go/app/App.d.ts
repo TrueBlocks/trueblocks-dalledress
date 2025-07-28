@@ -112,7 +112,7 @@ export function GetUserInfoStatus():Promise<app.UserInfoStatus>;
 
 export function GetUserPreferences():Promise<preferences.UserPreferences>;
 
-export function GetViewState(arg1:project.ViewStateKey):Promise<project.ViewState>;
+export function GetViewState(arg1:project.ViewStateKey):Promise<project.FilterState>;
 
 export function GetWizardReturn():Promise<string>;
 

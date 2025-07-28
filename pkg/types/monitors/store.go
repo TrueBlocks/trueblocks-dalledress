@@ -16,7 +16,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -32,12 +31,12 @@ var (
 	monitorsStoreMu sync.Mutex
 )
 
-func (c *MonitorsCollection) getMonitorsStore(facet types.DataFacet) *store.Store[Monitor] {
+func (c *MonitorsCollection) getMonitorsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Monitor] {
 	monitorsStoreMu.Lock()
 	defer monitorsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := monitorsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -92,7 +91,8 @@ func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet, chain, addr
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetMonitorsCount(payload *types.Payload) (int, error) {
-	chain := preferences.GetLastChain()
+	chain := payload.Chain
+	// address := payload.Address
 	countOpts := sdk.MonitorsOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
@@ -121,7 +121,7 @@ func GetMonitorsCollection(payload *types.Payload) *MonitorsCollection {
 		return collection
 	}
 
-	collection := NewMonitorsCollection()
+	collection := NewMonitorsCollection(payload)
 	collections[key] = collection
 	return collection
 }

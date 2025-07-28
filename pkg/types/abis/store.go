@@ -16,17 +16,17 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 // EXISTING_CODE
-// EXISTING_CODE
-
 type Abi = sdk.Abi
 type Function = sdk.Function
+type Parameter = sdk.Parameter
+
+// EXISTING_CODE
 
 var (
 	abisStore   *store.Store[Abi]
@@ -36,12 +36,12 @@ var (
 	functionsStoreMu sync.Mutex
 )
 
-func (c *AbisCollection) getAbisStore(facet types.DataFacet) *store.Store[Abi] {
+func (c *AbisCollection) getAbisStore(payload *types.Payload, facet types.DataFacet) *store.Store[Abi] {
 	abisStoreMu.Lock()
 	defer abisStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := abisStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -81,12 +81,12 @@ func (c *AbisCollection) getAbisStore(facet types.DataFacet) *store.Store[Abi] {
 	return theStore
 }
 
-func (c *AbisCollection) getFunctionsStore(facet types.DataFacet) *store.Store[Function] {
+func (c *AbisCollection) getFunctionsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Function] {
 	functionsStoreMu.Lock()
 	defer functionsStoreMu.Unlock()
 
-	chain := preferences.GetLastChain()
-	address := preferences.GetLastAddress()
+	chain := payload.Chain
+	address := payload.Address
 	theStore := functionsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -147,7 +147,7 @@ func (c *AbisCollection) GetStoreName(dataFacet types.DataFacet, chain, address 
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetAbisCount(payload *types.Payload) (int, error) {
-	chain := preferences.GetLastChain()
+	chain := payload.Chain
 	countOpts := sdk.AbisOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}
@@ -176,7 +176,7 @@ func GetAbisCollection(payload *types.Payload) *AbisCollection {
 		return collection
 	}
 
-	collection := NewAbisCollection()
+	collection := NewAbisCollection(payload)
 	collections[key] = collection
 	return collection
 }

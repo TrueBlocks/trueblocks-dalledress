@@ -6,8 +6,8 @@ export function AccumulateItem(arg1, arg2) {
   return window['go']['monitors']['MonitorsCollection']['AccumulateItem'](arg1, arg2);
 }
 
-export function Clean(arg1) {
-  return window['go']['monitors']['MonitorsCollection']['Clean'](arg1);
+export function Clean(arg1, arg2) {
+  return window['go']['monitors']['MonitorsCollection']['Clean'](arg1, arg2);
 }
 
 export function Crud(arg1, arg2, arg3) {

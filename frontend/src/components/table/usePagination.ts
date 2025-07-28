@@ -1,11 +1,12 @@
 import { useCallback, useMemo } from 'react';
 
-import { NavigationTarget, ViewStateKey, useViewContext } from '@contexts';
+import { NavigationTarget, useViewContext } from '@contexts';
+import { project } from '@models';
 
 import { calculateNavigationTarget } from './navigationUtils';
 
 // usePagination is a custom hook that manages pagination state and handlers for a table view/tab.
-export const usePagination = (viewStateKey: ViewStateKey) => {
+export const usePagination = (viewStateKey: project.ViewStateKey) => {
   const { getPagination, updatePagination } = useViewContext();
   const pagination = getPagination(viewStateKey);
 

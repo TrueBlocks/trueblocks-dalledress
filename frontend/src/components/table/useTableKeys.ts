@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { useTableContext } from '@components';
-import { ViewStateKey } from '@contexts';
+import { project } from '@models';
 
 import { usePagination } from './usePagination';
 
@@ -10,7 +10,7 @@ interface UseTableKeysProps {
   itemCount: number;
   currentPage: number;
   totalPages: number;
-  viewStateKey: ViewStateKey;
+  viewStateKey: project.ViewStateKey;
   onEnter?: () => void;
   onDelete?: () => void;
   onCmdDelete?: () => void;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { GetAppPreferences } from '@app';
+import { Log } from '@utils';
 
 /**
  * Hook to check if a dialog has been silenced by the user
@@ -18,7 +19,7 @@ export const useSilencedDialog = (dialogKey: string) => {
       const silenced = prefs.silencedDialogs?.[dialogKey] === true;
       setIsSilenced(silenced);
     } catch (error) {
-      console.error('Failed to check silenced dialog:', error);
+      Log('ERROR: Failed to check silenced dialog:', JSON.stringify(error));
       setIsSilenced(false); // Default to not silenced if we can't check
     } finally {
       setIsLoading(false);

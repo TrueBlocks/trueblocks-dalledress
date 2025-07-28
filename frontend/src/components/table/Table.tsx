@@ -4,7 +4,7 @@ import { useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
 import { useFiltering } from '@contexts';
 import { Modal } from '@mantine/core';
-import { ViewStateKey } from 'src/contexts/ViewStateKey';
+import { project } from '@models';
 
 import {
   Body,
@@ -22,7 +22,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   columns: FormField<T>[];
   data: T[];
   loading: boolean;
-  viewStateKey: ViewStateKey;
+  viewStateKey: project.ViewStateKey;
   onSubmit: (data: T) => void;
   onDelete?: (rowData: T) => void;
   onRemove?: (rowData: T) => void;

@@ -38,7 +38,7 @@ import { BaseTab, usePagination } from '@components';
 {{- if $hasCrud}}
 import { Action{{if $isNames}}, ConfirmModal{{end}} } from '@components';
 {{- end}}
-import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useFiltering, useSorting } from '@contexts';
 import { DataFacetConfig, toPageDataProp, useActiveFacet, useColumns, useEvent, usePayload } from '@hooks';
 {{- if $hasCrud}}
 import { {{if $isNames}}ActionType, useActionMsgs, {{end}}useActions{{if $isNames}}, useSilencedDialog{{end}} } from '@hooks';
@@ -46,7 +46,7 @@ import { {{if $isNames}}ActionType, useActionMsgs, {{end}}useActions{{if $isName
 import { {{if $hasForms}}FormView, {{end}}TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { {{$lower}} } from '@models';
-import { msgs, types } from '@models';
+import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 {{- if $hasCrud}}
 import { Group } from '@mantine/core';
@@ -67,7 +67,7 @@ export const {{$class}} = () => {
 
   const [pageData, setPageData] = useState<{{$lower}}.{{$class}}Page | null>(null);
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({
+    (): project.ViewStateKey => ({
       viewName: ROUTE,
       facetName: getCurrentDataFacet(),
     }),

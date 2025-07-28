@@ -298,6 +298,11 @@ func (a *App) SetProjectAddress(addr base.Address) {
 	}
 }
 
+func (a *App) GetViewState(key project.ViewStateKey) (project.ViewState, error) {
+	_ = key
+	return project.ViewState{}, nil
+}
+
 func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 	active := a.Projects.Active()
 	if active == nil {
@@ -409,7 +414,3 @@ func (a *App) Encode(fn sdk.Function, params []interface{}) (string, error) {
 	return "0x" + hex.EncodeToString(packed), nil
 }
 
-func (a *App) GetViewState(key project.ViewStateKey) (project.ViewState, error) {
-	_ = key
-	return project.ViewState{}, nil
-}

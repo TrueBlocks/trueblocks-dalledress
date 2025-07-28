@@ -1,4 +1,4 @@
-import { ViewStateKey } from '@contexts';
+import { project } from '@models';
 import { usePagination } from 'src/components/table/usePagination';
 
 import './PerPage.css';
@@ -6,7 +6,7 @@ import './PerPage.css';
 // PerPageProps defines the props for the PerPage component.
 interface PerPageProps {
   pageSize: number;
-  viewStateKey: ViewStateKey;
+  viewStateKey: project.ViewStateKey;
   focusTable: () => void;
   focusControls: () => void;
 }

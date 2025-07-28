@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AbisCrud, GetAbisPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { Action } from '@components';
-import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
   toPageDataProp,
@@ -25,7 +25,7 @@ import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { abis } from '@models';
-import { msgs, types } from '@models';
+import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
@@ -44,7 +44,7 @@ export const Abis = () => {
 
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({
+    (): project.ViewStateKey => ({
       viewName: ROUTE,
       facetName: getCurrentDataFacet(),
     }),

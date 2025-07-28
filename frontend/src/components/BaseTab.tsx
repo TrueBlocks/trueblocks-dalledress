@@ -1,14 +1,14 @@
 import React from 'react';
 
 import { FormField, Table, TableProvider } from '@components';
-import { ViewStateKey } from '@contexts';
+import { project } from '@models';
 
 import './BaseTab.css';
 
 interface BaseTabProps<T extends Record<string, unknown>> {
   data: T[];
   columns: FormField<T>[];
-  viewStateKey: ViewStateKey;
+  viewStateKey: project.ViewStateKey;
   loading: boolean;
   error: Error | null;
   onSubmit?: (formData: T) => void;

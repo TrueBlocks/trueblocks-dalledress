@@ -7,9 +7,9 @@ import {
   useState,
 } from 'react';
 
-import { sdk } from '@models';
+import { project, sdk } from '@models';
 
-import { ViewStateKey, viewStateKeyToString } from '.';
+import { viewStateKeyToString } from '.';
 import { createEmptySortSpec } from '../utils/sortSpec';
 
 const EMPTY_SORT = createEmptySortSpec();
@@ -71,18 +71,18 @@ export const initialPaginationState: PaginationState = Object.freeze({
 interface ViewContextType {
   currentView: string;
   setCurrentView: (view: string) => void;
-  getPagination: (viewStateKey: ViewStateKey) => PaginationState;
+  getPagination: (viewStateKey: project.ViewStateKey) => PaginationState;
   updatePagination: (
-    viewStateKey: ViewStateKey,
+    viewStateKey: project.ViewStateKey,
     changes: Partial<PaginationState>,
   ) => void;
-  getSorting: (viewStateKey: ViewStateKey) => sdk.SortSpec | null;
+  getSorting: (viewStateKey: project.ViewStateKey) => sdk.SortSpec | null;
   updateSorting: (
-    viewStateKey: ViewStateKey,
+    viewStateKey: project.ViewStateKey,
     sort: sdk.SortSpec | null,
   ) => void;
-  getFiltering: (viewStateKey: ViewStateKey) => string;
-  updateFiltering: (viewStateKey: ViewStateKey, filter: string) => void;
+  getFiltering: (viewStateKey: project.ViewStateKey) => string;
+  updateFiltering: (viewStateKey: project.ViewStateKey, filter: string) => void;
 }
 
 export const ViewContext = createContext<ViewContextType>({
@@ -103,7 +103,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   const [viewFiltering, setViewFiltering] = useState<ViewFilterState>({});
 
   const getPagination = useCallback(
-    (viewStateKey: ViewStateKey) => {
+    (viewStateKey: project.ViewStateKey) => {
       const key = viewStateKeyToString(viewStateKey);
       return viewPagination[key] || initialPaginationState;
     },
@@ -111,7 +111,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const updatePagination = useCallback(
-    (viewStateKey: ViewStateKey, changes: Partial<PaginationState>) => {
+    (viewStateKey: project.ViewStateKey, changes: Partial<PaginationState>) => {
       setViewPagination((prev) => {
         const key = viewStateKeyToString(viewStateKey);
         const currentPagination = prev[key] || { ...initialPaginationState };
@@ -128,7 +128,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const getSorting = useCallback(
-    (viewStateKey: ViewStateKey) => {
+    (viewStateKey: project.ViewStateKey) => {
       const key = viewStateKeyToString(viewStateKey);
       return viewSorting[key] || null;
     },
@@ -136,7 +136,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const updateSorting = useCallback(
-    (viewStateKey: ViewStateKey, sort: sdk.SortSpec | null) => {
+    (viewStateKey: project.ViewStateKey, sort: sdk.SortSpec | null) => {
       setViewSorting((prev) => {
         const key = viewStateKeyToString(viewStateKey);
         return {
@@ -149,14 +149,14 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const getFiltering = useCallback(
-    (viewStateKey: ViewStateKey) => {
+    (viewStateKey: project.ViewStateKey) => {
       return viewFiltering[viewStateKey.viewName] || '';
     },
     [viewFiltering],
   );
 
   const updateFiltering = useCallback(
-    (viewStateKey: ViewStateKey, filter: string) => {
+    (viewStateKey: project.ViewStateKey, filter: string) => {
       setViewFiltering((prev) => ({
         ...prev,
         [viewStateKey.viewName]: filter,
@@ -203,7 +203,7 @@ export const useViewContext = () => {
 
 // Hook for sorting state (per-facet)
 // Uses full ViewStateKey (viewName + facetName) to scope sorting per facet
-export const useSorting = (viewStateKey: ViewStateKey) => {
+export const useSorting = (viewStateKey: project.ViewStateKey) => {
   const { getSorting, updateSorting } = useViewContext();
 
   const setSorting = useCallback(
@@ -222,7 +222,7 @@ export const useSorting = (viewStateKey: ViewStateKey) => {
 
 // Hook for filtering state (per-view)
 // Uses only viewName from ViewStateKey to scope filtering per view
-export const useFiltering = (viewStateKey: ViewStateKey) => {
+export const useFiltering = (viewStateKey: project.ViewStateKey) => {
   const { getFiltering, updateFiltering } = useViewContext();
 
   const setFiltering = useCallback(

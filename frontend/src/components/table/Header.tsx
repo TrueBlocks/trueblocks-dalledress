@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FormField } from '@components';
 import { useSorting } from '@contexts';
-import { ViewStateKey } from 'src/contexts/ViewStateKey';
+import { project } from '@models';
 
 import { SortSpecManager } from '../../utils/sortSpec';
 import './Header.css';
@@ -12,7 +12,7 @@ export const Header = <T extends Record<string, unknown>>({
   viewStateKey,
 }: {
   columns: FormField<T>[];
-  viewStateKey: ViewStateKey;
+  viewStateKey: project.ViewStateKey;
 }) => {
   const { sort, setSorting } = useSorting(viewStateKey);
   const handleClick = (col: FormField<T>) => {

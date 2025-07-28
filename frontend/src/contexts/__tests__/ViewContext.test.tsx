@@ -1,10 +1,9 @@
 import { ReactNode } from 'react';
 
-import { types } from '@models';
+import { project, types } from '@models';
 import { act, renderHook } from '@testing-library/react';
 
 import { ViewContextProvider, useViewContext } from '../ViewContext';
-import { ViewStateKey } from '../index';
 
 // Minimal wrapper for testing
 const createWrapper = () => {
@@ -18,7 +17,7 @@ const createWrapper = () => {
 const createViewStateKey = (
   view: string,
   tab: types.DataFacet,
-): ViewStateKey => ({
+): project.ViewStateKey => ({
   viewName: view,
   facetName: tab,
 });

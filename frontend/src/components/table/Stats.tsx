@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ViewStateKey } from '@contexts';
+import { project } from '@models';
 import { usePagination } from 'src/components/table/usePagination';
 
 import './Stats.css';
@@ -8,7 +8,7 @@ import './Stats.css';
 // StatsProps defines the props for the Stats component.
 interface StatsProps {
   namesLength: number;
-  viewStateKey: ViewStateKey;
+  viewStateKey: project.ViewStateKey;
 }
 
 // Stats displays a summary of the current entries being shown in the table.

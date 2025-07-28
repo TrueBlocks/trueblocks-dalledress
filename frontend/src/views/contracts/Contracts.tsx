@@ -17,7 +17,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetContractsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
   toPageDataProp,
@@ -39,7 +39,7 @@ import {
 } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { contracts } from '@models';
-import { msgs, types } from '@models';
+import { msgs, project, types } from '@models';
 import { Debugger, Log, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
@@ -148,7 +148,7 @@ export const Contracts = () => {
     null,
   );
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({
+    (): project.ViewStateKey => ({
       viewName: ROUTE,
       facetName: getCurrentDataFacet(),
     }),

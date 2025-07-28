@@ -1,7 +1,6 @@
 import { FormField, Table, TableProps } from '@components';
-import { ViewStateKey } from '@contexts';
 import { MantineProvider } from '@mantine/core';
-import { types } from '@models';
+import { project, types } from '@models';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -31,8 +30,8 @@ const mockData = [
   { id: 3, name: 'Item 3', description: 'Third item' },
 ];
 
-const viewStateKey: ViewStateKey = {
-  viewName: 'test-view',
+const mockViewStateKey: project.ViewStateKey = {
+  viewName: 'test',
   facetName: types.DataFacet.ALL,
 };
 
@@ -40,7 +39,7 @@ const defaultProps: TableProps<TestRow> = {
   columns: mockColumns,
   data: mockData,
   loading: false,
-  viewStateKey,
+  viewStateKey: mockViewStateKey,
   onSubmit: vi.fn(),
 };
 
@@ -128,7 +127,7 @@ describe('Table', () => {
 
       setupTest({
         data: largeDataset.slice(0, 10),
-        viewStateKey: viewStateKey,
+        viewStateKey: mockViewStateKey,
       });
 
       const rows = screen.getAllByRole('row');

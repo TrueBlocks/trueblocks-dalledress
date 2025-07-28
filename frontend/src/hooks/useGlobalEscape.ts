@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { useEmitters } from '@utils';
+import { Log, useEmitters } from '@utils';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { CancelAllFetches } from '../../wailsjs/go/app/App';
@@ -30,7 +30,7 @@ export const useGlobalEscape = ({
       }
       onEscape?.();
     } catch (error) {
-      console.error('Failed to cancel fetches:', error);
+      Log('ERROR: Failed to cancel fetches:', JSON.stringify(error));
       emitStatus('Failed to cancel active fetches');
     }
   }, [emitStatus, onEscape]);

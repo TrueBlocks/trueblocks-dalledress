@@ -1,6 +1,5 @@
 import { Pagination } from '@components';
-import { ViewStateKey } from '@contexts';
-import { types } from '@models';
+import { project, types } from '@models';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +13,7 @@ vi.mock('../usePagination', () => ({
 }));
 
 describe('Pagination', () => {
-  const mockViewStateKey: ViewStateKey = {
+  const mockViewStateKey: project.ViewStateKey = {
     viewName: 'test-view',
     facetName: types.DataFacet.ALL,
   };

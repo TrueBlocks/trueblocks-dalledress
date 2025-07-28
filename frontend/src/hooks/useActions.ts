@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ViewStateKey } from '@contexts';
 import { useWalletGatedAction } from '@hooks';
-import { crud, sdk, types } from '@models';
+import { crud, project, sdk, types } from '@models';
 import { Log, useErrorHandler } from '@utils';
 
 import {
@@ -49,7 +48,7 @@ export interface CollectionActionsConfig<TPageData, TItem> {
   collection: string;
 
   // Current context
-  viewStateKey: ViewStateKey;
+  viewStateKey: project.ViewStateKey;
 
   // Required hooks from parent component
   pagination: ReturnType<

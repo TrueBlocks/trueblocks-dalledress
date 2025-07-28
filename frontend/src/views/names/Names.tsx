@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetNamesPage, NamesCrud, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { Action, ConfirmModal } from '@components';
-import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
   toPageDataProp,
@@ -30,7 +30,7 @@ import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { names } from '@models';
-import { msgs, types } from '@models';
+import { msgs, project, types } from '@models';
 import { Debugger, Log, useErrorHandler } from '@utils';
 
 import { TransactionReviewModal } from '../contracts/components/TransactionReviewModal';
@@ -53,7 +53,7 @@ export const Names = () => {
 
   const [pageData, setPageData] = useState<names.NamesPage | null>(null);
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({
+    (): project.ViewStateKey => ({
       viewName: ROUTE,
       facetName: getCurrentDataFacet(),
     }),

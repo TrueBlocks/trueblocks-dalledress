@@ -1,5 +1,5 @@
 import { useTableContext } from '@components';
-import { ViewStateKey } from '@contexts';
+import { project } from '@models';
 
 import './Pagination.css';
 import { usePagination } from './usePagination';
@@ -8,7 +8,7 @@ import { usePagination } from './usePagination';
 interface PaginationProps {
   totalPages: number;
   currentPage: number;
-  viewStateKey: ViewStateKey;
+  viewStateKey: project.ViewStateKey;
   focusControls: () => void;
 }
 

@@ -1,6 +1,5 @@
 import { usePagination } from '@components';
-import { ViewStateKey } from '@contexts';
-import { types } from '@models';
+import { project, types } from '@models';
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -19,11 +18,11 @@ vi.mock('@contexts', async () => {
 describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
   describe('usePagination with ViewStateKey', () => {
     it('creates unique pagination state for different ViewStateKey combinations', () => {
-      const exportsTransactionsKey: ViewStateKey = {
+      const exportsTransactionsKey: project.ViewStateKey = {
         viewName: '/exports',
         facetName: types.DataFacet.ALL,
       };
-      const exportsReceiptsKey: ViewStateKey = {
+      const exportsReceiptsKey: project.ViewStateKey = {
         viewName: '/exports',
         facetName: types.DataFacet.CUSTOM,
       };
@@ -44,7 +43,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     });
 
     it('handles ViewStateKey patterns used across all views', () => {
-      const testKeys: ViewStateKey[] = [
+      const testKeys: project.ViewStateKey[] = [
         { viewName: '/names', facetName: types.DataFacet.ALL },
       ];
 
@@ -59,11 +58,11 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
     it('maintains state isolation between different views with same facetName', () => {
       // Test case where different views might use the same facetName (DataFacet value)
-      const exportsKey: ViewStateKey = {
+      const exportsKey: project.ViewStateKey = {
         viewName: '/exports',
         facetName: types.DataFacet.ALL,
       };
-      const namesKey: ViewStateKey = {
+      const namesKey: project.ViewStateKey = {
         viewName: '/names',
         facetName: types.DataFacet.CUSTOM,
       };
@@ -91,7 +90,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
         'get-abis',
       ];
 
-      const keys: ViewStateKey[] = [];
+      const keys: project.ViewStateKey[] = [];
 
       // Generate all valid combinations as they appear in real views
       routes.forEach((route) => {
@@ -114,7 +113,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     });
 
     it('validates ViewStateKey structure required by hooks', () => {
-      const validKey: ViewStateKey = {
+      const validKey: project.ViewStateKey = {
         viewName: '/test-view',
         facetName: types.DataFacet.ALL,
       };
@@ -131,7 +130,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
   describe('Multi-hook integration', () => {
     it('tests ViewStateKey sharing between pagination, sorting, and filtering hooks', () => {
-      const testKey: ViewStateKey = {
+      const testKey: project.ViewStateKey = {
         viewName: '/exports',
         facetName: types.DataFacet.ALL,
       };
@@ -154,7 +153,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
     it('handles ViewStateKey memoization patterns from views', () => {
       let currentDataFacet = types.DataFacet.ALL;
-      const getMemoizedKey = (): ViewStateKey => ({
+      const getMemoizedKey = (): project.ViewStateKey => ({
         viewName: '/exports',
         facetName: currentDataFacet,
       });

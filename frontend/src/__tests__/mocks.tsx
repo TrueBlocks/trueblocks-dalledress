@@ -136,9 +136,8 @@ export const setupWailsMocks = ({
         if (key in currentAppMock) {
           (currentAppMock as any)[key] = vi.fn(overrideFn as any);
         } else {
-          console.warn(
-            `[setupWailsMocks] Attempted to override App.${key}, but it's not defined in the initial mock.`,
-          );
+          // This is test infrastructure code, so we'll just skip logging the warning
+          // since the mocked Log from global-mocks.tsx should handle actual Log calls
         }
       }
     }
@@ -151,9 +150,8 @@ export const setupWailsMocks = ({
         if (key in currentRuntimeMock) {
           (currentRuntimeMock as any)[key] = vi.fn(overrideFn as any);
         } else {
-          console.warn(
-            `[setupWailsMocks] Attempted to override Runtime.${key}, but it's not defined in the initial mock.`,
-          );
+          // This is test infrastructure code, so we'll just skip logging the warning
+          // since the mocked Log from global-mocks.tsx should handle actual Log calls
         }
       }
     }

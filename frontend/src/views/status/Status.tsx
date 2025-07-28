@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetStatusPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { ViewStateKey, useFiltering, useSorting } from '@contexts';
+import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
   toPageDataProp,
@@ -22,7 +22,7 @@ import {
 import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { status } from '@models';
-import { msgs, types } from '@models';
+import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
@@ -41,7 +41,7 @@ export const Status = () => {
 
   const [pageData, setPageData] = useState<status.StatusPage | null>(null);
   const viewStateKey = useMemo(
-    (): ViewStateKey => ({
+    (): project.ViewStateKey => ({
       viewName: ROUTE,
       facetName: getCurrentDataFacet(),
     }),

@@ -190,6 +190,10 @@ export function GetUserPreferences() {
   return window['go']['app']['App']['GetUserPreferences']();
 }
 
+export function GetViewState(arg1) {
+  return window['go']['app']['App']['GetViewState'](arg1);
+}
+
 export function GetWizardReturn() {
   return window['go']['app']['App']['GetWizardReturn']();
 }

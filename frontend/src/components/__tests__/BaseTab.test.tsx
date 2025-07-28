@@ -20,7 +20,7 @@ const mockData = [
 
 const mockViewStateKey: ViewStateKey = {
   viewName: 'test',
-  tabName: types.DataFacet.ALL,
+  facetName: types.DataFacet.ALL,
 };
 
 describe('BaseTab', () => {
@@ -71,14 +71,14 @@ describe('BaseTab', () => {
 
   // DataFacet-related tests for refactor preparation
   describe('ViewStateKey handling (DataFacet refactor preparation)', () => {
-    it('passes ViewStateKey with different tabName values correctly', () => {
+    it('passes ViewStateKey with different facetName values correctly', () => {
       const exportsTxnKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.ALL,
+        facetName: types.DataFacet.ALL,
       };
       const exportsReceiptsKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.CUSTOM,
+        facetName: types.DataFacet.CUSTOM,
       };
 
       const { rerender } = render(
@@ -113,18 +113,18 @@ describe('BaseTab', () => {
     });
 
     it('handles ViewStateKey creation patterns used in views', () => {
-      // Simulate the pattern used in actual views: { viewName: ROUTE, tabName: dataFacet }
+      // Simulate the pattern used in actual views: { viewName: ROUTE, facetName: dataFacet }
       const chunksKey: ViewStateKey = {
         viewName: '/chunks',
-        tabName: types.DataFacet.ALL,
+        facetName: types.DataFacet.ALL,
       };
       const monitorsKey: ViewStateKey = {
         viewName: '/monitors',
-        tabName: types.DataFacet.CUSTOM,
+        facetName: types.DataFacet.CUSTOM,
       };
       const abisKey: ViewStateKey = {
         viewName: '/abis',
-        tabName: types.DataFacet.PREFUND,
+        facetName: types.DataFacet.PREFUND,
       };
 
       // Test each key type
@@ -147,7 +147,7 @@ describe('BaseTab', () => {
     it('properly forwards ViewStateKey to Table component', () => {
       const testKey: ViewStateKey = {
         viewName: '/names',
-        tabName: types.DataFacet.CUSTOM,
+        facetName: types.DataFacet.CUSTOM,
       };
 
       render(
@@ -170,23 +170,23 @@ describe('BaseTab', () => {
     // it('handles ViewStateKey uniqueness requirements', () => {
     //   const key1: ViewStateKey = {
     //     viewName: '/exports',
-    //     tabName: types.DataFacet.ALL,
+    //     facetName: types.DataFacet.ALL,
     //   };
     //   const key2: ViewStateKey = {
     //     viewName: '/exports',
-    //     tabName: types.DataFacet.CUSTOM,
+    //     facetName: types.DataFacet.CUSTOM,
     //   };
     //   const key3: ViewStateKey = {
     //     viewName: '/names',
-    //     tabName: types.DataFacet.REGULAR,
-    //   }; // same tabName, different view
+    //     facetName: types.DataFacet.REGULAR,
+    //   }; // same facetName, different view
 
     //   // All keys should be valid and unique for state management
     //   [key1, key2, key3].forEach((key) => {
     //     expect(key.viewName).toBeTruthy();
-    //     expect(key.tabName).toBeTruthy();
+    //     expect(key.facetName).toBeTruthy();
     //     expect(typeof key.viewName).toBe('string');
-    //     expect(typeof key.tabName).toBe('string');
+    //     expect(typeof key.facetName).toBe('string');
     //   });
     // });
   });

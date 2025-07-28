@@ -202,7 +202,7 @@ export const useViewContext = () => {
 };
 
 // Hook for sorting state (per-facet)
-// Uses full ViewStateKey (viewName + tabName) to scope sorting per facet
+// Uses full ViewStateKey (viewName + facetName) to scope sorting per facet
 export const useSorting = (viewStateKey: ViewStateKey) => {
   const { getSorting, updateSorting } = useViewContext();
 

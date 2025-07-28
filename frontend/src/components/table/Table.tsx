@@ -364,7 +364,7 @@ export const Table = <T extends Record<string, unknown>>({
       >
         <div onKeyDown={handleFormKeyDown}>
           <Form
-            title={`Edit ${viewStateKey.tabName.replace(/\b\w/g, (char) =>
+            title={`Edit ${viewStateKey.facetName.replace(/\b\w/g, (char) =>
               char.toUpperCase(),
             )} ${viewStateKey.viewName
               .replace(/^\//, '')

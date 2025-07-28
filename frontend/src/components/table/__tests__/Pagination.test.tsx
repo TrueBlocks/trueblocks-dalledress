@@ -16,7 +16,7 @@ vi.mock('../usePagination', () => ({
 describe('Pagination', () => {
   const mockViewStateKey: ViewStateKey = {
     viewName: 'test-view',
-    tabName: types.DataFacet.ALL,
+    facetName: types.DataFacet.ALL,
   };
   const mockFocusControls = vi.fn();
 

@@ -34,8 +34,8 @@ describe('Cross-View Integration Tests (DataFacet refactor preparation)', () => 
       expect(true).toBe(true);
     });
 
-    it('should handle same tabName across different views', () => {
-      // Test that views can share tabName values without conflict
+    it('should handle same facetName across different views', () => {
+      // Test that views can share facetName values without conflict
       // Placeholder for future implementation
       expect(true).toBe(true);
     });

@@ -725,6 +725,36 @@ export namespace project {
 		    return a;
 		}
 	}
+	export class ViewState {
+	    sorting?: Record<string, any>;
+	    filtering?: Record<string, any>;
+	    other?: Record<string, any>;
+	
+	    static createFrom(source: any = {}) {
+	        return new ViewState(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.sorting = source["sorting"];
+	        this.filtering = source["filtering"];
+	        this.other = source["other"];
+	    }
+	}
+	export class ViewStateKey {
+	    viewName: string;
+	    facetName: types.DataFacet;
+	
+	    static createFrom(source: any = {}) {
+	        return new ViewStateKey(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.viewName = source["viewName"];
+	        this.facetName = source["facetName"];
+	    }
+	}
 
 }
 

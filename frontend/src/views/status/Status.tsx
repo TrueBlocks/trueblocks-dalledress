@@ -43,7 +43,7 @@ export const Status = () => {
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
-      tabName: getCurrentDataFacet(),
+      facetName: getCurrentDataFacet(),
     }),
     [getCurrentDataFacet],
   );

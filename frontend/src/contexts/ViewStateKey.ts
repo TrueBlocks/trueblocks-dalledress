@@ -1,10 +1,7 @@
-import { types } from '@models';
+import { project } from '@models';
 
-export interface ViewStateKey {
-  viewName: string;
-  tabName: types.DataFacet;
-}
+export type ViewStateKey = project.ViewStateKey;
 
 export const viewStateKeyToString = (key: ViewStateKey): string => {
-  return `${key.viewName}/${key.tabName}/`;
+  return `${key.viewName}/${key.facetName}/`;
 };

@@ -55,7 +55,7 @@ export const Names = () => {
   const viewStateKey = useMemo(
     (): ViewStateKey => ({
       viewName: ROUTE,
-      tabName: getCurrentDataFacet(),
+      facetName: getCurrentDataFacet(),
     }),
     [getCurrentDataFacet],
   );

@@ -20,7 +20,7 @@ const createViewStateKey = (
   tab: types.DataFacet,
 ): ViewStateKey => ({
   viewName: view,
-  tabName: tab,
+  facetName: tab,
 });
 
 describe('ViewContext Object Identity', () => {

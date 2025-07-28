@@ -172,11 +172,11 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
       // Test the pattern the view will use
       const viewStateKey = {
         viewName: '/exports',
-        tabName: result.current.activeFacet,
+        facetName: result.current.activeFacet,
       };
       expect(viewStateKey).toEqual({
         viewName: '/exports',
-        tabName: types.DataFacet.BALANCES,
+        facetName: types.DataFacet.BALANCES,
       });
     });
   });

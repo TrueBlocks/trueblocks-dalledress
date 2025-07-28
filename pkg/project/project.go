@@ -10,7 +10,19 @@ import (
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
+
+type ViewState struct {
+	Sorting   map[string]interface{} `json:"sorting,omitempty"`
+	Filtering map[string]interface{} `json:"filtering,omitempty"`
+	Other     map[string]interface{} `json:"other,omitempty"`
+}
+
+type ViewStateKey struct {
+	ViewName  string          `json:"viewName"`
+	FacetName types.DataFacet `json:"facetName"`
+}
 
 // Project represents a single project with its metadata and data.
 type Project struct {

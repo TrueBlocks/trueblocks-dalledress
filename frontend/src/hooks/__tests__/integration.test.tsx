@@ -21,14 +21,14 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     it('creates unique pagination state for different ViewStateKey combinations', () => {
       const exportsTransactionsKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.ALL,
+        facetName: types.DataFacet.ALL,
       };
       const exportsReceiptsKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.CUSTOM,
+        facetName: types.DataFacet.CUSTOM,
       };
 
-      // Test that different tabName values create separate pagination states
+      // Test that different facetName values create separate pagination states
       const { result: result1 } = renderHook(() =>
         usePagination(exportsTransactionsKey),
       );
@@ -45,7 +45,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
     it('handles ViewStateKey patterns used across all views', () => {
       const testKeys: ViewStateKey[] = [
-        { viewName: '/names', tabName: types.DataFacet.ALL },
+        { viewName: '/names', facetName: types.DataFacet.ALL },
       ];
 
       testKeys.forEach((key) => {
@@ -57,15 +57,15 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
       });
     });
 
-    it('maintains state isolation between different views with same tabName', () => {
-      // Test case where different views might use the same tabName (DataFacet value)
+    it('maintains state isolation between different views with same facetName', () => {
+      // Test case where different views might use the same facetName (DataFacet value)
       const exportsKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.ALL,
+        facetName: types.DataFacet.ALL,
       };
       const namesKey: ViewStateKey = {
         viewName: '/names',
-        tabName: types.DataFacet.CUSTOM,
+        facetName: types.DataFacet.CUSTOM,
       };
 
       const { result: exportsResult } = renderHook(() =>
@@ -73,7 +73,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
       );
       const { result: namesResult } = renderHook(() => usePagination(namesKey));
 
-      // Should have separate pagination states despite same tabName
+      // Should have separate pagination states despite same facetName
       expect(exportsResult.current.pagination).toBeDefined();
       expect(namesResult.current.pagination).toBeDefined();
     });
@@ -96,7 +96,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
       // Generate all valid combinations as they appear in real views
       routes.forEach((route) => {
         facets.forEach((facet) => {
-          keys.push({ viewName: route, tabName: facet as types.DataFacet });
+          keys.push({ viewName: route, facetName: facet as types.DataFacet });
         });
       });
 
@@ -108,7 +108,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
       });
 
       // Verify uniqueness through string conversion
-      const stringKeys = keys.map((key) => `${key.viewName}/${key.tabName}/`);
+      const stringKeys = keys.map((key) => `${key.viewName}/${key.facetName}/`);
       const uniqueKeys = [...new Set(stringKeys)];
       expect(uniqueKeys.length).toBe(stringKeys.length);
     });
@@ -116,16 +116,16 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     it('validates ViewStateKey structure required by hooks', () => {
       const validKey: ViewStateKey = {
         viewName: '/test-view',
-        tabName: types.DataFacet.ALL,
+        facetName: types.DataFacet.ALL,
       };
 
       const { result } = renderHook(() => usePagination(validKey));
 
       expect(result.current.pagination).toBeDefined();
       expect(typeof validKey.viewName).toBe('string');
-      expect(typeof validKey.tabName).toBe('string');
+      expect(typeof validKey.facetName).toBe('string');
       expect(validKey.viewName.length).toBeGreaterThan(0);
-      expect(validKey.tabName.length).toBeGreaterThan(0);
+      expect(validKey.facetName.length).toBeGreaterThan(0);
     });
   });
 
@@ -133,7 +133,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     it('tests ViewStateKey sharing between pagination, sorting, and filtering hooks', () => {
       const testKey: ViewStateKey = {
         viewName: '/exports',
-        tabName: types.DataFacet.ALL,
+        facetName: types.DataFacet.ALL,
       };
 
       // This simulates the pattern used in actual views where the same ViewStateKey
@@ -149,14 +149,14 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
       // Verify the key structure is maintained
       expect(testKey.viewName).toBe('/exports');
-      expect(testKey.tabName).toBe('all');
+      expect(testKey.facetName).toBe('all');
     });
 
     it('handles ViewStateKey memoization patterns from views', () => {
       let currentDataFacet = types.DataFacet.ALL;
       const getMemoizedKey = (): ViewStateKey => ({
         viewName: '/exports',
-        tabName: currentDataFacet,
+        facetName: currentDataFacet,
       });
 
       const { result: result1, rerender } = renderHook(() =>

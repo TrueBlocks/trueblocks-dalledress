@@ -1,5 +1,5 @@
-import { types } from '@models';
 import { Encode } from '@app';
+import { types } from '@models';
 import { Log } from '@utils';
 
 export interface TransactionData {

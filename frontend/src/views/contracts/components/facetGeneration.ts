@@ -1,4 +1,3 @@
-import { DataFacetConfig } from '@hooks';
 import { types } from '@models';
 
 export const getReadFunctions = (abi: types.Abi): types.Function[] => {

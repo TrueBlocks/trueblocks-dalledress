@@ -21,12 +21,19 @@ This is a **Wails desktop application** with Go backend (`app/`) and React front
 - **Always use `yarn start`** (Wails dev mode) - never browser mode or localhost:5173
 - **Use `Log` from `@utils`** instead of console.log (console.log is invisible in Wails)
 - **Read file contents first** before editing - files change between requests
+- **No comments in production code** - only use comments for TODOs or explanations
+- **Use `wails generate module`** to regenerate bindings after changes to the backend go code.
+- **Always run the linter** from the root of the project with `yarn lint`.
+- **Run linting, testing, and building** together with one command `yarn lint && yarn test && yarn start`. If any fail, stop and do not try to fix it. The developer will fix and provide guidance.
 
 ### Code Patterns
 - **Use existing patterns**: BaseTab, Table components, DataFacet enums, Collection/Store/Page architecture
 - **Follow established architecture**: Import from `@models`, `@components`, `@utils`, `@hooks`
 - **No React imports** (implicitly available)
 - **No comments** in production code
+- **Do not use `any` in TypeScript** - always use specific types (our linter won't allow it)
+- **No custom strings for DataFacet** - always use `types.DataFacet.*` values
+- **No custom ViewStateKey** - always use `{ viewName: string, tabName: types.DataFacet }`
 
 ## View Architecture Pattern
 

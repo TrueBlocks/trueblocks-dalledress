@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { IsInitialized, SetChain, SetInitialized, SetUserInfo } from '@app';
 import { preferences } from '@models';
+import { Log } from '@utils';
 
 import { WizardState, WizardValidationErrors } from '../WizardTypes';
 
@@ -87,7 +88,9 @@ export const useWizardState = () => {
       updateData({ isFirstTimeSetup: firstTimeSetup });
       updateAPI({ initialized });
     } catch (error) {
-      console.error('Error checking initialization status:', error);
+      Log(
+        'ERROR: Error checking initialization status: ' + JSON.stringify(error),
+      );
     } finally {
       updateUI({ initialLoading: false });
     }

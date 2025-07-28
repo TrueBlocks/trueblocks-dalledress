@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 )
 
@@ -19,7 +20,7 @@ func TestManager(t *testing.T) {
 	}
 
 	// Create a new project
-	proj := manager.New("test-project")
+	proj := manager.New("test-project", base.ZeroAddr)
 
 	// Check that the new project is active
 	if manager.Active() == nil {
@@ -40,7 +41,7 @@ func TestManager(t *testing.T) {
 	}
 
 	// Create another project
-	proj2 := manager.New("second-project")
+	proj2 := manager.New("second-project", base.ZeroAddr)
 
 	// Verify we now have two open projects
 	if len(manager.GetOpenProjectIDs()) != 2 {

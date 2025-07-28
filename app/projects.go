@@ -38,6 +38,13 @@ func (a *App) CloseProject(id string) error {
 				// Project hasn't been saved before, need to use SaveAs
 				path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
 					Title: "Save Project Before Closing",
+					Filters: []runtime.FileFilter{
+						{
+							DisplayName: "TrueBlocks Project Files (*.tbx)",
+							Pattern:     "*.tbx",
+						},
+					},
+					DefaultFilename: project.GetName() + ".tbx",
 				})
 				if err != nil || path == "" {
 					return fmt.Errorf("save canceled")

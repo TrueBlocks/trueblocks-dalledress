@@ -5,19 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 )
 
 // TestProject tests the basic functionality of the Project type
 func TestProject(t *testing.T) {
 	// Create a new project
-	p := project.New("test-project")
-
-	// Set some data
-	p.SetData(map[string]interface{}{
-		"key1": "value1",
-		"key2": 123,
-	})
+	p := project.New("test-project", base.ZeroAddr)
 
 	// Verify initial state
 	if !p.IsDirty() {

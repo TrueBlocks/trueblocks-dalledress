@@ -521,20 +521,20 @@ export namespace preferences {
 	    bounds?: Bounds;
 	    debugMode?: boolean;
 	    helpCollapsed?: boolean;
-	    lastAddress?: string;
-	    lastChain?: string;
-	    lastContract?: string;
-	    lastLanguage?: string;
-	    lastProject?: string;
-	    lastTab: Record<string, string>;
 	    lastTheme?: string;
-	    lastView?: string;
-	    lastViewNoWizard?: string;
 	    menuCollapsed?: boolean;
 	    name?: string;
 	    recentProjects: string[];
 	    silencedDialogs: Record<string, boolean>;
 	    version: string;
+	    lastLanguage?: string;
+	    lastAddress?: string;
+	    lastChain?: string;
+	    lastContract?: string;
+	    lastProject?: string;
+	    lastTab: Record<string, string>;
+	    lastView?: string;
+	    lastViewNoWizard?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppPreferences(source);
@@ -545,20 +545,20 @@ export namespace preferences {
 	        this.bounds = this.convertValues(source["bounds"], Bounds);
 	        this.debugMode = source["debugMode"];
 	        this.helpCollapsed = source["helpCollapsed"];
-	        this.lastAddress = source["lastAddress"];
-	        this.lastChain = source["lastChain"];
-	        this.lastContract = source["lastContract"];
-	        this.lastLanguage = source["lastLanguage"];
-	        this.lastProject = source["lastProject"];
-	        this.lastTab = source["lastTab"];
 	        this.lastTheme = source["lastTheme"];
-	        this.lastView = source["lastView"];
-	        this.lastViewNoWizard = source["lastViewNoWizard"];
 	        this.menuCollapsed = source["menuCollapsed"];
 	        this.name = source["name"];
 	        this.recentProjects = source["recentProjects"];
 	        this.silencedDialogs = source["silencedDialogs"];
 	        this.version = source["version"];
+	        this.lastLanguage = source["lastLanguage"];
+	        this.lastAddress = source["lastAddress"];
+	        this.lastChain = source["lastChain"];
+	        this.lastContract = source["lastContract"];
+	        this.lastProject = source["lastProject"];
+	        this.lastTab = source["lastTab"];
+	        this.lastView = source["lastView"];
+	        this.lastViewNoWizard = source["lastViewNoWizard"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -691,9 +691,7 @@ export namespace project {
 	    version: string;
 	    name: string;
 	    last_opened: string;
-	    preferences: Record<string, string>;
 	    dirty: boolean;
-	    data: Record<string, any>;
 	    address: base.Address;
 	
 	    static createFrom(source: any = {}) {
@@ -705,9 +703,7 @@ export namespace project {
 	        this.version = source["version"];
 	        this.name = source["name"];
 	        this.last_opened = source["last_opened"];
-	        this.preferences = source["preferences"];
 	        this.dirty = source["dirty"];
-	        this.data = source["data"];
 	        this.address = this.convertValues(source["address"], base.Address);
 	    }
 	

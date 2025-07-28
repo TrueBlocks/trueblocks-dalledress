@@ -6,20 +6,12 @@ export function GetAddress() {
   return window['go']['project']['Project']['GetAddress']();
 }
 
-export function GetData() {
-  return window['go']['project']['Project']['GetData']();
-}
-
 export function GetName() {
   return window['go']['project']['Project']['GetName']();
 }
 
 export function GetPath() {
   return window['go']['project']['Project']['GetPath']();
-}
-
-export function GetPreference(arg1) {
-  return window['go']['project']['Project']['GetPreference'](arg1);
 }
 
 export function IsDirty() {
@@ -38,18 +30,10 @@ export function SetAddress(arg1) {
   return window['go']['project']['Project']['SetAddress'](arg1);
 }
 
-export function SetData(arg1) {
-  return window['go']['project']['Project']['SetData'](arg1);
-}
-
 export function SetDirty(arg1) {
   return window['go']['project']['Project']['SetDirty'](arg1);
 }
 
 export function SetName(arg1) {
   return window['go']['project']['Project']['SetName'](arg1);
-}
-
-export function SetPreference(arg1, arg2) {
-  return window['go']['project']['Project']['SetPreference'](arg1, arg2);
 }

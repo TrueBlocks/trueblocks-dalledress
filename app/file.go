@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
@@ -22,8 +23,8 @@ var ErrWriteFileFailed = errors.New("failed to write file")
 var ErrSerializeFailed = errors.New("failed to serialize data")
 var ErrDeserializeFailed = errors.New("failed to deserialize data")
 
-func (a *App) fileNew() error {
-	a.Projects.New(a.uniqueProjectName("New Project"))
+func (a *App) fileNew(address base.Address) error {
+	a.Projects.New(a.uniqueProjectName("New Project"), address)
 
 	// Ensure the newly created project is not marked as dirty
 	activeProject := a.Projects.Active()

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 )
 
@@ -70,9 +71,9 @@ func (m *Manager) minimizeInactiveProject(project *Project) {
 	// 3. If T implements a ClearCache() method, call it
 }
 
-// New creates a new project with the given name and makes it the active project
-func (m *Manager) New(name string) *Project {
-	project := New(name)
+// New creates a new project with the given name and current address and makes it the active project
+func (m *Manager) New(name string, address base.Address) *Project {
+	project := New(name, address)
 	id := name
 	m.OpenProjects[id] = project
 	m.ActiveID = id

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
@@ -18,7 +19,7 @@ func TestFileNew(t *testing.T) {
 		app, dir, _ := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileNew()
+		err := app.fileNew(base.ZeroAddr)
 		if err != nil {
 			t.Fatalf("Expected no error for clean state, got: %v", err)
 		}
@@ -37,7 +38,7 @@ func TestFileNew(t *testing.T) {
 		app, dir, _ := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileNew()
+		err := app.fileNew(base.ZeroAddr)
 		if err != nil {
 			t.Fatalf("Expected no error when creating new file, got: %v", err)
 		}
@@ -267,8 +268,12 @@ func TestFileOpen(t *testing.T) {
 
 		// Attempt to open the invalid file
 		err := app.fileOpen(invalidFilePath)
-		if err != nil {
-			t.Fatalf("Expected no error opening invalid JSON, got: %v", err)
+		if err == nil {
+			t.Fatalf("Expected recovery error when opening invalid JSON, got no error")
+		}
+
+		if !strings.Contains(err.Error(), "recovery attempted but may not be complete") {
+			t.Fatalf("Expected recovery error, got: %v", err)
 		}
 	})
 }
@@ -309,7 +314,7 @@ func getTestApp(t *testing.T, dirty bool) (*App, string, string) {
 
 	manager := project.NewManager()
 
-	proj := manager.New("Test Project")
+	proj := manager.New("Test Project", base.ZeroAddr)
 	proj.SetDirty(dirty)
 	_ = proj.SaveAs(filePath)
 	proj.SetDirty(dirty)

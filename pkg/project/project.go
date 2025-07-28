@@ -14,28 +14,26 @@ import (
 
 // Project represents a single project with its metadata and data.
 type Project struct {
-	Version     string                 `json:"version"`
-	Name        string                 `json:"name"`
-	LastOpened  string                 `json:"last_opened"`
-	Preferences map[string]string      `json:"preferences"`
-	Dirty       bool                   `json:"dirty"`
-	Data        map[string]interface{} `json:"data"`
-	Address     base.Address           `json:"address"`
-	Path        string                 `json:"-"` // Not serialized, in-memory only
+	Version    string       `json:"version"`
+	Name       string       `json:"name"`
+	LastOpened string       `json:"last_opened"`
+	Dirty      bool         `json:"dirty"`
+	Address    base.Address `json:"address"`
+	Path       string       `json:"-"`
 }
 
 // New creates a new project with default values
-func New(name string) *Project {
+func New(name string, address base.Address) *Project {
 	return &Project{
-		Version:     "1.0",
-		Name:        name,
-		LastOpened:  time.Now().Format(time.RFC3339),
-		Preferences: make(map[string]string),
-		Dirty:       true,
-		Data:        make(map[string]interface{}),
-		Address:     base.ZeroAddr,
+		Version:    "1.0",
+		Name:       name,
+		LastOpened: time.Now().Format(time.RFC3339),
+		Dirty:      true,
+		Address:    address,
 	}
 }
+
+var ErrProjectRecoveryIncomplete = fmt.Errorf("failed to parse project file, recovery attempted but may not be complete")
 
 // Load loads a project from the specified file path with optimized deserialization
 func Load(path string) (*Project, error) {
@@ -59,30 +57,18 @@ func Load(path string) (*Project, error) {
 
 	var project Project
 	if err := json.Unmarshal(data, &project); err != nil {
-		project = Project{
-			Version:     "1.0",
-			Name:        "Recovered Project",
-			LastOpened:  "",
-			Preferences: make(map[string]string),
-			Dirty:       true, // Mark as dirty so user knows it was recovered
-			Data:        make(map[string]interface{}),
-			Address:     base.ZeroAddr,
-		}
-		project.Path = path
-		if saveErr := project.Save(); saveErr != nil {
+		projectPtr := New("Recovered Project", base.ZeroAddr)
+		projectPtr.Dirty = true // Mark as dirty so user knows it was recovered
+		projectPtr.Path = path
+		if saveErr := projectPtr.Save(); saveErr != nil {
 			return nil, fmt.Errorf("failed to parse project file and could not save recovered version: %w (original error: %v)", saveErr, err)
 		}
-		return &project, nil
+		return nil, ErrProjectRecoveryIncomplete
 	}
 
 	// Set in-memory fields
 	project.Path = path
 	project.Dirty = false
-
-	// Ensure preferences map exists
-	if project.Preferences == nil {
-		project.Preferences = make(map[string]string)
-	}
 
 	return &project, nil
 }
@@ -106,6 +92,7 @@ func (p *Project) SaveAs(path string) error {
 
 	// Update last opened timestamp
 	p.LastOpened = time.Now().Format(time.RFC3339)
+	p.Dirty = false
 
 	// Create a temporary file for safe writing
 	tempPath := path + ".tmp"
@@ -163,30 +150,6 @@ func (p *Project) SetName(name string) {
 		p.Name = name
 		p.Dirty = true
 	}
-}
-
-// GetPreference retrieves a project preference by key
-func (p *Project) GetPreference(key string) string {
-	return p.Preferences[key]
-}
-
-// SetPreference sets a project preference and marks the project as dirty
-func (p *Project) SetPreference(key, value string) {
-	if p.Preferences[key] != value {
-		p.Preferences[key] = value
-		p.Dirty = true
-	}
-}
-
-// GetData returns the project data
-func (p *Project) GetData() map[string]interface{} {
-	return p.Data
-}
-
-// SetData updates the project data and marks it as dirty
-func (p *Project) SetData(data map[string]interface{}) {
-	p.Data = data
-	p.Dirty = true
 }
 
 // GetAddress returns the project's main address

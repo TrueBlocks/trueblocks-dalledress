@@ -4,13 +4,9 @@ import {base} from '../models';
 
 export function GetAddress():Promise<base.Address>;
 
-export function GetData():Promise<Record<string, any>>;
-
 export function GetName():Promise<string>;
 
 export function GetPath():Promise<string>;
-
-export function GetPreference(arg1:string):Promise<string>;
 
 export function IsDirty():Promise<boolean>;
 
@@ -20,10 +16,6 @@ export function SaveAs(arg1:string):Promise<void>;
 
 export function SetAddress(arg1:base.Address):Promise<void>;
 
-export function SetData(arg1:Record<string, any>):Promise<void>;
-
 export function SetDirty(arg1:boolean):Promise<void>;
 
 export function SetName(arg1:string):Promise<void>;
-
-export function SetPreference(arg1:string,arg2:string):Promise<void>;

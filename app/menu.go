@@ -4,6 +4,7 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -12,8 +13,7 @@ import (
 )
 
 func (a *App) FileNew(_ *menu.CallbackData) {
-	// Simplified version without save prompts
-	if err := a.fileNew(); err != nil {
+	if err := a.fileNew(base.ZeroAddr); err != nil {
 		msgs.EmitError("File → New failed", err)
 		return
 	}
@@ -49,6 +49,12 @@ func (a *App) FileSave(_ *menu.CallbackData) {
 func (a *App) FileSaveAs(_ *menu.CallbackData) {
 	path, err := wailsRuntime.SaveFileDialog(a.ctx, wailsRuntime.SaveDialogOptions{
 		Title: "Save Project As",
+		Filters: []wailsRuntime.FileFilter{
+			{
+				DisplayName: "TrueBlocks Project Files (*.tbx)",
+				Pattern:     "*.tbx",
+			},
+		},
 	})
 	if err != nil || path == "" {
 		msgs.EmitStatus("save As canceled")

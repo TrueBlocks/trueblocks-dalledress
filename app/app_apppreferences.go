@@ -47,30 +47,25 @@ func (a *App) SetLanguage(language string) {
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-// GetLastAddress returns the last active address
 func (a *App) GetLastAddress() string {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
 	return a.Preferences.App.LastAddress
 }
 
-// SetLastAddress sets the last active address
 func (a *App) SetLastAddress(address string) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
-
 	a.Preferences.App.LastAddress = address
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-// GetLastChain returns the last chain setting
 func (a *App) GetLastChain() string {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
 	return a.Preferences.App.LastChain
 }
 
-// SetLastChain sets the last chain setting
 func (a *App) SetLastChain(chain string) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
@@ -79,43 +74,35 @@ func (a *App) SetLastChain(chain string) {
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-// GetLastContract returns the last contract setting
 func (a *App) GetLastContract() string {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
 	return a.Preferences.App.LastContract
 }
 
-// SetLastContract sets the last contract setting
 func (a *App) SetLastContract(contract string) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
-
 	a.Preferences.App.LastContract = contract
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-// GetLastTab returns the last tab for a given route
 func (a *App) GetLastTab(route string) types.DataFacet {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
 	return types.DataFacet(a.Preferences.App.LastTab[route])
 }
 
-// SetLastTab sets the last tab for a given route
 func (a *App) SetLastTab(route string, tab types.DataFacet) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
-
 	a.Preferences.App.LastTab[route] = string(tab)
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-// SetLastView sets the last view and updates LastViewNoWizard if not wizard
 func (a *App) SetLastView(view string) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
-
 	a.Preferences.App.LastView = view
 	if view != "/wizard" {
 		a.Preferences.App.LastViewNoWizard = view

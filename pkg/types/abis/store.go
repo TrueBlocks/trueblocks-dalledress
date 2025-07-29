@@ -22,11 +22,12 @@ import (
 )
 
 // EXISTING_CODE
-type Abi = sdk.Abi
-type Function = sdk.Function
 type Parameter = sdk.Parameter
 
 // EXISTING_CODE
+
+type Abi = sdk.Abi
+type Function = sdk.Function
 
 var (
 	abisStore   *store.Store[Abi]

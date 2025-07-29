@@ -92,7 +92,6 @@ func (c *MonitorsCollection) GetStoreName(dataFacet types.DataFacet, chain, addr
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetMonitorsCount(payload *types.Payload) (int, error) {
 	chain := payload.Chain
-	// address := payload.Address
 	countOpts := sdk.MonitorsOptions{
 		Globals: sdk.Globals{Cache: true, Chain: chain},
 	}

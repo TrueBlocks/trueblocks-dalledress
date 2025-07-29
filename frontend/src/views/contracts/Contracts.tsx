@@ -2,14 +2,7 @@
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
 /*
- * Parts of this file were au      Log(
-        `📦 GetContractsPage result: ${JSON.stringify({
-          hasResult: !!result,
-          totalItems: result.totalItems,
-          contractsCount: result.contracts?.length || 0,
-          isFetching: result.isFetching,
-        })}`,
-      );erated. Edit only those parts of
+ * Parts of this file were auto generated. Edit only those parts of
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
@@ -123,7 +116,7 @@ const FacetTitle: React.FC<FacetTitleProps> = ({
 export const ROUTE = '/contracts' as const;
 export const Contracts = () => {
   // === SECTION 2: Contract Detail Detection ===
-  const { lastContract, setActiveContract } = useActiveProject();
+  const { activeContract, setActiveContract } = useActiveProject();
 
   // === SECTION 3: Contract Detail State ===
   const [contractAbi, setContractAbi] = useState<types.Contract | null>(null);
@@ -141,7 +134,7 @@ export const Contracts = () => {
   const isForm = getCurrentDataFacet() !== types.DataFacet.EVENTS;
 
   Log(
-    `🎯 Contracts component - lastContract: ${lastContract}, isForm: ${isForm}, currentFacet: ${getCurrentDataFacet()}`,
+    `🎯 Contracts component - activeContract: ${activeContract}, isForm: ${isForm}, currentFacet: ${getCurrentDataFacet()}`,
   );
 
   const [pageData, setPageData] = useState<contracts.ContractsPage | null>(
@@ -166,8 +159,8 @@ export const Contracts = () => {
     clearError();
     try {
       const payload = createPayload(getCurrentDataFacet());
-      if (isForm && lastContract) {
-        payload.address = lastContract;
+      if (isForm && activeContract) {
+        payload.address = activeContract;
       }
 
       Log(
@@ -176,7 +169,7 @@ export const Contracts = () => {
           currentPage: pagination.currentPage,
           pageSize: pagination.pageSize,
           isForm,
-          lastContract,
+          activeContract,
         })}`,
       );
 
@@ -216,7 +209,7 @@ export const Contracts = () => {
     setTotalItems,
     handleError,
     isForm,
-    lastContract,
+    activeContract,
   ]);
 
   const currentData = useMemo(() => {
@@ -312,11 +305,11 @@ export const Contracts = () => {
 
   const perTabContent = useMemo(() => {
     const currentFacet = getCurrentDataFacet();
-    if (lastContract) {
+    if (activeContract) {
       return (
         <div style={{ padding: '20px' }}>
           <Stack gap="md">
-            <FacetTitle facet={currentFacet} contractAddress={lastContract} />
+            <FacetTitle facet={currentFacet} contractAddress={activeContract} />
             <BaseTab<Record<string, unknown>>
               data={currentData as unknown as Record<string, unknown>[]}
               columns={currentColumns}
@@ -347,7 +340,7 @@ export const Contracts = () => {
     error,
     viewStateKey,
     getCurrentDataFacet,
-    lastContract,
+    activeContract,
   ]);
 
   const tabs = useMemo(
@@ -366,12 +359,12 @@ export const Contracts = () => {
   useEffect(() => {
     const loadContractDetail = async () => {
       Log(
-        `🔍 loadContractDetail called - isForm: ${isForm}, lastContract: ${lastContract}`,
+        `🔍 loadContractDetail called - isForm: ${isForm}, activeContract: ${activeContract}`,
       );
 
-      if (!isForm || !lastContract) {
+      if (!isForm || !activeContract) {
         Log(
-          `❌ Early return - isForm: ${isForm}, lastContract: ${lastContract}`,
+          `❌ Early return - isForm: ${isForm}, activeContract: ${activeContract}`,
         );
         return;
       }
@@ -414,12 +407,12 @@ export const Contracts = () => {
         let contractData = pageData?.contracts?.find(
           (contract: types.Contract) =>
             String(contract.address)?.toLowerCase() ===
-            lastContract.toLowerCase(),
+            activeContract.toLowerCase(),
         );
 
         Log(
           `🔍 Contract search result: ${JSON.stringify({
-            targetAddress: lastContract.toLowerCase(),
+            targetAddress: activeContract.toLowerCase(),
             foundContract: !!contractData,
             contractAddress: contractData?.address,
             contractName: contractData?.name,
@@ -427,7 +420,7 @@ export const Contracts = () => {
           })}`,
         );
 
-        // If the lastContract is not found, fall back to the first available contract
+        // If the activeContract is not found, fall back to the first available contract
         if (
           !contractData &&
           pageData?.contracts &&
@@ -441,15 +434,15 @@ export const Contracts = () => {
             const newAddress = String(contractData.address);
 
             Log(
-              `🆕 Updating lastContract from ${lastContract} to ${newAddress}`,
+              `🆕 Updating activeContract from ${activeContract} to ${newAddress}`,
             );
 
             // Update the active contract in the system
             await setActiveContract(newAddress);
 
-            Log('✅ Updated lastContract, will reload on next render');
+            Log('✅ Updated activeContract, will reload on next render');
             setDetailLoading(false);
-            return; // Exit early, the component will re-render with the new lastContract
+            return; // Exit early, the component will re-render with the new activeContract
           }
         }
 
@@ -477,7 +470,7 @@ export const Contracts = () => {
     };
 
     loadContractDetail();
-  }, [isForm, lastContract, pageData, setActiveContract]);
+  }, [isForm, activeContract, pageData, setActiveContract]);
 
   // === SECTION 6.6: Early Return for Detail View ===
   if (isForm) {
@@ -518,7 +511,7 @@ export const Contracts = () => {
       return (
         <Container size="lg" py="xl">
           <Alert color="yellow" title="No ABI found">
-            No ABI found for contract address: {lastContract}
+            No ABI found for contract address: {activeContract}
           </Alert>
         </Container>
       );
@@ -564,7 +557,7 @@ export const Contracts = () => {
                       color="blue"
                       title={`Contract: ${contractAbi.name || 'Unknown'}`}
                     >
-                      Address: {lastContract}
+                      Address: {activeContract}
                       <br />
                       Facet: {facetConfig.label} (ID: {facetConfig.id})
                       <br />

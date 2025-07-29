@@ -1,4 +1,3 @@
-export { Breadcrumb } from './Breadcrumb';
 export { Footer } from './Footer';
 export { FormView } from './FormView';
 export { Header } from './Header';

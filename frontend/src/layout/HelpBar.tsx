@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { GetMarkdown } from '@app';
+import { GetLastFacet, GetMarkdown } from '@app';
 import { ChevronButton } from '@components';
 import { useActiveProject } from '@hooks';
 import { AppShell, Stack, Text } from '@mantine/core';
@@ -10,7 +10,7 @@ import { useLocation } from 'wouter';
 export const HelpBar = () => {
   const [markdown, setMarkdown] = useState<string>('Loading...');
   const [currentLocation] = useLocation();
-  const { helpCollapsed, setHelpCollapsed, lastTab } = useActiveProject();
+  const { lastView, helpCollapsed, setHelpCollapsed } = useActiveProject();
 
   useEffect(() => {
     var headerText = currentLocation.startsWith('/')
@@ -19,10 +19,11 @@ export const HelpBar = () => {
     headerText = `${headerText.charAt(0).toUpperCase() + headerText.slice(1)} View`;
     const fetchMarkdown = async () => {
       try {
+        const currentFacet = await GetLastFacet(lastView);
         const content = await GetMarkdown(
           'help',
           currentLocation,
-          lastTab[currentLocation] as string,
+          currentFacet,
         );
         setMarkdown(`# ${headerText}\n\n${content}`);
       } catch (rawErr) {
@@ -37,7 +38,7 @@ export const HelpBar = () => {
     } else {
       fetchMarkdown();
     }
-  }, [lastTab, currentLocation, helpCollapsed]);
+  }, [currentLocation, helpCollapsed, lastView]);
 
   return (
     <AppShell.Aside p="md" style={{ transition: 'width 0.2s ease' }}>

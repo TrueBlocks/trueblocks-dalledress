@@ -11,9 +11,8 @@ const { useActiveProject } = await import('../../hooks/useActiveProject');
 const mockedUseActiveProject = vi.mocked(useActiveProject);
 
 describe('Names View + useActiveFacet Integration Tests', () => {
-  let mockLastTab: Record<string, string>;
-  let mockSetLastTab: ReturnType<typeof vi.fn>;
-
+  let mockLastFacet: Record<string, string>;
+  let mockSetLastFacet: ReturnType<typeof vi.fn>;
   const namesFacets: DataFacetConfig[] = [
     {
       id: 'all' as DataFacet,
@@ -40,17 +39,17 @@ describe('Names View + useActiveFacet Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockLastTab = {};
-    mockSetLastTab = vi.fn();
+    // Mock successful project state
+    mockLastFacet = {};
+    mockSetLastFacet = vi.fn();
 
     mockedUseActiveProject.mockReturnValue({
-      lastTab: mockLastTab,
-      setLastTab: mockSetLastTab,
+      lastFacet: mockLastFacet,
+      setLastFacet: mockSetLastFacet,
       // Mock other required properties
-      lastProject: 'test-project',
-      lastChain: 'mainnet',
-      lastAddress: '0x123',
-      lastContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+      activeChain: 'mainnet',
+      activeAddress: '0x123',
+      activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
       projects: [],
       currentProject: { name: 'test-project', chain: 'mainnet' },
     } as any);
@@ -78,7 +77,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         }),
       );
 
-      // Initial state
+      // Initial state (should be first facet since no saved preference)
       expect(result.current.activeFacet).toBe('all');
 
       // Change to prefund facet
@@ -87,10 +86,10 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       });
 
       // Verify the preference was set correctly
-      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'prefund');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('/names', 'prefund');
 
       // Update mock to simulate preference persistence
-      mockLastTab['/names'] = 'prefund';
+      mockLastFacet['/names'] = 'prefund';
 
       // Re-render hook with updated preferences
       const { result: result2 } = renderHook(() =>
@@ -105,7 +104,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
     });
 
     it('respects saved preferences for Names view', () => {
-      mockLastTab['/names'] = 'custom';
+      mockLastFacet['/names'] = 'custom';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -130,7 +129,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         result.current.setActiveFacet('baddress' as DataFacet);
       });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'baddress');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('/names', 'baddress');
     });
 
     it('handles all Names view facets correctly', () => {
@@ -145,7 +144,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
 
       facetMappings.forEach(({ facet, dataFacet }) => {
         // Set up mock with this facet as saved preference
-        mockLastTab['/names'] = dataFacet;
+        mockLastFacet['/names'] = dataFacet;
 
         const { result } = renderHook(() =>
           useActiveFacet({
@@ -219,7 +218,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         result.current.setActiveFacet('custom' as DataFacet);
       });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith('/names', 'custom');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('/names', 'custom');
     });
   });
 });

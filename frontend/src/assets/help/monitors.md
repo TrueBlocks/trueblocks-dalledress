@@ -11,12 +11,13 @@ the code inside of 'EXISTING_CODE' tags.
 // EXISTING_CODE
 // EXISTING_CODE
 
-## Facets:
+## Facets
+
 - Monitors Facet uses Monitors store.
 
-## Stores:
+## Stores
 
-- **Monitors Store (8 members):**
+- **Monitors Store (8 members)**
 
   - address: the address of this monitor
   - name: the name of this monitor (if any)

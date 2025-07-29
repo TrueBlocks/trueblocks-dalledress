@@ -11,14 +11,15 @@ the code inside of 'EXISTING_CODE' tags.
 // EXISTING_CODE
 // EXISTING_CODE
 
-## Facets:
+## Facets
+
 - Dashboard Facet uses Contracts store.
 - Execute Facet uses Contracts store.
 - Events Facet uses Logs store.
 
-## Stores:
+## Stores
 
-- **Contracts Store (7 members):**
+- **Contracts Store (7 members)**
 
   - address: the address of this smart contract
   - name: the name of this contract (if available)
@@ -28,7 +29,7 @@ the code inside of 'EXISTING_CODE' tags.
   - errorCount: number of errors encountered when calling read functions
   - lastError: the most recent error message when calling functions
 
-- **Logs Store (14 members):**
+- **Logs Store (14 members)**
 
   - blockNumber: the number of the block
   - transactionIndex: the zero-indexed position of the transaction in the block

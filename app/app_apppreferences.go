@@ -46,7 +46,6 @@ func (a *App) SetLanguage(language string) {
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-/*
 func (a *App) GetActiveProjectPath() string {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
@@ -61,7 +60,6 @@ func (a *App) SetActiveProjectPath(path string) {
 	defer a.prefsMu.Unlock()
 	_ = a.Preferences.AddRecentProject(path)
 }
-*/
 
 // SetMenuCollapsed sets the menu collapsed state
 func (a *App) SetMenuCollapsed(collapse bool) {

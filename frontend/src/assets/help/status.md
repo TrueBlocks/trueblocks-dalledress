@@ -11,20 +11,21 @@ the code inside of 'EXISTING_CODE' tags.
 // EXISTING_CODE
 // EXISTING_CODE
 
-## Facets:
+## Facets
+
 - Status Facet uses Status store.
 - Caches Facet uses Caches store.
 - Chains Facet uses Chains store.
 
-## Stores:
+## Stores
 
-- **Caches Store (0 members):**
-
-
-- **Chains Store (0 members):**
+- **Caches Store (0 members)**
 
 
-- **Status Store (18 members):**
+- **Chains Store (0 members)**
+
+
+- **Status Store (18 members)**
 
   - cachePath: path to the cache directory
   - chain: the chain identifier

@@ -28,6 +28,8 @@ export function CancelFetch(arg1:types.DataFacet):Promise<void>;
 
 export function ChangeImageStorageLocation(arg1:string):Promise<void>;
 
+export function ClearActiveProject():Promise<void>;
+
 export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
@@ -47,6 +49,8 @@ export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 export function GetAbisPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
 export function GetAbisSummary(arg1:types.Payload):Promise<types.Summary>;
+
+export function GetActiveProjectPath():Promise<string>;
 
 export function GetAppId():Promise<preferences.Id>;
 
@@ -72,17 +76,13 @@ export function GetExportsSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetFilename():Promise<project.Project>;
 
+export function GetFilterState(arg1:project.ViewStateKey):Promise<project.FilterState>;
+
 export function GetImageURL(arg1:string):Promise<string>;
 
 export function GetLanguage():Promise<string>;
 
-export function GetLastAddress():Promise<string>;
-
-export function GetLastChain():Promise<string>;
-
-export function GetLastContract():Promise<string>;
-
-export function GetLastTab(arg1:string):Promise<types.DataFacet>;
+export function GetLastFacet(arg1:string):Promise<types.DataFacet>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
@@ -94,7 +94,7 @@ export function GetNamesPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk
 
 export function GetNamesSummary(arg1:types.Payload):Promise<types.Summary>;
 
-export function GetNodeStatus():Promise<types.MetaData>;
+export function GetNodeStatus(arg1:string):Promise<types.MetaData>;
 
 export function GetOpenProjects():Promise<Array<Record<string, any>>>;
 
@@ -112,9 +112,9 @@ export function GetUserInfoStatus():Promise<app.UserInfoStatus>;
 
 export function GetUserPreferences():Promise<preferences.UserPreferences>;
 
-export function GetViewState(arg1:project.ViewStateKey):Promise<project.FilterState>;
-
 export function GetWizardReturn():Promise<string>;
+
+export function HasActiveProject():Promise<boolean>;
 
 export function IsInitialized():Promise<boolean>;
 
@@ -131,6 +131,10 @@ export function MonitorsCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.M
 export function NameFromAddress(arg1:string):Promise<types.Name|boolean>;
 
 export function NamesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Name):Promise<void>;
+
+export function NewProject(arg1:string,arg2:string):Promise<void>;
+
+export function OpenProjectFile(arg1:string):Promise<void>;
 
 export function RegisterCollection(arg1:types.Collection):Promise<void>;
 
@@ -154,6 +158,12 @@ export function ResetStore(arg1:string):Promise<void>;
 
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 
+export function SaveProject():Promise<void>;
+
+export function SetActiveContract(arg1:string):Promise<void>;
+
+export function SetActiveProjectPath(arg1:string):Promise<void>;
+
 export function SetAppPreferences(arg1:preferences.AppPreferences):Promise<void>;
 
 export function SetChain(arg1:preferences.Chain):Promise<void>;
@@ -166,13 +176,7 @@ export function SetInitialized(arg1:boolean):Promise<void>;
 
 export function SetLanguage(arg1:string):Promise<void>;
 
-export function SetLastAddress(arg1:string):Promise<void>;
-
-export function SetLastChain(arg1:string):Promise<void>;
-
-export function SetLastContract(arg1:string):Promise<void>;
-
-export function SetLastTab(arg1:string,arg2:types.DataFacet):Promise<void>;
+export function SetLastFacet(arg1:string,arg2:types.DataFacet):Promise<void>;
 
 export function SetLastView(arg1:string):Promise<void>;
 
@@ -189,3 +193,5 @@ export function SetUserInfo(arg1:string,arg2:string):Promise<void>;
 export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<void>;
 
 export function SwitchToProject(arg1:string):Promise<void>;
+
+export function ValidateActiveProject():Promise<boolean>;

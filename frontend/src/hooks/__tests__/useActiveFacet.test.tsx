@@ -11,8 +11,8 @@ const { useActiveProject } = await import('../useActiveProject');
 const mockedUseActiveProject = vi.mocked(useActiveProject);
 
 describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
-  let mockLastTab: Record<string, string>;
-  let mockSetLastTab: ReturnType<typeof vi.fn>;
+  let mockLastFacet: Record<string, string>;
+  let mockSetLastFacet: ReturnType<typeof vi.fn>;
 
   const sampleFacets: DataFacetConfig[] = [
     {
@@ -32,17 +32,17 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockLastTab = {};
-    mockSetLastTab = vi.fn();
+    mockLastFacet = {};
+    mockSetLastFacet = vi.fn();
 
     mockedUseActiveProject.mockReturnValue({
-      lastTab: mockLastTab,
-      setLastTab: mockSetLastTab,
+      lastFacet: mockLastFacet,
+      setLastFacet: mockSetLastFacet,
       // Mock other required properties
       lastProject: 'test-project',
-      lastChain: 'mainnet',
-      lastAddress: '0x123',
-      lastContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+      activeChain: 'mainnet',
+      activeAddress: '0x123',
+      activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
       lastTheme: 'dark',
       lastLanguage: 'en',
       lastView: '/exports',
@@ -77,7 +77,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should restore saved preference via backend API mapping', () => {
-      mockLastTab['/exports'] = 'statements';
+      mockLastFacet['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -103,7 +103,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
         result.current.setActiveFacet('receipts' as DataFacet);
       });
 
-      expect(mockSetLastTab).toHaveBeenCalledWith('/exports', 'receipts');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('/exports', 'receipts');
     });
   });
 
@@ -136,7 +136,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should check if facet is active correctly', () => {
-      mockLastTab['/exports'] = 'statements';
+      mockLastFacet['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -154,7 +154,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
 
   describe('backward compatibility', () => {
     it('should provide correct backend API value for current facet', () => {
-      mockLastTab['/exports'] = 'statements';
+      mockLastFacet['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -200,7 +200,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should handle invalid saved preference', () => {
-      mockLastTab['/exports'] = 'INVALID_DATAFACET';
+      mockLastFacet['/exports'] = 'INVALID_DATAFACET';
 
       const { result } = renderHook(() =>
         useActiveFacet({

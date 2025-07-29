@@ -21,7 +21,7 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
     { field, mode, onChange, onBlur, loading, keyProp, autoFocus, tableCell },
     ref,
   ) => {
-    const { lastAddress } = useActiveProject();
+    const { activeAddress } = useActiveProject();
 
     if (field.fields && field.fields.length > 0) {
       return (
@@ -53,7 +53,7 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
     const isHighlighted =
       isAddressField &&
       field.value &&
-      field.value.toString().toLowerCase() === lastAddress.toLowerCase();
+      field.value.toString().toLowerCase() === activeAddress.toLowerCase();
 
     if (mode === 'display') {
       let displayValue;

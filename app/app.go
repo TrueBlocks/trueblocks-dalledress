@@ -299,17 +299,17 @@ func (a *App) SetProjectAddress(addr base.Address) {
 }
 
 // GetLastFacet returns the last visited facet for a specific view from the active project
-func (a *App) GetLastTab(view string) types.DataFacet {
+func (a *App) GetLastFacet(view string) types.DataFacet {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
-	return types.DataFacet(a.Preferences.App.LastTab[view])
+	return types.DataFacet(a.Preferences.App.LastFacet[view])
 }
 
 // SetLastFacet sets the last visited facet for a specific view in the active project
-func (a *App) SetLastTab(view string, tab types.DataFacet) {
+func (a *App) SetLastFacet(view string, tab types.DataFacet) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastTab[view] = string(tab)
+	a.Preferences.App.LastFacet[view] = string(tab)
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
@@ -323,48 +323,15 @@ func (a *App) SetLastView(view string) {
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-func (a *App) GetViewState(key project.ViewStateKey) (project.FilterState, error) {
+func (a *App) GetFilterState(key project.ViewStateKey) (project.FilterState, error) {
 	_ = key
 	return project.FilterState{}, nil
 }
 
-func (a *App) GetLastAddress() string {
-	a.prefsMu.RLock()
-	defer a.prefsMu.RUnlock()
-	return a.Preferences.App.LastAddress
-}
-
-func (a *App) SetLastAddress(address string) {
+func (a *App) SetActiveContract(contract string) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastAddress = address
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) GetLastChain() string {
-	a.prefsMu.RLock()
-	defer a.prefsMu.RUnlock()
-	return a.Preferences.App.LastChain
-}
-
-func (a *App) SetLastChain(chain string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-
-	a.Preferences.App.LastChain = chain
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) GetLastContract() string {
-	a.prefsMu.RLock()
-	defer a.prefsMu.RUnlock()
-	return a.Preferences.App.LastContract
-}
-
-func (a *App) SetLastContract(contract string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastContract = contract
+	a.Preferences.App.ActiveContract = contract
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
@@ -425,9 +392,9 @@ func (a *App) CancelAllFetches() int {
 	return store.CancelAllFetches()
 }
 
-func (a *App) GetNodeStatus() *coreTypes.MetaData {
+func (a *App) GetNodeStatus(chain string) *coreTypes.MetaData {
 	defer logging.Silence()()
-	a.meta, _ = sdk.GetMetaData(preferences.GetLastChain())
+	a.meta, _ = sdk.GetMetaData(chain)
 	return a.meta
 }
 
@@ -477,4 +444,167 @@ func (a *App) Encode(fn sdk.Function, params []interface{}) (string, error) {
 		return "", fmt.Errorf("failed to pack function call: %w", err)
 	}
 	return "0x" + hex.EncodeToString(packed), nil
+}
+
+// Simple project management functions for frontend modal (no CallbackData needed)
+
+// NewProject creates a new project with the given name and current address
+func (a *App) NewProject(name string, currentAddress string) error {
+	var addr base.Address
+	if currentAddress != "" {
+		convertedAddr, ok := a.ConvertToAddress(currentAddress)
+		if !ok {
+			return fmt.Errorf("invalid address: %s", currentAddress)
+		}
+		addr = convertedAddr
+	}
+
+	// Create new project with current address
+	newProject := a.Projects.New(name, addr)
+	if newProject == nil {
+		return fmt.Errorf("failed to create project")
+	}
+	return nil
+}
+
+// OpenProjectFile opens a project file with optional path (empty string triggers file picker)
+func (a *App) OpenProjectFile(path string) error {
+	if path == "" {
+		// Trigger file picker
+		selectedPath, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+			Title: "Open Project File",
+			Filters: []runtime.FileFilter{
+				{
+					DisplayName: "TrueBlocks Project Files (*.tbx)",
+					Pattern:     "*.tbx",
+				},
+			},
+		})
+		if err != nil || selectedPath == "" {
+			return fmt.Errorf("no file selected")
+		}
+		path = selectedPath
+	}
+
+	if err := a.fileOpen(path); err != nil {
+		return err
+	}
+
+	// Navigate to current address view on project open
+	active := a.Projects.Active()
+	if active != nil && active.GetActiveAddress() != base.ZeroAddr {
+		activeAddr := active.GetActiveAddress().String()
+		msgs.EmitStatus(fmt.Sprintf("opened project: %s - navigated to %s", active.GetName(), activeAddr))
+	}
+	msgs.EmitStatus("project opened: " + path)
+	return nil
+}
+
+// SaveProject saves the current project, prompting for a file path if not set
+func (a *App) SaveProject() error {
+	project := a.Projects.Active()
+	if project == nil {
+		return fmt.Errorf("no active project")
+	}
+
+	if project.GetPath() == "" {
+		// Project hasn't been saved before, need to use SaveAs with file dialog
+		path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+			Title: "Save Project",
+			Filters: []runtime.FileFilter{
+				{
+					DisplayName: "TrueBlocks Project Files (*.tbx)",
+					Pattern:     "*.tbx",
+				},
+			},
+			DefaultFilename: project.GetName() + ".tbx",
+		})
+		if err != nil {
+			return fmt.Errorf("file dialog error: %w", err)
+		}
+		if path == "" {
+			return fmt.Errorf("save canceled")
+		}
+
+		if err := a.Projects.SaveActiveAs(path); err != nil {
+			return err
+		}
+	} else {
+		// Project has a path, use normal save
+		if err := a.Projects.SaveActive(); err != nil {
+			return err
+		}
+	}
+
+	a.updateRecentProjects()
+	msgs.EmitStatus(fmt.Sprintf("project saved: %s", project.GetName()))
+	return nil
+}
+
+// HasActiveProject returns true if there is an active project
+func (a *App) HasActiveProject() bool {
+	if a.Projects == nil {
+		return false
+	}
+	return a.Projects.ActiveID != "" && a.Projects.Active() != nil
+}
+
+// ValidateActiveProject checks if the active project is valid (has current address)
+func (a *App) ValidateActiveProject() bool {
+	if !a.HasActiveProject() {
+		return false
+	}
+
+	project := a.Projects.Active()
+	if project == nil {
+		return false
+	}
+
+	// Check if project has at least one address and a valid current address
+	addresses := project.GetAddresses()
+	activeAddr := project.GetActiveAddress()
+	return len(addresses) > 0 && activeAddr != base.ZeroAddr
+}
+
+// ClearActiveProject clears the active project, checking for unsaved changes first
+func (a *App) ClearActiveProject() error {
+	if !a.HasActiveProject() {
+		return nil
+	}
+
+	project := a.Projects.Active()
+	if project == nil {
+		a.Projects.ActiveID = ""
+		return nil
+	}
+
+	if project.IsDirty() {
+		response, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
+			Type:          runtime.QuestionDialog,
+			Title:         "Unsaved Changes",
+			Message:       fmt.Sprintf("Project '%s' has unsaved changes. What would you like to do?", project.GetName()),
+			Buttons:       []string{"Save", "Discard Changes", "Cancel"},
+			DefaultButton: "Save",
+		})
+
+		if err != nil {
+			return fmt.Errorf("failed to show unsaved changes dialog: %w", err)
+		}
+
+		switch response {
+		case "Save":
+			if err := a.SaveProject(); err != nil {
+				return fmt.Errorf("failed to save project: %w", err)
+			}
+		case "Cancel":
+			return fmt.Errorf("operation canceled by user")
+		case "Discard Changes":
+			// Continue with clearing
+		}
+	}
+
+	// Clear the active project
+	a.Projects.ActiveID = ""
+	msgs.EmitManager("active_project_cleared")
+	return nil
 }

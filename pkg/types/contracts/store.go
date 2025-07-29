@@ -86,6 +86,7 @@ func (c *ContractsCollection) getLogsStore(payload *types.Payload, facet types.D
 
 	chain := payload.Chain
 	address := payload.Address
+	// TODO: WE NEED THIS ON THE PAYLOAD
 	// contract := payload.Contract
 	contract := "0x8fbea07446ddf4518b1a7ba2b4f11bd140a8df41"
 	theStore := logsStore

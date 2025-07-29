@@ -11,16 +11,17 @@ the code inside of 'EXISTING_CODE' tags.
 // EXISTING_CODE
 // EXISTING_CODE
 
-## Facets:
+## Facets
+
 - All Facet uses Names store.
 - Custom Facet uses Names store.
 - Prefund Facet uses Names store.
 - Regular Facet uses Names store.
 - Baddress Facet uses Names store.
 
-## Stores:
+## Stores
 
-- **Names Store (12 members):**
+- **Names Store (12 members)**
 
   - address: the address associated with this name
   - name: the name associated with this address

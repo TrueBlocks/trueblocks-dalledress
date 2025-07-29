@@ -46,11 +46,11 @@ type AppPreferences struct {
 	SilencedDialogs  map[string]bool   `json:"silencedDialogs"`
 	Version          string            `json:"version"`
 	LastLanguage     string            `json:"lastLanguage,omitempty"`
-	LastAddress      string            `json:"lastAddress,omitempty"`
-	LastChain        string            `json:"lastChain,omitempty"`
-	LastContract     string            `json:"lastContract,omitempty"`
 	LastProject      string            `json:"lastProject,omitempty"`
-	LastTab          map[string]string `json:"lastTab"`
+	ActiveAddress    string            `json:"activeAddress,omitempty"`
+	ActiveChain      string            `json:"activeChain,omitempty"`
+	ActiveContract   string            `json:"activeContract,omitempty"`
+	LastFacet        map[string]string `json:"lastFacet"`
 	LastView         string            `json:"lastView,omitempty"`
 	LastViewNoWizard string            `json:"lastViewNoWizard,omitempty"`
 }
@@ -63,18 +63,18 @@ func (p *AppPreferences) String() string {
 // NewAppPreferences creates a new AppPreferences instance with default values
 func NewAppPreferences() *AppPreferences {
 	return &AppPreferences{
-		Bounds:          NewBounds(),
-		DebugMode:       false,
-		HelpCollapsed:   false,
-		MenuCollapsed:   false,
-		LastLanguage:    "en",
-		LastTheme:       "dark",
-		RecentProjects:  []string{},
-		SilencedDialogs: make(map[string]bool),
-		Version:         "1.0",
-		LastAddress:      "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
-		LastContract:     "0x52df6e4d9989e7cf4739d687c765e75323a1b14c",
-		LastTab:          make(map[string]string),
+		Bounds:           NewBounds(),
+		DebugMode:        false,
+		HelpCollapsed:    false,
+		MenuCollapsed:    false,
+		LastLanguage:     "en",
+		LastTheme:        "dark",
+		RecentProjects:   []string{},
+		SilencedDialogs:  make(map[string]bool),
+		Version:          "1.0",
+		ActiveAddress:    "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
+		ActiveContract:   "0x52df6e4d9989e7cf4739d687c765e75323a1b14c",
+		LastFacet:        make(map[string]string),
 		LastView:         "/",
 		LastViewNoWizard: "/",
 	}
@@ -122,8 +122,8 @@ func GetAppPreferences() (AppPreferences, error) {
 		appPrefs.Version = "1.0"
 		needsSave = true
 	}
-	if appPrefs.LastTab == nil {
-		appPrefs.LastTab = make(map[string]string)
+	if appPrefs.LastFacet == nil {
+		appPrefs.LastFacet = make(map[string]string)
 		needsSave = true
 	}
 	if appPrefs.LastView == "" {

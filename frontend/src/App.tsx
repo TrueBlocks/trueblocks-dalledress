@@ -1,15 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { NodeStatus, getBarWidth } from '@components';
+import { HasActiveProject, ValidateActiveProject } from '@app';
+import { NodeStatus, ProjectSelectionModal, getBarWidth } from '@components';
 import { ViewContextProvider, WalletConnectProvider } from '@contexts';
 import {
   useActiveProject,
   useAppHealth,
   useAppHotkeys,
   useAppNavigation,
+  useEvent,
 } from '@hooks';
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
+import { Log } from '@utils';
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-react';
 import { Router } from 'wouter';
 
@@ -43,6 +46,9 @@ function globalNavKeySquelcher(e: KeyboardEvent) {
 }
 
 export const App = () => {
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [hasProject, setHasProject] = useState<boolean | null>(null);
+
   useEffect(() => {
     window.addEventListener('keydown', globalNavKeySquelcher, {
       capture: true,
@@ -54,6 +60,31 @@ export const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const checkActiveProject = async () => {
+      try {
+        const hasActiveProject = await HasActiveProject();
+        const isValidProject = await ValidateActiveProject();
+        const hasValidProject = hasActiveProject && isValidProject;
+        setHasProject(hasValidProject);
+        setShowProjectModal(!hasValidProject);
+      } catch (error) {
+        Log('ERROR: Failed to check active project:', JSON.stringify(error));
+        setHasProject(false);
+        setShowProjectModal(true);
+      }
+    };
+    checkActiveProject();
+  }, []);
+
+  useEvent('manager:change', (message: string) => {
+    if (message === 'show_project_modal') {
+      setShowProjectModal(true);
+    } else if (message === 'active_project_cleared') {
+      setHasProject(false);
+    }
+  });
+
   const { ready, isWizard } = useAppNavigation();
   const { menuCollapsed, helpCollapsed } = useActiveProject();
 
@@ -61,7 +92,12 @@ export const App = () => {
   useAppHealth();
   useGlobalEscape();
 
-  if (!ready) return <div>Not ready</div>;
+  const handleProjectModalClose = () => {
+    setShowProjectModal(false);
+    setHasProject(true);
+  };
+
+  if (!ready || hasProject === null) return <div>Not ready</div>;
 
   const header = { height: 60 };
   const footer = { height: 40 };
@@ -115,8 +151,8 @@ export const App = () => {
             projectId={
               import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ||
               (() => {
-                console.error(
-                  'VITE_WALLETCONNECT_PROJECT_ID not set in environment variables',
+                Log(
+                  'ERROR: VITE_WALLETCONNECT_PROJECT_ID not set in environment variables',
                 );
                 return 'MISSING_PROJECT_ID';
               })()
@@ -128,6 +164,10 @@ export const App = () => {
               url: 'https://trueblocks.io',
               icons: ['https://trueblocks.io/favicon.ico'],
             }}
+          />
+          <ProjectSelectionModal
+            opened={showProjectModal}
+            onProjectSelected={handleProjectModalClose}
           />
         </div>
       </WalletConnectProvider>

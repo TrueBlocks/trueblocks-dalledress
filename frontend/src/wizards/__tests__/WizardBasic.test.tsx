@@ -114,7 +114,7 @@ vi.mock('@hooks', () => ({
     lastView: 'home',
     menuCollapsed: false,
     helpCollapsed: false,
-    lastTab: {},
+    lastFacet: {},
     loading: false,
     // Actions
     setActiveAddress: vi.fn(),
@@ -124,7 +124,7 @@ vi.mock('@hooks', () => ({
     changeLanguage: vi.fn(),
     setMenuCollapsed: vi.fn(),
     setHelpCollapsed: vi.fn(),
-    setLastTab: vi.fn(),
+    setLastFacet: vi.fn(),
     setLastView: vi.fn(),
     toggleDarkMode: vi.fn(),
     // Computed values

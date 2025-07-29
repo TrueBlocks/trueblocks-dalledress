@@ -34,7 +34,6 @@ import { msgs, project, types } from '@models';
 import { Debugger, Log, useErrorHandler } from '@utils';
 
 import { TransactionReviewModal } from '../contracts/components/TransactionReviewModal';
-// Transaction modal imports
 import { PreparedTransaction } from '../contracts/components/transactionBuilder';
 import { useWalletConnection } from '../contracts/components/walletConnection';
 import { getColumns } from './columns';
@@ -162,7 +161,6 @@ export const Names = () => {
   // === SECTION 5: CRUD Operations ===
   const enabledActions = useMemo(() => {
     const currentFacet = getCurrentDataFacet();
-    Log('Current facet:', currentFacet);
     if (currentFacet === types.DataFacet.CUSTOM) {
       const actions = [
         'add',
@@ -211,7 +209,6 @@ export const Names = () => {
     getCurrentDataFacet,
   });
 
-  // Wallet connection for transaction signing
   const { sendTransaction } = useWalletConnection({
     onTransactionSigned: (txHash) => {
       Log(`Transaction signed successfully: ${txHash}`);
@@ -223,7 +220,6 @@ export const Names = () => {
     },
   });
 
-  // Handle transaction confirmation
   const handleTransactionConfirm = useCallback(
     async (preparedTx: PreparedTransaction) => {
       try {
@@ -235,7 +231,6 @@ export const Names = () => {
     [sendTransaction, handleError],
   );
 
-  // Debug: Log transaction modal state changes
   useEffect(() => {
     Log(
       'Transaction modal state changed:',

@@ -5,35 +5,37 @@ import { appPreferencesStore } from '@stores';
 
 export interface UseActiveProjectReturn {
   // State
-  lastProject: string;
-  lastChain: string;
-  lastAddress: string;
-  lastContract: string;
   lastTheme: string;
   lastLanguage: string;
-  lastView: string;
   menuCollapsed: boolean;
   helpCollapsed: boolean;
-  lastTab: Record<string, types.DataFacet>;
   debugMode: boolean;
   loading: boolean;
 
-  // Actions
+  // Project-specific state (from active project - computed via backend calls)
+  lastProject: string;
+  activeChain: string;
+  activeAddress: string;
+  activeContract: string;
+  lastView: string;
+  lastFacet: Record<string, types.DataFacet>;
+
+  // Actions that call backend directly
   setActiveAddress: (address: string) => Promise<void>;
-  setActiveChain: (chain: string) => Promise<void>;
-  setActiveContract: (contract: string) => Promise<void>;
   switchProject: (project: string) => Promise<void>;
   toggleTheme: () => Promise<void>;
   changeLanguage: (language: string) => Promise<void>;
   setMenuCollapsed: (collapsed: boolean) => Promise<void>;
   setHelpCollapsed: (collapsed: boolean) => Promise<void>;
-  setLastTab: (route: string, tab: types.DataFacet) => Promise<void>;
   setLastView: (view: string) => Promise<void>;
+  setLastFacet: (view: string, facet: types.DataFacet) => Promise<void>;
+  setActiveChain: (chain: string) => Promise<void>;
+  setActiveContract: (contract: string) => Promise<void>;
   isDarkMode: boolean;
   toggleDarkMode: () => Promise<void>;
   toggleDebugMode: () => Promise<void>;
 
-  // Computed values
+  // Computed values (sync calls to store)
   hasActiveProject: boolean;
   canExport: boolean;
 }
@@ -45,21 +47,23 @@ export const useActiveProject = (): UseActiveProjectReturn => {
   );
 
   return {
-    // State
-    lastProject: state.lastProject,
-    lastChain: state.lastChain,
-    lastAddress: state.lastAddress,
-    lastContract: state.lastContract,
+    // State from preferences store
     lastTheme: state.lastTheme,
     lastLanguage: state.lastLanguage,
-    lastView: state.lastView,
     menuCollapsed: state.menuCollapsed,
     helpCollapsed: state.helpCollapsed,
-    lastTab: state.lastTab,
     debugMode: state.debugMode,
     loading: state.loading,
 
-    // Actions - these are bound methods from the store
+    // Project-specific state (from active project)
+    activeAddress: state.activeAddress,
+    lastProject: state.lastProject,
+    activeChain: state.activeChain,
+    activeContract: state.activeContract,
+    lastView: state.lastView,
+    lastFacet: state.lastFacet,
+
+    // Actions - enhanced project-aware methods
     setActiveAddress: appPreferencesStore.setActiveAddress,
     setActiveChain: appPreferencesStore.setActiveChain,
     setActiveContract: appPreferencesStore.setActiveContract,
@@ -68,12 +72,12 @@ export const useActiveProject = (): UseActiveProjectReturn => {
     changeLanguage: appPreferencesStore.changeLanguage,
     setMenuCollapsed: appPreferencesStore.setMenuCollapsed,
     setHelpCollapsed: appPreferencesStore.setHelpCollapsed,
-    setLastTab: appPreferencesStore.setLastTab,
     setLastView: appPreferencesStore.setLastView,
+    setLastFacet: appPreferencesStore.setLastFacet,
     toggleDarkMode: appPreferencesStore.toggleDarkMode,
     toggleDebugMode: appPreferencesStore.toggleDebugMode,
 
-    // Computed values - these are getters from the store
+    // Computed values - these are sync getters from the store
     isDarkMode: appPreferencesStore.isDarkMode,
     hasActiveProject: appPreferencesStore.hasActiveProject,
     canExport: appPreferencesStore.canExport,

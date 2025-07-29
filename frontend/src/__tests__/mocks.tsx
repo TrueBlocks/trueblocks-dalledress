@@ -111,7 +111,7 @@ const createInitialMockAppBridge = (): AppBridgeFunctions => ({
     menuCollapsed: false,
   }),
   SetLastView: vi.fn().mockResolvedValue(undefined),
-  SetViewState: vi.fn().mockResolvedValue(undefined),
+  SetFilterState: vi.fn().mockResolvedValue(undefined),
   CancelAllFetches: vi.fn().mockResolvedValue(3),
 });
 

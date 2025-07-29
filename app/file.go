@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
@@ -42,7 +44,9 @@ func (a *App) fileSave() error {
 		return errors.New("no active project")
 	}
 
-	if project.GetPath() == "" {
+	projectPath := project.GetPath()
+	needsSaveAs := projectPath == "" || strings.Contains(filepath.Base(projectPath), "Unknown")
+	if needsSaveAs {
 		return ErrEmptyFilePath
 	}
 
@@ -94,6 +98,7 @@ func (a *App) fileOpen(path string) error {
 		return err
 	}
 
+	a.SetActiveProjectPath(path)
 	a.updateRecentProjects()
 	return nil
 }

@@ -22,6 +22,10 @@ export function ChangeImageStorageLocation(arg1) {
   return window['go']['app']['App']['ChangeImageStorageLocation'](arg1);
 }
 
+export function ClearActiveProject() {
+  return window['go']['app']['App']['ClearActiveProject']();
+}
+
 export function CloseProject(arg1) {
   return window['go']['app']['App']['CloseProject'](arg1);
 }
@@ -60,6 +64,10 @@ export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
 
 export function GetAbisSummary(arg1) {
   return window['go']['app']['App']['GetAbisSummary'](arg1);
+}
+
+export function GetActiveProjectPath() {
+  return window['go']['app']['App']['GetActiveProjectPath']();
 }
 
 export function GetAppId() {
@@ -110,6 +118,10 @@ export function GetFilename() {
   return window['go']['app']['App']['GetFilename']();
 }
 
+export function GetFilterState(arg1) {
+  return window['go']['app']['App']['GetFilterState'](arg1);
+}
+
 export function GetImageURL(arg1) {
   return window['go']['app']['App']['GetImageURL'](arg1);
 }
@@ -118,20 +130,8 @@ export function GetLanguage() {
   return window['go']['app']['App']['GetLanguage']();
 }
 
-export function GetLastAddress() {
-  return window['go']['app']['App']['GetLastAddress']();
-}
-
-export function GetLastChain() {
-  return window['go']['app']['App']['GetLastChain']();
-}
-
-export function GetLastContract() {
-  return window['go']['app']['App']['GetLastContract']();
-}
-
-export function GetLastTab(arg1) {
-  return window['go']['app']['App']['GetLastTab'](arg1);
+export function GetLastFacet(arg1) {
+  return window['go']['app']['App']['GetLastFacet'](arg1);
 }
 
 export function GetMarkdown(arg1, arg2, arg3) {
@@ -154,8 +154,8 @@ export function GetNamesSummary(arg1) {
   return window['go']['app']['App']['GetNamesSummary'](arg1);
 }
 
-export function GetNodeStatus() {
-  return window['go']['app']['App']['GetNodeStatus']();
+export function GetNodeStatus(arg1) {
+  return window['go']['app']['App']['GetNodeStatus'](arg1);
 }
 
 export function GetOpenProjects() {
@@ -190,12 +190,12 @@ export function GetUserPreferences() {
   return window['go']['app']['App']['GetUserPreferences']();
 }
 
-export function GetViewState(arg1) {
-  return window['go']['app']['App']['GetViewState'](arg1);
-}
-
 export function GetWizardReturn() {
   return window['go']['app']['App']['GetWizardReturn']();
+}
+
+export function HasActiveProject() {
+  return window['go']['app']['App']['HasActiveProject']();
 }
 
 export function IsInitialized() {
@@ -228,6 +228,14 @@ export function NameFromAddress(arg1) {
 
 export function NamesCrud(arg1, arg2, arg3) {
   return window['go']['app']['App']['NamesCrud'](arg1, arg2, arg3);
+}
+
+export function NewProject(arg1, arg2) {
+  return window['go']['app']['App']['NewProject'](arg1, arg2);
+}
+
+export function OpenProjectFile(arg1) {
+  return window['go']['app']['App']['OpenProjectFile'](arg1);
 }
 
 export function RegisterCollection(arg1) {
@@ -274,6 +282,18 @@ export function SaveBounds(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['SaveBounds'](arg1, arg2, arg3, arg4);
 }
 
+export function SaveProject() {
+  return window['go']['app']['App']['SaveProject']();
+}
+
+export function SetActiveContract(arg1) {
+  return window['go']['app']['App']['SetActiveContract'](arg1);
+}
+
+export function SetActiveProjectPath(arg1) {
+  return window['go']['app']['App']['SetActiveProjectPath'](arg1);
+}
+
 export function SetAppPreferences(arg1) {
   return window['go']['app']['App']['SetAppPreferences'](arg1);
 }
@@ -298,20 +318,8 @@ export function SetLanguage(arg1) {
   return window['go']['app']['App']['SetLanguage'](arg1);
 }
 
-export function SetLastAddress(arg1) {
-  return window['go']['app']['App']['SetLastAddress'](arg1);
-}
-
-export function SetLastChain(arg1) {
-  return window['go']['app']['App']['SetLastChain'](arg1);
-}
-
-export function SetLastContract(arg1) {
-  return window['go']['app']['App']['SetLastContract'](arg1);
-}
-
-export function SetLastTab(arg1, arg2) {
-  return window['go']['app']['App']['SetLastTab'](arg1, arg2);
+export function SetLastFacet(arg1, arg2) {
+  return window['go']['app']['App']['SetLastFacet'](arg1, arg2);
 }
 
 export function SetLastView(arg1) {
@@ -344,4 +352,8 @@ export function SetUserPreferences(arg1) {
 
 export function SwitchToProject(arg1) {
   return window['go']['app']['App']['SwitchToProject'](arg1);
+}
+
+export function ValidateActiveProject() {
+  return window['go']['app']['App']['ValidateActiveProject']();
 }

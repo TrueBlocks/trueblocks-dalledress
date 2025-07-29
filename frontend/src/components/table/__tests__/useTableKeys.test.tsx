@@ -29,9 +29,9 @@ vi.mock('@contexts', async () => {
       setFilter: vi.fn(),
     })),
     useViewState: vi.fn(() => ({
-      setViewState: vi.fn(),
-      getViewState: vi.fn(),
-      clearViewState: vi.fn(),
+      setFilterState: vi.fn(),
+      getFilterState: vi.fn(),
+      clearFilterState: vi.fn(),
     })),
   };
 });

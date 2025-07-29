@@ -33,13 +33,15 @@ type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
 export const useAppHotkeys = (): void => {
   const [currentLocation] = useLocation();
   const {
-    lastTab,
+    lastFacet,
     menuCollapsed,
     setMenuCollapsed,
     helpCollapsed,
     setHelpCollapsed,
   } = useActiveProject();
-  const currentTab = lastTab[currentLocation] || '';
+
+  // Helper function to get current facet for the current route
+  const currentTab = lastFacet[currentLocation] || '';
 
   const [, navigate] = useLocation();
   const { emitStatus, emitError } = useEmitters();

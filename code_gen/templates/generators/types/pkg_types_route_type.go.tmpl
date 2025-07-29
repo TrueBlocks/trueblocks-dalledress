@@ -43,20 +43,20 @@ type {{$class}}Collection struct {
 	summaryMutex    sync.RWMutex
 }
 
-func New{{$class}}Collection() *{{$class}}Collection {
+func New{{$class}}Collection(payload *types.Payload) *{{$class}}Collection {
 	c := &{{$class}}Collection{}
 	c.ResetSummary()
-	c.initializeFacets()
+	c.initializeFacets(payload)
 	return c
 }
 
-func (c *{{$class}}Collection) initializeFacets() {
+func (c *{{$class}}Collection) initializeFacets(payload *types.Payload) {
 	{{- range .Facets}}
 	c.{{toLower .Name}}Facet = facets.NewFacet(
 		{{$class}}{{.Name}},
 		is{{toSingular .Name}},
 		isDup{{.SingleStore}}(),
-		c.get{{.Store}}Store({{$class}}{{.Name}}),
+		c.get{{.Store}}Store(payload, {{$class}}{{.Name}}),
 		"{{toLower $class}}",
 		c,
 	)

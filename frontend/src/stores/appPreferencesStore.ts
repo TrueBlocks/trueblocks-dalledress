@@ -1,21 +1,22 @@
 import * as App from '@app';
 import { preferences, types } from '@models';
+import { Log } from '@utils';
 
-// State interface matching the current useActiveProject state
+// State interface for simplified preferences (no caching of project data)
 interface AppPreferencesState {
-  // Core project state
-  lastProject: string;
-  lastChain: string;
-  lastAddress: string;
-  lastContract: string;
-
-  // UI state
+  // UI state (from global preferences)
   lastTheme: string;
   lastLanguage: string;
-  lastView: string;
   menuCollapsed: boolean;
   helpCollapsed: boolean;
-  lastTab: Record<string, types.DataFacet>;
+  lastFacet: Record<string, types.DataFacet>;
+
+  // Project state
+  lastProject: string;
+  activeChain: string;
+  activeAddress: string;
+  activeContract: string;
+  lastView: string;
 
   // Debug state
   debugMode: boolean;
@@ -27,15 +28,15 @@ interface AppPreferencesState {
 // Initial state
 const initialState: AppPreferencesState = {
   lastProject: '',
-  lastChain: '',
-  lastAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
-  lastContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+  activeChain: '',
+  activeAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
+  activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
   lastTheme: 'dark',
   lastLanguage: 'en',
   lastView: '/',
   menuCollapsed: true,
   helpCollapsed: true,
-  lastTab: {},
+  lastFacet: {},
   debugMode: false,
   loading: true,
 };
@@ -97,7 +98,7 @@ class AppPreferencesStore {
       });
       await App.SetAppPreferences(updatedPrefs);
     } catch (error) {
-      console.error('Failed to update preferences:', error);
+      Log('ERROR: Failed to update preferences: ' + String(error));
       throw error;
     }
   };
@@ -120,25 +121,24 @@ class AppPreferencesStore {
           break; // Success, exit retry loop
         } catch (error) {
           retries++;
-          console.log(
-            `App preferences load attempt ${retries}/${maxRetries} failed:`,
-            error,
+          Log(
+            `App preferences load attempt ${retries}/${maxRetries} failed: ${JSON.stringify(error)}`,
           );
           if (retries >= maxRetries) {
-            console.warn(
-              'Failed to load app preferences after max retries, using defaults',
+            Log(
+              'WARN: Failed to load app preferences after max retries, using defaults',
             );
             // Use safe defaults if backend is not ready
             this.setState({
               lastProject: '',
-              lastChain: '',
-              lastAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
+              activeChain: '',
+              activeAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
               lastTheme: 'dark',
               lastLanguage: 'en',
               lastView: '/',
               menuCollapsed: false,
               helpCollapsed: false,
-              lastTab: {},
+              lastFacet: {},
               debugMode: false,
               loading: false,
             });
@@ -151,17 +151,18 @@ class AppPreferencesStore {
       if (prefs) {
         this.setState({
           lastProject: prefs.lastProject || '',
-          lastChain: prefs.lastChain || '',
-          lastAddress:
-            prefs.lastAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
-          lastContract:
-            prefs.lastContract || '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+          activeChain: prefs.activeChain || '',
+          activeAddress:
+            prefs.activeAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
+          activeContract:
+            prefs.activeContract ||
+            '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
           lastTheme: prefs.lastTheme || 'dark',
           lastLanguage: prefs.lastLanguage || 'en',
           lastView: prefs.lastView || '/',
           menuCollapsed: prefs.menuCollapsed || false,
           helpCollapsed: prefs.helpCollapsed || false,
-          lastTab: (prefs.lastTab || {}) as Record<string, types.DataFacet>,
+          lastFacet: (prefs.lastFacet || {}) as Record<string, types.DataFacet>,
           debugMode:
             (prefs as preferences.AppPreferences & { debugMode?: boolean })
               .debugMode || false,
@@ -169,28 +170,28 @@ class AppPreferencesStore {
         });
       }
     } catch (error) {
-      console.error('Failed to load app preferences:', error);
+      Log('ERROR: Failed to load app preferences: ' + String(error));
       this.setState({ loading: false });
     }
   };
 
   // Action methods that update both local state and backend
   setActiveAddress = async (address: string): Promise<void> => {
-    await this.updatePreferences({ lastAddress: address });
-    this.setState({ lastAddress: address });
+    await this.updatePreferences({ activeAddress: address });
+    this.setState({ activeAddress: address });
   };
 
   setActiveChain = async (chain: string): Promise<void> => {
-    await this.updatePreferences({ lastChain: chain });
-    this.setState({ lastChain: chain });
+    await this.updatePreferences({ activeChain: chain });
+    this.setState({ activeChain: chain });
   };
 
   setActiveContract = async (contract: string): Promise<void> => {
     // Skip backend calls in test mode
     if (!this.isTestMode) {
-      await App.SetLastContract(contract);
+      await App.SetActiveContract(contract);
     }
-    this.setState({ lastContract: contract });
+    this.setState({ activeContract: contract });
   };
 
   switchProject = async (project: string): Promise<void> => {
@@ -219,13 +220,13 @@ class AppPreferencesStore {
     this.setState({ helpCollapsed: collapsed });
   };
 
-  setLastTab = async (route: string, tab: types.DataFacet): Promise<void> => {
+  setLastFacet = async (route: string, tab: types.DataFacet): Promise<void> => {
     // Skip backend calls in test mode
     if (!this.isTestMode) {
-      await App.SetLastTab(route, tab);
+      await App.SetLastFacet(route, tab);
     }
     this.setState({
-      lastTab: { ...this.state.lastTab, [route]: tab },
+      lastFacet: { ...this.state.lastFacet, [route]: tab },
     });
   };
 
@@ -258,7 +259,7 @@ class AppPreferencesStore {
   }
 
   get canExport(): boolean {
-    return Boolean(this.state.lastProject && this.state.lastAddress);
+    return Boolean(this.state.lastProject && this.state.activeAddress);
   }
 }
 

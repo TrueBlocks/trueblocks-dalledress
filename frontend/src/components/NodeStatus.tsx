@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { GetNodeStatus } from '@app';
+import { useActiveProject } from '@hooks';
 import { types } from '@models';
 import { useLocation } from 'wouter';
 
@@ -9,11 +10,12 @@ export const NodeStatus = () => {
   const [spinnerIndex, setSpinnerIndex] = useState(0);
   const [location, navigate] = useLocation();
   const previousView = useRef<string | null>(null);
+  const { activeChain } = useActiveProject();
 
   useEffect(() => {
     const getStatus = async () => {
       try {
-        GetNodeStatus().then((meta: types.MetaData) => {
+        GetNodeStatus(activeChain).then((meta: types.MetaData) => {
           const spinnerFrames = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏';
           const dist = meta.client - meta.unripe;
           const formatter = new Intl.NumberFormat(navigator.language);
@@ -36,7 +38,7 @@ export const NodeStatus = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [spinnerIndex]);
+  }, [activeChain, spinnerIndex]);
 
   useEffect(() => {
     if (location !== '/khedra') {

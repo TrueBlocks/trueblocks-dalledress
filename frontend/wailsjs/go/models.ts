@@ -528,11 +528,11 @@ export namespace preferences {
 	    silencedDialogs: Record<string, boolean>;
 	    version: string;
 	    lastLanguage?: string;
-	    lastAddress?: string;
-	    lastChain?: string;
-	    lastContract?: string;
 	    lastProject?: string;
-	    lastTab: Record<string, string>;
+	    activeAddress?: string;
+	    activeChain?: string;
+	    activeContract?: string;
+	    lastFacet: Record<string, string>;
 	    lastView?: string;
 	    lastViewNoWizard?: string;
 	
@@ -552,11 +552,11 @@ export namespace preferences {
 	        this.silencedDialogs = source["silencedDialogs"];
 	        this.version = source["version"];
 	        this.lastLanguage = source["lastLanguage"];
-	        this.lastAddress = source["lastAddress"];
-	        this.lastChain = source["lastChain"];
-	        this.lastContract = source["lastContract"];
 	        this.lastProject = source["lastProject"];
-	        this.lastTab = source["lastTab"];
+	        this.activeAddress = source["activeAddress"];
+	        this.activeChain = source["activeChain"];
+	        this.activeContract = source["activeContract"];
+	        this.lastFacet = source["lastFacet"];
 	        this.lastView = source["lastView"];
 	        this.lastViewNoWizard = source["lastViewNoWizard"];
 	    }
@@ -703,12 +703,28 @@ export namespace project {
 	        this.other = source["other"];
 	    }
 	}
+	export class ViewStateKey {
+	    viewName: string;
+	    facetName: types.DataFacet;
+	
+	    static createFrom(source: any = {}) {
+	        return new ViewStateKey(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.viewName = source["viewName"];
+	        this.facetName = source["facetName"];
+	    }
+	}
 	export class Project {
 	    dirty?: boolean;
 	    version: string;
 	    name: string;
 	    last_opened: string;
-	    address: base.Address;
+	    addresses: base.Address[];
+	    activeAddress: base.Address;
+	    filterStates: Record<string, FilterState>;
 	
 	    static createFrom(source: any = {}) {
 	        return new Project(source);
@@ -720,7 +736,9 @@ export namespace project {
 	        this.version = source["version"];
 	        this.name = source["name"];
 	        this.last_opened = source["last_opened"];
-	        this.address = this.convertValues(source["address"], base.Address);
+	        this.addresses = this.convertValues(source["addresses"], base.Address);
+	        this.activeAddress = this.convertValues(source["activeAddress"], base.Address);
+	        this.filterStates = this.convertValues(source["filterStates"], FilterState, true);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -740,20 +758,6 @@ export namespace project {
 		    }
 		    return a;
 		}
-	}
-	export class ViewStateKey {
-	    viewName: string;
-	    facetName: types.DataFacet;
-	
-	    static createFrom(source: any = {}) {
-	        return new ViewStateKey(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.viewName = source["viewName"];
-	        this.facetName = source["facetName"];
-	    }
 	}
 
 }

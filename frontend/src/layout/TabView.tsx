@@ -21,10 +21,10 @@ interface TabViewProps {
 }
 
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
-  const { lastTab, setLastTab } = useActiveProject();
+  const { lastFacet, setLastFacet } = useActiveProject();
 
   const getInitialTab = (): string => {
-    const savedTab = lastTab[route];
+    const savedTab = lastFacet[route];
     if (savedTab) {
       return savedTab;
     }
@@ -34,20 +34,20 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   const [activeTab, setActiveTab] = useState<string>(getInitialTab());
 
   useEffect(() => {
-    const savedTab = lastTab[route];
+    const savedTab = lastFacet[route];
     if (savedTab && savedTab !== activeTab) {
       setActiveTab(savedTab);
     }
-  }, [lastTab, route, activeTab]);
+  }, [lastFacet, route, activeTab]);
 
   useEffect(() => {
-    if (activeTab && !lastTab[route]) {
-      setLastTab(route, activeTab as types.DataFacet);
+    if (activeTab && !lastFacet[route]) {
+      setLastFacet(route, activeTab as types.DataFacet);
       if (onTabChange) {
         onTabChange(activeTab);
       }
     }
-  }, [activeTab, lastTab, route, setLastTab, onTabChange]);
+  }, [activeTab, lastFacet, route, setLastFacet, onTabChange]);
 
   const nextTab = useCallback((): string => {
     const currentIndex = tabs.findIndex((tab) => tab.value === activeTab);
@@ -67,7 +67,7 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
       if (event?.route === route) {
         const newTab = event.key.startsWith('alt+') ? prevTab() : nextTab();
         setActiveTab(newTab);
-        setLastTab(route, newTab as types.DataFacet);
+        setLastFacet(route, newTab as types.DataFacet);
         if (onTabChange) {
           onTabChange(newTab);
         }
@@ -78,7 +78,7 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   const handleTabChange = (newTab: string | null) => {
     if (newTab === null) return;
     setActiveTab(newTab);
-    setLastTab(route, newTab as types.DataFacet);
+    setLastFacet(route, newTab as types.DataFacet);
     if (onTabChange) {
       onTabChange(newTab);
     }

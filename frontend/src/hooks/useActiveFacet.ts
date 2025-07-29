@@ -43,16 +43,16 @@ export const useActiveFacet = (
   params: UseActiveFacetParams,
 ): UseActiveFacetReturn => {
   const { viewRoute, facets } = params;
-  const { lastTab, setLastTab } = useActiveProject();
+  const { lastFacet, setLastFacet } = useActiveProject();
 
-  // Determine the default facet for this view
+  // Simple fallback facet: use first facet
   const computedDefaultFacet = useMemo((): DataFacet => {
     return facets[0]?.id || types.DataFacet.ALL;
   }, [facets]);
 
   // Get the currently active facet from preferences or default
   const activeFacet = useMemo((): DataFacet => {
-    const saved = lastTab[viewRoute];
+    const saved = lastFacet[viewRoute];
 
     if (saved) {
       const savedAsFacet = saved as unknown as DataFacet;
@@ -61,14 +61,14 @@ export const useActiveFacet = (
       }
     }
     return computedDefaultFacet;
-  }, [lastTab, viewRoute, facets, computedDefaultFacet]);
+  }, [lastFacet, viewRoute, facets, computedDefaultFacet]);
 
   // Function to change the active facet
   const setActiveFacet = useCallback(
     (facet: DataFacet): void => {
-      setLastTab(viewRoute, facet);
+      setLastFacet(viewRoute, facet);
     },
-    [setLastTab, viewRoute],
+    [setLastFacet, viewRoute],
   );
 
   // Get configuration for a specific facet

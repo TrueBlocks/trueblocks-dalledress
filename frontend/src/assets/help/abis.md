@@ -14,15 +14,16 @@ Welcome to the **Abis** view! This section provides information about managing a
 
 // EXISTING_CODE
 
-## Facets:
+## Facets
+
 - Downloaded Facet uses Abis store.
 - Known Facet uses Abis store.
 - Functions Facet uses Functions store.
 - Events Facet uses Functions store.
 
-## Stores:
+## Stores
 
-- **Abis Store (12 members):**
+- **Abis Store (12 members)**
 
   - address: the address for the ABI
   - name: the filename of the ABI (likely the smart contract address)
@@ -37,7 +38,7 @@ Welcome to the **Abis** view! This section provides information about managing a
   - hasFallback: if verbose and the abi has a fallback, then `true`, else `false`
   - functions: the functions for this address
 
-- **Functions Store (10 members):**
+- **Functions Store (10 members)**
 
   - encoding: the signature encoded with keccak
   - name: the name of the interface

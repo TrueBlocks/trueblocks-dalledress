@@ -23,7 +23,6 @@ import (
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -144,7 +143,7 @@ func Get{{.Class}}Collection(payload *types.Payload) *{{.Class}}Collection {
 		return collection
 	}
 
-	collection := New{{.Class}}Collection()
+	collection := New{{.Class}}Collection(payload)
 	collections[key] = collection
 	return collection
 }

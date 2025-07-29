@@ -11,15 +11,16 @@ the code inside of 'EXISTING_CODE' tags.
 // EXISTING_CODE
 // EXISTING_CODE
 
-## Facets:
+## Facets
+
 - Stats Facet uses Stats store.
 - Index Facet uses Index store.
 - Blooms Facet uses Blooms store.
 - Manifest Facet uses Manifest store.
 
-## Stores:
+## Stores
 
-- **Blooms Store (8 members):**
+- **Blooms Store (8 members)**
 
   - range: the block range (inclusive) covered by this chunk
   - magic: an internal use only magic number to indicate file format
@@ -30,7 +31,7 @@ the code inside of 'EXISTING_CODE' tags.
   - byteWidth: the width of the bloom filter
   - rangeDates: if verbose, the block and timestamp bounds of the chunk (may be null)
 
-- **Index Store (7 members):**
+- **Index Store (7 members)**
 
   - range: the block range (inclusive) covered by this chunk
   - magic: an internal use only magic number to indicate file format
@@ -40,14 +41,14 @@ the code inside of 'EXISTING_CODE' tags.
   - size: the size of the chunk in bytes
   - rangeDates: if verbose, the block and timestamp bounds of the chunk (may be null)
 
-- **Manifest Store (4 members):**
+- **Manifest Store (4 members)**
 
   - version: the version string hashed into the chunk data
   - chain: the chain to which this manifest belongs
   - specification: IPFS cid of the specification
   - chunks: a list of the IPFS hashes of all of the chunks in the unchained index
 
-- **Stats Store (13 members):**
+- **Stats Store (13 members)**
 
   - range: the block range (inclusive) covered by this chunk
   - nAddrs: the number of addresses in the chunk

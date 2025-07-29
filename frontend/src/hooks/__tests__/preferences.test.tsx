@@ -13,7 +13,7 @@ vi.mock('@stores', () => ({
       isDarkMode: false,
       hasActiveProject: true,
       canExport: true,
-      lastTab: 'default',
+      lastFacet: 'default',
       activeAddress: '',
       activeChain: '',
       theme: 'light',
@@ -22,7 +22,7 @@ vi.mock('@stores', () => ({
       helpCollapsed: false,
       lastView: 'default',
     })),
-    setLastTab: vi.fn(),
+    setLastFacet: vi.fn(),
     setActiveAddress: vi.fn(),
     setActiveChain: vi.fn(),
     switchProject: vi.fn(),
@@ -46,15 +46,15 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
 
     mockStoreState = {
       lastProject: 'test-project',
-      lastChain: 'mainnet',
-      lastAddress: '0x123',
-      lastContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+      activeChain: 'mainnet',
+      activeAddress: '0x123',
+      activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
       lastTheme: 'dark',
       lastLanguage: 'en',
       lastView: '/exports',
       menuCollapsed: false,
       helpCollapsed: false,
-      lastTab: {
+      lastFacet: {
         '/exports': 'transactions' as types.DataFacet,
         '/chunks': 'chunk-summary' as types.DataFacet,
         '/monitors': 'txs' as types.DataFacet,
@@ -71,49 +71,49 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
     );
   });
 
-  describe('lastTab persistence behavior', () => {
-    it('retrieves stored lastTab values for different routes', () => {
+  describe('lastFacet persistence behavior', () => {
+    it('retrieves stored lastFacet values for different routes', () => {
       const { result } = renderHook(() => useActiveProject());
 
-      expect(result.current.lastTab).toEqual({
+      expect(result.current.lastFacet).toEqual({
         '/exports': 'transactions',
         '/chunks': 'chunk-summary',
         '/monitors': 'txs',
       });
 
       // Verify specific route lookups
-      expect(result.current.lastTab['/exports']).toBe('transactions');
-      expect(result.current.lastTab['/chunks']).toBe('chunk-summary');
-      expect(result.current.lastTab['/monitors']).toBe('txs');
+      expect(result.current.lastFacet['/exports']).toBe('transactions');
+      expect(result.current.lastFacet['/chunks']).toBe('chunk-summary');
+      expect(result.current.lastFacet['/monitors']).toBe('txs');
     });
 
-    it('handles missing lastTab entries gracefully', () => {
-      // Test scenario where a route has no stored lastTab
+    it('handles missing lastFacet entries gracefully', () => {
+      // Test scenario where a route has no stored lastFacet
       const { result } = renderHook(() => useActiveProject());
 
-      // Routes not in the stored lastTab should return undefined
-      expect(result.current.lastTab['/names']).toBeUndefined();
-      expect(result.current.lastTab['/abis']).toBeUndefined();
-      expect(result.current.lastTab['/unknown-route']).toBeUndefined();
+      // Routes not in the stored lastFacet should return undefined
+      expect(result.current.lastFacet['/names']).toBeUndefined();
+      expect(result.current.lastFacet['/abis']).toBeUndefined();
+      expect(result.current.lastFacet['/unknown-route']).toBeUndefined();
     });
 
-    it('calls setLastTab with correct parameters', async () => {
+    it('calls setLastFacet with correct parameters', async () => {
       const { result } = renderHook(() => useActiveProject());
 
       await act(async () => {
-        await result.current.setLastTab(
+        await result.current.setLastFacet(
           '/exports',
           'receipts' as types.DataFacet,
         );
       });
 
-      expect(appPreferencesStore.setLastTab as any).toHaveBeenCalledWith(
+      expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
         '/exports',
         'receipts',
       );
     });
 
-    it('supports all known DataFacet values in setLastTab', async () => {
+    it('supports all known DataFacet values in setLastFacet', async () => {
       const { result } = renderHook(() => useActiveProject());
 
       const testCases: Array<[string, types.DataFacet]> = [
@@ -127,10 +127,10 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
 
       for (const [route, dataFacet] of testCases) {
         await act(async () => {
-          await result.current.setLastTab(route, dataFacet);
+          await result.current.setLastFacet(route, dataFacet);
         });
 
-        expect(appPreferencesStore.setLastTab as any).toHaveBeenCalledWith(
+        expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
           route,
           dataFacet,
         );
@@ -139,11 +139,11 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
   });
 
   describe('cross-session state recovery', () => {
-    it('initializes with previously stored lastTab state', () => {
+    it('initializes with previously stored lastFacet state', () => {
       // This simulates app restart with stored preferences
       const storedState = {
         ...mockStoreState,
-        lastTab: {
+        lastFacet: {
           '/exports': 'receipts' as types.DataFacet,
           '/chunks': 'chunk-summary' as types.DataFacet,
           '/monitors': 'txs' as types.DataFacet,
@@ -155,7 +155,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
 
       const { result } = renderHook(() => useActiveProject());
 
-      expect(result.current.lastTab).toEqual({
+      expect(result.current.lastFacet).toEqual({
         '/exports': 'receipts',
         '/chunks': 'chunk-summary',
         '/monitors': 'txs',
@@ -163,55 +163,55 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       });
     });
 
-    it('handles empty lastTab state on first run', () => {
+    it('handles empty lastFacet state on first run', () => {
       const emptyState = {
         ...mockStoreState,
-        lastTab: {},
+        lastFacet: {},
       };
 
       (appPreferencesStore.getState as any).mockReturnValue(emptyState);
 
       const { result } = renderHook(() => useActiveProject());
 
-      expect(result.current.lastTab).toEqual({});
-      expect(Object.keys(result.current.lastTab)).toHaveLength(0);
+      expect(result.current.lastFacet).toEqual({});
+      expect(Object.keys(result.current.lastFacet)).toHaveLength(0);
     });
   });
 
   describe('default facet selection logic', () => {
-    it('provides setLastTab for setting default selections', async () => {
+    it('provides setLastFacet for setting default selections', async () => {
       const { result } = renderHook(() => useActiveProject());
 
-      expect(result.current.setLastTab).toBeInstanceOf(Function);
+      expect(result.current.setLastFacet).toBeInstanceOf(Function);
 
       // Test that it can be called to set defaults
       await act(async () => {
-        await result.current.setLastTab(
+        await result.current.setLastFacet(
           '/new-route',
           'transactions' as types.DataFacet,
         );
       });
 
-      expect(appPreferencesStore.setLastTab as any).toHaveBeenCalledWith(
+      expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
         '/new-route',
         'transactions',
       );
     });
 
-    it('maintains lastTab structure for route-based lookups', () => {
+    it('maintains lastFacet structure for route-based lookups', () => {
       const { result } = renderHook(() => useActiveProject());
 
       // Verify the structure supports the pattern used in views:
-      // const currentTab = lastTab[currentRoute] || defaultTab;
-      const lastTab = result.current.lastTab;
+      // const currentTab = lastFacet[currentRoute] || defaultTab;
+      const lastFacet = result.current.lastFacet;
 
-      expect(typeof lastTab).toBe('object');
-      expect(lastTab).not.toBeNull();
-      expect(Array.isArray(lastTab)).toBe(false);
+      expect(typeof lastFacet).toBe('object');
+      expect(lastFacet).not.toBeNull();
+      expect(Array.isArray(lastFacet)).toBe(false);
 
       // Test the lookup pattern
-      const exportsTab = lastTab['/exports'] || 'transactions';
-      const unknownTab = lastTab['/unknown'] || 'default-facet';
+      const exportsTab = lastFacet['/exports'] || 'transactions';
+      const unknownTab = lastFacet['/unknown'] || 'default-facet';
 
       expect(exportsTab).toBe('transactions');
       expect(unknownTab).toBe('default-facet');
@@ -231,30 +231,30 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
 
       for (const route of specialRoutes) {
         await act(async () => {
-          await result.current.setLastTab(
+          await result.current.setLastFacet(
             route,
             'transactions' as types.DataFacet,
           );
         });
 
-        expect(appPreferencesStore.setLastTab as any).toHaveBeenCalledWith(
+        expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
           route,
           'transactions',
         );
       }
     });
 
-    it('handles concurrent lastTab updates', async () => {
+    it('handles concurrent lastFacet updates', async () => {
       const { result } = renderHook(() => useActiveProject());
 
       // Simulate rapid tab switching
       const promises = [
-        result.current.setLastTab(
+        result.current.setLastFacet(
           '/exports',
           'transactions' as types.DataFacet,
         ),
-        result.current.setLastTab('/exports', 'receipts' as types.DataFacet),
-        result.current.setLastTab(
+        result.current.setLastFacet('/exports', 'receipts' as types.DataFacet),
+        result.current.setLastFacet(
           '/chunks',
           'chunk-summary' as types.DataFacet,
         ),
@@ -264,7 +264,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
         await Promise.all(promises);
       });
 
-      expect(appPreferencesStore.setLastTab as any).toHaveBeenCalledTimes(3);
+      expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledTimes(3);
     });
 
     it('handles invalid DataFacet values gracefully', async () => {
@@ -274,13 +274,13 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       // but we test runtime behavior
 
       await act(async () => {
-        await result.current.setLastTab(
+        await result.current.setLastFacet(
           '/exports',
           'transactions' as types.DataFacet,
         );
       });
 
-      expect(appPreferencesStore.setLastTab as any).toHaveBeenCalledWith(
+      expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
         '/exports',
         'transactions',
       );
@@ -301,7 +301,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       const { result } = renderHook(() => useActiveProject());
 
       // Initial state
-      expect(result.current.lastTab).toEqual({
+      expect(result.current.lastFacet).toEqual({
         '/exports': 'transactions',
         '/chunks': 'chunk-summary',
         '/monitors': 'txs',
@@ -310,8 +310,8 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       // Simulate store update
       const newState = {
         ...mockStoreState,
-        lastTab: {
-          ...mockStoreState.lastTab,
+        lastFacet: {
+          ...mockStoreState.lastFacet,
           '/exports': 'receipts' as types.DataFacet,
         },
       };
@@ -325,7 +325,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       }
 
       // State should remain consistent
-      expect(result.current.lastTab['/exports']).toBe('receipts');
+      expect(result.current.lastFacet['/exports']).toBe('receipts');
     });
   });
 });

@@ -12,7 +12,7 @@ export const Debugger: React.FC<DebuggerProps> = ({
   headerActions,
   count,
 }) => {
-  const { lastChain, lastAddress, lastContract } = useActiveProject();
+  const { activeChain, activeAddress, activeContract } = useActiveProject();
 
   if (!isDebugMode()) {
     return <></>;
@@ -36,7 +36,7 @@ export const Debugger: React.FC<DebuggerProps> = ({
           fontWeight: 'bold',
         }}
       >
-        {`Renders: ${count} [${lastChain || 'N/A'}] [${lastAddress || 'N/A'}] [${lastContract || 'N/A'}]`}
+        {`Renders: ${count} [${activeChain || 'N/A'}] [${activeAddress || 'N/A'}] [${activeContract || 'N/A'}]`}
       </div>
     </>
   );

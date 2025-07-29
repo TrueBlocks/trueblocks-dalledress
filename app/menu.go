@@ -22,24 +22,16 @@ func (a *App) FileNew(_ *menu.CallbackData) {
 }
 
 func (a *App) FileOpen(_ *menu.CallbackData) {
-	path, err := wailsRuntime.OpenFileDialog(a.ctx, wailsRuntime.OpenDialogOptions{
-		Title: "Open Project File",
-	})
-	if err != nil || path == "" {
-		msgs.EmitStatus("no file selected")
+	if err := a.ClearActiveProject(); err != nil {
 		return
 	}
 
-	if err := a.fileOpen(path); err != nil {
-		msgs.EmitError("open failed", err)
-		return
-	}
-
-	msgs.EmitStatus("file opened")
+	msgs.EmitManager("show_project_modal")
+	msgs.EmitStatus("project selection dialog opened")
 }
 
 func (a *App) FileSave(_ *menu.CallbackData) {
-	if err := a.fileSave(); err != nil {
+	if err := a.SaveProject(); err != nil {
 		msgs.EmitError("save failed", err)
 		return
 	}

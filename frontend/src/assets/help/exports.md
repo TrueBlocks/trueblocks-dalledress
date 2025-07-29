@@ -12,7 +12,8 @@ the code inside of 'EXISTING_CODE' tags.
 This is the help file for the Exports view.
 // EXISTING_CODE
 
-## Facets:
+## Facets
+
 - Statements Facet uses Statements store.
 - Balances Facet uses Balances store.
 - Transfers Facet uses Transfers store.
@@ -23,9 +24,9 @@ This is the help file for the Exports view.
 - Traces Facet uses Traces store.
 - Receipts Facet uses Receipts store.
 
-## Stores:
+## Stores
 
-- **Assets Store (6 members):**
+- **Assets Store (6 members)**
 
   - address: Address
   - name: Name
@@ -34,7 +35,7 @@ This is the help file for the Exports view.
   - source: Source
   - tags: Tags
 
-- **Balances Store (10 members):**
+- **Balances Store (10 members)**
 
   - blockNumber: Block
   - transactionIndex: Tx Index
@@ -47,7 +48,7 @@ This is the help file for the Exports view.
   - decimals: Decimals
   - actions: Actions
 
-- **Logs Store (14 members):**
+- **Logs Store (14 members)**
 
   - blockNumber: the number of the block
   - transactionIndex: the zero-indexed position of the transaction in the block
@@ -64,7 +65,7 @@ This is the help file for the Exports view.
   - compressedLog: a truncated, more readable version of the articulation
   - isNFT: true if the log is an NFT transfer
 
-- **Receipts Store (14 members):**
+- **Receipts Store (14 members)**
 
   - logsBloom: 
   - cumulativeGasUsed: 
@@ -81,7 +82,7 @@ This is the help file for the Exports view.
   - transactionHash: 
   - transactionIndex: 
 
-- **Statements Store (43 members):**
+- **Statements Store (43 members)**
 
   - blockNumber: the number of the block
   - transactionIndex: the zero-indexed position of the transaction in the block
@@ -127,7 +128,7 @@ This is the help file for the Exports view.
   - endBalCalc: begBal + amountNet
   - correctingReasons: for unreconciled transfers, the reasons for the correcting entries, if any
 
-- **Traces Store (14 members):**
+- **Traces Store (14 members)**
 
   - blockHash: the hash of the block containing this trace
   - blockNumber: the number of the block
@@ -144,7 +145,7 @@ This is the help file for the Exports view.
   - result: the trace result of this trace
   - articulatedTrace: human readable version of the trace action input data
 
-- **Transactions Store (27 members):**
+- **Transactions Store (27 members)**
 
   - gasUsed: 
   - chainId: 
@@ -174,7 +175,7 @@ This is the help file for the Exports view.
   - isError: `true` if the transaction ended in error, `false` otherwise
   - compressedTx: truncated, more readable version of the articulation
 
-- **Transfers Store (23 members):**
+- **Transfers Store (23 members)**
 
   - blockNumber: the number of the block
   - transactionIndex: the zero-indexed position of the transaction in the block
@@ -200,7 +201,7 @@ This is the help file for the Exports view.
   - transaction: the transaction that triggered the transfer
   - log: if a token transfer, the log that triggered the transfer
 
-- **Withdrawals Store (8 members):**
+- **Withdrawals Store (8 members)**
 
   - address: the recipient for the withdrawn ether
   - amount: a nonzero amount of ether given in gwei (1e9 wei)

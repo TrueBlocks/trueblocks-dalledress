@@ -6,6 +6,10 @@ export function AbisCrud(arg1, arg2, arg3) {
   return window['go']['app']['App']['AbisCrud'](arg1, arg2, arg3);
 }
 
+export function AddAddressToProject(arg1) {
+  return window['go']['app']['App']['AddAddressToProject'](arg1);
+}
+
 export function BuildDalleDressForProject() {
   return window['go']['app']['App']['BuildDalleDressForProject']();
 }
@@ -286,6 +290,10 @@ export function ReloadStatus(arg1) {
   return window['go']['app']['App']['ReloadStatus'](arg1);
 }
 
+export function RemoveAddressFromProject(arg1) {
+  return window['go']['app']['App']['RemoveAddressFromProject'](arg1);
+}
+
 export function ResetStore(arg1) {
   return window['go']['app']['App']['ResetStore'](arg1);
 }
@@ -296,6 +304,10 @@ export function SaveBounds(arg1, arg2, arg3, arg4) {
 
 export function SaveProject() {
   return window['go']['app']['App']['SaveProject']();
+}
+
+export function SetActiveAddress(arg1) {
+  return window['go']['app']['App']['SetActiveAddress'](arg1);
 }
 
 export function SetActiveContract(arg1) {

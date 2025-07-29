@@ -296,32 +296,50 @@ func (a *App) SetProjectAddress(addr base.Address) {
 	}
 }
 
+var newCode = false
+
 // SetLastView sets the last visited view/route in the active project
-func (a *App) SetLastView(view string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastView = view
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+func (a *App) SetLastView(view string) error {
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			return active.SetLastView(view)
+		}
+		return fmt.Errorf("no active project")
+	} else {
+		a.prefsMu.Lock()
+		defer a.prefsMu.Unlock()
+		a.Preferences.App.LastView = view
+		return preferences.SetAppPreferences(&a.Preferences.App)
+	}
 }
 
 // GetLastFacet returns the last visited facet for a specific view from the active project
 func (a *App) GetLastFacet(view string) string {
-	a.prefsMu.RLock()
-	defer a.prefsMu.RUnlock()
-	return a.Preferences.App.LastFacetMap[view]
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			return active.GetLastFacet(view)
+		}
+		return ""
+	} else {
+		a.prefsMu.RLock()
+		defer a.prefsMu.RUnlock()
+		return a.Preferences.App.LastFacetMap[view]
+	}
 }
 
 // SetLastFacet sets the last visited facet for a specific view in the active project
-func (a *App) SetLastFacet(view, facet string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastFacetMap[view] = string(facet)
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
-func (a *App) GetFilterState(key project.ViewStateKey) (project.FilterState, error) {
-	_ = key
-	return project.FilterState{}, nil
+func (a *App) SetLastFacet(view, facet string) error {
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			return active.SetLastFacet(view, facet)
+		}
+		return fmt.Errorf("no active project")
+	} else {
+		a.prefsMu.Lock()
+		defer a.prefsMu.Unlock()
+		a.Preferences.App.LastFacetMap[view] = string(facet)
+		return preferences.SetAppPreferences(&a.Preferences.App)
+	}
 }
 
 // GetActiveProject returns the active project data or nil if no project is active
@@ -330,36 +348,79 @@ func (a *App) GetActiveProject() *project.Project {
 }
 
 // SetActiveAddress sets the active address in the active project's working context
+func (a *App) SetActiveAddress(addr base.Address) error {
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			return active.SetActiveAddress(addr)
+		}
+	}
+	return fmt.Errorf("no active project")
+}
 
 // AddAddressToProject adds an address to the active project's address list
+func (a *App) AddAddressToProject(addr base.Address) error {
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			return active.AddAddress(addr)
+		}
+	}
+	return fmt.Errorf("no active project")
+}
 
 // RemoveAddressFromProject removes an address from the active project's address list
+func (a *App) RemoveAddressFromProject(addr base.Address) error {
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			return active.RemoveAddress(addr)
+		}
+	}
+	return fmt.Errorf("no active project")
+}
 
 func (a *App) SetActiveContract(contract string) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.ActiveContract = contract
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+	if newCode {
+	} else {
+		a.prefsMu.Lock()
+		defer a.prefsMu.Unlock()
+		a.Preferences.App.ActiveContract = contract
+		_ = preferences.SetAppPreferences(&a.Preferences.App)
+	}
 }
 
 // GetFilterState retrieves view state for a given key from the active project
-// func (a *App) GetFilterState(key project.ViewStateKey) (project.FilterState, error) {
-// 	_ = key
-// 	return project.FilterState{}, nil
-// }
+func (a *App) GetFilterState(key project.ViewStateKey) (project.FilterState, error) {
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			if state, exists := active.GetFilterState(key); exists {
+				return state, nil
+			}
+			return project.FilterState{}, fmt.Errorf("filter state not found")
+		}
+		return project.FilterState{}, fmt.Errorf("no active project")
+	} else {
+		_ = key
+		return project.FilterState{}, nil
+	}
+}
 
 // SetFilterState sets view state for a given key in the active project
-func (a *App) SetFilterState(key project.ViewStateKey, state project.FilterState) {
-	// if active := a.GetActiveProject(); active != nil {
-	// 	_ = active.SetFilterState(key, state)
-	// }
+func (a *App) SetFilterState(key project.ViewStateKey, state project.FilterState) error {
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			return active.SetFilterState(key, state)
+		}
+	}
+	return fmt.Errorf("no active project")
 }
 
 // ClearFilterState removes filter state for a given key from the active project
-func (a *App) ClearFilterState(key project.ViewStateKey) {
-	// if active := a.GetActiveProject(); active != nil {
-	// 	_ = active.ClearFilterState(key)
-	// }
+func (a *App) ClearFilterState(key project.ViewStateKey) error {
+	if newCode {
+		if active := a.GetActiveProject(); active != nil {
+			return active.ClearFilterState(key)
+		}
+	}
+	return fmt.Errorf("no active project")
 }
 
 func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {

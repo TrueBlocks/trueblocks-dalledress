@@ -3,6 +3,12 @@
 import {base} from '../models';
 import {project} from '../models';
 
+export function AddAddress(arg1:base.Address):Promise<void>;
+
+export function ClearAllFilterStates():Promise<void>;
+
+export function ClearFilterState(arg1:project.ViewStateKey):Promise<void>;
+
 export function GetActiveAddress():Promise<base.Address>;
 
 export function GetAddress():Promise<base.Address>;
@@ -11,18 +17,30 @@ export function GetAddresses():Promise<Array<base.Address>>;
 
 export function GetFilterState(arg1:project.ViewStateKey):Promise<project.FilterState|boolean>;
 
+export function GetLastFacet(arg1:string):Promise<string>;
+
 export function GetName():Promise<string>;
 
 export function GetPath():Promise<string>;
 
 export function IsDirty():Promise<boolean>;
 
+export function RemoveAddress(arg1:base.Address):Promise<void>;
+
 export function Save():Promise<void>;
 
 export function SaveAs(arg1:string):Promise<void>;
 
+export function SetActiveAddress(arg1:base.Address):Promise<void>;
+
 export function SetAddress(arg1:base.Address):Promise<void>;
 
 export function SetDirty(arg1:boolean):Promise<void>;
+
+export function SetFilterState(arg1:project.ViewStateKey,arg2:project.FilterState):Promise<void>;
+
+export function SetLastFacet(arg1:string,arg2:string):Promise<void>;
+
+export function SetLastView(arg1:string):Promise<void>;
 
 export function SetName(arg1:string):Promise<void>;

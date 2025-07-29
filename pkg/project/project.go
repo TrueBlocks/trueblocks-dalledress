@@ -195,9 +195,15 @@ func (p *Project) GetActiveAddress() base.Address {
 
 // ------------------------------------------------------------------------------------
 // SetActiveAddress sets the currently selected address (must be in project)
+func (p *Project) SetActiveAddress(addr base.Address) error {
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // AddAddress adds a new address to the project
+func (p *Project) AddAddress(addr base.Address) error {
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // GetAddresses returns all addresses in the project
@@ -210,15 +216,27 @@ func (p *Project) GetAddresses() []base.Address {
 
 // ------------------------------------------------------------------------------------
 // SetLastView updates the last visited view/route and saves immediately (session state)
+func (p *Project) SetLastView(view string) error {
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // GetLastFacet returns the last visited facet for a specific view
+func (p *Project) GetLastFacet(view string) string {
+	return ""
+}
 
 // ------------------------------------------------------------------------------------
 // SetLastFacet updates the last visited facet for a specific view and saves immediately (session state)
+func (p *Project) SetLastFacet(view, facet string) error {
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // RemoveAddress removes an address from the project
+func (p *Project) RemoveAddress(addr base.Address) error {
+	return fmt.Errorf("address %s not found in project", addr.Hex())
+}
 
 // ------------------------------------------------------------------------------------
 // GetChains returns all chains in the project
@@ -264,9 +282,18 @@ func (p *Project) GetFilterState(key ViewStateKey) (FilterState, bool) {
 
 // ------------------------------------------------------------------------------------
 // SetFilterState sets filter state for a given key and saves immediately (session state)
+func (p *Project) SetFilterState(key ViewStateKey, state FilterState) error {
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // ClearFilterState removes view state for a given key and saves immediately (session state)
+func (p *Project) ClearFilterState(key ViewStateKey) error {
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // ClearAllFilterStates removes all filter states and saves immediately (session state)
+func (p *Project) ClearAllFilterStates() error {
+	return nil
+}

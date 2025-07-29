@@ -26,6 +26,10 @@ export function ClearActiveProject() {
   return window['go']['app']['App']['ClearActiveProject']();
 }
 
+export function ClearFilterState(arg1) {
+  return window['go']['app']['App']['ClearFilterState'](arg1);
+}
+
 export function CloseProject(arg1) {
   return window['go']['app']['App']['CloseProject'](arg1);
 }
@@ -64,6 +68,10 @@ export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
 
 export function GetAbisSummary(arg1) {
   return window['go']['app']['App']['GetAbisSummary'](arg1);
+}
+
+export function GetActiveProject() {
+  return window['go']['app']['App']['GetActiveProject']();
 }
 
 export function GetActiveProjectPath() {
@@ -304,6 +312,10 @@ export function SetChain(arg1) {
 
 export function SetDebugMode(arg1) {
   return window['go']['app']['App']['SetDebugMode'](arg1);
+}
+
+export function SetFilterState(arg1, arg2) {
+  return window['go']['app']['App']['SetFilterState'](arg1, arg2);
 }
 
 export function SetHelpCollapsed(arg1) {

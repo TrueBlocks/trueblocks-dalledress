@@ -43,7 +43,7 @@ export const useActiveFacet = (
   params: UseActiveFacetParams,
 ): UseActiveFacetReturn => {
   const { viewRoute, facets } = params;
-  const { lastFacet, setLastFacet } = useActiveProject();
+  const { lastFacetMap, setLastFacet } = useActiveProject();
 
   // Simple fallback facet: use first facet
   const computedDefaultFacet = useMemo((): DataFacet => {
@@ -52,7 +52,7 @@ export const useActiveFacet = (
 
   // Get the currently active facet from preferences or default
   const activeFacet = useMemo((): DataFacet => {
-    const saved = lastFacet[viewRoute];
+    const saved = lastFacetMap[viewRoute];
 
     if (saved) {
       const savedAsFacet = saved as unknown as DataFacet;
@@ -61,7 +61,7 @@ export const useActiveFacet = (
       }
     }
     return computedDefaultFacet;
-  }, [lastFacet, viewRoute, facets, computedDefaultFacet]);
+  }, [lastFacetMap, viewRoute, facets, computedDefaultFacet]);
 
   // Function to change the active facet
   const setActiveFacet = useCallback(

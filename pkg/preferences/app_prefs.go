@@ -50,7 +50,7 @@ type AppPreferences struct {
 	ActiveAddress    string            `json:"activeAddress,omitempty"`
 	ActiveChain      string            `json:"activeChain,omitempty"`
 	ActiveContract   string            `json:"activeContract,omitempty"`
-	LastFacet        map[string]string `json:"lastFacet"`
+	LastFacetMap     map[string]string `json:"lastFacetMap"`
 	LastView         string            `json:"lastView,omitempty"`
 	LastViewNoWizard string            `json:"lastViewNoWizard,omitempty"`
 }
@@ -74,7 +74,7 @@ func NewAppPreferences() *AppPreferences {
 		Version:          "1.0",
 		ActiveAddress:    "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
 		ActiveContract:   "0x52df6e4d9989e7cf4739d687c765e75323a1b14c",
-		LastFacet:        make(map[string]string),
+		LastFacetMap:     make(map[string]string),
 		LastView:         "/",
 		LastViewNoWizard: "/",
 	}
@@ -122,8 +122,8 @@ func GetAppPreferences() (AppPreferences, error) {
 		appPrefs.Version = "1.0"
 		needsSave = true
 	}
-	if appPrefs.LastFacet == nil {
-		appPrefs.LastFacet = make(map[string]string)
+	if appPrefs.LastFacetMap == nil {
+		appPrefs.LastFacetMap = make(map[string]string)
 		needsSave = true
 	}
 	if appPrefs.LastView == "" {

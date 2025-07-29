@@ -12,7 +12,7 @@ import (
 // TestProject tests the basic functionality of the Project type
 func TestProject(t *testing.T) {
 	// Create a new project
-	p := project.New("test-project", base.ZeroAddr)
+	p := project.NewProject("test-project", base.ZeroAddr, []string{"mainnet"})
 
 	// Verify initial state
 	if !p.IsDirty() {

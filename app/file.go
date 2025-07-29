@@ -26,10 +26,10 @@ var ErrSerializeFailed = errors.New("failed to serialize data")
 var ErrDeserializeFailed = errors.New("failed to deserialize data")
 
 func (a *App) fileNew(address base.Address) error {
-	a.Projects.New(a.uniqueProjectName("New Project"), address)
+	a.Projects.NewProject(a.uniqueProjectName("New Project"), address, []string{"mainnet"})
 
 	// Ensure the newly created project is not marked as dirty
-	activeProject := a.Projects.Active()
+	activeProject := a.GetActiveProject()
 	if activeProject != nil {
 		activeProject.SetDirty(false)
 	}
@@ -39,7 +39,7 @@ func (a *App) fileNew(address base.Address) error {
 }
 
 func (a *App) fileSave() error {
-	project := a.Projects.Active()
+	project := a.GetActiveProject()
 	if project == nil {
 		return errors.New("no active project")
 	}
@@ -63,7 +63,7 @@ func (a *App) fileSave() error {
 }
 
 func (a *App) fileSaveAs(newPath string, overwriteConfirmed bool) error {
-	project := a.Projects.Active()
+	project := a.GetActiveProject()
 	if project == nil {
 		return errors.New("no active project")
 	}
@@ -104,7 +104,7 @@ func (a *App) fileOpen(path string) error {
 }
 
 func (a *App) updateRecentProjects() {
-	activeProject := a.Projects.Active()
+	activeProject := a.GetActiveProject()
 	if activeProject == nil || activeProject.GetPath() == "" {
 		return
 	}
@@ -120,7 +120,7 @@ func (a *App) updateRecentProjects() {
 }
 
 func (a *App) GetFilename() *project.Project {
-	return a.Projects.Active()
+	return a.GetActiveProject()
 }
 
 func (a *App) uniqueProjectName(baseName string) string {

@@ -114,7 +114,7 @@ vi.mock('@hooks', () => ({
     lastView: 'home',
     menuCollapsed: false,
     helpCollapsed: false,
-    lastFacet: {},
+    lastFacetMap: {},
     loading: false,
     // Actions
     setActiveAddress: vi.fn(),

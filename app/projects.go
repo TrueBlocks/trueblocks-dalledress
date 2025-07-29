@@ -10,7 +10,7 @@ func (a *App) SwitchToProject(id string) error {
 	if a.Projects.GetProjectByID(id) == nil {
 		return fmt.Errorf("no project with ID %s exists", id)
 	}
-	return a.Projects.SetActive(id)
+	return a.Projects.SetActiveProject(id)
 }
 
 func (a *App) CloseProject(id string) error {

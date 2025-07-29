@@ -223,10 +223,10 @@ func (a *App) SetInitialized(isInit bool) error {
 }
 
 func (a *App) GetWizardReturn() string {
-	if a.Preferences.App.LastViewNoWizard == "" {
-		return "/"
-	}
-	return a.Preferences.App.LastViewNoWizard
+	// if a.GetActiveProject() != nil {
+	// 	return strings.Replace(a.GetActiveProject().LastView, "/wizard", "/", -1)
+	// }
+	return "/"
 }
 
 func (a *App) GetAppId() preferences.Id {
@@ -283,7 +283,7 @@ func (app *App) GetChainList() *utils.ChainList {
 
 // GetProjectAddress returns the address of the active project
 func (a *App) GetProjectAddress() base.Address {
-	active := a.Projects.Active()
+	active := a.GetActiveProject()
 	if active == nil {
 		return base.ZeroAddr
 	}
@@ -292,7 +292,7 @@ func (a *App) GetProjectAddress() base.Address {
 
 // SetProjectAddress sets the address of the active project
 func (a *App) SetProjectAddress(addr base.Address) {
-	active := a.Projects.Active()
+	active := a.GetActiveProject()
 	if active != nil {
 		active.SetAddress(addr)
 	}
@@ -302,14 +302,14 @@ func (a *App) SetProjectAddress(addr base.Address) {
 func (a *App) GetLastFacet(view string) types.DataFacet {
 	a.prefsMu.RLock()
 	defer a.prefsMu.RUnlock()
-	return types.DataFacet(a.Preferences.App.LastFacet[view])
+	return types.DataFacet(a.Preferences.App.LastFacetMap[view])
 }
 
 // SetLastFacet sets the last visited facet for a specific view in the active project
 func (a *App) SetLastFacet(view string, tab types.DataFacet) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastFacet[view] = string(tab)
+	a.Preferences.App.LastFacetMap[view] = string(tab)
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
@@ -328,6 +328,17 @@ func (a *App) GetFilterState(key project.ViewStateKey) (project.FilterState, err
 	return project.FilterState{}, nil
 }
 
+// GetActiveProject returns the active project data or nil if no project is active
+func (a *App) GetActiveProject() *project.Project {
+	return a.Projects.GetActiveProject()
+}
+
+// SetActiveAddress sets the active address in the active project's working context
+
+// AddAddressToProject adds an address to the active project's address list
+
+// RemoveAddressFromProject removes an address from the active project's address list
+
 func (a *App) SetActiveContract(contract string) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
@@ -335,8 +346,28 @@ func (a *App) SetActiveContract(contract string) {
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
+// GetFilterState retrieves view state for a given key from the active project
+// func (a *App) GetFilterState(key project.ViewStateKey) (project.FilterState, error) {
+// 	_ = key
+// 	return project.FilterState{}, nil
+// }
+
+// SetFilterState sets view state for a given key in the active project
+func (a *App) SetFilterState(key project.ViewStateKey, state project.FilterState) {
+	// if active := a.GetActiveProject(); active != nil {
+	// 	_ = active.SetFilterState(key, state)
+	// }
+}
+
+// ClearFilterState removes filter state for a given key from the active project
+func (a *App) ClearFilterState(key project.ViewStateKey) {
+	// if active := a.GetActiveProject(); active != nil {
+	// 	_ = active.ClearFilterState(key)
+	// }
+}
+
 func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
-	active := a.Projects.Active()
+	active := a.GetActiveProject()
 	if active == nil {
 		return nil, fmt.Errorf("no active project")
 	}
@@ -460,7 +491,7 @@ func (a *App) NewProject(name string, currentAddress string) error {
 	}
 
 	// Create new project with current address
-	newProject := a.Projects.New(name, addr)
+	newProject := a.Projects.NewProject(name, addr, []string{"mainnet"})
 	if newProject == nil {
 		return fmt.Errorf("failed to create project")
 	}
@@ -491,7 +522,7 @@ func (a *App) OpenProjectFile(path string) error {
 	}
 
 	// Navigate to current address view on project open
-	active := a.Projects.Active()
+	active := a.GetActiveProject()
 	if active != nil && active.GetActiveAddress() != base.ZeroAddr {
 		activeAddr := active.GetActiveAddress().String()
 		msgs.EmitStatus(fmt.Sprintf("opened project: %s - navigated to %s", active.GetName(), activeAddr))
@@ -502,7 +533,7 @@ func (a *App) OpenProjectFile(path string) error {
 
 // SaveProject saves the current project, prompting for a file path if not set
 func (a *App) SaveProject() error {
-	project := a.Projects.Active()
+	project := a.GetActiveProject()
 	if project == nil {
 		return fmt.Errorf("no active project")
 	}
@@ -546,7 +577,7 @@ func (a *App) HasActiveProject() bool {
 	if a.Projects == nil {
 		return false
 	}
-	return a.Projects.ActiveID != "" && a.Projects.Active() != nil
+	return a.Projects.ActiveID != "" && a.GetActiveProject() != nil
 }
 
 // ValidateActiveProject checks if the active project is valid (has current address)
@@ -555,7 +586,7 @@ func (a *App) ValidateActiveProject() bool {
 		return false
 	}
 
-	project := a.Projects.Active()
+	project := a.GetActiveProject()
 	if project == nil {
 		return false
 	}
@@ -572,7 +603,7 @@ func (a *App) ClearActiveProject() error {
 		return nil
 	}
 
-	project := a.Projects.Active()
+	project := a.GetActiveProject()
 	if project == nil {
 		a.Projects.ActiveID = ""
 		return nil

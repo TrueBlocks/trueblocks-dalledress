@@ -11,7 +11,7 @@ const { useActiveProject } = await import('../useActiveProject');
 const mockedUseActiveProject = vi.mocked(useActiveProject);
 
 describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
-  let mockLastFacet: Record<string, string>;
+  let mockLastFacetMap: Record<string, string>;
   let mockSetLastFacet: ReturnType<typeof vi.fn>;
 
   const sampleFacets: DataFacetConfig[] = [
@@ -32,11 +32,11 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockLastFacet = {};
+    mockLastFacetMap = {};
     mockSetLastFacet = vi.fn();
 
     mockedUseActiveProject.mockReturnValue({
-      lastFacet: mockLastFacet,
+      lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
       // Mock other required properties
       lastProject: 'test-project',
@@ -77,7 +77,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should restore saved preference via backend API mapping', () => {
-      mockLastFacet['/exports'] = 'statements';
+      mockLastFacetMap['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -136,7 +136,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should check if facet is active correctly', () => {
-      mockLastFacet['/exports'] = 'statements';
+      mockLastFacetMap['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -154,7 +154,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
 
   describe('backward compatibility', () => {
     it('should provide correct backend API value for current facet', () => {
-      mockLastFacet['/exports'] = 'statements';
+      mockLastFacetMap['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -200,7 +200,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should handle invalid saved preference', () => {
-      mockLastFacet['/exports'] = 'INVALID_DATAFACET';
+      mockLastFacetMap['/exports'] = 'INVALID_DATAFACET';
 
       const { result } = renderHook(() =>
         useActiveFacet({

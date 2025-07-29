@@ -17,7 +17,7 @@ func (a *App) FileNew(_ *menu.CallbackData) {
 		msgs.EmitError("File → New failed", err)
 		return
 	}
-	activeProject := a.Projects.Active()
+	activeProject := a.GetActiveProject()
 	msgs.EmitStatus("new file created " + activeProject.GetPath())
 }
 

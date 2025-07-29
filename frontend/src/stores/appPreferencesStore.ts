@@ -9,7 +9,7 @@ interface AppPreferencesState {
   lastLanguage: string;
   menuCollapsed: boolean;
   helpCollapsed: boolean;
-  lastFacet: Record<string, types.DataFacet>;
+  lastFacetMap: Record<string, types.DataFacet>;
 
   // Project state
   lastProject: string;
@@ -36,7 +36,7 @@ const initialState: AppPreferencesState = {
   lastView: '/',
   menuCollapsed: true,
   helpCollapsed: true,
-  lastFacet: {},
+  lastFacetMap: {},
   debugMode: false,
   loading: true,
 };
@@ -138,7 +138,7 @@ class AppPreferencesStore {
               lastView: '/',
               menuCollapsed: false,
               helpCollapsed: false,
-              lastFacet: {},
+              lastFacetMap: {},
               debugMode: false,
               loading: false,
             });
@@ -162,7 +162,10 @@ class AppPreferencesStore {
           lastView: prefs.lastView || '/',
           menuCollapsed: prefs.menuCollapsed || false,
           helpCollapsed: prefs.helpCollapsed || false,
-          lastFacet: (prefs.lastFacet || {}) as Record<string, types.DataFacet>,
+          lastFacetMap: (prefs.lastFacetMap || {}) as Record<
+            string,
+            types.DataFacet
+          >,
           debugMode:
             (prefs as preferences.AppPreferences & { debugMode?: boolean })
               .debugMode || false,
@@ -226,7 +229,7 @@ class AppPreferencesStore {
       await App.SetLastFacet(route, tab);
     }
     this.setState({
-      lastFacet: { ...this.state.lastFacet, [route]: tab },
+      lastFacetMap: { ...this.state.lastFacetMap, [route]: tab },
     });
   };
 

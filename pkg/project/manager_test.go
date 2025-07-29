@@ -15,16 +15,16 @@ func TestManager(t *testing.T) {
 	manager := project.NewManager()
 
 	// Check that there's no active project initially
-	if manager.Active() != nil {
+	if manager.GetActiveProject() != nil {
 		t.Error("New manager should not have an active project")
 	}
 
 	// Create a new project
-	proj := manager.New("test-project", base.ZeroAddr)
+	proj := manager.NewProject("test-project", base.ZeroAddr, []string{"mainnet"})
 
 	// Check that the new project is active
-	if manager.Active() == nil {
-		t.Error("Active project should not be nil after creation")
+	if manager.GetActiveProject() == nil {
+		t.Error("GetActiveProject project should not be nil after creation")
 	}
 
 	// Create a temporary directory for testing
@@ -41,7 +41,7 @@ func TestManager(t *testing.T) {
 	}
 
 	// Create another project
-	proj2 := manager.New("second-project", base.ZeroAddr)
+	proj2 := manager.NewProject("second-project", base.ZeroAddr, []string{"mainnet"})
 
 	// Verify we now have two open projects
 	if len(manager.GetOpenProjectIDs()) != 2 {
@@ -49,8 +49,8 @@ func TestManager(t *testing.T) {
 	}
 
 	// Verify the active project is the second one
-	if manager.Active() != proj2 {
-		t.Error("Active project should be the second project")
+	if manager.GetActiveProject() != proj2 {
+		t.Error("GetActiveProject project should be the second project")
 	}
 
 	// Open the first project again
@@ -60,8 +60,8 @@ func TestManager(t *testing.T) {
 	}
 
 	// Verify the active project is now the reopened one
-	if manager.Active() != reopenedProj {
-		t.Error("Active project should be the reopened project")
+	if manager.GetActiveProject() != reopenedProj {
+		t.Error("GetActiveProject project should be the reopened project")
 	}
 
 	// Close the active project

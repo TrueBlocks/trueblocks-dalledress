@@ -11,7 +11,7 @@ const { useActiveProject } = await import('../../hooks/useActiveProject');
 const mockedUseActiveProject = vi.mocked(useActiveProject);
 
 describe('Names View + useActiveFacet Integration Tests', () => {
-  let mockLastFacet: Record<string, string>;
+  let mockLastFacetMap: Record<string, string>;
   let mockSetLastFacet: ReturnType<typeof vi.fn>;
   const namesFacets: DataFacetConfig[] = [
     {
@@ -40,11 +40,11 @@ describe('Names View + useActiveFacet Integration Tests', () => {
     vi.clearAllMocks();
 
     // Mock successful project state
-    mockLastFacet = {};
+    mockLastFacetMap = {};
     mockSetLastFacet = vi.fn();
 
     mockedUseActiveProject.mockReturnValue({
-      lastFacet: mockLastFacet,
+      lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
       // Mock other required properties
       activeChain: 'mainnet',
@@ -89,7 +89,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       expect(mockSetLastFacet).toHaveBeenCalledWith('/names', 'prefund');
 
       // Update mock to simulate preference persistence
-      mockLastFacet['/names'] = 'prefund';
+      mockLastFacetMap['/names'] = 'prefund';
 
       // Re-render hook with updated preferences
       const { result: result2 } = renderHook(() =>
@@ -104,7 +104,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
     });
 
     it('respects saved preferences for Names view', () => {
-      mockLastFacet['/names'] = 'custom';
+      mockLastFacetMap['/names'] = 'custom';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -144,7 +144,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
 
       facetMappings.forEach(({ facet, dataFacet }) => {
         // Set up mock with this facet as saved preference
-        mockLastFacet['/names'] = dataFacet;
+        mockLastFacetMap['/names'] = dataFacet;
 
         const { result } = renderHook(() =>
           useActiveFacet({

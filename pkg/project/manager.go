@@ -27,16 +27,16 @@ func NewManager() *Manager {
 	}
 }
 
-// Active returns the currently active project, or nil if no project is active
-func (m *Manager) Active() *Project {
+// GetActiveProject returns the currently active project, or nil if no project is active
+func (m *Manager) GetActiveProject() *Project {
 	if m.ActiveID == "" {
 		return nil
 	}
 	return m.OpenProjects[m.ActiveID]
 }
 
-// SetActive sets the active project by ID
-func (m *Manager) SetActive(id string) error {
+// SetActiveProject sets the active project by ID
+func (m *Manager) SetActiveProject(id string) error {
 	if m.ActiveID == id {
 		return nil
 	}
@@ -71,9 +71,9 @@ func (m *Manager) minimizeInactiveProject(project *Project) {
 	// 3. If T implements a ClearCache() method, call it
 }
 
-// New creates a new project with the given name and current address and makes it the active project
-func (m *Manager) New(name string, address base.Address) *Project {
-	project := New(name, address)
+// NewProject creates a new project with the given name and current address and makes it the active project
+func (m *Manager) NewProject(name string, address base.Address, chains []string) *Project {
+	project := NewProject(name, address, chains)
 	id := name
 	m.OpenProjects[id] = project
 	m.ActiveID = id

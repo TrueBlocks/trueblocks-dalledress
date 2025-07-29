@@ -16,32 +16,32 @@ import (
 // ------------------------------------------------------------------------------------
 // Project represents a single project with its metadata and data.
 type Project struct {
-	mu             sync.RWMutex                 `json:"-"`
-	Dirty          bool                         `json:"dirty,omitempty"`
-	Version        string                       `json:"version"`
-	Name           string                       `json:"name"`
-	LastOpened     string                       `json:"last_opened"`
-	Addresses      []base.Address               `json:"addresses"`
-	ActiveAddress  base.Address                 `json:"activeAddress"`
-	FilterStates   map[ViewStateKey]FilterState `json:"filterStates"`
-	Path           string                       `json:"-"`
+	mu            sync.RWMutex                 `json:"-"`
+	Dirty         bool                         `json:"dirty,omitempty"`
+	Version       string                       `json:"version"`
+	Name          string                       `json:"name"`
+	LastOpened    string                       `json:"last_opened"`
+	Addresses     []base.Address               `json:"addresses"`
+	ActiveAddress base.Address                 `json:"activeAddress"`
+	FilterStates  map[ViewStateKey]FilterState `json:"filterStates"`
+	Path          string                       `json:"-"`
 }
 
 // ------------------------------------------------------------------------------------
-// New creates a new project with default values and required active address
-func New(name string, activeAddress base.Address) *Project {
+// NewProject creates a new project with default values and required active address
+func NewProject(name string, activeAddress base.Address, chains []string) *Project {
 	addresses := []base.Address{}
 	if activeAddress != base.ZeroAddr {
 		addresses = append(addresses, activeAddress)
 	}
 	return &Project{
-		Version:        "1.0",
-		Name:           name,
-		LastOpened:     time.Now().Format(time.RFC3339),
-		Dirty:          true,
-		ActiveAddress:  activeAddress,
-		Addresses:      addresses,
-		FilterStates:   make(map[ViewStateKey]FilterState),
+		Version:       "1.0",
+		Name:          name,
+		LastOpened:    time.Now().Format(time.RFC3339),
+		Dirty:         true,
+		ActiveAddress: activeAddress,
+		Addresses:     addresses,
+		FilterStates:  make(map[ViewStateKey]FilterState),
 	}
 }
 
@@ -71,7 +71,7 @@ func Load(path string) (*Project, error) {
 
 	var project Project
 	if err := json.Unmarshal(data, &project); err != nil {
-		projectPtr := New("Recovered Project", base.ZeroAddr)
+		projectPtr := NewProject("Recovered Project", base.ZeroAddr, []string{"mainnet"})
 		projectPtr.Dirty = true // Mark as dirty so user knows it was recovered
 		projectPtr.Path = path
 		if saveErr := projectPtr.Save(); saveErr != nil {
@@ -269,4 +269,4 @@ func (p *Project) GetFilterState(key ViewStateKey) (FilterState, bool) {
 // ClearFilterState removes view state for a given key and saves immediately (session state)
 
 // ------------------------------------------------------------------------------------
-// ClearAllViewStates removes all filter states and saves immediately (session state)
+// ClearAllFilterStates removes all filter states and saves immediately (session state)

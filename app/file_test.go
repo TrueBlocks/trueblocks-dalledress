@@ -16,15 +16,15 @@ import (
 
 func TestFileNew(t *testing.T) {
 	t.Run("CleanStateAllowsNewFile", func(t *testing.T) {
-		app, dir, _ := getTestApp(t, false)
+		a, dir, _ := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileNew(base.ZeroAddr)
+		err := a.fileNew(base.ZeroAddr)
 		if err != nil {
 			t.Fatalf("Expected no error for clean state, got: %v", err)
 		}
 
-		activeProject := app.Projects.Active()
+		activeProject := a.GetActiveProject()
 		if activeProject == nil {
 			t.Fatalf("Expected a new active project, but got nil")
 		}
@@ -35,15 +35,15 @@ func TestFileNew(t *testing.T) {
 	})
 
 	t.Run("NewFileIsNotDirty", func(t *testing.T) {
-		app, dir, _ := getTestApp(t, false)
+		a, dir, _ := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileNew(base.ZeroAddr)
+		err := a.fileNew(base.ZeroAddr)
 		if err != nil {
 			t.Fatalf("Expected no error when creating new file, got: %v", err)
 		}
 
-		activeProject := app.Projects.Active()
+		activeProject := a.GetActiveProject()
 		if activeProject == nil {
 			t.Fatalf("Expected an active project after fileNew(), but got nil")
 		}
@@ -56,14 +56,14 @@ func TestFileNew(t *testing.T) {
 
 func TestFileSave(t *testing.T) {
 	t.Run("BasicSaveCreatesFile", func(t *testing.T) {
-		app, dir, filePath := getTestApp(t, true)
+		a, dir, filePath := getTestApp(t, true)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		if err := app.fileSave(); err != nil {
+		if err := a.fileSave(); err != nil {
 			t.Fatalf("fileSave() returned an error: %v", err)
 		}
 
-		activeProject := app.Projects.Active()
+		activeProject := a.GetActiveProject()
 		if activeProject == nil {
 			t.Fatalf("Expected an active project, but got nil")
 		}
@@ -93,17 +93,17 @@ func TestFileSave(t *testing.T) {
 
 	// New test for empty path
 	t.Run("EmptyPathFails", func(t *testing.T) {
-		app, dir, _ := getTestApp(t, true)
+		a, dir, _ := getTestApp(t, true)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		activeProject := app.Projects.Active()
+		activeProject := a.GetActiveProject()
 		if activeProject == nil {
 			t.Fatalf("Expected an active project, but got nil")
 		}
 
 		activeProject.Path = ""
 
-		err := app.fileSave()
+		err := a.fileSave()
 		if !errors.Is(err, ErrEmptyFilePath) {
 			t.Fatalf("Expected ErrEmptyFilePath, got: %v", err)
 		}
@@ -111,10 +111,10 @@ func TestFileSave(t *testing.T) {
 
 	// New test for non-dirty state
 	t.Run("NotDirtyNoOp", func(t *testing.T) {
-		app, dir, _ := getTestApp(t, false /* not dirty */)
+		a, dir, _ := getTestApp(t, false /* not dirty */)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileSave()
+		err := a.fileSave()
 		if err != nil {
 			t.Fatalf("Expected no error for non-dirty state, got: %v", err)
 		}
@@ -123,10 +123,10 @@ func TestFileSave(t *testing.T) {
 
 func TestFileSaveAs(t *testing.T) {
 	t.Run("CreatesNewFile", func(t *testing.T) {
-		app, dir, filePath := getTestApp(t, true)
+		a, dir, filePath := getTestApp(t, true)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileSaveAs(filePath, true)
+		err := a.fileSaveAs(filePath, true)
 		if err != nil {
 			t.Fatalf("fileSaveAs() returned an error: %v", err)
 		}
@@ -135,7 +135,7 @@ func TestFileSaveAs(t *testing.T) {
 			t.Fatalf("Expected file %s to be created, but it wasn't", filePath)
 		}
 
-		activeProject := app.Projects.Active()
+		activeProject := a.GetActiveProject()
 		if activeProject == nil {
 			t.Fatalf("Expected an active project, but got nil")
 		}
@@ -151,10 +151,10 @@ func TestFileSaveAs(t *testing.T) {
 
 	// New test for empty path
 	t.Run("EmptyPathFails", func(t *testing.T) {
-		app, dir, _ := getTestApp(t, true)
+		a, dir, _ := getTestApp(t, true)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileSaveAs("", true)
+		err := a.fileSaveAs("", true)
 		if !errors.Is(err, ErrEmptyFilePath) {
 			t.Fatalf("Expected ErrEmptyFilePath, got: %v", err)
 		}
@@ -162,12 +162,12 @@ func TestFileSaveAs(t *testing.T) {
 
 	// New test for overwrite protection
 	t.Run("OverwriteNotConfirmedFails", func(t *testing.T) {
-		app, dir, filePath := getTestApp(t, true)
+		a, dir, filePath := getTestApp(t, true)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
 		_ = os.WriteFile(filePath, []byte("{}"), 0644)
 
-		err := app.fileSaveAs(filePath, false)
+		err := a.fileSaveAs(filePath, false)
 		if !errors.Is(err, ErrOverwriteNotConfirmed) {
 			t.Fatalf("Expected ErrOverwriteNotConfirmed, got: %v", err)
 		}
@@ -176,7 +176,7 @@ func TestFileSaveAs(t *testing.T) {
 
 func TestFileOpen(t *testing.T) {
 	t.Run("ValidProjectFile", func(t *testing.T) {
-		app, dir, filePath := getTestApp(t, false)
+		a, dir, filePath := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
 		proj := project.Project{
@@ -193,12 +193,12 @@ func TestFileOpen(t *testing.T) {
 		bytes, _ := json.Marshal(serializableProj)
 		_ = os.WriteFile(filePath, bytes, 0644)
 
-		err := app.fileOpen(filePath)
+		err := a.fileOpen(filePath)
 		if err != nil {
 			t.Fatalf("fileOpen() returned an error: %v", err)
 		}
 
-		activeProject := app.Projects.Active()
+		activeProject := a.GetActiveProject()
 		if activeProject == nil {
 			t.Fatalf("Expected an active project, but got nil")
 		}
@@ -213,10 +213,10 @@ func TestFileOpen(t *testing.T) {
 	})
 
 	t.Run("NonexistentFile", func(t *testing.T) {
-		app, dir, _ := getTestApp(t, false)
+		a, dir, _ := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileOpen("./nonexistent_project.json")
+		err := a.fileOpen("./nonexistent_project.json")
 		if !errors.Is(err, ErrFileNotFound) {
 			t.Fatalf("Expected ErrFileNotFound, got: %v", err)
 		}
@@ -224,7 +224,7 @@ func TestFileOpen(t *testing.T) {
 
 	// New test to verify file open doesn't mark file as dirty
 	t.Run("FileOpenDoesNotMakeTheFileDirty", func(t *testing.T) {
-		app, dir, filePath := getTestApp(t, false)
+		a, dir, filePath := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
 		// Set up a valid project file
@@ -243,13 +243,13 @@ func TestFileOpen(t *testing.T) {
 		_ = os.WriteFile(filePath, bytes, 0644)
 
 		// Open the file
-		err := app.fileOpen(filePath)
+		err := a.fileOpen(filePath)
 		if err != nil {
 			t.Fatalf("fileOpen() returned an error: %v", err)
 		}
 
 		// Check that the project is not dirty after opening
-		activeProject := app.Projects.Active()
+		activeProject := a.GetActiveProject()
 		if activeProject == nil {
 			t.Fatalf("Expected an active project, but got nil")
 		}
@@ -261,17 +261,17 @@ func TestFileOpen(t *testing.T) {
 
 	// New test for empty path
 	t.Run("EmptyPathFails", func(t *testing.T) {
-		app, dir, _ := getTestApp(t, false)
+		a, dir, _ := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
-		err := app.fileOpen("")
+		err := a.fileOpen("")
 		if !errors.Is(err, ErrEmptyFilePath) {
 			t.Fatalf("Expected ErrEmptyFilePath, got: %v", err)
 		}
 	})
 
 	t.Run("InvalidJSONDoesNotFail", func(t *testing.T) {
-		app, dir, _ := getTestApp(t, false)
+		a, dir, _ := getTestApp(t, false)
 		defer preferences.SetConfigBaseForTest(t, dir)()
 
 		// Use a different path for the invalid JSON file
@@ -281,7 +281,7 @@ func TestFileOpen(t *testing.T) {
 		_ = os.WriteFile(invalidFilePath, []byte("{invalid json"), 0644)
 
 		// Attempt to open the invalid file
-		err := app.fileOpen(invalidFilePath)
+		err := a.fileOpen(invalidFilePath)
 		if err == nil {
 			t.Fatalf("Expected recovery error when opening invalid JSON, got no error")
 		}
@@ -293,21 +293,21 @@ func TestFileOpen(t *testing.T) {
 }
 
 func TestUpdateRecentProjects(t *testing.T) {
-	app, dir, _ := getTestApp(t, true)
+	a, dir, _ := getTestApp(t, true)
 	defer preferences.SetConfigBaseForTest(t, dir)()
 
-	activeProject := app.Projects.Active()
+	activeProject := a.GetActiveProject()
 	if activeProject == nil {
 		t.Fatalf("Expected an active project, but got nil")
 	}
 
-	_ = app.fileSave()
+	_ = a.fileSave()
 
-	if len(app.Preferences.App.RecentProjects) == 0 {
+	if len(a.Preferences.App.RecentProjects) == 0 {
 		t.Fatalf("Expected recently used files list to contain entries, but it was empty")
 	}
 
-	ruf := strings.Replace(app.Preferences.App.RecentProjects[0], dir, ".", -1)
+	ruf := strings.Replace(a.Preferences.App.RecentProjects[0], dir, ".", -1)
 	if ruf != "./test_project.json" {
 		t.Fatalf("Expected recently used file at position 0 to be './test_project.json', got %s", ruf)
 	}
@@ -328,15 +328,15 @@ func getTestApp(t *testing.T, dirty bool) (*App, string, string) {
 
 	manager := project.NewManager()
 
-	proj := manager.New("Test Project", base.ZeroAddr)
+	proj := manager.NewProject("Test Project", base.ZeroAddr, []string{"mainnet"})
 	proj.SetDirty(dirty)
 	_ = proj.SaveAs(filePath)
 	proj.SetDirty(dirty)
 
-	app := &App{
+	a := &App{
 		Preferences: preferences,
 		Projects:    manager,
 	}
 
-	return app, dir, filePath
+	return a, dir, filePath
 }

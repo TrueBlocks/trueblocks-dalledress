@@ -18,7 +18,7 @@ export interface UseActiveProjectReturn {
   activeAddress: string;
   activeContract: string;
   lastView: string;
-  lastFacet: Record<string, types.DataFacet>;
+  lastFacetMap: Record<string, types.DataFacet>;
 
   // Actions that call backend directly
   setActiveAddress: (address: string) => Promise<void>;
@@ -61,7 +61,7 @@ export const useActiveProject = (): UseActiveProjectReturn => {
     activeChain: state.activeChain,
     activeContract: state.activeContract,
     lastView: state.lastView,
-    lastFacet: state.lastFacet,
+    lastFacetMap: state.lastFacetMap,
 
     // Actions - enhanced project-aware methods
     setActiveAddress: appPreferencesStore.setActiveAddress,

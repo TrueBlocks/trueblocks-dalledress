@@ -33,7 +33,7 @@ type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
 export const useAppHotkeys = (): void => {
   const [currentLocation] = useLocation();
   const {
-    lastFacet,
+    lastFacetMap,
     menuCollapsed,
     setMenuCollapsed,
     helpCollapsed,
@@ -41,7 +41,7 @@ export const useAppHotkeys = (): void => {
   } = useActiveProject();
 
   // Helper function to get current facet for the current route
-  const currentTab = lastFacet[currentLocation] || '';
+  const currentFacet = lastFacetMap[currentLocation] || '';
 
   const [, navigate] = useLocation();
   const { emitStatus, emitError } = useEmitters();
@@ -134,11 +134,11 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+r',
             label: 'Reload',
             action: () => {
-              Reload(types.Payload.createFrom({ dataFacet: currentTab })).then(
-                () => {
-                  // do nothing
-                },
-              );
+              Reload(
+                types.Payload.createFrom({ dataFacet: currentFacet }),
+              ).then(() => {
+                // do nothing
+              });
             },
           },
           e,
@@ -302,7 +302,7 @@ export const useAppHotkeys = (): void => {
     {
       key: 'escape',
       handler: (_e: KeyboardEvent) => {
-        CancelFetch(currentTab as types.DataFacet)
+        CancelFetch(currentFacet as types.DataFacet)
           .then(() => {
             emitStatus('Cancellation request processed.');
           })

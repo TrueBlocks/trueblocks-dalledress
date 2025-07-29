@@ -12,7 +12,7 @@ const { useActiveProject } = await import('../../hooks/useActiveProject');
 const mockedUseActiveProject = vi.mocked(useActiveProject);
 
 describe('Exports View Migration Tests (useActiveFacet integration)', () => {
-  let mockLastFacet: Record<string, string>;
+  let mockLastFacetMap: Record<string, string>;
   let mockSetLastFacet: ReturnType<typeof vi.fn>;
 
   const exportsFacets: DataFacetConfig[] = [
@@ -37,11 +37,11 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockLastFacet = {};
+    mockLastFacetMap = {};
     mockSetLastFacet = vi.fn();
 
     mockedUseActiveProject.mockReturnValue({
-      lastFacet: mockLastFacet,
+      lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
       // Mock other required properties
       activeChain: 'mainnet',
@@ -74,7 +74,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     });
 
     it('should restore saved facet from preferences', () => {
-      mockLastFacet['/exports'] = 'statements';
+      mockLastFacetMap['/exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -133,7 +133,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     });
 
     it('should handle ViewStateKey generation', () => {
-      mockLastFacet['/exports'] = 'balances';
+      mockLastFacetMap['/exports'] = 'balances';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -160,7 +160,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
   describe('state management integration', () => {
     it('should maintain facet state across preference updates', () => {
       // Set initial preference
-      mockLastFacet['/exports'] = 'transfers';
+      mockLastFacetMap['/exports'] = 'transfers';
 
       const { result } = renderHook(() =>
         useActiveFacet({
@@ -174,7 +174,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     });
 
     it('should fallback to default for invalid saved facets', () => {
-      mockLastFacet['/exports'] = 'INVALID_FACET';
+      mockLastFacetMap['/exports'] = 'INVALID_FACET';
 
       const { result } = renderHook(() =>
         useActiveFacet({

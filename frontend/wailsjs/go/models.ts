@@ -532,7 +532,7 @@ export namespace preferences {
 	    activeAddress?: string;
 	    activeChain?: string;
 	    activeContract?: string;
-	    lastFacet: Record<string, string>;
+	    lastFacetMap: Record<string, string>;
 	    lastView?: string;
 	    lastViewNoWizard?: string;
 	
@@ -556,7 +556,7 @@ export namespace preferences {
 	        this.activeAddress = source["activeAddress"];
 	        this.activeChain = source["activeChain"];
 	        this.activeContract = source["activeContract"];
-	        this.lastFacet = source["lastFacet"];
+	        this.lastFacetMap = source["lastFacetMap"];
 	        this.lastView = source["lastView"];
 	        this.lastViewNoWizard = source["lastViewNoWizard"];
 	    }

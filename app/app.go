@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -223,10 +224,7 @@ func (a *App) SetInitialized(isInit bool) error {
 }
 
 func (a *App) GetWizardReturn() string {
-	// if a.GetActiveProject() != nil {
-	// 	return strings.Replace(a.GetActiveProject().LastView, "/wizard", "/", -1)
-	// }
-	return "/"
+	return strings.Replace(a.GetLastView(), "/wizard", "/", -1)
 }
 
 func (a *App) GetAppId() preferences.Id {
@@ -298,28 +296,26 @@ func (a *App) SetProjectAddress(addr base.Address) {
 	}
 }
 
-// GetLastFacet returns the last visited facet for a specific view from the active project
-func (a *App) GetLastFacet(view string) types.DataFacet {
-	a.prefsMu.RLock()
-	defer a.prefsMu.RUnlock()
-	return types.DataFacet(a.Preferences.App.LastFacetMap[view])
-}
-
-// SetLastFacet sets the last visited facet for a specific view in the active project
-func (a *App) SetLastFacet(view string, tab types.DataFacet) {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	a.Preferences.App.LastFacetMap[view] = string(tab)
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
-}
-
+// SetLastView sets the last visited view/route in the active project
 func (a *App) SetLastView(view string) {
 	a.prefsMu.Lock()
 	defer a.prefsMu.Unlock()
 	a.Preferences.App.LastView = view
-	if view != "/wizard" {
-		a.Preferences.App.LastViewNoWizard = view
-	}
+	_ = preferences.SetAppPreferences(&a.Preferences.App)
+}
+
+// GetLastFacet returns the last visited facet for a specific view from the active project
+func (a *App) GetLastFacet(view string) string {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	return a.Preferences.App.LastFacetMap[view]
+}
+
+// SetLastFacet sets the last visited facet for a specific view in the active project
+func (a *App) SetLastFacet(view, facet string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	a.Preferences.App.LastFacetMap[view] = string(facet)
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 

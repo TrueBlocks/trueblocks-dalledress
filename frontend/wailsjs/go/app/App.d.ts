@@ -86,7 +86,9 @@ export function GetImageURL(arg1:string):Promise<string>;
 
 export function GetLanguage():Promise<string>;
 
-export function GetLastFacet(arg1:string):Promise<types.DataFacet>;
+export function GetLastFacet(arg1:string):Promise<string>;
+
+export function GetLastView():Promise<string>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
@@ -182,7 +184,7 @@ export function SetInitialized(arg1:boolean):Promise<void>;
 
 export function SetLanguage(arg1:string):Promise<void>;
 
-export function SetLastFacet(arg1:string,arg2:types.DataFacet):Promise<void>;
+export function SetLastFacet(arg1:string,arg2:string):Promise<void>;
 
 export function SetLastView(arg1:string):Promise<void>;
 

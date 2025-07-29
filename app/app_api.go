@@ -19,9 +19,7 @@ import (
 // EXISTING_CODE
 
 func (a *App) Reload(payload *types.Payload) error {
-	lastView := a.GetAppPreferences().LastView
-
-	switch lastView {
+	switch a.GetLastView() {
 	case "/exports":
 		return a.ReloadExports(payload)
 	case "/monitors":
@@ -37,7 +35,6 @@ func (a *App) Reload(payload *types.Payload) error {
 	case "/status":
 		return a.ReloadStatus(payload)
 	}
-
 	return nil
 }
 

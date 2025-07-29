@@ -142,6 +142,10 @@ export function GetLastFacet(arg1) {
   return window['go']['app']['App']['GetLastFacet'](arg1);
 }
 
+export function GetLastView() {
+  return window['go']['app']['App']['GetLastView']();
+}
+
 export function GetMarkdown(arg1, arg2, arg3) {
   return window['go']['app']['App']['GetMarkdown'](arg1, arg2, arg3);
 }

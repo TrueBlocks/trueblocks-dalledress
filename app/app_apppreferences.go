@@ -101,3 +101,9 @@ func (a *App) SetDebugMode(debugMode bool) {
 	a.Preferences.App.DebugMode = debugMode
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
+
+func (a *App) GetLastView() string {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	return a.GetAppPreferences().LastView
+}

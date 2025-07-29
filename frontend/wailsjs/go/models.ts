@@ -534,7 +534,6 @@ export namespace preferences {
 	    activeContract?: string;
 	    lastFacetMap: Record<string, string>;
 	    lastView?: string;
-	    lastViewNoWizard?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppPreferences(source);
@@ -558,7 +557,6 @@ export namespace preferences {
 	        this.activeContract = source["activeContract"];
 	        this.lastFacetMap = source["lastFacetMap"];
 	        this.lastView = source["lastView"];
-	        this.lastViewNoWizard = source["lastViewNoWizard"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

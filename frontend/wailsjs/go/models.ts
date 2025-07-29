@@ -720,8 +720,14 @@ export namespace project {
 	    version: string;
 	    name: string;
 	    last_opened: string;
+	    lastView: string;
+	    lastFacetMap: Record<string, string>;
 	    addresses: base.Address[];
 	    activeAddress: base.Address;
+	    chains: string[];
+	    activeChain: string;
+	    contracts: string[];
+	    activeContract: string;
 	    filterStates: Record<string, FilterState>;
 	
 	    static createFrom(source: any = {}) {
@@ -734,8 +740,14 @@ export namespace project {
 	        this.version = source["version"];
 	        this.name = source["name"];
 	        this.last_opened = source["last_opened"];
+	        this.lastView = source["lastView"];
+	        this.lastFacetMap = source["lastFacetMap"];
 	        this.addresses = this.convertValues(source["addresses"], base.Address);
 	        this.activeAddress = this.convertValues(source["activeAddress"], base.Address);
+	        this.chains = source["chains"];
+	        this.activeChain = source["activeChain"];
+	        this.contracts = source["contracts"];
+	        this.activeContract = source["activeContract"];
 	        this.filterStates = this.convertValues(source["filterStates"], FilterState, true);
 	    }
 	

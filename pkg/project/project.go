@@ -16,15 +16,21 @@ import (
 // ------------------------------------------------------------------------------------
 // Project represents a single project with its metadata and data.
 type Project struct {
-	mu            sync.RWMutex                 `json:"-"`
-	Dirty         bool                         `json:"dirty,omitempty"`
-	Version       string                       `json:"version"`
-	Name          string                       `json:"name"`
-	LastOpened    string                       `json:"last_opened"`
-	Addresses     []base.Address               `json:"addresses"`
-	ActiveAddress base.Address                 `json:"activeAddress"`
-	FilterStates  map[ViewStateKey]FilterState `json:"filterStates"`
-	Path          string                       `json:"-"`
+	mu             sync.RWMutex                 `json:"-"`
+	Dirty          bool                         `json:"dirty,omitempty"`
+	Version        string                       `json:"version"`
+	Name           string                       `json:"name"`
+	LastOpened     string                       `json:"last_opened"`
+	LastView       string                       `json:"lastView"`
+	LastFacetMap   map[string]string            `json:"lastFacetMap"`
+	Addresses      []base.Address               `json:"addresses"`
+	ActiveAddress  base.Address                 `json:"activeAddress"`
+	Chains         []string                     `json:"chains"`
+	ActiveChain    string                       `json:"activeChain"`
+	Contracts      []string                     `json:"contracts"`
+	ActiveContract string                       `json:"activeContract"`
+	FilterStates   map[ViewStateKey]FilterState `json:"filterStates"`
+	Path           string                       `json:"-"`
 }
 
 // ------------------------------------------------------------------------------------
@@ -35,13 +41,19 @@ func NewProject(name string, activeAddress base.Address, chains []string) *Proje
 		addresses = append(addresses, activeAddress)
 	}
 	return &Project{
-		Version:       "1.0",
-		Name:          name,
-		LastOpened:    time.Now().Format(time.RFC3339),
-		Dirty:         true,
-		ActiveAddress: activeAddress,
-		Addresses:     addresses,
-		FilterStates:  make(map[ViewStateKey]FilterState),
+		Version:        "1.0",
+		Name:           name,
+		LastOpened:     time.Now().Format(time.RFC3339),
+		Dirty:          true,
+		LastView:       "",
+		LastFacetMap:   map[string]string{},
+		ActiveAddress:  activeAddress,
+		Addresses:      addresses,
+		ActiveChain:    chains[0],
+		Chains:         chains,
+		ActiveContract: "",
+		Contracts:      []string{},
+		FilterStates:   make(map[ViewStateKey]FilterState),
 	}
 }
 
@@ -181,6 +193,19 @@ func (p *Project) GetAddress() base.Address {
 // ------------------------------------------------------------------------------------
 // SetAddress sets the project's active address and adds it to addresses if not present (backward compatibility)
 func (p *Project) SetAddress(addr base.Address) {
+	found := false
+	for _, existingAddr := range p.Addresses {
+		if existingAddr == addr {
+			found = true
+			break
+		}
+	}
+	if !found {
+		// TODO: Bound this at 10?
+		p.Addresses = append([]base.Address{addr}, p.Addresses...)
+		p.Dirty = true
+	}
+
 	if p.ActiveAddress != addr {
 		p.ActiveAddress = addr
 		p.Dirty = true
@@ -196,12 +221,38 @@ func (p *Project) GetActiveAddress() base.Address {
 // ------------------------------------------------------------------------------------
 // SetActiveAddress sets the currently selected address (must be in project)
 func (p *Project) SetActiveAddress(addr base.Address) error {
+	found := false
+	for _, existingAddr := range p.Addresses {
+		if existingAddr == addr {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		// TODO: Why do we require it to already be seen?
+		return fmt.Errorf("address %s not found in project", addr.Hex())
+	}
+
+	if p.ActiveAddress != addr {
+		p.ActiveAddress = addr
+		p.Dirty = true
+	}
+
 	return nil
 }
 
 // ------------------------------------------------------------------------------------
 // AddAddress adds a new address to the project
 func (p *Project) AddAddress(addr base.Address) error {
+	for _, existingAddr := range p.Addresses {
+		if existingAddr == addr {
+			return fmt.Errorf("address %s already exists in project", addr.Hex())
+		}
+	}
+
+	p.Addresses = append(p.Addresses, addr)
+	p.Dirty = true
 	return nil
 }
 
@@ -217,56 +268,194 @@ func (p *Project) GetAddresses() []base.Address {
 // ------------------------------------------------------------------------------------
 // SetLastView updates the last visited view/route and saves immediately (session state)
 func (p *Project) SetLastView(view string) error {
+	if p.LastView != view {
+		p.LastView = view
+		return p.Save()
+	}
 	return nil
 }
 
 // ------------------------------------------------------------------------------------
 // GetLastFacet returns the last visited facet for a specific view
 func (p *Project) GetLastFacet(view string) string {
-	return ""
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return p.LastFacetMap[view]
 }
 
 // ------------------------------------------------------------------------------------
 // SetLastFacet updates the last visited facet for a specific view and saves immediately (session state)
 func (p *Project) SetLastFacet(view, facet string) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	currentFacet := p.LastFacetMap[view]
+	if currentFacet != facet {
+		p.LastFacetMap[view] = facet
+		return p.Save()
+	}
 	return nil
 }
 
 // ------------------------------------------------------------------------------------
 // RemoveAddress removes an address from the project
 func (p *Project) RemoveAddress(addr base.Address) error {
+	for i, existingAddr := range p.Addresses {
+		if existingAddr == addr {
+			p.Addresses = append(p.Addresses[:i], p.Addresses[i+1:]...)
+			if p.ActiveAddress == addr {
+				if len(p.Addresses) > 0 {
+					p.ActiveAddress = p.Addresses[0]
+				} else {
+					p.ActiveAddress = base.ZeroAddr
+				}
+			}
+			p.Dirty = true
+			return nil
+		}
+	}
 	return fmt.Errorf("address %s not found in project", addr.Hex())
 }
 
 // ------------------------------------------------------------------------------------
 // GetChains returns all chains in the project
+func (p *Project) GetChains() []string {
+	return p.Chains
+}
 
 // ------------------------------------------------------------------------------------
 // GetActiveChain returns the currently selected chain
+func (p *Project) GetActiveChain() string {
+	return p.ActiveChain
+}
 
 // ------------------------------------------------------------------------------------
 // SetActiveChain sets the currently selected chain (must be in project)
+func (p *Project) SetActiveChain(chain string) error {
+	found := false
+	for _, existingChain := range p.Chains {
+		if existingChain == chain {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		// TODO: Why does it already have to exist?
+		return fmt.Errorf("chain %s not found in project", chain)
+	}
+
+	if p.ActiveChain != chain {
+		p.ActiveChain = chain
+		p.Dirty = true
+	}
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // AddChain adds a new chain to the project
+func (p *Project) AddChain(chain string) error {
+	for _, existingChain := range p.Chains {
+		if existingChain == chain {
+			return fmt.Errorf("chain %s already exists in project", chain)
+		}
+	}
+	p.Chains = append(p.Chains, chain)
+	p.Dirty = true
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // RemoveChain removes a chain from the project
+func (p *Project) RemoveChain(chain string) error {
+	for i, existingChain := range p.Chains {
+		if existingChain == chain {
+			p.Chains = append(p.Chains[:i], p.Chains[i+1:]...)
+			if p.ActiveChain == chain {
+				if len(p.Chains) > 0 {
+					p.ActiveChain = p.Chains[0]
+				} else {
+					p.ActiveChain = "mainnet"
+					p.Chains = append(p.Chains, "mainnet")
+				}
+			}
+			p.Dirty = true
+			return nil
+		}
+	}
+	return fmt.Errorf("chain %s not found in project", chain)
+}
 
 // ------------------------------------------------------------------------------------
 // GetContracts returns all contracts in the project
+func (p *Project) GetContracts() []string {
+	return p.Contracts
+}
 
 // ------------------------------------------------------------------------------------
 // GetActiveContract returns the currently selected contract
+func (p *Project) GetActiveContract() string {
+	return p.ActiveContract
+}
 
 // ------------------------------------------------------------------------------------
 // SetActiveContract sets the currently selected contract (must be in project or empty)
+func (p *Project) SetActiveContract(contract string) error {
+	if contract == "" {
+		if p.ActiveContract != contract {
+			p.ActiveContract = contract
+			p.Dirty = true
+		}
+		return nil
+	}
+
+	found := false
+	for _, existingContract := range p.Contracts {
+		if existingContract == contract {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		// TODO: Why does it have to exist?
+		return fmt.Errorf("contract %s not found in project", contract)
+	}
+
+	if p.ActiveContract != contract {
+		p.ActiveContract = contract
+		p.Dirty = true
+	}
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // AddContract adds a new contract to the project
+func (p *Project) AddContract(contract string) error {
+	for _, existingContract := range p.Contracts {
+		if existingContract == contract {
+			return fmt.Errorf("contract %s already exists in project", contract)
+		}
+	}
+	p.Contracts = append(p.Contracts, contract)
+	p.Dirty = true
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // RemoveContract removes a contract from the project
+func (p *Project) RemoveContract(contract string) error {
+	for i, existingContract := range p.Contracts {
+		if existingContract == contract {
+			p.Contracts = append(p.Contracts[:i], p.Contracts[i+1:]...)
+			if p.ActiveContract == contract {
+				p.ActiveContract = ""
+			}
+			p.Dirty = true
+			return nil
+		}
+	}
+	return fmt.Errorf("contract %s not found in project", contract)
+}
 
 // ------------------------------------------------------------------------------------
 // ViewStateKeyToString converts a ViewStateKey to a string for map indexing
@@ -283,17 +472,32 @@ func (p *Project) GetFilterState(key ViewStateKey) (FilterState, bool) {
 // ------------------------------------------------------------------------------------
 // SetFilterState sets filter state for a given key and saves immediately (session state)
 func (p *Project) SetFilterState(key ViewStateKey, state FilterState) error {
-	return nil
+	if p.FilterStates == nil {
+		p.FilterStates = make(map[ViewStateKey]FilterState)
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.FilterStates[key] = state
+	return p.Save() // Save immediately - no dirty flag set
 }
 
 // ------------------------------------------------------------------------------------
 // ClearFilterState removes view state for a given key and saves immediately (session state)
 func (p *Project) ClearFilterState(key ViewStateKey) error {
+	if p.FilterStates != nil {
+		p.mu.Lock()
+		defer p.mu.Unlock()
+		delete(p.FilterStates, key)
+		return p.Save() // Save immediately - no dirty flag set
+	}
 	return nil
 }
 
 // ------------------------------------------------------------------------------------
 // ClearAllFilterStates removes all filter states and saves immediately (session state)
 func (p *Project) ClearAllFilterStates() error {
-	return nil
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.FilterStates = make(map[ViewStateKey]FilterState)
+	return p.Save()
 }

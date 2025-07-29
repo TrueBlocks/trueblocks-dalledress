@@ -5,15 +5,27 @@ import {project} from '../models';
 
 export function AddAddress(arg1:base.Address):Promise<void>;
 
+export function AddChain(arg1:string):Promise<void>;
+
+export function AddContract(arg1:string):Promise<void>;
+
 export function ClearAllFilterStates():Promise<void>;
 
 export function ClearFilterState(arg1:project.ViewStateKey):Promise<void>;
 
 export function GetActiveAddress():Promise<base.Address>;
 
+export function GetActiveChain():Promise<string>;
+
+export function GetActiveContract():Promise<string>;
+
 export function GetAddress():Promise<base.Address>;
 
 export function GetAddresses():Promise<Array<base.Address>>;
+
+export function GetChains():Promise<Array<string>>;
+
+export function GetContracts():Promise<Array<string>>;
 
 export function GetFilterState(arg1:project.ViewStateKey):Promise<project.FilterState|boolean>;
 
@@ -27,11 +39,19 @@ export function IsDirty():Promise<boolean>;
 
 export function RemoveAddress(arg1:base.Address):Promise<void>;
 
+export function RemoveChain(arg1:string):Promise<void>;
+
+export function RemoveContract(arg1:string):Promise<void>;
+
 export function Save():Promise<void>;
 
 export function SaveAs(arg1:string):Promise<void>;
 
 export function SetActiveAddress(arg1:base.Address):Promise<void>;
+
+export function SetActiveChain(arg1:string):Promise<void>;
+
+export function SetActiveContract(arg1:string):Promise<void>;
 
 export function SetAddress(arg1:base.Address):Promise<void>;
 

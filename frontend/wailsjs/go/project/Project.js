@@ -6,6 +6,14 @@ export function AddAddress(arg1) {
   return window['go']['project']['Project']['AddAddress'](arg1);
 }
 
+export function AddChain(arg1) {
+  return window['go']['project']['Project']['AddChain'](arg1);
+}
+
+export function AddContract(arg1) {
+  return window['go']['project']['Project']['AddContract'](arg1);
+}
+
 export function ClearAllFilterStates() {
   return window['go']['project']['Project']['ClearAllFilterStates']();
 }
@@ -18,12 +26,28 @@ export function GetActiveAddress() {
   return window['go']['project']['Project']['GetActiveAddress']();
 }
 
+export function GetActiveChain() {
+  return window['go']['project']['Project']['GetActiveChain']();
+}
+
+export function GetActiveContract() {
+  return window['go']['project']['Project']['GetActiveContract']();
+}
+
 export function GetAddress() {
   return window['go']['project']['Project']['GetAddress']();
 }
 
 export function GetAddresses() {
   return window['go']['project']['Project']['GetAddresses']();
+}
+
+export function GetChains() {
+  return window['go']['project']['Project']['GetChains']();
+}
+
+export function GetContracts() {
+  return window['go']['project']['Project']['GetContracts']();
 }
 
 export function GetFilterState(arg1) {
@@ -50,6 +74,14 @@ export function RemoveAddress(arg1) {
   return window['go']['project']['Project']['RemoveAddress'](arg1);
 }
 
+export function RemoveChain(arg1) {
+  return window['go']['project']['Project']['RemoveChain'](arg1);
+}
+
+export function RemoveContract(arg1) {
+  return window['go']['project']['Project']['RemoveContract'](arg1);
+}
+
 export function Save() {
   return window['go']['project']['Project']['Save']();
 }
@@ -60,6 +92,14 @@ export function SaveAs(arg1) {
 
 export function SetActiveAddress(arg1) {
   return window['go']['project']['Project']['SetActiveAddress'](arg1);
+}
+
+export function SetActiveChain(arg1) {
+  return window['go']['project']['Project']['SetActiveChain'](arg1);
+}
+
+export function SetActiveContract(arg1) {
+  return window['go']['project']['Project']['SetActiveContract'](arg1);
 }
 
 export function SetAddress(arg1) {

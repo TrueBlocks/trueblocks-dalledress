@@ -190,10 +190,7 @@ class AppPreferencesStore {
   };
 
   setActiveContract = async (contract: string): Promise<void> => {
-    // Skip backend calls in test mode
-    if (!this.isTestMode) {
-      await App.SetActiveContract(contract);
-    }
+    await this.updatePreferences({ activeContract: contract });
     this.setState({ activeContract: contract });
   };
 
@@ -236,12 +233,6 @@ class AppPreferencesStore {
   setLastView = async (view: string): Promise<void> => {
     await this.updatePreferences({ lastView: view });
     this.setState({ lastView: view });
-  };
-
-  toggleDarkMode = async (): Promise<void> => {
-    const newTheme = this.state.lastTheme === 'dark' ? 'light' : 'dark';
-    await this.updatePreferences({ lastTheme: newTheme });
-    this.setState({ lastTheme: newTheme });
   };
 
   toggleDebugMode = async (): Promise<void> => {

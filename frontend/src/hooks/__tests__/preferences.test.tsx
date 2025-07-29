@@ -31,7 +31,6 @@ vi.mock('@stores', () => ({
     setMenuCollapsed: vi.fn(),
     setHelpCollapsed: vi.fn(),
     setLastView: vi.fn(),
-    toggleDarkMode: vi.fn(),
     isDarkMode: false,
     hasActiveProject: true,
     canExport: true,

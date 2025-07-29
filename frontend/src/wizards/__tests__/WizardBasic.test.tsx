@@ -126,7 +126,6 @@ vi.mock('@hooks', () => ({
     setHelpCollapsed: vi.fn(),
     setLastFacet: vi.fn(),
     setLastView: vi.fn(),
-    toggleDarkMode: vi.fn(),
     // Computed values
     isDarkMode: false,
     hasActiveProject: true,

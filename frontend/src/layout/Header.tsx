@@ -8,7 +8,7 @@ import { AppShell, Group, Text, useMantineColorScheme } from '@mantine/core';
 export const Header = () => {
   const [appName, setAppName] = useState('AppName');
   const { colorScheme, setColorScheme } = useMantineColorScheme();
-  const { toggleDarkMode, isDarkMode, toggleDebugMode, debugMode } =
+  const { toggleTheme, isDarkMode, toggleDebugMode, debugMode } =
     useActiveProject();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export const Header = () => {
   }, [isDarkMode, setColorScheme]);
 
   const handleToggleTheme = async () => {
-    await toggleDarkMode();
+    await toggleTheme();
   };
 
   const handleToggleDebug = async () => {

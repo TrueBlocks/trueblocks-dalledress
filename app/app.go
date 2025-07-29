@@ -300,17 +300,23 @@ var newCode = false
 
 // SetLastView sets the last visited view/route in the active project
 func (a *App) SetLastView(view string) error {
-	if newCode {
-		if active := a.GetActiveProject(); active != nil {
-			return active.SetLastView(view)
-		}
-		return fmt.Errorf("no active project")
+	var e1, e2 error
+	if active := a.GetActiveProject(); active != nil {
+		e1 = active.SetLastView(view)
 	} else {
-		a.prefsMu.Lock()
-		defer a.prefsMu.Unlock()
-		a.Preferences.App.LastView = view
-		return preferences.SetAppPreferences(&a.Preferences.App)
+		e1 = fmt.Errorf("no active project")
 	}
+
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	a.Preferences.App.LastView = view
+	e2 = preferences.SetAppPreferences(&a.Preferences.App)
+
+	if e1 != e2 {
+		logging.LogBackend(fmt.Sprintf("SetLastView: errors do not match error1 %v, error2 %v", e1, e2))
+	}
+
+	return e2
 }
 
 // GetLastFacet returns the last visited facet for a specific view from the active project

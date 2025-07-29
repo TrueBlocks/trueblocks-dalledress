@@ -32,7 +32,6 @@ export interface UseActiveProjectReturn {
   setActiveChain: (chain: string) => Promise<void>;
   setActiveContract: (contract: string) => Promise<void>;
   isDarkMode: boolean;
-  toggleDarkMode: () => Promise<void>;
   toggleDebugMode: () => Promise<void>;
 
   // Computed values (sync calls to store)
@@ -74,7 +73,6 @@ export const useActiveProject = (): UseActiveProjectReturn => {
     setHelpCollapsed: appPreferencesStore.setHelpCollapsed,
     setLastView: appPreferencesStore.setLastView,
     setLastFacet: appPreferencesStore.setLastFacet,
-    toggleDarkMode: appPreferencesStore.toggleDarkMode,
     toggleDebugMode: appPreferencesStore.toggleDebugMode,
 
     // Computed values - these are sync getters from the store

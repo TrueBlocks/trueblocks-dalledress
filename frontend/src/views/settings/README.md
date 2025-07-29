@@ -80,7 +80,6 @@ classDiagram
     string[] RecentProjects
     string LastView
     map~string,string~ LastTab
-    string LastViewNoWizard
     bool MenuCollapsed
     bool HelpCollapsed
   }

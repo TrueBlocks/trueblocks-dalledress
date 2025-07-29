@@ -31,6 +31,8 @@ export function GetFilterState(arg1:project.ViewStateKey):Promise<project.Filter
 
 export function GetLastFacet(arg1:string):Promise<string>;
 
+export function GetLastView():Promise<string>;
+
 export function GetName():Promise<string>;
 
 export function GetPath():Promise<string>;

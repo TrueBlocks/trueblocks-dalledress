@@ -36,22 +36,17 @@ func (b *Bounds) IsValid() bool {
 }
 
 type AppPreferences struct {
-	Bounds          Bounds            `json:"bounds,omitempty"`
-	DebugMode       bool              `json:"debugMode,omitempty"`
-	HelpCollapsed   bool              `json:"helpCollapsed,omitempty"`
-	LastTheme       string            `json:"lastTheme,omitempty"`
-	MenuCollapsed   bool              `json:"menuCollapsed,omitempty"`
-	Name            string            `json:"name,omitempty"`
-	RecentProjects  []string          `json:"recentProjects"`
-	SilencedDialogs map[string]bool   `json:"silencedDialogs"`
-	Version         string            `json:"version"`
-	LastLanguage    string            `json:"lastLanguage,omitempty"`
-	LastProject     string            `json:"lastProject,omitempty"`
-	ActiveAddress   string            `json:"activeAddress,omitempty"`
-	ActiveChain     string            `json:"activeChain,omitempty"`
-	ActiveContract  string            `json:"activeContract,omitempty"`
-	LastFacetMap    map[string]string `json:"lastFacetMap"`
-	LastView        string            `json:"lastView,omitempty"`
+	Bounds          Bounds          `json:"bounds,omitempty"`
+	DebugMode       bool            `json:"debugMode,omitempty"`
+	HelpCollapsed   bool            `json:"helpCollapsed,omitempty"`
+	LastTheme       string          `json:"lastTheme,omitempty"`
+	MenuCollapsed   bool            `json:"menuCollapsed,omitempty"`
+	Name            string          `json:"name,omitempty"`
+	RecentProjects  []string        `json:"recentProjects"`
+	SilencedDialogs map[string]bool `json:"silencedDialogs"`
+	Version         string          `json:"version"`
+	LastLanguage    string          `json:"lastLanguage,omitempty"`
+	LastProject     string          `json:"lastProject,omitempty"`
 }
 
 func (p *AppPreferences) String() string {
@@ -71,10 +66,6 @@ func NewAppPreferences() *AppPreferences {
 		RecentProjects:  []string{},
 		SilencedDialogs: make(map[string]bool),
 		Version:         "1.0",
-		ActiveAddress:   "0xf503017d7baf7fbc0fff7492b751025c6a78179b",
-		ActiveContract:  "0x52df6e4d9989e7cf4739d687c765e75323a1b14c",
-		LastFacetMap:    make(map[string]string),
-		LastView:        "/",
 	}
 }
 
@@ -118,14 +109,6 @@ func GetAppPreferences() (AppPreferences, error) {
 	}
 	if appPrefs.Version == "" {
 		appPrefs.Version = "1.0"
-		needsSave = true
-	}
-	if appPrefs.LastFacetMap == nil {
-		appPrefs.LastFacetMap = make(map[string]string)
-		needsSave = true
-	}
-	if appPrefs.LastView == "" {
-		appPrefs.LastView = "/"
 		needsSave = true
 	}
 

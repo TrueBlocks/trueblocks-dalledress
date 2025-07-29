@@ -529,11 +529,6 @@ export namespace preferences {
 	    version: string;
 	    lastLanguage?: string;
 	    lastProject?: string;
-	    activeAddress?: string;
-	    activeChain?: string;
-	    activeContract?: string;
-	    lastFacetMap: Record<string, string>;
-	    lastView?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppPreferences(source);
@@ -552,11 +547,6 @@ export namespace preferences {
 	        this.version = source["version"];
 	        this.lastLanguage = source["lastLanguage"];
 	        this.lastProject = source["lastProject"];
-	        this.activeAddress = source["activeAddress"];
-	        this.activeChain = source["activeChain"];
-	        this.activeContract = source["activeContract"];
-	        this.lastFacetMap = source["lastFacetMap"];
-	        this.lastView = source["lastView"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

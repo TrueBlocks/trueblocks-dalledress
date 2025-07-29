@@ -7,10 +7,12 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
 )
 
 // ------------------------------------------------------------------------------------
@@ -111,43 +113,22 @@ func (p *Project) Save() error {
 // SaveAs saves the project to a new file path and updates the project's path
 // with optimized serialization for better performance
 func (p *Project) SaveAs(path string) error {
-	// Ensure the directory exists
-	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return fmt.Errorf("failed to create directory: %w", err)
-	}
+	_ = file.EstablishFolder(filepath.Dir(path))
 
-	// Update last opened timestamp
 	p.LastOpened = time.Now().Format(time.RFC3339)
 	p.Dirty = false
 
-	// Create a temporary file for safe writing
-	tempPath := path + ".tmp"
-
-	// Optimize serialization with a single marshal operation
 	data, err := json.MarshalIndent(p, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to serialize project: %w", err)
 	}
 
-	// Write to temporary file first
-	if err := os.WriteFile(tempPath, data, 0644); err != nil {
-		// Clean up temporary file if write fails
-		os.Remove(tempPath)
+	if err := os.WriteFile(path, data, 0644); err != nil {
 		return fmt.Errorf("failed to write project file: %w", err)
 	}
 
-	// Atomically rename temporary file to final path for better durability
-	if err := os.Rename(tempPath, path); err != nil {
-		// Clean up temporary file if rename fails
-		os.Remove(tempPath)
-		return fmt.Errorf("failed to finalize project file: %w", err)
-	}
-
-	// Update in-memory state
 	p.Path = path
 	p.Dirty = false
-
 	return nil
 }
 
@@ -264,12 +245,15 @@ func (p *Project) GetAddresses() []base.Address {
 
 // ------------------------------------------------------------------------------------
 // GetLastView returns the last visited view/route
+func (p *Project) GetLastView() string {
+	return p.LastView
+}
 
 // ------------------------------------------------------------------------------------
 // SetLastView updates the last visited view/route and saves immediately (session state)
 func (p *Project) SetLastView(view string) error {
 	if p.LastView != view {
-		p.LastView = view
+		p.LastView = strings.Trim(view, "/")
 		return p.Save()
 	}
 	return nil
@@ -288,6 +272,9 @@ func (p *Project) GetLastFacet(view string) string {
 func (p *Project) SetLastFacet(view, facet string) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
+	if p.LastFacetMap == nil {
+		p.LastFacetMap = make(map[string]string)
+	}
 	currentFacet := p.LastFacetMap[view]
 	if currentFacet != facet {
 		p.LastFacetMap[view] = facet

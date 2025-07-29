@@ -103,7 +103,8 @@ func (a *App) SetDebugMode(debugMode bool) {
 }
 
 func (a *App) GetLastView() string {
-	a.prefsMu.Lock()
-	defer a.prefsMu.Unlock()
-	return a.GetAppPreferences().LastView
+	if active := a.GetActiveProject(); active != nil {
+		return active.GetLastView()
+	}
+	return ""
 }

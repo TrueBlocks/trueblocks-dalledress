@@ -58,6 +58,10 @@ export function GetLastFacet(arg1) {
   return window['go']['project']['Project']['GetLastFacet'](arg1);
 }
 
+export function GetLastView() {
+  return window['go']['project']['Project']['GetLastView']();
+}
+
 export function GetName() {
   return window['go']['project']['Project']['GetName']();
 }

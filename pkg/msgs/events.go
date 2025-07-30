@@ -149,6 +149,12 @@ func EmitError(msgText string, err error, payload ...interface{}) {
 	emitMessage(EventError, msg, payload...)
 }
 
+// EmitProjectOpened signals that a project has been opened and context should be restored.
+// This includes navigation to the project's last view and analytical state restoration.
+func EmitProjectOpened(lastView string, payload ...interface{}) {
+	emitMessage(EventProjectOpened, lastView, payload...)
+}
+
 // On registers a callback function for a specific event type.
 // In production, it uses Wails' runtime.EventsOn.
 // In test mode, it registers the callback with the internal listener system.

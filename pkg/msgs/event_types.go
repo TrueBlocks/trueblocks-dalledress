@@ -9,6 +9,7 @@ const (
 	EventDataLoaded    EventType = "data:loaded"
 	EventTabCycle      EventType = "hotkey:tab-cycle"
 	EventImagesChanged EventType = "images:changed"
+	EventProjectOpened EventType = "project:opened"
 )
 
 var AllMessages = []struct {
@@ -21,4 +22,5 @@ var AllMessages = []struct {
 	{EventDataLoaded, "DATA_LOADED"},
 	{EventTabCycle, "TAB_CYCLE"},
 	{EventImagesChanged, "IMAGES_CHANGED"},
+	{EventProjectOpened, "PROJECT_OPENED"},
 }

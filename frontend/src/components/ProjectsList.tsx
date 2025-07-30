@@ -56,6 +56,13 @@ export const ProjectsList = () => {
 
   useEvent(msgs.EventType.MANAGER, (_message?: string) => refreshProjects());
 
+  useEvent(msgs.EventType.PROJECT_OPENED, async (lastView: string) => {
+    await restoreProjectFilterStates();
+    const targetView = lastView || '/';
+    navigate(targetView);
+    refreshProjects();
+  });
+
   const handleSwitchProject = async (id: string) => {
     try {
       await SwitchToProject(id);

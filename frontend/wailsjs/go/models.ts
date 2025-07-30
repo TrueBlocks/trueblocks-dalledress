@@ -448,6 +448,7 @@ export namespace msgs {
 	    DATA_LOADED = "data:loaded",
 	    TAB_CYCLE = "hotkey:tab-cycle",
 	    IMAGES_CHANGED = "images:changed",
+	    PROJECT_OPENED = "project:opened",
 	}
 
 }

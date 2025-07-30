@@ -51,13 +51,36 @@ func (a *App) OpenProjectFile(path string) error {
 		return err
 	}
 
-	// Navigate to current address view on project open
+	// Get the opened project to restore full context
 	active := a.GetActiveProject()
-	if active != nil && active.GetActiveAddress() != base.ZeroAddr {
-		activeAddr := active.GetActiveAddress().String()
-		msgs.EmitStatus(fmt.Sprintf("opened project: %s - navigated to %s", active.GetName(), activeAddr))
+	if active == nil {
+		return fmt.Errorf("failed to get active project after opening")
 	}
-	msgs.EmitStatus("project opened: " + path)
+
+	// Get the active project ID from the manager
+	activeProjectID := a.Projects.ActiveID
+	if activeProjectID == "" {
+		return fmt.Errorf("no active project ID available")
+	}
+
+	// Trigger analytical state restoration by restoring project context
+	if err := a.RestoreProjectContext(activeProjectID); err != nil {
+		return fmt.Errorf("failed to restore project context: %w", err)
+	}
+
+	// Emit project opened event for frontend navigation and pagination reset
+	lastView := active.GetLastView()
+	if lastView == "" {
+		lastView = "/" // Default to home if no last view
+	}
+	msgs.EmitProjectOpened(lastView, map[string]interface{}{
+		"projectId":     activeProjectID,
+		"projectName":   active.GetName(),
+		"activeAddress": active.GetActiveAddress().String(),
+		"activeChain":   active.GetActiveChain(),
+	})
+
+	msgs.EmitStatus(fmt.Sprintf("project opened: %s - restoring context", active.GetName()))
 	return nil
 }
 

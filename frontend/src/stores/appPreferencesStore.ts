@@ -1,6 +1,16 @@
-import * as App from '@app';
+import {
+  ConvertToAddress,
+  GetActiveProject,
+  GetAppPreferences,
+  SetActiveAddress,
+  SetActiveContract,
+  SetAppPreferences,
+  SetLastFacet,
+  SetLastView,
+} from '@app';
 import { preferences, types } from '@models';
-import { Log } from '@utils';
+import { Log, getAddressString } from '@utils';
+import { SetActiveChain } from 'wailsjs/go/project/Project';
 
 // State interface for simplified preferences (no caching of project data)
 interface AppPreferencesState {
@@ -85,18 +95,15 @@ class AppPreferencesStore {
   private updatePreferences = async (
     updates: Partial<preferences.AppPreferences>,
   ): Promise<void> => {
-    // Skip backend calls in test mode
-    if (this.isTestMode) {
-      return;
-    }
+    if (this.isTestMode) return;
 
     try {
-      const currentPrefs = await App.GetAppPreferences();
+      const currentPrefs = await GetAppPreferences();
       const updatedPrefs = preferences.AppPreferences.createFrom({
         ...currentPrefs,
         ...updates,
       });
-      await App.SetAppPreferences(updatedPrefs);
+      await SetAppPreferences(updatedPrefs);
     } catch (error) {
       Log('ERROR: Failed to update preferences: ' + String(error));
       throw error;
@@ -117,7 +124,7 @@ class AppPreferencesStore {
       let prefs = null;
       while (retries < maxRetries) {
         try {
-          prefs = await App.GetAppPreferences();
+          prefs = await GetAppPreferences();
           break; // Success, exit retry loop
         } catch (error) {
           retries++;
@@ -130,17 +137,17 @@ class AppPreferencesStore {
             );
             // Use safe defaults if backend is not ready
             this.setState({
+              lastTheme: 'dark',
+              lastLanguage: 'en',
+              menuCollapsed: false,
+              helpCollapsed: false,
+              debugMode: false,
+              loading: false,
+              lastView: '/',
+              lastFacetMap: {},
               lastProject: '',
               activeChain: '',
               activeAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
-              lastTheme: 'dark',
-              lastLanguage: 'en',
-              lastView: '/',
-              menuCollapsed: false,
-              helpCollapsed: false,
-              lastFacetMap: {},
-              debugMode: false,
-              loading: false,
             });
             return;
           }
@@ -148,24 +155,46 @@ class AppPreferencesStore {
           await new Promise((resolve) => setTimeout(resolve, 200));
         }
       }
+
       if (prefs) {
-        this.setState({
-          lastProject: prefs.lastProject || '',
-          activeChain: prefs.activeChain || '',
-          activeAddress:
-            prefs.activeAddress || '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
-          activeContract:
-            prefs.activeContract ||
-            '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
-          lastTheme: prefs.lastTheme || 'dark',
-          lastLanguage: prefs.lastLanguage || 'en',
-          lastView: prefs.lastView || '/',
-          menuCollapsed: prefs.menuCollapsed || false,
-          helpCollapsed: prefs.helpCollapsed || false,
-          lastFacetMap: (prefs.lastFacetMap || {}) as Record<
+        let lastView = '/';
+        let activeChain = '';
+        let activeAddress = '0xf503017d7baf7fbc0fff7492b751025c6a78179b';
+        let activeContract = '0x52df6e4d9989e7cf4739d687c765e75323a1b14c';
+        let lastFacetMap: Record<string, types.DataFacet> = {};
+
+        try {
+          const activeProject = await GetActiveProject();
+          lastView = activeProject.lastView || '/';
+          activeChain = activeProject.activeChain || '';
+          activeAddress =
+            getAddressString(activeProject.activeAddress) ||
+            '0xf503017d7baf7fbc0fff7492b751025c6a78179b';
+          activeContract =
+            activeProject.activeContract ||
+            '0x52df6e4d9989e7cf4739d687c765e75323a1b14c';
+          lastFacetMap = (activeProject.lastFacetMap || {}) as Record<
             string,
             types.DataFacet
-          >,
+          >;
+        } catch (error) {
+          Log(
+            'WARN: Failed to get project properties from active project, using defaults: ' +
+              String(error),
+          );
+        }
+
+        this.setState({
+          lastProject: prefs.lastProject || '',
+          activeChain: activeChain,
+          activeAddress: activeAddress,
+          activeContract: activeContract,
+          lastTheme: prefs.lastTheme || 'dark',
+          lastLanguage: prefs.lastLanguage || 'en',
+          lastView: lastView,
+          menuCollapsed: prefs.menuCollapsed || false,
+          helpCollapsed: prefs.helpCollapsed || false,
+          lastFacetMap: lastFacetMap,
           debugMode:
             (prefs as preferences.AppPreferences & { debugMode?: boolean })
               .debugMode || false,
@@ -176,22 +205,6 @@ class AppPreferencesStore {
       Log('ERROR: Failed to load app preferences: ' + String(error));
       this.setState({ loading: false });
     }
-  };
-
-  // Action methods that update both local state and backend
-  setActiveAddress = async (address: string): Promise<void> => {
-    await this.updatePreferences({ activeAddress: address });
-    this.setState({ activeAddress: address });
-  };
-
-  setActiveChain = async (chain: string): Promise<void> => {
-    await this.updatePreferences({ activeChain: chain });
-    this.setState({ activeChain: chain });
-  };
-
-  setActiveContract = async (contract: string): Promise<void> => {
-    await this.updatePreferences({ activeContract: contract });
-    this.setState({ activeContract: contract });
   };
 
   switchProject = async (project: string): Promise<void> => {
@@ -220,27 +233,50 @@ class AppPreferencesStore {
     this.setState({ helpCollapsed: collapsed });
   };
 
-  setLastFacet = async (route: string, tab: types.DataFacet): Promise<void> => {
-    // Skip backend calls in test mode
-    if (!this.isTestMode) {
-      await App.SetLastFacet(route, tab);
+  toggleDebugMode = async (): Promise<void> => {
+    const newDebugMode = !this.state.debugMode;
+    await this.updatePreferences({ debugMode: newDebugMode });
+    this.setState({ debugMode: newDebugMode });
+  };
+
+  // Action methods that update both local state and backend
+  setActiveAddress = async (address: string): Promise<void> => {
+    const convertedAddress = await ConvertToAddress(address);
+    if (convertedAddress && typeof convertedAddress === 'object') {
+      // await this.updatePreferences({ activeAddress: address });
+      await SetActiveAddress(convertedAddress);
+      this.setState({ activeAddress: address });
+    } else {
+      throw new Error('Invalid address format');
     }
+  };
+
+  setActiveChain = async (chain: string): Promise<void> => {
+    // await this.updatePreferences({ activeChain: chain });
+    await SetActiveChain(chain);
+    this.setState({ activeChain: chain });
+  };
+
+  setActiveContract = async (contract: string): Promise<void> => {
+    // await this.updatePreferences({ activeContract: contract });
+    await SetActiveContract(contract);
+    this.setState({ activeContract: contract });
+  };
+
+  setLastFacet = async (view: string, facet: string): Promise<void> => {
+    await SetLastFacet(view, facet);
     this.setState({
-      lastFacetMap: { ...this.state.lastFacetMap, [route]: tab },
+      lastFacetMap: {
+        ...this.state.lastFacetMap,
+        [view]: facet as types.DataFacet,
+      },
     });
   };
 
   setLastView = async (view: string): Promise<void> => {
-    await this.updatePreferences({ lastView: view });
+    // await this.updatePreferences({ lastView: view });
+    await SetLastView(view);
     this.setState({ lastView: view });
-  };
-
-  toggleDebugMode = async (): Promise<void> => {
-    const newDebugMode = !this.state.debugMode;
-    await this.updatePreferences({
-      debugMode: newDebugMode,
-    } as Partial<preferences.AppPreferences & { debugMode: boolean }>);
-    this.setState({ debugMode: newDebugMode });
   };
 
   // Computed getters

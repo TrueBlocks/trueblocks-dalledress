@@ -20,22 +20,23 @@ import (
 
 func (a *App) Reload(payload *types.Payload) error {
 	switch a.GetLastView() {
-	case "/exports":
+	case "exports":
 		return a.ReloadExports(payload)
-	case "/monitors":
+	case "monitors":
 		return a.ReloadMonitors(payload)
-	case "/abis":
+	case "abis":
 		return a.ReloadAbis(payload)
-	case "/names":
+	case "names":
 		return a.ReloadNames(payload)
-	case "/chunks":
+	case "chunks":
 		return a.ReloadChunks(payload)
-	case "/contracts":
+	case "contracts":
 		return a.ReloadContracts(payload)
-	case "/status":
+	case "status":
 		return a.ReloadStatus(payload)
+	default:
+		panic("unknown view in Reload" + a.GetLastView())
 	}
-	return nil
 }
 
 // EXISTING_CODE

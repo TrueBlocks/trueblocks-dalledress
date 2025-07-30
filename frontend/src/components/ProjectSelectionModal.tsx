@@ -7,7 +7,8 @@ import {
   SaveProject,
 } from '@app';
 import { Action } from '@components';
-import { useIconSets } from '@hooks';
+import { useViewContext } from '@contexts';
+import { useActiveProject, useIconSets } from '@hooks';
 import {
   Button,
   Group,
@@ -20,6 +21,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { Log } from '@utils';
+import { useLocation } from 'wouter';
 
 interface ProjectSelectionModalProps {
   opened: boolean;
@@ -46,6 +48,9 @@ export const ProjectSelectionModal = ({
   const [loadingOpen, setLoadingOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { File, Add } = useIconSets();
+  const { restoreProjectFilterStates } = useViewContext();
+  const { lastView } = useActiveProject();
+  const [, navigate] = useLocation();
   const isMounted = useRef(true);
 
   const form = useForm<NewProjectForm>({
@@ -127,6 +132,11 @@ export const ProjectSelectionModal = ({
       // Immediately save the project after creation
       await SaveProject();
 
+      await restoreProjectFilterStates();
+
+      const targetView = lastView || '/';
+      navigate(targetView);
+
       onProjectSelected();
     } catch (err) {
       const errorMsg = `Failed to create project: ${err}`;
@@ -143,6 +153,11 @@ export const ProjectSelectionModal = ({
 
     try {
       await OpenProjectFile(projectPath);
+      await restoreProjectFilterStates();
+
+      const targetView = lastView || '/';
+      navigate(targetView);
+
       onProjectSelected();
     } catch (err) {
       const errorMsg = `Failed to open project: ${err}`;
@@ -160,6 +175,11 @@ export const ProjectSelectionModal = ({
     try {
       // This will trigger the native file picker
       await OpenProjectFile('');
+      await restoreProjectFilterStates();
+
+      const targetView = lastView || '/';
+      navigate(targetView);
+
       onProjectSelected();
     } catch (err) {
       const errorMsg = `Failed to open project: ${err}`;

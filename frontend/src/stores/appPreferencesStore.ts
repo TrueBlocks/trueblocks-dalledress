@@ -12,6 +12,37 @@ import { preferences, types } from '@models';
 import { Log, getAddressString } from '@utils';
 import { SetActiveChain } from 'wailsjs/go/project/Project';
 
+export interface UseActiveProjectReturn {
+  lastTheme: string;
+  lastLanguage: string;
+  menuCollapsed: boolean;
+  helpCollapsed: boolean;
+  debugMode: boolean;
+  loading: boolean;
+  lastProject: string;
+  activeChain: string;
+  activeAddress: string;
+  activeContract: string;
+  lastView: string;
+  lastFacetMap: Record<string, types.DataFacet>;
+  setActiveAddress: (address: string) => Promise<void>;
+  setActiveChain: (chain: string) => Promise<void>;
+  setActiveContract: (contract: string) => Promise<void>;
+  setLastView: (view: string) => Promise<void>;
+  setLastFacet: (view: string, facet: types.DataFacet) => Promise<void>;
+  switchProject: (project: string) => Promise<void>;
+  toggleTheme: () => Promise<void>;
+  changeLanguage: (language: string) => Promise<void>;
+  setMenuCollapsed: (collapsed: boolean) => Promise<void>;
+  setHelpCollapsed: (collapsed: boolean) => Promise<void>;
+  toggleDebugMode: () => Promise<void>;
+  isDarkMode: boolean;
+  hasActiveProject: boolean;
+  canExport: boolean;
+  effectiveAddress: string;
+  effectiveChain: string;
+}
+
 // State interface for simplified preferences (no caching of project data)
 interface AppPreferencesState {
   // UI state (from global preferences)
@@ -55,6 +86,7 @@ class AppPreferencesStore {
   private state: AppPreferencesState = { ...initialState };
   private listeners = new Set<() => void>();
   private isTestMode = false;
+  private cachedSnapshot: UseActiveProjectReturn | null = null;
 
   // Set test mode to skip backend calls
   setTestMode = (testMode: boolean): void => {
@@ -68,6 +100,43 @@ class AppPreferencesStore {
   // Get current state (required by useSyncExternalStore)
   getState = (): AppPreferencesState => {
     return this.state;
+  };
+
+  // Get snapshot for useSyncExternalStore - returns stable reference
+  getSnapshot = (): UseActiveProjectReturn => {
+    if (!this.cachedSnapshot) {
+      this.cachedSnapshot = {
+        lastTheme: this.state.lastTheme,
+        lastLanguage: this.state.lastLanguage,
+        menuCollapsed: this.state.menuCollapsed,
+        helpCollapsed: this.state.helpCollapsed,
+        debugMode: this.state.debugMode,
+        loading: this.state.loading,
+        lastProject: this.state.lastProject,
+        activeChain: this.state.activeChain,
+        activeAddress: this.state.activeAddress,
+        activeContract: this.state.activeContract,
+        lastView: this.state.lastView,
+        lastFacetMap: this.state.lastFacetMap,
+        setActiveAddress: this.setActiveAddress,
+        setActiveChain: this.setActiveChain,
+        setActiveContract: this.setActiveContract,
+        setLastView: this.setLastView,
+        setLastFacet: this.setLastFacet,
+        switchProject: this.switchProject,
+        toggleTheme: this.toggleTheme,
+        changeLanguage: this.changeLanguage,
+        setMenuCollapsed: this.setMenuCollapsed,
+        setHelpCollapsed: this.setHelpCollapsed,
+        toggleDebugMode: this.toggleDebugMode,
+        isDarkMode: this.isDarkMode,
+        hasActiveProject: this.hasActiveProject,
+        canExport: this.canExport,
+        effectiveAddress: this.state.activeAddress,
+        effectiveChain: this.state.activeChain,
+      };
+    }
+    return this.cachedSnapshot;
   };
 
   // Subscribe to state changes (required by useSyncExternalStore)
@@ -88,6 +157,7 @@ class AppPreferencesStore {
   // Internal method to update state and notify listeners
   private setState = (updates: Partial<AppPreferencesState>): void => {
     this.state = { ...this.state, ...updates };
+    this.cachedSnapshot = null; // Invalidate cache when state changes
     this.notify();
   };
 

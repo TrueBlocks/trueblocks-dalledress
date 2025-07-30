@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 
 import { CloseProject, GetOpenProjects, SwitchToProject } from '@app';
 import { Action } from '@components';
-import { useEvent, useIconSets } from '@hooks';
+import { useViewContext } from '@contexts';
+import { useActiveProject, useEvent, useIconSets } from '@hooks';
 import { Group, List, Paper, Text, ThemeIcon, Title } from '@mantine/core';
 import { msgs } from '@models';
 import { Log } from '@utils';
+import { useLocation } from 'wouter';
 
 // TODO: Use Project from project model
 interface Project {
@@ -21,6 +23,9 @@ interface Project {
 export const ProjectsList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const { File } = useIconSets();
+  const { restoreProjectFilterStates } = useViewContext();
+  const { lastView } = useActiveProject();
+  const [, navigate] = useLocation();
 
   const refreshProjects = async () => {
     try {
@@ -54,6 +59,11 @@ export const ProjectsList = () => {
   const handleSwitchProject = async (id: string) => {
     try {
       await SwitchToProject(id);
+      await restoreProjectFilterStates();
+
+      const targetView = lastView || '/';
+      navigate(targetView);
+
       refreshProjects();
     } catch (error) {
       Log(`Error switching projects: ${error}`);

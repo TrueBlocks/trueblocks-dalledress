@@ -37,5 +37,18 @@ func (a *App) Reload(payload *types.Payload) error {
 	}
 }
 
+// GetRegisteredViews returns all registered view names
+func (a *App) GetRegisteredViews() []string {
+	return []string{
+		"exports",
+		"monitors",
+		"abis",
+		"names",
+		"chunks",
+		"contracts",
+		"status",
+	}
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

@@ -5,63 +5,148 @@ import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the store dependency
-vi.mock('@stores', () => ({
-  appPreferencesStore: {
-    subscribe: vi.fn(),
-    getState: vi.fn(() => ({
-      debugMode: false,
+vi.mock('@stores', () => {
+  // Create mock functions inside the factory
+  const mockSetLastFacet = vi.fn();
+  const mockSetActiveAddress = vi.fn();
+  const mockSetActiveChain = vi.fn();
+  const mockSetActiveContract = vi.fn();
+  const mockSwitchProject = vi.fn();
+  const mockToggleTheme = vi.fn();
+  const mockChangeLanguage = vi.fn();
+  const mockSetMenuCollapsed = vi.fn();
+  const mockSetHelpCollapsed = vi.fn();
+  const mockSetLastView = vi.fn();
+  const mockToggleDebugMode = vi.fn();
+
+  return {
+    appPreferencesStore: {
+      subscribe: vi.fn(),
+      getSnapshot: vi.fn(() => ({
+        debugMode: false,
+        isDarkMode: false,
+        hasActiveProject: true,
+        canExport: true,
+        lastFacetMap: {},
+        activeAddress: '0x123',
+        activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+        activeChain: 'mainnet',
+        lastTheme: 'light',
+        lastLanguage: 'en',
+        menuCollapsed: false,
+        helpCollapsed: false,
+        lastView: '/',
+        lastProject: 'test-project',
+        loading: false,
+        effectiveAddress: '0x123',
+        effectiveChain: 'mainnet',
+        setLastFacet: mockSetLastFacet,
+        setActiveAddress: mockSetActiveAddress,
+        setActiveChain: mockSetActiveChain,
+        setActiveContract: mockSetActiveContract,
+        switchProject: mockSwitchProject,
+        toggleTheme: mockToggleTheme,
+        changeLanguage: mockChangeLanguage,
+        setMenuCollapsed: mockSetMenuCollapsed,
+        setHelpCollapsed: mockSetHelpCollapsed,
+        setLastView: mockSetLastView,
+        toggleDebugMode: mockToggleDebugMode,
+      })),
+      getState: vi.fn(() => ({
+        debugMode: false,
+        isDarkMode: false,
+        hasActiveProject: true,
+        canExport: true,
+        lastFacetMap: {},
+        activeAddress: '0x123',
+        activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+        activeChain: 'mainnet',
+        lastTheme: 'light',
+        lastLanguage: 'en',
+        menuCollapsed: false,
+        helpCollapsed: false,
+        lastView: '/',
+        lastProject: 'test-project',
+        loading: false,
+      })),
+      setLastFacet: mockSetLastFacet,
+      setActiveAddress: mockSetActiveAddress,
+      setActiveChain: mockSetActiveChain,
+      setActiveContract: mockSetActiveContract,
+      switchProject: mockSwitchProject,
+      toggleTheme: mockToggleTheme,
+      changeLanguage: mockChangeLanguage,
+      setMenuCollapsed: mockSetMenuCollapsed,
+      setHelpCollapsed: mockSetHelpCollapsed,
+      setLastView: mockSetLastView,
+      toggleDebugMode: mockToggleDebugMode,
       isDarkMode: false,
       hasActiveProject: true,
       canExport: true,
-      lastFacetMap: 'default',
-      activeAddress: '',
-      activeChain: '',
-      theme: 'light',
-      language: 'en',
-      menuCollapsed: false,
-      helpCollapsed: false,
-      lastView: 'default',
-    })),
-    setLastFacet: vi.fn(),
-    setActiveAddress: vi.fn(),
-    setActiveChain: vi.fn(),
-    switchProject: vi.fn(),
-    toggleTheme: vi.fn(),
-    changeLanguage: vi.fn(),
-    setMenuCollapsed: vi.fn(),
-    setHelpCollapsed: vi.fn(),
-    setLastView: vi.fn(),
-    isDarkMode: false,
-    hasActiveProject: true,
-    canExport: true,
-  },
-}));
+      // Export the mock functions so tests can access them
+      _mockFns: {
+        mockSetLastFacet,
+        mockSetActiveAddress,
+        mockSetActiveChain,
+        mockSetActiveContract,
+        mockSwitchProject,
+        mockToggleTheme,
+        mockChangeLanguage,
+        mockSetMenuCollapsed,
+        mockSetHelpCollapsed,
+        mockSetLastView,
+        mockToggleDebugMode,
+      },
+    },
+  };
+});
 
 describe('Preference System Tests (DataFacet refactor preparation)', () => {
   let mockStoreState: any;
+  let mockFns: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Get mock functions from the store
+    mockFns = (appPreferencesStore as any)._mockFns;
 
     mockStoreState = {
       lastProject: 'test-project',
       activeChain: 'mainnet',
       activeAddress: '0x123',
       activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
-      lastTheme: 'dark',
+      lastTheme: 'light',
       lastLanguage: 'en',
-      lastView: 'exports',
+      lastView: '/',
       menuCollapsed: false,
       helpCollapsed: false,
+      debugMode: false,
+      loading: false,
       lastFacetMap: {
         exports: 'transactions' as types.DataFacet,
         chunks: 'chunk-summary' as types.DataFacet,
         monitors: 'txs' as types.DataFacet,
       },
-      loading: false,
+      effectiveAddress: '0x123',
+      effectiveChain: 'mainnet',
+      isDarkMode: false,
+      hasActiveProject: true,
+      canExport: true,
+      setLastFacet: mockFns.mockSetLastFacet,
+      setActiveAddress: mockFns.mockSetActiveAddress,
+      setActiveChain: mockFns.mockSetActiveChain,
+      setActiveContract: mockFns.mockSetActiveContract,
+      switchProject: mockFns.mockSwitchProject,
+      toggleTheme: mockFns.mockToggleTheme,
+      changeLanguage: mockFns.mockChangeLanguage,
+      setMenuCollapsed: mockFns.mockSetMenuCollapsed,
+      setHelpCollapsed: mockFns.mockSetHelpCollapsed,
+      setLastView: mockFns.mockSetLastView,
+      toggleDebugMode: mockFns.mockToggleDebugMode,
     };
 
-    (appPreferencesStore.getState as any).mockReturnValue(mockStoreState);
+    (appPreferencesStore.getSnapshot as any).mockReturnValue(mockStoreState);
     (appPreferencesStore.subscribe as any).mockImplementation(
       (_callback: () => void) => {
         // Mock subscription
@@ -106,7 +191,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
         );
       });
 
-      expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
+      expect(mockFns.mockSetLastFacet).toHaveBeenCalledWith(
         'exports',
         'receipts',
       );
@@ -129,10 +214,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
           await result.current.setLastFacet(route, dataFacet);
         });
 
-        expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
-          route,
-          dataFacet,
-        );
+        expect(mockFns.mockSetLastFacet).toHaveBeenCalledWith(route, dataFacet);
       }
     });
   });
@@ -150,7 +232,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
         },
       };
 
-      (appPreferencesStore.getState as any).mockReturnValue(storedState);
+      (appPreferencesStore.getSnapshot as any).mockReturnValue(storedState);
 
       const { result } = renderHook(() => useActiveProject());
 
@@ -168,7 +250,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
         lastFacetMap: {},
       };
 
-      (appPreferencesStore.getState as any).mockReturnValue(emptyState);
+      (appPreferencesStore.getSnapshot as any).mockReturnValue(emptyState);
 
       const { result } = renderHook(() => useActiveProject());
 
@@ -191,7 +273,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
         );
       });
 
-      expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
+      expect(mockFns.mockSetLastFacet).toHaveBeenCalledWith(
         '/new-route',
         'transactions',
       );
@@ -236,7 +318,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
           );
         });
 
-        expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
+        expect(mockFns.mockSetLastFacet).toHaveBeenCalledWith(
           route,
           'transactions',
         );
@@ -263,7 +345,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
         await Promise.all(promises);
       });
 
-      expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledTimes(3);
+      expect(mockFns.mockSetLastFacet).toHaveBeenCalledTimes(3);
     });
 
     it('handles invalid DataFacet values gracefully', async () => {
@@ -279,7 +361,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
         );
       });
 
-      expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
+      expect(mockFns.mockSetLastFacet).toHaveBeenCalledWith(
         'exports',
         'transactions',
       );
@@ -314,7 +396,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
           exports: 'receipts' as types.DataFacet,
         },
       };
-      (appPreferencesStore.getState as any).mockReturnValue(newState);
+      (appPreferencesStore.getSnapshot as any).mockReturnValue(newState);
 
       // Trigger subscription callback to simulate store change
       if (subscriptionCallback) {

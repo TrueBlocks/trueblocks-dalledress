@@ -209,6 +209,25 @@ func (a *App) SwitchToProject(id string) error {
 	return a.Projects.SetActiveProject(id)
 }
 
+// RestoreProjectContext restores the full context for the specified project
+func (a *App) RestoreProjectContext(projectID string) error {
+	if err := a.SwitchToProject(projectID); err != nil {
+		return err
+	}
+
+	project := a.GetActiveProject()
+	if project == nil {
+		return fmt.Errorf("failed to get active project after switching to %s", projectID)
+	}
+
+	a.Preferences.App.LastProject = projectID
+	if err := a.SetAppPreferences(&a.Preferences.App); err != nil {
+		return fmt.Errorf("failed to update app preferences: %w", err)
+	}
+
+	return nil
+}
+
 // CloseProject closes a project, prompting to save if it has unsaved changes
 func (a *App) CloseProject(id string) error {
 	project := a.Projects.GetProjectByID(id)

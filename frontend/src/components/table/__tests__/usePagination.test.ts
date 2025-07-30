@@ -12,6 +12,7 @@ const baseMockContext = {
   updateSorting: vi.fn(),
   getFiltering: vi.fn(),
   updateFiltering: vi.fn(),
+  restoreProjectFilterStates: vi.fn(),
 };
 
 describe('usePagination', () => {

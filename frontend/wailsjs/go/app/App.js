@@ -186,6 +186,14 @@ export function GetProjectAddress() {
   return window['go']['app']['App']['GetProjectAddress']();
 }
 
+export function GetProjectViewState(arg1) {
+  return window['go']['app']['App']['GetProjectViewState'](arg1);
+}
+
+export function GetRegisteredViews() {
+  return window['go']['app']['App']['GetRegisteredViews']();
+}
+
 export function GetStatusPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetStatusPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -298,6 +306,10 @@ export function ResetStore(arg1) {
   return window['go']['app']['App']['ResetStore'](arg1);
 }
 
+export function RestoreProjectContext(arg1) {
+  return window['go']['app']['App']['RestoreProjectContext'](arg1);
+}
+
 export function SaveBounds(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['SaveBounds'](arg1, arg2, arg3, arg4);
 }
@@ -364,6 +376,10 @@ export function SetOrgPreferences(arg1) {
 
 export function SetProjectAddress(arg1) {
   return window['go']['app']['App']['SetProjectAddress'](arg1);
+}
+
+export function SetProjectViewState(arg1, arg2) {
+  return window['go']['app']['App']['SetProjectViewState'](arg1, arg2);
 }
 
 export function SetTheme(arg1) {

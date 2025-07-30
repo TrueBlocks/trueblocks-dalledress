@@ -7,7 +7,13 @@ import {
   useState,
 } from 'react';
 
-import { project, sdk } from '@models';
+import {
+  GetProjectViewState,
+  GetRegisteredViews,
+  SetProjectViewState,
+} from '@app';
+import { project, sdk, types } from '@models';
+import { Log } from '@utils';
 
 import { viewStateKeyToString } from '.';
 import { createEmptySortSpec } from '../utils/sortSpec';
@@ -29,7 +35,7 @@ export interface NavigationContext {
   deletingRowIndex: number;
   deletingRowId: string;
   currentPageData: Record<string, unknown>[];
-  // Performance hints
+
   isOnlyRowOnPage: boolean;
   isFirstRowOnPage: boolean;
   isLastRowOnPage: boolean;
@@ -83,6 +89,7 @@ interface ViewContextType {
   ) => void;
   getFiltering: (viewStateKey: project.ViewStateKey) => string;
   updateFiltering: (viewStateKey: project.ViewStateKey, filter: string) => void;
+  restoreProjectFilterStates: () => Promise<void>;
 }
 
 export const ViewContext = createContext<ViewContextType>({
@@ -94,6 +101,7 @@ export const ViewContext = createContext<ViewContextType>({
   updateSorting: () => {},
   getFiltering: () => '',
   updateFiltering: () => {},
+  restoreProjectFilterStates: async () => {},
 });
 
 export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
@@ -144,26 +152,136 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
           [key]: sort,
         };
       });
+
+      // Fire-and-forget background persistence
+      (async () => {
+        try {
+          const viewStates = await GetProjectViewState(viewStateKey.viewName);
+          const facetName = viewStateKey.facetName;
+
+          const existingState = viewStates[facetName] || {
+            sorting: {},
+            filtering: {},
+            other: {},
+          };
+
+          const updatedState: project.FilterState = {
+            ...existingState,
+            sorting: {
+              ...(existingState.sorting || {}),
+              sortSpec: sort,
+            },
+          };
+
+          const updatedViewStates = {
+            ...viewStates,
+            [facetName]: updatedState,
+          };
+
+          await SetProjectViewState(viewStateKey.viewName, updatedViewStates);
+        } catch (error) {
+          Log(`Failed to persist sorting state to backend: ${error}`);
+        }
+      })();
     },
     [],
   );
 
   const getFiltering = useCallback(
     (viewStateKey: project.ViewStateKey) => {
-      return viewFiltering[viewStateKey.viewName] || '';
+      const key = viewStateKeyToString(viewStateKey);
+      return viewFiltering[key] || '';
     },
     [viewFiltering],
   );
 
   const updateFiltering = useCallback(
     (viewStateKey: project.ViewStateKey, filter: string) => {
+      const key = viewStateKeyToString(viewStateKey);
       setViewFiltering((prev) => ({
         ...prev,
-        [viewStateKey.viewName]: filter,
+        [key]: filter,
       }));
+
+      // Fire-and-forget background persistence
+      (async () => {
+        try {
+          const viewStates = await GetProjectViewState(viewStateKey.viewName);
+          const facetName = viewStateKey.facetName;
+
+          const existingState = viewStates[facetName] || {
+            sorting: {},
+            filtering: {},
+            other: {},
+          };
+
+          const updatedState: project.FilterState = {
+            ...existingState,
+            filtering: {
+              ...(existingState.filtering || {}),
+              searchTerm: filter,
+            },
+          };
+
+          const updatedViewStates = {
+            ...viewStates,
+            [facetName]: updatedState,
+          };
+
+          await SetProjectViewState(viewStateKey.viewName, updatedViewStates);
+        } catch (error) {
+          Log(`Failed to persist filtering state to backend: ${error}`);
+        }
+      })();
     },
     [],
   );
+
+  const restoreProjectFilterStates = useCallback(async () => {
+    try {
+      const viewNames = await GetRegisteredViews();
+
+      for (const viewName of viewNames) {
+        try {
+          const viewStates = await GetProjectViewState(viewName);
+
+          Object.entries(viewStates).forEach(([facetName, filterState]) => {
+            if (filterState.sorting?.sortSpec) {
+              const viewStateKey: project.ViewStateKey = {
+                viewName,
+                facetName: facetName as types.DataFacet,
+              };
+              const key = viewStateKeyToString(viewStateKey);
+
+              setViewSorting((prev) => ({
+                ...prev,
+                [key]: filterState.sorting?.sortSpec || null,
+              }));
+            }
+
+            if (filterState.filtering?.searchTerm) {
+              const viewStateKey: project.ViewStateKey = {
+                viewName,
+                facetName: facetName as types.DataFacet,
+              };
+              const key = viewStateKeyToString(viewStateKey);
+
+              setViewFiltering((prev) => ({
+                ...prev,
+                [key]: filterState.filtering?.searchTerm || '',
+              }));
+            }
+          });
+        } catch (viewError) {
+          Log(`No stored state for view ${viewName}: ${viewError}`);
+        }
+      }
+
+      setViewPagination({});
+    } catch (error) {
+      Log(`Failed to restore project filter states: ${error}`);
+    }
+  }, []);
 
   const contextValue = useMemo(
     () => ({
@@ -175,6 +293,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
       updateSorting,
       getFiltering,
       updateFiltering,
+      restoreProjectFilterStates,
     }),
     [
       currentView,
@@ -185,6 +304,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
       updateSorting,
       getFiltering,
       updateFiltering,
+      restoreProjectFilterStates,
     ],
   );
 
@@ -220,8 +340,8 @@ export const useSorting = (viewStateKey: project.ViewStateKey) => {
   return useMemo(() => ({ sort, setSorting }), [sort, setSorting]);
 };
 
-// Hook for filtering state (per-view)
-// Uses only viewName from ViewStateKey to scope filtering per view
+// Hook for filtering state (per-facet)
+// Uses full ViewStateKey (viewName + facetName) to scope filtering per facet
 export const useFiltering = (viewStateKey: project.ViewStateKey) => {
   const { getFiltering, updateFiltering } = useViewContext();
 

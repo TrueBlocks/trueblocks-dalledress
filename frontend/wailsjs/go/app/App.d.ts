@@ -110,6 +110,10 @@ export function GetOrgPreferences():Promise<preferences.OrgPreferences>;
 
 export function GetProjectAddress():Promise<base.Address>;
 
+export function GetProjectViewState(arg1:string):Promise<Record<string, project.FilterState>>;
+
+export function GetRegisteredViews():Promise<Array<string>>;
+
 export function GetStatusPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<status.StatusPage>;
 
 export function GetStatusSummary(arg1:types.Payload):Promise<types.Summary>;
@@ -166,6 +170,8 @@ export function RemoveAddressFromProject(arg1:base.Address):Promise<void>;
 
 export function ResetStore(arg1:string):Promise<void>;
 
+export function RestoreProjectContext(arg1:string):Promise<void>;
+
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 
 export function SaveProject():Promise<void>;
@@ -199,6 +205,8 @@ export function SetMenuCollapsed(arg1:boolean):Promise<void>;
 export function SetOrgPreferences(arg1:preferences.OrgPreferences):Promise<void>;
 
 export function SetProjectAddress(arg1:base.Address):Promise<void>;
+
+export function SetProjectViewState(arg1:string,arg2:Record<string, project.FilterState>):Promise<void>;
 
 export function SetTheme(arg1:string):Promise<void>;
 

@@ -7,28 +7,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
 )
 
-// Reload dispatches reload requests to the appropriate view-specific reload function
-func (a *App) Reload(payload *types.Payload) error {
-	switch a.GetLastView() {
-	case "exports":
-		return a.ReloadExports(payload)
-	case "monitors":
-		return a.ReloadMonitors(payload)
-	case "abis":
-		return a.ReloadAbis(payload)
-	case "names":
-		return a.ReloadNames(payload)
-	case "chunks":
-		return a.ReloadChunks(payload)
-	case "contracts":
-		return a.ReloadContracts(payload)
-	case "status":
-		return a.ReloadStatus(payload)
-	default:
-		panic("unknown view in Reload" + a.GetLastView())
-	}
-}
-
 // NameFromAddress resolves an Ethereum address to a named entity if one exists
 func (a *App) NameFromAddress(address string) (*names.Name, bool) {
 	collection := names.GetNamesCollection(&types.Payload{})

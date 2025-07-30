@@ -18,12 +18,20 @@ import (
 // Reload dispatches reload requests to the appropriate view-specific reload function
 func (a *App) Reload(payload *types.Payload) error {
 	switch a.GetLastView() {
-	{{- range .Structures }}
-	{{- if and (not (eq .Class "")) (not .DisableGo) }}
-	case "{{ toLower .Class }}":
-		return a.Reload{{ .Class }}(payload)
-	{{- end }}
-	{{- end }}
+	case "exports":
+		return a.ReloadExports(payload)
+	case "monitors":
+		return a.ReloadMonitors(payload)
+	case "abis":
+		return a.ReloadAbis(payload)
+	case "names":
+		return a.ReloadNames(payload)
+	case "chunks":
+		return a.ReloadChunks(payload)
+	case "contracts":
+		return a.ReloadContracts(payload)
+	case "status":
+		return a.ReloadStatus(payload)
 	default:
 		panic("unknown view in Reload" + a.GetLastView())
 	}

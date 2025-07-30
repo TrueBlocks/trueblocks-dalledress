@@ -31,11 +31,8 @@ import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { names } from '@models';
 import { msgs, project, types } from '@models';
-import { Debugger, Log, useErrorHandler } from '@utils';
+import { Debugger, useErrorHandler } from '@utils';
 
-import { TransactionReviewModal } from '../contracts/components/TransactionReviewModal';
-import { PreparedTransaction } from '../contracts/components/transactionBuilder';
-import { useWalletConnection } from '../contracts/components/walletConnection';
 import { getColumns } from './columns';
 import { namesFacets } from './facets';
 
@@ -162,7 +159,7 @@ export const Names = () => {
   const enabledActions = useMemo(() => {
     const currentFacet = getCurrentDataFacet();
     if (currentFacet === types.DataFacet.CUSTOM) {
-      const actions = [
+      return [
         'add',
         'publish',
         'pin',
@@ -171,19 +168,13 @@ export const Names = () => {
         'autoname',
         'update',
       ] as ActionType[];
-      Log('Enabled actions for CUSTOM facet:', JSON.stringify(actions));
-      return actions;
     }
     if (currentFacet === types.DataFacet.BADDRESS) {
-      const actions = ['add'] as ActionType[];
-      Log('Enabled actions for BADDRESS facet:', JSON.stringify(actions));
-      return actions;
+      return ['add'] as ActionType[];
     }
-    const actions = ['add', 'autoname', 'update'] as ActionType[];
-    Log('Enabled actions for other facets:', JSON.stringify(actions));
-    return actions;
+    return ['add', 'autoname', 'update'] as ActionType[];
   }, [getCurrentDataFacet]);
-  const { handlers, config, transactionModal } = useActions({
+  const { handlers, config } = useActions({
     collection: 'names',
     viewStateKey,
     pagination,
@@ -208,38 +199,6 @@ export const Names = () => {
     createPayload,
     getCurrentDataFacet,
   });
-
-  const { sendTransaction } = useWalletConnection({
-    onTransactionSigned: (txHash) => {
-      Log(`Transaction signed successfully: ${txHash}`);
-      emitSuccess('publish', `Transaction signed: ${txHash}`);
-    },
-    onError: (error) => {
-      Log(`Transaction failed: ${error}`);
-      handleError(new Error(error), 'Transaction failed');
-    },
-  });
-
-  const handleTransactionConfirm = useCallback(
-    async (preparedTx: PreparedTransaction) => {
-      try {
-        await sendTransaction(preparedTx);
-      } catch (error) {
-        handleError(error as Error, 'Failed to send transaction');
-      }
-    },
-    [sendTransaction, handleError],
-  );
-
-  useEffect(() => {
-    Log(
-      'Transaction modal state changed:',
-      JSON.stringify({
-        opened: transactionModal.opened,
-        hasTransactionData: !!transactionModal.transactionData,
-      }),
-    );
-  }, [transactionModal]);
 
   const {
     handleAutoname: originalHandleAutoname,
@@ -406,12 +365,6 @@ export const Names = () => {
         title={confirmModal.title}
         message={confirmModal.message}
         dialogKey="confirmNamesModal"
-      />
-      <TransactionReviewModal
-        opened={transactionModal.opened}
-        onClose={transactionModal.onClose}
-        transactionData={transactionModal.transactionData}
-        onConfirm={handleTransactionConfirm}
       />
     </div>
   );

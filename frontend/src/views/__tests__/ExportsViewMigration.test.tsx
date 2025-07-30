@@ -49,7 +49,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
       activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
       lastTheme: 'dark',
       lastLanguage: 'en',
-      lastView: '/exports',
+      lastView: 'exports',
       menuCollapsed: false,
       helpCollapsed: false,
       loading: false,
@@ -62,7 +62,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     it('should initialize with default transactions facet', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: exportsFacets,
         }),
       );
@@ -74,11 +74,11 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     });
 
     it('should restore saved facet from preferences', () => {
-      mockLastFacetMap['/exports'] = 'statements';
+      mockLastFacetMap['exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: exportsFacets,
         }),
       );
@@ -92,7 +92,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     it('should support switching between all export facets', async () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: exportsFacets,
         }),
       );
@@ -102,14 +102,14 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
         result.current.setActiveFacet(types.DataFacet.TRANSFERS);
       });
 
-      expect(mockSetLastFacet).toHaveBeenCalledWith('/exports', 'transfers');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('exports', 'transfers');
 
       // Switch to balances
       await act(async () => {
         result.current.setActiveFacet(types.DataFacet.BALANCES);
       });
 
-      expect(mockSetLastFacet).toHaveBeenCalledWith('/exports', 'balances');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('exports', 'balances');
 
       // Verify all expected calls were made
       expect(mockSetLastFacet).toHaveBeenCalledTimes(2);
@@ -118,7 +118,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     it('should provide all available facets', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: exportsFacets,
         }),
       );
@@ -133,11 +133,11 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     });
 
     it('should handle ViewStateKey generation', () => {
-      mockLastFacetMap['/exports'] = 'balances';
+      mockLastFacetMap['exports'] = 'balances';
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: exportsFacets,
         }),
       );
@@ -147,11 +147,11 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
 
       // Test the pattern the view will use
       const viewStateKey = {
-        viewName: '/exports',
+        viewName: 'exports',
         facetName: result.current.activeFacet,
       };
       expect(viewStateKey).toEqual({
-        viewName: '/exports',
+        viewName: 'exports',
         facetName: types.DataFacet.BALANCES,
       });
     });
@@ -160,11 +160,11 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
   describe('state management integration', () => {
     it('should maintain facet state across preference updates', () => {
       // Set initial preference
-      mockLastFacetMap['/exports'] = 'transfers';
+      mockLastFacetMap['exports'] = 'transfers';
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: exportsFacets,
         }),
       );
@@ -174,11 +174,11 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     });
 
     it('should fallback to default for invalid saved facets', () => {
-      mockLastFacetMap['/exports'] = 'INVALID_FACET';
+      mockLastFacetMap['exports'] = 'INVALID_FACET';
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: exportsFacets,
         }),
       );

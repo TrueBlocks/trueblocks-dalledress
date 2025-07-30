@@ -19,11 +19,11 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
   describe('usePagination with ViewStateKey', () => {
     it('creates unique pagination state for different ViewStateKey combinations', () => {
       const exportsTransactionsKey: project.ViewStateKey = {
-        viewName: '/exports',
+        viewName: 'exports',
         facetName: types.DataFacet.ALL,
       };
       const exportsReceiptsKey: project.ViewStateKey = {
-        viewName: '/exports',
+        viewName: 'exports',
         facetName: types.DataFacet.CUSTOM,
       };
 
@@ -44,7 +44,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
     it('handles ViewStateKey patterns used across all views', () => {
       const testKeys: project.ViewStateKey[] = [
-        { viewName: '/names', facetName: types.DataFacet.ALL },
+        { viewName: 'names', facetName: types.DataFacet.ALL },
       ];
 
       testKeys.forEach((key) => {
@@ -59,11 +59,11 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     it('maintains state isolation between different views with same facetName', () => {
       // Test case where different views might use the same facetName (DataFacet value)
       const exportsKey: project.ViewStateKey = {
-        viewName: '/exports',
+        viewName: 'exports',
         facetName: types.DataFacet.ALL,
       };
       const namesKey: project.ViewStateKey = {
-        viewName: '/names',
+        viewName: 'names',
         facetName: types.DataFacet.CUSTOM,
       };
 
@@ -80,7 +80,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
   describe('ViewStateKey creation patterns', () => {
     it('tests ViewStateKey uniqueness across all combinations', () => {
-      const routes = ['/exports', '/chunks', '/monitors', '/names', '/abis'];
+      const routes = ['exports', 'chunks', 'monitors', 'names', 'abis'];
       const facets = [
         'transactions',
         'receipts',
@@ -131,7 +131,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
   describe('Multi-hook integration', () => {
     it('tests ViewStateKey sharing between pagination, sorting, and filtering hooks', () => {
       const testKey: project.ViewStateKey = {
-        viewName: '/exports',
+        viewName: 'exports',
         facetName: types.DataFacet.ALL,
       };
 
@@ -147,14 +147,14 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
       expect(paginationResult.current.setTotalItems).toBeInstanceOf(Function);
 
       // Verify the key structure is maintained
-      expect(testKey.viewName).toBe('/exports');
+      expect(testKey.viewName).toBe('exports');
       expect(testKey.facetName).toBe('all');
     });
 
     it('handles ViewStateKey memoization patterns from views', () => {
       let currentDataFacet = types.DataFacet.ALL;
       const getMemoizedKey = (): project.ViewStateKey => ({
-        viewName: '/exports',
+        viewName: 'exports',
         facetName: currentDataFacet,
       });
 

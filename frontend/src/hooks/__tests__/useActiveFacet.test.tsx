@@ -45,7 +45,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
       activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
       lastTheme: 'dark',
       lastLanguage: 'en',
-      lastView: '/exports',
+      lastView: 'exports',
       menuCollapsed: false,
       helpCollapsed: false,
       loading: false,
@@ -56,7 +56,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     it('should initialize with default facet when no preference saved', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );
@@ -68,7 +68,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     it('should use provided default facet override', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );
@@ -77,11 +77,11 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should restore saved preference via backend API mapping', () => {
-      mockLastFacetMap['/exports'] = 'statements';
+      mockLastFacetMap['exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );
@@ -94,7 +94,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     it('should change active facet and persist backend API value to preferences', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );
@@ -103,7 +103,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
         result.current.setActiveFacet('receipts' as DataFacet);
       });
 
-      expect(mockSetLastFacet).toHaveBeenCalledWith('/exports', 'receipts');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('exports', 'receipts');
     });
   });
 
@@ -111,7 +111,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     it('should return correct facet configuration', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );
@@ -126,7 +126,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     it('should provide available facets', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );
@@ -136,11 +136,11 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should check if facet is active correctly', () => {
-      mockLastFacetMap['/exports'] = 'statements';
+      mockLastFacetMap['exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );
@@ -154,11 +154,11 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
 
   describe('backward compatibility', () => {
     it('should provide correct backend API value for current facet', () => {
-      mockLastFacetMap['/exports'] = 'statements';
+      mockLastFacetMap['exports'] = 'statements';
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );
@@ -177,7 +177,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: facetsWithoutApiMapping,
         }),
       );
@@ -190,7 +190,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     it('should handle empty facets array', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: [],
         }),
       );
@@ -200,11 +200,11 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should handle invalid saved preference', () => {
-      mockLastFacetMap['/exports'] = 'INVALID_DATAFACET';
+      mockLastFacetMap['exports'] = 'INVALID_DATAFACET';
 
       const { result } = renderHook(() =>
         useActiveFacet({
-          viewRoute: '/exports',
+          viewRoute: 'exports',
           facets: sampleFacets,
         }),
       );

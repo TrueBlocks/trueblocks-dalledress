@@ -114,15 +114,15 @@ describe('BaseTab', () => {
     it('handles ViewStateKey creation patterns used in views', () => {
       // Simulate the pattern used in actual views: { viewName: /route, facetName: dataFacet }
       const chunksKey: project.ViewStateKey = {
-        viewName: '/chunks',
+        viewName: 'chunks',
         facetName: types.DataFacet.ALL,
       };
       const monitorsKey: project.ViewStateKey = {
-        viewName: '/monitors',
+        viewName: 'monitors',
         facetName: types.DataFacet.CUSTOM,
       };
       const abisKey: project.ViewStateKey = {
-        viewName: '/abis',
+        viewName: 'abis',
         facetName: types.DataFacet.PREFUND,
       };
 
@@ -145,7 +145,7 @@ describe('BaseTab', () => {
 
     it('properly forwards ViewStateKey to Table component', () => {
       const testKey: project.ViewStateKey = {
-        viewName: '/names',
+        viewName: 'names',
         facetName: types.DataFacet.CUSTOM,
       };
 
@@ -168,15 +168,15 @@ describe('BaseTab', () => {
 
     // it('handles ViewStateKey uniqueness requirements', () => {
     //   const key1: project.ViewStateKey = {
-    //     viewName: '/exports',
+    //     viewName: 'exports',
     //     facetName: types.DataFacet.ALL,
     //   };
     //   const key2: project.ViewStateKey = {
-    //     viewName: '/exports',
+    //     viewName: 'exports',
     //     facetName: types.DataFacet.CUSTOM,
     //   };
     //   const key3: project.ViewStateKey = {
-    //     viewName: '/names',
+    //     viewName: 'names',
     //     facetName: types.DataFacet.REGULAR,
     //   }; // same facetName, different view
 

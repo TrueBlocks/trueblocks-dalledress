@@ -50,13 +50,13 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
       lastTheme: 'dark',
       lastLanguage: 'en',
-      lastView: '/exports',
+      lastView: 'exports',
       menuCollapsed: false,
       helpCollapsed: false,
       lastFacetMap: {
-        '/exports': 'transactions' as types.DataFacet,
-        '/chunks': 'chunk-summary' as types.DataFacet,
-        '/monitors': 'txs' as types.DataFacet,
+        exports: 'transactions' as types.DataFacet,
+        chunks: 'chunk-summary' as types.DataFacet,
+        monitors: 'txs' as types.DataFacet,
       },
       loading: false,
     };
@@ -75,15 +75,15 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       const { result } = renderHook(() => useActiveProject());
 
       expect(result.current.lastFacetMap).toEqual({
-        '/exports': 'transactions',
-        '/chunks': 'chunk-summary',
-        '/monitors': 'txs',
+        exports: 'transactions',
+        chunks: 'chunk-summary',
+        monitors: 'txs',
       });
 
       // Verify specific route lookups
-      expect(result.current.lastFacetMap['/exports']).toBe('transactions');
-      expect(result.current.lastFacetMap['/chunks']).toBe('chunk-summary');
-      expect(result.current.lastFacetMap['/monitors']).toBe('txs');
+      expect(result.current.lastFacetMap['exports']).toBe('transactions');
+      expect(result.current.lastFacetMap['chunks']).toBe('chunk-summary');
+      expect(result.current.lastFacetMap['monitors']).toBe('txs');
     });
 
     it('handles missing lastFacetMap entries gracefully', () => {
@@ -91,8 +91,8 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       const { result } = renderHook(() => useActiveProject());
 
       // Routes not in the stored lastFacetMap should return undefined
-      expect(result.current.lastFacetMap['/names']).toBeUndefined();
-      expect(result.current.lastFacetMap['/abis']).toBeUndefined();
+      expect(result.current.lastFacetMap['names']).toBeUndefined();
+      expect(result.current.lastFacetMap['abis']).toBeUndefined();
       expect(result.current.lastFacetMap['/unknown-route']).toBeUndefined();
     });
 
@@ -101,13 +101,13 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
 
       await act(async () => {
         await result.current.setLastFacet(
-          '/exports',
+          'exports',
           'receipts' as types.DataFacet,
         );
       });
 
       expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
-        '/exports',
+        'exports',
         'receipts',
       );
     });
@@ -116,12 +116,12 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       const { result } = renderHook(() => useActiveProject());
 
       const testCases: Array<[string, types.DataFacet]> = [
-        ['/exports', types.DataFacet.ALL],
-        ['/exports', 'receipts' as types.DataFacet],
-        ['/chunks', 'chunk-summary' as types.DataFacet],
-        ['/monitors', 'txs' as types.DataFacet],
-        ['/names', 'entity-names' as types.DataFacet],
-        ['/abis', 'get-abis' as types.DataFacet],
+        ['exports', types.DataFacet.ALL],
+        ['exports', 'receipts' as types.DataFacet],
+        ['chunks', 'chunk-summary' as types.DataFacet],
+        ['monitors', 'txs' as types.DataFacet],
+        ['names', 'entity-names' as types.DataFacet],
+        ['abis', 'get-abis' as types.DataFacet],
       ];
 
       for (const [route, dataFacet] of testCases) {
@@ -143,10 +143,10 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       const storedState = {
         ...mockStoreState,
         lastFacetMap: {
-          '/exports': 'receipts' as types.DataFacet,
-          '/chunks': 'chunk-summary' as types.DataFacet,
-          '/monitors': 'txs' as types.DataFacet,
-          '/names': 'entity-names' as types.DataFacet,
+          exports: 'receipts' as types.DataFacet,
+          chunks: 'chunk-summary' as types.DataFacet,
+          monitors: 'txs' as types.DataFacet,
+          names: 'entity-names' as types.DataFacet,
         },
       };
 
@@ -155,10 +155,10 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       const { result } = renderHook(() => useActiveProject());
 
       expect(result.current.lastFacetMap).toEqual({
-        '/exports': 'receipts',
-        '/chunks': 'chunk-summary',
-        '/monitors': 'txs',
-        '/names': 'entity-names',
+        exports: 'receipts',
+        chunks: 'chunk-summary',
+        monitors: 'txs',
+        names: 'entity-names',
       });
     });
 
@@ -209,8 +209,8 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       expect(Array.isArray(lastFacetMap)).toBe(false);
 
       // Test the lookup pattern
-      const exportsTab = lastFacetMap['/exports'] || 'transactions';
-      const unknownTab = lastFacetMap['/unknown'] || 'default-facet';
+      const exportsTab = lastFacetMap['exports'] || 'transactions';
+      const unknownTab = lastFacetMap['unknown'] || 'default-facet';
 
       expect(exportsTab).toBe('transactions');
       expect(unknownTab).toBe('default-facet');
@@ -249,12 +249,12 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       // Simulate rapid tab switching
       const promises = [
         result.current.setLastFacet(
-          '/exports',
+          'exports',
           'transactions' as types.DataFacet,
         ),
-        result.current.setLastFacet('/exports', 'receipts' as types.DataFacet),
+        result.current.setLastFacet('exports', 'receipts' as types.DataFacet),
         result.current.setLastFacet(
-          '/chunks',
+          'chunks',
           'chunk-summary' as types.DataFacet,
         ),
       ];
@@ -274,13 +274,13 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
 
       await act(async () => {
         await result.current.setLastFacet(
-          '/exports',
+          'exports',
           'transactions' as types.DataFacet,
         );
       });
 
       expect(appPreferencesStore.setLastFacet as any).toHaveBeenCalledWith(
-        '/exports',
+        'exports',
         'transactions',
       );
     });
@@ -301,9 +301,9 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
 
       // Initial state
       expect(result.current.lastFacetMap).toEqual({
-        '/exports': 'transactions',
-        '/chunks': 'chunk-summary',
-        '/monitors': 'txs',
+        exports: 'transactions',
+        chunks: 'chunk-summary',
+        monitors: 'txs',
       });
 
       // Simulate store update
@@ -311,7 +311,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
         ...mockStoreState,
         lastFacetMap: {
           ...mockStoreState.lastFacetMap,
-          '/exports': 'receipts' as types.DataFacet,
+          exports: 'receipts' as types.DataFacet,
         },
       };
       (appPreferencesStore.getState as any).mockReturnValue(newState);
@@ -324,7 +324,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       }
 
       // State should remain consistent
-      expect(result.current.lastFacetMap['/exports']).toBe('receipts');
+      expect(result.current.lastFacetMap['exports']).toBe('receipts');
     });
   });
 });

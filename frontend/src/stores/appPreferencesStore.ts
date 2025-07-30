@@ -243,7 +243,6 @@ class AppPreferencesStore {
   setActiveAddress = async (address: string): Promise<void> => {
     const convertedAddress = await ConvertToAddress(address);
     if (convertedAddress && typeof convertedAddress === 'object') {
-      // await this.updatePreferences({ activeAddress: address });
       await SetActiveAddress(convertedAddress);
       this.setState({ activeAddress: address });
     } else {
@@ -252,13 +251,11 @@ class AppPreferencesStore {
   };
 
   setActiveChain = async (chain: string): Promise<void> => {
-    // await this.updatePreferences({ activeChain: chain });
     await SetActiveChain(chain);
     this.setState({ activeChain: chain });
   };
 
   setActiveContract = async (contract: string): Promise<void> => {
-    // await this.updatePreferences({ activeContract: contract });
     await SetActiveContract(contract);
     this.setState({ activeContract: contract });
   };
@@ -274,7 +271,6 @@ class AppPreferencesStore {
   };
 
   setLastView = async (view: string): Promise<void> => {
-    // await this.updatePreferences({ lastView: view });
     await SetLastView(view);
     this.setState({ lastView: view });
   };

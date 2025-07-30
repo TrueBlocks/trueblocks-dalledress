@@ -23,7 +23,7 @@ describe('Cross-View Integration Tests (DataFacet refactor preparation)', () => 
     });
 
     it('should persist facets independently per route', () => {
-      // Test that lastFacetMap['/exports'] ≠ lastFacetMap['/names']
+      // Test that lastFacetMap['exports'] ≠ lastFacetMap['names']
       // Placeholder for future implementation
       expect(true).toBe(true);
     });

@@ -60,7 +60,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          viewRoute: '/names',
+          viewRoute: 'names',
         }),
       );
 
@@ -73,7 +73,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          viewRoute: '/names',
+          viewRoute: 'names',
         }),
       );
 
@@ -86,16 +86,16 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       });
 
       // Verify the preference was set correctly
-      expect(mockSetLastFacet).toHaveBeenCalledWith('/names', 'prefund');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('names', 'prefund');
 
       // Update mock to simulate preference persistence
-      mockLastFacetMap['/names'] = 'prefund';
+      mockLastFacetMap['names'] = 'prefund';
 
       // Re-render hook with updated preferences
       const { result: result2 } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          viewRoute: '/names',
+          viewRoute: 'names',
         }),
       );
 
@@ -104,12 +104,12 @@ describe('Names View + useActiveFacet Integration Tests', () => {
     });
 
     it('respects saved preferences for Names view', () => {
-      mockLastFacetMap['/names'] = 'custom';
+      mockLastFacetMap['names'] = 'custom';
 
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          viewRoute: '/names',
+          viewRoute: 'names',
         }),
       );
 
@@ -121,7 +121,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          viewRoute: '/names',
+          viewRoute: 'names',
         }),
       );
 
@@ -129,7 +129,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         result.current.setActiveFacet('baddress' as DataFacet);
       });
 
-      expect(mockSetLastFacet).toHaveBeenCalledWith('/names', 'baddress');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('names', 'baddress');
     });
 
     it('handles all Names view facets correctly', () => {
@@ -144,12 +144,12 @@ describe('Names View + useActiveFacet Integration Tests', () => {
 
       facetMappings.forEach(({ facet, dataFacet }) => {
         // Set up mock with this facet as saved preference
-        mockLastFacetMap['/names'] = dataFacet;
+        mockLastFacetMap['names'] = dataFacet;
 
         const { result } = renderHook(() =>
           useActiveFacet({
             facets: namesFacets,
-            viewRoute: '/names',
+            viewRoute: 'names',
           }),
         );
 
@@ -164,7 +164,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          viewRoute: '/names',
+          viewRoute: 'names',
         }),
       );
 
@@ -182,7 +182,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          viewRoute: '/names',
+          viewRoute: 'names',
         }),
       );
 
@@ -209,7 +209,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       const { result } = renderHook(() =>
         useActiveFacet({
           facets: namesFacets,
-          viewRoute: '/names',
+          viewRoute: 'names',
         }),
       );
 
@@ -218,7 +218,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         result.current.setActiveFacet('custom' as DataFacet);
       });
 
-      expect(mockSetLastFacet).toHaveBeenCalledWith('/names', 'custom');
+      expect(mockSetLastFacet).toHaveBeenCalledWith('names', 'custom');
     });
   });
 });

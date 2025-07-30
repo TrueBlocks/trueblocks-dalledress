@@ -56,6 +56,8 @@ export function GetAbisSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetActiveProject():Promise<project.Project>;
 
+export function GetActiveProjectData():Promise<types.ProjectPayload>;
+
 export function GetActiveProjectPath():Promise<string>;
 
 export function GetAppId():Promise<preferences.Id>;
@@ -177,6 +179,8 @@ export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Prom
 export function SaveProject():Promise<void>;
 
 export function SetActiveAddress(arg1:base.Address):Promise<void>;
+
+export function SetActiveChain(arg1:string):Promise<void>;
 
 export function SetActiveContract(arg1:string):Promise<void>;
 

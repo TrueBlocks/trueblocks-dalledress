@@ -111,3 +111,11 @@ func (a *App) SetProjectViewState(viewName string, states map[string]project.Fil
 
 	return fmt.Errorf("no active project")
 }
+
+// SetActiveChain sets the active chain in the active project
+func (a *App) SetActiveChain(chain string) error {
+	if active := a.GetActiveProject(); active != nil {
+		return active.SetActiveChain(chain)
+	}
+	return fmt.Errorf("no active project")
+}

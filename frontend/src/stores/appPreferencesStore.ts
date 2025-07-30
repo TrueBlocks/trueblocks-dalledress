@@ -1,16 +1,16 @@
 import {
   ConvertToAddress,
-  GetActiveProject,
+  GetActiveProjectData,
   GetAppPreferences,
   SetActiveAddress,
+  SetActiveChain,
   SetActiveContract,
   SetAppPreferences,
   SetLastFacet,
   SetLastView,
 } from '@app';
 import { preferences, types } from '@models';
-import { Log, getAddressString } from '@utils';
-import { SetActiveChain } from 'wailsjs/go/project/Project';
+import { Log } from '@utils';
 
 export interface UseActiveProjectReturn {
   lastTheme: string;
@@ -43,43 +43,34 @@ export interface UseActiveProjectReturn {
   effectiveChain: string;
 }
 
-// State interface for simplified preferences (no caching of project data)
 interface AppPreferencesState {
-  // UI state (from global preferences)
   lastTheme: string;
   lastLanguage: string;
   menuCollapsed: boolean;
   helpCollapsed: boolean;
-  lastFacetMap: Record<string, types.DataFacet>;
-
-  // Project state
+  debugMode: boolean;
   lastProject: string;
+  loading: boolean;
   activeChain: string;
   activeAddress: string;
   activeContract: string;
   lastView: string;
-
-  // Debug state
-  debugMode: boolean;
-
-  // Loading state
-  loading: boolean;
+  lastFacetMap: Record<string, types.DataFacet>;
 }
 
-// Initial state
 const initialState: AppPreferencesState = {
   lastProject: '',
-  activeChain: '',
-  activeAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
-  activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
   lastTheme: 'dark',
   lastLanguage: 'en',
-  lastView: '/',
   menuCollapsed: true,
   helpCollapsed: true,
-  lastFacetMap: {},
   debugMode: false,
   loading: true,
+  activeChain: 'mainnet',
+  activeAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
+  activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+  lastView: '/',
+  lastFacetMap: {},
 };
 
 class AppPreferencesStore {
@@ -88,21 +79,13 @@ class AppPreferencesStore {
   private isTestMode = false;
   private cachedSnapshot: UseActiveProjectReturn | null = null;
 
-  // Set test mode to skip backend calls
   setTestMode = (testMode: boolean): void => {
     this.isTestMode = testMode;
     if (testMode) {
-      // In test mode, set loading to false and use defaults
       this.setState({ loading: false });
     }
   };
 
-  // Get current state (required by useSyncExternalStore)
-  getState = (): AppPreferencesState => {
-    return this.state;
-  };
-
-  // Get snapshot for useSyncExternalStore - returns stable reference
   getSnapshot = (): UseActiveProjectReturn => {
     if (!this.cachedSnapshot) {
       this.cachedSnapshot = {
@@ -139,29 +122,23 @@ class AppPreferencesStore {
     return this.cachedSnapshot;
   };
 
-  // Subscribe to state changes (required by useSyncExternalStore)
   subscribe = (listener: () => void): (() => void) => {
     this.listeners.add(listener);
-
-    // Return unsubscribe function
     return () => {
       this.listeners.delete(listener);
     };
   };
 
-  // Notify all listeners of state changes
   private notify = (): void => {
     this.listeners.forEach((listener) => listener());
   };
 
-  // Internal method to update state and notify listeners
   private setState = (updates: Partial<AppPreferencesState>): void => {
     this.state = { ...this.state, ...updates };
     this.cachedSnapshot = null; // Invalidate cache when state changes
     this.notify();
   };
 
-  // Helper function to update backend preferences
   private updatePreferences = async (
     updates: Partial<preferences.AppPreferences>,
   ): Promise<void> => {
@@ -180,97 +157,42 @@ class AppPreferencesStore {
     }
   };
 
-  // Initialize the store by loading state from backend
   initialize = async (): Promise<void> => {
-    // Skip initialization in test mode
-    if (this.isTestMode) {
-      return;
-    }
+    if (this.isTestMode) return;
 
     try {
       this.setState({ loading: true });
-      let retries = 0;
-      const maxRetries = 10;
-      let prefs = null;
-      while (retries < maxRetries) {
-        try {
-          prefs = await GetAppPreferences();
-          break; // Success, exit retry loop
-        } catch (error) {
-          retries++;
-          Log(
-            `App preferences load attempt ${retries}/${maxRetries} failed: ${JSON.stringify(error)}`,
-          );
-          if (retries >= maxRetries) {
-            Log(
-              'WARN: Failed to load app preferences after max retries, using defaults',
-            );
-            // Use safe defaults if backend is not ready
-            this.setState({
-              lastTheme: 'dark',
-              lastLanguage: 'en',
-              menuCollapsed: false,
-              helpCollapsed: false,
-              debugMode: false,
-              loading: false,
-              lastView: '/',
-              lastFacetMap: {},
-              lastProject: '',
-              activeChain: '',
-              activeAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
-            });
-            return;
-          }
-          // Wait before retry
-          await new Promise((resolve) => setTimeout(resolve, 200));
-        }
-      }
 
-      if (prefs) {
-        let lastView = '/';
-        let activeChain = '';
-        let activeAddress = '0xf503017d7baf7fbc0fff7492b751025c6a78179b';
-        let activeContract = '0x52df6e4d9989e7cf4739d687c765e75323a1b14c';
-        let lastFacetMap: Record<string, types.DataFacet> = {};
+      // Use single call to get all project data and app preferences
+      const [prefs, projectData] = await Promise.all([
+        GetAppPreferences(),
+        GetActiveProjectData(),
+      ]);
 
-        try {
-          const activeProject = await GetActiveProject();
-          lastView = activeProject.lastView || '/';
-          activeChain = activeProject.activeChain || '';
-          activeAddress =
-            getAddressString(activeProject.activeAddress) ||
-            '0xf503017d7baf7fbc0fff7492b751025c6a78179b';
-          activeContract =
-            activeProject.activeContract ||
-            '0x52df6e4d9989e7cf4739d687c765e75323a1b14c';
-          lastFacetMap = (activeProject.lastFacetMap || {}) as Record<
-            string,
-            types.DataFacet
-          >;
-        } catch (error) {
-          Log(
-            'WARN: Failed to get project properties from active project, using defaults: ' +
-              String(error),
-          );
-        }
-
-        this.setState({
-          lastProject: prefs.lastProject || '',
-          activeChain: activeChain,
-          activeAddress: activeAddress,
-          activeContract: activeContract,
-          lastTheme: prefs.lastTheme || 'dark',
-          lastLanguage: prefs.lastLanguage || 'en',
-          lastView: lastView,
-          menuCollapsed: prefs.menuCollapsed || false,
-          helpCollapsed: prefs.helpCollapsed || false,
-          lastFacetMap: lastFacetMap,
-          debugMode:
-            (prefs as preferences.AppPreferences & { debugMode?: boolean })
-              .debugMode || false,
-          loading: false,
-        });
-      }
+      this.setState({
+        lastProject: prefs.lastProject || '',
+        lastTheme: prefs.lastTheme || 'dark',
+        lastLanguage: prefs.lastLanguage || 'en',
+        menuCollapsed: prefs.menuCollapsed || false,
+        helpCollapsed: prefs.helpCollapsed || false,
+        debugMode:
+          (prefs as preferences.AppPreferences & { debugMode?: boolean })
+            .debugMode || false,
+        // Use project data from single call
+        activeChain: projectData.activeChain || initialState.activeChain,
+        activeAddress: projectData.activeAddress || initialState.activeAddress,
+        activeContract:
+          projectData.activeContract || initialState.activeContract,
+        lastView: projectData.lastView || initialState.lastView,
+        // Convert string map to DataFacet map
+        lastFacetMap: Object.fromEntries(
+          Object.entries(projectData.lastFacetMap || {}).map(([key, value]) => [
+            key,
+            value as types.DataFacet,
+          ]),
+        ),
+        loading: false,
+      });
     } catch (error) {
       Log('ERROR: Failed to load app preferences: ' + String(error));
       this.setState({ loading: false });
@@ -309,7 +231,6 @@ class AppPreferencesStore {
     this.setState({ debugMode: newDebugMode });
   };
 
-  // Action methods that update both local state and backend
   setActiveAddress = async (address: string): Promise<void> => {
     const convertedAddress = await ConvertToAddress(address);
     if (convertedAddress && typeof convertedAddress === 'object') {
@@ -345,7 +266,6 @@ class AppPreferencesStore {
     this.setState({ lastView: view });
   };
 
-  // Computed getters
   get isDarkMode(): boolean {
     return this.state.lastTheme === 'dark';
   }
@@ -355,7 +275,7 @@ class AppPreferencesStore {
   }
 
   get canExport(): boolean {
-    return Boolean(this.state.lastProject && this.state.activeAddress);
+    return Boolean(this.state.lastProject);
   }
 }
 

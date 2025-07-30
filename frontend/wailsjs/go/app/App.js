@@ -78,6 +78,10 @@ export function GetActiveProject() {
   return window['go']['app']['App']['GetActiveProject']();
 }
 
+export function GetActiveProjectData() {
+  return window['go']['app']['App']['GetActiveProjectData']();
+}
+
 export function GetActiveProjectPath() {
   return window['go']['app']['App']['GetActiveProjectPath']();
 }
@@ -320,6 +324,10 @@ export function SaveProject() {
 
 export function SetActiveAddress(arg1) {
   return window['go']['app']['App']['SetActiveAddress'](arg1);
+}
+
+export function SetActiveChain(arg1) {
+  return window['go']['app']['App']['SetActiveChain'](arg1);
 }
 
 export function SetActiveContract(arg1) {

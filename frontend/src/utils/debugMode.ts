@@ -2,7 +2,7 @@ import { GetDebugMode } from '@app';
 import { appPreferencesStore } from '@stores';
 
 export const isDebugMode = (): boolean => {
-  return appPreferencesStore.getState().debugMode;
+  return appPreferencesStore.getSnapshot().debugMode;
 };
 
 export const getDebugModeAsync = async (): Promise<boolean> => {

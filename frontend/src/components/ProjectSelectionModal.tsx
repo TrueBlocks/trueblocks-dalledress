@@ -6,11 +6,13 @@ import {
   OpenProjectFile,
   SaveProject,
 } from '@app';
-import { Action } from '@components';
+import { Action, StatusIndicator } from '@components';
 import { useViewContext } from '@contexts';
 import { useActiveProject, useIconSets } from '@hooks';
 import {
+  Badge,
   Button,
+  Card,
   Group,
   Modal,
   Paper,
@@ -18,8 +20,10 @@ import {
   Text,
   TextInput,
   Title,
+  Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { types } from '@models';
 import { Log } from '@utils';
 import { useLocation } from 'wouter';
 
@@ -32,6 +36,17 @@ interface RecentProject {
   name: string;
   path: string;
   last_opened: string;
+  id?: string;
+  isDirty?: boolean;
+  isActive?: boolean;
+}
+
+interface ProjectContext {
+  lastView: string;
+  activeAddress: string;
+  activeChain: string;
+  activeContract: string;
+  lastFacetMap: Record<string, types.DataFacet>;
 }
 
 interface NewProjectForm {
@@ -46,6 +61,10 @@ export const ProjectSelectionModal = ({
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingOpen, setLoadingOpen] = useState(false);
+  const [_loadingContext, setLoadingContext] = useState<string | null>(null);
+  const [projectContexts, setProjectContexts] = useState<
+    Record<string, ProjectContext>
+  >({});
   const [error, setError] = useState<string | null>(null);
   const { File, Add } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
@@ -83,6 +102,33 @@ export const ProjectSelectionModal = ({
     },
   });
 
+  const loadProjectContext = useCallback(
+    async (projectId: string, _projectPath: string) => {
+      if (projectContexts[projectId]) return; // Already loaded
+
+      setLoadingContext(projectId);
+      try {
+        // For now, we'll use placeholder data since we need the project to be active to get its context
+        // In a real implementation, we might need a backend API to get project context without activating it
+        setProjectContexts((prev) => ({
+          ...prev,
+          [projectId]: {
+            lastView: '/', // Default placeholder
+            activeAddress: '', // Would need backend API to get this
+            activeChain: 'mainnet', // Default placeholder
+            activeContract: '',
+            lastFacetMap: {},
+          },
+        }));
+      } catch (err) {
+        Log(`Failed to load context for project ${projectId}: ${err}`);
+      } finally {
+        setLoadingContext(null);
+      }
+    },
+    [projectContexts],
+  );
+
   const loadRecentProjects = useCallback(async () => {
     try {
       const projects = await GetOpenProjects();
@@ -92,21 +138,32 @@ export const ProjectSelectionModal = ({
         return isNaN(d.getTime()) ? 0 : d.getTime();
       };
       const recentProjects: RecentProject[] = projects
-        .map((p: Record<string, string>) => ({
-          name: p.name || '',
-          path: p.path || '',
-          last_opened: p.last_opened || '',
+        .map((p: Record<string, unknown>) => ({
+          id: String(p.id || ''),
+          name: String(p.name || ''),
+          path: String(p.path || ''),
+          last_opened: String(p.last_opened || p.lastOpened || ''),
+          isDirty: Boolean(p.isDirty),
+          isActive: Boolean(p.isActive),
         }))
         .sort((a, b) => getTime(b.last_opened) - getTime(a.last_opened))
         .slice(0, 10); // Show only 10 most recent
+
       if (isMounted.current) {
         setRecentProjects(recentProjects);
+
+        // Load context for recent projects
+        recentProjects.forEach((project) => {
+          if (project.id) {
+            loadProjectContext(project.id, project.path);
+          }
+        });
       }
     } catch (err) {
       Log(`Failed to load recent projects: ${err}`);
       setRecentProjects([]);
     }
-  }, []);
+  }, [loadProjectContext]);
 
   useEffect(() => {
     isMounted.current = true;
@@ -284,34 +341,164 @@ export const ProjectSelectionModal = ({
                   <Text size="sm" fw={500} mt="md">
                     Recent Projects
                   </Text>
-                  <Stack gap="xs">
-                    {recentProjects.map((project, index) => (
-                      <Group
-                        key={index}
-                        gap="xs"
-                        style={{
-                          padding: '8px',
-                          borderRadius: '4px',
-                        }}
-                      >
-                        <File size={16} />
-                        <div style={{ flex: 1 }}>
-                          <Text size="sm" fw={500}>
-                            {project.name}
-                          </Text>
-                          <Text size="xs" c="dimmed">
-                            {new Date(project.last_opened).toLocaleDateString()}
-                          </Text>
-                        </div>
-                        <Action
-                          icon="Switch"
-                          size="sm"
-                          variant="light"
-                          onClick={() => handleOpenProject(project.path)}
-                          disabled={isLoading}
-                        />
-                      </Group>
-                    ))}
+                  <Stack gap="sm">
+                    {recentProjects.map((project, index) => {
+                      const context = projectContexts[project.id || ''];
+                      const isRecent =
+                        new Date().getTime() -
+                          new Date(project.last_opened).getTime() <
+                        24 * 60 * 60 * 1000; // Within 24 hours
+
+                      return (
+                        <Card key={index} withBorder padding="sm" radius="md">
+                          <Stack gap="xs">
+                            {/* Project Header */}
+                            <Group justify="space-between" wrap="nowrap">
+                              <Group gap="xs" style={{ flex: 1, minWidth: 0 }}>
+                                <File size={16} />
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <Group gap="xs" wrap="nowrap">
+                                    <Text
+                                      size="sm"
+                                      fw={project.isActive ? 600 : 500}
+                                      style={{
+                                        textOverflow: 'ellipsis',
+                                        overflow: 'hidden',
+                                        whiteSpace: 'nowrap',
+                                      }}
+                                    >
+                                      {project.name}
+                                    </Text>
+                                    {project.isDirty && (
+                                      <Tooltip label="Has unsaved changes">
+                                        <Badge
+                                          size="xs"
+                                          color="orange"
+                                          variant="dot"
+                                        >
+                                          Modified
+                                        </Badge>
+                                      </Tooltip>
+                                    )}
+                                    {project.isActive && (
+                                      <Badge
+                                        size="xs"
+                                        color="blue"
+                                        variant="light"
+                                      >
+                                        Active
+                                      </Badge>
+                                    )}
+                                    {isRecent && (
+                                      <Badge
+                                        size="xs"
+                                        color="green"
+                                        variant="light"
+                                      >
+                                        Recent
+                                      </Badge>
+                                    )}
+                                  </Group>
+                                </div>
+                              </Group>
+                              <Action
+                                icon="Switch"
+                                size="sm"
+                                variant="light"
+                                onClick={() => handleOpenProject(project.path)}
+                                disabled={isLoading}
+                              />
+                            </Group>
+
+                            {/* Project Context Preview */}
+                            {context && (
+                              <Group
+                                gap="md"
+                                style={{
+                                  fontSize: '12px',
+                                  color: 'var(--mantine-color-dimmed)',
+                                }}
+                              >
+                                {context.activeAddress && (
+                                  <Group gap="xs">
+                                    <Text size="xs" c="dimmed">
+                                      Address:
+                                    </Text>
+                                    <Text
+                                      size="xs"
+                                      fw={500}
+                                      style={{ fontFamily: 'monospace' }}
+                                    >
+                                      {context.activeAddress.slice(0, 8)}...
+                                      {context.activeAddress.slice(-6)}
+                                    </Text>
+                                  </Group>
+                                )}
+                                {context.activeChain && (
+                                  <Group gap="xs">
+                                    <Text size="xs" c="dimmed">
+                                      Chain:
+                                    </Text>
+                                    <Badge
+                                      size="xs"
+                                      variant="light"
+                                      color="blue"
+                                    >
+                                      {context.activeChain}
+                                    </Badge>
+                                  </Group>
+                                )}
+                                {context.lastView &&
+                                  context.lastView !== '/' && (
+                                    <Group gap="xs">
+                                      <Text size="xs" c="dimmed">
+                                        Last View:
+                                      </Text>
+                                      <Text size="xs" fw={500}>
+                                        {context.lastView
+                                          .replace('/', '')
+                                          .replace(/^./, (c) =>
+                                            c.toUpperCase(),
+                                          )}
+                                      </Text>
+                                    </Group>
+                                  )}
+                              </Group>
+                            )}
+
+                            {/* Project Metadata */}
+                            <Group
+                              justify="space-between"
+                              style={{ fontSize: '11px' }}
+                            >
+                              <Text size="xs" c="dimmed">
+                                {new Date(
+                                  project.last_opened,
+                                ).toLocaleDateString()}{' '}
+                                at{' '}
+                                {new Date(
+                                  project.last_opened,
+                                ).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </Text>
+                              <StatusIndicator
+                                status={
+                                  project.isActive
+                                    ? 'healthy'
+                                    : project.isDirty
+                                      ? 'warning'
+                                      : 'inactive'
+                                }
+                                label=""
+                                size="xs"
+                              />
+                            </Group>
+                          </Stack>
+                        </Card>
+                      );
+                    })}
                   </Stack>
                 </>
               )}

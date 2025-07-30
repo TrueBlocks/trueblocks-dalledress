@@ -5,7 +5,7 @@ import { types } from '@models';
 import { useActiveProject } from './useActiveProject';
 
 function validatePayloadAddress(address: string, context: string) {
-  if (address === '') {
+  if (address === '' || address === '0x0') {
     return;
   }
 

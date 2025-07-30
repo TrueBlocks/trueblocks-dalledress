@@ -17,3 +17,12 @@ type DataLoadedPayload struct {
 	Timestamp     int64     `json:"timestamp"`
 	EventPhase    string    `json:"eventPhase"`
 }
+
+type ProjectPayload struct {
+	HasProject     bool                 `json:"hasProject"`
+	ActiveChain    string               `json:"activeChain"`
+	ActiveAddress  string               `json:"activeAddress"`
+	ActiveContract string               `json:"activeContract"`
+	LastView       string               `json:"lastView"`
+	LastFacetMap   map[string]DataFacet `json:"lastFacetMap"`
+}

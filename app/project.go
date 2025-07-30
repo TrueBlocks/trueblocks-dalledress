@@ -6,6 +6,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -222,6 +223,46 @@ func (a *App) GetOpenProjects() []map[string]interface{} {
 
 func (a *App) GetActiveProject() *project.Project {
 	return a.Projects.GetActiveProject()
+}
+
+// GetActiveProjectData returns all active project state in a single call
+func (a *App) GetActiveProjectData() *types.ProjectPayload {
+	project := a.GetActiveProject()
+	if project == nil {
+		return &types.ProjectPayload{
+			HasProject:     false,
+			ActiveChain:    "",
+			ActiveAddress:  "",
+			ActiveContract: "",
+			LastView:       "",
+			LastFacetMap:   make(map[string]types.DataFacet),
+		}
+	}
+
+	// Get the active address as string, converting 0x0 to empty string
+	activeAddr := project.GetActiveAddress()
+	activeAddrStr := ""
+	if activeAddr != base.ZeroAddr {
+		activeAddrStr = activeAddr.Hex()
+	}
+
+	// Build the last facet map for all registered views
+	lastFacetMap := make(map[string]types.DataFacet)
+	for _, view := range a.GetRegisteredViews() {
+		facetStr := project.GetLastFacet(view)
+		if facetStr != "" {
+			lastFacetMap[view] = types.DataFacet(facetStr)
+		}
+	}
+
+	return &types.ProjectPayload{
+		HasProject:     true,
+		ActiveChain:    project.GetActiveChain(),
+		ActiveAddress:  activeAddrStr,
+		ActiveContract: project.GetActiveContract(),
+		LastView:       project.GetLastView(),
+		LastFacetMap:   lastFacetMap,
+	}
 }
 
 // SwitchToProject sets the specified project as the active project

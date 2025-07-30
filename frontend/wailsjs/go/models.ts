@@ -1534,6 +1534,28 @@ export namespace types {
 	        this.address = source["address"];
 	    }
 	}
+	export class ProjectPayload {
+	    hasProject: boolean;
+	    activeChain: string;
+	    activeAddress: string;
+	    activeContract: string;
+	    lastView: string;
+	    lastFacetMap: Record<string, string>;
+	
+	    static createFrom(source: any = {}) {
+	        return new ProjectPayload(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hasProject = source["hasProject"];
+	        this.activeChain = source["activeChain"];
+	        this.activeAddress = source["activeAddress"];
+	        this.activeContract = source["activeContract"];
+	        this.lastView = source["lastView"];
+	        this.lastFacetMap = source["lastFacetMap"];
+	    }
+	}
 	
 	export class Receipt {
 	    blockHash?: base.Hash;

@@ -9,11 +9,13 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/validation"
 )
 
+// UserInfoStatus represents the status of user information and RPC connectivity for the setup wizard
 type UserInfoStatus struct {
 	MissingNameEmail bool `json:"missingNameEmail"`
 	RPCUnavailable   bool `json:"rpcUnavailable"`
 }
 
+// GetUserInfoStatus returns the current status of user information and RPC connectivity
 func (a *App) GetUserInfoStatus() UserInfoStatus {
 	missingNameEmail := a.Preferences.User.Name == "" || a.Preferences.User.Email == ""
 
@@ -39,6 +41,7 @@ func (a *App) GetUserInfoStatus() UserInfoStatus {
 	}
 }
 
+// SetUserInfo validates and sets the user's name and email in preferences
 func (a *App) SetUserInfo(name, email string) error {
 	name = strings.TrimSpace(name)
 	email = strings.TrimSpace(email)
@@ -56,6 +59,7 @@ func (a *App) SetUserInfo(name, email string) error {
 	return preferences.SetUserPreferences(&a.Preferences.User)
 }
 
+// SetChain validates and adds or updates a blockchain chain configuration with RPC providers
 func (a *App) SetChain(ch preferences.Chain) error {
 	if len(ch.RpcProviders) > 0 {
 		for i, rpc := range ch.RpcProviders {

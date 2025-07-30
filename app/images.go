@@ -13,7 +13,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// GetImageURL returns a URL that can be used to access an image
+// GetImageURL returns a URL for serving an image file, creating sample files if needed
 func (a *App) GetImageURL(relativePath string) string {
 	if a.fileServer == nil {
 		return ""
@@ -62,7 +62,7 @@ func (a *App) GetImageURL(relativePath string) string {
 	return url
 }
 
-// ChangeImageStorageLocation changes the directory where images are stored
+// ChangeImageStorageLocation updates the base path for the file server
 func (a *App) ChangeImageStorageLocation(newPath string) error {
 	if a.fileServer == nil {
 		return fmt.Errorf("file server not initialized")
@@ -70,7 +70,7 @@ func (a *App) ChangeImageStorageLocation(newPath string) error {
 	return a.fileServer.UpdateBasePath(newPath)
 }
 
-// Watch the images directory for changes and notify frontend
+// watchImagesDir monitors the images directory for changes and emits events
 func (a *App) watchImagesDir() {
 	basePath := a.fileServer.GetBasePath()
 	imagesDir := filepath.Join(basePath, "samples")

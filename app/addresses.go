@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
@@ -42,4 +43,32 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 			return ret, ret != base.ZeroAddr
 		}
 	}
+}
+
+func (a *App) SetActiveAddress(addr base.Address) error {
+	if active := a.GetActiveProject(); active != nil {
+		return active.SetActiveAddress(addr)
+	}
+	return fmt.Errorf("no active project")
+}
+
+func (a *App) AddAddressToProject(addr base.Address) error {
+	if active := a.GetActiveProject(); active != nil {
+		return active.AddAddress(addr)
+	}
+	return fmt.Errorf("no active project")
+}
+
+func (a *App) RemoveAddressFromProject(addr base.Address) error {
+	if active := a.GetActiveProject(); active != nil {
+		return active.RemoveAddress(addr)
+	}
+	return fmt.Errorf("no active project")
+}
+
+func (a *App) SetActiveContract(contract string) error {
+	if active := a.GetActiveProject(); active != nil {
+		return active.SetActiveContract(contract)
+	}
+	return fmt.Errorf("no active project")
 }

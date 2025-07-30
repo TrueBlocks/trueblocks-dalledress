@@ -1,0 +1,73 @@
+package app
+
+import (
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
+)
+
+// Reload dispatches reload requests to the appropriate view-specific reload function
+func (a *App) Reload(payload *types.Payload) error {
+	switch a.GetLastView() {
+	case "exports":
+		return a.ReloadExports(payload)
+	case "monitors":
+		return a.ReloadMonitors(payload)
+	case "abis":
+		return a.ReloadAbis(payload)
+	case "names":
+		return a.ReloadNames(payload)
+	case "chunks":
+		return a.ReloadChunks(payload)
+	case "contracts":
+		return a.ReloadContracts(payload)
+	case "status":
+		return a.ReloadStatus(payload)
+	default:
+		panic("unknown view in Reload" + a.GetLastView())
+	}
+}
+
+// NameFromAddress resolves an Ethereum address to a named entity if one exists
+func (a *App) NameFromAddress(address string) (*names.Name, bool) {
+	collection := names.GetNamesCollection(&types.Payload{})
+	return collection.NameFromAddress(base.HexToAddress(address))
+}
+
+// CancelFetch cancels an active data fetch operation for a specific data facet
+func (a *App) CancelFetch(dataFacet types.DataFacet) {
+	storeName := ""
+
+	for _, collection := range a.collections {
+		for _, facet := range collection.GetSupportedFacets() {
+			if facet == dataFacet {
+				storeName = collection.GetStoreName(facet)
+				break
+			}
+		}
+		if storeName != "" {
+			break
+		}
+	}
+
+	if storeName != "" {
+		store.CancelFetch(storeName)
+	}
+}
+
+// CancelAllFetches cancels all active fetch operations and returns the count of cancelled operations
+func (a *App) CancelAllFetches() int {
+	return store.CancelAllFetches()
+}
+
+// ResetStore resets the data store for all collections matching the given store name
+func (a *App) ResetStore(storeName string) {
+	for _, collection := range a.collections {
+		for _, facet := range collection.GetSupportedFacets() {
+			if collection.GetStoreName(facet) == storeName {
+				collection.Reset(facet)
+			}
+		}
+	}
+}

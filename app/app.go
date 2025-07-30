@@ -3,12 +3,10 @@ package app
 import (
 	"context"
 	"embed"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
@@ -19,11 +17,9 @@ import (
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -87,10 +83,12 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 	return app, appMenu
 }
 
+// GetContext returns the application's context instance
 func (a *App) GetContext() context.Context {
 	return a.ctx
 }
 
+// Startup initializes the application with context, preferences, and services
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 
@@ -135,6 +133,7 @@ func (a *App) Startup(ctx context.Context) {
 	}
 }
 
+// DomReady configures the window and starts monitoring after DOM is ready
 func (a *App) DomReady(ctx context.Context) {
 	a.ctx = ctx
 	if a.IsReady() {
@@ -151,6 +150,7 @@ func (a *App) DomReady(ctx context.Context) {
 	go a.watchWindowBounds() // if the window moves or resizes, we want to know
 }
 
+// BeforeClose saves window bounds and shuts down services before closing
 func (a *App) BeforeClose(ctx context.Context) bool {
 	x, y := runtime.WindowGetPosition(ctx)
 	w, h := runtime.WindowGetSize(ctx)
@@ -165,6 +165,35 @@ func (a *App) BeforeClose(ctx context.Context) bool {
 	return false // allow window to close
 }
 
+// IsReady returns true if the application context is initialized
+func (a *App) IsReady() bool {
+	return a.ctx != nil
+}
+
+// IsInitialized checks if the application has been initialized by looking for a marker file
+func (a *App) IsInitialized() bool {
+	_, appFolder := preferences.GetConfigFolders()
+	fn := filepath.Join(appFolder, ".initialized")
+	return file.FileExists(fn)
+}
+
+// SetInitialized creates or removes the initialization marker file
+func (a *App) SetInitialized(isInit bool) error {
+	_, appFolder := preferences.GetConfigFolders()
+	fn := filepath.Join(appFolder, ".initialized")
+	if isInit {
+		if !file.Touch(fn) {
+			return fmt.Errorf("failed to create " + fn + " file")
+		} else {
+			return nil
+		}
+	} else {
+		_ = os.Remove(fn)
+		return nil // do not fail even if not found
+	}
+}
+
+// watchWindowBounds monitors window position and size changes
 func (a *App) watchWindowBounds() {
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
@@ -183,6 +212,7 @@ func (a *App) watchWindowBounds() {
 	}
 }
 
+// SaveBounds updates and persists the window bounds to preferences
 func (a *App) SaveBounds(x, y, w, h int) {
 	if !a.IsReady() {
 		return
@@ -198,257 +228,17 @@ func (a *App) SaveBounds(x, y, w, h int) {
 	_ = preferences.SetAppPreferences(&a.Preferences.App)
 }
 
-func (a *App) IsReady() bool {
-	return a.ctx != nil
-}
-
-func (a *App) IsInitialized() bool {
-	_, appFolder := preferences.GetConfigFolders()
-	fn := filepath.Join(appFolder, ".initialized")
-	return file.FileExists(fn)
-}
-
-func (a *App) SetInitialized(isInit bool) error {
-	_, appFolder := preferences.GetConfigFolders()
-	fn := filepath.Join(appFolder, ".initialized")
-	if isInit {
-		if !file.Touch(fn) {
-			return fmt.Errorf("failed to create " + fn + " file")
-		} else {
-			return nil
-		}
-	} else {
-		_ = os.Remove(fn)
-		return nil // do not fail even if not found
-	}
-}
-
-func (a *App) GetWizardReturn() string {
-	return strings.Replace(a.GetLastView(), "/wizard", "/", -1)
-}
-
+// GetAppId returns the application identifier
 func (a *App) GetAppId() preferences.Id {
 	return preferences.GetAppId()
 }
 
-func (a *App) GetOpenProjects() []map[string]interface{} {
-	projectIDs := a.Projects.GetOpenProjectIDs()
-	result := make([]map[string]interface{}, 0, len(projectIDs))
-
-	for _, id := range projectIDs {
-		project := a.Projects.GetProjectByID(id)
-		if project == nil {
-			continue
-		}
-
-		projectInfo := map[string]interface{}{
-			"id":         id,
-			"name":       project.GetName(),
-			"path":       project.GetPath(),
-			"isActive":   id == a.Projects.ActiveID,
-			"isDirty":    project.IsDirty(),
-			"lastOpened": project.LastOpened,
-			// "createdAt":  project.CreatedAt,
-		}
-
-		result = append(result, projectInfo)
-	}
-
-	return result
-}
-
-func (a *App) GetUserPreferences() *preferences.UserPreferences {
-	return &a.Preferences.User
-}
-
-func (a *App) SetUserPreferences(userPrefs *preferences.UserPreferences) error {
-	a.Preferences.User = *userPrefs
-	return preferences.SetUserPreferences(userPrefs)
-}
-
-func (a *App) GetOrgPreferences() *preferences.OrgPreferences {
-	return &a.Preferences.Org
-}
-
-func (a *App) SetOrgPreferences(orgPrefs *preferences.OrgPreferences) error {
-	a.Preferences.Org = *orgPrefs
-	return preferences.SetOrgPreferences(orgPrefs)
-}
-
-func (app *App) GetChainList() *utils.ChainList {
-	return app.chainList
-}
-
-// GetProjectAddress returns the address of the active project
-func (a *App) GetProjectAddress() base.Address {
-	active := a.GetActiveProject()
-	if active == nil {
-		return base.ZeroAddr
-	}
-	return active.GetAddress()
-}
-
-// SetProjectAddress sets the address of the active project
-func (a *App) SetProjectAddress(addr base.Address) {
-	active := a.GetActiveProject()
-	if active != nil {
-		active.SetAddress(addr)
-	}
-}
-
-// SetLastView sets the last visited view/route in the active project
-func (a *App) SetLastView(view string) error {
-	if active := a.GetActiveProject(); active != nil {
-		return active.SetLastView(view)
-	}
-	return fmt.Errorf("no active project")
-}
-
-// SetLastFacet sets the last visited facet for a specific view in the active project
-func (a *App) SetLastFacet(view, facet string) error {
-	if active := a.GetActiveProject(); active != nil {
-		return active.SetLastFacet(view, facet)
-	}
-	return fmt.Errorf("no active project")
-}
-
-// GetLastFacet returns the last visited facet for a specific view from the active project
-func (a *App) GetLastFacet(view string) string {
-	if active := a.GetActiveProject(); active != nil {
-		return active.GetLastFacet(view)
-	}
-	return ""
-}
-
-// GetActiveProject returns the active project data or nil if no project is active
-func (a *App) GetActiveProject() *project.Project {
-	return a.Projects.GetActiveProject()
-}
-
-// SetActiveAddress sets the active address in the active project's working context
-func (a *App) SetActiveAddress(addr base.Address) error {
-	if active := a.GetActiveProject(); active != nil {
-		return active.SetActiveAddress(addr)
-	}
-	return fmt.Errorf("no active project")
-}
-
-// AddAddressToProject adds an address to the active project's address list
-func (a *App) AddAddressToProject(addr base.Address) error {
-	if active := a.GetActiveProject(); active != nil {
-		return active.AddAddress(addr)
-	}
-	return fmt.Errorf("no active project")
-}
-
-// RemoveAddressFromProject removes an address from the active project's address list
-func (a *App) RemoveAddressFromProject(addr base.Address) error {
-	if active := a.GetActiveProject(); active != nil {
-		return active.RemoveAddress(addr)
-	}
-	return fmt.Errorf("no active project")
-}
-
-func (a *App) SetActiveContract(contract string) error {
-	if active := a.GetActiveProject(); active != nil {
-		return active.SetActiveContract(contract)
-	}
-	return fmt.Errorf("no active project")
-}
-
-// GetFilterState retrieves view state for a given key from the active project
-func (a *App) GetFilterState(key project.ViewStateKey) (project.FilterState, error) {
-	if active := a.GetActiveProject(); active != nil {
-		if state, exists := active.GetFilterState(key); exists {
-			return state, nil
-		}
-	}
-	return project.FilterState{}, fmt.Errorf("no active project")
-}
-
-// SetFilterState sets view state for a given key in the active project
-func (a *App) SetFilterState(key project.ViewStateKey, state project.FilterState) error {
-	if active := a.GetActiveProject(); active != nil {
-		return active.SetFilterState(key, state)
-	}
-	return fmt.Errorf("no active project")
-}
-
-// ClearFilterState removes filter state for a given key from the active project
-func (a *App) ClearFilterState(key project.ViewStateKey) error {
-	if active := a.GetActiveProject(); active != nil {
-		return active.ClearFilterState(key)
-	}
-	return fmt.Errorf("no active project")
-}
-
-func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
-	active := a.GetActiveProject()
-	if active == nil {
-		return nil, fmt.Errorf("no active project")
-	}
-	addr := active.GetAddress()
-	if addr == base.ZeroAddr {
-		return nil, fmt.Errorf("project address is not set")
-	}
-
-	// Always resolve ENS/address using ConvertToAddress
-	resolved, ok := a.ConvertToAddress(addr.Hex())
-	if !ok || resolved == base.ZeroAddr {
-		return nil, fmt.Errorf("invalid address or ENS name")
-	}
-
-	dress, err := a.Dalle.MakeDalleDress(resolved.Hex())
-	if err != nil {
-		return nil, err
-	}
-
-	imagePath := filepath.Join("generated", dress.Filename+".png")
-	imageURL := ""
-	if a.fileServer != nil {
-		imageURL = a.fileServer.GetURL(imagePath)
-	}
-
-	return map[string]interface{}{
-		"imageUrl": imageURL,
-		"parts":    dress,
-	}, nil
-}
-
-func (a *App) CancelFetch(dataFacet types.DataFacet) {
-	storeName := ""
-
-	for _, collection := range a.collections {
-		for _, facet := range collection.GetSupportedFacets() {
-			if facet == dataFacet {
-				storeName = collection.GetStoreName(facet)
-				break
-			}
-		}
-		if storeName != "" {
-			break
-		}
-	}
-
-	if storeName != "" {
-		store.CancelFetch(storeName)
-	}
-}
-
-func (a *App) CancelAllFetches() int {
-	return store.CancelAllFetches()
-}
-
-func (a *App) GetNodeStatus(chain string) *coreTypes.MetaData {
-	defer logging.Silence()()
-	a.meta, _ = sdk.GetMetaData(chain)
-	return a.meta
-}
-
+// RegisterCollection adds a collection to the application's collection registry
 func (a *App) RegisterCollection(collection types.Collection) {
 	a.collections = append(a.collections, collection)
 }
 
+// getCollectionPage is a generic helper that fetches a typed Page from a collection using the provided payload, pagination, sorting, and filtering parameters.
 func getCollectionPage[T any](
 	collection interface {
 		GetPage(*types.Payload, int, int, sdk.SortSpec, string) (types.Page, error)
@@ -473,185 +263,4 @@ func getCollectionPage[T any](
 	}
 
 	return typedPage, nil
-}
-
-func (a *App) ResetStore(storeName string) {
-	for _, collection := range a.collections {
-		for _, facet := range collection.GetSupportedFacets() {
-			if collection.GetStoreName(facet) == storeName {
-				collection.Reset(facet)
-			}
-		}
-	}
-}
-
-func (a *App) Encode(fn sdk.Function, params []interface{}) (string, error) {
-	packed, err := fn.Pack(params)
-	if err != nil {
-		return "", fmt.Errorf("failed to pack function call: %w", err)
-	}
-	return "0x" + hex.EncodeToString(packed), nil
-}
-
-// Simple project management functions for frontend modal (no CallbackData needed)
-
-// NewProject creates a new project with the given name and current address
-func (a *App) NewProject(name string, currentAddress string) error {
-	var addr base.Address
-	if currentAddress != "" {
-		convertedAddr, ok := a.ConvertToAddress(currentAddress)
-		if !ok {
-			return fmt.Errorf("invalid address: %s", currentAddress)
-		}
-		addr = convertedAddr
-	}
-
-	// Create new project with current address
-	newProject := a.Projects.NewProject(name, addr, []string{"mainnet"})
-	if newProject == nil {
-		return fmt.Errorf("failed to create project")
-	}
-	return nil
-}
-
-// OpenProjectFile opens a project file with optional path (empty string triggers file picker)
-func (a *App) OpenProjectFile(path string) error {
-	if path == "" {
-		// Trigger file picker
-		selectedPath, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
-			Title: "Open Project File",
-			Filters: []runtime.FileFilter{
-				{
-					DisplayName: "TrueBlocks Project Files (*.tbx)",
-					Pattern:     "*.tbx",
-				},
-			},
-		})
-		if err != nil || selectedPath == "" {
-			return fmt.Errorf("no file selected")
-		}
-		path = selectedPath
-	}
-
-	if err := a.fileOpen(path); err != nil {
-		return err
-	}
-
-	// Navigate to current address view on project open
-	active := a.GetActiveProject()
-	if active != nil && active.GetActiveAddress() != base.ZeroAddr {
-		activeAddr := active.GetActiveAddress().String()
-		msgs.EmitStatus(fmt.Sprintf("opened project: %s - navigated to %s", active.GetName(), activeAddr))
-	}
-	msgs.EmitStatus("project opened: " + path)
-	return nil
-}
-
-// SaveProject saves the current project, prompting for a file path if not set
-func (a *App) SaveProject() error {
-	project := a.GetActiveProject()
-	if project == nil {
-		return fmt.Errorf("no active project")
-	}
-
-	if project.GetPath() == "" {
-		// Project hasn't been saved before, need to use SaveAs with file dialog
-		path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-			Title: "Save Project",
-			Filters: []runtime.FileFilter{
-				{
-					DisplayName: "TrueBlocks Project Files (*.tbx)",
-					Pattern:     "*.tbx",
-				},
-			},
-			DefaultFilename: project.GetName() + ".tbx",
-		})
-		if err != nil {
-			return fmt.Errorf("file dialog error: %w", err)
-		}
-		if path == "" {
-			return fmt.Errorf("save canceled")
-		}
-
-		if err := a.Projects.SaveActiveAs(path); err != nil {
-			return err
-		}
-	} else {
-		// Project has a path, use normal save
-		if err := a.Projects.SaveActive(); err != nil {
-			return err
-		}
-	}
-
-	a.updateRecentProjects()
-	msgs.EmitStatus(fmt.Sprintf("project saved: %s", project.GetName()))
-	return nil
-}
-
-// HasActiveProject returns true if there is an active project
-func (a *App) HasActiveProject() bool {
-	if a.Projects == nil {
-		return false
-	}
-	return a.Projects.ActiveID != "" && a.GetActiveProject() != nil
-}
-
-// ValidateActiveProject checks if the active project is valid (has current address)
-func (a *App) ValidateActiveProject() bool {
-	if !a.HasActiveProject() {
-		return false
-	}
-
-	project := a.GetActiveProject()
-	if project == nil {
-		return false
-	}
-
-	// Check if project has at least one address and a valid current address
-	addresses := project.GetAddresses()
-	activeAddr := project.GetActiveAddress()
-	return len(addresses) > 0 && activeAddr != base.ZeroAddr
-}
-
-// ClearActiveProject clears the active project, checking for unsaved changes first
-func (a *App) ClearActiveProject() error {
-	if !a.HasActiveProject() {
-		return nil
-	}
-
-	project := a.GetActiveProject()
-	if project == nil {
-		a.Projects.ActiveID = ""
-		return nil
-	}
-
-	if project.IsDirty() {
-		response, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type:          runtime.QuestionDialog,
-			Title:         "Unsaved Changes",
-			Message:       fmt.Sprintf("Project '%s' has unsaved changes. What would you like to do?", project.GetName()),
-			Buttons:       []string{"Save", "Discard Changes", "Cancel"},
-			DefaultButton: "Save",
-		})
-
-		if err != nil {
-			return fmt.Errorf("failed to show unsaved changes dialog: %w", err)
-		}
-
-		switch response {
-		case "Save":
-			if err := a.SaveProject(); err != nil {
-				return fmt.Errorf("failed to save project: %w", err)
-			}
-		case "Cancel":
-			return fmt.Errorf("operation canceled by user")
-		case "Discard Changes":
-			// Continue with clearing
-		}
-	}
-
-	// Clear the active project
-	a.Projects.ActiveID = ""
-	msgs.EmitManager("active_project_cleared")
-	return nil
 }

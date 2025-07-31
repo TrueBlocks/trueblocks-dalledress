@@ -6,7 +6,6 @@ shit*
 x
 build/bin
 node_modules
-frontend/dist
 
 *.exe
 *.exe~

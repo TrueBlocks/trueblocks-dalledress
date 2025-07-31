@@ -9,6 +9,7 @@ import { project } from '@models';
 
 import {
   Body,
+  DetailPanel,
   Header,
   Pagination,
   PerPage,
@@ -321,32 +322,10 @@ export const Table = <T extends Record<string, unknown>>({
 
         {/* Detail panel */}
         {showDetailPanel && (
-          <div className="detail-panel">
-            <div className="detail-panel-content">
-              {selectedRowData && detailPanel ? (
-                detailPanel(selectedRowData)
-              ) : (
-                <div className="detail-panel-placeholder">
-                  {selectedRowData ? (
-                    <div>
-                      <h4>Row Details</h4>
-                      <div className="detail-panel-default">
-                        {Object.entries(selectedRowData).map(([key, value]) => (
-                          <div key={key} className="detail-row">
-                            <strong>{key}:</strong> {String(value)}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="no-selection">
-                      Select a row to view details
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+          <DetailPanel
+            selectedRowData={selectedRowData}
+            detailPanel={detailPanel}
+          />
         )}
       </div>
 

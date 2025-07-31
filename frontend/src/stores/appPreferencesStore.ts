@@ -18,6 +18,7 @@ export interface UseActiveProjectReturn {
   menuCollapsed: boolean;
   helpCollapsed: boolean;
   debugMode: boolean;
+  showDetailPanel: boolean;
   loading: boolean;
   lastProject: string;
   activeChain: string;
@@ -36,6 +37,7 @@ export interface UseActiveProjectReturn {
   setMenuCollapsed: (collapsed: boolean) => Promise<void>;
   setHelpCollapsed: (collapsed: boolean) => Promise<void>;
   toggleDebugMode: () => Promise<void>;
+  setShowDetailPanel: (enabled: boolean) => Promise<void>;
   isDarkMode: boolean;
   hasActiveProject: boolean;
   canExport: boolean;
@@ -49,6 +51,7 @@ interface AppPreferencesState {
   menuCollapsed: boolean;
   helpCollapsed: boolean;
   debugMode: boolean;
+  showDetailPanel: boolean;
   lastProject: string;
   loading: boolean;
   activeChain: string;
@@ -65,6 +68,7 @@ const initialState: AppPreferencesState = {
   menuCollapsed: true,
   helpCollapsed: true,
   debugMode: false,
+  showDetailPanel: false,
   loading: true,
   activeChain: 'mainnet',
   activeAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
@@ -94,6 +98,7 @@ class AppPreferencesStore {
         menuCollapsed: this.state.menuCollapsed,
         helpCollapsed: this.state.helpCollapsed,
         debugMode: this.state.debugMode,
+        showDetailPanel: this.state.showDetailPanel,
         loading: this.state.loading,
         lastProject: this.state.lastProject,
         activeChain: this.state.activeChain,
@@ -112,6 +117,7 @@ class AppPreferencesStore {
         setMenuCollapsed: this.setMenuCollapsed,
         setHelpCollapsed: this.setHelpCollapsed,
         toggleDebugMode: this.toggleDebugMode,
+        setShowDetailPanel: this.setShowDetailPanel,
         isDarkMode: this.isDarkMode,
         hasActiveProject: this.hasActiveProject,
         canExport: this.canExport,
@@ -178,6 +184,7 @@ class AppPreferencesStore {
         debugMode:
           (prefs as preferences.AppPreferences & { debugMode?: boolean })
             .debugMode || false,
+        showDetailPanel: prefs.showDetailPanel || false,
         // Use project data from single call
         activeChain: projectData.activeChain || initialState.activeChain,
         activeAddress: projectData.activeAddress || initialState.activeAddress,
@@ -229,6 +236,11 @@ class AppPreferencesStore {
     const newDebugMode = !this.state.debugMode;
     await this.updatePreferences({ debugMode: newDebugMode });
     this.setState({ debugMode: newDebugMode });
+  };
+
+  setShowDetailPanel = async (enabled: boolean): Promise<void> => {
+    await this.updatePreferences({ showDetailPanel: enabled });
+    this.setState({ showDetailPanel: enabled });
   };
 
   setActiveAddress = async (address: string): Promise<void> => {
@@ -283,11 +295,14 @@ class AppPreferencesStore {
 export const appPreferencesStore = new AppPreferencesStore();
 
 // Initialize the store when the module loads (only when not in test environment)
+// Use setTimeout to ensure all modules are loaded first
 if (
   typeof window !== 'undefined' &&
   typeof import.meta.env.VITEST === 'undefined'
 ) {
-  appPreferencesStore.initialize();
+  setTimeout(() => {
+    appPreferencesStore.initialize();
+  }, 0);
 } else {
   // In test environment, enable test mode
   appPreferencesStore.setTestMode(true);

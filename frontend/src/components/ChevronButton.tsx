@@ -3,42 +3,37 @@ import { Action } from './Action';
 export const ChevronButton = ({
   collapsed,
   onToggle,
-  direction,
+  direction = 'none',
 }: {
   collapsed: boolean;
   onToggle: () => void;
-  direction: 'left' | 'right';
+  direction?: 'left' | 'right' | 'none';
 }) => {
-  const alignment =
-    direction === 'left'
-      ? collapsed
-        ? 'flex-end'
-        : 'flex-start'
-      : collapsed
-        ? 'flex-start'
-        : 'flex-end';
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: alignment,
-      }}
-    >
+  if (direction === 'none') {
+    return (
       <Action
-        icon={direction === 'left' ? 'ChevronLeft' : 'ChevronRight'}
-        iconOff={direction === 'left' ? 'ChevronRight' : 'ChevronLeft'}
+        icon="ChevronRight"
+        iconOff="ChevronLeft"
         isOn={!collapsed}
         onClick={onToggle}
         variant="subtle"
         size="sm"
         radius="md"
-        style={{
-          fontWeight: 'normal',
-          paddingRight: direction === 'right' ? '0.5rem' : '',
-          paddingLeft: direction !== 'right' ? '0.5rem' : '',
-        }}
       />
-    </div>
+    );
+  }
+
+  const icon = direction === 'left' ? 'ChevronLeft' : 'ChevronRight';
+  const iconOff = direction === 'left' ? 'ChevronRight' : 'ChevronLeft';
+  return (
+    <Action
+      icon={icon}
+      iconOff={iconOff}
+      isOn={!collapsed}
+      onClick={onToggle}
+      variant="subtle"
+      size="sm"
+      radius="md"
+    />
   );
 };

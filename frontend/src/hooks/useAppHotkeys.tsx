@@ -38,6 +38,8 @@ export const useAppHotkeys = (): void => {
     setMenuCollapsed,
     helpCollapsed,
     setHelpCollapsed,
+    showDetailPanel,
+    setShowDetailPanel,
   } = useActiveProject();
 
   // Helper function to get current facet for the current route
@@ -92,6 +94,23 @@ export const useAppHotkeys = (): void => {
 
   const toggleHotkeys: HotkeyConfig[] = [
     {
+      key: 'mod+m',
+      handler: (e: KeyboardEvent) =>
+        handleHotkey(
+          {
+            type: 'toggle',
+            hotkey: 'mod+m',
+            label: 'Toggle menu panel',
+            action: () => {
+              const next = !menuCollapsed;
+              setMenuCollapsed(next);
+            },
+          },
+          e,
+        ),
+      options: { preventDefault: true, enableOnFormTags: true },
+    },
+    {
       key: 'mod+h',
       handler: (e: KeyboardEvent) =>
         handleHotkey(
@@ -109,16 +128,16 @@ export const useAppHotkeys = (): void => {
       options: { preventDefault: true, enableOnFormTags: true },
     },
     {
-      key: 'mod+m',
+      key: 'mod+p',
       handler: (e: KeyboardEvent) =>
         handleHotkey(
           {
             type: 'toggle',
-            hotkey: 'mod+m',
-            label: 'Toggle menu panel',
+            hotkey: 'mod+p',
+            label: 'Toggle detail panel',
             action: () => {
-              const next = !menuCollapsed;
-              setMenuCollapsed(next);
+              const next = !showDetailPanel;
+              setShowDetailPanel(next);
             },
           },
           e,

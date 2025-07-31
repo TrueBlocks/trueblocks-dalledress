@@ -47,6 +47,7 @@ type AppPreferences struct {
 	Version         string          `json:"version"`
 	LastLanguage    string          `json:"lastLanguage,omitempty"`
 	LastProject     string          `json:"lastProject,omitempty"`
+	ShowDetailPanel bool            `json:"showDetailPanel,omitempty"`
 }
 
 func (p *AppPreferences) String() string {
@@ -66,6 +67,7 @@ func NewAppPreferences() *AppPreferences {
 		RecentProjects:  []string{},
 		SilencedDialogs: make(map[string]bool),
 		Version:         "1.0",
+		ShowDetailPanel: false,
 	}
 }
 

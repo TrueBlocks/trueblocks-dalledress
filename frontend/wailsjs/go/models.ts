@@ -530,6 +530,7 @@ export namespace preferences {
 	    version: string;
 	    lastLanguage?: string;
 	    lastProject?: string;
+	    showDetailPanel?: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppPreferences(source);
@@ -548,6 +549,7 @@ export namespace preferences {
 	        this.version = source["version"];
 	        this.lastLanguage = source["lastLanguage"];
 	        this.lastProject = source["lastProject"];
+	        this.showDetailPanel = source["showDetailPanel"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

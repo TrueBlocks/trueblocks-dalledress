@@ -1,8 +1,9 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
-import { useTableContext, useTableKeys } from '@components';
+import { ChevronButton, useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
 import { useFiltering } from '@contexts';
+import { useActiveProject } from '@hooks';
 import { Modal } from '@mantine/core';
 import { project } from '@models';
 
@@ -33,6 +34,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   >;
   onModalOpen?: (openModal: (data: T) => void) => void;
   headerActions?: React.ReactNode;
+  detailPanel?: (rowData: T | null) => React.ReactNode;
 }
 
 export const Table = <T extends Record<string, unknown>>({
@@ -47,8 +49,19 @@ export const Table = <T extends Record<string, unknown>>({
   validate,
   onModalOpen,
   headerActions,
+  detailPanel,
 }: TableProps<T>) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentRowData, setCurrentRowData] = useState<T | null>(null);
+
+  const { showDetailPanel, setShowDetailPanel } = useActiveProject();
+
   const processedColumns = processColumns(columns);
+
+  // For detail panel mode, only show first 3 columns
+  const displayColumns = showDetailPanel
+    ? processedColumns.slice(0, 3)
+    : processedColumns;
 
   const { pagination } = usePagination(viewStateKey);
   const { filter, setFiltering } = useFiltering(viewStateKey);
@@ -62,13 +75,6 @@ export const Table = <T extends Record<string, unknown>>({
     focusTable,
     focusControls,
   } = useTableContext();
-
-  // Refs for header and body scroll containers
-  const headerScrollRef = useRef<HTMLDivElement>(null);
-  const bodyScrollRef = useRef<HTMLDivElement>(null);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentRowData, setCurrentRowData] = useState<T | null>(null);
 
   const isModalOpenRef = useRef(false);
 
@@ -162,21 +168,6 @@ export const Table = <T extends Record<string, unknown>>({
     }
   }, [handleKeyDown, tableRef]);
 
-  // Synchronize header scroll with body scroll
-  useEffect(() => {
-    const bodyScroll = bodyScrollRef.current;
-    const headerScroll = headerScrollRef.current;
-    if (!bodyScroll || !headerScroll) return;
-
-    const handleBodyScroll = () => {
-      headerScroll.scrollLeft = bodyScroll.scrollLeft;
-    };
-    bodyScroll.addEventListener('scroll', handleBodyScroll);
-    return () => {
-      bodyScroll.removeEventListener('scroll', handleBodyScroll);
-    };
-  }, []);
-
   const handleFieldChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCurrentRowData((prev) => {
@@ -241,6 +232,12 @@ export const Table = <T extends Record<string, unknown>>({
     setCurrentRowData(data[index] || null);
   };
 
+  // Get current selected row data for the detail panel
+  const selectedRowData =
+    selectedRowIndex >= 0 && selectedRowIndex < data.length
+      ? data[selectedRowIndex]
+      : null;
+
   const openModalWithData = useCallback((rowData: T) => {
     setCurrentRowData(rowData);
     setIsModalOpen(true);
@@ -254,85 +251,103 @@ export const Table = <T extends Record<string, unknown>>({
   }, [onModalOpen, openModalWithData]);
 
   return (
-    <div className="table-outer-container">
+    <div className="table-container">
       <div className="top-pagination-container">
-        <SearchBox value={filter} onChange={setFiltering} />
-        <PerPage
-          viewStateKey={viewStateKey}
-          pageSize={pageSize}
-          focusTable={focusTable}
-          focusControls={focusControls}
+        <ChevronButton
+          collapsed={showDetailPanel}
+          onToggle={() => setShowDetailPanel(!showDetailPanel)}
+          direction="none"
         />
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          viewStateKey={viewStateKey}
-          focusControls={focusControls}
-        />
-        {headerActions}
-      </div>
-      {/* Synchronized scrollable header */}
-      <div
-        className="table-header-scroll"
-        ref={headerScrollRef}
-        style={{ overflowX: 'auto', overflowY: 'hidden' }}
-      >
-        <div className="table-header-container" style={{ minWidth: '100%' }}>
-          <table
-            className="data-table"
-            style={{ width: '100%', tableLayout: 'fixed' }}
-          >
-            <Header columns={processedColumns} viewStateKey={viewStateKey} />
-          </table>
+        <div className="pagination-controls">
+          <SearchBox value={filter} onChange={setFiltering} />
+          <PerPage
+            viewStateKey={viewStateKey}
+            pageSize={pageSize}
+            focusTable={focusTable}
+            focusControls={focusControls}
+          />
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            viewStateKey={viewStateKey}
+            focusControls={focusControls}
+          />
+          {headerActions}
         </div>
       </div>
 
-      {/* Synchronized scrollable body */}
       <div
-        className="table-body-scroll"
-        ref={bodyScrollRef}
-        onClick={focusTable}
-        style={{ overflowX: 'auto', overflowY: 'auto' }}
+        className={`table-main-content ${showDetailPanel ? 'with-detail-panel' : ''}`}
       >
-        <table
-          className="data-table"
-          ref={tableRef}
-          tabIndex={0}
-          aria-label="Table with keyboard navigation"
-          style={{ width: '100%', tableLayout: 'fixed' }}
-        >
-          <colgroup>
-            {processedColumns.map((col) => (
-              <col key={col.key} style={{ width: col.width || 'auto' }} />
-            ))}
-          </colgroup>
-          <tbody>
-            {data.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={processedColumns.length}
-                  style={{
-                    textAlign: 'left',
-                    padding: '20px',
-                    color: loading
-                      ? 'var(--mantine-color-blue-6)'
-                      : 'var(--mantine-color-gray-6)',
-                  }}
-                >
-                  {loading ? 'Loading...' : 'No data found.'}
-                </td>
-              </tr>
-            ) : (
-              <Body
-                columns={processColumns(columns)}
-                data={data}
-                selectedRowIndex={selectedRowIndex}
-                handleRowClick={handleRowClick}
-                noDataMessage={loading ? 'Loading...' : 'No data found.'}
-              />
-            )}
-          </tbody>
-        </table>
+        <div className="table-section">
+          <table
+            className="data-table"
+            ref={tableRef}
+            tabIndex={0}
+            aria-label="Table with keyboard navigation"
+            onClick={focusTable}
+          >
+            <Header columns={displayColumns} viewStateKey={viewStateKey} />
+            <tbody>
+              {data.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={displayColumns.length}
+                    style={{
+                      textAlign: 'left',
+                      padding: '20px',
+                      color: loading
+                        ? 'var(--mantine-color-blue-6)'
+                        : 'var(--mantine-color-gray-6)',
+                    }}
+                  >
+                    {loading ? 'Loading...' : 'No data found.'}
+                  </td>
+                </tr>
+              ) : (
+                <Body
+                  columns={processColumns(
+                    showDetailPanel ? columns.slice(0, 3) : columns,
+                  )}
+                  data={data}
+                  selectedRowIndex={selectedRowIndex}
+                  handleRowClick={handleRowClick}
+                  noDataMessage={loading ? 'Loading...' : 'No data found.'}
+                />
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Detail panel */}
+        {showDetailPanel && (
+          <div className="detail-panel">
+            <div className="detail-panel-content">
+              {selectedRowData && detailPanel ? (
+                detailPanel(selectedRowData)
+              ) : (
+                <div className="detail-panel-placeholder">
+                  {selectedRowData ? (
+                    <div>
+                      <h4>Row Details</h4>
+                      <div className="detail-panel-default">
+                        {Object.entries(selectedRowData).map(([key, value]) => (
+                          <div key={key} className="detail-row">
+                            <strong>{key}:</strong> {String(value)}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="no-selection">
+                      Select a row to view details
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="table-footer">

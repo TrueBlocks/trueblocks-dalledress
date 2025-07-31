@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "wails build",
+    "build": "cd frontend && yarn build && cd .. && wails build",
     "clean": "make clean",
     "dev": "wails dev -debounce 1000 | grep -v 'AssetHandler'",
     "install": "cd frontend && yarn install && cd - && go mod tidy && yarn build",

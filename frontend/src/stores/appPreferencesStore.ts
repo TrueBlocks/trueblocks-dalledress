@@ -59,22 +59,25 @@ interface AppPreferencesState {
   activeContract: string;
   lastView: string;
   lastFacetMap: Record<string, types.DataFacet>;
+  canExport: boolean;
 }
 
+// Initial state - values will be populated from active project context
 const initialState: AppPreferencesState = {
-  lastProject: '',
-  lastTheme: 'dark',
+  canExport: false,
+  lastFacetMap: {},
+  activeAddress: '', // Will be set from active project
+  activeContract: '',
+  activeChain: '', // Will be set from active project
+  lastTheme: 'light',
   lastLanguage: 'en',
-  menuCollapsed: true,
-  helpCollapsed: true,
+  menuCollapsed: false,
+  helpCollapsed: false,
   debugMode: false,
   showDetailPanel: false,
-  loading: true,
-  activeChain: 'mainnet',
-  activeAddress: '0xf503017d7baf7fbc0fff7492b751025c6a78179b',
-  activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
   lastView: '/',
-  lastFacetMap: {},
+  lastProject: '',
+  loading: false,
 };
 
 class AppPreferencesStore {
@@ -185,12 +188,11 @@ class AppPreferencesStore {
           (prefs as preferences.AppPreferences & { debugMode?: boolean })
             .debugMode || false,
         showDetailPanel: prefs.showDetailPanel || false,
-        // Use project data from single call
-        activeChain: projectData.activeChain || initialState.activeChain,
-        activeAddress: projectData.activeAddress || initialState.activeAddress,
-        activeContract:
-          projectData.activeContract || initialState.activeContract,
-        lastView: projectData.lastView || initialState.lastView,
+        // Use project data directly - no hardcoded fallbacks
+        activeChain: projectData.activeChain || '',
+        activeAddress: projectData.activeAddress || '',
+        activeContract: projectData.activeContract || '',
+        lastView: projectData.lastView || '/',
         // Convert string map to DataFacet map
         lastFacetMap: Object.fromEntries(
           Object.entries(projectData.lastFacetMap || {}).map(([key, value]) => [
@@ -283,11 +285,19 @@ class AppPreferencesStore {
   }
 
   get hasActiveProject(): boolean {
-    return Boolean(this.state.lastProject);
+    return Boolean(
+      this.state.lastProject &&
+        this.state.activeAddress &&
+        this.state.activeChain,
+    );
   }
 
   get canExport(): boolean {
-    return Boolean(this.state.lastProject);
+    return Boolean(
+      this.state.lastProject &&
+        this.state.activeAddress &&
+        this.state.activeChain,
+    );
   }
 }
 

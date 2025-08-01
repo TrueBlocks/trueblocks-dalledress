@@ -1,4 +1,5 @@
 export * from './Action';
+export * from './AddressSelector';
 export * from './BaseTab';
 export * from './ChevronButton';
 export * from './ConfirmModal';

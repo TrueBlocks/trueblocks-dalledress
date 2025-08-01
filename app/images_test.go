@@ -51,6 +51,8 @@ func TestGetImageURL(t *testing.T) {
 			relativePath: "samples/test.png",
 			setup: func(app *App, tempDir string) {
 				app.fileServer = fileserver.NewFileServer()
+				// Set a proper base path to prevent creation in current directory
+				_ = app.fileServer.UpdateBasePath(tempDir)
 				// Don't create the file - let the function try to create samples
 			},
 			expectEmpty: true, // Will be empty since file won't exist after creation attempt

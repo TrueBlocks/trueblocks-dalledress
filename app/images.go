@@ -39,6 +39,11 @@ func (a *App) GetImageURL(relativePath string) string {
 	fullPath := filepath.Join(basePath, pathWithoutQuery)
 	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
 		if strings.HasPrefix(pathWithoutQuery, "samples/") {
+			// Only create samples if we have a valid base path to avoid polluting current directory
+			if basePath == "" {
+				log.Printf("GetImageURL: Cannot create samples without a valid base path")
+				return ""
+			}
 			sampleDir := filepath.Join(basePath, "samples")
 			if err := os.MkdirAll(sampleDir, 0755); err != nil {
 				log.Printf("GetImageURL: Failed to create samples directory: %v", err)

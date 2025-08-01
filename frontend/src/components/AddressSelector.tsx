@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { base } from '@models';
-import { getAddressString, getDisplayAddress } from '@utils';
+import { addressToHex, getDisplayAddress } from '@utils';
 import { Log } from '@utils';
 
 import { GetAddresses } from '../../wailsjs/go/project/Project';
@@ -69,7 +69,7 @@ export const AddressSelector = () => {
   }, []);
 
   const addressOptions: AddressOption[] = addresses.map((addr) => ({
-    value: getAddressString(addr),
+    value: addressToHex(addr),
     label: getDisplayAddress(addr),
   }));
 
@@ -81,7 +81,7 @@ export const AddressSelector = () => {
 
       // Find the address object
       const selectedAddr = addresses.find(
-        (addr) => getAddressString(addr) === value,
+        (addr) => addressToHex(addr) === value,
       );
       if (selectedAddr) {
         await SetActiveAddress(selectedAddr);

@@ -20,7 +20,7 @@ import {
   Title,
 } from '@mantine/core';
 import { types } from '@models';
-import { Log, getAddressString } from '@utils';
+import { Log, addressToHex } from '@utils';
 
 import { TransactionReviewModal } from './TransactionReviewModal';
 import { getWriteFunctions } from './facetGeneration';
@@ -216,7 +216,7 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
 
       // Build transaction data
       const txData = buildTransaction(
-        getAddressString(contractState.address),
+        addressToHex(contractState.address),
         currentFunction,
         inputValues,
       );

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useWalletGatedAction } from '@hooks';
 import { crud, project, sdk, types } from '@models';
-import { Log, getAddressString, useErrorHandler } from '@utils';
+import { Log, addressToHex, useErrorHandler } from '@utils';
 
 import {
   TransactionData,
@@ -377,7 +377,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
         const original = [...(items as TItem[])];
 
         const currentItem = original.find((item: TItem) => {
-          const itemAddress = getAddressString(
+          const itemAddress = addressToHex(
             (item as Record<string, unknown>).address,
           );
           return itemAddress === address;
@@ -400,7 +400,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           : crud.Operation.UNDELETE;
 
         const optimisticValues = original.map((item: TItem) => {
-          const itemAddress = getAddressString(
+          const itemAddress = addressToHex(
             (item as Record<string, unknown>).address,
           );
           if (itemAddress === address) {
@@ -480,7 +480,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
         const isOnlyRowOnPage = original.length === 1;
 
         const optimisticValues = original.filter((item: TItem) => {
-          const itemAddress = getAddressString(
+          const itemAddress = addressToHex(
             (item as Record<string, unknown>).address,
           );
           return itemAddress !== address;
@@ -578,7 +578,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
         const original = [...(items as TItem[])];
 
         const optimisticValues = original.map((item: TItem) => {
-          const itemAddress = getAddressString(
+          const itemAddress = addressToHex(
             (item as Record<string, unknown>).address,
           );
           if (itemAddress === address) {
@@ -656,7 +656,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
   const handleUpdate = useCallback(
     (data: Record<string, unknown>) => {
       const item = data as unknown as TItem;
-      const addressStr = getAddressString(
+      const addressStr = addressToHex(
         (item as Record<string, unknown>).address,
       );
 
@@ -680,7 +680,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
         // Optimistic UI Update
         let optimisticValues: TItem[];
         const existingItemIndex = original.findIndex((originalItem: TItem) => {
-          const itemAddress = getAddressString(
+          const itemAddress = addressToHex(
             (originalItem as Record<string, unknown>).address,
           );
           return itemAddress === addressStr;

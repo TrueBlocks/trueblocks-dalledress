@@ -36,7 +36,7 @@ import { msgs, project, types } from '@models';
 import {
   Debugger,
   Log,
-  getAddressString,
+  addressToHex,
   getDisplayAddress,
   useErrorHandler,
 } from '@utils';
@@ -259,10 +259,10 @@ export const Contracts = () => {
     if (!pageData?.contracts) return [];
 
     return pageData.contracts.map((contract: types.Contract) => ({
-      value: getAddressString(contract.address),
+      value: addressToHex(contract.address),
       label: `${contract.name || 'Unknown'} · ${getDisplayAddress(contract.address)}`,
       name: contract.name || 'Unknown',
-      address: getAddressString(contract.address),
+      address: addressToHex(contract.address),
     }));
   }, [pageData?.contracts]);
 
@@ -399,8 +399,8 @@ export const Contracts = () => {
           const contractAddresses = pageData.contracts.map(
             (contract: types.Contract, index: number) => ({
               index,
-              address: getAddressString(contract.address),
-              addressLower: getAddressString(contract.address)?.toLowerCase(),
+              address: addressToHex(contract.address),
+              addressLower: addressToHex(contract.address)?.toLowerCase(),
               name: contract.name,
               hasAbi: !!contract.abi,
             }),
@@ -412,7 +412,7 @@ export const Contracts = () => {
 
         let contractData = pageData?.contracts?.find(
           (contract: types.Contract) =>
-            getAddressString(contract.address)?.toLowerCase() ===
+            addressToHex(contract.address)?.toLowerCase() ===
             activeContract.toLowerCase(),
         );
 
@@ -437,7 +437,7 @@ export const Contracts = () => {
           );
           contractData = pageData.contracts[0];
           if (contractData) {
-            const newAddress = getAddressString(contractData.address);
+            const newAddress = addressToHex(contractData.address);
 
             Log(
               `🆕 Updating activeContract from ${activeContract} to ${newAddress}`,
@@ -537,7 +537,7 @@ export const Contracts = () => {
                   <FacetTitle
                     facet={facetConfig.id}
                     contractName={contractAbi.name}
-                    contractAddress={getAddressString(contractAbi.address)}
+                    contractAddress={addressToHex(contractAbi.address)}
                     availableContracts={availableContracts}
                     onContractChange={async (address: string) => {
                       await setActiveContract(address);

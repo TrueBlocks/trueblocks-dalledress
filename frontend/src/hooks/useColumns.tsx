@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Action } from '@components';
 import { FormField } from '@components';
 import { types } from '@models';
-import { getAddressString } from '@utils';
+import { addressToHex } from '@utils';
 import { ActionType } from 'src/hooks/useActions';
 
 import type { ActionData } from './useActionConfig';
@@ -119,7 +119,7 @@ export const useColumns = (
       visible: true,
       render: (row: Record<string, unknown>) => {
         const canRemove = config.getCanRemove ? config.getCanRemove(row) : true;
-        const addressStr = getAddressString(row.address);
+        const addressStr = addressToHex(row.address);
         const isProcessing = Boolean(row.processing);
         const isDeleted = Boolean(row.deleted);
         const actionData = {

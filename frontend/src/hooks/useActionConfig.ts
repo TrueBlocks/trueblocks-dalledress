@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { FormField } from '@components';
-import { getAddressString } from '@utils';
+import { addressToHex } from '@utils';
 
 interface ActionableItem {
   address?: unknown;
@@ -61,7 +61,7 @@ export const useActionConfig = (options: ActionConfigOptions) => {
   // Function to create action data for a row
   const createActionData = useCallback(
     (row: ActionableItem, canRemove = true): ActionData => {
-      const addressStr = getAddressString(row.address);
+      const addressStr = addressToHex(row.address);
       const isProcessing =
         Boolean(row.processing) || processingAddresses.has(addressStr);
       const isDeleted = Boolean(row.deleted);

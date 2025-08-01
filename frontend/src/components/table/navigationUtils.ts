@@ -4,7 +4,7 @@ import {
   NavigationStrategy,
   NavigationTarget,
 } from '@contexts';
-import { getAddressString } from '@utils';
+import { addressToHex } from '@utils';
 
 // Type for address-containing objects
 interface AddressEntity {
@@ -23,8 +23,7 @@ export const buildNavigationContext = (
     // For ABI data, compare addresses
     if ('address' in row && row.address) {
       return (
-        getAddressString(row.address as AddressEntity['address']) ===
-        deletingRowId
+        addressToHex(row.address as AddressEntity['address']) === deletingRowId
       );
     }
     // For other data types, could add other comparison logic here
@@ -67,7 +66,7 @@ export const navigateWithinPage: NavigationStrategy = (context) => {
     if (nextRow && 'address' in nextRow) {
       return {
         type: 'row',
-        rowId: getAddressString(nextRow.address as AddressEntity['address']),
+        rowId: addressToHex(nextRow.address as AddressEntity['address']),
       };
     }
   }
@@ -78,7 +77,7 @@ export const navigateWithinPage: NavigationStrategy = (context) => {
     if (prevRow && 'address' in prevRow) {
       return {
         type: 'row',
-        rowId: getAddressString(prevRow.address as AddressEntity['address']),
+        rowId: addressToHex(prevRow.address as AddressEntity['address']),
       };
     }
   }

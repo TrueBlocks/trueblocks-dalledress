@@ -18,7 +18,7 @@ import {
   Title,
 } from '@mantine/core';
 import { base } from '@models';
-import { getAddressString } from '@utils';
+import { addressToHex } from '@utils';
 
 // Address Entry Component
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -122,7 +122,7 @@ export const DalleDress = () => {
   useEffect(() => {
     GetProjectAddress().then((addr: base.Address) => {
       if (addr && addr.address && addr.address.length > 0) {
-        setAddress(getAddressString(addr));
+        setAddress(addressToHex(addr));
       }
     });
   }, []);

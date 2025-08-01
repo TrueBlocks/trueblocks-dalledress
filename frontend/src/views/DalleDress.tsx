@@ -18,6 +18,7 @@ import {
   Title,
 } from '@mantine/core';
 import { base } from '@models';
+import { getAddressString } from '@utils';
 
 // Address Entry Component
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,12 +122,7 @@ export const DalleDress = () => {
   useEffect(() => {
     GetProjectAddress().then((addr: base.Address) => {
       if (addr && addr.address && addr.address.length > 0) {
-        setAddress(
-          '0x' +
-            addr.address
-              .map((b: number) => b.toString(16).padStart(2, '0'))
-              .join(''),
-        );
+        setAddress(getAddressString(addr));
       }
     });
   }, []);

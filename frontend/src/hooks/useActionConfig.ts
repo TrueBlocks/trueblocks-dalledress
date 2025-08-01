@@ -61,7 +61,7 @@ export const useActionConfig = (options: ActionConfigOptions) => {
   // Function to create action data for a row
   const createActionData = useCallback(
     (row: ActionableItem, canRemove = true): ActionData => {
-      const addressStr = getAddressString(row.address as string);
+      const addressStr = getAddressString(row.address);
       const isProcessing =
         Boolean(row.processing) || processingAddresses.has(addressStr);
       const isDeleted = Boolean(row.deleted);

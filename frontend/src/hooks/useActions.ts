@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useWalletGatedAction } from '@hooks';
 import { crud, project, sdk, types } from '@models';
-import { Log, useErrorHandler } from '@utils';
+import { Log, getAddressString, useErrorHandler } from '@utils';
 
 import {
   TransactionData,
@@ -14,15 +14,6 @@ const debug = false; // isDebugMode();
 
 // Constants for the unchainedindex.eth contract
 const UNCHAINED_INDEX_CONTRACT = '0x0c316b7042b419d07d343f2f4f5bd54ff731183d';
-
-// Helper function for getting address string - moved outside component for stability
-const getAddressString = (address: unknown): string => {
-  if (typeof address === 'string') return address;
-  if (address && typeof address === 'object' && 'address' in address) {
-    return String((address as { address: unknown }).address);
-  }
-  return String(address || '');
-};
 
 export type ActionType =
   | 'publish'

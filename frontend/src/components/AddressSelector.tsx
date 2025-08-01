@@ -15,6 +15,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { base } from '@models';
+import { getAddressString, getDisplayAddress } from '@utils';
 import { Log } from '@utils';
 
 import { GetAddresses } from '../../wailsjs/go/project/Project';
@@ -67,29 +68,9 @@ export const AddressSelector = () => {
     loadAddresses();
   }, []);
 
-  const formatAddress = (addr: base.Address): string => {
-    if (!addr || !addr.address) return '';
-
-    const hexAddr =
-      '0x' +
-      addr.address.map((b: number) => b.toString(16).padStart(2, '0')).join('');
-
-    // Show first 6 and last 4 characters for display
-    return `${hexAddr.slice(0, 6)}...${hexAddr.slice(-4)}`;
-  };
-
-  const getFullAddress = (addr: base.Address): string => {
-    if (!addr || !addr.address) return '';
-
-    return (
-      '0x' +
-      addr.address.map((b: number) => b.toString(16).padStart(2, '0')).join('')
-    );
-  };
-
   const addressOptions: AddressOption[] = addresses.map((addr) => ({
-    value: getFullAddress(addr),
-    label: formatAddress(addr),
+    value: getAddressString(addr),
+    label: getDisplayAddress(addr),
   }));
 
   const handleAddressChange = async (value: string | null) => {
@@ -100,11 +81,11 @@ export const AddressSelector = () => {
 
       // Find the address object
       const selectedAddr = addresses.find(
-        (addr) => getFullAddress(addr) === value,
+        (addr) => getAddressString(addr) === value,
       );
       if (selectedAddr) {
         await SetActiveAddress(selectedAddr);
-        Log(`Switched to address: ${formatAddress(selectedAddr)}`);
+        Log(`Switched to address: ${getDisplayAddress(selectedAddr)}`);
       }
     } catch (error) {
       Log(`Error switching address: ${error}`);

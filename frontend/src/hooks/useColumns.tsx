@@ -119,7 +119,7 @@ export const useColumns = (
       visible: true,
       render: (row: Record<string, unknown>) => {
         const canRemove = config.getCanRemove ? config.getCanRemove(row) : true;
-        const addressStr = getAddressString(row.address as string);
+        const addressStr = getAddressString(row.address);
         const isProcessing = Boolean(row.processing);
         const isDeleted = Boolean(row.deleted);
         const actionData = {

@@ -33,7 +33,13 @@ import {
 import { useHotkeys } from '@mantine/hooks';
 import { contracts } from '@models';
 import { msgs, project, types } from '@models';
-import { Debugger, Log, useErrorHandler } from '@utils';
+import {
+  Debugger,
+  Log,
+  getAddressString,
+  getDisplayAddress,
+  useErrorHandler,
+} from '@utils';
 
 import { getColumns } from './columns';
 import { ContractDashboard, ContractExecute } from './components';
@@ -253,10 +259,10 @@ export const Contracts = () => {
     if (!pageData?.contracts) return [];
 
     return pageData.contracts.map((contract: types.Contract) => ({
-      value: String(contract.address),
-      label: `${contract.name || 'Unknown'} · ${String(contract.address)}`,
+      value: getAddressString(contract.address),
+      label: `${contract.name || 'Unknown'} · ${getDisplayAddress(contract.address)}`,
       name: contract.name || 'Unknown',
-      address: String(contract.address),
+      address: getAddressString(contract.address),
     }));
   }, [pageData?.contracts]);
 
@@ -393,8 +399,8 @@ export const Contracts = () => {
           const contractAddresses = pageData.contracts.map(
             (contract: types.Contract, index: number) => ({
               index,
-              address: String(contract.address),
-              addressLower: String(contract.address)?.toLowerCase(),
+              address: getAddressString(contract.address),
+              addressLower: getAddressString(contract.address)?.toLowerCase(),
               name: contract.name,
               hasAbi: !!contract.abi,
             }),
@@ -406,7 +412,7 @@ export const Contracts = () => {
 
         let contractData = pageData?.contracts?.find(
           (contract: types.Contract) =>
-            String(contract.address)?.toLowerCase() ===
+            getAddressString(contract.address)?.toLowerCase() ===
             activeContract.toLowerCase(),
         );
 
@@ -431,7 +437,7 @@ export const Contracts = () => {
           );
           contractData = pageData.contracts[0];
           if (contractData) {
-            const newAddress = String(contractData.address);
+            const newAddress = getAddressString(contractData.address);
 
             Log(
               `🆕 Updating activeContract from ${activeContract} to ${newAddress}`,
@@ -531,7 +537,7 @@ export const Contracts = () => {
                   <FacetTitle
                     facet={facetConfig.id}
                     contractName={contractAbi.name}
-                    contractAddress={String(contractAbi.address)}
+                    contractAddress={getAddressString(contractAbi.address)}
                     availableContracts={availableContracts}
                     onContractChange={async (address: string) => {
                       await setActiveContract(address);

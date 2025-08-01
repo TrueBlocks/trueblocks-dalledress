@@ -111,6 +111,32 @@ import { Log } from '@utils';
 Log('Debug message here'); // Single string parameter only
 ```
 
+### Address Handling
+- **NEVER use manual address conversion** - use standardized utilities from `@utils`
+- **Frontend ↔ Backend consistency**: Mirror Go patterns with TypeScript equivalents
+- **Standard conversions**:
+  ```tsx
+  import { addressToHex, hexToAddress, getDisplayAddress, isValidAddress } from '@utils';
+  
+  // Convert address to hex string (equivalent to Go's addr.Hex())
+  const hexString = addressToHex(address);
+  
+  // Convert hex string to address object (equivalent to Go's base.HexToAddress())
+  const addressObj = hexToAddress('0x1234...');
+  
+  // Display truncated address (0x1234...abcd)
+  const display = getDisplayAddress(address);
+  
+  // Validate non-zero address
+  const valid = isValidAddress(address);
+  ```
+- **Forbidden patterns**:
+  - `String(contract.address)` ❌
+  - Manual byte array conversion ❌ 
+  - `address as string` casting ❌
+  - Custom address formatting functions ❌
+  - Legacy function names `getAddressString`, `stringToAddress` ❌
+
 ## Error Handling Protocol
 
 ### Stop Conditions
@@ -123,6 +149,13 @@ Log('Debug message here'); // Single string parameter only
 - Ask "Please clarify: [specific question]" instead of assuming
 - Be honest about mock vs. real implementations
 - Acknowledge when you don't understand something
+
+### Anti-Bloat Principles
+- **Use existing utilities** before creating new ones - check `@utils` first
+- **Maintain consistency** with established patterns across the codebase
+- **Remove redundant code** when standardizing - don't leave both old and new patterns
+- **Check for existing solutions** before implementing custom logic
+- **Follow the principle**: "If we've solved this problem once, reuse that solution"
 
 ## File Structure Context
 

@@ -87,6 +87,12 @@ class AppPreferencesStore {
   private isTestMode = false;
   private cachedSnapshot: UseActiveProjectReturn | null = null;
 
+  // Make getLastFacet a stable bound method to prevent dependency array issues
+  private getLastFacet = (view: string): string => {
+    const vR = view.replace(/^\/+/, '');
+    return this.state.lastFacetMap[vR] || '';
+  };
+
   setTestMode = (testMode: boolean): void => {
     this.isTestMode = testMode;
     if (testMode) {
@@ -247,18 +253,21 @@ class AppPreferencesStore {
     this.setState({ showDetailPanel: enabled });
   };
 
-  getLastFacet = (view: string): string => {
-    const vR = view.replace(/^\/+/, '');
-    return this.state.lastFacetMap[vR] || '';
-  };
-
   setActiveAddress = async (address: string): Promise<void> => {
-    const result = await ConvertToAddress(address);
-    if (result && typeof result === 'object') {
-      await SetActiveAddress(addressToHex(result));
-      this.setState({ activeAddress: address });
-    } else {
-      throw new Error('Invalid address format');
+    try {
+      const result = await ConvertToAddress(address);
+      if (result && typeof result === 'object') {
+        const hexAddress = addressToHex(result);
+        await SetActiveAddress(hexAddress);
+        this.setState({ activeAddress: hexAddress });
+      } else {
+        const errorMsg = `Invalid address - ConvertToAddress returned: ${JSON.stringify(result)}`;
+        Log(`ERROR: ${errorMsg}`);
+        throw new Error(errorMsg);
+      }
+    } catch (error) {
+      Log(`ERROR: Failed to set active address: ${String(error)}`);
+      throw error;
     }
   };
 

@@ -33,7 +33,7 @@ type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
 export const useAppHotkeys = (): void => {
   const [currentLocation] = useLocation();
   const {
-    lastFacetMap,
+    getLastFacet,
     menuCollapsed,
     setMenuCollapsed,
     helpCollapsed,
@@ -44,7 +44,7 @@ export const useAppHotkeys = (): void => {
 
   // Helper function to get current facet for the current route
   const vR = currentLocation.replace(/^\/+/, '');
-  const currentFacet = lastFacetMap[vR] || '';
+  const currentFacet = getLastFacet(vR);
 
   const [, navigate] = useLocation();
   const { emitStatus, emitError } = useEmitters();

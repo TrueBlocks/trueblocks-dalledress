@@ -21,7 +21,7 @@ interface TabViewProps {
 }
 
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
-  const { lastFacetMap, setLastFacet, loading } = useActiveProject();
+  const { getLastFacet, setLastFacet, loading } = useActiveProject();
 
   const [activeTab, setActiveTab] = useState<string>('');
 
@@ -31,7 +31,7 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
     }
 
     const vR = route.replace(/^\/+/, '');
-    const savedTab = lastFacetMap[vR];
+    const savedTab = getLastFacet(vR);
     const isValidSavedTab =
       savedTab &&
       String(savedTab) !== 'undefined' &&
@@ -41,7 +41,7 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
     if (targetTab && targetTab !== activeTab) {
       setActiveTab(targetTab);
     }
-  }, [activeTab, lastFacetMap, route, tabs, loading]);
+  }, [activeTab, getLastFacet, route, tabs, loading]);
 
   const nextTab = useCallback((): string => {
     const currentIndex = tabs.findIndex((tab) => tab.value === activeTab);

@@ -43,7 +43,7 @@ export const useActiveFacet = (
   params: UseActiveFacetParams,
 ): UseActiveFacetReturn => {
   const { viewRoute, facets } = params;
-  const { lastFacetMap, setLastFacet } = useActiveProject();
+  const { getLastFacet, setLastFacet, lastFacetMap } = useActiveProject();
 
   // Simple fallback facet: use first facet
   const computedDefaultFacet = useMemo((): DataFacet => {
@@ -53,7 +53,7 @@ export const useActiveFacet = (
   // Get the currently active facet from preferences or default
   const activeFacet = useMemo((): DataFacet => {
     const vR = viewRoute.replace(/^\/+/, '');
-    const saved = lastFacetMap[vR];
+    const saved = getLastFacet(vR);
     if (saved) {
       const savedAsFacet = saved as unknown as DataFacet;
       if (facets.some((f) => f.id === savedAsFacet)) {
@@ -61,7 +61,8 @@ export const useActiveFacet = (
       }
     }
     return computedDefaultFacet;
-  }, [lastFacetMap, viewRoute, facets, computedDefaultFacet]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getLastFacet, viewRoute, facets, computedDefaultFacet, lastFacetMap]);
 
   // Function to change the active facet
   const setActiveFacet = useCallback(

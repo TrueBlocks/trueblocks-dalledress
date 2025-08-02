@@ -4,7 +4,6 @@ import { TabDivider } from '@components';
 import { useActiveProject, useEvent } from '@hooks';
 import { Tabs } from '@mantine/core';
 import { msgs, types } from '@models';
-import { Log } from '@utils';
 
 import './TabView.css';
 
@@ -22,19 +21,12 @@ interface TabViewProps {
 }
 
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
-  Log(`[TabView] Component rendered for route: ${route}`);
-
-  const { lastFacetMap, setLastFacet, loading } = useActiveProject();
+  const { lastFacetMap, setLastFacet } = useActiveProject();
 
   const [activeTab, setActiveTab] = useState<string>('');
 
   useEffect(() => {
-    Log(
-      `[TabView] useEffect: route=${route}, loading=${loading}, activeTab="${activeTab}"`,
-    );
-
     if (loading) {
-      Log('[TabView] Still loading, skipping tab setup');
       return;
     }
 
@@ -46,17 +38,16 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
       tabs.some((tab) => tab.value === savedTab);
     const targetTab = isValidSavedTab ? savedTab : tabs[0]?.value || '';
 
-    Log(
-      `[TabView] savedTab="${savedTab}", isValidSavedTab=${isValidSavedTab}, targetTab="${targetTab}"`,
-    );
-
     if (targetTab && targetTab !== activeTab) {
-      Log(`[TabView] Setting activeTab to "${targetTab}"`);
       setActiveTab(targetTab);
-    } else {
-      Log('[TabView] No tab change needed');
     }
-  }, [lastFacetMap, route, tabs, activeTab, loading]);
+  }, [
+    activeTab,
+    lastFacetMap,
+    route,
+    tabs,
+    loading
+  ]);
 
   const nextTab = useCallback((): string => {
     const currentIndex = tabs.findIndex((tab) => tab.value === activeTab);
@@ -78,7 +69,6 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
       const vR = route.replace(/^\/+/, '');
       if (vER === vR) {
         const newTab = event.key.startsWith('alt+') ? prevTab() : nextTab();
-        Log(`[TabView] Tab cycle event: "${newTab}" (route=${route})`);
         setActiveTab(newTab);
         setLastFacet(vR, newTab as types.DataFacet);
         if (onTabChange) {
@@ -90,7 +80,6 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
 
   const handleTabChange = (newTab: string | null) => {
     if (newTab === null) return;
-    Log(`[TabView] handleTabChange: "${newTab}" (route=${route})`);
     setActiveTab(newTab);
     const vR = route.replace(/^\/+/, '');
     setLastFacet(vR, newTab as types.DataFacet);

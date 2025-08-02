@@ -195,12 +195,10 @@ class AppPreferencesStore {
         lastView: projectData.lastView || '/',
         // Convert string map to DataFacet map
         lastFacetMap: Object.fromEntries(
-          Object.entries(projectData.lastFacetMap || {}).map(([key, value]) => {
-            Log(
-              `[AppPreferencesStore] Converting lastFacetMap: ${key}="${value}" (type: ${typeof value})`,
-            );
-            return [key, value as types.DataFacet];
-          }),
+          Object.entries(projectData.lastFacetMap || {}).map(([key, value]) => [
+            key,
+            value as types.DataFacet,
+          ]),
         ),
         loading: false,
       });

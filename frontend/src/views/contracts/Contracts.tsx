@@ -199,9 +199,6 @@ export const Contracts = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      Log(
-        `❌ fetchData error: ${err instanceof Error ? err.message : String(err)}`,
-      );
       handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
     }
   }, [

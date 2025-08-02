@@ -30,7 +30,6 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 		Terms: []string{addr},
 	}
 	if names, _, err := opts.Names(); err != nil {
-		// msgs.Send(a.ctx, msgs.Error, msgs.NewErrorMsg(err))
 		return base.ZeroAddr, false
 	} else {
 		if len(names) > 0 {

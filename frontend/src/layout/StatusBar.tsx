@@ -11,6 +11,7 @@ export const StatusBar = () => {
   const [cn, setCn] = useState('okay');
 
   useEvent(msgs.EventType.STATUS, (message: string) => {
+    if (cn === 'error' && visible) return;
     setCn('okay');
     setStatus(message);
     setVisible(true);
@@ -24,11 +25,12 @@ export const StatusBar = () => {
 
   useEffect(() => {
     if (!visible) return;
+    const timeout = cn === 'error' ? 8000 : 1500;
     const timer = setTimeout(() => {
       setVisible(false);
-    }, 1500);
+    }, timeout);
     return () => clearTimeout(timer);
-  }, [visible, status]);
+  }, [visible, status, cn]);
 
   if (!visible) return null;
 

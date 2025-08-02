@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 
 import { TabDivider } from '@components';
 import { useActiveProject, useEvent } from '@hooks';
@@ -94,12 +94,12 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
       >
         <Tabs.List>
           {tabs.map((tab, index) => (
-            <>
+            <Fragment key={`tab-${index}`}>
               {tab.dividerBefore && <TabDivider key={`divider-${index}`} />}
               <Tabs.Tab key={tab.value} value={tab.value}>
                 {tab.label}
               </Tabs.Tab>
-            </>
+            </Fragment>
           ))}
         </Tabs.List>
 

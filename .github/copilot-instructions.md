@@ -186,3 +186,22 @@ dalle/                 # Separate Go module for AI/image generation
 - **File System**: Project management and preferences via Go backend
 
 Follow these patterns precisely. When in doubt, examine existing views like `monitors/` or `status/` for reference implementations.
+
+## Wails Architecture
+
+Go backend runs in the same process as the frontend
+CGO bridge enables direct JavaScript ↔ Go function calls
+Webview (like embedded Chromium) hosts the frontend
+No separate processes - everything runs in a single process
+Direct memory sharing between JS and Go (with serialization at the boundary) So it's even more impressive than IPC! The calls are:
+
+- Synchronous from JS perspective (though Go functions can be async)
+- Direct function invocation across the language boundary
+- Minimal overhead compared to network calls or traditional IPC
+- Shared memory space with serialization only at the JS/Go boundary
+This makes the caching discussion even more interesting because:
+
+- Calls are very fast - Direct CGO bridge, not IPC
+- But serialization still exists - JSON-like marshaling between JS objects and Go structs
+- Caching is still beneficial - Avoids repeated marshaling overhead
+- Cache coherence is still the real problem - Backend transforms data without frontend awareness

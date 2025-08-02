@@ -44,21 +44,24 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 	}
 }
 
-func (a *App) SetActiveAddress(addr base.Address) error {
+func (a *App) SetActiveAddress(addrStr string) error {
+	addr := base.HexToAddress(addrStr)
 	if active := a.GetActiveProject(); active != nil {
 		return active.SetActiveAddress(addr)
 	}
 	return fmt.Errorf("no active project")
 }
 
-func (a *App) AddAddressToProject(addr base.Address) error {
+func (a *App) AddAddressToProject(addrStr string) error {
+	addr := base.HexToAddress(addrStr)
 	if active := a.GetActiveProject(); active != nil {
 		return active.AddAddress(addr)
 	}
 	return fmt.Errorf("no active project")
 }
 
-func (a *App) RemoveAddressFromProject(addr base.Address) error {
+func (a *App) RemoveAddressFromProject(addrStr string) error {
+	addr := base.HexToAddress(addrStr)
 	if active := a.GetActiveProject(); active != nil {
 		return active.RemoveAddress(addr)
 	}

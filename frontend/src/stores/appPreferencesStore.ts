@@ -10,7 +10,7 @@ import {
   SetLastView,
 } from '@app';
 import { preferences, types } from '@models';
-import { Log } from '@utils';
+import { Log, addressToHex } from '@utils';
 
 export interface UseActiveProjectReturn {
   lastTheme: string;
@@ -246,9 +246,9 @@ class AppPreferencesStore {
   };
 
   setActiveAddress = async (address: string): Promise<void> => {
-    const convertedAddress = await ConvertToAddress(address);
-    if (convertedAddress && typeof convertedAddress === 'object') {
-      await SetActiveAddress(convertedAddress);
+    const result = await ConvertToAddress(address);
+    if (result && typeof result === 'object') {
+      await SetActiveAddress(addressToHex(result));
       this.setState({ activeAddress: address });
     } else {
       throw new Error('Invalid address format');

@@ -84,7 +84,7 @@ export const AddressSelector = () => {
         (addr) => addressToHex(addr) === value,
       );
       if (selectedAddr) {
-        await SetActiveAddress(selectedAddr);
+        await SetActiveAddress(addressToHex(selectedAddr));
         Log(`Switched to address: ${getDisplayAddress(selectedAddr)}`);
       }
     } catch (error) {
@@ -100,7 +100,7 @@ export const AddressSelector = () => {
 
       const result = await ConvertToAddress(values.address);
       if (result && typeof result === 'object' && 'hex' in result) {
-        await AddAddressToProject(result as base.Address);
+        await AddAddressToProject(addressToHex(result as base.Address));
         await loadAddresses();
         form.reset();
         setAddModalOpened(false);

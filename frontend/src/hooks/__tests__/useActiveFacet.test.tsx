@@ -38,6 +38,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     mockedUseActiveProject.mockReturnValue({
       lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
+      getLastFacet: vi.fn((view: string) => mockLastFacetMap[view] || ''),
       // Mock other required properties
       lastProject: 'test-project',
       activeChain: 'mainnet',

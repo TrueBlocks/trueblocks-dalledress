@@ -26,6 +26,7 @@ export interface UseActiveProjectReturn {
   activeContract: string;
   lastView: string;
   lastFacetMap: Record<string, types.DataFacet>;
+  getLastFacet: (view: string) => string;
   setActiveAddress: (address: string) => Promise<void>;
   setActiveChain: (chain: string) => Promise<void>;
   setActiveContract: (contract: string) => Promise<void>;
@@ -109,6 +110,7 @@ class AppPreferencesStore {
         activeContract: this.state.activeContract,
         lastView: this.state.lastView,
         lastFacetMap: this.state.lastFacetMap,
+        getLastFacet: this.getLastFacet,
         setActiveAddress: this.setActiveAddress,
         setActiveChain: this.setActiveChain,
         setActiveContract: this.setActiveContract,
@@ -243,6 +245,11 @@ class AppPreferencesStore {
   setShowDetailPanel = async (enabled: boolean): Promise<void> => {
     await this.updatePreferences({ showDetailPanel: enabled });
     this.setState({ showDetailPanel: enabled });
+  };
+
+  getLastFacet = (view: string): string => {
+    const vR = view.replace(/^\/+/, '');
+    return this.state.lastFacetMap[vR] || '';
   };
 
   setActiveAddress = async (address: string): Promise<void> => {

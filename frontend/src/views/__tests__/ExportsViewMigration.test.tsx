@@ -43,6 +43,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     mockedUseActiveProject.mockReturnValue({
       lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
+      getLastFacet: vi.fn((view: string) => mockLastFacetMap[view] || ''),
       // Mock other required properties
       activeChain: 'mainnet',
       activeAddress: '0x123',

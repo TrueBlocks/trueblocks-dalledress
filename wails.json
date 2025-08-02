@@ -9,8 +9,5 @@
   "author": {
     "name": "TrueBlocks",
     "email": "info@trueblocks.io"
-  },
-  "bindings": {
-    "exclude": ["base.Wei", "base.Float"]
   }
 }

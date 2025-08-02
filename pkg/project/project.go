@@ -264,6 +264,7 @@ func (p *Project) SetLastView(view string) error {
 func (p *Project) GetLastFacet(view string) string {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
+	view = strings.Trim(view, "/")
 	return p.LastFacetMap[view]
 }
 
@@ -275,8 +276,9 @@ func (p *Project) SetLastFacet(view, facet string) error {
 	if p.LastFacetMap == nil {
 		p.LastFacetMap = make(map[string]string)
 	}
-	currentFacet := p.LastFacetMap[view]
-	if currentFacet != facet {
+	view = strings.Trim(view, "/")
+	current := p.LastFacetMap[view]
+	if current != facet {
 		p.LastFacetMap[view] = facet
 		return p.Save()
 	}

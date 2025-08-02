@@ -31,7 +31,7 @@ import { Debugger, useErrorHandler } from '@utils';
 import { getColumns } from './columns';
 import { abisFacets } from './facets';
 
-export const ROUTE = '/abis' as const;
+export const ROUTE = 'abis' as const;
 export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);

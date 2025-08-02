@@ -52,8 +52,8 @@ export const useActiveFacet = (
 
   // Get the currently active facet from preferences or default
   const activeFacet = useMemo((): DataFacet => {
-    const saved = lastFacetMap[viewRoute];
-
+    const vR = viewRoute.replace(/^\/+/, '');
+    const saved = lastFacetMap[vR];
     if (saved) {
       const savedAsFacet = saved as unknown as DataFacet;
       if (facets.some((f) => f.id === savedAsFacet)) {
@@ -66,7 +66,8 @@ export const useActiveFacet = (
   // Function to change the active facet
   const setActiveFacet = useCallback(
     (facet: DataFacet): void => {
-      setLastFacet(viewRoute, facet);
+      const vR = viewRoute.replace(/^\/+/, '');
+      setLastFacet(vR, facet);
     },
     [setLastFacet, viewRoute],
   );

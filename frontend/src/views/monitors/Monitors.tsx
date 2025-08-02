@@ -31,7 +31,7 @@ import { Debugger, useErrorHandler } from '@utils';
 import { getColumns } from './columns';
 import { monitorsFacets } from './facets';
 
-export const ROUTE = '/monitors' as const;
+export const ROUTE = 'monitors' as const;
 export const Monitors = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);

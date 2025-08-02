@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 import { SetInitialized } from '@app';
-import { DalleDress, Home, Khedra, Settings } from '@views';
+import { DalleDress, Home, Khedra, Projects, Settings } from '@views';
 import {
   Abis,
   Chunks,
@@ -118,6 +118,15 @@ export const MenuItems: MenuItem[] = [
     component: Khedra,
     hotkey: 'mod+0',
     altHotkey: 'alt+0',
+    type: 'navigation',
+  },
+  {
+    label: 'Projects',
+    path: '/projects',
+    position: 'bottom',
+    component: Projects,
+    hotkey: 'mod+shift+0',
+    altHotkey: 'alt+shift+0',
     type: 'navigation',
   },
   {

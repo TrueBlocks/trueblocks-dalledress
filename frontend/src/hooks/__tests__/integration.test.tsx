@@ -82,12 +82,12 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
     it('tests ViewStateKey uniqueness across all combinations', () => {
       const routes = ['exports', 'chunks', 'monitors', 'names', 'abis'];
       const facets = [
-        'transactions',
+        'statements',
         'receipts',
-        'chunk-summary',
-        'txs',
-        'entity-names',
-        'get-abis',
+        'stats',
+        'all',
+        'custom',
+        'downloaded',
       ];
 
       const keys: project.ViewStateKey[] = [];
@@ -114,7 +114,7 @@ describe('Hook Integration Tests (DataFacet refactor preparation)', () => {
 
     it('validates ViewStateKey structure required by hooks', () => {
       const validKey: project.ViewStateKey = {
-        viewName: '/test-view',
+        viewName: 'test-view',
         facetName: types.DataFacet.ALL,
       };
 

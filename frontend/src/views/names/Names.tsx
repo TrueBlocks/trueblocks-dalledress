@@ -36,7 +36,7 @@ import { Debugger, useErrorHandler } from '@utils';
 import { getColumns } from './columns';
 import { namesFacets } from './facets';
 
-export const ROUTE = '/names' as const;
+export const ROUTE = 'names' as const;
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);

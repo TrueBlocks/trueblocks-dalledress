@@ -17,3 +17,4 @@ export { Names } from './names';
 export { Chunks } from './chunks';
 export { Contracts } from './contracts';
 export { Status } from './status';
+export { Projects } from './projects/Projects';

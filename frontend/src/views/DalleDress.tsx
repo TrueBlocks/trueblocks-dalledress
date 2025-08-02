@@ -165,5 +165,5 @@ export const DalleDress = () => {
     // ...add more templates as needed
   ];
 
-  return <TabView tabs={tabs} route="/dalledress" />;
+  return <TabView tabs={tabs} route="dalledress" />;
 };

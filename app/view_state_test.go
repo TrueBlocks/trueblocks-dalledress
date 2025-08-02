@@ -236,7 +236,7 @@ func TestGetWizardReturn(t *testing.T) {
 			setup: func(app *App) {
 				proj := app.Projects.NewProject("test", base.ZeroAddr, []string{"mainnet"})
 				proj.Path = "/tmp/test.tbx" // Set path so project can save
-				_ = proj.SetLastView("/monitors/wizard")
+				_ = proj.SetLastView("monitors/wizard")
 			},
 			expected: "monitors/",
 		},

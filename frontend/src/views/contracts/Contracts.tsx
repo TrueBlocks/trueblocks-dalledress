@@ -119,7 +119,7 @@ const FacetTitle: React.FC<FacetTitleProps> = ({
   );
 };
 
-export const ROUTE = '/contracts' as const;
+export const ROUTE = 'contracts' as const;
 export const Contracts = () => {
   // === SECTION 2: Contract Detail Detection ===
   const { activeContract, setActiveContract } = useActiveProject();

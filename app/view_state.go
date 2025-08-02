@@ -66,9 +66,9 @@ func (a *App) ClearFilterState(key project.ViewStateKey) error {
 	return fmt.Errorf("no active project")
 }
 
-// GetWizardReturn returns the last view without the "/wizard" prefix
+// GetWizardReturn returns the last view without the "wizard" suffix
 func (a *App) GetWizardReturn() string {
-	return strings.Replace(a.GetLastView(), "/wizard", "/", -1)
+	return strings.Replace(a.GetLastView(), "wizard", "", -1)
 }
 
 // GetProjectViewState retrieves all filter states for a given view name from the active project

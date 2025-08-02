@@ -8,5 +8,5 @@ export const Settings = () => {
     { label: 'App', value: 'app', content: <SettingsApp /> },
   ];
 
-  return <TabView tabs={tabs} route="/settings" />;
+  return <TabView tabs={tabs} route="settings" />;
 };

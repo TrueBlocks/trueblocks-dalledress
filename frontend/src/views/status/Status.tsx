@@ -28,7 +28,7 @@ import { Debugger, useErrorHandler } from '@utils';
 import { getColumns } from './columns';
 import { statusFacets } from './facets';
 
-export const ROUTE = '/status' as const;
+export const ROUTE = 'status' as const;
 export const Status = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);

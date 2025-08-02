@@ -43,7 +43,8 @@ export const useAppHotkeys = (): void => {
   } = useActiveProject();
 
   // Helper function to get current facet for the current route
-  const currentFacet = lastFacetMap[currentLocation] || '';
+  const vR = currentLocation.replace(/^\/+/, '');
+  const currentFacet = lastFacetMap[vR] || '';
 
   const [, navigate] = useLocation();
   const { emitStatus, emitError } = useEmitters();

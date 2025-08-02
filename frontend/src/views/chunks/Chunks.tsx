@@ -28,7 +28,7 @@ import { Debugger, useErrorHandler } from '@utils';
 import { getColumns } from './columns';
 import { chunksFacets } from './facets';
 
-export const ROUTE = '/chunks' as const;
+export const ROUTE = 'chunks' as const;
 export const Chunks = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);

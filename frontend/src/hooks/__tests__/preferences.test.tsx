@@ -178,7 +178,7 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       // Routes not in the stored lastFacetMap should return undefined
       expect(result.current.lastFacetMap['names']).toBeUndefined();
       expect(result.current.lastFacetMap['abis']).toBeUndefined();
-      expect(result.current.lastFacetMap['/unknown-route']).toBeUndefined();
+      expect(result.current.lastFacetMap['unknown-route']).toBeUndefined();
     });
 
     it('calls setLastFacet with correct parameters', async () => {
@@ -268,13 +268,13 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
       // Test that it can be called to set defaults
       await act(async () => {
         await result.current.setLastFacet(
-          '/new-route',
+          'new-route',
           'transactions' as types.DataFacet,
         );
       });
 
       expect(mockFns.mockSetLastFacet).toHaveBeenCalledWith(
-        '/new-route',
+        'new-route',
         'transactions',
       );
     });
@@ -305,9 +305,9 @@ describe('Preference System Tests (DataFacet refactor preparation)', () => {
 
       // Test routes that might have special characters
       const specialRoutes = [
-        '/exports/sub-route',
-        '/exports?param=value',
-        '/exports#hash',
+        'exports/sub-route',
+        'exports?param=value',
+        'exports#hash',
       ];
 
       for (const route of specialRoutes) {

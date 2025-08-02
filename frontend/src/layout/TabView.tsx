@@ -4,6 +4,7 @@ import { TabDivider } from '@components';
 import { useActiveProject, useEvent } from '@hooks';
 import { Tabs } from '@mantine/core';
 import { msgs, types } from '@models';
+import { Log } from '@utils';
 
 import './TabView.css';
 
@@ -21,33 +22,41 @@ interface TabViewProps {
 }
 
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
-  const { lastFacetMap, setLastFacet } = useActiveProject();
+  Log(`[TabView] Component rendered for route: ${route}`);
 
-  const getInitialTab = (): string => {
-    const savedTab = lastFacetMap[route];
-    if (savedTab) {
-      return savedTab;
-    }
-    return tabs[0]?.value || '';
-  };
+  const { lastFacetMap, setLastFacet, loading } = useActiveProject();
 
-  const [activeTab, setActiveTab] = useState<string>(getInitialTab());
+  const [activeTab, setActiveTab] = useState<string>('');
 
   useEffect(() => {
-    const savedTab = lastFacetMap[route];
-    if (savedTab && savedTab !== activeTab) {
-      setActiveTab(savedTab);
-    }
-  }, [lastFacetMap, route, activeTab]);
+    Log(
+      `[TabView] useEffect: route=${route}, loading=${loading}, activeTab="${activeTab}"`,
+    );
 
-  useEffect(() => {
-    if (activeTab && !lastFacetMap[route]) {
-      setLastFacet(route, activeTab as types.DataFacet);
-      if (onTabChange) {
-        onTabChange(activeTab);
-      }
+    if (loading) {
+      Log('[TabView] Still loading, skipping tab setup');
+      return;
     }
-  }, [activeTab, lastFacetMap, route, setLastFacet, onTabChange]);
+
+    const vR = route.replace(/^\/+/, '');
+    const savedTab = lastFacetMap[vR];
+    const isValidSavedTab =
+      savedTab &&
+      String(savedTab) !== 'undefined' &&
+      tabs.some((tab) => tab.value === savedTab);
+    const targetTab = isValidSavedTab ? savedTab : tabs[0]?.value || '';
+
+    Log(
+      `[TabView] savedTab="${savedTab}", isValidSavedTab=${isValidSavedTab}, targetTab="${targetTab}"`,
+    );
+
+    if (targetTab && targetTab !== activeTab) {
+      Log(`[TabView] Setting activeTab to "${targetTab}"`);
+      setActiveTab(targetTab);
+    } else {
+      Log('[TabView] No tab change needed');
+    }
+  }, [lastFacetMap, route, tabs, activeTab, loading]);
 
   const nextTab = useCallback((): string => {
     const currentIndex = tabs.findIndex((tab) => tab.value === activeTab);
@@ -64,10 +73,14 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
   useEvent<{ route: string; key: string }>(
     msgs.EventType.TAB_CYCLE,
     (_message: string, event?: { route: string; key: string }) => {
-      if (event?.route === route) {
+      if (!event) return;
+      const vER = event.route?.replace(/^\/+/, '') || '';
+      const vR = route.replace(/^\/+/, '');
+      if (vER === vR) {
         const newTab = event.key.startsWith('alt+') ? prevTab() : nextTab();
+        Log(`[TabView] Tab cycle event: "${newTab}" (route=${route})`);
         setActiveTab(newTab);
-        setLastFacet(route, newTab as types.DataFacet);
+        setLastFacet(vR, newTab as types.DataFacet);
         if (onTabChange) {
           onTabChange(newTab);
         }
@@ -77,8 +90,10 @@ export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
 
   const handleTabChange = (newTab: string | null) => {
     if (newTab === null) return;
+    Log(`[TabView] handleTabChange: "${newTab}" (route=${route})`);
     setActiveTab(newTab);
-    setLastFacet(route, newTab as types.DataFacet);
+    const vR = route.replace(/^\/+/, '');
+    setLastFacet(vR, newTab as types.DataFacet);
     if (onTabChange) {
       onTabChange(newTab);
     }

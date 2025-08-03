@@ -43,7 +43,7 @@ export const useActiveFacet2 = ({
   viewRoute,
   facets,
 }: UseActiveFacetParams2): UseActiveFacetReturn2 => {
-  const { getLastFacet, setLastFacet } = useActiveProject2();
+  const { getLastFacet, setLastFacet, lastFacetMap } = useActiveProject2();
 
   const getDefaultFacet = useCallback((): DataFacet => {
     const firstFacet = facets[0];
@@ -57,7 +57,8 @@ export const useActiveFacet2 = ({
     const isValidFacet = facets.some((facet) => facet.id === saved);
 
     return isValidFacet ? (saved as DataFacet) : getDefaultFacet();
-  }, [getLastFacet, viewRoute, facets, getDefaultFacet]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getLastFacet, viewRoute, facets, getDefaultFacet, lastFacetMap]);
 
   const setActiveFacet = useCallback(
     async (facet: DataFacet): Promise<void> => {

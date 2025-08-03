@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { CloseProject, GetOpenProjects, SwitchToProject } from '@app';
 import { Action } from '@components';
 import { useViewContext } from '@contexts';
-import { useActiveProject, useEvent, useIconSets } from '@hooks';
+import { useActiveProject2, useEvent, useIconSets } from '@hooks';
 import { Group, List, Paper, Text, ThemeIcon, Title } from '@mantine/core';
 import { msgs } from '@models';
 import { Log } from '@utils';
@@ -24,7 +24,7 @@ export const ProjectsList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const { File } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
-  const { lastView } = useActiveProject();
+  const { lastView } = useActiveProject2();
   const [, navigate] = useLocation();
 
   const refreshProjects = async () => {

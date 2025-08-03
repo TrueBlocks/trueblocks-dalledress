@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { GetLastFacet, GetMarkdown } from '@app';
 import { ChevronButton } from '@components';
-import { useActiveProject } from '@hooks';
+import { useActiveProject2, useUIState } from '@hooks';
 import { AppShell, Stack, Text } from '@mantine/core';
 import Markdown from 'markdown-to-jsx';
 import { useLocation } from 'wouter';
@@ -10,7 +10,8 @@ import { useLocation } from 'wouter';
 export const HelpBar = () => {
   const [markdown, setMarkdown] = useState<string>('Loading...');
   const [currentLocation] = useLocation();
-  const { lastView, helpCollapsed, setHelpCollapsed } = useActiveProject();
+  const { lastView } = useActiveProject2();
+  const { helpCollapsed, setHelpCollapsed } = useUIState();
 
   useEffect(() => {
     var headerText = currentLocation.startsWith('/')

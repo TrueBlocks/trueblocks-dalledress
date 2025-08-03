@@ -1,6 +1,5 @@
 export * from './Debugger';
 export * from './addresses';
-export * from './debugMode';
 export * from './ether';
 export * from './eventUtils';
 export * from './registerHotkeys';

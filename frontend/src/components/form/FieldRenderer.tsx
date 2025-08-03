@@ -1,7 +1,7 @@
 import { ChangeEvent, forwardRef } from 'react';
 
 import { FormField } from '@components';
-import { useActiveProject } from '@hooks';
+import { useActiveProject2 } from '@hooks';
 import { Fieldset, Stack, Text, TextInput } from '@mantine/core';
 import { formatWeiToEther, formatWeiToGigawei } from '@utils';
 
@@ -21,7 +21,7 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
     { field, mode, onChange, onBlur, loading, keyProp, autoFocus, tableCell },
     ref,
   ) => {
-    const { activeAddress } = useActiveProject();
+    const { activeAddress } = useActiveProject2();
 
     if (field.fields && field.fields.length > 0) {
       return (

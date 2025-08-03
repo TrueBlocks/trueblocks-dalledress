@@ -3,7 +3,7 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronButton, useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
 import { useFiltering } from '@contexts';
-import { useActiveProject } from '@hooks';
+import { useUIState } from '@hooks';
 import { Modal } from '@mantine/core';
 import { project } from '@models';
 
@@ -55,7 +55,7 @@ export const Table = <T extends Record<string, unknown>>({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRowData, setCurrentRowData] = useState<T | null>(null);
 
-  const { showDetailPanel, setShowDetailPanel } = useActiveProject();
+  const { showDetailPanel, setShowDetailPanel } = useUIState();
 
   const processedColumns = processColumns(columns);
 

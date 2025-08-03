@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
 import { Action, WalletConnectButton } from '@components';
-import { useActiveProject } from '@hooks';
+import { usePreferences2 } from '@hooks';
 import { AppShell, Group, Text, useMantineColorScheme } from '@mantine/core';
 
 export const Header = () => {
   const [appName, setAppName] = useState('AppName');
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const { toggleTheme, isDarkMode, toggleDebugMode, debugMode } =
-    useActiveProject();
+    usePreferences2();
 
   useEffect(() => {
     GetAppId().then((id) => {

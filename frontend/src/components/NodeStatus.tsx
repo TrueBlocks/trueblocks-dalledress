@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { GetNodeStatus } from '@app';
-import { useActiveProject } from '@hooks';
+import { useActiveProject2 } from '@hooks';
 import { types } from '@models';
 import { useLocation } from 'wouter';
 
@@ -10,7 +10,7 @@ export const NodeStatus = () => {
   const [spinnerIndex, setSpinnerIndex] = useState(0);
   const [location, navigate] = useLocation();
   const previousView = useRef<string | null>(null);
-  const { activeChain } = useActiveProject();
+  const { activeChain } = useActiveProject2();
 
   useEffect(() => {
     const getStatus = async () => {

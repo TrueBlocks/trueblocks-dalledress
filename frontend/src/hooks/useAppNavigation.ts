@@ -2,14 +2,14 @@ import { useEffect, useRef } from 'react';
 
 import { useLocation } from 'wouter';
 
-import { useActiveProject } from './useActiveProject';
+import { useActiveProject2 } from './useActiveProject2';
 import { useAppReadiness } from './useAppReadiness';
 
 export const useAppNavigation = () => {
   const [location, navigate] = useLocation();
   const ready = useAppReadiness();
   const hasRedirected = useRef(false);
-  const { lastView, setLastView, loading } = useActiveProject();
+  const { lastView, setLastView, loading } = useActiveProject2();
 
   const isWizard = location.startsWith('/wizard');
 

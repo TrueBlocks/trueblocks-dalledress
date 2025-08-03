@@ -1,5 +1,5 @@
 import { CancelFetch, Reload } from '@app';
-import { useActiveProject } from '@hooks';
+import { useActiveProject2, useUIState } from '@hooks';
 import { msgs, types } from '@models';
 import { Log, emitEvent, registerHotkeys, useEmitters } from '@utils';
 import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
@@ -32,15 +32,15 @@ type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
 
 export const useAppHotkeys = (): void => {
   const [currentLocation] = useLocation();
+  const { getLastFacet } = useActiveProject2();
   const {
-    getLastFacet,
     menuCollapsed,
     setMenuCollapsed,
     helpCollapsed,
     setHelpCollapsed,
     showDetailPanel,
     setShowDetailPanel,
-  } = useActiveProject();
+  } = useUIState();
 
   // Helper function to get current facet for the current route
   const vR = currentLocation.replace(/^\/+/, '');

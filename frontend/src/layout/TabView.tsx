@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useState } from 'react';
 
 import { TabDivider } from '@components';
-import { useActiveProject, useEvent } from '@hooks';
+import { useActiveProject2, useEvent } from '@hooks';
 import { Tabs } from '@mantine/core';
 import { msgs, types } from '@models';
 
@@ -21,7 +21,7 @@ interface TabViewProps {
 }
 
 export const TabView = ({ tabs, route, onTabChange }: TabViewProps) => {
-  const { getLastFacet, setLastFacet, loading } = useActiveProject();
+  const { getLastFacet, setLastFacet, loading } = useActiveProject2();
 
   const [activeTab, setActiveTab] = useState<string>('');
 

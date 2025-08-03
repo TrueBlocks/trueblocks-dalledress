@@ -107,8 +107,8 @@ vi.mock('@hooks', () => ({
     Light: () => null,
     Dark: () => null,
   }),
-  useActiveProject: () => ({
-    // State
+  useActiveProject2: () => ({
+    // State values that come from focused hooks
     lastTheme: 'light',
     lastLanguage: 'en',
     lastView: 'home',
@@ -116,9 +116,16 @@ vi.mock('@hooks', () => ({
     helpCollapsed: false,
     lastFacetMap: {},
     loading: false,
+    activeAddress: '0x123',
+    activeChain: 'mainnet',
+    activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+    effectiveAddress: '0x123',
+    effectiveChain: 'mainnet',
+    lastProject: 'test-project',
     // Actions
     setActiveAddress: vi.fn(),
     setActiveChain: vi.fn(),
+    setActiveContract: vi.fn(),
     switchProject: vi.fn(),
     toggleTheme: vi.fn(),
     changeLanguage: vi.fn(),

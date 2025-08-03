@@ -4,11 +4,11 @@ import { HasActiveProject, ValidateActiveProject } from '@app';
 import { NodeStatus, ProjectSelectionModal, getBarWidth } from '@components';
 import { ViewContextProvider, WalletConnectProvider } from '@contexts';
 import {
-  useActiveProject,
   useAppHealth,
   useAppHotkeys,
   useAppNavigation,
   useEvent,
+  useUIState,
 } from '@hooks';
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
@@ -86,7 +86,7 @@ export const App = () => {
   });
 
   const { ready, isWizard } = useAppNavigation();
-  const { menuCollapsed, helpCollapsed } = useActiveProject();
+  const { menuCollapsed, helpCollapsed } = useUIState();
 
   useAppHotkeys();
   useAppHealth();

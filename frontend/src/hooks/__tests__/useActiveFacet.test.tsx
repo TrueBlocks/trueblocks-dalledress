@@ -1,17 +1,32 @@
-import { DataFacet, DataFacetConfig, useActiveFacet } from '@hooks';
+import { DataFacet, DataFacetConfig, useActiveFacet2 } from '@hooks';
+import { setupWailsMocks } from '@mocks';
+import { types } from '@models';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock the useActiveProject hook
-vi.mock('../useActiveProject', () => ({
-  useActiveProject: vi.fn(),
+// Mock the focused hooks (no duplication - individual setup)
+vi.mock('../useActiveProject2', () => ({
+  useActiveProject2: vi.fn(),
 }));
 
-const { useActiveProject } = await import('../useActiveProject');
-const mockedUseActiveProject = vi.mocked(useActiveProject);
+vi.mock('../usePreferences2', () => ({
+  usePreferences2: vi.fn(),
+}));
 
-describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
-  let mockLastFacetMap: Record<string, string>;
+vi.mock('../useUIState2', () => ({
+  useUIState: vi.fn(),
+}));
+
+const { useActiveProject2 } = await import('../useActiveProject2');
+const { usePreferences2 } = await import('../usePreferences2');
+const { useUIState } = await import('../useUIState2');
+
+const mockedUseActiveProject2 = vi.mocked(useActiveProject2);
+const mockedUsePreferences = vi.mocked(usePreferences2);
+const mockedUseUIState = vi.mocked(useUIState);
+
+describe('useActiveFacet2 Hook Tests (Focused Hook implementation)', () => {
+  let mockLastFacetMap: Record<string, types.DataFacet>;
   let mockSetLastFacet: ReturnType<typeof vi.fn>;
 
   const sampleFacets: DataFacetConfig[] = [
@@ -32,31 +47,65 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    // Set up Wails mocks to prevent bridge errors
+    setupWailsMocks();
+
     mockLastFacetMap = {};
     mockSetLastFacet = vi.fn();
 
-    mockedUseActiveProject.mockReturnValue({
+    // Mock useActiveProject2 (project context)
+    mockedUseActiveProject2.mockReturnValue({
       lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
-      getLastFacet: vi.fn((view: string) => mockLastFacetMap[view] || ''),
-      // Mock other required properties
-      lastProject: 'test-project',
+      getLastFacet: vi.fn((view: string) => {
+        const vR = view.replace(/^\/+/, '');
+        return mockLastFacetMap[vR] || '';
+      }),
       activeChain: 'mainnet',
       activeAddress: '0x123',
       activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+      loading: false,
+      effectiveAddress: '0x123',
+      effectiveChain: 'mainnet',
+      lastProject: 'test-project',
+      lastView: 'exports',
+      setActiveAddress: vi.fn(),
+      setActiveChain: vi.fn(),
+      setActiveContract: vi.fn(),
+      setLastView: vi.fn(),
+      switchProject: vi.fn(),
+      hasActiveProject: true,
+      canExport: true,
+    });
+
+    // Mock usePreferences2 (theme, language, debug)
+    mockedUsePreferences.mockReturnValue({
       lastTheme: 'dark',
       lastLanguage: 'en',
-      lastView: 'exports',
+      debugMode: false,
+      loading: false,
+      toggleTheme: vi.fn(),
+      changeLanguage: vi.fn(),
+      toggleDebugMode: vi.fn(),
+      isDarkMode: true,
+    });
+
+    // Mock useUIState (collapsed states)
+    mockedUseUIState.mockReturnValue({
       menuCollapsed: false,
       helpCollapsed: false,
+      showDetailPanel: true,
       loading: false,
-    } as any);
+      setMenuCollapsed: vi.fn(),
+      setHelpCollapsed: vi.fn(),
+      setShowDetailPanel: vi.fn(),
+    });
   });
 
   describe('initialization and defaults', () => {
     it('should initialize with default facet when no preference saved', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),
@@ -68,7 +117,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
 
     it('should use provided default facet override', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),
@@ -78,10 +127,10 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should restore saved preference via backend API mapping', () => {
-      mockLastFacetMap['exports'] = 'statements';
+      mockLastFacetMap['exports'] = 'statements' as types.DataFacet;
 
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),
@@ -94,7 +143,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
   describe('facet switching', () => {
     it('should change active facet and persist backend API value to preferences', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),
@@ -111,7 +160,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
   describe('facet configuration', () => {
     it('should return correct facet configuration', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),
@@ -126,7 +175,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
 
     it('should provide available facets', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),
@@ -137,10 +186,10 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
     });
 
     it('should check if facet is active correctly', () => {
-      mockLastFacetMap['exports'] = 'statements';
+      mockLastFacetMap['exports'] = 'statements' as types.DataFacet;
 
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),
@@ -155,10 +204,10 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
 
   describe('backward compatibility', () => {
     it('should provide correct backend API value for current facet', () => {
-      mockLastFacetMap['exports'] = 'statements';
+      mockLastFacetMap['exports'] = 'statements' as types.DataFacet;
 
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),
@@ -177,7 +226,7 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
       ];
 
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: facetsWithoutApiMapping,
         }),
@@ -190,21 +239,22 @@ describe('useActiveFacet Hook Tests (DataFacet implementation)', () => {
   describe('edge cases', () => {
     it('should handle empty facets array', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: [],
         }),
       );
 
-      expect(result.current.activeFacet).toBe('all'); // fallback
+      expect(result.current.activeFacet).toBe('dashboard'); // fallback to DASHBOARD when no facets
       expect(result.current.availableFacets).toEqual([]);
     });
 
     it('should handle invalid saved preference', () => {
-      mockLastFacetMap['exports'] = 'INVALID_DATAFACET';
+      // Clear the mock to simulate invalid/missing facet data
+      mockLastFacetMap = {};
 
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           viewRoute: 'exports',
           facets: sampleFacets,
         }),

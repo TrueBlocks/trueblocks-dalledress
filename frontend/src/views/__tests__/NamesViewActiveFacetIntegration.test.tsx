@@ -1,17 +1,32 @@
-import { DataFacet, DataFacetConfig, useActiveFacet } from '@hooks';
+import { DataFacet, DataFacetConfig, useActiveFacet2 } from '@hooks';
+import { setupWailsMocks } from '@mocks';
+import { types } from '@models';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock the useActiveProject hook
-vi.mock('../../hooks/useActiveProject', () => ({
-  useActiveProject: vi.fn(),
+// Mock the focused hooks (no duplication - individual setup)
+vi.mock('../../hooks/useActiveProject2', () => ({
+  useActiveProject2: vi.fn(),
 }));
 
-const { useActiveProject } = await import('../../hooks/useActiveProject');
-const mockedUseActiveProject = vi.mocked(useActiveProject);
+vi.mock('../../hooks/usePreferences2', () => ({
+  usePreferences2: vi.fn(),
+}));
 
-describe('Names View + useActiveFacet Integration Tests', () => {
-  let mockLastFacetMap: Record<string, string>;
+vi.mock('../../hooks/useUIState2', () => ({
+  useUIState: vi.fn(),
+}));
+
+const { useActiveProject2 } = await import('../../hooks/useActiveProject2');
+const { usePreferences2 } = await import('../../hooks/usePreferences2');
+const { useUIState } = await import('../../hooks/useUIState2');
+
+const mockedUseActiveProject2 = vi.mocked(useActiveProject2);
+const mockedUsePreferences = vi.mocked(usePreferences2);
+const mockedUseUIState = vi.mocked(useUIState);
+
+describe('Names View + useActiveFacet2 Integration Tests', () => {
+  let mockLastFacetMap: Record<string, types.DataFacet>;
   let mockSetLastFacet: ReturnType<typeof vi.fn>;
   const namesFacets: DataFacetConfig[] = [
     {
@@ -39,27 +54,66 @@ describe('Names View + useActiveFacet Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    // Set up Wails mocks to prevent bridge errors
+    setupWailsMocks();
+
     // Mock successful project state
     mockLastFacetMap = {};
     mockSetLastFacet = vi.fn();
 
-    mockedUseActiveProject.mockReturnValue({
+    // Mock useActiveProject2 (project context)
+    mockedUseActiveProject2.mockReturnValue({
       lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
-      getLastFacet: vi.fn((view: string) => mockLastFacetMap[view] || ''),
-      // Mock other required properties
+      getLastFacet: vi.fn((view: string) => {
+        const vR = view.replace(/^\/+/, '');
+        return mockLastFacetMap[vR] || '';
+      }),
       activeChain: 'mainnet',
       activeAddress: '0x123',
       activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
-      projects: [],
-      currentProject: { name: 'test-project', chain: 'mainnet' },
-    } as any);
+      loading: false,
+      effectiveAddress: '0x123',
+      effectiveChain: 'mainnet',
+      lastProject: 'test-project',
+      lastView: 'names',
+      setActiveAddress: vi.fn(),
+      setActiveChain: vi.fn(),
+      setActiveContract: vi.fn(),
+      setLastView: vi.fn(),
+      switchProject: vi.fn(),
+      hasActiveProject: true,
+      canExport: true,
+    });
+
+    // Mock usePreferences2 (theme, language, debug)
+    mockedUsePreferences.mockReturnValue({
+      lastTheme: 'dark',
+      lastLanguage: 'en',
+      debugMode: false,
+      loading: false,
+      toggleTheme: vi.fn(),
+      changeLanguage: vi.fn(),
+      toggleDebugMode: vi.fn(),
+      isDarkMode: true,
+    });
+
+    // Mock useUIState (collapsed states)
+    mockedUseUIState.mockReturnValue({
+      menuCollapsed: false,
+      helpCollapsed: false,
+      showDetailPanel: true,
+      loading: false,
+      setMenuCollapsed: vi.fn(),
+      setHelpCollapsed: vi.fn(),
+      setShowDetailPanel: vi.fn(),
+    });
   });
 
-  describe('useActiveFacet hook behavior with Names facets', () => {
+  describe('useActiveFacet2 hook behavior with Names facets', () => {
     it('returns correct default values for Names view', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -72,7 +126,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
 
     it('maintains facet consistency across state changes', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -90,11 +144,11 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       expect(mockSetLastFacet).toHaveBeenCalledWith('names', 'prefund');
 
       // Update mock to simulate preference persistence
-      mockLastFacetMap['names'] = 'prefund';
+      mockLastFacetMap['names'] = 'prefund' as types.DataFacet;
 
       // Re-render hook with updated preferences
       const { result: result2 } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -105,10 +159,10 @@ describe('Names View + useActiveFacet Integration Tests', () => {
     });
 
     it('respects saved preferences for Names view', () => {
-      mockLastFacetMap['names'] = 'custom';
+      mockLastFacetMap['names'] = 'custom' as types.DataFacet;
 
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -120,7 +174,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
 
     it('persists facet changes to preferences', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -145,10 +199,10 @@ describe('Names View + useActiveFacet Integration Tests', () => {
 
       facetMappings.forEach(({ facet, dataFacet }) => {
         // Set up mock with this facet as saved preference
-        mockLastFacetMap['names'] = dataFacet;
+        mockLastFacetMap['names'] = dataFacet as types.DataFacet;
 
         const { result } = renderHook(() =>
-          useActiveFacet({
+          useActiveFacet2({
             facets: namesFacets,
             viewRoute: 'names',
           }),
@@ -163,7 +217,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
   describe('error handling and edge cases', () => {
     it('handles invalid facet selection gracefully', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -181,13 +235,13 @@ describe('Names View + useActiveFacet Integration Tests', () => {
   describe('integration with Names view constants and patterns', () => {
     it('provides all expected Names facets', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           facets: namesFacets,
           viewRoute: 'names',
         }),
       );
 
-      const facetIds = result.current.availableFacets.map((f) => f.id);
+      const facetIds = result.current.availableFacets.map((f: any) => f.id);
       expect(facetIds).toEqual([
         'all',
         'custom',
@@ -196,7 +250,9 @@ describe('Names View + useActiveFacet Integration Tests', () => {
         'baddress',
       ]);
 
-      const facetLabels = result.current.availableFacets.map((f) => f.label);
+      const facetLabels = result.current.availableFacets.map(
+        (f: any) => f.label,
+      );
       expect(facetLabels).toEqual([
         'All',
         'Custom',
@@ -208,7 +264,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
 
     it('matches expected Names view route pattern', () => {
       const { result } = renderHook(() =>
-        useActiveFacet({
+        useActiveFacet2({
           facets: namesFacets,
           viewRoute: 'names',
         }),

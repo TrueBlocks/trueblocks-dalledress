@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { types } from '@models';
 
-import { useActiveProject } from './useActiveProject';
+import { useActiveProject2 } from './useActiveProject2';
 
 function validatePayloadAddress(address: string, context: string) {
   if (address === '' || address === '0x0') {
@@ -17,7 +17,7 @@ function validatePayloadAddress(address: string, context: string) {
 }
 
 export const usePayload = () => {
-  const { activeAddress, activeChain } = useActiveProject();
+  const { activeAddress, activeChain } = useActiveProject2();
   return useCallback(
     (dataFacet: types.DataFacet, address?: string) => {
       const finalAddress = address || activeAddress;

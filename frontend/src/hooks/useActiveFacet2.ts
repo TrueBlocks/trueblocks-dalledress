@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { types } from '@models';
 
-import { useActiveProject } from './useActiveProject';
+import { useActiveProject2 } from './useActiveProject2';
 
 export type DataFacet = types.DataFacet;
 
@@ -12,7 +12,7 @@ export interface DataFacetConfig {
   dividerBefore?: boolean;
 }
 
-export interface UseActiveFacetReturn {
+export interface UseActiveFacetReturn2 {
   activeFacet: DataFacet;
   setActiveFacet: (facet: DataFacet) => void;
   availableFacets: DataFacetConfig[];
@@ -22,58 +22,50 @@ export interface UseActiveFacetReturn {
   getCurrentDataFacet: () => types.DataFacet;
 }
 
-export interface UseActiveFacetParams {
+export interface UseActiveFacetParams2 {
   viewRoute: string;
   facets: DataFacetConfig[];
 }
 
 /**
- * Hook for managing active data facets in views
+ * Hook for managing active data facets in views (using focused hooks)
  *
  * This hook provides a clean API for:
  * - Managing the currently active facet in a view
- * - Persisting facet selection to user preferences
+ * - Persisting facet selection to user preferences via useActiveProject2
  * - Providing facet configuration and metadata
  * - Backward compatibility with existing DataFacet usage
  *
  * @param params Configuration for the hook
  * @returns Hook interface for facet management
  */
-export const useActiveFacet = (
-  params: UseActiveFacetParams,
-): UseActiveFacetReturn => {
-  const { viewRoute, facets } = params;
-  const { getLastFacet, setLastFacet, lastFacetMap } = useActiveProject();
+export const useActiveFacet2 = ({
+  viewRoute,
+  facets,
+}: UseActiveFacetParams2): UseActiveFacetReturn2 => {
+  const { getLastFacet, setLastFacet } = useActiveProject2();
 
-  // Simple fallback facet: use first facet
-  const computedDefaultFacet = useMemo((): DataFacet => {
-    return facets[0]?.id || types.DataFacet.ALL;
+  const getDefaultFacet = useCallback((): DataFacet => {
+    const firstFacet = facets[0];
+    return firstFacet ? firstFacet.id : types.DataFacet.DASHBOARD;
   }, [facets]);
 
-  // Get the currently active facet from preferences or default
   const activeFacet = useMemo((): DataFacet => {
-    const vR = viewRoute.replace(/^\/+/, '');
-    const saved = getLastFacet(vR);
-    if (saved) {
-      const savedAsFacet = saved as unknown as DataFacet;
-      if (facets.some((f) => f.id === savedAsFacet)) {
-        return savedAsFacet;
-      }
-    }
-    return computedDefaultFacet;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getLastFacet, viewRoute, facets, computedDefaultFacet, lastFacetMap]);
+    const saved = getLastFacet(viewRoute);
 
-  // Function to change the active facet
+    // Check if saved facet is valid for this view
+    const isValidFacet = facets.some((facet) => facet.id === saved);
+
+    return isValidFacet ? (saved as DataFacet) : getDefaultFacet();
+  }, [getLastFacet, viewRoute, facets, getDefaultFacet]);
+
   const setActiveFacet = useCallback(
-    (facet: DataFacet): void => {
-      const vR = viewRoute.replace(/^\/+/, '');
-      setLastFacet(vR, facet);
+    async (facet: DataFacet): Promise<void> => {
+      await setLastFacet(viewRoute, facet);
     },
     [setLastFacet, viewRoute],
   );
 
-  // Get configuration for a specific facet
   const getFacetConfig = useCallback(
     (facet: DataFacet): DataFacetConfig | undefined => {
       return facets.find((f) => f.id === facet);
@@ -81,7 +73,6 @@ export const useActiveFacet = (
     [facets],
   );
 
-  // Check if a facet is active
   const isFacetActive = useCallback(
     (facet: DataFacet): boolean => {
       return activeFacet === facet;
@@ -89,12 +80,7 @@ export const useActiveFacet = (
     [activeFacet],
   );
 
-  // Get the default facet for the view
-  const getDefaultFacet = useCallback((): DataFacet => {
-    return computedDefaultFacet;
-  }, [computedDefaultFacet]);
-
-  const getCurrentDataFacet = useCallback((): DataFacet => {
+  const getCurrentDataFacet = useCallback((): types.DataFacet => {
     return activeFacet;
   }, [activeFacet]);
 

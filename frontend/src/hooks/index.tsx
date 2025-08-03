@@ -1,7 +1,5 @@
 export * from './useActionMsgs';
 export * from './useActionConfig';
-export * from './useActiveFacet';
-export * from './useActiveProject';
 export * from './useAppHealth';
 export * from './useAppHotkeys';
 export * from './useAppNavigation';
@@ -16,3 +14,9 @@ export * from './useSilencedDialog';
 export * from './useStaggeredLoading';
 export * from './useWallet';
 export * from './useWalletGatedAction';
+
+export * from './useActiveProject2';
+export * from './usePreferences2';
+export * from './useUIState2';
+export * from './useProjectManagement2';
+export * from './useActiveFacet2';

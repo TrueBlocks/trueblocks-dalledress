@@ -218,6 +218,8 @@ export function SetUserInfo(arg1:string,arg2:string):Promise<void>;
 
 export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<void>;
 
+export function SetViewAndFacet(arg1:string,arg2:string):Promise<void>;
+
 export function SwitchToProject(arg1:string):Promise<void>;
 
 export function ValidateActiveProject():Promise<boolean>;

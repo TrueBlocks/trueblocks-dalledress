@@ -32,6 +32,14 @@ func (a *App) SetLastFacet(view, facet string) error {
 	return fmt.Errorf("no active project")
 }
 
+// SetViewAndFacet atomically sets both the last view and facet in a single operation
+func (a *App) SetViewAndFacet(view, facet string) error {
+	if active := a.GetActiveProject(); active != nil {
+		return active.SetViewAndFacet(view, facet)
+	}
+	return fmt.Errorf("no active project")
+}
+
 // GetLastFacet returns the last visited facet for a specific view from the active project
 func (a *App) GetLastFacet(view string) string {
 	if active := a.GetActiveProject(); active != nil {

@@ -402,6 +402,10 @@ export function SetUserPreferences(arg1) {
   return window['go']['app']['App']['SetUserPreferences'](arg1);
 }
 
+export function SetViewAndFacet(arg1, arg2) {
+  return window['go']['app']['App']['SetViewAndFacet'](arg1, arg2);
+}
+
 export function SwitchToProject(arg1) {
   return window['go']['app']['App']['SwitchToProject'](arg1);
 }

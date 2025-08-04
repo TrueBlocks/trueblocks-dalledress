@@ -15,6 +15,7 @@ import {
   SetAppPreferences,
   SetLastFacet,
   SetLastView,
+  SetViewAndFacet,
   SwitchToProject,
 } from '@app';
 import { preferences, types } from '@models';
@@ -53,6 +54,7 @@ export interface UseActiveProjectReturn {
   setActiveContract: (contract: string) => Promise<void>;
   setLastView: (view: string) => Promise<void>;
   setLastFacet: (view: string, facet: types.DataFacet) => Promise<void>;
+  setViewAndFacet: (view: string, facet: types.DataFacet) => Promise<void>;
 
   // Project management operations
   switchProject: (project: string) => Promise<void>;
@@ -118,6 +120,7 @@ class ProjectStore {
         setActiveContract: this.setActiveContract,
         setLastView: this.setLastView,
         setLastFacet: this.setLastFacet,
+        setViewAndFacet: this.setViewAndFacet,
         switchProject: this.switchProject,
         newProject: this.newProject,
         openProjectFile: this.openProjectFile,
@@ -234,6 +237,20 @@ class ProjectStore {
   setLastView = async (view: string): Promise<void> => {
     await SetLastView(view);
     this.setState({ lastView: view });
+  };
+
+  setViewAndFacet = async (
+    view: string,
+    facet: types.DataFacet,
+  ): Promise<void> => {
+    await SetViewAndFacet(view, facet);
+    this.setState({
+      lastView: view,
+      lastFacetMap: {
+        ...this.state.lastFacetMap,
+        [view]: facet,
+      },
+    });
   };
 
   private updatePreferences = async (

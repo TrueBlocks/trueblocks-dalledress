@@ -129,3 +129,7 @@ export function SetLastView(arg1) {
 export function SetName(arg1) {
   return window['go']['project']['Project']['SetName'](arg1);
 }
+
+export function SetViewAndFacet(arg1, arg2) {
+  return window['go']['project']['Project']['SetViewAndFacet'](arg1, arg2);
+}

@@ -264,3 +264,61 @@ func TestGetWizardReturn(t *testing.T) {
 		})
 	}
 }
+
+func TestSetViewAndFacet(t *testing.T) {
+	tests := []struct {
+		name      string
+		setup     func(*App)
+		view      string
+		facet     string
+		expectErr bool
+	}{
+		{
+			name: "no active project",
+			setup: func(app *App) {
+				// No active project
+			},
+			view:      "monitors",
+			facet:     "transactions",
+			expectErr: true,
+		},
+		{
+			name: "has active project - atomic operation",
+			setup: func(app *App) {
+				proj := app.Projects.NewProject("test", base.ZeroAddr, []string{"mainnet"})
+				proj.Path = "/tmp/test-atomic.tbx" // Set path so project can save
+			},
+			view:      "exports",
+			facet:     "receipts",
+			expectErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app := &App{
+				Projects: project.NewManager(),
+				Preferences: &preferences.Preferences{
+					User: preferences.UserPreferences{},
+				},
+			}
+			tt.setup(app)
+
+			// Test atomic SetViewAndFacet
+			err := app.SetViewAndFacet(tt.view, tt.facet)
+			if tt.expectErr {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), "no active project")
+				return
+			}
+			require.NoError(t, err)
+
+			// Verify both view and facet were set atomically
+			actualView := app.GetLastView()
+			actualFacet := app.GetLastFacet(tt.view)
+
+			assert.Equal(t, tt.facet, actualFacet, "Facet should be set correctly")
+			assert.Equal(t, "exports", actualView, "View should be set correctly") // tt.view is trimmed in implementation
+		})
+	}
+}

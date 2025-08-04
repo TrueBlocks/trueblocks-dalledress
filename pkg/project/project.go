@@ -286,6 +286,39 @@ func (p *Project) SetLastFacet(view, facet string) error {
 }
 
 // ------------------------------------------------------------------------------------
+// SetViewAndFacet atomically updates both the last view and facet in a single operation
+func (p *Project) SetViewAndFacet(view, facet string) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	viewChanged := false
+	facetChanged := false
+
+	// Check if view needs updating
+	cleanView := strings.Trim(view, "/")
+	if p.LastView != cleanView {
+		p.LastView = cleanView
+		viewChanged = true
+	}
+
+	// Check if facet needs updating
+	if p.LastFacetMap == nil {
+		p.LastFacetMap = make(map[string]string)
+	}
+	current := p.LastFacetMap[cleanView]
+	if current != facet {
+		p.LastFacetMap[cleanView] = facet
+		facetChanged = true
+	}
+
+	// Only save if something actually changed
+	if viewChanged || facetChanged {
+		return p.Save()
+	}
+	return nil
+}
+
+// ------------------------------------------------------------------------------------
 // RemoveAddress removes an address from the project
 func (p *Project) RemoveAddress(addr base.Address) error {
 	for i, existingAddr := range p.Addresses {

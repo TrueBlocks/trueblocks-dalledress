@@ -204,7 +204,7 @@ func TestGetActiveProjectPath(t *testing.T) {
 			app := &App{
 				Projects: project.NewManager(),
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 			}
 			tt.setup(app)

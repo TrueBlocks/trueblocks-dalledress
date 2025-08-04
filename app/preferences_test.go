@@ -55,6 +55,9 @@ func TestSetUserPreferences(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
 			app := &App{
 				Preferences: &preferences.Preferences{
 					User: preferences.UserPreferences{},
@@ -119,6 +122,9 @@ func TestSetOrgPreferences(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
 			app := &App{
 				Preferences: &preferences.Preferences{
 					Org: preferences.OrgPreferences{},
@@ -155,7 +161,7 @@ func TestGetAppPreferences(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -179,9 +185,13 @@ func TestSetAppPreferences(t *testing.T) {
 		{
 			name: "set valid app preferences",
 			appPrefs: &preferences.AppPreferences{
-				LastTheme:      "light",
-				DebugCollapsed: true,
-				LastLanguage:   "fr",
+				LastTheme:       "light",
+				DebugCollapsed:  true,
+				LastLanguage:    "fr",
+				DetailCollapsed: true,
+				RecentProjects:  []string{},
+				SilencedDialogs: map[string]bool{},
+				Bounds:          preferences.Bounds{X: 100, Y: 100, Width: 800, Height: 600},
 			},
 			expectErr: false,
 		},
@@ -189,9 +199,12 @@ func TestSetAppPreferences(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -234,7 +247,7 @@ func TestGetLanguage(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -267,9 +280,12 @@ func TestSetLanguage(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -306,7 +322,7 @@ func TestGetTheme(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -339,9 +355,12 @@ func TestSetTheme(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -378,7 +397,7 @@ func TestGetDebugCollapsed(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -406,9 +425,12 @@ func TestSetDebugCollapsed(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -436,9 +458,12 @@ func TestSetHelpCollapsed(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}
@@ -466,9 +491,12 @@ func TestSetMenuCollapsed(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
 			app := &App{
 				Preferences: &preferences.Preferences{
-					App: preferences.AppPreferences{},
+					App: *preferences.NewAppPreferences(),
 				},
 				prefsMu: sync.RWMutex{},
 			}

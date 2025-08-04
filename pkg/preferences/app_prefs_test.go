@@ -13,10 +13,9 @@ func TestSaveAndGetAppPreferences(t *testing.T) {
 	tmp := t.TempDir()
 	defer SetConfigBaseForTest(t, tmp)()
 
-	expected := AppPreferences{
-		Version:        "1.0",
-		RecentProjects: []string{"file1", "file2"},
-	}
+	expected := *NewAppPreferences()
+	expected.Version = "1.0"
+	expected.RecentProjects = []string{"file1", "file2"}
 
 	err := SetAppPreferences(&expected)
 	if err != nil {
@@ -67,10 +66,9 @@ func TestGetAppPreferences(t *testing.T) {
 		tmp := t.TempDir()
 		defer SetConfigBaseForTest(t, tmp)()
 
-		expected := AppPreferences{
-			Version:        "1.0",
-			RecentProjects: []string{"/tmp/one", "/tmp/two"},
-		}
+		expected := *NewAppPreferences()
+		expected.Version = "1.0"
+		expected.RecentProjects = []string{"/tmp/one", "/tmp/two"}
 
 		_ = file.EstablishFolder(filepath.Join(tmp, "testing"))
 		path := filepath.Join(tmp, "testing", "app_prefs.json")

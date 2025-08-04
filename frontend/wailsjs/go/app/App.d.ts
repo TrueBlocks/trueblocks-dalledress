@@ -78,6 +78,8 @@ export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetDebugCollapsed():Promise<boolean>;
 
+export function GetDefaultAppPreferences():Promise<preferences.AppPreferences>;
+
 export function GetExportsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<exports.ExportsPage>;
 
 export function GetExportsSummary(arg1:types.Payload):Promise<types.Summary>;

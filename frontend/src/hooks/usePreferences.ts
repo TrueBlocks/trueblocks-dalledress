@@ -10,7 +10,7 @@ import {
   SetTheme,
 } from '@app';
 import { preferences } from '@models';
-import { Log } from '@utils';
+import { Log, updateAppPreferencesSafely } from '@utils';
 
 export interface UsePreferencesReturn {
   lastTheme: string;
@@ -98,10 +98,36 @@ class PreferencesStore {
   ): Promise<void> => {
     try {
       const currentPrefs = await GetAppPreferences();
-      const updatedPrefs = preferences.AppPreferences.createFrom({
-        ...currentPrefs,
-        ...updates,
-      });
+
+      if (
+        updates.recentProjects !== undefined &&
+        !Array.isArray(updates.recentProjects)
+      ) {
+        Log('ERROR: Invalid recentProjects value, must be an array');
+        throw new Error('recentProjects must be an array');
+      }
+
+      if (
+        updates.silencedDialogs !== undefined &&
+        typeof updates.silencedDialogs !== 'object'
+      ) {
+        Log('ERROR: Invalid silencedDialogs value, must be an object');
+        throw new Error('silencedDialogs must be an object');
+      }
+
+      if (
+        updates.bounds !== undefined &&
+        (typeof updates.bounds !== 'object' ||
+          typeof updates.bounds.width !== 'number' ||
+          typeof updates.bounds.height !== 'number' ||
+          updates.bounds.width < 100 ||
+          updates.bounds.height < 100)
+      ) {
+        Log('ERROR: Invalid bounds value, must have valid width/height >= 100');
+        throw new Error('bounds must have valid width and height >= 100');
+      }
+
+      const updatedPrefs = updateAppPreferencesSafely(currentPrefs, updates);
       await SetAppPreferences(updatedPrefs);
     } catch (error) {
       Log('ERROR: Failed to update preferences: ' + String(error));
@@ -126,7 +152,15 @@ class PreferencesStore {
       });
     } catch (error) {
       Log('ERROR: Failed to load preferences: ' + String(error));
-      this.setState({ loading: false });
+      this.setState({
+        lastTheme: 'dark',
+        lastLanguage: 'en',
+        debugCollapsed: true,
+        menuCollapsed: false,
+        helpCollapsed: false,
+        detailCollapsed: true,
+        loading: false,
+      });
     }
   };
 

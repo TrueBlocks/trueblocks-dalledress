@@ -44,6 +44,13 @@ func (a *App) SetAppPreferences(appPrefs *preferences.AppPreferences) error {
 	return preferences.SetAppPreferences(appPrefs)
 }
 
+// GetDefaultAppPreferences returns the default AppPreferences values
+// This ensures frontend and backend use the same defaults without duplication
+func (a *App) GetDefaultAppPreferences() *preferences.AppPreferences {
+	defaults := preferences.NewAppPreferences()
+	return defaults
+}
+
 // GetLanguage returns the currently selected language
 func (a *App) GetLanguage() string {
 	a.prefsMu.RLock()
@@ -57,7 +64,9 @@ func (a *App) SetLanguage(language string) {
 	defer a.prefsMu.Unlock()
 
 	a.Preferences.App.LastLanguage = language
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save language preference", err)
+	}
 }
 
 // GetTheme returns the currently selected theme
@@ -73,7 +82,9 @@ func (a *App) SetTheme(theme string) {
 	defer a.prefsMu.Unlock()
 
 	a.Preferences.App.LastTheme = theme
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save theme preference", err)
+	}
 }
 
 // GetActiveProjectPath returns the path of the most recently used project
@@ -123,7 +134,9 @@ func (a *App) SetDebugCollapsed(collapse bool) {
 	defer a.prefsMu.Unlock()
 
 	a.Preferences.App.DebugCollapsed = collapse
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save debug collapsed preference", err)
+	}
 }
 
 // SetHelpCollapsed updates the help panel collapsed state
@@ -132,7 +145,9 @@ func (a *App) SetHelpCollapsed(collapse bool) {
 	defer a.prefsMu.Unlock()
 
 	a.Preferences.App.HelpCollapsed = collapse
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save help collapsed preference", err)
+	}
 }
 
 // SetMenuCollapsed updates the menu panel collapsed state
@@ -141,5 +156,7 @@ func (a *App) SetMenuCollapsed(collapse bool) {
 	defer a.prefsMu.Unlock()
 
 	a.Preferences.App.MenuCollapsed = collapse
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save menu collapsed preference", err)
+	}
 }

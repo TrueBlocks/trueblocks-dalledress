@@ -122,6 +122,10 @@ export function GetDebugCollapsed() {
   return window['go']['app']['App']['GetDebugCollapsed']();
 }
 
+export function GetDefaultAppPreferences() {
+  return window['go']['app']['App']['GetDefaultAppPreferences']();
+}
+
 export function GetExportsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetExportsPage'](arg1, arg2, arg3, arg4, arg5);
 }

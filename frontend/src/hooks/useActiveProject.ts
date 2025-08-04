@@ -20,7 +20,7 @@ import {
 } from '@app';
 import { preferences, types } from '@models';
 import { EventsOn } from '@runtime';
-import { Log, addressToHex } from '@utils';
+import { Log, addressToHex, updateAppPreferencesSafely } from '@utils';
 
 export interface ProjectInfo {
   id: string;
@@ -258,10 +258,7 @@ class ProjectStore {
   ): Promise<void> => {
     try {
       const currentPrefs = await GetAppPreferences();
-      const updatedPrefs = preferences.AppPreferences.createFrom({
-        ...currentPrefs,
-        ...updates,
-      });
+      const updatedPrefs = updateAppPreferencesSafely(currentPrefs, updates);
       await SetAppPreferences(updatedPrefs);
     } catch (error) {
       Log(

@@ -2,8 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { GetAppPreferences, SetAppPreferences } from '@app';
 import { Button, Checkbox, Group, Modal, Stack, Text } from '@mantine/core';
-import { preferences } from '@models';
-import { Log } from '@utils';
+import { Log, updateAppPreferencesSafely } from '@utils';
 
 interface ConfirmModalProps {
   opened: boolean;
@@ -33,8 +32,7 @@ export const ConfirmModal = ({
       try {
         // Save the silenced dialog preference
         const currentPrefs = await GetAppPreferences();
-        const updatedPrefs = preferences.AppPreferences.createFrom({
-          ...currentPrefs,
+        const updatedPrefs = updateAppPreferencesSafely(currentPrefs, {
           silencedDialogs: {
             ...currentPrefs.silencedDialogs,
             [dialogKey]: true,

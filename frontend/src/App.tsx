@@ -13,7 +13,7 @@ import {
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
 import { msgs } from '@models';
-import { Log } from '@utils';
+import { Log, initializePreferencesDefaults } from '@utils';
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-react';
 import { Router } from 'wouter';
 
@@ -51,6 +51,13 @@ export const App = () => {
   const { hasActiveProject } = useActiveProject();
 
   useEffect(() => {
+    // Initialize preferences defaults cache on app startup
+    initializePreferencesDefaults().catch((error) => {
+      Log(
+        'WARNING: Failed to initialize preferences defaults: ' + String(error),
+      );
+    });
+
     window.addEventListener('keydown', globalNavKeySquelcher, {
       capture: true,
     });

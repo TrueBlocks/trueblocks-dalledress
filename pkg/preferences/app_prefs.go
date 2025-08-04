@@ -113,9 +113,29 @@ func GetAppPreferences() (AppPreferences, error) {
 		appPrefs.Version = "1.0"
 		needsSave = true
 	}
+	if appPrefs.LastTheme == "" {
+		appPrefs.LastTheme = "dark"
+		needsSave = true
+	}
+	if appPrefs.LastLanguage == "" {
+		appPrefs.LastLanguage = "en"
+		needsSave = true
+	}
+	if !appPrefs.Bounds.IsValid() {
+		appPrefs.Bounds = NewBounds()
+		needsSave = true
+	}
+
+	if !appPrefs.DetailCollapsed && !appPrefs.DebugCollapsed && !appPrefs.HelpCollapsed && !appPrefs.MenuCollapsed {
+		defaults := NewAppPreferences()
+		appPrefs.DetailCollapsed = defaults.DetailCollapsed
+		appPrefs.DebugCollapsed = defaults.DebugCollapsed
+		appPrefs.HelpCollapsed = defaults.HelpCollapsed
+		appPrefs.MenuCollapsed = defaults.MenuCollapsed
+		needsSave = true
+	}
 
 	if needsSave {
-		logging.LogBackend("App preferences had missing fields, saving corrected version")
 		if err := SetAppPreferences(&appPrefs); err != nil {
 			logging.LogBackend(fmt.Sprintf("Warning: Could not save corrected app preferences: %v", err))
 		}
@@ -125,6 +145,10 @@ func GetAppPreferences() (AppPreferences, error) {
 }
 
 func SetAppPreferences(appPrefs *AppPreferences) error {
+	if err := validateAppPreferences(appPrefs); err != nil {
+		return fmt.Errorf("refusing to save invalid preferences: %w", err)
+	}
+
 	path := getAppPrefsPath()
 
 	data, err := json.MarshalIndent(appPrefs, "", "  ")
@@ -138,6 +162,26 @@ func SetAppPreferences(appPrefs *AppPreferences) error {
 	}
 
 	return os.WriteFile(path, data, 0644)
+}
+
+func validateAppPreferences(appPrefs *AppPreferences) error {
+	if appPrefs == nil {
+		return fmt.Errorf("preferences cannot be nil")
+	}
+
+	if appPrefs.RecentProjects == nil {
+		return fmt.Errorf("recentProjects field cannot be nil (suggests memory corruption)")
+	}
+
+	if appPrefs.SilencedDialogs == nil {
+		return fmt.Errorf("silencedDialogs field cannot be nil (suggests memory corruption)")
+	}
+
+	if appPrefs.Bounds.Width < 0 || appPrefs.Bounds.Height < 0 {
+		return fmt.Errorf("bounds field has negative dimensions (suggests memory corruption)")
+	}
+
+	return nil
 }
 
 func getAppPrefsPath() string {

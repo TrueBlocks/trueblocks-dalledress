@@ -14,11 +14,6 @@ func TestProject(t *testing.T) {
 	// Create a new project
 	p := project.NewProject("test-project", base.ZeroAddr, []string{"mainnet"})
 
-	// Verify initial state
-	if !p.IsDirty() {
-		t.Error("New project should be marked as dirty")
-	}
-
 	// Create a temporary directory for testing
 	tempDir, err := os.MkdirTemp("", "project-test")
 	if err != nil {
@@ -32,18 +27,8 @@ func TestProject(t *testing.T) {
 		t.Fatalf("Failed to save project: %v", err)
 	}
 
-	// Verify the project is no longer dirty
-	if p.IsDirty() {
-		t.Error("Project should not be dirty after saving")
-	}
-
 	// Modify the project
-	p.SetName("renamed-project")
-
-	// Verify the project is dirty again
-	if !p.IsDirty() {
-		t.Error("Project should be dirty after modification")
-	}
+	_ = p.SetName("renamed-project")
 
 	// Save again
 	if err := p.Save(); err != nil {

@@ -328,9 +328,8 @@ func TestValidateActiveProject(t *testing.T) {
 // 			setup: func(app *App) {
 // 				proj := app.Projects.NewProject("test", base.ZeroAddr, []string{"mainnet"})
 // 				proj.Path = "/tmp/test.tbx"
-// 				// Mark as dirty but can't test UI dialog in unit tests
 // 			},
-// 			expectErr: false, // Will succeed if no dirty state
+// 			expectErr: false, // Will succeed
 // 		},
 // 	}
 
@@ -400,7 +399,6 @@ func TestGetOpenProjects(t *testing.T) {
 				assert.Contains(t, proj, "name")
 				assert.Contains(t, proj, "path")
 				assert.Contains(t, proj, "isActive")
-				assert.Contains(t, proj, "isDirty")
 			}
 		})
 	}

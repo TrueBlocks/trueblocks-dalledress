@@ -164,26 +164,8 @@ func (m *Manager) SaveActiveAs(path string) error {
 
 	project := m.OpenProjects[m.ActiveID]
 
-	if strings.HasPrefix(project.Name, "New Project") {
-		wasDirty := project.Dirty
-		project.Dirty = true
-
-		err := project.SaveAs(path)
-
-		if !wasDirty && err == nil {
-			project.Dirty = false
-		}
-
-		if err == nil {
-			msgs.EmitManager("project_saved_as")
-		} else {
-			msgs.EmitError("SaveProjectAs", err)
-		}
-		return err
-	}
-
-	err := project.SaveAs(path)
-	if err == nil {
+	var err error
+	if err = project.SaveAs(path); err == nil {
 		msgs.EmitManager("project_saved_as")
 	} else {
 		msgs.EmitError("SaveProjectAs", err)
@@ -198,16 +180,6 @@ func (m *Manager) GetOpenProjectIDs() []string {
 		ids = append(ids, id)
 	}
 	return ids
-}
-
-// HasUnsavedChanges returns true if any open project has unsaved changes
-func (m *Manager) HasUnsavedChanges() bool {
-	for _, project := range m.OpenProjects {
-		if project.IsDirty() {
-			return true
-		}
-	}
-	return false
 }
 
 // GetProjectByID returns the project with the given ID, or nil if it doesn't exist

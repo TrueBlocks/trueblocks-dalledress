@@ -276,6 +276,15 @@ export const Contracts = () => {
     },
   );
 
+  useEvent(msgs.EventType.MANAGER, (message: string) => {
+    if (
+      message === 'active_address_changed' ||
+      message === 'active_chain_changed'
+    ) {
+      fetchData();
+    }
+  });
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);

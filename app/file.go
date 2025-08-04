@@ -68,30 +68,6 @@ func (a *App) FileSaveAs(_ *menu.CallbackData) {
 
 // FileQuit shuts down the application after saving if needed
 func (a *App) FileQuit(_ *menu.CallbackData) {
-	if a.Projects.HasUnsavedChanges() {
-		response, err := wailsRuntime.MessageDialog(a.ctx, wailsRuntime.MessageDialogOptions{
-			Title:   "Unsaved Changes",
-			Message: "Do you want to save changes before quitting?",
-			Buttons: []string{"Yes", "No", "Cancel"},
-		})
-
-		if err != nil {
-			msgs.EmitError("Dialog error", err)
-			return
-		}
-
-		switch response {
-		case "Yes":
-			if err := a.fileSave(); err != nil {
-				msgs.EmitError("Save failed", err)
-				return // Don't quit if save fails
-			}
-			// Continue to quit after successful save
-		case "Cancel":
-			return // Don't quit if user cancels
-		}
-	}
-
 	msgs.EmitStatus("quitting application")
 	os.Exit(0)
 }
@@ -111,13 +87,6 @@ var ErrDeserializeFailed = errors.New("failed to deserialize data")
 // fileNew creates a new project with the given address and default settings
 func (a *App) fileNew(address base.Address) error {
 	a.Projects.NewProject(a.uniqueProjectName("New Project"), address, []string{"mainnet"})
-
-	// Ensure the newly created project is not marked as dirty
-	activeProject := a.GetActiveProject()
-	if activeProject != nil {
-		activeProject.SetDirty(false)
-	}
-
 	a.updateRecentProjects()
 	return nil
 }
@@ -133,10 +102,6 @@ func (a *App) fileSave() error {
 	needsSaveAs := projectPath == "" || strings.Contains(filepath.Base(projectPath), "Unknown")
 	if needsSaveAs {
 		return ErrEmptyFilePath
-	}
-
-	if !project.IsDirty() {
-		return nil
 	}
 
 	if err := a.Projects.SaveActive(); err != nil {

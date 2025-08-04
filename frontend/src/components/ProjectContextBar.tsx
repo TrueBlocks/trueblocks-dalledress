@@ -29,7 +29,7 @@ export const ProjectContextBar = ({
 
   const projectOptions = projects.map((project) => ({
     value: project.id,
-    label: `${project.name}${project.isDirty ? ' *' : ''}`,
+    label: `${project.name}`,
   }));
 
   const addressOptions =

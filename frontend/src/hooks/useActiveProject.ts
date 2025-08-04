@@ -199,7 +199,7 @@ class ProjectStore {
   setActiveAddress = async (address: string): Promise<void> => {
     try {
       const result = await ConvertToAddress(address);
-      if (result && typeof result === 'object') {
+      if (result) {
         const hexAddress = addressToHex(result);
         await SetActiveAddress(hexAddress);
         this.setState({ activeAddress: hexAddress });

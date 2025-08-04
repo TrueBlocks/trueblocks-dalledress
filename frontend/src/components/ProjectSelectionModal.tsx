@@ -15,7 +15,6 @@ import {
   Text,
   TextInput,
   Title,
-  Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useLocation } from 'wouter';
@@ -271,17 +270,6 @@ export const ProjectSelectionModal = ({
                                     >
                                       {project.name}
                                     </Text>
-                                    {project.isDirty && (
-                                      <Tooltip label="Has unsaved changes">
-                                        <Badge
-                                          size="xs"
-                                          color="orange"
-                                          variant="dot"
-                                        >
-                                          Modified
-                                        </Badge>
-                                      </Tooltip>
-                                    )}
                                     {project.isActive && (
                                       <Badge
                                         size="xs"
@@ -331,11 +319,7 @@ export const ProjectSelectionModal = ({
                               </Text>
                               <StatusIndicator
                                 status={
-                                  project.isActive
-                                    ? 'healthy'
-                                    : project.isDirty
-                                      ? 'warning'
-                                      : 'inactive'
+                                  project.isActive ? 'healthy' : 'inactive'
                                 }
                                 label=""
                                 size="xs"

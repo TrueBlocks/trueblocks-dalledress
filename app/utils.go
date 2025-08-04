@@ -55,7 +55,7 @@ func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
 	if active == nil {
 		return nil, fmt.Errorf("no active project")
 	}
-	addr := active.GetAddress()
+	addr := active.GetActiveAddress()
 	if addr == base.ZeroAddr {
 		return nil, fmt.Errorf("project address is not set")
 	}

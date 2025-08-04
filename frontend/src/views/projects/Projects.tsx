@@ -117,11 +117,6 @@ export const Projects = () => {
                   Active
                 </Badge>
               )}
-              {project.isDirty && (
-                <Badge size="xs" color="orange">
-                  Modified
-                </Badge>
-              )}
             </Group>
 
             <Text size="xs" c="dimmed" mt="2px">

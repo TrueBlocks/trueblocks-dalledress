@@ -45,15 +45,6 @@ export const FilePanel = () => {
   });
 
   return (
-    <>
-      {status ? (
-        <>
-          <Text>{status.name}</Text>
-          {status.dirty && <Text>(Modified)</Text>}
-        </>
-      ) : (
-        <Text>No Open Project</Text>
-      )}
-    </>
+    <>{status ? <Text>{status.name}</Text> : <Text>No Open Project</Text>}</>
   );
 };

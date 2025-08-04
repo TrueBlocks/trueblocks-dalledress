@@ -709,7 +709,6 @@ export namespace project {
 	    }
 	}
 	export class Project {
-	    dirty?: boolean;
 	    version: string;
 	    name: string;
 	    last_opened: string;
@@ -729,7 +728,6 @@ export namespace project {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.dirty = source["dirty"];
 	        this.version = source["version"];
 	        this.name = source["name"];
 	        this.last_opened = source["last_opened"];

@@ -34,14 +34,7 @@ export const ProjectsList = () => {
     }
   };
 
-  const handleCloseProject = async (id: string, isDirty: boolean) => {
-    if (isDirty) {
-      const confirmed = window.confirm(
-        'This project has unsaved changes. Close anyway?',
-      );
-      if (!confirmed) return;
-    }
-
+  const handleCloseProject = async (id: string) => {
     try {
       await closeProject(id);
     } catch (error) {
@@ -74,9 +67,7 @@ export const ProjectsList = () => {
           >
             <Group justify="space-between" wrap="nowrap">
               <div>
-                <Text fw={project.isActive ? 700 : 400}>
-                  {project.name} {project.isDirty && '*'}
-                </Text>
+                <Text fw={project.isActive ? 700 : 400}>{project.name}</Text>
                 <Text size="xs" c="dimmed">
                   {project.path}
                 </Text>
@@ -96,9 +87,7 @@ export const ProjectsList = () => {
                   title="Close project"
                   color="red"
                   variant="light"
-                  onClick={() =>
-                    handleCloseProject(project.id, project.isDirty)
-                  }
+                  onClick={() => handleCloseProject(project.id)}
                 />
               </Group>
             </Group>

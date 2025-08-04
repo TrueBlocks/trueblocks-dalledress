@@ -64,21 +64,16 @@ export const ProjectsPanel = ({
           <Badge size="sm" variant="light" color="orange">
             Recent: {recentProjects.length}
           </Badge>
-          <Badge size="sm" variant="light" color="purple">
-            Dirty: {projects.filter((p) => p.isDirty).length}
-          </Badge>
         </div>
 
         <div>
           {activeProject ? (
             <Text size="xs" c="dimmed">
               Active: {activeProject.name}
-              {activeProject.isDirty && ' *'}
             </Text>
           ) : recentProjects.length > 0 ? (
             <Text size="xs" c="dimmed">
               Most recent: {recentProjects[0]?.name}
-              {recentProjects[0]?.isDirty && ' *'}
             </Text>
           ) : (
             <Text size="xs" c="dimmed">

@@ -6,10 +6,6 @@ export function AddAddress(arg1) {
   return window['go']['project']['Project']['AddAddress'](arg1);
 }
 
-export function AddChain(arg1) {
-  return window['go']['project']['Project']['AddChain'](arg1);
-}
-
 export function AddContract(arg1) {
   return window['go']['project']['Project']['AddContract'](arg1);
 }
@@ -32,10 +28,6 @@ export function GetActiveChain() {
 
 export function GetActiveContract() {
   return window['go']['project']['Project']['GetActiveContract']();
-}
-
-export function GetAddress() {
-  return window['go']['project']['Project']['GetAddress']();
 }
 
 export function GetAddresses() {
@@ -70,16 +62,8 @@ export function GetPath() {
   return window['go']['project']['Project']['GetPath']();
 }
 
-export function IsDirty() {
-  return window['go']['project']['Project']['IsDirty']();
-}
-
 export function RemoveAddress(arg1) {
   return window['go']['project']['Project']['RemoveAddress'](arg1);
-}
-
-export function RemoveChain(arg1) {
-  return window['go']['project']['Project']['RemoveChain'](arg1);
 }
 
 export function RemoveContract(arg1) {
@@ -104,14 +88,6 @@ export function SetActiveChain(arg1) {
 
 export function SetActiveContract(arg1) {
   return window['go']['project']['Project']['SetActiveContract'](arg1);
-}
-
-export function SetAddress(arg1) {
-  return window['go']['project']['Project']['SetAddress'](arg1);
-}
-
-export function SetDirty(arg1) {
-  return window['go']['project']['Project']['SetDirty'](arg1);
 }
 
 export function SetFilterState(arg1, arg2) {

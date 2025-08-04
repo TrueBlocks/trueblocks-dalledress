@@ -154,7 +154,7 @@ func (a *App) ValidateActiveProject() bool {
 	return len(addresses) > 0 && activeAddr != base.ZeroAddr
 }
 
-// ClearActiveProject clears the active project, prompting to save if dirty
+// ClearActiveProject clears the active project
 func (a *App) ClearActiveProject() error {
 	if !a.HasActiveProject() {
 		return nil
@@ -166,32 +166,6 @@ func (a *App) ClearActiveProject() error {
 		return nil
 	}
 
-	if project.IsDirty() {
-		response, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Type:          runtime.QuestionDialog,
-			Title:         "Unsaved Changes",
-			Message:       fmt.Sprintf("Project '%s' has unsaved changes. What would you like to do?", project.GetName()),
-			Buttons:       []string{"Save", "Discard Changes", "Cancel"},
-			DefaultButton: "Save",
-		})
-
-		if err != nil {
-			return fmt.Errorf("failed to show unsaved changes dialog: %w", err)
-		}
-
-		switch response {
-		case "Save":
-			if err := a.SaveProject(); err != nil {
-				return fmt.Errorf("failed to save project: %w", err)
-			}
-		case "Cancel":
-			return fmt.Errorf("operation canceled by user")
-		case "Discard Changes":
-			// Continue with clearing
-		}
-	}
-
-	// Clear the active project
 	a.Projects.ActiveID = ""
 	msgs.EmitManager("active_project_cleared")
 	return nil
@@ -208,14 +182,20 @@ func (a *App) GetOpenProjects() []map[string]interface{} {
 			continue
 		}
 
+		// Convert addresses to string slice for frontend consumption
+		addresses := make([]string, 0, len(project.GetAddresses()))
+		for _, addr := range project.GetAddresses() {
+			addresses = append(addresses, addr.Hex())
+		}
+
 		projectInfo := map[string]interface{}{
 			"id":         id,
 			"name":       project.GetName(),
 			"path":       project.GetPath(),
 			"isActive":   id == a.Projects.ActiveID,
-			"isDirty":    project.IsDirty(),
 			"lastOpened": project.LastOpened,
-			// "createdAt":  project.CreatedAt,
+			"addresses":  addresses,
+			"chains":     project.GetChains(),
 		}
 
 		result = append(result, projectInfo)
@@ -302,59 +282,10 @@ func (a *App) RestoreProjectContext(projectID string) error {
 
 // CloseProject closes a project, prompting to save if it has unsaved changes
 func (a *App) CloseProject(id string) error {
-	project := a.Projects.GetProjectByID(id)
-	if project == nil {
-		return fmt.Errorf("no project with ID %s exists", id)
+	if project := a.Projects.GetProjectByID(id); project != nil {
+		return a.Projects.Close(id)
 	}
-
-	// Check if project has unsaved changes
-	if project.IsDirty() {
-		response, err := runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
-			Title:   "Unsaved Changes",
-			Message: fmt.Sprintf("Do you want to save changes to project '%s' before closing?", project.GetName()),
-			Buttons: []string{"Yes", "No", "Cancel"},
-		})
-
-		if err != nil {
-			return err
-		}
-
-		switch response {
-		case "Yes":
-			// Save the project before closing
-			if project.GetPath() == "" {
-				// Project hasn't been saved before, need to use SaveAs
-				path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-					Title: "Save Project Before Closing",
-					Filters: []runtime.FileFilter{
-						{
-							DisplayName: "TrueBlocks Project Files (*.tbx)",
-							Pattern:     "*.tbx",
-						},
-					},
-					DefaultFilename: project.GetName() + ".tbx",
-				})
-				if err != nil || path == "" {
-					return fmt.Errorf("save canceled")
-				}
-
-				// Use project's SaveAs method instead of SaveProjectAs
-				if err := project.SaveAs(path); err != nil {
-					return err
-				}
-			} else {
-				// Project has a path, use normal save
-				// Use project's Save method instead of SaveProject
-				if err := project.Save(); err != nil {
-					return err
-				}
-			}
-		case "Cancel":
-			return fmt.Errorf("close canceled")
-		}
-	}
-
-	return a.Projects.Close(id)
+	return fmt.Errorf("no project with ID %s exists", id)
 }
 
 // GetProjectAddress returns the address of the active project
@@ -363,14 +294,14 @@ func (a *App) GetProjectAddress() base.Address {
 	if active == nil {
 		return base.ZeroAddr
 	}
-	return active.GetAddress()
+	return active.GetActiveAddress()
 }
 
 // SetProjectAddress sets the address for the active project
 func (a *App) SetProjectAddress(addr base.Address) {
 	active := a.GetActiveProject()
 	if active != nil {
-		active.SetAddress(addr)
+		_ = active.SetActiveAddress(addr)
 	}
 }
 

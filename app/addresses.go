@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
@@ -47,7 +48,11 @@ func (a *App) ConvertToAddress(addr string) (base.Address, bool) {
 func (a *App) SetActiveAddress(addrStr string) error {
 	addr := base.HexToAddress(addrStr)
 	if active := a.GetActiveProject(); active != nil {
-		return active.SetActiveAddress(addr)
+		err := active.SetActiveAddress(addr)
+		if err == nil {
+			msgs.EmitManager("active_address_changed")
+		}
+		return err
 	}
 	return fmt.Errorf("no active project")
 }

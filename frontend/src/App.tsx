@@ -68,7 +68,6 @@ export const App = () => {
 
   // Listen for project events
   useEvent(msgs.EventType.MANAGER, (message: string) => {
-    Log(`Manager event received: ${message}`);
     if (message === 'show_project_modal') {
       setShowProjectModal(true);
     }

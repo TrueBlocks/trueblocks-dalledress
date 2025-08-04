@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
@@ -129,7 +130,11 @@ func (a *App) SetProjectViewState(viewName string, states map[string]project.Fil
 // SetActiveChain sets the active chain in the active project
 func (a *App) SetActiveChain(chain string) error {
 	if active := a.GetActiveProject(); active != nil {
-		return active.SetActiveChain(chain)
+		err := active.SetActiveChain(chain)
+		if err == nil {
+			msgs.EmitManager("active_chain_changed")
+		}
+		return err
 	}
 	return fmt.Errorf("no active project")
 }

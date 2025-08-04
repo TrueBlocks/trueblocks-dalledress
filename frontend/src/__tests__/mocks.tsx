@@ -114,6 +114,7 @@ const createInitialFocusedHooksDefaultValue = () => ({
     setActiveContract: vi.fn(),
     setLastView: vi.fn(),
     setLastFacet: vi.fn(),
+    setViewAndFacet: vi.fn(),
     getLastFacet: vi.fn((_view: string) => {
       return '';
     }),

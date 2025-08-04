@@ -17,27 +17,33 @@ func (a *App) GetLastView() string {
 }
 
 // SetLastView sets the last visited view/route in the active project
-func (a *App) SetLastView(view string) error {
+func (a *App) SetLastView(view string) (string, error) {
 	if active := a.GetActiveProject(); active != nil {
-		return active.SetLastView(view)
+		cleanView := strings.Trim(view, "/")
+		err := active.SetLastView(view)
+		return cleanView, err
 	}
-	return fmt.Errorf("no active project")
+	return "", fmt.Errorf("no active project")
 }
 
 // SetLastFacet sets the last visited facet for a specific view in the active project
-func (a *App) SetLastFacet(view, facet string) error {
+func (a *App) SetLastFacet(view, facet string) (string, error) {
 	if active := a.GetActiveProject(); active != nil {
-		return active.SetLastFacet(view, facet)
+		cleanView := strings.Trim(view, "/")
+		err := active.SetLastFacet(view, facet)
+		return cleanView, err
 	}
-	return fmt.Errorf("no active project")
+	return "", fmt.Errorf("no active project")
 }
 
 // SetViewAndFacet atomically sets both the last view and facet in a single operation
-func (a *App) SetViewAndFacet(view, facet string) error {
+func (a *App) SetViewAndFacet(view, facet string) (string, error) {
 	if active := a.GetActiveProject(); active != nil {
-		return active.SetViewAndFacet(view, facet)
+		cleanView := strings.Trim(view, "/")
+		err := active.SetViewAndFacet(view, facet)
+		return cleanView, err
 	}
-	return fmt.Errorf("no active project")
+	return "", fmt.Errorf("no active project")
 }
 
 // GetLastFacet returns the last visited facet for a specific view from the active project

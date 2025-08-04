@@ -200,9 +200,9 @@ export function SetInitialized(arg1:boolean):Promise<void>;
 
 export function SetLanguage(arg1:string):Promise<void>;
 
-export function SetLastFacet(arg1:string,arg2:string):Promise<void>;
+export function SetLastFacet(arg1:string,arg2:string):Promise<string>;
 
-export function SetLastView(arg1:string):Promise<void>;
+export function SetLastView(arg1:string):Promise<string>;
 
 export function SetMenuCollapsed(arg1:boolean):Promise<void>;
 
@@ -218,7 +218,7 @@ export function SetUserInfo(arg1:string,arg2:string):Promise<void>;
 
 export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<void>;
 
-export function SetViewAndFacet(arg1:string,arg2:string):Promise<void>;
+export function SetViewAndFacet(arg1:string,arg2:string):Promise<string>;
 
 export function SwitchToProject(arg1:string):Promise<void>;
 

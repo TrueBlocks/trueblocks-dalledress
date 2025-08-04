@@ -77,6 +77,12 @@ describe('useActiveFacet Hook Tests (Focused Hook implementation)', () => {
       closeProject: vi.fn(),
       clearActiveProject: vi.fn(),
       refreshProjects: vi.fn(),
+      setViewAndFacet: function (
+        _view: string,
+        _facet: types.DataFacet,
+      ): Promise<void> {
+        throw new Error('Function not implemented.');
+      },
     });
 
     // Mock usePreferences (theme, language, debug)

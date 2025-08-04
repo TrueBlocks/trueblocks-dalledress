@@ -55,6 +55,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
     mockedUseActiveProject.mockReturnValue({
       lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
+      setViewAndFacet: vi.fn(),
       getLastFacet: vi.fn((view: string) => {
         const vR = view.replace(/^\/+/, '');
         return mockLastFacetMap[vR] || '';

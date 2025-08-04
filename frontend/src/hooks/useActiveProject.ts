@@ -225,30 +225,30 @@ class ProjectStore {
   };
 
   setLastFacet = async (view: string, facet: string): Promise<void> => {
-    await SetLastFacet(view, facet);
+    const actualView = await SetLastFacet(view, facet);
     this.setState({
       lastFacetMap: {
         ...this.state.lastFacetMap,
-        [view]: facet as types.DataFacet,
+        [actualView]: facet as types.DataFacet,
       },
     });
   };
 
   setLastView = async (view: string): Promise<void> => {
-    await SetLastView(view);
-    this.setState({ lastView: view });
+    const actualView = await SetLastView(view);
+    this.setState({ lastView: actualView });
   };
 
   setViewAndFacet = async (
     view: string,
     facet: types.DataFacet,
   ): Promise<void> => {
-    await SetViewAndFacet(view, facet);
+    const actualView = await SetViewAndFacet(view, facet);
     this.setState({
-      lastView: view,
+      lastView: actualView,
       lastFacetMap: {
         ...this.state.lastFacetMap,
-        [view]: facet,
+        [actualView]: facet,
       },
     });
   };

@@ -86,7 +86,7 @@ func TestSetLastView(t *testing.T) {
 			}
 			tt.setup(app)
 
-			err := app.SetLastView(tt.view)
+			_, err := app.SetLastView(tt.view)
 
 			if tt.expectErr {
 				require.Error(t, err)
@@ -139,7 +139,7 @@ func TestLastFacet(t *testing.T) {
 			tt.setup(app)
 
 			// Test SetLastFacet
-			err := app.SetLastFacet(tt.view, tt.facet)
+			_, err := app.SetLastFacet(tt.view, tt.facet)
 			if tt.expectErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), "no active project")
@@ -305,7 +305,7 @@ func TestSetViewAndFacet(t *testing.T) {
 			tt.setup(app)
 
 			// Test atomic SetViewAndFacet
-			err := app.SetViewAndFacet(tt.view, tt.facet)
+			_, err := app.SetViewAndFacet(tt.view, tt.facet)
 			if tt.expectErr {
 				require.Error(t, err)
 				assert.Contains(t, err.Error(), "no active project")

@@ -25,15 +25,6 @@ interface ProjectSelectionModalProps {
   onProjectSelected: () => void;
 }
 
-interface RecentProject {
-  name: string;
-  path: string;
-  last_opened: string;
-  id?: string;
-  isDirty?: boolean;
-  isActive?: boolean;
-}
-
 interface NewProjectForm {
   name: string;
   address: string;
@@ -52,16 +43,6 @@ export const ProjectSelectionModal = ({
     useActiveProject();
   const [, navigate] = useLocation();
   const isMounted = useRef(true);
-
-  // Convert projects to the format expected by this component
-  const recentProjects: RecentProject[] = projects.map((project) => ({
-    name: project.name,
-    path: project.path,
-    last_opened: project.lastOpened,
-    id: project.id,
-    isDirty: project.isDirty,
-    isActive: project.isActive,
-  }));
 
   const form = useForm<NewProjectForm>({
     initialValues: {
@@ -258,16 +239,16 @@ export const ProjectSelectionModal = ({
                 Browse for Project File
               </Button>
 
-              {recentProjects.length > 0 && (
+              {projects.length > 0 && (
                 <>
                   <Text size="sm" fw={500} mt="md">
                     Recent Projects
                   </Text>
                   <Stack gap="sm">
-                    {recentProjects.map((project, index) => {
+                    {projects.map((project, index) => {
                       const isRecent =
                         new Date().getTime() -
-                          new Date(project.last_opened).getTime() <
+                          new Date(project.lastOpened).getTime() <
                         24 * 60 * 60 * 1000; // Within 24 hours
 
                       return (
@@ -338,11 +319,11 @@ export const ProjectSelectionModal = ({
                             >
                               <Text size="xs" c="dimmed">
                                 {new Date(
-                                  project.last_opened,
+                                  project.lastOpened,
                                 ).toLocaleDateString()}{' '}
                                 at{' '}
                                 {new Date(
-                                  project.last_opened,
+                                  project.lastOpened,
                                 ).toLocaleTimeString([], {
                                   hour: '2-digit',
                                   minute: '2-digit',

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
-import { Action, WalletConnectButton } from '@components';
+import { Action, ProjectContextBar, WalletConnectButton } from '@components';
 import { usePreferences } from '@hooks';
 import { AppShell, Group, Text, useMantineColorScheme } from '@mantine/core';
 
@@ -31,6 +31,7 @@ export const Header = () => {
         <Text size="xl" fw={700}>
           {appName}
         </Text>
+        <ProjectContextBar compact />
         <Group justify="flex-end" align="center" gap="xs">
           <Action
             icon="DebugOn"

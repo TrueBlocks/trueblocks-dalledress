@@ -7,6 +7,7 @@ export * from './DashboardCard';
 export * from './LazyPanel';
 export * from './NodeStatus';
 export * from './PanelSkeleton';
+export * from './ProjectContextBar';
 export * from './ProjectSelectionModal';
 export * from './ProjectsList';
 export * from './Socials';

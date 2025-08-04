@@ -76,7 +76,7 @@ export function GetContractsPage(arg1:types.Payload,arg2:number,arg3:number,arg4
 
 export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
 
-export function GetDebugMode():Promise<boolean>;
+export function GetDebugCollapsed():Promise<boolean>;
 
 export function GetExportsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<exports.ExportsPage>;
 
@@ -190,7 +190,7 @@ export function SetAppPreferences(arg1:preferences.AppPreferences):Promise<void>
 
 export function SetChain(arg1:preferences.Chain):Promise<void>;
 
-export function SetDebugMode(arg1:boolean):Promise<void>;
+export function SetDebugCollapsed(arg1:boolean):Promise<void>;
 
 export function SetFilterState(arg1:project.ViewStateKey,arg2:project.FilterState):Promise<void>;
 

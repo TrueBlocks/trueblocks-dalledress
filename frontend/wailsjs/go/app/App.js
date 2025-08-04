@@ -118,8 +118,8 @@ export function GetContractsSummary(arg1) {
   return window['go']['app']['App']['GetContractsSummary'](arg1);
 }
 
-export function GetDebugMode() {
-  return window['go']['app']['App']['GetDebugMode']();
+export function GetDebugCollapsed() {
+  return window['go']['app']['App']['GetDebugCollapsed']();
 }
 
 export function GetExportsPage(arg1, arg2, arg3, arg4, arg5) {
@@ -346,8 +346,8 @@ export function SetChain(arg1) {
   return window['go']['app']['App']['SetChain'](arg1);
 }
 
-export function SetDebugMode(arg1) {
-  return window['go']['app']['App']['SetDebugMode'](arg1);
+export function SetDebugCollapsed(arg1) {
+  return window['go']['app']['App']['SetDebugCollapsed'](arg1);
 }
 
 export function SetFilterState(arg1, arg2) {

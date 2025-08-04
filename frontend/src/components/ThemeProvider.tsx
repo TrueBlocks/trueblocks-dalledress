@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 
-import { usePreferences2 } from '@hooks';
+import { usePreferences } from '@hooks';
 import {
   MantineColorScheme,
   MantineProvider,
@@ -17,7 +17,7 @@ const theme = createTheme({
 });
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const { isDarkMode, loading } = usePreferences2();
+  const { isDarkMode, loading } = usePreferences();
   const [colorScheme, setColorScheme] = useState<MantineColorScheme>('dark');
 
   // Update Mantine color scheme when app preferences change

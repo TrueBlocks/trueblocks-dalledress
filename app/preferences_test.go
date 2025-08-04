@@ -146,7 +146,7 @@ func TestGetAppPreferences(t *testing.T) {
 			name: "get app preferences with thread safety",
 			setup: func(app *App) {
 				app.Preferences.App.LastTheme = "dark"
-				app.Preferences.App.DebugMode = true
+				app.Preferences.App.DebugCollapsed = false
 			},
 		},
 	}
@@ -179,9 +179,9 @@ func TestSetAppPreferences(t *testing.T) {
 		{
 			name: "set valid app preferences",
 			appPrefs: &preferences.AppPreferences{
-				LastTheme:    "light",
-				DebugMode:    false,
-				LastLanguage: "fr",
+				LastTheme:      "light",
+				DebugCollapsed: true,
+				LastLanguage:   "fr",
 			},
 			expectErr: false,
 		},
@@ -352,7 +352,7 @@ func TestSetTheme(t *testing.T) {
 	}
 }
 
-func TestGetDebugMode(t *testing.T) {
+func TestGetDebugCollapsed(t *testing.T) {
 	tests := []struct {
 		name     string
 		setup    func(*App)
@@ -361,16 +361,16 @@ func TestGetDebugMode(t *testing.T) {
 		{
 			name: "debug mode disabled",
 			setup: func(app *App) {
-				app.Preferences.App.DebugMode = false
+				app.Preferences.App.DebugCollapsed = true
 			},
-			expected: false,
+			expected: true,
 		},
 		{
 			name: "debug mode enabled",
 			setup: func(app *App) {
-				app.Preferences.App.DebugMode = true
+				app.Preferences.App.DebugCollapsed = false
 			},
-			expected: true,
+			expected: false,
 		},
 	}
 
@@ -383,25 +383,24 @@ func TestGetDebugMode(t *testing.T) {
 				prefsMu: sync.RWMutex{},
 			}
 			tt.setup(app)
-
-			result := app.GetDebugMode()
+			result := app.GetDebugCollapsed()
 			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
 
-func TestSetDebugMode(t *testing.T) {
+func TestSetDebugCollapsed(t *testing.T) {
 	tests := []struct {
-		name      string
-		debugMode bool
+		name           string
+		debugCollapsed bool
 	}{
 		{
-			name:      "enable debug mode",
-			debugMode: true,
+			name:           "enable debug mode",
+			debugCollapsed: false,
 		},
 		{
-			name:      "disable debug mode",
-			debugMode: false,
+			name:           "disable debug mode",
+			debugCollapsed: true,
 		},
 	}
 
@@ -414,8 +413,8 @@ func TestSetDebugMode(t *testing.T) {
 				prefsMu: sync.RWMutex{},
 			}
 
-			app.SetDebugMode(tt.debugMode)
-			assert.Equal(t, tt.debugMode, app.Preferences.App.DebugMode)
+			app.SetDebugCollapsed(tt.debugCollapsed)
+			assert.Equal(t, tt.debugCollapsed, app.Preferences.App.DebugCollapsed)
 		})
 	}
 }

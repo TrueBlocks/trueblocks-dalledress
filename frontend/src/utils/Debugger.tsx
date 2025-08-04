@@ -1,5 +1,5 @@
-import { ActionDefinition, useActiveProject2 } from '@hooks';
-import { usePreferences2 } from '@hooks';
+import { ActionDefinition, useActiveProject } from '@hooks';
+import { usePreferences } from '@hooks';
 
 interface DebuggerProps {
   rowActions: ActionDefinition[];
@@ -12,9 +12,9 @@ export const Debugger: React.FC<DebuggerProps> = ({
   headerActions,
   count,
 }) => {
-  const { activeChain, activeAddress, activeContract } = useActiveProject2();
-  const { debugMode } = usePreferences2();
-  if (!debugMode) {
+  const { activeChain, activeAddress, activeContract } = useActiveProject();
+  const { debugCollapsed } = usePreferences();
+  if (debugCollapsed) {
     return <></>;
   }
 
@@ -51,8 +51,8 @@ export const ActionDebugger: React.FC<ActionDebuggerProps> = ({
   rowActions,
   headerActions,
 }) => {
-  const { debugMode } = usePreferences2();
-  if (!debugMode) {
+  const { debugCollapsed } = usePreferences();
+  if (debugCollapsed) {
     return <></>;
   }
 

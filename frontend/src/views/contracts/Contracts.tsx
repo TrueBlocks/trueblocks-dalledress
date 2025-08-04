@@ -14,8 +14,8 @@ import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
   toPageDataProp,
-  useActiveFacet2,
-  useActiveProject2,
+  useActiveFacet,
+  useActiveProject,
   useColumns,
   useEvent,
   usePayload,
@@ -122,7 +122,7 @@ const FacetTitle: React.FC<FacetTitleProps> = ({
 export const ROUTE = 'contracts' as const;
 export const Contracts = () => {
   // === SECTION 2: Contract Detail Detection ===
-  const { activeContract, setActiveContract } = useActiveProject2();
+  const { activeContract, setActiveContract } = useActiveProject();
 
   // === SECTION 3: Contract Detail State ===
   const [contractAbi, setContractAbi] = useState<types.Contract | null>(null);
@@ -132,7 +132,7 @@ export const Contracts = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-  const activeFacetHook = useActiveFacet2({
+  const activeFacetHook = useActiveFacet({
     facets: contractsFacets,
     viewRoute: ROUTE,
   });

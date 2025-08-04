@@ -95,13 +95,9 @@ export function clearRegisteredHotkeys() {
 
 // --- Focused Hooks Mocking --- //
 const createInitialFocusedHooksDefaultValue = () => ({
-  // useActiveProject2 defaults
-  activeProject2: {
+  // useActiveProject defaults
+  activeProject: {
     lastFacetMap: {},
-    setLastFacet: vi.fn(),
-    getLastFacet: vi.fn((_view: string) => {
-      return '';
-    }),
     activeChain: 'mainnet',
     activeAddress: '0x123',
     activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
@@ -110,92 +106,79 @@ const createInitialFocusedHooksDefaultValue = () => ({
     effectiveChain: 'mainnet',
     lastProject: 'test-project',
     lastView: 'home',
+    hasActiveProject: true,
+    canExport: true,
+    switchProject: vi.fn(),
     setActiveAddress: vi.fn(),
     setActiveChain: vi.fn(),
     setActiveContract: vi.fn(),
     setLastView: vi.fn(),
-    switchProject: vi.fn(),
-    hasActiveProject: true,
-    canExport: true,
+    setLastFacet: vi.fn(),
+    getLastFacet: vi.fn((_view: string) => {
+      return '';
+    }),
   },
-  // usePreferences2 defaults
-  preferences2: {
+  // usePreferences defaults
+  preferences: {
     lastTheme: 'light',
     lastLanguage: 'en',
-    debugMode: false,
     loading: false,
+    isDarkMode: false,
+    debugCollapsed: true,
+    helpCollapsed: false,
+    menuCollapsed: false,
+    detailCollapsed: true,
     toggleTheme: vi.fn(),
     changeLanguage: vi.fn(),
-    toggleDebugMode: vi.fn(),
-    isDarkMode: false,
-  },
-  // useUIState2 defaults
-  uiState2: {
-    menuCollapsed: false,
-    helpCollapsed: false,
-    showDetailPanel: true,
-    loading: false,
-    setMenuCollapsed: vi.fn(),
+    setDebugCollapsed: vi.fn(),
+    setDetailCollapsed: vi.fn(),
     setHelpCollapsed: vi.fn(),
-    setShowDetailPanel: vi.fn(),
+    setMenuCollapsed: vi.fn(),
   },
 });
 
 export let mockFocusedHooksValues = createInitialFocusedHooksDefaultValue();
 
-export const mockUseActiveProject2 = vi.fn(
-  () => mockFocusedHooksValues.activeProject2,
+export const mockUseActiveProject = vi.fn(
+  () => mockFocusedHooksValues.activeProject,
 );
-export const mockUsePreferences2 = vi.fn(
-  () => mockFocusedHooksValues.preferences2,
+export const mockUsePreferences = vi.fn(
+  () => mockFocusedHooksValues.preferences,
 );
-export const mockUseUIState2 = vi.fn(() => mockFocusedHooksValues.uiState2);
-
 export function setupFocusedHookMocks({
-  customActiveProject2,
-  customPreferences2,
-  customUIState2,
+  customActiveProject,
+  customPreferences,
 }: {
-  customActiveProject2?: Partial<typeof mockFocusedHooksValues.activeProject2>;
-  customPreferences2?: Partial<typeof mockFocusedHooksValues.preferences2>;
-  customUIState2?: Partial<typeof mockFocusedHooksValues.uiState2>;
+  customActiveProject?: Partial<typeof mockFocusedHooksValues.activeProject>;
+  customPreferences?: Partial<typeof mockFocusedHooksValues.preferences>;
 } = {}) {
   const newDefaults = createInitialFocusedHooksDefaultValue();
 
   // Set up Wails mocks to prevent "Cannot read properties of undefined" errors
   setupWailsMocks();
 
-  if (customActiveProject2) {
-    mockFocusedHooksValues.activeProject2 = {
-      ...newDefaults.activeProject2,
-      ...customActiveProject2,
+  if (customActiveProject) {
+    mockFocusedHooksValues.activeProject = {
+      ...newDefaults.activeProject,
+      ...customActiveProject,
     };
   }
 
-  if (customPreferences2) {
-    mockFocusedHooksValues.preferences2 = {
-      ...newDefaults.preferences2,
-      ...customPreferences2,
-    };
-  }
-
-  if (customUIState2) {
-    mockFocusedHooksValues.uiState2 = {
-      ...newDefaults.uiState2,
-      ...customUIState2,
+  if (customPreferences) {
+    mockFocusedHooksValues.preferences = {
+      ...newDefaults.preferences,
+      ...customPreferences,
     };
   }
 
   // Update the mock implementations to use the new values
-  mockUseActiveProject2.mockReturnValue(mockFocusedHooksValues.activeProject2);
-  mockUsePreferences2.mockReturnValue(mockFocusedHooksValues.preferences2);
-  mockUseUIState2.mockReturnValue(mockFocusedHooksValues.uiState2);
+  mockUseActiveProject.mockReturnValue(mockFocusedHooksValues.activeProject);
+  mockUsePreferences.mockReturnValue(mockFocusedHooksValues.preferences);
 
   // Return the mock functions so tests can access them
   return {
-    mockActiveProject2: mockFocusedHooksValues.activeProject2,
-    mockPreferences2: mockFocusedHooksValues.preferences2,
-    mockUIState2: mockFocusedHooksValues.uiState2,
+    mockActiveProject: mockFocusedHooksValues.activeProject,
+    mockPreferences: mockFocusedHooksValues.preferences,
   };
 }
 
@@ -205,15 +188,13 @@ vi.mock('@hooks', async (importOriginal) => {
     const originalModule = await importOriginal();
     return {
       ...(originalModule as any),
-      useActiveProject2: mockUseActiveProject2,
-      usePreferences2: mockUsePreferences2,
-      useUIState2: mockUseUIState2,
+      useActiveProject: mockUseActiveProject,
+      usePreferences: mockUsePreferences,
     };
   } catch {
     return {
-      useActiveProject2: mockUseActiveProject2,
-      usePreferences2: mockUsePreferences2,
-      useUIState2: mockUseUIState2,
+      useActiveProject: mockUseActiveProject,
+      usePreferences: mockUsePreferences,
     };
   }
 });
@@ -463,9 +444,8 @@ export function resetAllCentralMocks() {
 
   // Reset Focused Hooks mock values
   mockFocusedHooksValues = createInitialFocusedHooksDefaultValue();
-  mockUseActiveProject2.mockReturnValue(mockFocusedHooksValues.activeProject2);
-  mockUsePreferences2.mockReturnValue(mockFocusedHooksValues.preferences2);
-  mockUseUIState2.mockReturnValue(mockFocusedHooksValues.uiState2);
+  mockUseActiveProject.mockReturnValue(mockFocusedHooksValues.activeProject);
+  mockUsePreferences.mockReturnValue(mockFocusedHooksValues.preferences);
 
   // Reset and re-initialize implementations for @components hooks
   mockUseTableContext.mockReset();
@@ -475,15 +455,13 @@ export function resetAllCentralMocks() {
 
   // Reset Focused Hooks mock values
   mockFocusedHooksValues = createInitialFocusedHooksDefaultValue();
-  mockUseActiveProject2.mockReset();
-  mockUseActiveProject2.mockImplementation(
-    () => mockFocusedHooksValues.activeProject2,
+  mockUseActiveProject.mockReset();
+  mockUseActiveProject.mockImplementation(
+    () => mockFocusedHooksValues.activeProject,
   );
-  mockUsePreferences2.mockReset();
-  mockUsePreferences2.mockImplementation(
-    () => mockFocusedHooksValues.preferences2,
+  mockUsePreferences.mockReset();
+  mockUsePreferences.mockImplementation(
+    () => mockFocusedHooksValues.preferences,
   );
-  mockUseUIState2.mockReset();
-  mockUseUIState2.mockImplementation(() => mockFocusedHooksValues.uiState2);
 }
 // --- End Global Reset Utility --- //

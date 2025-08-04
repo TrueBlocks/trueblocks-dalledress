@@ -1,5 +1,5 @@
 import { CancelFetch, Reload } from '@app';
-import { useActiveProject2, useUIState } from '@hooks';
+import { useActiveProject, usePreferences } from '@hooks';
 import { msgs, types } from '@models';
 import { Log, emitEvent, registerHotkeys, useEmitters } from '@utils';
 import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
@@ -32,15 +32,17 @@ type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
 
 export const useAppHotkeys = (): void => {
   const [currentLocation] = useLocation();
-  const { getLastFacet } = useActiveProject2();
+  const { getLastFacet } = useActiveProject();
   const {
+    debugCollapsed,
+    setDebugCollapsed,
     menuCollapsed,
     setMenuCollapsed,
     helpCollapsed,
     setHelpCollapsed,
-    showDetailPanel,
-    setShowDetailPanel,
-  } = useUIState();
+    detailCollapsed,
+    setDetailCollapsed,
+  } = usePreferences();
 
   // Helper function to get current facet for the current route
   const vR = currentLocation.replace(/^\/+/, '');
@@ -103,8 +105,7 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+m',
             label: 'Toggle menu panel',
             action: () => {
-              const next = !menuCollapsed;
-              setMenuCollapsed(next);
+              setMenuCollapsed(!menuCollapsed);
             },
           },
           e,
@@ -120,8 +121,7 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+h',
             label: 'Toggle help panel',
             action: () => {
-              const next = !helpCollapsed;
-              setHelpCollapsed(next);
+              setHelpCollapsed(!helpCollapsed);
             },
           },
           e,
@@ -137,8 +137,23 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+p',
             label: 'Toggle detail panel',
             action: () => {
-              const next = !showDetailPanel;
-              setShowDetailPanel(next);
+              setDetailCollapsed(!detailCollapsed);
+            },
+          },
+          e,
+        ),
+      options: { preventDefault: true, enableOnFormTags: true },
+    },
+    {
+      key: 'mod+d',
+      handler: (e: KeyboardEvent) =>
+        handleHotkey(
+          {
+            type: 'toggle',
+            hotkey: 'mod+d',
+            label: 'Toggle debug info',
+            action: () => {
+              setDebugCollapsed(!debugCollapsed);
             },
           },
           e,

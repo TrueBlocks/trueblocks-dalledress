@@ -8,7 +8,7 @@ import {
 } from '@app';
 import { Action, StatusIndicator } from '@components';
 import { useViewContext } from '@contexts';
-import { useActiveProject2, useIconSets } from '@hooks';
+import { useActiveProject, useIconSets } from '@hooks';
 import {
   Badge,
   Button,
@@ -68,7 +68,7 @@ export const ProjectSelectionModal = ({
   const [error, setError] = useState<string | null>(null);
   const { File, Add } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
-  const { lastView } = useActiveProject2();
+  const { lastView } = useActiveProject();
   const [, navigate] = useLocation();
   const isMounted = useRef(true);
 

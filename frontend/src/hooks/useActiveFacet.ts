@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { types } from '@models';
 
-import { useActiveProject2 } from './useActiveProject2';
+import { useActiveProject } from './useActiveProject';
 
 export type DataFacet = types.DataFacet;
 
@@ -12,7 +12,7 @@ export interface DataFacetConfig {
   dividerBefore?: boolean;
 }
 
-export interface UseActiveFacetReturn2 {
+export interface UseActiveFacetReturn {
   activeFacet: DataFacet;
   setActiveFacet: (facet: DataFacet) => void;
   availableFacets: DataFacetConfig[];
@@ -22,7 +22,7 @@ export interface UseActiveFacetReturn2 {
   getCurrentDataFacet: () => types.DataFacet;
 }
 
-export interface UseActiveFacetParams2 {
+export interface UseActiveFacetParams {
   viewRoute: string;
   facets: DataFacetConfig[];
 }
@@ -32,18 +32,18 @@ export interface UseActiveFacetParams2 {
  *
  * This hook provides a clean API for:
  * - Managing the currently active facet in a view
- * - Persisting facet selection to user preferences via useActiveProject2
+ * - Persisting facet selection to user preferences via useActiveProject
  * - Providing facet configuration and metadata
  * - Backward compatibility with existing DataFacet usage
  *
  * @param params Configuration for the hook
  * @returns Hook interface for facet management
  */
-export const useActiveFacet2 = ({
+export const useActiveFacet = ({
   viewRoute,
   facets,
-}: UseActiveFacetParams2): UseActiveFacetReturn2 => {
-  const { getLastFacet, setLastFacet, lastFacetMap } = useActiveProject2();
+}: UseActiveFacetParams): UseActiveFacetReturn => {
+  const { getLastFacet, setLastFacet, lastFacetMap } = useActiveProject();
 
   const getDefaultFacet = useCallback((): DataFacet => {
     const firstFacet = facets[0];

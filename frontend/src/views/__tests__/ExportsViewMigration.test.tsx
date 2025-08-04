@@ -1,31 +1,25 @@
-import { DataFacetConfig, useActiveFacet2 } from '@hooks';
+import { DataFacetConfig, useActiveFacet } from '@hooks';
 import { setupWailsMocks } from '@mocks';
 import { types } from '@models';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the focused hooks (no duplication - centralized in setup)
-vi.mock('../../hooks/useActiveProject2', () => ({
-  useActiveProject2: vi.fn(),
+vi.mock('../../hooks/useActiveProject', () => ({
+  useActiveProject: vi.fn(),
 }));
 
-vi.mock('../../hooks/usePreferences2', () => ({
-  usePreferences2: vi.fn(),
+vi.mock('../../hooks/usePreferences', () => ({
+  usePreferences: vi.fn(),
 }));
 
-vi.mock('../../hooks/useUIState2', () => ({
-  useUIState: vi.fn(),
-}));
+const { useActiveProject } = await import('../../hooks/useActiveProject');
+const { usePreferences } = await import('../../hooks/usePreferences');
 
-const { useActiveProject2 } = await import('../../hooks/useActiveProject2');
-const { usePreferences2 } = await import('../../hooks/usePreferences2');
-const { useUIState } = await import('../../hooks/useUIState2');
+const mockedUseActiveProject = vi.mocked(useActiveProject);
+const mockedUsePreferences = vi.mocked(usePreferences);
 
-const mockedUseActiveProject2 = vi.mocked(useActiveProject2);
-const mockedUsePreferences = vi.mocked(usePreferences2);
-const mockedUseUIState = vi.mocked(useUIState);
-
-describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
+describe('Exports View Migration Tests (useActiveFacet integration)', () => {
   let mockLastFacetMap: Record<string, types.DataFacet>;
   let mockSetLastFacet: ReturnType<typeof vi.fn>;
 
@@ -57,8 +51,8 @@ describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
     mockLastFacetMap = {};
     mockSetLastFacet = vi.fn();
 
-    // Mock useActiveProject2 (project context)
-    mockedUseActiveProject2.mockReturnValue({
+    // Mock useActiveProject (project context)
+    mockedUseActiveProject.mockReturnValue({
       lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
       getLastFacet: vi.fn((view: string) => {
@@ -82,34 +76,29 @@ describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
       canExport: true,
     });
 
-    // Mock usePreferences2 (theme, language, debug)
+    // Mock usePreferences (theme, language, debug)
     mockedUsePreferences.mockReturnValue({
       lastTheme: 'dark',
       lastLanguage: 'en',
-      debugMode: false,
+      debugCollapsed: true,
+      menuCollapsed: false,
+      helpCollapsed: false,
+      detailCollapsed: true,
+      isDarkMode: true,
       loading: false,
       toggleTheme: vi.fn(),
       changeLanguage: vi.fn(),
-      toggleDebugMode: vi.fn(),
-      isDarkMode: true,
-    });
-
-    // Mock useUIState (collapsed states)
-    mockedUseUIState.mockReturnValue({
-      menuCollapsed: false,
-      helpCollapsed: false,
-      showDetailPanel: true,
-      loading: false,
+      setDebugCollapsed: vi.fn(),
       setMenuCollapsed: vi.fn(),
       setHelpCollapsed: vi.fn(),
-      setShowDetailPanel: vi.fn(),
+      setDetailCollapsed: vi.fn(),
     });
   });
 
   describe('hook integration', () => {
     it('should initialize with default transactions facet', () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           viewRoute: 'exports',
           facets: exportsFacets,
         }),
@@ -125,7 +114,7 @@ describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
       mockLastFacetMap['exports'] = types.DataFacet.STATEMENTS;
 
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           viewRoute: 'exports',
           facets: exportsFacets,
         }),
@@ -139,7 +128,7 @@ describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
 
     it('should support switching between all export facets', async () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           viewRoute: 'exports',
           facets: exportsFacets,
         }),
@@ -165,7 +154,7 @@ describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
 
     it('should provide all available facets', () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           viewRoute: 'exports',
           facets: exportsFacets,
         }),
@@ -184,7 +173,7 @@ describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
       mockLastFacetMap['exports'] = types.DataFacet.BALANCES;
 
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           viewRoute: 'exports',
           facets: exportsFacets,
         }),
@@ -211,7 +200,7 @@ describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
       mockLastFacetMap['exports'] = types.DataFacet.TRANSFERS;
 
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           viewRoute: 'exports',
           facets: exportsFacets,
         }),
@@ -226,7 +215,7 @@ describe('Exports View Migration Tests (useActiveFacet2 integration)', () => {
       mockLastFacetMap = {};
 
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           viewRoute: 'exports',
           facets: exportsFacets,
         }),

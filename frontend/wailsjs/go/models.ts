@@ -519,18 +519,18 @@ export namespace preferences {
 	    }
 	}
 	export class AppPreferences {
-	    bounds?: Bounds;
-	    debugMode?: boolean;
-	    helpCollapsed?: boolean;
-	    lastTheme?: string;
-	    menuCollapsed?: boolean;
-	    name?: string;
+	    version: string;
+	    name: string;
+	    lastTheme: string;
+	    lastLanguage: string;
+	    lastProject: string;
+	    helpCollapsed: boolean;
+	    menuCollapsed: boolean;
+	    detailCollapsed: boolean;
+	    debugCollapsed: boolean;
 	    recentProjects: string[];
 	    silencedDialogs: Record<string, boolean>;
-	    version: string;
-	    lastLanguage?: string;
-	    lastProject?: string;
-	    showDetailPanel?: boolean;
+	    bounds?: Bounds;
 	
 	    static createFrom(source: any = {}) {
 	        return new AppPreferences(source);
@@ -538,18 +538,18 @@ export namespace preferences {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.bounds = this.convertValues(source["bounds"], Bounds);
-	        this.debugMode = source["debugMode"];
-	        this.helpCollapsed = source["helpCollapsed"];
-	        this.lastTheme = source["lastTheme"];
-	        this.menuCollapsed = source["menuCollapsed"];
-	        this.name = source["name"];
-	        this.recentProjects = source["recentProjects"];
-	        this.silencedDialogs = source["silencedDialogs"];
 	        this.version = source["version"];
+	        this.name = source["name"];
+	        this.lastTheme = source["lastTheme"];
 	        this.lastLanguage = source["lastLanguage"];
 	        this.lastProject = source["lastProject"];
-	        this.showDetailPanel = source["showDetailPanel"];
+	        this.helpCollapsed = source["helpCollapsed"];
+	        this.menuCollapsed = source["menuCollapsed"];
+	        this.detailCollapsed = source["detailCollapsed"];
+	        this.debugCollapsed = source["debugCollapsed"];
+	        this.recentProjects = source["recentProjects"];
+	        this.silencedDialogs = source["silencedDialogs"];
+	        this.bounds = this.convertValues(source["bounds"], Bounds);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

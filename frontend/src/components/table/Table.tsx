@@ -3,7 +3,7 @@ import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronButton, useTableContext, useTableKeys } from '@components';
 import { Form, FormField } from '@components';
 import { useFiltering } from '@contexts';
-import { useUIState } from '@hooks';
+import { usePreferences } from '@hooks';
 import { Modal } from '@mantine/core';
 import { project } from '@models';
 
@@ -55,14 +55,14 @@ export const Table = <T extends Record<string, unknown>>({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRowData, setCurrentRowData] = useState<T | null>(null);
 
-  const { showDetailPanel, setShowDetailPanel } = useUIState();
+  const { detailCollapsed, setDetailCollapsed } = usePreferences();
 
   const processedColumns = processColumns(columns);
 
-  // For detail panel mode, only show first 3 columns
-  const displayColumns = showDetailPanel
-    ? processedColumns.slice(0, 3)
-    : processedColumns;
+  // When detailCollapsed is false, the detail panel is showing, so show fewer columns
+  const displayColumns = detailCollapsed
+    ? processedColumns
+    : processedColumns.slice(0, 3);
 
   const { pagination } = usePagination(viewStateKey);
   const { filter, setFiltering } = useFiltering(viewStateKey);
@@ -255,8 +255,8 @@ export const Table = <T extends Record<string, unknown>>({
     <div className="table-container">
       <div className="top-pagination-container">
         <ChevronButton
-          collapsed={showDetailPanel}
-          onToggle={() => setShowDetailPanel(!showDetailPanel)}
+          collapsed={detailCollapsed}
+          onToggle={() => setDetailCollapsed(!detailCollapsed)}
           direction="none"
         />
         <div className="pagination-controls">
@@ -278,7 +278,7 @@ export const Table = <T extends Record<string, unknown>>({
       </div>
 
       <div
-        className={`table-main-content ${showDetailPanel ? 'with-detail-panel' : ''}`}
+        className={`table-main-content ${!detailCollapsed ? 'with-detail-panel' : ''}`}
       >
         <div className="table-section">
           <table
@@ -307,9 +307,7 @@ export const Table = <T extends Record<string, unknown>>({
                 </tr>
               ) : (
                 <Body
-                  columns={processColumns(
-                    showDetailPanel ? columns.slice(0, 3) : columns,
-                  )}
+                  columns={displayColumns}
                   data={data}
                   selectedRowIndex={selectedRowIndex}
                   handleRowClick={handleRowClick}
@@ -320,8 +318,7 @@ export const Table = <T extends Record<string, unknown>>({
           </table>
         </div>
 
-        {/* Detail panel */}
-        {showDetailPanel && (
+        {!detailCollapsed && (
           <DetailPanel
             selectedRowData={selectedRowData}
             detailPanel={detailPanel}

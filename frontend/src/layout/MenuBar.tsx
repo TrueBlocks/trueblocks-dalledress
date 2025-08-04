@@ -1,5 +1,5 @@
 import { ChevronButton, getBarWidth } from '@components';
-import { useIconSets, useUIState } from '@hooks';
+import { useIconSets, usePreferences } from '@hooks';
 import { AppShell, Button, Stack } from '@mantine/core';
 import { MenuItem, MenuItems } from 'src/Menu';
 import { useLocation } from 'wouter';
@@ -10,7 +10,7 @@ interface MenuBarProps {
 
 export const MenuBar = ({ disabled = false }: MenuBarProps) => {
   const [currentLocation, navigate] = useLocation();
-  const { menuCollapsed, setMenuCollapsed } = useUIState();
+  const { menuCollapsed, setMenuCollapsed } = usePreferences();
 
   const topMenuItems = MenuItems.filter((item) => item.position === 'top');
   const botMenuItems = MenuItems.filter((item) => item.position === 'bottom');

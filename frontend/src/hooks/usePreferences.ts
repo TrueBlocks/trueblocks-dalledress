@@ -3,61 +3,73 @@ import { useSyncExternalStore } from 'react';
 import {
   GetAppPreferences,
   SetAppPreferences,
-  SetDebugMode,
+  SetDebugCollapsed,
+  SetHelpCollapsed,
   SetLanguage,
+  SetMenuCollapsed,
   SetTheme,
 } from '@app';
 import { preferences } from '@models';
 import { Log } from '@utils';
 
-export interface UsePreferencesReturn2 {
+export interface UsePreferencesReturn {
   lastTheme: string;
   lastLanguage: string;
-  debugMode: boolean;
+  debugCollapsed: boolean;
+  menuCollapsed: boolean;
+  helpCollapsed: boolean;
+  detailCollapsed: boolean;
   loading: boolean;
   toggleTheme: () => Promise<void>;
   changeLanguage: (language: string) => Promise<void>;
-  toggleDebugMode: () => Promise<void>;
+  setDebugCollapsed: (collapsed: boolean) => Promise<void>;
+  setMenuCollapsed: (collapsed: boolean) => Promise<void>;
+  setHelpCollapsed: (collapsed: boolean) => Promise<void>;
+  setDetailCollapsed: (enabled: boolean) => Promise<void>;
   isDarkMode: boolean;
 }
 
 interface PreferencesState {
   lastTheme: string;
   lastLanguage: string;
-  debugMode: boolean;
+  debugCollapsed: boolean;
+  menuCollapsed: boolean;
+  helpCollapsed: boolean;
+  detailCollapsed: boolean;
   loading: boolean;
 }
 
 const initialPreferencesState: PreferencesState = {
   lastTheme: 'dark',
   lastLanguage: 'en',
-  debugMode: false,
+  debugCollapsed: true,
+  menuCollapsed: false,
+  helpCollapsed: false,
+  detailCollapsed: true,
   loading: false,
 };
 
 class PreferencesStore {
   private state: PreferencesState = { ...initialPreferencesState };
   private listeners = new Set<() => void>();
-  private isTestMode = false;
-  private cachedSnapshot: UsePreferencesReturn2 | null = null;
+  private cachedSnapshot: UsePreferencesReturn | null = null;
 
-  setTestMode = (testMode: boolean): void => {
-    this.isTestMode = testMode;
-    if (testMode) {
-      this.setState({ loading: false });
-    }
-  };
-
-  getSnapshot = (): UsePreferencesReturn2 => {
+  getSnapshot = (): UsePreferencesReturn => {
     if (!this.cachedSnapshot) {
       this.cachedSnapshot = {
         lastTheme: this.state.lastTheme,
         lastLanguage: this.state.lastLanguage,
-        debugMode: this.state.debugMode,
+        debugCollapsed: this.state.debugCollapsed,
+        menuCollapsed: this.state.menuCollapsed,
+        helpCollapsed: this.state.helpCollapsed,
+        detailCollapsed: this.state.detailCollapsed,
         loading: this.state.loading,
         toggleTheme: this.toggleTheme,
         changeLanguage: this.changeLanguage,
-        toggleDebugMode: this.toggleDebugMode,
+        setDebugCollapsed: this.setDebugCollapsed,
+        setMenuCollapsed: this.setMenuCollapsed,
+        setHelpCollapsed: this.setHelpCollapsed,
+        setDetailCollapsed: this.setDetailCollapsed,
         isDarkMode: this.isDarkMode,
       };
     }
@@ -84,8 +96,6 @@ class PreferencesStore {
   private updatePreferences = async (
     updates: Partial<preferences.AppPreferences>,
   ): Promise<void> => {
-    if (this.isTestMode) return;
-
     try {
       const currentPrefs = await GetAppPreferences();
       const updatedPrefs = preferences.AppPreferences.createFrom({
@@ -100,8 +110,6 @@ class PreferencesStore {
   };
 
   initialize = async (): Promise<void> => {
-    if (this.isTestMode) return;
-
     try {
       this.setState({ loading: true });
 
@@ -110,7 +118,10 @@ class PreferencesStore {
       this.setState({
         lastTheme: prefs.lastTheme || 'dark',
         lastLanguage: prefs.lastLanguage || 'en',
-        debugMode: prefs.debugMode || false,
+        debugCollapsed: prefs.debugCollapsed ?? true,
+        menuCollapsed: prefs.menuCollapsed ?? false,
+        helpCollapsed: prefs.helpCollapsed ?? false,
+        detailCollapsed: prefs.detailCollapsed ?? true,
         loading: false,
       });
     } catch (error) {
@@ -132,11 +143,27 @@ class PreferencesStore {
     this.setState({ lastLanguage: language });
   };
 
-  toggleDebugMode = async (): Promise<void> => {
-    const newDebugMode = !this.state.debugMode;
-    await SetDebugMode(newDebugMode);
-    await this.updatePreferences({ debugMode: newDebugMode });
-    this.setState({ debugMode: newDebugMode });
+  setDebugCollapsed = async (collapsed: boolean): Promise<void> => {
+    await SetDebugCollapsed(collapsed);
+    await this.updatePreferences({ debugCollapsed: collapsed });
+    this.setState({ debugCollapsed: collapsed });
+  };
+
+  setMenuCollapsed = async (collapsed: boolean): Promise<void> => {
+    await SetMenuCollapsed(collapsed);
+    await this.updatePreferences({ menuCollapsed: collapsed });
+    this.setState({ menuCollapsed: collapsed });
+  };
+
+  setHelpCollapsed = async (collapsed: boolean): Promise<void> => {
+    await SetHelpCollapsed(collapsed);
+    await this.updatePreferences({ helpCollapsed: collapsed });
+    this.setState({ helpCollapsed: collapsed });
+  };
+
+  setDetailCollapsed = async (collapsed: boolean): Promise<void> => {
+    await this.updatePreferences({ detailCollapsed: collapsed });
+    this.setState({ detailCollapsed: collapsed });
   };
 
   get isDarkMode(): boolean {
@@ -153,11 +180,9 @@ if (
   setTimeout(() => {
     preferencesStore.initialize();
   }, 0);
-} else {
-  preferencesStore.setTestMode(true);
 }
 
-export const usePreferences2 = (): UsePreferencesReturn2 => {
+export const usePreferences = (): UsePreferencesReturn => {
   return useSyncExternalStore(
     preferencesStore.subscribe,
     preferencesStore.getSnapshot,

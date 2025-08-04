@@ -1,31 +1,25 @@
-import { DataFacet, DataFacetConfig, useActiveFacet2 } from '@hooks';
+import { DataFacet, DataFacetConfig, useActiveFacet } from '@hooks';
 import { setupWailsMocks } from '@mocks';
 import { types } from '@models';
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the focused hooks (no duplication - individual setup)
-vi.mock('../../hooks/useActiveProject2', () => ({
-  useActiveProject2: vi.fn(),
+vi.mock('../../hooks/useActiveProject', () => ({
+  useActiveProject: vi.fn(),
 }));
 
-vi.mock('../../hooks/usePreferences2', () => ({
-  usePreferences2: vi.fn(),
+vi.mock('../../hooks/usePreferences', () => ({
+  usePreferences: vi.fn(),
 }));
 
-vi.mock('../../hooks/useUIState2', () => ({
-  useUIState: vi.fn(),
-}));
+const { useActiveProject } = await import('../../hooks/useActiveProject');
+const { usePreferences } = await import('../../hooks/usePreferences');
 
-const { useActiveProject2 } = await import('../../hooks/useActiveProject2');
-const { usePreferences2 } = await import('../../hooks/usePreferences2');
-const { useUIState } = await import('../../hooks/useUIState2');
+const mockedUseActiveProject = vi.mocked(useActiveProject);
+const mockedUsePreferences = vi.mocked(usePreferences);
 
-const mockedUseActiveProject2 = vi.mocked(useActiveProject2);
-const mockedUsePreferences = vi.mocked(usePreferences2);
-const mockedUseUIState = vi.mocked(useUIState);
-
-describe('Names View + useActiveFacet2 Integration Tests', () => {
+describe('Names View + useActiveFacet Integration Tests', () => {
   let mockLastFacetMap: Record<string, types.DataFacet>;
   let mockSetLastFacet: ReturnType<typeof vi.fn>;
   const namesFacets: DataFacetConfig[] = [
@@ -61,8 +55,8 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
     mockLastFacetMap = {};
     mockSetLastFacet = vi.fn();
 
-    // Mock useActiveProject2 (project context)
-    mockedUseActiveProject2.mockReturnValue({
+    // Mock useActiveProject (project context)
+    mockedUseActiveProject.mockReturnValue({
       lastFacetMap: mockLastFacetMap,
       setLastFacet: mockSetLastFacet,
       getLastFacet: vi.fn((view: string) => {
@@ -86,34 +80,29 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
       canExport: true,
     });
 
-    // Mock usePreferences2 (theme, language, debug)
+    // Mock usePreferences (theme, language, debug)
     mockedUsePreferences.mockReturnValue({
       lastTheme: 'dark',
       lastLanguage: 'en',
-      debugMode: false,
+      debugCollapsed: true,
+      menuCollapsed: false,
+      helpCollapsed: false,
+      detailCollapsed: true,
+      isDarkMode: true,
       loading: false,
       toggleTheme: vi.fn(),
       changeLanguage: vi.fn(),
-      toggleDebugMode: vi.fn(),
-      isDarkMode: true,
-    });
-
-    // Mock useUIState (collapsed states)
-    mockedUseUIState.mockReturnValue({
-      menuCollapsed: false,
-      helpCollapsed: false,
-      showDetailPanel: true,
-      loading: false,
+      setDebugCollapsed: vi.fn(),
       setMenuCollapsed: vi.fn(),
       setHelpCollapsed: vi.fn(),
-      setShowDetailPanel: vi.fn(),
+      setDetailCollapsed: vi.fn(),
     });
   });
 
-  describe('useActiveFacet2 hook behavior with Names facets', () => {
+  describe('useActiveFacet hook behavior with Names facets', () => {
     it('returns correct default values for Names view', () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -126,7 +115,7 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
 
     it('maintains facet consistency across state changes', () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -148,7 +137,7 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
 
       // Re-render hook with updated preferences
       const { result: result2 } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -162,7 +151,7 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
       mockLastFacetMap['names'] = 'custom' as types.DataFacet;
 
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -174,7 +163,7 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
 
     it('persists facet changes to preferences', () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -202,7 +191,7 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
         mockLastFacetMap['names'] = dataFacet as types.DataFacet;
 
         const { result } = renderHook(() =>
-          useActiveFacet2({
+          useActiveFacet({
             facets: namesFacets,
             viewRoute: 'names',
           }),
@@ -217,7 +206,7 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
   describe('error handling and edge cases', () => {
     it('handles invalid facet selection gracefully', () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -235,7 +224,7 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
   describe('integration with Names view constants and patterns', () => {
     it('provides all expected Names facets', () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           facets: namesFacets,
           viewRoute: 'names',
         }),
@@ -264,7 +253,7 @@ describe('Names View + useActiveFacet2 Integration Tests', () => {
 
     it('matches expected Names view route pattern', () => {
       const { result } = renderHook(() =>
-        useActiveFacet2({
+        useActiveFacet({
           facets: namesFacets,
           viewRoute: 'names',
         }),

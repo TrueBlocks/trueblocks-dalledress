@@ -13,7 +13,7 @@ import {
 import { preferences } from '@models';
 import { Log } from '@utils';
 
-export interface UseProjectManagementReturn2 {
+export interface UseProjectManagementReturn {
   lastProject: string;
   projects: Record<string, unknown>[];
   loading: boolean;
@@ -40,17 +40,9 @@ const initialProjectManagementState: ProjectManagementState = {
 class ProjectManagementStore {
   private state: ProjectManagementState = { ...initialProjectManagementState };
   private listeners = new Set<() => void>();
-  private isTestMode = false;
-  private cachedSnapshot: UseProjectManagementReturn2 | null = null;
+  private cachedSnapshot: UseProjectManagementReturn | null = null;
 
-  setTestMode = (testMode: boolean): void => {
-    this.isTestMode = testMode;
-    if (testMode) {
-      this.setState({ loading: false });
-    }
-  };
-
-  getSnapshot = (): UseProjectManagementReturn2 => {
+  getSnapshot = (): UseProjectManagementReturn => {
     if (!this.cachedSnapshot) {
       this.cachedSnapshot = {
         lastProject: this.state.lastProject,
@@ -87,8 +79,6 @@ class ProjectManagementStore {
   private updatePreferences = async (
     updates: Partial<preferences.AppPreferences>,
   ): Promise<void> => {
-    if (this.isTestMode) return;
-
     try {
       const currentPrefs = await GetAppPreferences();
       const updatedPrefs = preferences.AppPreferences.createFrom({
@@ -106,8 +96,6 @@ class ProjectManagementStore {
   };
 
   initialize = async (): Promise<void> => {
-    if (this.isTestMode) return;
-
     try {
       this.setState({ loading: true });
 
@@ -128,8 +116,6 @@ class ProjectManagementStore {
   };
 
   refreshProjects = async (): Promise<void> => {
-    if (this.isTestMode) return;
-
     try {
       const projects = await GetOpenProjects();
       this.setState({ projects: projects || [] });
@@ -178,11 +164,9 @@ if (
   setTimeout(() => {
     projectManagementStore.initialize();
   }, 0);
-} else {
-  projectManagementStore.setTestMode(true);
 }
 
-export const useProjectManagement = (): UseProjectManagementReturn2 => {
+export const useProjectManagement = (): UseProjectManagementReturn => {
   return useSyncExternalStore(
     projectManagementStore.subscribe,
     projectManagementStore.getSnapshot,

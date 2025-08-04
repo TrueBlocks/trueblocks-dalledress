@@ -8,7 +8,7 @@ import {
   useAppHotkeys,
   useAppNavigation,
   useEvent,
-  useUIState,
+  usePreferences,
 } from '@hooks';
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
@@ -86,7 +86,7 @@ export const App = () => {
   });
 
   const { ready, isWizard } = useAppNavigation();
-  const { menuCollapsed, helpCollapsed } = useUIState();
+  const { menuCollapsed, helpCollapsed } = usePreferences();
 
   useAppHotkeys();
   useAppHealth();

@@ -36,18 +36,18 @@ func (b *Bounds) IsValid() bool {
 }
 
 type AppPreferences struct {
-	Bounds          Bounds          `json:"bounds,omitempty"`
-	DebugMode       bool            `json:"debugMode,omitempty"`
-	HelpCollapsed   bool            `json:"helpCollapsed,omitempty"`
-	LastTheme       string          `json:"lastTheme,omitempty"`
-	MenuCollapsed   bool            `json:"menuCollapsed,omitempty"`
-	Name            string          `json:"name,omitempty"`
+	Version         string          `json:"version"`
+	Name            string          `json:"name"`
+	LastTheme       string          `json:"lastTheme"`
+	LastLanguage    string          `json:"lastLanguage"`
+	LastProject     string          `json:"lastProject"`
+	HelpCollapsed   bool            `json:"helpCollapsed"`
+	MenuCollapsed   bool            `json:"menuCollapsed"`
+	DetailCollapsed bool            `json:"detailCollapsed"`
+	DebugCollapsed  bool            `json:"debugCollapsed"`
 	RecentProjects  []string        `json:"recentProjects"`
 	SilencedDialogs map[string]bool `json:"silencedDialogs"`
-	Version         string          `json:"version"`
-	LastLanguage    string          `json:"lastLanguage,omitempty"`
-	LastProject     string          `json:"lastProject,omitempty"`
-	ShowDetailPanel bool            `json:"showDetailPanel,omitempty"`
+	Bounds          Bounds          `json:"bounds,omitempty"`
 }
 
 func (p *AppPreferences) String() string {
@@ -58,16 +58,16 @@ func (p *AppPreferences) String() string {
 // NewAppPreferences creates a new AppPreferences instance with default values
 func NewAppPreferences() *AppPreferences {
 	return &AppPreferences{
-		Bounds:          NewBounds(),
-		DebugMode:       false,
+		Version:         "1.0",
+		LastTheme:       "dark",
+		LastLanguage:    "en",
+		DetailCollapsed: true,
 		HelpCollapsed:   false,
 		MenuCollapsed:   false,
-		LastLanguage:    "en",
-		LastTheme:       "dark",
+		DebugCollapsed:  true,
 		RecentProjects:  []string{},
 		SilencedDialogs: make(map[string]bool),
-		Version:         "1.0",
-		ShowDetailPanel: false,
+		Bounds:          NewBounds(),
 	}
 }
 
@@ -118,17 +118,6 @@ func GetAppPreferences() (AppPreferences, error) {
 		logging.LogBackend("App preferences had missing fields, saving corrected version")
 		if err := SetAppPreferences(&appPrefs); err != nil {
 			logging.LogBackend(fmt.Sprintf("Warning: Could not save corrected app preferences: %v", err))
-		}
-	}
-
-	if tbDebug := os.Getenv("TB_DEBUG"); tbDebug != "" {
-		envDebugMode := tbDebug == "true" || tbDebug == "1" || tbDebug == "on"
-		if appPrefs.DebugMode != envDebugMode {
-			logging.LogBackend(fmt.Sprintf("TB_DEBUG environment variable (%s) overriding stored debug mode (%t) with %t", tbDebug, appPrefs.DebugMode, envDebugMode))
-			appPrefs.DebugMode = envDebugMode
-			if err := SetAppPreferences(&appPrefs); err != nil {
-				logging.LogBackend(fmt.Sprintf("Warning: Could not save debug mode from TB_DEBUG: %v", err))
-			}
 		}
 	}
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { AddAddressToProject, ConvertToAddress, SetActiveAddress } from '@app';
-import { useActiveProject2, useIconSets } from '@hooks';
+import { useActiveProject, useIconSets } from '@hooks';
 import {
   ActionIcon,
   Button,
@@ -33,7 +33,7 @@ export const AddressSelector = () => {
   const [addresses, setAddresses] = useState<base.Address[]>([]);
   const [loading, setLoading] = useState(false);
   const [addModalOpened, setAddModalOpened] = useState(false);
-  const { activeAddress } = useActiveProject2();
+  const { activeAddress } = useActiveProject();
   const { Add, Switch } = useIconSets();
 
   const form = useForm<AddAddressForm>({

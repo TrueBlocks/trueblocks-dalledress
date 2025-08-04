@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
 import { Action, WalletConnectButton } from '@components';
-import { usePreferences2 } from '@hooks';
+import { usePreferences } from '@hooks';
 import { AppShell, Group, Text, useMantineColorScheme } from '@mantine/core';
 
 export const Header = () => {
   const [appName, setAppName] = useState('AppName');
   const { colorScheme, setColorScheme } = useMantineColorScheme();
-  const { toggleTheme, isDarkMode, toggleDebugMode, debugMode } =
-    usePreferences2();
+  const { toggleTheme, isDarkMode, setDebugCollapsed, debugCollapsed } =
+    usePreferences();
 
   useEffect(() => {
     GetAppId().then((id) => {
@@ -25,10 +25,6 @@ export const Header = () => {
     await toggleTheme();
   };
 
-  const handleToggleDebug = async () => {
-    await toggleDebugMode();
-  };
-
   return (
     <AppShell.Header>
       <Group justify="space-between" p="md" h="100%">
@@ -39,15 +35,15 @@ export const Header = () => {
           <Action
             icon="DebugOn"
             iconOff="DebugOff"
-            isOn={debugMode}
-            onClick={handleToggleDebug}
+            isOn={!debugCollapsed}
+            onClick={() => setDebugCollapsed(!debugCollapsed)}
             title={
-              debugMode
-                ? 'Debug mode ON - Click to disable'
-                : 'Debug mode OFF - Click to enable'
+              debugCollapsed
+                ? 'Debug mode OFF - Click to enable'
+                : 'Debug mode ON - Click to disable'
             }
             variant="default"
-            color={debugMode ? 'red' : 'gray'}
+            color={debugCollapsed ? 'gray' : 'red'}
           />
           <Action
             icon="Light"

@@ -15,7 +15,7 @@ import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
   toPageDataProp,
-  useActiveFacet2,
+  useActiveFacet,
   useColumns,
   useEvent,
   usePayload,
@@ -36,7 +36,7 @@ export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-  const activeFacetHook = useActiveFacet2({
+  const activeFacetHook = useActiveFacet({
     facets: abisFacets,
     viewRoute: ROUTE,
   });

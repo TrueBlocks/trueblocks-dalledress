@@ -107,7 +107,7 @@ vi.mock('@hooks', () => ({
     Light: () => null,
     Dark: () => null,
   }),
-  useActiveProject2: () => ({
+  useActiveProject: () => ({
     // State values that come from focused hooks
     lastTheme: 'light',
     lastLanguage: 'en',

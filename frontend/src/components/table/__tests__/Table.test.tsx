@@ -4,6 +4,22 @@ import { project, types } from '@models';
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('@hooks', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hooks')>();
+  return {
+    ...actual,
+    usePreferences: () => ({
+      menuCollapsed: false,
+      helpCollapsed: false,
+      detailCollapsed: true,
+      loading: false,
+      setDetailCollapsed: vi.fn(),
+      setMenuCollapsed: vi.fn(),
+      setHelpCollapsed: vi.fn(),
+    }),
+  };
+});
+
 type TestRow = {
   id: number;
   name: string;

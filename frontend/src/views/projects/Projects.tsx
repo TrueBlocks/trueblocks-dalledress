@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetOpenProjects, NewProject, SwitchToProject } from '@app';
 import { Action } from '@components';
 import { useViewContext } from '@contexts';
-import { useActiveProject2, useIconSets } from '@hooks';
+import { useActiveProject, useIconSets } from '@hooks';
 import {
   Badge,
   Button,
@@ -50,7 +50,7 @@ export const Projects = () => {
 
   const { File, Add } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
-  const { lastView } = useActiveProject2();
+  const { lastView } = useActiveProject();
   const [, navigate] = useLocation();
 
   const form = useForm<NewProjectForm>({

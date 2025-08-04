@@ -12,7 +12,7 @@ import {
 import { types } from '@models';
 import { Log, addressToHex } from '@utils';
 
-export interface UseActiveProjectReturn2 {
+export interface UseActiveProjectReturn {
   loading: boolean;
   lastProject: string;
   activeChain: string;
@@ -56,22 +56,14 @@ const initialProjectState: ProjectState = {
 class ProjectStore {
   private state: ProjectState = { ...initialProjectState };
   private listeners = new Set<() => void>();
-  private isTestMode = false;
-  private cachedSnapshot: UseActiveProjectReturn2 | null = null;
+  private cachedSnapshot: UseActiveProjectReturn | null = null;
 
   private getLastFacet = (view: string): string => {
     const vR = view.replace(/^\/+/, '');
     return this.state.lastFacetMap[vR] || '';
   };
 
-  setTestMode = (testMode: boolean): void => {
-    this.isTestMode = testMode;
-    if (testMode) {
-      this.setState({ loading: false });
-    }
-  };
-
-  getSnapshot = (): UseActiveProjectReturn2 => {
+  getSnapshot = (): UseActiveProjectReturn => {
     if (!this.cachedSnapshot) {
       this.cachedSnapshot = {
         loading: this.state.loading,
@@ -115,8 +107,6 @@ class ProjectStore {
   };
 
   initialize = async (): Promise<void> => {
-    if (this.isTestMode) return;
-
     try {
       this.setState({ loading: true });
 
@@ -214,10 +204,8 @@ if (
   setTimeout(() => {
     projectStore.initialize();
   }, 0);
-} else {
-  projectStore.setTestMode(true);
 }
 
-export const useActiveProject2 = (): UseActiveProjectReturn2 => {
+export const useActiveProject = (): UseActiveProjectReturn => {
   return useSyncExternalStore(projectStore.subscribe, projectStore.getSnapshot);
 };

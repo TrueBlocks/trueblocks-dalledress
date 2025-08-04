@@ -15,8 +15,7 @@ export * from './useStaggeredLoading';
 export * from './useWallet';
 export * from './useWalletGatedAction';
 
-export * from './useActiveProject2';
-export * from './usePreferences2';
-export * from './useUIState2';
-export * from './useProjectManagement2';
-export * from './useActiveFacet2';
+export * from './useActiveProject';
+export * from './usePreferences';
+export * from './useProjectManagement';
+export * from './useActiveFacet';

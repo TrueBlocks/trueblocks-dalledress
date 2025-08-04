@@ -70,6 +70,13 @@ describe('useActiveFacet Hook Tests (Focused Hook implementation)', () => {
       switchProject: vi.fn(),
       hasActiveProject: true,
       canExport: true,
+      // Add missing project management properties
+      projects: [],
+      newProject: vi.fn(),
+      openProjectFile: vi.fn(),
+      closeProject: vi.fn(),
+      clearActiveProject: vi.fn(),
+      refreshProjects: vi.fn(),
     });
 
     // Mock usePreferences (theme, language, debug)

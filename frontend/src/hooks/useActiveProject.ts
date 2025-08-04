@@ -1,16 +1,38 @@
 import { useSyncExternalStore } from 'react';
 
 import {
+  ClearActiveProject,
+  CloseProject,
   ConvertToAddress,
   GetActiveProjectData,
+  GetAppPreferences,
+  GetOpenProjects,
+  NewProject,
+  OpenProjectFile,
   SetActiveAddress,
   SetActiveChain,
   SetActiveContract,
+  SetAppPreferences,
   SetLastFacet,
   SetLastView,
+  SwitchToProject,
 } from '@app';
-import { types } from '@models';
+import { preferences, types } from '@models';
+import { EventsOn } from '@runtime';
 import { Log, addressToHex } from '@utils';
+
+export interface ProjectInfo {
+  id: string;
+  name: string;
+  path: string;
+  isActive: boolean;
+  isDirty: boolean;
+  lastOpened: string;
+  createdAt: string;
+  description?: string;
+  addresses?: string[];
+  chains?: string[];
+}
 
 export interface UseActiveProjectReturn {
   loading: boolean;
@@ -20,13 +42,27 @@ export interface UseActiveProjectReturn {
   activeContract: string;
   lastView: string;
   lastFacetMap: Record<string, types.DataFacet>;
+
+  // Project management state
+  projects: ProjectInfo[];
+
+  // Current active project operations
   getLastFacet: (view: string) => string;
   setActiveAddress: (address: string) => Promise<void>;
   setActiveChain: (chain: string) => Promise<void>;
   setActiveContract: (contract: string) => Promise<void>;
   setLastView: (view: string) => Promise<void>;
   setLastFacet: (view: string, facet: types.DataFacet) => Promise<void>;
+
+  // Project management operations
   switchProject: (project: string) => Promise<void>;
+  newProject: (name: string, address: string) => Promise<void>;
+  openProjectFile: (path: string) => Promise<void>;
+  closeProject: (projectId: string) => Promise<void>;
+  clearActiveProject: () => Promise<void>;
+  refreshProjects: () => Promise<void>;
+
+  // Computed properties
   hasActiveProject: boolean;
   canExport: boolean;
   effectiveAddress: string;
@@ -41,6 +77,7 @@ interface ProjectState {
   activeContract: string;
   lastView: string;
   lastFacetMap: Record<string, types.DataFacet>;
+  projects: ProjectInfo[];
 }
 
 const initialProjectState: ProjectState = {
@@ -51,6 +88,7 @@ const initialProjectState: ProjectState = {
   activeContract: '',
   lastView: '/',
   lastFacetMap: {},
+  projects: [],
 };
 
 class ProjectStore {
@@ -73,6 +111,7 @@ class ProjectStore {
         activeContract: this.state.activeContract,
         lastView: this.state.lastView,
         lastFacetMap: this.state.lastFacetMap,
+        projects: this.state.projects,
         getLastFacet: this.getLastFacet,
         setActiveAddress: this.setActiveAddress,
         setActiveChain: this.setActiveChain,
@@ -80,6 +119,11 @@ class ProjectStore {
         setLastView: this.setLastView,
         setLastFacet: this.setLastFacet,
         switchProject: this.switchProject,
+        newProject: this.newProject,
+        openProjectFile: this.openProjectFile,
+        closeProject: this.closeProject,
+        clearActiveProject: this.clearActiveProject,
+        refreshProjects: this.refreshProjects,
         hasActiveProject: this.hasActiveProject,
         canExport: this.canExport,
         effectiveAddress: this.state.activeAddress,
@@ -110,9 +154,14 @@ class ProjectStore {
     try {
       this.setState({ loading: true });
 
-      const projectData = await GetActiveProjectData();
+      const [projectData, prefs, projects] = await Promise.all([
+        GetActiveProjectData(),
+        GetAppPreferences(),
+        GetOpenProjects(),
+      ]);
 
       this.setState({
+        lastProject: prefs.lastProject || '',
         activeChain: projectData.activeChain || '',
         activeAddress: projectData.activeAddress || '',
         activeContract: projectData.activeContract || '',
@@ -123,16 +172,25 @@ class ProjectStore {
             value as types.DataFacet,
           ]),
         ),
+        projects: (projects as ProjectInfo[]) || [],
         loading: false,
       });
+
+      this.setupEventListeners();
     } catch (error) {
       Log('ERROR: Failed to load project data: ' + String(error));
       this.setState({ loading: false });
     }
   };
 
-  switchProject = async (project: string): Promise<void> => {
-    this.setState({ lastProject: project });
+  private setupEventListeners = (): void => {
+    const handleProjectEvent = () => {
+      this.refreshProjects();
+      this.initialize();
+    };
+
+    EventsOn('manager:change', handleProjectEvent);
+    EventsOn('project:opened', handleProjectEvent);
   };
 
   setActiveAddress = async (address: string): Promise<void> => {
@@ -176,6 +234,67 @@ class ProjectStore {
   setLastView = async (view: string): Promise<void> => {
     await SetLastView(view);
     this.setState({ lastView: view });
+  };
+
+  private updatePreferences = async (
+    updates: Partial<preferences.AppPreferences>,
+  ): Promise<void> => {
+    try {
+      const currentPrefs = await GetAppPreferences();
+      const updatedPrefs = preferences.AppPreferences.createFrom({
+        ...currentPrefs,
+        ...updates,
+      });
+      await SetAppPreferences(updatedPrefs);
+    } catch (error) {
+      Log(
+        'ERROR: Failed to update project management preferences: ' +
+          String(error),
+      );
+      throw error;
+    }
+  };
+
+  refreshProjects = async (): Promise<void> => {
+    try {
+      const projects = await GetOpenProjects();
+      this.setState({ projects: (projects as ProjectInfo[]) || [] });
+    } catch (error) {
+      Log('ERROR: Failed to refresh projects: ' + String(error));
+      throw error;
+    }
+  };
+
+  switchProject = async (projectId: string): Promise<void> => {
+    await SwitchToProject(projectId);
+    await this.updatePreferences({ lastProject: projectId });
+    this.setState({ lastProject: projectId });
+    await this.refreshProjects();
+    await this.initialize();
+  };
+
+  newProject = async (name: string, address: string): Promise<void> => {
+    await NewProject(name, address);
+    await this.refreshProjects();
+    await this.initialize();
+  };
+
+  openProjectFile = async (path: string): Promise<void> => {
+    await OpenProjectFile(path);
+    await this.refreshProjects();
+    await this.initialize();
+  };
+
+  closeProject = async (projectId: string): Promise<void> => {
+    await CloseProject(projectId);
+    await this.refreshProjects();
+  };
+
+  clearActiveProject = async (): Promise<void> => {
+    await ClearActiveProject();
+    await this.updatePreferences({ lastProject: '' });
+    this.setState({ lastProject: '' });
+    await this.refreshProjects();
   };
 
   get hasActiveProject(): boolean {

@@ -1,11 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import {
-  GetOpenProjects,
-  NewProject,
-  OpenProjectFile,
-  SaveProject,
-} from '@app';
+import { SaveProject } from '@app';
 import { Action, StatusIndicator } from '@components';
 import { useViewContext } from '@contexts';
 import { useActiveProject, useIconSets } from '@hooks';
@@ -23,8 +18,6 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { types } from '@models';
-import { Log } from '@utils';
 import { useLocation } from 'wouter';
 
 interface ProjectSelectionModalProps {
@@ -41,14 +34,6 @@ interface RecentProject {
   isActive?: boolean;
 }
 
-interface ProjectContext {
-  lastView: string;
-  activeAddress: string;
-  activeChain: string;
-  activeContract: string;
-  lastFacetMap: Record<string, types.DataFacet>;
-}
-
 interface NewProjectForm {
   name: string;
   address: string;
@@ -58,19 +43,25 @@ export const ProjectSelectionModal = ({
   opened,
   onProjectSelected,
 }: ProjectSelectionModalProps) => {
-  const [recentProjects, setRecentProjects] = useState<RecentProject[]>([]);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingOpen, setLoadingOpen] = useState(false);
-  const [_loadingContext, setLoadingContext] = useState<string | null>(null);
-  const [projectContexts, setProjectContexts] = useState<
-    Record<string, ProjectContext>
-  >({});
   const [error, setError] = useState<string | null>(null);
   const { File, Add } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
-  const { lastView } = useActiveProject();
+  const { projects, lastView, newProject, openProjectFile } =
+    useActiveProject();
   const [, navigate] = useLocation();
   const isMounted = useRef(true);
+
+  // Convert projects to the format expected by this component
+  const recentProjects: RecentProject[] = projects.map((project) => ({
+    name: project.name,
+    path: project.path,
+    last_opened: project.lastOpened,
+    id: project.id,
+    isDirty: project.isDirty,
+    isActive: project.isActive,
+  }));
 
   const form = useForm<NewProjectForm>({
     initialValues: {
@@ -102,69 +93,6 @@ export const ProjectSelectionModal = ({
     },
   });
 
-  const loadProjectContext = useCallback(
-    async (projectId: string, _projectPath: string) => {
-      if (projectContexts[projectId]) return; // Already loaded
-
-      setLoadingContext(projectId);
-      try {
-        // For now, we'll use placeholder data since we need the project to be active to get its context
-        // In a real implementation, we might need a backend API to get project context without activating it
-        setProjectContexts((prev) => ({
-          ...prev,
-          [projectId]: {
-            lastView: '/', // Default placeholder
-            activeAddress: '', // Would need backend API to get this
-            activeChain: 'mainnet', // Default placeholder
-            activeContract: '',
-            lastFacetMap: {},
-          },
-        }));
-      } catch (err) {
-        Log(`Failed to load context for project ${projectId}: ${err}`);
-      } finally {
-        setLoadingContext(null);
-      }
-    },
-    [projectContexts],
-  );
-
-  const loadRecentProjects = useCallback(async () => {
-    try {
-      const projects = await GetOpenProjects();
-      // Convert to our interface and sort by last_opened
-      const getTime = (dateStr: string) => {
-        const d = new Date(dateStr);
-        return isNaN(d.getTime()) ? 0 : d.getTime();
-      };
-      const recentProjects: RecentProject[] = projects
-        .map((p: Record<string, unknown>) => ({
-          id: String(p.id || ''),
-          name: String(p.name || ''),
-          path: String(p.path || ''),
-          last_opened: String(p.last_opened || p.lastOpened || ''),
-          isDirty: Boolean(p.isDirty),
-          isActive: Boolean(p.isActive),
-        }))
-        .sort((a, b) => getTime(b.last_opened) - getTime(a.last_opened))
-        .slice(0, 10); // Show only 10 most recent
-
-      if (isMounted.current) {
-        setRecentProjects(recentProjects);
-
-        // Load context for recent projects
-        recentProjects.forEach((project) => {
-          if (project.id) {
-            loadProjectContext(project.id, project.path);
-          }
-        });
-      }
-    } catch (err) {
-      Log(`Failed to load recent projects: ${err}`);
-      setRecentProjects([]);
-    }
-  }, [loadProjectContext]);
-
   useEffect(() => {
     isMounted.current = true;
     return () => {
@@ -172,19 +100,13 @@ export const ProjectSelectionModal = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (opened) {
-      loadRecentProjects();
-    }
-  }, [opened, loadRecentProjects]);
-
   const handleCreateProject = async (values: NewProjectForm) => {
     if (loadingCreate || loadingOpen) return;
     setLoadingCreate(true);
     setError(null);
 
     try {
-      await NewProject(values.name, values.address);
+      await newProject(values.name, values.address);
 
       // Immediately save the project after creation
       await SaveProject();
@@ -209,7 +131,7 @@ export const ProjectSelectionModal = ({
     setError(null);
 
     try {
-      await OpenProjectFile(projectPath);
+      await openProjectFile(projectPath);
       await restoreProjectFilterStates();
 
       const targetView = lastView || '/';
@@ -231,7 +153,7 @@ export const ProjectSelectionModal = ({
 
     try {
       // This will trigger the native file picker
-      await OpenProjectFile('');
+      await openProjectFile('');
       await restoreProjectFilterStates();
 
       const targetView = lastView || '/';
@@ -343,7 +265,6 @@ export const ProjectSelectionModal = ({
                   </Text>
                   <Stack gap="sm">
                     {recentProjects.map((project, index) => {
-                      const context = projectContexts[project.id || ''];
                       const isRecent =
                         new Date().getTime() -
                           new Date(project.last_opened).getTime() <
@@ -409,62 +330,6 @@ export const ProjectSelectionModal = ({
                                 disabled={isLoading}
                               />
                             </Group>
-
-                            {/* Project Context Preview */}
-                            {context && (
-                              <Group
-                                gap="md"
-                                style={{
-                                  fontSize: '12px',
-                                  color: 'var(--mantine-color-dimmed)',
-                                }}
-                              >
-                                {context.activeAddress && (
-                                  <Group gap="xs">
-                                    <Text size="xs" c="dimmed">
-                                      Address:
-                                    </Text>
-                                    <Text
-                                      size="xs"
-                                      fw={500}
-                                      style={{ fontFamily: 'monospace' }}
-                                    >
-                                      {context.activeAddress.slice(0, 8)}...
-                                      {context.activeAddress.slice(-6)}
-                                    </Text>
-                                  </Group>
-                                )}
-                                {context.activeChain && (
-                                  <Group gap="xs">
-                                    <Text size="xs" c="dimmed">
-                                      Chain:
-                                    </Text>
-                                    <Badge
-                                      size="xs"
-                                      variant="light"
-                                      color="blue"
-                                    >
-                                      {context.activeChain}
-                                    </Badge>
-                                  </Group>
-                                )}
-                                {context.lastView &&
-                                  context.lastView !== '/' && (
-                                    <Group gap="xs">
-                                      <Text size="xs" c="dimmed">
-                                        Last View:
-                                      </Text>
-                                      <Text size="xs" fw={500}>
-                                        {context.lastView
-                                          .replace('/', '')
-                                          .replace(/^./, (c) =>
-                                            c.toUpperCase(),
-                                          )}
-                                      </Text>
-                                    </Group>
-                                  )}
-                              </Group>
-                            )}
 
                             {/* Project Metadata */}
                             <Group

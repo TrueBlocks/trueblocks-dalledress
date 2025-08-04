@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { HasActiveProject, ValidateActiveProject } from '@app';
 import { NodeStatus, ProjectSelectionModal, getBarWidth } from '@components';
 import { ViewContextProvider, WalletConnectProvider } from '@contexts';
 import {
+  useActiveProject,
   useAppHealth,
   useAppHotkeys,
   useAppNavigation,
@@ -12,6 +12,7 @@ import {
 } from '@hooks';
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
+import { msgs } from '@models';
 import { Log } from '@utils';
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-react';
 import { Router } from 'wouter';
@@ -47,7 +48,7 @@ function globalNavKeySquelcher(e: KeyboardEvent) {
 
 export const App = () => {
   const [showProjectModal, setShowProjectModal] = useState(false);
-  const [hasProject, setHasProject] = useState<boolean | null>(null);
+  const { hasActiveProject } = useActiveProject();
 
   useEffect(() => {
     window.addEventListener('keydown', globalNavKeySquelcher, {
@@ -60,29 +61,22 @@ export const App = () => {
     };
   }, []);
 
+  // Show project modal if we don't have a valid project
   useEffect(() => {
-    const checkActiveProject = async () => {
-      try {
-        const hasActiveProject = await HasActiveProject();
-        const isValidProject = await ValidateActiveProject();
-        const hasValidProject = hasActiveProject && isValidProject;
-        setHasProject(hasValidProject);
-        setShowProjectModal(!hasValidProject);
-      } catch (error) {
-        Log('ERROR: Failed to check active project:', JSON.stringify(error));
-        setHasProject(false);
-        setShowProjectModal(true);
-      }
-    };
-    checkActiveProject();
-  }, []);
+    setShowProjectModal(!hasActiveProject);
+  }, [hasActiveProject]);
 
-  useEvent('manager:change', (message: string) => {
+  // Listen for project events
+  useEvent(msgs.EventType.MANAGER, (message: string) => {
+    Log(`Manager event received: ${message}`);
     if (message === 'show_project_modal') {
       setShowProjectModal(true);
-    } else if (message === 'active_project_cleared') {
-      setHasProject(false);
     }
+  });
+
+  useEvent(msgs.EventType.PROJECT_OPENED, () => {
+    // Project was opened successfully, modal should close
+    setShowProjectModal(false);
   });
 
   const { ready, isWizard } = useAppNavigation();
@@ -94,10 +88,9 @@ export const App = () => {
 
   const handleProjectModalClose = () => {
     setShowProjectModal(false);
-    setHasProject(true);
   };
 
-  if (!ready || hasProject === null) return <div>Not ready</div>;
+  if (!ready) return <div>Not ready</div>;
 
   const header = { height: 60 };
   const footer = { height: 40 };

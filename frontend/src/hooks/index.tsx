@@ -17,5 +17,4 @@ export * from './useWalletGatedAction';
 
 export * from './useActiveProject';
 export * from './usePreferences';
-export * from './useProjectManagement';
 export * from './useActiveFacet';

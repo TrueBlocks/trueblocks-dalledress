@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { CloseProject, GetOpenProjects, SwitchToProject } from '@app';
 import { Action } from '@components';
 import { useViewContext } from '@contexts';
 import { useActiveProject, useEvent, useIconSets } from '@hooks';
@@ -9,69 +6,29 @@ import { msgs } from '@models';
 import { Log } from '@utils';
 import { useLocation } from 'wouter';
 
-// TODO: Use Project from project model
-interface Project {
-  id: string;
-  name: string;
-  path: string;
-  isActive: boolean;
-  isDirty: boolean;
-  lastOpened: string;
-  createdAt: string;
-}
-
 export const ProjectsList = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
   const { File } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
-  const { lastView } = useActiveProject();
+  const { projects, lastView, switchProject, closeProject } =
+    useActiveProject();
   const [, navigate] = useLocation();
 
-  const refreshProjects = async () => {
-    try {
-      const openProjects = await GetOpenProjects();
-      const typedProjects = openProjects as unknown as Project[];
-
-      const sortedProjects = typedProjects.sort((a, b) => {
-        const lastOpenedDiff =
-          new Date(b.lastOpened).getTime() - new Date(a.lastOpened).getTime();
-        if (lastOpenedDiff !== 0) {
-          return lastOpenedDiff;
-        }
-
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      });
-
-      setProjects(sortedProjects);
-    } catch (error) {
-      Log(`Error fetching projects: ${error}`);
-    }
-  };
-
-  useEffect(() => {
-    refreshProjects();
-  }, []);
-
-  useEvent(msgs.EventType.MANAGER, (_message?: string) => refreshProjects());
+  useEvent(msgs.EventType.MANAGER, (_message?: string) => {
+    Log('Projects updated via manager event');
+  });
 
   useEvent(msgs.EventType.PROJECT_OPENED, async (lastView: string) => {
     await restoreProjectFilterStates();
     const targetView = lastView || '/';
     navigate(targetView);
-    refreshProjects();
   });
 
   const handleSwitchProject = async (id: string) => {
     try {
-      await SwitchToProject(id);
+      await switchProject(id);
       await restoreProjectFilterStates();
-
       const targetView = lastView || '/';
       navigate(targetView);
-
-      refreshProjects();
     } catch (error) {
       Log(`Error switching projects: ${error}`);
     }
@@ -79,7 +36,6 @@ export const ProjectsList = () => {
 
   const handleCloseProject = async (id: string, isDirty: boolean) => {
     if (isDirty) {
-      // You might want to show a confirmation dialog here
       const confirmed = window.confirm(
         'This project has unsaved changes. Close anyway?',
       );
@@ -87,8 +43,7 @@ export const ProjectsList = () => {
     }
 
     try {
-      await CloseProject(id);
-      refreshProjects();
+      await closeProject(id);
     } catch (error) {
       Log(`Error closing project: ${error}`);
     }

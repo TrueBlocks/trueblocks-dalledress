@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { GetOpenProjects, NewProject, SwitchToProject } from '@app';
 import { Action } from '@components';
 import { useViewContext } from '@contexts';
-import { useActiveProject, useIconSets } from '@hooks';
+import { ProjectInfo, useActiveProject, useIconSets } from '@hooks';
 import {
   Badge,
   Button,
@@ -20,19 +19,6 @@ import { useForm } from '@mantine/form';
 import { Log } from '@utils';
 import { useLocation } from 'wouter';
 
-interface ProjectInfo {
-  id: string;
-  name: string;
-  path: string;
-  isActive: boolean;
-  isDirty: boolean;
-  lastOpened: string;
-  createdAt: string;
-  description?: string;
-  addresses?: string[];
-  chains?: string[];
-}
-
 interface NewProjectForm {
   name: string;
   address: string;
@@ -40,17 +26,15 @@ interface NewProjectForm {
 }
 
 export const Projects = () => {
-  const [projects, setProjects] = useState<ProjectInfo[]>([]);
-  const [recentProjects, setRecentProjects] = useState<ProjectInfo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { File, Add } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
-  const { lastView } = useActiveProject();
+  const { projects, loading, lastView, newProject, switchProject } =
+    useActiveProject();
   const [, navigate] = useLocation();
 
   const form = useForm<NewProjectForm>({
@@ -77,41 +61,10 @@ export const Projects = () => {
     },
   });
 
-  const fetchProjects = async () => {
-    try {
-      setLoading(true);
-      const openProjects = await GetOpenProjects();
-
-      const typedOpenProjects = openProjects as unknown as ProjectInfo[];
-
-      // Sort projects by last opened date
-      const sortedOpen = typedOpenProjects.sort(
-        (a, b) =>
-          new Date(b.lastOpened).getTime() - new Date(a.lastOpened).getTime(),
-      );
-
-      setProjects(sortedOpen);
-      setRecentProjects([]); // No recent projects API yet
-      setError(null);
-    } catch (err) {
-      Log(`Error fetching projects: ${err}`);
-      setError('Failed to load projects');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
   const handleCreateProject = async (values: NewProjectForm) => {
     try {
       setCreating(true);
-      await NewProject(values.name, values.address);
-
-      // Refresh projects list
-      await fetchProjects();
+      await newProject(values.name, values.address);
 
       // Reset form and hide create form
       form.reset();
@@ -128,7 +81,7 @@ export const Projects = () => {
 
   const handleSwitchProject = async (projectId: string) => {
     try {
-      await SwitchToProject(projectId);
+      await switchProject(projectId);
       await restoreProjectFilterStates();
 
       const targetView = lastView || '/';
@@ -150,13 +103,7 @@ export const Projects = () => {
         project.description.toLowerCase().includes(searchQuery.toLowerCase())),
   );
 
-  const filteredRecentProjects = recentProjects.filter(
-    (project) =>
-      project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.path.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const renderProject = (project: ProjectInfo, isRecent = false) => (
+  const renderProject = (project: ProjectInfo) => (
     <Card key={project.id} shadow="sm" padding="md" radius="md" withBorder>
       <Stack gap="xs">
         <Group justify="space-between" align="flex-start">
@@ -222,19 +169,17 @@ export const Projects = () => {
                 Log('Edit project clicked - not implemented yet');
               }}
             />
-            {!isRecent && (
-              <Action
-                icon="Delete"
-                title="Close project"
-                color="red"
-                variant="light"
-                size="sm"
-                onClick={() => {
-                  // TODO: Implement project closing with confirmation
-                  Log('Close project clicked - not implemented yet');
-                }}
-              />
-            )}
+            <Action
+              icon="Delete"
+              title="Close project"
+              color="red"
+              variant="light"
+              size="sm"
+              onClick={() => {
+                // TODO: Implement project closing with confirmation
+                Log('Close project clicked - not implemented yet');
+              }}
+            />
           </Group>
         </Group>
       </Stack>
@@ -378,29 +323,6 @@ export const Projects = () => {
             </Grid>
           )}
         </div>
-
-        {/* Recent Projects */}
-        {recentProjects.length > 0 && (
-          <div>
-            <Title order={3} mb="md">
-              Recent Projects ({filteredRecentProjects.length})
-            </Title>
-
-            {filteredRecentProjects.length === 0 ? (
-              <Text c="dimmed" size="sm">
-                No recent projects match your search
-              </Text>
-            ) : (
-              <Grid>
-                {filteredRecentProjects.slice(0, 6).map((project) => (
-                  <Grid.Col key={project.id} span={{ base: 12, md: 6, lg: 4 }}>
-                    {renderProject(project, true)}
-                  </Grid.Col>
-                ))}
-              </Grid>
-            )}
-          </div>
-        )}
       </Stack>
     </Container>
   );

@@ -255,7 +255,7 @@ export const Table = <T extends Record<string, unknown>>({
     <div className="table-container">
       <div className="top-pagination-container">
         <ChevronButton
-          collapsed={detailCollapsed}
+          collapsed={!detailCollapsed} // we reverse the logic here so the button make sense
           onToggle={() => setDetailCollapsed(!detailCollapsed)}
           direction="none"
         />

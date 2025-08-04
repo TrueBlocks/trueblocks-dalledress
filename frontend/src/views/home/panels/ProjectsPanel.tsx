@@ -1,21 +1,8 @@
-import { useEffect, useState } from 'react';
-
-import { GetOpenProjects } from '@app';
 import { DashboardCard, StatusIndicator } from '@components';
-import { useEvent, useIconSets } from '@hooks';
+import { useActiveProject, useEvent, useIconSets } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs } from '@models';
 import { Log } from '@utils';
-
-interface Project {
-  id: string;
-  name: string;
-  path: string;
-  isActive: boolean;
-  isDirty: boolean;
-  lastOpened: string;
-  createdAt: string;
-}
 
 interface ProjectsPanelProps {
   onViewAll?: () => void;
@@ -26,51 +13,30 @@ export const ProjectsPanel = ({
   onViewAll,
   onNewProject,
 }: ProjectsPanelProps) => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { projects } = useActiveProject();
   const { File } = useIconSets();
 
-  const fetchProjects = async (showLoading = true) => {
-    try {
-      if (showLoading) setLoading(true);
-      const openProjects = await GetOpenProjects();
-      const typedProjects = openProjects as unknown as Project[];
-      const sorted = typedProjects
-        .sort(
-          (a, b) =>
-            new Date(b.lastOpened).getTime() - new Date(a.lastOpened).getTime(),
-        )
-        .slice(0, 3);
-      setProjects(sorted);
-      setError(null);
-    } catch (err) {
-      Log(`Error fetching projects: ${err}`);
-      setError('Failed to load projects');
-    } finally {
-      if (showLoading) setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  // Listen for project changes and refresh silently (no loading state)
+  // Listen for project changes
   useEvent(msgs.EventType.MANAGER, () => {
-    fetchProjects(false);
+    Log('Projects updated via manager event');
   });
 
-  const activeProject = projects.find((p) => p.isActive);
-  const recentProjects = projects.filter((p) => !p.isActive);
+  // Show only the 3 most recent projects
+  const sortedProjects = projects
+    .sort(
+      (a, b) =>
+        new Date(b.lastOpened).getTime() - new Date(a.lastOpened).getTime(),
+    )
+    .slice(0, 3);
+
+  const activeProject = sortedProjects.find((p) => p.isActive);
+  const recentProjects = sortedProjects.filter((p) => !p.isActive);
 
   return (
     <DashboardCard
       title="Projects"
-      subtitle={`${projects.length} open`}
+      subtitle={`${sortedProjects.length} recent`}
       icon={<File size={20} />}
-      loading={loading}
-      error={error}
       onClick={onViewAll}
     >
       <Stack gap="sm">

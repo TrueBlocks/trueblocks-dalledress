@@ -26,6 +26,9 @@ func (a *App) NewProject(name string, currentAddress string) error {
 	if newProject == nil {
 		return fmt.Errorf("failed to create project")
 	}
+
+	// Emit event for frontend synchronization
+	msgs.EmitManager("project_created")
 	return nil
 }
 
@@ -270,7 +273,12 @@ func (a *App) SwitchToProject(id string) error {
 	if a.Projects.GetProjectByID(id) == nil {
 		return fmt.Errorf("no project with ID %s exists", id)
 	}
-	return a.Projects.SetActiveProject(id)
+
+	err := a.Projects.SetActiveProject(id)
+	if err == nil {
+		msgs.EmitManager("project_switched")
+	}
+	return err
 }
 
 // RestoreProjectContext restores the full context for the specified project

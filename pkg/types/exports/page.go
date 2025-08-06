@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
 	// EXISTING_CODE
@@ -84,7 +85,6 @@ func (c *ExportsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
 		} else {
-
 			page.Statements, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
@@ -103,7 +103,6 @@ func (c *ExportsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
 		} else {
-
 			page.Balances, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()

@@ -12,6 +12,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/progress"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 

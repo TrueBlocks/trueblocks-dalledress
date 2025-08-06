@@ -1,10 +1,22 @@
 package types
 
+// Period string constants for different time aggregation levels
+const (
+	PeriodBlockly   = "blockly" // Default - no aggregation, raw data
+	PeriodHourly    = "hourly"
+	PeriodDaily     = "daily"
+	PeriodWeekly    = "weekly"
+	PeriodMonthly   = "monthly"
+	PeriodQuarterly = "quarterly"
+	PeriodAnnual    = "annual"
+)
+
 type Payload struct {
 	Collection string    `json:"collection"`
 	DataFacet  DataFacet `json:"dataFacet"`
 	Chain      string    `json:"chain,omitempty"`
 	Address    string    `json:"address,omitempty"`
+	Period     string    `json:"period,omitempty"`
 }
 
 type DataLoadedPayload struct {
@@ -21,6 +33,7 @@ type DataLoadedPayload struct {
 type ProjectPayload struct {
 	HasProject     bool                 `json:"hasProject"`
 	ActiveChain    string               `json:"activeChain"`
+	ActivePeriod   string               `json:"activePeriod"`
 	ActiveAddress  string               `json:"activeAddress"`
 	ActiveContract string               `json:"activeContract"`
 	LastView       string               `json:"lastView"`

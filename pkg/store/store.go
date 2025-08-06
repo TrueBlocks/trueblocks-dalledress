@@ -6,8 +6,9 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
+
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 )
 
 type StoreState int
@@ -57,13 +58,13 @@ func NewStore[T any](
 	mappingFunc MappingFunc[T],
 ) *Store[T] {
 	s := &Store[T]{
-		data:        make([]*T, 0),
-		observers:   make([]FacetObserver[T], 0),
-		queryFunc:   queryFunc,
-		processFunc: processFunc,
-		mappingFunc: mappingFunc,
-		contextKey:  contextKey,
-		state:       StateStale,
+		data:           make([]*T, 0),
+		observers:      make([]FacetObserver[T], 0),
+		queryFunc:      queryFunc,
+		processFunc:    processFunc,
+		mappingFunc:    mappingFunc,
+		contextKey:     contextKey,
+		state:          StateStale,
 	}
 	if mappingFunc != nil {
 		tempMap := make(map[interface{}]*T)

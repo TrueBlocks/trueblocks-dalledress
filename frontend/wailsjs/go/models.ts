@@ -445,6 +445,10 @@ export namespace msgs {
 	    STATUS = "statusbar:status",
 	    ERROR = "statusbar:error",
 	    MANAGER = "manager:change",
+	    PROJECT_MODAL = "project:modal",
+	    ADDRESS_CHANGED = "address:changed",
+	    CHAIN_CHANGED = "chain:changed",
+	    PERIOD_CHANGED = "period:changed",
 	    DATA_LOADED = "data:loaded",
 	    TAB_CYCLE = "hotkey:tab-cycle",
 	    IMAGES_CHANGED = "images:changed",
@@ -720,6 +724,7 @@ export namespace project {
 	    activeChain: string;
 	    contracts: string[];
 	    activeContract: string;
+	    activePeriod: string;
 	    filterStates: Record<string, FilterState>;
 	
 	    static createFrom(source: any = {}) {
@@ -739,6 +744,7 @@ export namespace project {
 	        this.activeChain = source["activeChain"];
 	        this.contracts = source["contracts"];
 	        this.activeContract = source["activeContract"];
+	        this.activePeriod = source["activePeriod"];
 	        this.filterStates = this.convertValues(source["filterStates"], FilterState, true);
 	    }
 	
@@ -1521,6 +1527,7 @@ export namespace types {
 	    dataFacet: DataFacet;
 	    chain?: string;
 	    address?: string;
+	    period?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Payload(source);
@@ -1532,11 +1539,13 @@ export namespace types {
 	        this.dataFacet = source["dataFacet"];
 	        this.chain = source["chain"];
 	        this.address = source["address"];
+	        this.period = source["period"];
 	    }
 	}
 	export class ProjectPayload {
 	    hasProject: boolean;
 	    activeChain: string;
+	    activePeriod: string;
 	    activeAddress: string;
 	    activeContract: string;
 	    lastView: string;
@@ -1550,6 +1559,7 @@ export namespace types {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.hasProject = source["hasProject"];
 	        this.activeChain = source["activeChain"];
+	        this.activePeriod = source["activePeriod"];
 	        this.activeAddress = source["activeAddress"];
 	        this.activeContract = source["activeContract"];
 	        this.lastView = source["lastView"];

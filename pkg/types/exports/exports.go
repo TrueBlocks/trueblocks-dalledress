@@ -310,6 +310,8 @@ func (c *ExportsCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
 	case ExportsStatements:
 		c.statementsFacet.GetStore().Reset()
+		// Also reset balances since they depend on statements
+		c.balancesFacet.GetStore().Reset()
 	case ExportsBalances:
 		c.balancesFacet.GetStore().Reset()
 	case ExportsTransfers:
@@ -336,7 +338,8 @@ func (c *ExportsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	case ExportsStatements:
 		return c.statementsFacet.NeedsUpdate()
 	case ExportsBalances:
-		return c.balancesFacet.NeedsUpdate()
+		// Balances depend on statements, so we need update if either needs update
+		return c.balancesFacet.NeedsUpdate() || c.statementsFacet.NeedsUpdate()
 	case ExportsTransfers:
 		return c.transfersFacet.NeedsUpdate()
 	case ExportsTransactions:
@@ -417,6 +420,17 @@ func (c *ExportsCollection) AccumulateItem(item interface{}, summary *types.Summ
 		balanceCount, _ := summary.CustomData["balancesCount"].(int)
 		balanceCount++
 		summary.CustomData["balancesCount"] = balanceCount
+
+	case *Asset:
+		summary.TotalCount++
+		summary.FacetCounts[ExportsAssets]++
+		if summary.CustomData == nil {
+			summary.CustomData = make(map[string]interface{})
+		}
+
+		assetCount, _ := summary.CustomData["assetsCount"].(int)
+		assetCount++
+		summary.CustomData["assetsCount"] = assetCount
 
 	case *Transaction:
 		summary.TotalCount++

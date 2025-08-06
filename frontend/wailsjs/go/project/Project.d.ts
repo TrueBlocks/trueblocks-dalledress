@@ -17,6 +17,8 @@ export function GetActiveChain():Promise<string>;
 
 export function GetActiveContract():Promise<string>;
 
+export function GetActivePeriod():Promise<string>;
+
 export function GetAddresses():Promise<Array<base.Address>>;
 
 export function GetChains():Promise<Array<string>>;
@@ -46,6 +48,8 @@ export function SetActiveAddress(arg1:base.Address):Promise<void>;
 export function SetActiveChain(arg1:string):Promise<void>;
 
 export function SetActiveContract(arg1:string):Promise<void>;
+
+export function SetActivePeriod(arg1:string):Promise<void>;
 
 export function SetFilterState(arg1:project.ViewStateKey,arg2:project.FilterState):Promise<void>;
 

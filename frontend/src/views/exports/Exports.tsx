@@ -56,11 +56,17 @@ export const Exports = () => {
   // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
+
+    const facet = getCurrentDataFacet();
+    const payload = createPayload(facet);
+    const currentPage = pagination.currentPage * pagination.pageSize;
+    const pageSize = pagination.pageSize;
+
     try {
       const result = await GetExportsPage(
-        createPayload(getCurrentDataFacet()),
-        pagination.currentPage * pagination.pageSize,
-        pagination.pageSize,
+        payload,
+        currentPage,
+        pageSize,
         sort,
         filter,
       );
@@ -121,15 +127,10 @@ export const Exports = () => {
     },
   );
 
-  // Listen for active address changes to refresh data
-  useEvent(msgs.EventType.MANAGER, (message: string) => {
-    if (
-      message === 'active_address_changed' ||
-      message === 'active_chain_changed'
-    ) {
-      fetchData();
-    }
-  });
+  // Listen for active address/chain/period changes to refresh data
+  useEvent(msgs.EventType.ADDRESS_CHANGED, fetchData);
+  useEvent(msgs.EventType.CHAIN_CHANGED, fetchData);
+  useEvent(msgs.EventType.PERIOD_CHANGED, fetchData);
 
   useEffect(() => {
     fetchData();

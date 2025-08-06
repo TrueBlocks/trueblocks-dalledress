@@ -30,6 +30,7 @@ type Project struct {
 	ActiveChain    string                       `json:"activeChain"`
 	Contracts      []string                     `json:"contracts"`
 	ActiveContract string                       `json:"activeContract"`
+	ActivePeriod   string                       `json:"activePeriod"`
 	FilterStates   map[ViewStateKey]FilterState `json:"filterStates"`
 	Path           string                       `json:"-"`
 }
@@ -53,6 +54,7 @@ func NewProject(name string, activeAddress base.Address, chains []string) *Proje
 		Chains:         chains,
 		ActiveContract: "",
 		Contracts:      []string{},
+		ActivePeriod:   "blockly",
 		FilterStates:   make(map[ViewStateKey]FilterState),
 	}
 }
@@ -306,7 +308,23 @@ func (p *Project) RemoveContract(contract string) error {
 }
 
 // ------------------------------------------------------------------------------------
-// ViewStateKeyToString converts a ViewStateKey to a string for map indexing
+// GetActivePeriod returns the currently selected period
+func (p *Project) GetActivePeriod() string {
+	if p.ActivePeriod == "" {
+		return "blockly" // Default fallback for older projects
+	}
+	return p.ActivePeriod
+}
+
+// ------------------------------------------------------------------------------------
+// SetActivePeriod sets the currently selected period
+func (p *Project) SetActivePeriod(period string) error {
+	if p.ActivePeriod != period {
+		p.ActivePeriod = period
+		return p.Save()
+	}
+	return nil
+}
 
 // ------------------------------------------------------------------------------------
 // GetFilterState retrieves filter state for a given key
@@ -353,6 +371,8 @@ func (p *Project) ClearAllFilterStates() error {
 // ------------------------------------------------------------------------------------
 // GetLastView returns the last visited view/route
 func (p *Project) GetLastView() string {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
 	return p.LastView
 }
 

@@ -30,6 +30,10 @@ export function GetActiveContract() {
   return window['go']['project']['Project']['GetActiveContract']();
 }
 
+export function GetActivePeriod() {
+  return window['go']['project']['Project']['GetActivePeriod']();
+}
+
 export function GetAddresses() {
   return window['go']['project']['Project']['GetAddresses']();
 }
@@ -88,6 +92,10 @@ export function SetActiveChain(arg1) {
 
 export function SetActiveContract(arg1) {
   return window['go']['project']['Project']['SetActiveContract'](arg1);
+}
+
+export function SetActivePeriod(arg1) {
+  return window['go']['project']['Project']['SetActivePeriod'](arg1);
 }
 
 export function SetFilterState(arg1, arg2) {

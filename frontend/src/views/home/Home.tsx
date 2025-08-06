@@ -22,7 +22,6 @@ import { useUploadAddressesDialog } from './UploadAddressesDialog';
 
 export const Home = () => {
   const [_, setAppName] = useState('Your App');
-  const [, navigate] = useLocation();
   const uploadDialog = useUploadAddressesDialog();
 
   useEffect(() => {
@@ -32,11 +31,10 @@ export const Home = () => {
   }, []);
 
   const handleAddressesUpload = async (addresses: string[]) => {
-    // TODO: Implement actual address upload to monitors
+    // TODO: Implement actual address upload functionality
     Log(`Uploading addresses not implemented:, ${addresses}`);
-    // This would typically call an API to add multiple monitors
-    // For now, we'll just log and navigate to monitors page
-    navigate('/monitors');
+    // This would typically call an API to add multiple addresses
+    // For now, we'll just log
   };
 
   const handleViewGallery = () => {

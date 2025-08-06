@@ -1,5 +1,6 @@
 export * from './Debugger';
 export * from './addresses';
+export * from './clipboard';
 export * from './debugLayout';
 export * from './ether';
 export * from './eventUtils';

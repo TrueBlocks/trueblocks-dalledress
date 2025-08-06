@@ -1,26 +1,24 @@
-import { useActiveProject, useIconSets } from '@hooks';
-import { ActionIcon, Group, Loader, Select, Text } from '@mantine/core';
-import { getDisplayAddress } from '@utils';
-import { useLocation } from 'wouter';
+import { useState } from 'react';
 
-interface ProjectContextBarProps {
-  compact?: boolean;
-}
+import { useActiveProject } from '@hooks';
+import { Group, Loader, Select, Text } from '@mantine/core';
+import { PeriodOptions, getDisplayAddress } from '@utils';
 
-export const ProjectContextBar = ({
-  compact = false,
-}: ProjectContextBarProps) => {
-  const { Settings } = useIconSets();
-  const [, navigate] = useLocation();
+import { AddAddressModal } from './AddAddressModal';
+
+export const ProjectContextBar = ({}) => {
+  const [addModalOpened, setAddModalOpened] = useState(false);
 
   const {
     projects,
     activeAddress,
     activeChain,
     activeContract,
+    activePeriod,
     setActiveAddress,
     setActiveChain,
     setActiveContract,
+    setActivePeriod,
     switchProject,
     loading,
   } = useActiveProject();
@@ -38,6 +36,11 @@ export const ProjectContextBar = ({
       label: getDisplayAddress(address),
     })) || [];
 
+  addressOptions.push({
+    value: '__add_address__',
+    label: 'Add address...',
+  });
+
   const chainOptions =
     currentProject?.chains?.map((chain) => ({
       value: chain,
@@ -53,6 +56,10 @@ export const ProjectContextBar = ({
   };
 
   const handleAddressChange = async (address: string | null) => {
+    if (address === '__add_address__') {
+      setAddModalOpened(true);
+      return;
+    }
     if (address && address !== activeAddress) {
       await setActiveAddress(address);
     }
@@ -71,8 +78,10 @@ export const ProjectContextBar = ({
     }
   };
 
-  const handleManageProjects = () => {
-    navigate('/projects');
+  const handlePeriodChange = (period: string | null) => {
+    if (period !== null) {
+      setActivePeriod(period);
+    }
   };
 
   if (loading) {
@@ -84,8 +93,8 @@ export const ProjectContextBar = ({
     );
   }
 
-  if (compact) {
-    return (
+  return (
+    <>
       <Group gap="xs">
         <Select
           size="xs"
@@ -119,75 +128,24 @@ export const ProjectContextBar = ({
           onChange={handleContractChange}
           w={140}
         />
-      </Group>
-    );
-  }
-
-  return (
-    <Group gap="md">
-      <Group gap="xs">
-        <Text size="sm" fw={500}>
-          Project:
-        </Text>
         <Select
-          size="sm"
-          placeholder="Select project"
-          value={currentProject?.id || ''}
-          data={projectOptions}
-          onChange={handleProjectChange}
-          w={200}
-        />
-        <ActionIcon
-          size="sm"
-          variant="light"
-          onClick={handleManageProjects}
-          title="Manage Projects"
-        >
-          <Settings />
-        </ActionIcon>
-      </Group>
-
-      <Group gap="xs">
-        <Text size="sm" fw={500}>
-          Address:
-        </Text>
-        <Select
-          size="sm"
-          placeholder="Select address"
-          value={activeAddress}
-          data={addressOptions}
-          onChange={handleAddressChange}
-          w={200}
+          size="xs"
+          placeholder="Period"
+          value={activePeriod}
+          data={PeriodOptions}
+          onChange={handlePeriodChange}
+          w={110}
         />
       </Group>
-
-      <Group gap="xs">
-        <Text size="sm" fw={500}>
-          Chain:
-        </Text>
-        <Select
-          size="sm"
-          placeholder="Select chain"
-          value={activeChain}
-          data={chainOptions}
-          onChange={handleChainChange}
-          w={150}
-        />
-      </Group>
-
-      <Group gap="xs">
-        <Text size="sm" fw={500}>
-          Contract:
-        </Text>
-        <Select
-          size="sm"
-          placeholder="Select contract"
-          value={activeContract}
-          data={contractOptions}
-          onChange={handleContractChange}
-          w={200}
-        />
-      </Group>
-    </Group>
+      <AddAddressModal
+        opened={addModalOpened}
+        onSubmit={() => {
+          setAddModalOpened(false);
+        }}
+        onCancel={() => {
+          setAddModalOpened(false);
+        }}
+      />
+    </>
   );
 };

@@ -83,6 +83,10 @@ describe('useActiveFacet Hook Tests (Focused Hook implementation)', () => {
       ): Promise<void> {
         throw new Error('Function not implemented.');
       },
+      activePeriod: '',
+      setActivePeriod: function (_period: string): Promise<void> {
+        throw new Error('Function not implemented.');
+      },
     });
 
     // Mock usePreferences (theme, language, debug)

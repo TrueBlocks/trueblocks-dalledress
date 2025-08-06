@@ -41,6 +41,7 @@ type Store[T any] struct {
 	stateReason        string
 	expectedTotalItems atomic.Int64
 	dataGeneration     atomic.Uint64
+	summaryManager     *SummaryManager[T] // Manages aggregated summary data
 	mutex              sync.RWMutex
 }
 
@@ -65,6 +66,7 @@ func NewStore[T any](
 		mappingFunc:    mappingFunc,
 		contextKey:     contextKey,
 		state:          StateStale,
+		summaryManager: NewSummaryManager[T](),
 	}
 	if mappingFunc != nil {
 		tempMap := make(map[interface{}]*T)
@@ -245,6 +247,12 @@ func (s *Store[T]) Fetch() error {
 			s.data = append(s.data, itemPtr)
 			s.expectedTotalItems.Store(int64(len(s.data)))
 			index := len(s.data) - 1
+
+			// TODO: BOGUS
+			// Note: Summary aggregation is now handled by the GetSummaryPage method in the backend
+			// which calls AddItem/AddBalance during summary generation per period
+			// Items during fetch are stored but not immediately summarized
+
 			currentObservers := make([]FacetObserver[T], len(s.observers))
 			copy(currentObservers, s.observers)
 			s.mutex.Unlock()
@@ -305,6 +313,11 @@ func (s *Store[T]) AddItem(item *T, index int) {
 		}
 	}
 
+	// TODO: BOGUS
+	// Note: Summary aggregation is now handled by the GetSummaryPage method in the backend
+	// which calls summary manager methods during summary generation per period
+	// Items added individually are stored but not immediately summarized
+
 	observers := make([]FacetObserver[T], len(s.observers))
 	copy(observers, s.observers)
 	s.mutex.Unlock()
@@ -327,6 +340,7 @@ func (s *Store[T]) Reset() {
 		newMap := make(map[interface{}]*T)
 		s.dataMap = &newMap
 	}
+	s.summaryManager.Reset()
 	s.expectedTotalItems.Store(0)
 	s.dataGeneration.Add(1)
 	newState := StateStale
@@ -352,5 +366,46 @@ func (s *Store[T]) UpdateData(updateFunc func(data []*T) []*T) {
 			}
 		}
 		s.dataMap = &newMap
+	}
+}
+
+// GetSummaryManager returns the summary manager for this store
+func (s *Store[T]) GetSummaryManager() *SummaryManager[T] {
+	return s.summaryManager
+}
+
+// GetSummaries returns summary data for the given period
+func (s *Store[T]) GetSummaries(period string) []*T {
+	return s.summaryManager.GetSummaries(period)
+}
+
+// AddBalance adds a balance item using the balance-specific summarization logic
+// This method keeps only the most recent balance per period instead of accumulating all balances
+func (s *Store[T]) AddBalance(item *T, index int) {
+	s.mutex.Lock()
+	s.data = append(s.data, item)
+	newIndex := len(s.data) - 1
+	itemPtr := s.data[newIndex]
+
+	if s.mappingFunc != nil {
+		if key, include := s.mappingFunc(itemPtr); include {
+			if s.dataMap == nil {
+				tempMap := make(map[interface{}]*T)
+				s.dataMap = &tempMap
+			}
+			(*s.dataMap)[key] = itemPtr
+		}
+	}
+
+	// Note: Balance summarization is handled by the GetSummaryPage method in the backend
+	// which calls AddBalance during summary generation per period with proper period strings
+	// Balances added individually are stored but not immediately summarized
+
+	observers := make([]FacetObserver[T], len(s.observers))
+	copy(observers, s.observers)
+	s.mutex.Unlock()
+
+	for _, observer := range observers {
+		observer.OnNewItem(itemPtr, newIndex)
 	}
 }

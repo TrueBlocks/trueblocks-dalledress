@@ -82,6 +82,10 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
       closeProject: vi.fn(),
       clearActiveProject: vi.fn(),
       refreshProjects: vi.fn(),
+      activePeriod: '',
+      setActivePeriod: function (_period: string): Promise<void> {
+        throw new Error('Function not implemented.');
+      },
     });
 
     // Mock usePreferences (theme, language, debug)

@@ -6,6 +6,7 @@ import { useFiltering } from '@contexts';
 import { usePreferences } from '@hooks';
 import { Modal } from '@mantine/core';
 import { project } from '@models';
+import { getDebugClass } from '@utils';
 
 import {
   Body,
@@ -278,45 +279,46 @@ export const Table = <T extends Record<string, unknown>>({
       </div>
 
       <div
-        className={`table-main-content ${!detailCollapsed ? 'with-detail-panel' : ''}`}
+        className={`table-main-content ${!detailCollapsed ? 'with-detail-panel' : ''} ${getDebugClass(2)}`}
       >
-        <div className="table-section">
-          <table
-            className="data-table"
-            ref={tableRef}
-            tabIndex={0}
-            aria-label="Table with keyboard navigation"
-            onClick={focusTable}
-          >
-            <Header columns={displayColumns} viewStateKey={viewStateKey} />
-            <tbody>
-              {data.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={displayColumns.length}
-                    style={{
-                      textAlign: 'left',
-                      padding: '20px',
-                      color: loading
-                        ? 'var(--mantine-color-blue-6)'
-                        : 'var(--mantine-color-gray-6)',
-                    }}
-                  >
-                    {loading ? 'Loading...' : 'No data found.'}
-                  </td>
-                </tr>
-              ) : (
-                <Body
-                  columns={displayColumns}
-                  data={data}
-                  selectedRowIndex={selectedRowIndex}
-                  handleRowClick={handleRowClick}
-                  noDataMessage={loading ? 'Loading...' : 'No data found.'}
-                />
-              )}
-            </tbody>
-          </table>
-        </div>
+        <table
+          className={`data-table ${getDebugClass(4)}`}
+          ref={tableRef}
+          tabIndex={0}
+          aria-label="Table with keyboard navigation"
+          onClick={focusTable}
+        >
+          <Header columns={displayColumns} viewStateKey={viewStateKey} />
+          <tbody className={getDebugClass(5)}>
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={displayColumns.length}
+                  style={{
+                    textAlign: 'left',
+                    padding: '20px',
+                    color: loading
+                      ? 'var(--mantine-color-blue-6)'
+                      : 'var(--mantine-color-gray-6)',
+                  }}
+                >
+                  {loading ? 'Loading...' : 'No data found.'}
+                </td>
+              </tr>
+            ) : (
+              <Body
+                columns={displayColumns}
+                data={data}
+                selectedRowIndex={selectedRowIndex}
+                handleRowClick={handleRowClick}
+                noDataMessage={loading ? 'Loading...' : 'No data found.'}
+              />
+            )}
+          </tbody>
+          <div className={`table-footer ${getDebugClass(6)}`}>
+            <Stats namesLength={data.length} viewStateKey={viewStateKey} />
+          </div>
+        </table>
 
         {!detailCollapsed && (
           <DetailPanel
@@ -324,10 +326,6 @@ export const Table = <T extends Record<string, unknown>>({
             detailPanel={detailPanel}
           />
         )}
-      </div>
-
-      <div className="table-footer">
-        <Stats namesLength={data.length} viewStateKey={viewStateKey} />
       </div>
 
       <Modal

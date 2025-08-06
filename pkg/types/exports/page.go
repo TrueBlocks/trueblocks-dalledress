@@ -11,7 +11,9 @@ package exports
 import (
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -64,11 +66,15 @@ func (c *ExportsCollection) GetPage(
 	filter string,
 ) (types.Page, error) {
 	dataFacet := payload.DataFacet
-
+	period := payload.Period
 	page := &ExportsPage{
 		Facet: dataFacet,
 	}
 	filter = strings.ToLower(filter)
+
+	if period != types.PeriodBlockly && dataFacet != ExportsAssets {
+		return c.getSummaryPage(dataFacet, period, first, pageSize, sortSpec, filter)
+	}
 
 	switch dataFacet {
 	case ExportsStatements:
@@ -178,7 +184,6 @@ func (c *ExportsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
 		} else {
-
 			page.Assets, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
@@ -244,7 +249,6 @@ func (c *ExportsCollection) GetPage(
 		return nil, types.NewValidationError("exports", dataFacet, "GetPage",
 			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
-
 	return page, nil
 }
 
@@ -298,6 +302,228 @@ func (c *ExportsCollection) matchesReceiptFilter(item *Receipt, filter string) b
 	_ = filter  // delint
 	return true // strings.Contains(strings.ToLower(item.TransactionHash.Hex()), filter) ||
 	// strings.Contains(strings.ToLower(item.ContractAddress.Hex()), filter)
+}
+
+// getSummaryPage returns paginated summary data for a given period
+func (c *ExportsCollection) getSummaryPage(
+	dataFacet types.DataFacet,
+	period string,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (types.Page, error) {
+	// CRITICAL: Ensure underlying raw data is loaded before generating summaries
+	// For summary periods, we need the blockly (raw) data to be loaded first
+	c.LoadData(dataFacet)
+	if err := c.generateSummariesForPeriod(dataFacet, period); err != nil {
+		return nil, types.NewStoreError("exports", dataFacet, "getSummaryPage", err)
+	}
+
+	page := &ExportsPage{
+		Facet: dataFacet,
+	}
+
+	switch dataFacet {
+	case ExportsStatements:
+		summaries := c.statementsFacet.GetStore().GetSummaries(period)
+
+		// Apply filtering if needed
+		var filtered []*Statement
+		if filter != "" {
+			for _, item := range summaries {
+				if c.matchesStatementFilter(item, filter) {
+					filtered = append(filtered, item)
+				}
+			}
+		} else {
+			filtered = summaries
+		}
+
+		// Convert to value slice for sorting
+		valueSlice := toValueSlice(filtered)
+
+		// Apply sorting
+		if err := sdk.SortStatements(valueSlice, sortSpec); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "getSummaryPage", err)
+		}
+
+		// Apply pagination
+		total := len(valueSlice)
+		end := first + pageSize
+		if end > total {
+			end = total
+		}
+		if first >= total {
+			valueSlice = []Statement{}
+		} else {
+			valueSlice = valueSlice[first:end]
+		}
+		page.Statements = valueSlice
+		page.TotalItems = total
+		page.State = types.StateLoaded
+
+	case ExportsBalances:
+		summaries := c.balancesFacet.GetStore().GetSummaries(period)
+
+		// Apply filtering if needed
+		var filtered []*Balance
+		if filter != "" {
+			for _, item := range summaries {
+				if c.matchesBalanceFilter(item, filter) {
+					filtered = append(filtered, item)
+				}
+			}
+		} else {
+			filtered = summaries
+		}
+
+		// Convert to sdk.Balance slice for sorting
+		valueSlice := make([]sdk.Balance, len(filtered))
+		for i, item := range filtered {
+			valueSlice[i] = *item
+		}
+
+		// Apply sorting
+		if err := sdk.SortBalances(valueSlice, sortSpec); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "getSummaryPage", err)
+		}
+
+		// Apply pagination
+		total := len(valueSlice)
+		end := first + pageSize
+		if end > total {
+			end = total
+		}
+		if first >= total {
+			valueSlice = []sdk.Balance{}
+		} else {
+			valueSlice = valueSlice[first:end]
+		}
+
+		page.Balances = valueSlice
+		page.TotalItems = total
+		page.State = types.StateLoaded
+
+	default:
+		return nil, types.NewValidationError("exports", dataFacet, "getSummaryPage",
+			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
+	}
+
+	return page, nil
+}
+
+// generateSummariesForPeriod ensures summaries are generated for the given period
+func (c *ExportsCollection) generateSummariesForPeriod(dataFacet types.DataFacet, period string) error {
+	switch dataFacet {
+	case ExportsStatements:
+		store := c.statementsFacet.GetStore()
+		data := store.GetItems()
+
+		// Clear existing summaries for this period
+		store.GetSummaryManager().Reset()
+
+		// For statements, we need to create aggregated summary statements per period
+		// Group statements by normalized timestamp and create one summary per period
+		periodGroups := make(map[int64][]*Statement)
+
+		for _, statement := range data {
+			normalizedTime := normalizeToPeriod(int64(statement.Timestamp), period)
+			periodGroups[normalizedTime] = append(periodGroups[normalizedTime], statement)
+		}
+
+		// Create one summary statement per period
+		for normalizedTime, statements := range periodGroups {
+			if len(statements) == 0 {
+				continue
+			}
+
+			// Create a representative summary statement for this period
+			// Use the latest transaction as the base and aggregate key metrics
+			latestStatement := statements[len(statements)-1]
+			summaryStatement := &Statement{
+				AccountedFor:    latestStatement.AccountedFor,
+				Asset:           latestStatement.Asset,
+				BlockNumber:     latestStatement.BlockNumber,
+				Timestamp:       base.Timestamp(normalizedTime), // Use normalized timestamp as base.Timestamp
+				Symbol:          latestStatement.Symbol,
+				Decimals:        latestStatement.Decimals,
+				TransactionHash: latestStatement.TransactionHash,
+
+				// Aggregate counts or amounts if needed
+				// For now, just use the latest values
+				EndBal:    latestStatement.EndBal,
+				AmountIn:  latestStatement.AmountIn,
+				AmountOut: latestStatement.AmountOut,
+			}
+
+			// Add the summary statement as a single-item group
+			store.GetSummaryManager().Add([]*Statement{summaryStatement}, period)
+		}
+
+	case ExportsBalances:
+		statementsStore := c.statementsFacet.GetStore()
+		balancesStore := c.balancesFacet.GetStore()
+		statements := statementsStore.GetItems()
+
+		// Clear existing balance summaries for this period
+		balancesStore.GetSummaryManager().Reset()
+
+		// Generate balance summaries using asset-aware logic
+		for _, statement := range statements {
+			// Create a balance record for this statement (same logic as BalanceObserver)
+			balance := &Balance{
+				Address:          statement.Asset,
+				Holder:           statement.AccountedFor,
+				Balance:          statement.EndBal,
+				BlockNumber:      statement.BlockNumber,
+				Timestamp:        statement.Timestamp,
+				TransactionIndex: statement.TransactionIndex,
+				Decimals:         uint64(statement.Decimals),
+				Symbol:           statement.Symbol,
+			}
+
+			// Use AddBalance for asset-aware summarization (keeps latest balance per period per asset)
+			balancesStore.GetSummaryManager().AddBalance(balance, period)
+		}
+	default:
+		return fmt.Errorf("unsupported dataFacet for summary generation: %v", dataFacet)
+	}
+
+	return nil
+}
+
+// Helper function to normalize timestamps to periods
+func normalizeToPeriod(timestamp int64, period string) int64 {
+	t := time.Unix(timestamp, 0).UTC()
+
+	switch period {
+	case types.PeriodHourly:
+		return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), 0, 0, 0, time.UTC).Unix()
+	case types.PeriodDaily:
+		return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC).Unix()
+	case types.PeriodWeekly:
+		// Start of week (Sunday)
+		days := int(t.Weekday())
+		return time.Date(t.Year(), t.Month(), t.Day()-days, 0, 0, 0, 0, time.UTC).Unix()
+	case types.PeriodMonthly:
+		return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC).Unix()
+	case types.PeriodQuarterly:
+		quarter := ((int(t.Month())-1)/3)*3 + 1
+		return time.Date(t.Year(), time.Month(quarter), 1, 0, 0, 0, 0, time.UTC).Unix()
+	case types.PeriodAnnual:
+		return time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC).Unix()
+	default: // PeriodBlockly
+		return timestamp // No normalization for block-level data
+	}
+}
+
+// Helper function to convert pointer slices to value slices for sorting
+func toValueSlice[T any](ptrs []*T) []T {
+	values := make([]T, len(ptrs))
+	for i, ptr := range ptrs {
+		values[i] = *ptr
+	}
+	return values
 }
 
 // EXISTING_CODE

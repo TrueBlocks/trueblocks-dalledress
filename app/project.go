@@ -218,6 +218,7 @@ func (a *App) GetActiveProjectData() *types.ProjectPayload {
 			ActiveChain:    "",
 			ActiveAddress:  "",
 			ActiveContract: "",
+			ActivePeriod:   "",
 			LastView:       "",
 			LastFacetMap:   make(map[string]types.DataFacet),
 		}
@@ -244,6 +245,7 @@ func (a *App) GetActiveProjectData() *types.ProjectPayload {
 		ActiveChain:    project.GetActiveChain(),
 		ActiveAddress:  activeAddrStr,
 		ActiveContract: project.GetActiveContract(),
+		ActivePeriod:  project.GetActivePeriod(),
 		LastView:       project.GetLastView(),
 		LastFacetMap:   lastFacetMap,
 	}

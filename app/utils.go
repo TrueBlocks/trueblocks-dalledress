@@ -14,11 +14,6 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-// LogBackend logs a message to the backend logger
-func (a *App) LogBackend(msg string) {
-	logging.LogBackend(msg)
-}
-
 // LogFrontend logs a message to the frontend logger
 func (a *App) LogFrontend(msg string) {
 	logging.LogFrontend(msg)

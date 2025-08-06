@@ -36,6 +36,7 @@ export type IconSet = {
 
   Add: IconType;
   Edit: IconType;
+  Copy: IconType;
   Delete: IconType;
   Undelete: IconType;
   Remove: IconType;
@@ -87,6 +88,7 @@ const faIcons: IconSet = {
   // Actions
   Add: Icons.FaPlus,
   Edit: Icons.FaEdit,
+  Copy: Icons.FaCopy,
   Delete: Icons.FaTimes,
   Undelete: Icons.FaUndo,
   Remove: Icons.FaEraser,
@@ -142,6 +144,7 @@ const biIcons: IconSet = {
   // Actions
   Add: Icons.BiPlus,
   Edit: Icons.BiPencil,
+  Copy: Icons.BiCopy,
   Delete: Icons.BiX,
   Undelete: Icons.BiUndo,
   Remove: Icons.BiTrash,
@@ -240,6 +243,8 @@ export const useIconSets = (
       createElement(iconSet.Add, { size, ...props });
     const Edit: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Edit, { size, ...props });
+    const Copy: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Copy, { size, ...props });
     const Delete: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Delete, { size, ...props });
     const Undelete: FC<IconProps> = (props = {}) =>
@@ -297,6 +302,7 @@ export const useIconSets = (
 
       Add,
       Edit,
+      Copy,
       Delete,
       Undelete,
       Remove,

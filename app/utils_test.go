@@ -13,20 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLogBackend(t *testing.T) {
-	app := &App{
-		Projects: project.NewManager(),
-		Preferences: &preferences.Preferences{
-			User: preferences.UserPreferences{},
-		},
-	}
-
-	// Test that LogBackend doesn't panic
-	assert.NotPanics(t, func() {
-		app.LogBackend("test message")
-	})
-}
-
 func TestLogFrontend(t *testing.T) {
 	app := &App{
 		Projects: project.NewManager(),
@@ -51,7 +37,7 @@ func TestGetMarkdown(t *testing.T) {
 		{
 			name:   "basic markdown request",
 			folder: "help",
-			route:  "monitors",
+			route:  "exports",
 			tab:    "list",
 		},
 		{

@@ -71,11 +71,13 @@ export const App = () => {
 
   // Show project modal only if we don't have a valid project AND it's not a user-requested modal
   useEffect(() => {
-    setShowProjectModal(!hasActiveProject);
-  }, [hasActiveProject]);
+    if (!hasActiveProject && !showProjectModal) {
+      setShowProjectModal(true);
+    }
+  }, [hasActiveProject, showProjectModal]);
 
-  // Listen for project events
-  useEvent(msgs.EventType.MANAGER, (message: string) => {
+  // Listen for project modal events
+  useEvent(msgs.EventType.PROJECT_MODAL, (message: string) => {
     if (message === 'show_project_modal') {
       setShowProjectModal(true);
     }
@@ -93,6 +95,10 @@ export const App = () => {
   useGlobalEscape();
 
   const handleProjectModalClose = () => {
+    setShowProjectModal(false);
+  };
+
+  const handleProjectModalCancel = () => {
     setShowProjectModal(false);
   };
 
@@ -167,6 +173,7 @@ export const App = () => {
           <ProjectSelectionModal
             opened={showProjectModal}
             onProjectSelected={handleProjectModalClose}
+            onCancel={hasActiveProject ? handleProjectModalCancel : undefined}
           />
         </div>
       </WalletConnectProvider>

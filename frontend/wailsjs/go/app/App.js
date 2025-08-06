@@ -10,6 +10,10 @@ export function AddAddressToProject(arg1) {
   return window['go']['app']['App']['AddAddressToProject'](arg1);
 }
 
+export function AddAddressesToProject(arg1) {
+  return window['go']['app']['App']['AddAddressesToProject'](arg1);
+}
+
 export function BuildDalleDressForProject() {
   return window['go']['app']['App']['BuildDalleDressForProject']();
 }
@@ -238,10 +242,6 @@ export function IsReady() {
   return window['go']['app']['App']['IsReady']();
 }
 
-export function LogBackend(arg1) {
-  return window['go']['app']['App']['LogBackend'](arg1);
-}
-
 export function LogFrontend(arg1) {
   return window['go']['app']['App']['LogFrontend'](arg1);
 }
@@ -336,6 +336,10 @@ export function SetActiveChain(arg1) {
 
 export function SetActiveContract(arg1) {
   return window['go']['app']['App']['SetActiveContract'](arg1);
+}
+
+export function SetActivePeriod(arg1) {
+  return window['go']['app']['App']['SetActivePeriod'](arg1);
 }
 
 export function SetActiveProjectPath(arg1) {

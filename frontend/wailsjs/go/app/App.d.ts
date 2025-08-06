@@ -22,6 +22,8 @@ export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Abi):
 
 export function AddAddressToProject(arg1:string):Promise<void>;
 
+export function AddAddressesToProject(arg1:string):Promise<void>;
+
 export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
 export function CancelAllFetches():Promise<number>;
@@ -136,8 +138,6 @@ export function IsInitialized():Promise<boolean>;
 
 export function IsReady():Promise<boolean>;
 
-export function LogBackend(arg1:string):Promise<void>;
-
 export function LogFrontend(arg1:string):Promise<void>;
 
 export function MonitorsClean(arg1:types.Payload,arg2:Array<string>):Promise<void>;
@@ -185,6 +185,8 @@ export function SetActiveAddress(arg1:string):Promise<void>;
 export function SetActiveChain(arg1:string):Promise<void>;
 
 export function SetActiveContract(arg1:string):Promise<void>;
+
+export function SetActivePeriod(arg1:string):Promise<void>;
 
 export function SetActiveProjectPath(arg1:string):Promise<void>;
 

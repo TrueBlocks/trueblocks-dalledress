@@ -1,23 +1,26 @@
 {{- $class := .Class -}}
-{{/* TODO: remove this */}}
-{{- if ne $class "Contracts" -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
 
 {{/* Determine View Type */}}
-{{- $isReadOnly := or (or (eq $class "Chunks") (eq $class "Exports")) (eq $class "Status") -}}
-{{- $isNames := eq $class "Names" -}}
-{{- $isExports := eq $class "Exports" -}}
 {{- $isAbis := eq $class "Abis" -}}
+{{- $isChunks := eq $class "Chunks" -}}
+{{- $isContracts := eq $class "Contracts" -}}
+{{- $isExports := eq $class "Exports" -}}
 {{- $isMonitors := eq $class "Monitors" -}}
-{{- $isAction := or $isAbis $isMonitors -}}
+{{- $isNames := eq $class "Names" -}}
+{{- $isStatus := eq $class "Status" -}}
 
 {{/* Determine Features */}}
-{{- $hasCrud := or $isNames $isAction -}}
 {{- $hasForms := .HasForms -}}
-{{- $hasDelete := contains .CrudStrs "delete" -}}
-{{- $cruds := replace .CrudStrs ", 'undelete'" "" -}}
-{{- $hasExport := or $hasCrud $isExports -}}
+{{- $hasExport := false -}}
+{{- $hasConfirm := $isNames -}}
+
+{{/* Crud related */}}
+{{- $hasCrud := or $isNames (or $isAbis $isMonitors) -}}
+{{- $crudStrs := .CrudStrs -}}
+{{- $cruds := replace $crudStrs ", 'undelete'" "" -}}
+{{- $hasDelete := contains $crudStrs "delete" -}}
 
 {{/* Build API imports based on view type */}}
 {{- $apis := printf "Get%sPage, Reload" $class -}}
@@ -25,7 +28,7 @@
   {{- $apis = printf "Get%sPage, %sCrud, Reload" $class $class -}}
 {{- end -}}
 
-// Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
+// Copyright 2016, 2026 The Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
 /*
@@ -38,7 +41,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { {{$apis}} } from '@app';
 import { BaseTab, usePagination } from '@components';
 {{- if $hasCrud}}
-import { Action{{if $hasExport}}, ExportFormatModal{{if $isNames}}, ConfirmModal{{end}}{{end}} } from '@components';
+import { Action{{if $hasExport}}, ExportFormatModal{{if $hasConfirm}}, ConfirmModal{{end}}{{end}} } from '@components';
 {{- end}}
 import { useFiltering, useSorting } from '@contexts';
 import { DataFacetConfig, toPageDataProp, useActiveFacet, useColumns, useEvent, usePayload } from '@hooks';
@@ -81,7 +84,7 @@ export const {{$class}} = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  {{if $isNames}}
+  {{if $hasConfirm}}
   // Names-specific state
   const { emitSuccess } = useActionMsgs('names');
   const [confirmModal, setConfirmModal] = useState<{
@@ -298,7 +301,7 @@ export const {{$class}} = () => {
         {{- else}}
         (_row: unknown) => false,
         {{- end}}
-        [{{if $isNames}}{{end}}{{if $isAbis}}getCurrentDataFacet{{end}}]
+        [{{if $isAbis}}getCurrentDataFacet{{end}}]
       ),
     },
     {{if $hasCrud}}{
@@ -426,7 +429,7 @@ export const {{$class}} = () => {
         headerActions={ {{if $hasCrud}}config.headerActions{{else}}[]{{end}} }
         count={++renderCnt.current}
       />
-      {{if $isNames}}<ConfirmModal
+      {{if $hasConfirm}}<ConfirmModal
         opened={confirmModal.opened}
         onClose={useCallback(
           () => setConfirmModal((prev) => ({ ...prev, opened: false })),
@@ -444,4 +447,3 @@ export const {{$class}} = () => {
 
 // EXISTING_CODE
 // EXISTING_CODE
-{{- end -}}

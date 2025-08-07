@@ -559,6 +559,8 @@ func GetExportsCount2(dataFacet string, payload *types.Payload) (int, error) {
 		return getExportsBalancesCount(payload)
 	case ExportsWithdrawals:
 		return getExportsWithdrawalsCount(payload)
+	case ExportsAssets:
+		return getExportsAssetsCount(payload)
 	default:
 		return 0, fmt.Errorf("unknown dataFacet: %s", dataFacet)
 	}
@@ -591,6 +593,10 @@ func getExportsBalancesCount(payload *types.Payload) (int, error) {
 }
 
 func getExportsWithdrawalsCount(payload *types.Payload) (int, error) {
+	return getExportsTransactionsCount(payload)
+}
+
+func getExportsAssetsCount(payload *types.Payload) (int, error) {
 	return getExportsTransactionsCount(payload)
 }
 
@@ -629,6 +635,12 @@ func ResetExportsStore(payload *types.Payload, dataFacet types.DataFacet) {
 			store.Reset()
 		}
 		withdrawalsStoreMu.Unlock()
+	case ExportsAssets:
+		assetsStoreMu.Lock()
+		if store, exists := assetsStore[storeKey]; exists {
+			store.Reset()
+		}
+		assetsStoreMu.Unlock()
 	}
 }
 
@@ -657,6 +669,10 @@ func ClearExportsStores(payload *types.Payload) {
 	withdrawalsStoreMu.Lock()
 	delete(withdrawalsStore, storeKey)
 	withdrawalsStoreMu.Unlock()
+
+	assetsStoreMu.Lock()
+	delete(assetsStore, storeKey)
+	assetsStoreMu.Unlock()
 }
 
 // ClearAllExportsStores clears all cached stores (useful for global reset)
@@ -680,6 +696,10 @@ func ClearAllExportsStores() {
 	withdrawalsStoreMu.Lock()
 	withdrawalsStore = make(map[string]*store.Store[Withdrawal])
 	withdrawalsStoreMu.Unlock()
+
+	assetsStoreMu.Lock()
+	assetsStore = make(map[string]*store.Store[Asset])
+	assetsStoreMu.Unlock()
 }
 
 func getStoreKey(chain, address string) string {

@@ -344,8 +344,7 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
   // Handle transaction confirmation from modal
   const handleConfirmTransaction = async (preparedTx: PreparedTransaction) => {
     try {
-      const txHash = await sendTransaction(preparedTx);
-      Log(`Transaction sent: ${txHash}`);
+      await sendTransaction(preparedTx);
     } catch (error) {
       Log(`Transaction failed: ${error}`);
     }

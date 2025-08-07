@@ -235,5 +235,18 @@ func (c *ContractsCollection) ResetSummary() {
 	}
 }
 
+func (c *ContractsCollection) ExportData(payload *types.Payload) (string, error) {
+	switch payload.DataFacet {
+	case ContractsDashboard:
+		return c.dashboardFacet.ExportDataPointers(payload, string(ContractsDashboard))
+	case ContractsExecute:
+		return c.executeFacet.ExportDataPointers(payload, string(ContractsExecute))
+	case ContractsEvents:
+		return c.eventsFacet.ExportDataPointers(payload, string(ContractsEvents))
+	default:
+		return "", fmt.Errorf("unsupported contracts facet: %s", payload.DataFacet)
+	}
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

@@ -351,12 +351,16 @@ func (m MockCollection) GetSupportedFacets() []types.DataFacet {
 	return []types.DataFacet{}
 }
 
-func (m MockCollection) GetStoreName(facet types.DataFacet) string {
+func (m MockCollection) GetStoreName(facet types.DataFacet, chain, address string) string {
 	return m.name
 }
 
 func (m MockCollection) GetSummary() types.Summary {
 	return types.Summary{}
+}
+
+func (m MockCollection) ExportData(payload *types.Payload) (string, error) {
+	return "", nil
 }
 
 func (m MockCollection) AccumulateItem(item interface{}, summary *types.Summary) {}

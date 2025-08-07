@@ -37,6 +37,7 @@ const iconNames = [
   'Delete',
   'Undelete',
   'Remove',
+  'Export',
   'ChevronLeft',
   'ChevronRight',
   'ChevronUp',

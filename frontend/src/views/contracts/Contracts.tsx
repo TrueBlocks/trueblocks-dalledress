@@ -35,7 +35,6 @@ import { contracts } from '@models';
 import { msgs, project, types } from '@models';
 import {
   Debugger,
-  Log,
   addressToHex,
   getDisplayAddress,
   useErrorHandler,
@@ -139,10 +138,6 @@ export const Contracts = () => {
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
   const isForm = getCurrentDataFacet() !== types.DataFacet.EVENTS;
 
-  Log(
-    `🎯 Contracts component - activeContract: ${activeContract}, isForm: ${isForm}, currentFacet: ${getCurrentDataFacet()}`,
-  );
-
   const [pageData, setPageData] = useState<contracts.ContractsPage | null>(
     null,
   );
@@ -161,7 +156,6 @@ export const Contracts = () => {
 
   // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
-    Log('🚀 fetchData called');
     clearError();
     try {
       const payload = createPayload(getCurrentDataFacet());
@@ -169,31 +163,12 @@ export const Contracts = () => {
         payload.address = activeContract;
       }
 
-      Log(
-        `📡 Calling GetContractsPage with payload: ${JSON.stringify({
-          payload,
-          currentPage: pagination.currentPage,
-          pageSize: pagination.pageSize,
-          isForm,
-          activeContract,
-        })}`,
-      );
-
       const result = await GetContractsPage(
         payload,
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
         filter,
-      );
-
-      Log(
-        `📦 GetContractsPage result: ${JSON.stringify({
-          hasResult: !!result,
-          totalItems: result.totalItems,
-          contractsCount: result.contracts?.length || 0,
-          isFetching: result.isFetching,
-        })}`,
       );
 
       setPageData(result);
@@ -370,50 +345,16 @@ export const Contracts = () => {
   // === SECTION 6.5: Contract Detail Loading Effect ===
   useEffect(() => {
     const loadContractDetail = async () => {
-      Log(
-        `🔍 loadContractDetail called - isForm: ${isForm}, activeContract: ${activeContract}`,
-      );
-
       if (!isForm || !activeContract) {
-        Log(
-          `❌ Early return - isForm: ${isForm}, activeContract: ${activeContract}`,
-        );
         return;
       }
 
       try {
-        Log('⏳ Setting detail loading to true');
         setDetailLoading(true);
         setDetailError(null);
 
         if (pageData?.isFetching) {
-          Log('🔄 pageData is fetching, returning early');
           return;
-        }
-
-        Log(
-          `📊 pageData available: ${JSON.stringify({
-            hasPageData: !!pageData,
-            hasContracts: !!pageData?.contracts,
-            contractsCount: pageData?.contracts?.length || 0,
-            isFetching: pageData?.isFetching,
-          })}`,
-        );
-
-        // Log all contract addresses for debugging
-        if (pageData?.contracts) {
-          const contractAddresses = pageData.contracts.map(
-            (contract: types.Contract, index: number) => ({
-              index,
-              address: addressToHex(contract.address),
-              addressLower: addressToHex(contract.address)?.toLowerCase(),
-              name: contract.name,
-              hasAbi: !!contract.abi,
-            }),
-          );
-          Log(
-            `📋 All contracts in response: ${JSON.stringify(contractAddresses, null, 2)}`,
-          );
         }
 
         let contractData = pageData?.contracts?.find(
@@ -422,56 +363,31 @@ export const Contracts = () => {
             activeContract.toLowerCase(),
         );
 
-        Log(
-          `🔍 Contract search result: ${JSON.stringify({
-            targetAddress: activeContract.toLowerCase(),
-            foundContract: !!contractData,
-            contractAddress: contractData?.address,
-            contractName: contractData?.name,
-            hasAbi: !!contractData?.abi,
-          })}`,
-        );
-
         // If the activeContract is not found, fall back to the first available contract
         if (
           !contractData &&
           pageData?.contracts &&
           pageData.contracts.length > 0
         ) {
-          Log(
-            '🔄 Contract not found, falling back to first available contract',
-          );
           contractData = pageData.contracts[0];
           if (contractData) {
             const newAddress = addressToHex(contractData.address);
 
-            Log(
-              `🆕 Updating activeContract from ${activeContract} to ${newAddress}`,
-            );
-
             // Update the active contract in the system
             await setActiveContract(newAddress);
 
-            Log('✅ Updated activeContract, will reload on next render');
             setDetailLoading(false);
             return; // Exit early, the component will re-render with the new activeContract
           }
         }
 
         if (contractData) {
-          Log('✅ Setting contract ABI and clearing loading state');
           setContractAbi(contractData);
           setDetailLoading(false);
         } else {
-          Log(
-            '❌ No contract found and no fallback available, clearing loading state',
-          );
           setDetailLoading(false);
         }
       } catch (err) {
-        Log(
-          `💥 Error in loadContractDetail: ${err instanceof Error ? err.message : String(err)}`,
-        );
         setDetailError(
           err instanceof Error
             ? err.message
@@ -486,12 +402,7 @@ export const Contracts = () => {
 
   // === SECTION 6.6: Early Return for Detail View ===
   if (isForm) {
-    Log(
-      `🎭 Detail view conditions - detailLoading: ${detailLoading}, contractAbi: ${!!contractAbi}, pageData.isFetching: ${pageData?.isFetching}`,
-    );
-
     if (detailLoading || !contractAbi || pageData?.isFetching) {
-      Log('⏳ Showing loading spinner');
       return (
         <Container size="lg" py="xl">
           <div

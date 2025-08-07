@@ -50,6 +50,10 @@ export function Encode(arg1, arg2) {
   return window['go']['app']['App']['Encode'](arg1, arg2);
 }
 
+export function ExportData(arg1) {
+  return window['go']['app']['App']['ExportData'](arg1);
+}
+
 export function FileNew(arg1) {
   return window['go']['app']['App']['FileNew'](arg1);
 }
@@ -146,6 +150,10 @@ export function GetFilterState(arg1) {
   return window['go']['app']['App']['GetFilterState'](arg1);
 }
 
+export function GetFormat() {
+  return window['go']['app']['App']['GetFormat']();
+}
+
 export function GetImageURL(arg1) {
   return window['go']['app']['App']['GetImageURL'](arg1);
 }
@@ -232,6 +240,10 @@ export function GetWizardReturn() {
 
 export function HasActiveProject() {
   return window['go']['app']['App']['HasActiveProject']();
+}
+
+export function IsDialogSilenced(arg1) {
+  return window['go']['app']['App']['IsDialogSilenced'](arg1);
 }
 
 export function IsInitialized() {
@@ -362,6 +374,10 @@ export function SetFilterState(arg1, arg2) {
   return window['go']['app']['App']['SetFilterState'](arg1, arg2);
 }
 
+export function SetFormat(arg1) {
+  return window['go']['app']['App']['SetFormat'](arg1);
+}
+
 export function SetHelpCollapsed(arg1) {
   return window['go']['app']['App']['SetHelpCollapsed'](arg1);
 }
@@ -412,6 +428,10 @@ export function SetUserPreferences(arg1) {
 
 export function SetViewAndFacet(arg1, arg2) {
   return window['go']['app']['App']['SetViewAndFacet'](arg1, arg2);
+}
+
+export function SilenceDialog(arg1) {
+  return window['go']['app']['App']['SilenceDialog'](arg1);
 }
 
 export function SwitchToProject(arg1) {

@@ -18,7 +18,8 @@ type Collection interface {
 	Reset(facet DataFacet)
 	NeedsUpdate(facet DataFacet) bool
 	GetSupportedFacets() []DataFacet
-	GetStoreName(facet DataFacet) string
+	GetStoreName(facet DataFacet, chain, address string) string
 	GetSummary() Summary
+	ExportData(payload *Payload) (string, error)
 	SummaryAccumulator
 }

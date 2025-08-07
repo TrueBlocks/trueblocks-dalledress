@@ -87,6 +87,46 @@ func (a *App) SetTheme(theme string) {
 	}
 }
 
+// GetFormat returns the currently selected export format
+func (a *App) GetFormat() string {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	if a.Preferences.App.LastFormat == "" {
+		return "csv"
+	}
+	return a.Preferences.App.LastFormat
+}
+
+// SetFormat updates the application export format preference
+func (a *App) SetFormat(format string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	a.Preferences.App.LastFormat = format
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save format preference", err)
+	}
+}
+
+// IsDialogSilenced checks if a specific dialog is silenced
+func (a *App) IsDialogSilenced(dialogKey string) bool {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	return a.Preferences.App.SilencedDialogs[dialogKey]
+}
+
+// SilenceDialog marks a dialog as silenced
+func (a *App) SilenceDialog(dialogKey string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+	if a.Preferences.App.SilencedDialogs == nil {
+		a.Preferences.App.SilencedDialogs = make(map[string]bool)
+	}
+	a.Preferences.App.SilencedDialogs[dialogKey] = true
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save dialog silence preference", err)
+	}
+}
+
 // GetActiveProjectPath returns the path of the most recently used project
 func (a *App) GetActiveProjectPath() string {
 	a.prefsMu.RLock()

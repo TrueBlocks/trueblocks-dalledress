@@ -6,6 +6,7 @@ export * from './BaseTab';
 export * from './ChevronButton';
 export * from './ConfirmModal';
 export * from './DashboardCard';
+export * from './ExportFormatModal';
 export * from './LazyPanel';
 export * from './NodeStatus';
 export * from './PanelSkeleton';

@@ -274,5 +274,22 @@ func (c *NamesCollection) ResetSummary() {
 	}
 }
 
+func (c *NamesCollection) ExportData(payload *types.Payload) (string, error) {
+	switch payload.DataFacet {
+	case NamesAll:
+		return c.allFacet.ExportData(payload, string(NamesAll))
+	case NamesCustom:
+		return c.customFacet.ExportData(payload, string(NamesCustom))
+	case NamesPrefund:
+		return c.prefundFacet.ExportData(payload, string(NamesPrefund))
+	case NamesRegular:
+		return c.regularFacet.ExportData(payload, string(NamesRegular))
+	case NamesBaddress:
+		return c.baddressFacet.ExportData(payload, string(NamesBaddress))
+	default:
+		return "", fmt.Errorf("unsupported names facet: %s", payload.DataFacet)
+	}
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

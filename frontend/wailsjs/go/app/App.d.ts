@@ -42,6 +42,8 @@ export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
 
 export function Encode(arg1:types.Function,arg2:Array<any>):Promise<string>;
 
+export function ExportData(arg1:types.Payload):Promise<void>;
+
 export function FileNew(arg1:menu.CallbackData):Promise<void>;
 
 export function FileOpen(arg1:menu.CallbackData):Promise<void>;
@@ -90,6 +92,8 @@ export function GetFilename():Promise<project.Project>;
 
 export function GetFilterState(arg1:project.ViewStateKey):Promise<project.FilterState>;
 
+export function GetFormat():Promise<string>;
+
 export function GetImageURL(arg1:string):Promise<string>;
 
 export function GetLanguage():Promise<string>;
@@ -133,6 +137,8 @@ export function GetUserPreferences():Promise<preferences.UserPreferences>;
 export function GetWizardReturn():Promise<string>;
 
 export function HasActiveProject():Promise<boolean>;
+
+export function IsDialogSilenced(arg1:string):Promise<boolean>;
 
 export function IsInitialized():Promise<boolean>;
 
@@ -198,6 +204,8 @@ export function SetDebugCollapsed(arg1:boolean):Promise<void>;
 
 export function SetFilterState(arg1:project.ViewStateKey,arg2:project.FilterState):Promise<void>;
 
+export function SetFormat(arg1:string):Promise<void>;
+
 export function SetHelpCollapsed(arg1:boolean):Promise<void>;
 
 export function SetInitialized(arg1:boolean):Promise<void>;
@@ -223,6 +231,8 @@ export function SetUserInfo(arg1:string,arg2:string):Promise<void>;
 export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<void>;
 
 export function SetViewAndFacet(arg1:string,arg2:string):Promise<string>;
+
+export function SilenceDialog(arg1:string):Promise<void>;
 
 export function SwitchToProject(arg1:string):Promise<void>;
 

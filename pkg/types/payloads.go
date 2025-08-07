@@ -12,11 +12,13 @@ const (
 )
 
 type Payload struct {
-	Collection string    `json:"collection"`
-	DataFacet  DataFacet `json:"dataFacet"`
-	Chain      string    `json:"chain,omitempty"`
-	Address    string    `json:"address,omitempty"`
-	Period     string    `json:"period,omitempty"`
+	Collection  string    `json:"collection"`
+	DataFacet   DataFacet `json:"dataFacet"`
+	Chain       string    `json:"chain,omitempty"`
+	Address     string    `json:"address,omitempty"`
+	Period      string    `json:"period,omitempty"`
+	Format      string    `json:"format,omitempty"`
+	ProjectPath string    `json:"projectPath,omitempty"`
 }
 
 type DataLoadedPayload struct {

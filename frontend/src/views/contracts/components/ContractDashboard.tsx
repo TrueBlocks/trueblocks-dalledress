@@ -32,20 +32,6 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
   contractState,
   onRefresh,
 }) => {
-  Log(
-    `🎯 ContractDashboard rendered with contractState: ${JSON.stringify({
-      address: contractState.address,
-      name: contractState.name,
-      hasAbi: !!contractState.abi,
-      abiLength: contractState.abi?.functions?.length || 0,
-      hasReadResults: !!contractState.readResults,
-      readResultsKeys: contractState.readResults
-        ? Object.keys(contractState.readResults)
-        : [],
-      lastUpdated: contractState.lastUpdated,
-    })}`,
-  );
-
   const [functionResults, setFunctionResults] = useState<
     Record<string, FunctionResult>
   >({});
@@ -56,23 +42,16 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
     const functions = contractState.abi
       ? getReadFunctions(contractState.abi)
       : [];
-    Log(`📋 Read functions computed: ${functions.length} functions found`);
     return functions;
   }, [contractState.abi]);
 
   // Initialize function results state
   useEffect(() => {
-    Log('🔄 Initializing function results state');
-
     const initialResults: Record<string, FunctionResult> = {};
     readFunctions.forEach((func) => {
       let functionWithResults = func;
       if (contractState.readResults?.[func.name] !== undefined) {
         const result = contractState.readResults[func.name];
-
-        Log(
-          `📊 Processing read result for ${func.name}: ${JSON.stringify(result)}`,
-        );
 
         // DINGLEBERRY: USE THE PARAMETER VALUES SINCE THIS NEVER IS NOT TRUE
         // Compare readResults with ABI output values
@@ -97,9 +76,10 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
               JSON.stringify(abiOutputValue) ===
               JSON.stringify(readResultValue);
             const status = isMatch ? '✅' : '❌';
-
             Log(
-              `${status} Function '${func.name}' output[${index}]: readResults=${JSON.stringify(readResultValue)} vs abi.outputs[${index}].value=${JSON.stringify(abiOutputValue)}`,
+              `Function ${func.name} output ${index} match: ${status} (ABI: ${JSON.stringify(
+                abiOutputValue,
+              )}, Read Result: ${JSON.stringify(readResultValue)})`,
             );
           });
         }
@@ -133,9 +113,6 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
       };
     });
 
-    Log(
-      `✅ Function results state initialized with ${Object.keys(initialResults).length} functions`,
-    );
     setFunctionResults(initialResults);
     setLoading(false);
   }, [contractState, readFunctions]);
@@ -288,7 +265,6 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
 
   // Show loading state while data is being processed
   if (loading) {
-    Log('⏳ ContractDashboard showing loading state');
     return (
       <Stack gap="md" align="center" style={{ padding: '2rem' }}>
         <Loader size="lg" />
@@ -298,7 +274,6 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
   }
 
   if (!hasReadFunctions) {
-    Log('❌ ContractDashboard: No read functions available');
     return (
       <Alert color="blue">
         This contract has no read functions (view/pure) to display

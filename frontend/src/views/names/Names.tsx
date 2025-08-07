@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
-import { BaseTab, usePagination } from '@components';
+import { BaseTab, ExportFormatModal, usePagination } from '@components';
 import { Action, ConfirmModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
@@ -167,8 +167,10 @@ export const Names = () => {
   // === SECTION 5: CRUD Operations ===
   const enabledActions = useMemo(() => {
     const currentFacet = getCurrentDataFacet();
+    let actions: ActionType[] = [];
+
     if (currentFacet === types.DataFacet.CUSTOM) {
-      return [
+      actions = [
         'add',
         'publish',
         'pin',
@@ -176,14 +178,20 @@ export const Names = () => {
         'remove',
         'autoname',
         'update',
-      ] as ActionType[];
+      ];
+    } else if (currentFacet === types.DataFacet.BADDRESS) {
+      actions = ['add'];
+    } else {
+      actions = ['add', 'autoname', 'update'];
     }
-    if (currentFacet === types.DataFacet.BADDRESS) {
-      return ['add'] as ActionType[];
+
+    if (!actions.includes('export')) {
+      actions.push('export');
     }
-    return ['add', 'autoname', 'update'] as ActionType[];
+
+    return actions as ActionType[];
   }, [getCurrentDataFacet]);
-  const { handlers, config } = useActions({
+  const { handlers, config, exportFormatModal } = useActions({
     collection: 'names',
     viewStateKey,
     pagination,
@@ -374,6 +382,11 @@ export const Names = () => {
         title={confirmModal.title}
         message={confirmModal.message}
         dialogKey="confirmNamesModal"
+      />
+      <ExportFormatModal
+        opened={exportFormatModal.opened}
+        onClose={exportFormatModal.onClose}
+        onFormatSelected={exportFormatModal.onFormatSelected}
       />
     </div>
   );

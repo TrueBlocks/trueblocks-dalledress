@@ -41,6 +41,7 @@ export type IconSet = {
   Undelete: IconType;
   Remove: IconType;
   Autoname: IconType;
+  Export: IconType;
   Publish: IconType;
   Pin: IconType;
 
@@ -93,6 +94,7 @@ const faIcons: IconSet = {
   Undelete: Icons.FaUndo,
   Remove: Icons.FaEraser,
   Autoname: Icons.FaMagic,
+  Export: Icons.FaDownload,
   Publish: Icons.FaGlobe,
   Pin: Icons.FaListAlt,
 
@@ -149,6 +151,7 @@ const biIcons: IconSet = {
   Undelete: Icons.BiUndo,
   Remove: Icons.BiTrash,
   Autoname: Icons.BiBot,
+  Export: Icons.BiDownload,
   Publish: Icons.BiGlobe,
   Pin: Icons.BiListUl,
 
@@ -253,6 +256,8 @@ export const useIconSets = (
       createElement(iconSet.Remove, { size, ...props });
     const Autoname: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Autoname, { size, ...props });
+    const Export: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Export, { size, ...props });
     const Publish: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Publish, { size, ...props });
     const Pin: FC<IconProps> = (props = {}) =>
@@ -307,6 +312,7 @@ export const useIconSets = (
       Undelete,
       Remove,
       Autoname,
+      Export,
       Publish,
       Pin,
 

@@ -1,6 +1,5 @@
 import { Encode } from '@app';
 import { types } from '@models';
-import { Log } from '@utils';
 
 export interface TransactionData {
   to: string;
@@ -32,21 +31,15 @@ export const encodeParameters = async (
   inputs: TransactionInput[],
 ): Promise<string> => {
   try {
-    Log('Encoding transaction parameters via TrueBlocks backend...');
-
     // Convert inputs to the format expected by the backend
     const callArguments = inputs.map((input) => {
       // The Go backend expects proper types, not strings
       return convertInputValue(input.type, input.value);
     });
 
-    Log('Function ABI:', JSON.stringify(functionAbi));
-    Log('Call arguments:', JSON.stringify(callArguments));
-
     // Call the TrueBlocks backend Encode function which uses Function.Pack
     const encodedData = await Encode(functionAbi, callArguments);
 
-    Log('Successfully encoded transaction data:', encodedData);
     return encodedData;
   } catch (error) {
     let errorMsg = 'Unknown error';
@@ -58,10 +51,6 @@ export const encodeParameters = async (
       // Try to extract meaningful error information
       errorMsg = JSON.stringify(error);
     }
-
-    Log('Error encoding parameters:', errorMsg);
-    Log('Function ABI that failed:', JSON.stringify(functionAbi));
-    Log('Inputs that failed:', JSON.stringify(inputs));
 
     throw new Error(`Failed to encode transaction parameters: ${errorMsg}`);
   }

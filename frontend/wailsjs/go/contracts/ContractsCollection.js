@@ -6,6 +6,10 @@ export function AccumulateItem(arg1, arg2) {
   return window['go']['contracts']['ContractsCollection']['AccumulateItem'](arg1, arg2);
 }
 
+export function ExportData(arg1) {
+  return window['go']['contracts']['ContractsCollection']['ExportData'](arg1);
+}
+
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['contracts']['ContractsCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

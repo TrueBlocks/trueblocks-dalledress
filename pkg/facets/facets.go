@@ -399,3 +399,28 @@ func (r *Facet[T]) ForEvery(actionFunc func(itemMatched *T) (error, bool), match
 
 	return matchCount, nil
 }
+
+// ExportData exports all data in this facet to the specified file path and format
+func (r *Facet[T]) ExportData(payload *types.Payload, typeName string) (string, error) {
+	r.mutex.RLock()
+	data := make([]T, len(r.view))
+	for i, ptr := range r.view {
+		data[i] = *ptr
+	}
+	r.mutex.RUnlock()
+	return types.ExportData(data, payload, typeName)
+}
+
+// ExportDataPointers exports all data in this facet as pointers to the specified file path and format
+func (r *Facet[T]) ExportDataPointers(payload *types.Payload, typeName string) (string, error) {
+	r.mutex.RLock()
+	// Convert pointer data to value data
+	data := make([]T, 0, len(r.view))
+	for _, ptr := range r.view {
+		if ptr != nil {
+			data = append(data, *ptr)
+		}
+	}
+	r.mutex.RUnlock()
+	return types.ExportData(data, payload, typeName)
+}

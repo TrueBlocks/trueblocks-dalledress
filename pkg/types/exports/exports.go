@@ -338,7 +338,6 @@ func (c *ExportsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	case ExportsStatements:
 		return c.statementsFacet.NeedsUpdate()
 	case ExportsBalances:
-		// Balances depend on statements, so we need update if either needs update
 		return c.balancesFacet.NeedsUpdate() || c.statementsFacet.NeedsUpdate()
 	case ExportsTransfers:
 		return c.transfersFacet.NeedsUpdate()
@@ -496,6 +495,31 @@ func (c *ExportsCollection) ResetSummary() {
 		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: time.Now().Unix(),
+	}
+}
+
+func (c *ExportsCollection) ExportData(payload *types.Payload) (string, error) {
+	switch payload.DataFacet {
+	case ExportsStatements:
+		return c.statementsFacet.ExportData(payload, string(ExportsStatements))
+	case ExportsBalances:
+		return c.balancesFacet.ExportData(payload, string(ExportsBalances))
+	case ExportsTransfers:
+		return c.transfersFacet.ExportData(payload, string(ExportsTransfers))
+	case ExportsTransactions:
+		return c.transactionsFacet.ExportData(payload, string(ExportsTransactions))
+	case ExportsWithdrawals:
+		return c.withdrawalsFacet.ExportData(payload, string(ExportsWithdrawals))
+	case ExportsAssets:
+		return c.assetsFacet.ExportData(payload, string(ExportsAssets))
+	case ExportsLogs:
+		return c.logsFacet.ExportData(payload, string(ExportsLogs))
+	case ExportsTraces:
+		return c.tracesFacet.ExportData(payload, string(ExportsTraces))
+	case ExportsReceipts:
+		return c.receiptsFacet.ExportData(payload, string(ExportsReceipts))
+	default:
+		return "", fmt.Errorf("unsupported exports facet: %s", payload.DataFacet)
 	}
 }
 

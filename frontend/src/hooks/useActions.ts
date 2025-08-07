@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { ExportData, IsDialogSilenced } from '@app';
 import { useWalletGatedAction } from '@hooks';
 import { crud, project, sdk, types } from '@models';
 import { Log, addressToHex, useErrorHandler } from '@utils';
@@ -24,6 +25,7 @@ export type ActionType =
   | 'delete'
   | 'remove'
   | 'autoname'
+  | 'export'
   | 'clean'
   | 'update';
 
@@ -109,6 +111,13 @@ const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
     title: 'Add',
     icon: 'Add',
   },
+  export: {
+    type: 'export',
+    level: 'header',
+    requiresWallet: false,
+    title: 'Export',
+    icon: 'Export',
+  },
   delete: {
     type: 'delete',
     level: 'row',
@@ -191,13 +200,20 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
   // Pending publish action state
   const [pendingPublish, setPendingPublish] = useState(false);
 
+  // Export format modal state
+  const [exportFormatModal, setExportFormatModal] = useState<{
+    opened: boolean;
+    pendingPayload: types.Payload | null;
+  }>({
+    opened: false,
+    pendingPayload: null,
+  });
+
   // Execute pending publish when wallet connects
   const executePendingPublish = useCallback(() => {
     if (!pendingPublish || !isWalletConnected) return;
 
-    Log('Executing pending publish action after wallet connection');
     setPendingPublish(false);
-
     try {
       // Create a mock function definition for publishHash(string,string)
       const publishHashFunction: types.Function = {
@@ -230,18 +246,10 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
         transactionInputs,
       );
 
-      Log(
-        'Transaction data created for pending publish:',
-        JSON.stringify(transactionData),
-      );
-
-      // Open the transaction modal
       setTransactionModal({
         opened: true,
         transactionData,
       });
-
-      Log('Transaction modal opened for pending publish');
     } catch (error) {
       Log('Error creating pending publish transaction:', String(error));
     }
@@ -292,6 +300,66 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     Log(`Adding ${collection}`);
     // TODO: Implement add functionality
   }, [collection]);
+
+  const handleExport = useCallback(async () => {
+    const facet = getCurrentDataFacet();
+    const payload = createPayload(facet);
+    payload.collection = collection;
+
+    try {
+      const isDialogSilenced = await IsDialogSilenced('exportFormat');
+
+      if (isDialogSilenced) {
+        ExportData(payload)
+          .then(() => {
+            // do nothing - the backend did it all
+          })
+          .catch((error) => {
+            Log(`[EXPORT FRONTEND] Export failed for ${collection}: ${error}`);
+          });
+      } else {
+        setExportFormatModal({
+          opened: true,
+          pendingPayload: payload,
+        });
+      }
+    } catch (error) {
+      Log(`[EXPORT FRONTEND] Error checking dialog silence state: ${error}`);
+      setExportFormatModal({
+        opened: true,
+        pendingPayload: payload,
+      });
+    }
+  }, [collection, getCurrentDataFacet, createPayload]);
+
+  // Handle format selection from modal
+  const handleFormatSelected = useCallback(
+    (format: string) => {
+      const payload = exportFormatModal.pendingPayload;
+      if (!payload) {
+        Log('[EXPORT FRONTEND] No pending payload found');
+        return;
+      }
+
+      payload.format = format;
+      ExportData(payload)
+        .then(() => {
+          // do nothing - the backend did it all
+        })
+        .catch((error) => {
+          Log(`[EXPORT FRONTEND] Export failed for ${collection}: ${error}`);
+        });
+    },
+    [collection, exportFormatModal.pendingPayload],
+  );
+
+  // Handle modal close
+  const handleExportFormatModalClose = useCallback(() => {
+    setExportFormatModal({
+      opened: false,
+      pendingPayload: null,
+    });
+  }, []);
 
   const handlePublish = useCallback(() => {
     Log(`Publish button clicked for ${collection}`);
@@ -843,6 +911,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
   const handlers = useMemo(
     () => ({
       handleAdd,
+      handleExport,
       handlePublish,
       handlePin,
       handleToggle,
@@ -853,6 +922,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     }),
     [
       handleAdd,
+      handleExport,
       handlePublish,
       handlePin,
       handleToggle,
@@ -881,6 +951,11 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       onConfirm: async () => {
         setTransactionModal((prev) => ({ ...prev, opened: false }));
       },
+    },
+    exportFormatModal: {
+      ...exportFormatModal,
+      onClose: handleExportFormatModalClose,
+      onFormatSelected: handleFormatSelected,
     },
   };
 };

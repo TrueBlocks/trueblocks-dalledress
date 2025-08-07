@@ -245,7 +245,7 @@ func (a *App) GetActiveProjectData() *types.ProjectPayload {
 		ActiveChain:    project.GetActiveChain(),
 		ActiveAddress:  activeAddrStr,
 		ActiveContract: project.GetActiveContract(),
-		ActivePeriod:  project.GetActivePeriod(),
+		ActivePeriod:   project.GetActivePeriod(),
 		LastView:       project.GetLastView(),
 		LastFacetMap:   lastFacetMap,
 	}

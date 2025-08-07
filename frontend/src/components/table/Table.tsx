@@ -315,9 +315,9 @@ export const Table = <T extends Record<string, unknown>>({
               />
             )}
           </tbody>
-          <div className={`table-footer ${getDebugClass(6)}`}>
+          <tfoot className={`table-footer ${getDebugClass(6)}`}>
             <Stats namesLength={data.length} viewStateKey={viewStateKey} />
-          </div>
+          </tfoot>
         </table>
 
         {!detailCollapsed && (

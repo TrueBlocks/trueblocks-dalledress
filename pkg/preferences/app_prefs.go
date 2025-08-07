@@ -40,6 +40,7 @@ type AppPreferences struct {
 	Version         string          `json:"version"`
 	Name            string          `json:"name"`
 	LastTheme       string          `json:"lastTheme"`
+	LastFormat      string          `json:"lastFormat"`
 	LastLanguage    string          `json:"lastLanguage"`
 	LastProject     string          `json:"lastProject"`
 	HelpCollapsed   bool            `json:"helpCollapsed"`
@@ -61,6 +62,7 @@ func NewAppPreferences() *AppPreferences {
 	return &AppPreferences{
 		Version:         "1.0",
 		LastTheme:       "dark",
+		LastFormat:      "csv",
 		LastLanguage:    "en",
 		DetailCollapsed: true,
 		HelpCollapsed:   false,

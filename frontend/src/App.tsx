@@ -154,7 +154,7 @@ export const App = () => {
           </AppShell>
           <WalletConnectModalSign
             projectId={
-              import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ||
+              (import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string) ||
               (() => {
                 Log(
                   'ERROR: VITE_WALLETCONNECT_PROJECT_ID not set in environment variables',

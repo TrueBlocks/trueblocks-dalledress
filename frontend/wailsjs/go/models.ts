@@ -526,6 +526,7 @@ export namespace preferences {
 	    version: string;
 	    name: string;
 	    lastTheme: string;
+	    lastFormat: string;
 	    lastLanguage: string;
 	    lastProject: string;
 	    helpCollapsed: boolean;
@@ -545,6 +546,7 @@ export namespace preferences {
 	        this.version = source["version"];
 	        this.name = source["name"];
 	        this.lastTheme = source["lastTheme"];
+	        this.lastFormat = source["lastFormat"];
 	        this.lastLanguage = source["lastLanguage"];
 	        this.lastProject = source["lastProject"];
 	        this.helpCollapsed = source["helpCollapsed"];
@@ -839,6 +841,14 @@ export namespace status {
 
 export namespace types {
 	
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
+	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -868,14 +878,6 @@ export namespace types {
 	    STATUS = "status",
 	    CACHES = "caches",
 	    CHAINS = "chains",
-	}
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];
@@ -1087,13 +1089,13 @@ export namespace types {
 	}
 	export class ChunkBloom {
 	    byteWidth: number;
+	    fileSize: number;
 	    hash: base.Hash;
 	    magic: string;
 	    nBlooms: number;
 	    nInserted: number;
 	    range: string;
 	    rangeDates?: RangeDates;
-	    size: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ChunkBloom(source);
@@ -1102,13 +1104,13 @@ export namespace types {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.byteWidth = source["byteWidth"];
+	        this.fileSize = source["fileSize"];
 	        this.hash = this.convertValues(source["hash"], base.Hash);
 	        this.magic = source["magic"];
 	        this.nBlooms = source["nBlooms"];
 	        this.nInserted = source["nInserted"];
 	        this.range = source["range"];
 	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
-	        this.size = source["size"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1130,13 +1132,13 @@ export namespace types {
 		}
 	}
 	export class ChunkIndex {
+	    fileSize: number;
 	    hash: base.Hash;
 	    magic: string;
 	    nAddresses: number;
 	    nAppearances: number;
 	    range: string;
 	    rangeDates?: RangeDates;
-	    size: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ChunkIndex(source);
@@ -1144,13 +1146,13 @@ export namespace types {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.fileSize = source["fileSize"];
 	        this.hash = this.convertValues(source["hash"], base.Hash);
 	        this.magic = source["magic"];
 	        this.nAddresses = source["nAddresses"];
 	        this.nAppearances = source["nAppearances"];
 	        this.range = source["range"];
 	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
-	        this.size = source["size"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1528,6 +1530,8 @@ export namespace types {
 	    chain?: string;
 	    address?: string;
 	    period?: string;
+	    format?: string;
+	    projectPath?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Payload(source);
@@ -1540,6 +1544,8 @@ export namespace types {
 	        this.chain = source["chain"];
 	        this.address = source["address"];
 	        this.period = source["period"];
+	        this.format = source["format"];
+	        this.projectPath = source["projectPath"];
 	    }
 	}
 	export class ProjectPayload {

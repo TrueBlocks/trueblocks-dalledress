@@ -16,22 +16,16 @@ func (a *App) NameFromAddress(address string) (*names.Name, bool) {
 
 // CancelFetch cancels an active data fetch operation for a specific data facet
 func (a *App) CancelFetch(dataFacet types.DataFacet) {
-	storeName := ""
-
 	for _, collection := range a.collections {
-		for _, facet := range collection.GetSupportedFacets() {
+		supportedFacets := collection.GetSupportedFacets()
+		for _, facet := range supportedFacets {
 			if facet == dataFacet {
-				storeName = collection.GetStoreName(facet)
-				break
+				// TODO: BOGUS - this does not reset export which requires chain and address to find the collection
+				storeName := collection.GetStoreName(facet, "", "")
+				store.CancelFetch(storeName)
+				return
 			}
 		}
-		if storeName != "" {
-			break
-		}
-	}
-
-	if storeName != "" {
-		store.CancelFetch(storeName)
 	}
 }
 
@@ -44,7 +38,8 @@ func (a *App) CancelAllFetches() int {
 func (a *App) ResetStore(storeName string) {
 	for _, collection := range a.collections {
 		for _, facet := range collection.GetSupportedFacets() {
-			if collection.GetStoreName(facet) == storeName {
+			// TODO: BOGUS - this does not reset export which requires chain and address to find the collection
+			if collection.GetStoreName(facet, "", "") == storeName {
 				collection.Reset(facet)
 			}
 		}

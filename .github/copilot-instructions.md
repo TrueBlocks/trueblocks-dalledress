@@ -25,6 +25,7 @@ This is a **Wails desktop application** with Go backend (`app/`) and React front
 - **Use `wails generate module`** to regenerate bindings after changes to the backend go code.
 - **Always run the linter** from the root of the project with `yarn lint`.
 - **Run linting, testing, and building** together with one command `yarn lint && yarn test && yarn start`. If any fail, stop and do not try to fix it. The developer will fix and provide guidance.
+- **Removing files**: If you delete a file, use `rm -f` and ask for confirmation before proceeding. If you need to delete a folder, use `rm -R` (do not include the `-f` flag). Again, Ask for confirmation before proceeding.
 
 ### Code Patterns
 - **Use existing patterns**: BaseTab, Table components, DataFacet enums, Collection/Store/Page architecture

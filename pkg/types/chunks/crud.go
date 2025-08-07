@@ -1,8 +1,9 @@
 package chunks
 
 import (
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 )
 
 // Crud implements CRUD operations for chunks - placeholder implementation

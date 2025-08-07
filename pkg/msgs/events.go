@@ -77,6 +77,7 @@ import (
 	"sync"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 

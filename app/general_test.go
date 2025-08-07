@@ -8,6 +8,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
+
 	"github.com/stretchr/testify/assert"
 )
 

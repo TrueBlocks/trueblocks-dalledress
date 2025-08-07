@@ -14,7 +14,6 @@ import (
 	"time"
 
 	// EXISTING_CODE
-
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"

@@ -1,3 +1,0 @@
-[submodule "dalle"]
-	path = dalle
-	url = git@github.com:TrueBlocks/trueblocks-dalle.git

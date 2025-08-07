@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -62,6 +63,10 @@ func (c *MonitorsCollection) GetPage(
 	}
 	filter = strings.ToLower(filter)
 
+	if c.shouldSummarize(payload) {
+		return c.getSummaryPage(dataFacet, payload.Period, first, pageSize, sortSpec, filter)
+	}
+
 	switch dataFacet {
 	case MonitorsMonitors:
 		facet := c.monitorsFacet
@@ -88,6 +93,55 @@ func (c *MonitorsCollection) GetPage(
 	}
 
 	return page, nil
+}
+
+// shouldSummarize returns true if the current facet can be simmarized by period
+func (c *MonitorsCollection) shouldSummarize(payload *types.Payload) bool {
+	if !payload.ShouldSummarize() {
+		return false
+	}
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return false
+}
+
+// getSummaryPage returns paginated summary data for a given period
+func (c *MonitorsCollection) getSummaryPage(
+	dataFacet types.DataFacet,
+	period string,
+	first, pageSize int,
+	sortSpec sdk.SortSpec,
+	filter string,
+) (types.Page, error) {
+	// CRITICAL: Ensure underlying raw data is loaded before generating summaries
+	// For summary periods, we need the blockly (raw) data to be loaded first
+	c.LoadData(dataFacet)
+	if err := c.generateSummariesForPeriod(dataFacet, period); err != nil {
+		return nil, types.NewStoreError("exports", dataFacet, "getSummaryPage", err)
+	}
+
+	page := &MonitorsPage{
+		Facet: dataFacet,
+	}
+	logging.LogBackend(string(page.Facet))
+
+	switch dataFacet {
+	// EXISTING_CODE
+	// EXISTING_CODE
+	default:
+		return nil, types.NewValidationError("monitors", dataFacet, "getSummaryPage",
+			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
+	}
+}
+
+// generateSummariesForPeriod ensures summaries are generated for the given period
+func (c *MonitorsCollection) generateSummariesForPeriod(dataFacet types.DataFacet, period string) error {
+	switch dataFacet {
+	// EXISTING_CODE
+	// EXISTING_CODE
+	default:
+		return fmt.Errorf("unsupported dataFacet for summary generation: %v", dataFacet)
+	}
 }
 
 // EXISTING_CODE

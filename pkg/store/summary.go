@@ -35,7 +35,7 @@ func (sm *SummaryManager[T]) Add(items []*T, period string) {
 
 	for _, item := range items {
 		timestamp := extractTimestampFromItem(item)
-		normalizedTime := normalizeToPeriod(timestamp, period)
+		normalizedTime := NormalizeToPeriod(timestamp, period)
 		key := SummaryKey{Timestamp: normalizedTime, Period: period, AssetAddr: ""} // Empty asset for regular Add
 		sm.summaries[key] = append(sm.summaries[key], item)
 	}
@@ -49,7 +49,7 @@ func (sm *SummaryManager[T]) AddBalance(item *T, period string) {
 
 	timestamp := extractTimestampFromItem(item)
 	assetAddr := extractAssetAddressFromItem(item)
-	normalizedTime := normalizeToPeriod(timestamp, period)
+	normalizedTime := NormalizeToPeriod(timestamp, period)
 	key := SummaryKey{Timestamp: normalizedTime, Period: period, AssetAddr: assetAddr}
 	// For balances, we replace any existing balance for this timestamp/period/asset combination
 	// instead of accumulating them (since we want the latest balance per period per asset)
@@ -79,8 +79,8 @@ func (sm *SummaryManager[T]) Reset() {
 	sm.summaries = make(map[SummaryKey][]*T)
 }
 
-// normalizeToPeriod normalizes a timestamp to the start of the given period
-func normalizeToPeriod(timestamp int64, period string) int64 {
+// NormalizeToPeriod normalizes a timestamp to the start of the given period
+func NormalizeToPeriod(timestamp int64, period string) int64 {
 	t := time.Unix(timestamp, 0).UTC()
 
 	switch period {

@@ -21,6 +21,10 @@ type Payload struct {
 	ProjectPath string    `json:"projectPath,omitempty"`
 }
 
+func (p *Payload) ShouldSummarize() bool {
+	return p.Period != PeriodBlockly
+}
+
 type DataLoadedPayload struct {
 	Payload
 	CurrentCount  int       `json:"currentCount"`

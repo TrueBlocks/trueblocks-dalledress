@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { Action, ConfirmModal, ExportFormatModal } from '@components';
+import { Action } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
@@ -20,12 +20,7 @@ import {
   useEvent,
   usePayload,
 } from '@hooks';
-import {
-  ActionType,
-  useActionMsgs,
-  useActions,
-  useSilencedDialog,
-} from '@hooks';
+import { useActions } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
@@ -184,7 +179,7 @@ export const Names = () => {
     }
     return actions;
   }, [getCurrentDataFacet]);
-  const { handlers, config, exportFormatModal } = useActions({
+  const { handlers, config } = useActions({
     collection: 'names',
     viewStateKey,
     pagination,
@@ -375,11 +370,6 @@ export const Names = () => {
         title={confirmModal.title}
         message={confirmModal.message}
         dialogKey="confirmNamesModal"
-      />
-      <ExportFormatModal
-        opened={exportFormatModal.opened}
-        onClose={exportFormatModal.onClose}
-        onFormatSelected={exportFormatModal.onFormatSelected}
       />
     </div>
   );

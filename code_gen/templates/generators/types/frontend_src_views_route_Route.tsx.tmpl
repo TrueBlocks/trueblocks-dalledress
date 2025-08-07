@@ -1,4 +1,6 @@
 {{- $class := .Class -}}
+{{/* TODO: remove this */}}
+{{- if ne $class "Contracts" -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
 
@@ -447,3 +449,4 @@ export const {{$class}} = () => {
 
 // EXISTING_CODE
 // EXISTING_CODE
+{{- end -}}

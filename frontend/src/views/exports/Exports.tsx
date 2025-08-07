@@ -10,20 +10,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { Action, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
-  ActionType,
   DataFacetConfig,
   toPageDataProp,
-  useActions,
   useActiveFacet,
   useColumns,
   useEvent,
   usePayload,
 } from '@hooks';
 import { TabView } from '@layout';
-import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { exports } from '@models';
 import { msgs, project, types } from '@models';
@@ -147,61 +143,6 @@ export const Exports = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: Actions Configuration ===
-  const enabledActions = useMemo(() => {
-    // Auto-enable Export for all DataTable views that are not forms
-    return ['export'] as ActionType[];
-  }, []);
-
-  const { handlers, config, exportFormatModal } = useActions({
-    collection: 'exports',
-    viewStateKey,
-    pagination,
-    goToPage: () => {}, // Exports typically don't have pagination navigation
-    sort,
-    filter,
-    enabledActions,
-    pageData,
-    setPageData,
-    setTotalItems,
-    crudFunc: () => Promise.resolve(), // Exports don't have CRUD operations
-    pageFunc: GetExportsPage,
-    pageClass: exports.ExportsPage,
-    updateItem: undefined,
-    createPayload,
-    getCurrentDataFacet,
-  });
-
-  const headerActions = useMemo(() => {
-    if (!config.headerActions?.length) return null;
-    return (
-      <Group gap="xs" style={{ flexShrink: 0 }}>
-        {config.headerActions.map((action) => {
-          const handlerKey =
-            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
-          const handler = handlers[handlerKey] as () => void;
-          return (
-            <Action
-              key={action.type}
-              icon={
-                action.icon as keyof ReturnType<
-                  typeof import('@hooks').useIconSets
-                >
-              }
-              onClick={handler}
-              title={
-                action.requiresWallet && !config.isWalletConnected
-                  ? `${action.title} (requires wallet connection)`
-                  : action.title
-              }
-              size="sm"
-            />
-          );
-        })}
-      </Group>
-    );
-  }, [config.headerActions, config.isWalletConnected, handlers]);
-
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
@@ -223,17 +164,10 @@ export const Exports = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        headerActions={headerActions}
+        headerActions={[]}
       />
     );
-  }, [
-    currentData,
-    currentColumns,
-    pageData?.isFetching,
-    error,
-    viewStateKey,
-    headerActions,
-  ]);
+  }, [currentData, currentColumns, pageData?.isFetching, error, viewStateKey]);
 
   const tabs = useMemo(
     () =>
@@ -261,11 +195,6 @@ export const Exports = () => {
         rowActions={[]}
         headerActions={[]}
         count={++renderCnt.current}
-      />
-      <ExportFormatModal
-        opened={exportFormatModal.opened}
-        onClose={exportFormatModal.onClose}
-        onFormatSelected={exportFormatModal.onFormatSelected}
       />
     </div>
   );

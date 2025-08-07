@@ -9,7 +9,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetExportsPage, Reload } from '@app';
-import { Action, BaseTab, ExportFormatModal, usePagination } from '@components';
+import { BaseTab, usePagination } from '@components';
+import { Action, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
   ActionType,
@@ -59,17 +60,11 @@ export const Exports = () => {
   // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
-
-    const facet = getCurrentDataFacet();
-    const payload = createPayload(facet);
-    const currentPage = pagination.currentPage * pagination.pageSize;
-    const pageSize = pagination.pageSize;
-
     try {
       const result = await GetExportsPage(
-        payload,
-        currentPage,
-        pageSize,
+        createPayload(getCurrentDataFacet()),
+        pagination.currentPage * pagination.pageSize,
+        pagination.pageSize,
         sort,
         filter,
       );

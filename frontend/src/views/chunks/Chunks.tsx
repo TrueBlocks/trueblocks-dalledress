@@ -111,14 +111,10 @@ export const Chunks = () => {
     },
   );
 
-  useEvent(msgs.EventType.MANAGER, (message: string) => {
-    if (
-      message === 'active_address_changed' ||
-      message === 'active_chain_changed'
-    ) {
-      fetchData();
-    }
-  });
+  // Listen for active address/chain/period changes to refresh data
+  useEvent(msgs.EventType.ADDRESS_CHANGED, fetchData);
+  useEvent(msgs.EventType.CHAIN_CHANGED, fetchData);
+  useEvent(msgs.EventType.PERIOD_CHANGED, fetchData);
 
   useEffect(() => {
     fetchData();

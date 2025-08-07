@@ -14,6 +14,10 @@ export function Crud(arg1, arg2, arg3) {
   return window['go']['monitors']['MonitorsCollection']['Crud'](arg1, arg2, arg3);
 }
 
+export function ExportData(arg1) {
+  return window['go']['monitors']['MonitorsCollection']['ExportData'](arg1);
+}
+
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['monitors']['MonitorsCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

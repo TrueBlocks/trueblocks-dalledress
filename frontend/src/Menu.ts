@@ -125,8 +125,8 @@ export const MenuItems: MenuItem[] = [
     path: '/projects',
     position: 'bottom',
     component: Projects,
-    hotkey: 'mod+shift+0',
-    altHotkey: 'alt+shift+0',
+    hotkey: 'mod+shift+1',
+    altHotkey: 'alt+shift+1',
     type: 'navigation',
   },
   {
@@ -134,8 +134,8 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+shift+1',
-    altHotkey: 'alt+shift+1',
+    hotkey: 'mod+shift+2',
+    altHotkey: 'alt+shift+2',
     type: 'navigation',
   },
   {
@@ -143,8 +143,8 @@ export const MenuItems: MenuItem[] = [
     label: 'Wizard',
     position: 'hidden',
     component: Wizard,
-    hotkey: 'mod+shift+2',
-    altHotkey: 'alt+shift+2',
+    hotkey: 'mod+shift+3',
+    altHotkey: 'alt+shift+3',
     type: 'dev',
     action: async () => {
       await SetInitialized(false);

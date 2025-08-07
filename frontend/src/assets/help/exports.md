@@ -35,10 +35,12 @@ This is the help file for the Exports view.
   - source: Source
   - tags: Tags
 
-- **Balances Store (10 members)**
+- **Balances Store (12 members)**
 
-  - blockNumber: Block
-  - transactionIndex: Tx Index
+  - blockNumber: the number of the block
+  - transactionIndex: the zero-indexed position of the transaction in the block
+  - timestamp: the timestamp of the block this log appears in
+  - date: the timestamp as a date
   - holder: Holder
   - address: Token Address
   - symbol: Symbol

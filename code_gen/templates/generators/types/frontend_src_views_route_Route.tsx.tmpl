@@ -7,6 +7,7 @@
 {{/* Determine View Type */}}
 {{- $isReadOnly := or (or (eq $class "Chunks") (eq $class "Exports")) (eq $class "Status") -}}
 {{- $isNames := eq $class "Names" -}}
+{{- $isExports := eq $class "Exports" -}}
 {{- $isAbis := eq $class "Abis" -}}
 {{- $isMonitors := eq $class "Monitors" -}}
 {{- $isAction := or $isAbis $isMonitors -}}
@@ -16,6 +17,7 @@
 {{- $hasForms := .HasForms -}}
 {{- $hasDelete := contains .CrudStrs "delete" -}}
 {{- $cruds := replace .CrudStrs ", 'undelete'" "" -}}
+{{- $hasExport := or $hasCrud $isExports -}}
 
 {{/* Build API imports based on view type */}}
 {{- $apis := printf "Get%sPage, Reload" $class -}}
@@ -36,12 +38,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { {{$apis}} } from '@app';
 import { BaseTab, usePagination } from '@components';
 {{- if $hasCrud}}
-import { Action{{if $isNames}}, ConfirmModal{{end}} } from '@components';
+import { Action{{if $hasExport}}, ExportFormatModal{{if $isNames}}, ConfirmModal{{end}}{{end}} } from '@components';
 {{- end}}
 import { useFiltering, useSorting } from '@contexts';
 import { DataFacetConfig, toPageDataProp, useActiveFacet, useColumns, useEvent, usePayload } from '@hooks';
 {{- if $hasCrud}}
-import { {{if $isNames}}ActionType, useActionMsgs, {{end}}useActions{{if $isNames}}, useSilencedDialog{{end}} } from '@hooks';
+import { {{if $hasExport}}ActionType, useActionMsgs, {{end}}useActions{{if $hasExport}}, useSilencedDialog{{end}} } from '@hooks';
 {{- end}}
 import { {{if $hasForms}}FormView, {{end}}TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
@@ -151,6 +153,11 @@ export const {{$class}} = () => {
     },
   );
 
+  // Listen for active address/chain/period changes to refresh data
+  useEvent(msgs.EventType.ADDRESS_CHANGED, fetchData);
+  useEvent(msgs.EventType.CHAIN_CHANGED, fetchData);
+  useEvent(msgs.EventType.PERIOD_CHANGED, fetchData);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -174,13 +181,18 @@ export const {{$class}} = () => {
   {{if $isNames -}}
   const enabledActions = useMemo(() => {
     const currentFacet = getCurrentDataFacet();
+    let actions: ActionType[] = [];
     if (currentFacet === types.DataFacet.CUSTOM) {
-      return ['add', 'publish', 'pin', 'delete', 'remove', 'autoname', 'update'] as ActionType[];
+      actions = ['add', 'publish', 'pin', 'delete', 'remove', 'autoname', 'update'];
+    } else if (currentFacet === types.DataFacet.BADDRESS) {
+      actions = ['add'];
+    } else {
+      actions = ['add', 'autoname', 'update'];
     }
-    if (currentFacet === types.DataFacet.BADDRESS) {
-      return ['add'] as ActionType[];
+    if (!actions.includes('export')) {
+      actions.push('export');
     }
-    return ['add', 'autoname', 'update'] as ActionType[];
+    return actions;
   }, [getCurrentDataFacet]);
   {{end -}}
 

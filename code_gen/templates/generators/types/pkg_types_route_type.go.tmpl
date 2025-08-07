@@ -3,6 +3,7 @@
 {{- $single := toSingular $class -}}
 {{- $isAbis := eq $class "Abis" -}}
 {{- $isMonitors := eq $class "Monitors" -}}
+{{- $isContracts := eq $class "Contracts" -}}
 {{- $isPtr := or $isAbis $isMonitors -}}
 // Copyright 2016, 2026 The TrueBlocks Authors. All rights reserved.
 // Use of this source code is governed by a license that can
@@ -159,6 +160,17 @@ func (c *{{$class}}Collection) ResetSummary() {
 		FacetCounts: make(map[types.DataFacet]int),
 		CustomData:  make(map[string]interface{}),
 		LastUpdated: time.Now().Unix(),
+	}
+}
+
+func (c *{{$class}}Collection) ExportData(payload *types.Payload) (string, error) {
+	switch payload.DataFacet {
+	{{- range .Facets}}
+	case {{$class}}{{.Name}}:
+		return c.{{toLower .Name}}Facet.ExportData{{if $isContracts}}Pointers{{end}}(payload, string({{$class}}{{.Name}}))
+	{{- end}}
+	default:
+		return "", fmt.Errorf("unsupported {{$lower}} facet: %s", payload.DataFacet)
 	}
 }
 

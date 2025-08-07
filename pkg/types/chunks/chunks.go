@@ -296,5 +296,20 @@ func (c *ChunksCollection) ResetSummary() {
 	}
 }
 
+func (c *ChunksCollection) ExportData(payload *types.Payload) (string, error) {
+	switch payload.DataFacet {
+	case ChunksStats:
+		return c.statsFacet.ExportData(payload, string(ChunksStats))
+	case ChunksIndex:
+		return c.indexFacet.ExportData(payload, string(ChunksIndex))
+	case ChunksBlooms:
+		return c.bloomsFacet.ExportData(payload, string(ChunksBlooms))
+	case ChunksManifest:
+		return c.manifestFacet.ExportData(payload, string(ChunksManifest))
+	default:
+		return "", fmt.Errorf("unsupported chunks facet: %s", payload.DataFacet)
+	}
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

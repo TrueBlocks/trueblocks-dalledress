@@ -245,5 +245,18 @@ func (c *StatusCollection) ResetSummary() {
 	}
 }
 
+func (c *StatusCollection) ExportData(payload *types.Payload) (string, error) {
+	switch payload.DataFacet {
+	case StatusStatus:
+		return c.statusFacet.ExportData(payload, string(StatusStatus))
+	case StatusCaches:
+		return c.cachesFacet.ExportData(payload, string(StatusCaches))
+	case StatusChains:
+		return c.chainsFacet.ExportData(payload, string(StatusChains))
+	default:
+		return "", fmt.Errorf("unsupported status facet: %s", payload.DataFacet)
+	}
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

@@ -10,6 +10,10 @@ export function Crud(arg1, arg2, arg3) {
   return window['go']['abis']['AbisCollection']['Crud'](arg1, arg2, arg3);
 }
 
+export function ExportData(arg1) {
+  return window['go']['abis']['AbisCollection']['ExportData'](arg1);
+}
+
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['abis']['AbisCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

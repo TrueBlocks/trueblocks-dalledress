@@ -12,10 +12,11 @@
 package app
 
 import (
-	{{- if .HasCruds}}"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
-	{{- end}}
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/{{$lower}}"
+	//
+	{{- if .HasCruds}}
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"{{end}}
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
     // EXISTING_CODE
     // EXISTING_CODE

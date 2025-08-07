@@ -9,8 +9,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
-import { BaseTab, ExportFormatModal, usePagination } from '@components';
-import { Action, ConfirmModal } from '@components';
+import { BaseTab, usePagination } from '@components';
+import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
@@ -138,14 +138,10 @@ export const Names = () => {
     },
   );
 
-  useEvent(msgs.EventType.MANAGER, (message: string) => {
-    if (
-      message === 'active_address_changed' ||
-      message === 'active_chain_changed'
-    ) {
-      fetchData();
-    }
-  });
+  // Listen for active address/chain/period changes to refresh data
+  useEvent(msgs.EventType.ADDRESS_CHANGED, fetchData);
+  useEvent(msgs.EventType.CHAIN_CHANGED, fetchData);
+  useEvent(msgs.EventType.PERIOD_CHANGED, fetchData);
 
   useEffect(() => {
     fetchData();
@@ -168,7 +164,6 @@ export const Names = () => {
   const enabledActions = useMemo(() => {
     const currentFacet = getCurrentDataFacet();
     let actions: ActionType[] = [];
-
     if (currentFacet === types.DataFacet.CUSTOM) {
       actions = [
         'add',
@@ -184,12 +179,10 @@ export const Names = () => {
     } else {
       actions = ['add', 'autoname', 'update'];
     }
-
     if (!actions.includes('export')) {
       actions.push('export');
     }
-
-    return actions as ActionType[];
+    return actions;
   }, [getCurrentDataFacet]);
   const { handlers, config, exportFormatModal } = useActions({
     collection: 'names',

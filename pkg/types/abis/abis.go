@@ -305,5 +305,20 @@ func (c *AbisCollection) ResetSummary() {
 	}
 }
 
+func (c *AbisCollection) ExportData(payload *types.Payload) (string, error) {
+	switch payload.DataFacet {
+	case AbisDownloaded:
+		return c.downloadedFacet.ExportData(payload, string(AbisDownloaded))
+	case AbisKnown:
+		return c.knownFacet.ExportData(payload, string(AbisKnown))
+	case AbisFunctions:
+		return c.functionsFacet.ExportData(payload, string(AbisFunctions))
+	case AbisEvents:
+		return c.eventsFacet.ExportData(payload, string(AbisEvents))
+	default:
+		return "", fmt.Errorf("unsupported abis facet: %s", payload.DataFacet)
+	}
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

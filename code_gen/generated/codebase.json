@@ -437,77 +437,95 @@
                     "members": [
                         {
                             "name": "blockNumber",
-                            "type": "int64",
+                            "type": "blknum",
+                            "attributes": "noui",
                             "docOrder": 1,
-                            "description": "Block",
+                            "description": "the number of the block",
                             "num": 1
                         },
                         {
                             "name": "transactionIndex",
-                            "type": "int64",
+                            "type": "txnum",
+                            "attributes": "noui",
                             "docOrder": 2,
-                            "description": "Tx Index",
+                            "description": "the zero-indexed position of the transaction in the block",
                             "num": 2
+                        },
+                        {
+                            "name": "timestamp",
+                            "type": "timestamp",
+                            "attributes": "noui",
+                            "docOrder": 3,
+                            "description": "the timestamp of the block this log appears in",
+                            "num": 3
+                        },
+                        {
+                            "name": "date",
+                            "type": "datetime",
+                            "attributes": "calc",
+                            "docOrder": 4,
+                            "description": "the timestamp as a date",
+                            "num": 4
                         },
                         {
                             "name": "holder",
                             "type": "address",
                             "attributes": "readOnly",
-                            "docOrder": 3,
+                            "docOrder": 5,
                             "description": "Holder",
-                            "num": 3
+                            "num": 5
                         },
                         {
                             "name": "address",
                             "type": "address",
                             "attributes": "readOnly",
-                            "docOrder": 4,
+                            "docOrder": 6,
                             "description": "Token Address",
-                            "num": 4
+                            "num": 6
                         },
                         {
                             "name": "symbol",
                             "type": "string",
-                            "docOrder": 5,
+                            "docOrder": 7,
                             "description": "Symbol",
-                            "num": 5
+                            "num": 7
                         },
                         {
                             "name": "name",
                             "type": "string",
-                            "docOrder": 6,
+                            "docOrder": 8,
                             "description": "Token Name",
-                            "num": 6
+                            "num": 8
                         },
                         {
                             "name": "balance",
                             "type": "ether",
-                            "docOrder": 7,
+                            "docOrder": 9,
                             "description": "Balance",
-                            "num": 7
+                            "num": 9
                         },
                         {
                             "name": "priorBalance",
                             "type": "ether",
                             "attributes": "calc",
-                            "docOrder": 8,
+                            "docOrder": 10,
                             "description": "Prior Balance",
-                            "num": 8
+                            "num": 10
                         },
                         {
                             "name": "decimals",
                             "type": "int64",
-                            "docOrder": 9,
+                            "docOrder": 11,
                             "description": "Decimals",
-                            "num": 9
+                            "num": 11
                         },
                         {
                             "name": "actions",
                             "type": "string",
                             "attributes": "width=120px",
-                            "docOrder": 10,
+                            "docOrder": 12,
                             "description": "Actions",
-                            "num": 10
+                            "num": 12
                         }
                     ]
                 },
@@ -3134,77 +3152,95 @@
             "members": [
                 {
                     "name": "blockNumber",
-                    "type": "int64",
+                    "type": "blknum",
+                    "attributes": "noui",
                     "docOrder": 1,
-                    "description": "Block",
+                    "description": "the number of the block",
                     "num": 1
                 },
                 {
                     "name": "transactionIndex",
-                    "type": "int64",
+                    "type": "txnum",
+                    "attributes": "noui",
                     "docOrder": 2,
-                    "description": "Tx Index",
+                    "description": "the zero-indexed position of the transaction in the block",
                     "num": 2
+                },
+                {
+                    "name": "timestamp",
+                    "type": "timestamp",
+                    "attributes": "noui",
+                    "docOrder": 3,
+                    "description": "the timestamp of the block this log appears in",
+                    "num": 3
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "attributes": "calc",
+                    "docOrder": 4,
+                    "description": "the timestamp as a date",
+                    "num": 4
                 },
                 {
                     "name": "holder",
                     "type": "address",
                     "attributes": "readOnly",
-                    "docOrder": 3,
+                    "docOrder": 5,
                     "description": "Holder",
-                    "num": 3
+                    "num": 5
                 },
                 {
                     "name": "address",
                     "type": "address",
                     "attributes": "readOnly",
-                    "docOrder": 4,
+                    "docOrder": 6,
                     "description": "Token Address",
-                    "num": 4
+                    "num": 6
                 },
                 {
                     "name": "symbol",
                     "type": "string",
-                    "docOrder": 5,
+                    "docOrder": 7,
                     "description": "Symbol",
-                    "num": 5
+                    "num": 7
                 },
                 {
                     "name": "name",
                     "type": "string",
-                    "docOrder": 6,
+                    "docOrder": 8,
                     "description": "Token Name",
-                    "num": 6
+                    "num": 8
                 },
                 {
                     "name": "balance",
                     "type": "ether",
-                    "docOrder": 7,
+                    "docOrder": 9,
                     "description": "Balance",
-                    "num": 7
+                    "num": 9
                 },
                 {
                     "name": "priorBalance",
                     "type": "ether",
                     "attributes": "calc",
-                    "docOrder": 8,
+                    "docOrder": 10,
                     "description": "Prior Balance",
-                    "num": 8
+                    "num": 10
                 },
                 {
                     "name": "decimals",
                     "type": "int64",
-                    "docOrder": 9,
+                    "docOrder": 11,
                     "description": "Decimals",
-                    "num": 9
+                    "num": 11
                 },
                 {
                     "name": "actions",
                     "type": "string",
                     "attributes": "width=120px",
-                    "docOrder": 10,
+                    "docOrder": 12,
                     "description": "Actions",
-                    "num": 10
+                    "num": 12
                 }
             ]
         },

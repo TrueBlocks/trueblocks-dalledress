@@ -8,6 +8,7 @@
 export { Home } from './home';
 export { DalleDress } from './DalleDress';
 export { Khedra } from './Khedra';
+export { Projects } from './projects/Projects';
 export * from './settings';
 {{range .Structures -}}
   {{- if and (not .DisableGo) (ne .Class "") }}

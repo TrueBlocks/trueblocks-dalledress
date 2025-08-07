@@ -310,8 +310,6 @@ func (c *ExportsCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
 	case ExportsStatements:
 		c.statementsFacet.GetStore().Reset()
-		// Also reset balances since they depend on statements
-		c.balancesFacet.GetStore().Reset()
 	case ExportsBalances:
 		c.balancesFacet.GetStore().Reset()
 	case ExportsTransfers:
@@ -338,7 +336,7 @@ func (c *ExportsCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	case ExportsStatements:
 		return c.statementsFacet.NeedsUpdate()
 	case ExportsBalances:
-		return c.balancesFacet.NeedsUpdate() || c.statementsFacet.NeedsUpdate()
+		return c.balancesFacet.NeedsUpdate()
 	case ExportsTransfers:
 		return c.transfersFacet.NeedsUpdate()
 	case ExportsTransactions:

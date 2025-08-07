@@ -185,5 +185,14 @@ func (c *MonitorsCollection) ResetSummary() {
 	}
 }
 
+func (c *MonitorsCollection) ExportData(payload *types.Payload) (string, error) {
+	switch payload.DataFacet {
+	case MonitorsMonitors:
+		return c.monitorsFacet.ExportData(payload, string(MonitorsMonitors))
+	default:
+		return "", fmt.Errorf("unsupported monitors facet: %s", payload.DataFacet)
+	}
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

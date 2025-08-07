@@ -14,10 +14,10 @@ import (
 	"time"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	// EXISTING_CODE
 )
 
@@ -91,6 +91,7 @@ func (c *ExportsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
 		} else {
+
 			page.Statements, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
@@ -109,6 +110,7 @@ func (c *ExportsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
 		} else {
+
 			page.Balances, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
@@ -184,6 +186,7 @@ func (c *ExportsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
 		} else {
+
 			page.Assets, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
@@ -249,6 +252,7 @@ func (c *ExportsCollection) GetPage(
 		return nil, types.NewValidationError("exports", dataFacet, "GetPage",
 			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
 	}
+
 	return page, nil
 }
 

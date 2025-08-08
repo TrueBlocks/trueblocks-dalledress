@@ -7,9 +7,8 @@
  */
 import { FormField } from '@components';
 import { types } from '@models';
-
 // EXISTING_CODE
-import { formatWeiToEther, formatWeiToGigawei } from '../../utils/ether';
+import { formatWeiToEther, formatWeiToGigawei } from '@utils';
 
 // EXISTING_CODE
 

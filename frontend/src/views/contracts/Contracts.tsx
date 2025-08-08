@@ -39,9 +39,11 @@ import {
   getDisplayAddress,
   useErrorHandler,
 } from '@utils';
+import { getDetailPanel } from '@views';
 
 import { getColumns } from './columns';
 import { ContractDashboard, ContractExecute } from './components';
+import { contractsDetailPanels } from './detailPanels';
 import { contractsFacets } from './facets';
 
 // Tiny component for consistent facet titles
@@ -304,6 +306,11 @@ export const Contracts = () => {
               error={error}
               viewStateKey={viewStateKey}
               headerActions={[]}
+              detailPanel={getDetailPanel(
+                ROUTE,
+                getCurrentDataFacet(),
+                contractsDetailPanels,
+              )}
             />
           </Stack>
         </div>
@@ -318,6 +325,11 @@ export const Contracts = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={[]}
+        detailPanel={getDetailPanel(
+          ROUTE,
+          getCurrentDataFacet(),
+          contractsDetailPanels,
+        )}
       />
     );
   }, [

@@ -24,8 +24,10 @@ import { useHotkeys } from '@mantine/hooks';
 import { status } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
+import { getDetailPanel } from '@views';
 
 import { getColumns } from './columns';
+import { statusDetailPanels } from './detailPanels';
 import { statusFacets } from './facets';
 
 export const ROUTE = 'status' as const;
@@ -200,6 +202,11 @@ export const Status = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={[]}
+        detailPanel={getDetailPanel(
+          ROUTE,
+          getCurrentDataFacet(),
+          statusDetailPanels,
+        )}
       />
     );
   }, [

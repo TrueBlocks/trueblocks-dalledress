@@ -9,7 +9,6 @@ export { Home } from './home';
 export { DalleDress } from './DalleDress';
 export { Khedra } from './Khedra';
 export { Projects } from './projects/Projects';
-export * from './settings';
 
 export { Exports } from './exports';
 export { Monitors } from './monitors';
@@ -18,3 +17,6 @@ export { Names } from './names';
 export { Chunks } from './chunks';
 export { Contracts } from './contracts';
 export { Status } from './status';
+
+export * from './settings';
+export * from './utils';

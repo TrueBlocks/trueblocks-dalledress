@@ -24,8 +24,10 @@ import { useHotkeys } from '@mantine/hooks';
 import { chunks } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
+import { getDetailPanel } from '@views';
 
 import { getColumns } from './columns';
+import { chunksDetailPanels } from './detailPanels';
 import { chunksFacets } from './facets';
 
 export const ROUTE = 'chunks' as const;
@@ -202,6 +204,11 @@ export const Chunks = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={[]}
+        detailPanel={getDetailPanel(
+          ROUTE,
+          getCurrentDataFacet(),
+          chunksDetailPanels,
+        )}
       />
     );
   }, [

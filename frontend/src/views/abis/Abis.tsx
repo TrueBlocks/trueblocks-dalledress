@@ -27,8 +27,10 @@ import { useHotkeys } from '@mantine/hooks';
 import { abis } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
+import { getDetailPanel } from '@views';
 
 import { getColumns } from './columns';
+import { abisDetailPanels } from './detailPanels';
 import { abisFacets } from './facets';
 
 export const ROUTE = 'abis' as const;
@@ -216,6 +218,11 @@ export const Abis = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={headerActions}
+        detailPanel={getDetailPanel(
+          ROUTE,
+          getCurrentDataFacet(),
+          abisDetailPanels,
+        )}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
       />
     );
@@ -226,6 +233,7 @@ export const Abis = () => {
     error,
     viewStateKey,
     headerActions,
+    getCurrentDataFacet,
     handleRemove,
   ]);
 

@@ -36,7 +36,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   >;
   onModalOpen?: (openModal: (data: T) => void) => void;
   headerActions?: React.ReactNode;
-  detailPanel?: (rowData: T | null) => React.ReactNode;
+  detailPanel: (rowData: T | null) => React.ReactNode;
 }
 
 export const Table = <T extends Record<string, unknown>>({

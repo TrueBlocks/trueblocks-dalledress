@@ -32,8 +32,10 @@ import { useHotkeys } from '@mantine/hooks';
 import { names } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
+import { getDetailPanel } from '@views';
 
 import { getColumns } from './columns';
+import { namesDetailPanels } from './detailPanels';
 import { namesFacets } from './facets';
 
 export const ROUTE = 'names' as const;
@@ -320,6 +322,11 @@ export const Names = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={headerActions}
+        detailPanel={getDetailPanel(
+          ROUTE,
+          getCurrentDataFacet(),
+          namesDetailPanels,
+        )}
         onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
         onAutoname={(rowData) => handleAutoname(String(rowData.address || ''))}
@@ -333,6 +340,7 @@ export const Names = () => {
     error,
     viewStateKey,
     headerActions,
+    getCurrentDataFacet,
     handleToggle,
     handleRemove,
     handleAutoname,

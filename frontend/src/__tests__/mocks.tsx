@@ -3,9 +3,8 @@ import type { ReactElement, ReactNode } from 'react';
 import { MantineProvider } from '@mantine/core';
 import { render } from '@testing-library/react';
 import type { RenderOptions } from '@testing-library/react';
+import type { RegisterHotkeyOptions } from '@utils';
 import { vi } from 'vitest';
-
-import type { RegisterHotkeyOptions } from '../utils/registerHotkeys';
 
 // Type fallbacks for Wails bridge functions
 type AppBridgeFunctions = any;
@@ -362,10 +361,34 @@ export const mockUseFormHotkeys = vi.fn(); // Basic spy, can be configured if ne
 vi.mock('@components', async (importOriginal) => {
   try {
     const originalModule = await importOriginal();
+    const WizardForm = (props: any) => {
+      const { fields = [], onSubmit, submitText = 'Next' } = props || {};
+      return (
+        <div role="form">
+          {fields.map((f: any, index: number) => (
+            <input
+              key={String(f?.name ?? index)}
+              placeholder={f?.placeholder}
+              value={f?.value ?? ''}
+              onChange={f?.onChange}
+              onBlur={f?.onBlur}
+            />
+          ))}
+          <button
+            type="button"
+            onClick={() => onSubmit?.({ preventDefault: () => {} } as any)}
+          >
+            {submitText}
+          </button>
+          {props.children}
+        </div>
+      );
+    };
     return {
       ...(originalModule as any), // Spread other potential exports from @components
       useTableContext: mockUseTableContext,
       useFormHotkeys: mockUseFormHotkeys,
+      WizardForm: (originalModule as any).WizardForm || WizardForm,
       // Add commonly needed component mocks
       TableProvider: ({ children }: { children: React.ReactNode }) => (
         <div data-testid="mock-table-provider">{children}</div>
@@ -378,11 +401,35 @@ vi.mock('@components', async (importOriginal) => {
       FormField: vi.fn(),
     };
   } catch {
+    const WizardForm = (props: any) => {
+      const { fields = [], onSubmit, submitText = 'Next' } = props || {};
+      return (
+        <div role="form">
+          {fields.map((f: any, index: number) => (
+            <input
+              key={String(f?.name ?? index)}
+              placeholder={f?.placeholder}
+              value={f?.value ?? ''}
+              onChange={f?.onChange}
+              onBlur={f?.onBlur}
+            />
+          ))}
+          <button
+            type="button"
+            onClick={() => onSubmit?.({ preventDefault: () => {} } as any)}
+          >
+            {submitText}
+          </button>
+          {props.children}
+        </div>
+      );
+    };
     // If @components has no actual module (e.g., only types or if resolution fails during test setup)
     // return only the mocks. This can happen in some test environments or if path aliases are tricky.
     return {
       useTableContext: mockUseTableContext,
       useFormHotkeys: mockUseFormHotkeys,
+      WizardForm,
       TableProvider: ({ children }: { children: React.ReactNode }) => (
         <div data-testid="mock-table-provider">{children}</div>
       ),

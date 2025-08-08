@@ -13,10 +13,9 @@ import {
   SetProjectViewState,
 } from '@app';
 import { project, sdk, types } from '@models';
-import { Log } from '@utils';
+import { Log, createEmptySortSpec } from '@utils';
 
 import { viewStateKeyToString } from '.';
-import { createEmptySortSpec } from '../utils/sortSpec';
 
 const EMPTY_SORT = createEmptySortSpec();
 

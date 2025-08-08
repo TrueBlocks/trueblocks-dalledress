@@ -23,6 +23,9 @@ const mockViewStateKey: project.ViewStateKey = {
 };
 
 describe('BaseTab', () => {
+  const stubDetail: (
+    row: { id: string; name: string } | null,
+  ) => React.ReactNode = () => null;
   it('renders table with data', () => {
     const { container } = render(
       <BaseTab
@@ -31,6 +34,7 @@ describe('BaseTab', () => {
         loading={false}
         error={null}
         viewStateKey={mockViewStateKey}
+        detailPanel={stubDetail}
       />,
     );
 
@@ -46,6 +50,7 @@ describe('BaseTab', () => {
         loading={true}
         error={null}
         viewStateKey={mockViewStateKey}
+        detailPanel={stubDetail}
       />,
     );
 
@@ -61,6 +66,7 @@ describe('BaseTab', () => {
         loading={false}
         error={null}
         viewStateKey={mockViewStateKey}
+        detailPanel={stubDetail}
       />,
     );
 
@@ -87,6 +93,7 @@ describe('BaseTab', () => {
           loading={false}
           error={null}
           viewStateKey={allFacetKey}
+          detailPanel={stubDetail}
         />,
       );
 
@@ -103,6 +110,7 @@ describe('BaseTab', () => {
           loading={false}
           error={null}
           viewStateKey={customFacetKey}
+          detailPanel={stubDetail}
         />,
       );
 
@@ -135,6 +143,7 @@ describe('BaseTab', () => {
             loading={false}
             error={null}
             viewStateKey={key}
+            detailPanel={stubDetail}
           />,
         );
 
@@ -156,6 +165,7 @@ describe('BaseTab', () => {
           loading={false}
           error={null}
           viewStateKey={testKey}
+          detailPanel={stubDetail}
         />,
       );
 
@@ -202,6 +212,7 @@ describe('BaseTab', () => {
           error={null}
           viewStateKey={mockViewStateKey}
           onSubmit={mockOnSubmit}
+          detailPanel={stubDetail}
         />,
       );
 
@@ -220,6 +231,7 @@ describe('BaseTab', () => {
           loading={false}
           error={mockError}
           viewStateKey={mockViewStateKey}
+          detailPanel={stubDetail}
         />,
       );
 

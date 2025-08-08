@@ -59,15 +59,35 @@ const iconMocks = Object.fromEntries(
 );
 
 vi.mock('@utils', async (importOriginal) => {
-  const original = await importOriginal();
-  return {
-    ...(original as object),
-    Log: vi.fn(),
-    checkAndNavigateToWizard: () => Promise.resolve(null),
-    useEmitters: () => ({ emitStatus: vi.fn(), emitError: vi.fn() }),
-    isDebugMode: vi.fn(() => false),
-    useErrorHandler: vi.fn(() => vi.fn()),
-  };
+  try {
+    const original = await importOriginal();
+    return {
+      ...(original as object),
+      Log: vi.fn(),
+      checkAndNavigateToWizard: () => Promise.resolve(null),
+      useEmitters: () => ({ emitStatus: vi.fn(), emitError: vi.fn() }),
+      isDebugMode: vi.fn(() => false),
+      useErrorHandler: vi.fn(() => vi.fn()),
+      // Ensure createEmptySortSpec is available even if importOriginal fails to include it
+      createEmptySortSpec:
+        (original as any).createEmptySortSpec ||
+        (() => ({ fields: [], orders: [] })),
+      EMPTY_SORT_SPEC: (original as any).EMPTY_SORT_SPEC || {
+        fields: [],
+        orders: [],
+      },
+    };
+  } catch {
+    return {
+      Log: vi.fn(),
+      checkAndNavigateToWizard: () => Promise.resolve(null),
+      useEmitters: () => ({ emitStatus: vi.fn(), emitError: vi.fn() }),
+      isDebugMode: vi.fn(() => false),
+      useErrorHandler: vi.fn(() => vi.fn()),
+      createEmptySortSpec: () => ({ fields: [], orders: [] }),
+      EMPTY_SORT_SPEC: { fields: [], orders: [] },
+    } as Record<string, unknown>;
+  }
 });
 
 vi.mock('@hooks', async (importOriginal) => {

@@ -57,6 +57,7 @@ const defaultProps: TableProps<TestRow> = {
   loading: false,
   viewStateKey: mockViewStateKey,
   onSubmit: vi.fn(),
+  detailPanel: () => null,
 };
 
 const setupTest = (props: Partial<TableProps<TestRow>> = {}) => {

@@ -315,9 +315,11 @@ export const Table = <T extends Record<string, unknown>>({
               />
             )}
           </tbody>
-          <tfoot className={`table-footer ${getDebugClass(6)}`}>
-            <Stats namesLength={data.length} viewStateKey={viewStateKey} />
-          </tfoot>
+          <Stats
+            nRecords={data.length}
+            nCols={displayColumns.length}
+            viewStateKey={viewStateKey}
+          />
         </table>
 
         {!detailCollapsed && (

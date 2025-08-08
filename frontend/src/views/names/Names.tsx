@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetNamesPage, NamesCrud, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { Action } from '@components';
+import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
@@ -20,7 +20,12 @@ import {
   useEvent,
   usePayload,
 } from '@hooks';
-import { useActions } from '@hooks';
+import {
+  ActionType,
+  useActionMsgs,
+  useActions,
+  useSilencedDialog,
+} from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
@@ -179,7 +184,7 @@ export const Names = () => {
     }
     return actions;
   }, [getCurrentDataFacet]);
-  const { handlers, config } = useActions({
+  const { handlers, config, exportFormatModal } = useActions({
     collection: 'names',
     viewStateKey,
     pagination,
@@ -277,6 +282,7 @@ export const Names = () => {
                   ? `${action.title} (requires wallet connection)`
                   : action.title
               }
+              hotkey={action.type === 'export' ? 'mod+x' : undefined}
               size="sm"
             />
           );
@@ -370,6 +376,11 @@ export const Names = () => {
         title={confirmModal.title}
         message={confirmModal.message}
         dialogKey="confirmNamesModal"
+      />
+      <ExportFormatModal
+        opened={exportFormatModal.opened}
+        onClose={exportFormatModal.onClose}
+        onFormatSelected={exportFormatModal.onFormatSelected}
       />
     </div>
   );

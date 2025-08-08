@@ -147,7 +147,7 @@ describe('Table', () => {
       });
 
       const rows = screen.getAllByRole('row');
-      expect(rows.length).toBe(11);
+      expect(rows.length).toBe(12);
     });
 
     it('handles column with custom render function', () => {

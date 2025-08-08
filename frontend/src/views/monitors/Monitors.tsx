@@ -174,6 +174,7 @@ export const Monitors = () => {
                   ? `${action.title} (requires wallet connection)`
                   : action.title
               }
+              hotkey={action.type === 'export' ? 'mod+x' : undefined}
               size="sm"
             />
           );

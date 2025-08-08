@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { GetFormat, SetFormat, SilenceDialog } from '@app';
 import {
@@ -52,32 +52,48 @@ export const ExportFormatModal = ({
     }
   }, [opened]);
 
-  const handleFormatSelect = async (format: string) => {
-    Log(
-      `[EXPORT FORMAT MODAL] Format selected: ${format}, dontShowAgain: ${dontShowAgain}`,
-    );
+  const handleFormatSelect = useCallback(
+    async (format: string) => {
+      Log(
+        `[EXPORT FORMAT MODAL] Format selected: ${format}, dontShowAgain: ${dontShowAgain}`,
+      );
 
-    try {
-      // Save the selected format preference
-      await SetFormat(format);
-      Log(`[EXPORT FORMAT MODAL] Format preference saved: ${format}`);
+      try {
+        // Save the selected format preference
+        await SetFormat(format);
+        Log(`[EXPORT FORMAT MODAL] Format preference saved: ${format}`);
 
-      // If user chose "don't show again", silence the dialog
-      if (dontShowAgain) {
-        await SilenceDialog('exportFormat');
-        Log('[EXPORT FORMAT MODAL] Export format dialog silenced');
+        // If user chose "don't show again", silence the dialog
+        if (dontShowAgain) {
+          await SilenceDialog('exportFormat');
+          Log('[EXPORT FORMAT MODAL] Export format dialog silenced');
+        }
+
+        // Close modal and proceed with export
+        onClose();
+        onFormatSelected(format);
+      } catch (error) {
+        Log(`[EXPORT FORMAT MODAL] Error saving preferences: ${error}`);
+        // Still proceed with export even if preference saving fails
+        onClose();
+        onFormatSelected(format);
       }
+    },
+    [dontShowAgain, onClose, onFormatSelected],
+  );
 
-      // Close modal and proceed with export
-      onClose();
-      onFormatSelected(format);
-    } catch (error) {
-      Log(`[EXPORT FORMAT MODAL] Error saving preferences: ${error}`);
-      // Still proceed with export even if preference saving fails
-      onClose();
-      onFormatSelected(format);
-    }
-  };
+  // Handle Enter key to trigger export
+  useEffect(() => {
+    if (!opened || loading) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleFormatSelect(selectedFormat);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [opened, selectedFormat, loading, handleFormatSelect]);
 
   const handleCancel = () => {
     Log('[EXPORT FORMAT MODAL] Export cancelled by user');

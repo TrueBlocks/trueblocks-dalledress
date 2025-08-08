@@ -26,13 +26,42 @@ import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { monitors } from '@models';
 import { msgs, project, types } from '@models';
-import { Debugger, useErrorHandler } from '@utils';
+import { Debugger, getDisplayAddress, useErrorHandler } from '@utils';
 
 import { getColumns } from './columns';
 import { monitorsFacets } from './facets';
 
 export const ROUTE = 'monitors' as const;
 export const Monitors = () => {
+  // Custom detail panel for Monitor rows
+  const renderMonitorDetailPanel = (
+    rowData: Record<string, unknown> | null,
+  ) => {
+    if (!rowData) return null;
+    const monitor = rowData as unknown as types.Monitor;
+    return (
+      <div>
+        <h4>Monitor Details</h4>
+        <div>
+          <div>
+            <strong>Name:</strong> {monitor.name}
+          </div>
+          <div>
+            <strong>Address:</strong> {getDisplayAddress(monitor.address)}
+          </div>
+          <div>
+            <strong>Records:</strong> {monitor.nRecords}
+          </div>
+          <div>
+            <strong>File Size:</strong> {monitor.fileSize}
+          </div>
+          <div>
+            <strong>Last Scanned:</strong> {monitor.lastScanned}
+          </div>
+        </div>
+      </div>
+    );
+  };
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
@@ -213,6 +242,7 @@ export const Monitors = () => {
         headerActions={headerActions}
         onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
+        detailPanel={renderMonitorDetailPanel}
       />
     );
   }, [

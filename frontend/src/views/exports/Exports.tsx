@@ -30,11 +30,10 @@ import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 import { getDetailPanel } from '@views';
 
-import { getColumns } from './columns';
+import { ROUTE, getColumns } from './columns';
 import { exportsDetailPanels } from './detailPanels';
 import { exportsFacets } from './facets';
 
-export const ROUTE = 'exports' as const;
 export const Exports = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
@@ -86,33 +85,6 @@ export const Exports = () => {
     setTotalItems,
     handleError,
   ]);
-
-  const currentData = useMemo(() => {
-    if (!pageData) return [];
-    const facet = getCurrentDataFacet();
-    switch (facet) {
-      case types.DataFacet.STATEMENTS:
-        return pageData.statements || [];
-      case types.DataFacet.BALANCES:
-        return pageData.balances || [];
-      case types.DataFacet.TRANSFERS:
-        return pageData.transfers || [];
-      case types.DataFacet.TRANSACTIONS:
-        return pageData.transactions || [];
-      case types.DataFacet.WITHDRAWALS:
-        return pageData.withdrawals || [];
-      case types.DataFacet.ASSETS:
-        return pageData.assets || [];
-      case types.DataFacet.LOGS:
-        return pageData.logs || [];
-      case types.DataFacet.TRACES:
-        return pageData.traces || [];
-      case types.DataFacet.RECEIPTS:
-        return pageData.receipts || [];
-      default:
-        return [];
-    }
-  }, [pageData, getCurrentDataFacet]);
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -206,6 +178,33 @@ export const Exports = () => {
   }, [config.headerActions, config.isWalletConnected, handlers]);
 
   // === SECTION 6: UI Configuration ===
+  const currentData = useMemo(() => {
+    if (!pageData) return [];
+    const facet = getCurrentDataFacet();
+    switch (facet) {
+      case types.DataFacet.STATEMENTS:
+        return pageData.statements || [];
+      case types.DataFacet.BALANCES:
+        return pageData.balances || [];
+      case types.DataFacet.TRANSFERS:
+        return pageData.transfers || [];
+      case types.DataFacet.TRANSACTIONS:
+        return pageData.transactions || [];
+      case types.DataFacet.WITHDRAWALS:
+        return pageData.withdrawals || [];
+      case types.DataFacet.ASSETS:
+        return pageData.assets || [];
+      case types.DataFacet.LOGS:
+        return pageData.logs || [];
+      case types.DataFacet.TRACES:
+        return pageData.traces || [];
+      case types.DataFacet.RECEIPTS:
+        return pageData.receipts || [];
+      default:
+        return [];
+    }
+  }, [pageData, getCurrentDataFacet]);
+
   const currentColumns = useColumns(
     getColumns(getCurrentDataFacet()),
     {
@@ -218,8 +217,8 @@ export const Exports = () => {
     { rowActions: [] },
   );
 
-  const perTabContent = useMemo(() => {
-    return (
+  const perTabContent = useMemo(
+    () => (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
@@ -233,16 +232,17 @@ export const Exports = () => {
           exportsDetailPanels,
         )}
       />
-    );
-  }, [
-    currentData,
-    currentColumns,
-    pageData?.isFetching,
-    error,
-    viewStateKey,
-    headerActions,
-    getCurrentDataFacet,
-  ]);
+    ),
+    [
+      currentData,
+      currentColumns,
+      pageData?.isFetching,
+      error,
+      viewStateKey,
+      headerActions,
+      getCurrentDataFacet,
+    ],
+  );
 
   const tabs = useMemo(
     () =>

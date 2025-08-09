@@ -8,6 +8,8 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
+export const ROUTE = 'status' as const;
+
 // EXISTING_CODE
 // EXISTING_CODE
 

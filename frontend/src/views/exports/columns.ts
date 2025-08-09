@@ -7,9 +7,11 @@
  */
 import { FormField } from '@components';
 import { types } from '@models';
-// EXISTING_CODE
-import { formatWeiToEther, formatWeiToGigawei } from '@utils';
+import { displayHash, formatWeiToEther, formatWeiToGigawei } from '@utils';
 
+export const ROUTE = 'exports' as const;
+
+// EXISTING_CODE
 // EXISTING_CODE
 
 // Column configurations for the Exports data facets
@@ -1133,8 +1135,8 @@ export function renderDate(row: Record<string, unknown>) {
     if (blockNumber !== undefined) parts.push(`Block: ${blockNumber}`);
     if (transactionIndex !== undefined)
       parts.push(`TxIdx: ${transactionIndex}`);
-    if (transactionHash) parts.push(`Tx: ${transactionHash.slice(0, 10)}…`);
-    if (blockHash) parts.push(`BlkHash: ${blockHash.slice(0, 10)}…`);
+    if (transactionHash) parts.push(`Tx: ${displayHash(transactionHash)}`);
+    if (blockHash) parts.push(`BlkHash: ${displayHash(blockHash)}`);
     if (node) parts.push(`Node: ${node}`);
 
     return [dateStr, ...parts].join(' | ');

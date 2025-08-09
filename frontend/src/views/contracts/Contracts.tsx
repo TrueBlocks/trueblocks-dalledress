@@ -41,7 +41,7 @@ import {
 } from '@utils';
 import { getDetailPanel } from '@views';
 
-import { getColumns } from './columns';
+import { ROUTE, getColumns } from './columns';
 import { ContractDashboard, ContractExecute } from './components';
 import { contractsDetailPanels } from './detailPanels';
 import { contractsFacets } from './facets';
@@ -120,17 +120,13 @@ const FacetTitle: React.FC<FacetTitleProps> = ({
   );
 };
 
-export const ROUTE = 'contracts' as const;
 export const Contracts = () => {
-  // === SECTION 2: Contract Detail Detection ===
+  // === SECTION 2: Hook Initialization ===
   const { activeContract, setActiveContract } = useActiveProject();
-
-  // === SECTION 3: Contract Detail State ===
   const [contractAbi, setContractAbi] = useState<types.Contract | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
 
-  // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
   const activeFacetHook = useActiveFacet({
@@ -278,6 +274,9 @@ export const Contracts = () => {
   }, [clearError, getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
+
+  // === SECTION 5: CRUD Operations ===
+  // No CRUD operations for Contracts view
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(

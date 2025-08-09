@@ -34,11 +34,10 @@ import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 import { getDetailPanel } from '@views';
 
-import { getColumns } from './columns';
+import { ROUTE, getColumns } from './columns';
 import { namesDetailPanels } from './detailPanels';
 import { namesFacets } from './facets';
 
-export const ROUTE = 'names' as const;
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);

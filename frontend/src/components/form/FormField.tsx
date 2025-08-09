@@ -6,6 +6,19 @@ export interface FormField<T = Record<string, unknown>> {
   header?: string;
   value?: string | number | boolean;
   label?: string;
+  section?: string;
+  showInDetail?: boolean;
+  detailLabel?: string;
+  detailOrder?: number;
+  detailOnly?: boolean;
+  detailFormat?:
+    | 'hash'
+    | 'address'
+    | 'bytes'
+    | 'json'
+    | 'ether'
+    | 'gas'
+    | 'value';
   placeholder?: string;
   required?: boolean;
   error?: string;

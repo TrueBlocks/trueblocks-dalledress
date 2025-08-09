@@ -22,3 +22,4 @@ export * from './WalletConnectButton';
 export * from './form';
 export * from './table';
 export * from './utils';
+export * from './detail';

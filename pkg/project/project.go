@@ -247,7 +247,8 @@ func (p *Project) GetContracts() []string {
 // ------------------------------------------------------------------------------------
 // GetActiveContract returns the currently selected contract
 func (p *Project) GetActiveContract() string {
-	return p.ActiveContract
+	// TODO: BOGUS Temporary hardcode - replace with dynamic selection
+	return "0x0c316b7042b419d07d343f2f4f5bd54ff731183d"
 }
 
 // ------------------------------------------------------------------------------------

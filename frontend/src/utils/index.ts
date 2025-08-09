@@ -11,3 +11,4 @@ export * from './registerHotkeys';
 export * from './wizardUtils';
 export * from './useErrorHandler';
 export * from './sortSpec';
+export * from './hashes';

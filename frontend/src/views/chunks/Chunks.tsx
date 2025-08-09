@@ -26,11 +26,10 @@ import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 import { getDetailPanel } from '@views';
 
-import { getColumns } from './columns';
+import { ROUTE, getColumns } from './columns';
 import { chunksDetailPanels } from './detailPanels';
 import { chunksFacets } from './facets';
 
-export const ROUTE = 'chunks' as const;
 export const Chunks = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
@@ -134,6 +133,9 @@ export const Chunks = () => {
   }, [clearError, getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
+
+  // === SECTION 5: CRUD Operations ===
+  // No CRUD operations for Chunks view
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(

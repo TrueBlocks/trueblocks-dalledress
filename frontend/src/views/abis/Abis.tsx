@@ -29,11 +29,10 @@ import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 import { getDetailPanel } from '@views';
 
-import { getColumns } from './columns';
+import { ROUTE, getColumns } from './columns';
 import { abisDetailPanels } from './detailPanels';
 import { abisFacets } from './facets';
 
-export const ROUTE = 'abis' as const;
 export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);

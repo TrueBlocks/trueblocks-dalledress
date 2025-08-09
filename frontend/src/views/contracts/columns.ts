@@ -7,6 +7,9 @@
  */
 import { FormField } from '@components';
 import { types } from '@models';
+import { displayHash } from '@utils';
+
+export const ROUTE = 'contracts' as const;
 
 // EXISTING_CODE
 // EXISTING_CODE
@@ -154,8 +157,8 @@ export function renderDate(row: Record<string, unknown>) {
     const parts: string[] = [];
     if (blockNumber !== undefined) parts.push(` ${blockNumber}`);
     if (transactionIndex !== undefined) parts.push(`${transactionIndex}`);
-    if (transactionHash) parts.push(`${transactionHash.slice(0, 10)}…`);
-    if (blockHash) parts.push(`${blockHash.slice(0, 10)}…`);
+    if (transactionHash) parts.push(`${displayHash(transactionHash)}`);
+    if (blockHash) parts.push(`${displayHash(blockHash)}`);
     if (node) parts.push(`${node}`);
     return [dateStr, ...parts].join(' | ');
     // EXISTING_CODE

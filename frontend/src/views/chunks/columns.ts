@@ -8,6 +8,8 @@
 import { FormField } from '@components';
 import { types } from '@models';
 
+export const ROUTE = 'chunks' as const;
+
 // EXISTING_CODE
 // EXISTING_CODE
 

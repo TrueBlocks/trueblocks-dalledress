@@ -27,13 +27,12 @@ import { useHotkeys } from '@mantine/hooks';
 import { monitors } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
-import { monitorsDetailPanels } from 'src/views/monitors/detailPanels';
+import { getDetailPanel } from '@views';
 
-import { getDetailPanel } from '../utils/detailPanel';
-import { getColumns } from './columns';
+import { ROUTE, getColumns } from './columns';
+import { monitorsDetailPanels } from './detailPanels';
 import { monitorsFacets } from './facets';
 
-export const ROUTE = 'monitors' as const;
 export const Monitors = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);

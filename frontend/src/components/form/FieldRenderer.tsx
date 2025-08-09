@@ -1,4 +1,4 @@
-import { ChangeEvent, forwardRef } from 'react';
+import { ChangeEvent, forwardRef, isValidElement } from 'react';
 
 import { FormField } from '@components';
 import { useActiveProject } from '@hooks';
@@ -63,6 +63,16 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
         displayValue = formatWeiToGigawei(field.value as string);
       } else {
         displayValue = field.value || 'N/A';
+      }
+
+      if (typeof displayValue === 'object') {
+        if (!isValidElement(displayValue)) {
+          try {
+            displayValue = JSON.stringify(displayValue);
+          } catch {
+            displayValue = String(displayValue);
+          }
+        }
       }
 
       if (tableCell) {

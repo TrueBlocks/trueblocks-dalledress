@@ -26,11 +26,10 @@ import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
 import { getDetailPanel } from '@views';
 
-import { getColumns } from './columns';
+import { ROUTE, getColumns } from './columns';
 import { statusDetailPanels } from './detailPanels';
 import { statusFacets } from './facets';
 
-export const ROUTE = 'status' as const;
 export const Status = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
@@ -132,6 +131,9 @@ export const Status = () => {
   }, [clearError, getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
+
+  // === SECTION 5: CRUD Operations ===
+  // No CRUD operations for Status view
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(

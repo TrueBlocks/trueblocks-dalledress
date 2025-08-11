@@ -141,7 +141,6 @@ func (c *{{.Class}}Collection) getSummaryPage(
 	page := &{{.Class}}Page{
 		Facet: dataFacet,
 	}
-	logging.LogBackend(string(page.Facet))
 
 	switch dataFacet {
 	// EXISTING_CODE

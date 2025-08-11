@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+
 	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
@@ -137,7 +137,7 @@ func (c *StatusCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	default:
 		return nil, types.NewValidationError("status", dataFacet, "GetPage",
-			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
+			fmt.Errorf("GetPage unsupported dataFacet: %v", dataFacet))
 	}
 
 	return page, nil
@@ -161,6 +161,11 @@ func (c *StatusCollection) getSummaryPage(
 	sortSpec sdk.SortSpec,
 	filter string,
 ) (types.Page, error) {
+	// TODO: Use these
+	_ = first
+	_ = pageSize
+	_ = sortSpec
+	_ = filter
 	// CRITICAL: Ensure underlying raw data is loaded before generating summaries
 	// For summary periods, we need the blockly (raw) data to be loaded first
 	c.LoadData(dataFacet)
@@ -168,22 +173,19 @@ func (c *StatusCollection) getSummaryPage(
 		return nil, types.NewStoreError("exports", dataFacet, "getSummaryPage", err)
 	}
 
-	page := &StatusPage{
-		Facet: dataFacet,
-	}
-	logging.LogBackend(string(page.Facet))
-
 	switch dataFacet {
 	// EXISTING_CODE
 	// EXISTING_CODE
 	default:
 		return nil, types.NewValidationError("status", dataFacet, "getSummaryPage",
-			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
+			fmt.Errorf("getSummaryPage unsupported dataFacet: %v", dataFacet))
 	}
 }
 
 // generateSummariesForPeriod ensures summaries are generated for the given period
 func (c *StatusCollection) generateSummariesForPeriod(dataFacet types.DataFacet, period string) error {
+	// TODO: Use this
+	_ = period
 	switch dataFacet {
 	// EXISTING_CODE
 	// EXISTING_CODE

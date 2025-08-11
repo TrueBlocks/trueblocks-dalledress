@@ -40,5 +40,11 @@ func (a *App) ReloadExports(payload *types.Payload) error {
 	return nil
 }
 
+// GetExportsConfig returns the view configuration for exports
+func (a *App) GetExportsConfig(payload types.Payload) (*types.ViewConfig, error) {
+	collection := exports.GetExportsCollection(&payload)
+	return collection.GetConfig()
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

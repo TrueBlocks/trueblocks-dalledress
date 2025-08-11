@@ -50,5 +50,10 @@ func (a *App) ReloadAbis(payload *types.Payload) error {
 	return nil
 }
 
+func (a *App) GetAbisConfig(payload types.Payload) (*types.ViewConfig, error) {
+	collection := abis.GetAbisCollection(&payload)
+	return collection.GetConfig()
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

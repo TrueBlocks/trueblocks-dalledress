@@ -53,7 +53,6 @@ func (c *NamesCollection) getNamesStore(payload *types.Payload, facet types.Data
 				logging.LogBackend(fmt.Sprintf("Names SDK query error: %v", wrappedErr))
 				return wrappedErr
 			}
-			logging.LogBackend("The names query function returned without an error.")
 			// EXISTING_CODE
 			return nil
 		}

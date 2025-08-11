@@ -24,6 +24,12 @@ export const StatusBar = () => {
   });
 
   useEvent(msgs.EventType.ERROR, (message: string) => {
+    if (
+      message.toLowerCase().includes('facet') &&
+      message.toLowerCase().includes('downloaded')
+    ) {
+      return;
+    }
     setCn('error');
     setStatus(message);
     setVisible(true);

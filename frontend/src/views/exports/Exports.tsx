@@ -21,6 +21,7 @@ import {
   useColumns,
   useEvent,
   usePayload,
+  useViewConfig,
 } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
@@ -28,26 +29,55 @@ import { useHotkeys } from '@mantine/hooks';
 import { exports } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
-import { getDetailPanel } from '@views';
-
-import { ROUTE, getColumns } from './columns';
-import { exportsDetailPanels } from './detailPanels';
-import { exportsFacets } from './facets';
+import { createDetailPanelFromViewConfig } from '@views';
 
 export const Exports = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
+
+  // ViewConfig hook - guaranteed to be available in Wails
+  const { config: viewConfig } = useViewConfig({
+    viewName: 'exports',
+  });
+
+  // Generate facets from ViewConfig - no fallbacks needed in Wails
+  const facetsFromConfig = useMemo((): DataFacetConfig[] => {
+    // Define the correct order for Exports facets
+    const facetOrder = [
+      'statements',
+      'balances',
+      'transfers',
+      'transactions',
+      'withdrawals',
+      'assets',
+      'logs',
+      'traces',
+      'receipts',
+    ];
+
+    return facetOrder
+      .filter((facetId) => viewConfig.facets[facetId]) // Only include facets that exist
+      .map((facetId) => {
+        const facetConfig = viewConfig.facets[facetId];
+        return {
+          id: facetId as types.DataFacet,
+          label: facetConfig?.name || facetId,
+          dividerBefore: facetConfig?.dividerBefore,
+        };
+      });
+  }, [viewConfig.facets]);
+
   const activeFacetHook = useActiveFacet({
-    facets: exportsFacets,
-    viewRoute: ROUTE,
+    facets: facetsFromConfig,
+    viewRoute: 'exports',
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
   const viewStateKey = useMemo(
     (): project.ViewStateKey => ({
-      viewName: ROUTE,
+      viewName: 'exports',
       facetName: getCurrentDataFacet(),
     }),
     [getCurrentDataFacet],
@@ -61,9 +91,11 @@ export const Exports = () => {
   // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
+    const currentFacet = getCurrentDataFacet();
+
     try {
       const result = await GetExportsPage(
-        createPayload(getCurrentDataFacet()),
+        createPayload(currentFacet),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -206,7 +238,7 @@ export const Exports = () => {
   }, [pageData, getCurrentDataFacet]);
 
   const currentColumns = useColumns(
-    getColumns(getCurrentDataFacet()),
+    viewConfig.facets[getCurrentDataFacet()]?.columns || [],
     {
       showActions: false,
       actions: [],
@@ -226,10 +258,10 @@ export const Exports = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={headerActions}
-        detailPanel={getDetailPanel(
-          ROUTE,
-          getCurrentDataFacet(),
-          exportsDetailPanels,
+        detailPanel={createDetailPanelFromViewConfig(
+          viewConfig,
+          getCurrentDataFacet,
+          'Exports Details',
         )}
       />
     ),
@@ -241,6 +273,7 @@ export const Exports = () => {
       viewStateKey,
       headerActions,
       getCurrentDataFacet,
+      viewConfig,
     ],
   );
 
@@ -259,7 +292,7 @@ export const Exports = () => {
   // === SECTION 7: Render ===
   return (
     <div className="mainView">
-      <TabView tabs={tabs} route={ROUTE} />
+      <TabView tabs={tabs} route="exports" />
       {error && (
         <div>
           <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>
@@ -279,5 +312,3 @@ export const Exports = () => {
     </div>
   );
 };
-
-// EXISTING_CODE

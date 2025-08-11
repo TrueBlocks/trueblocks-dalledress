@@ -19,6 +19,7 @@ import {
   useColumns,
   useEvent,
   usePayload,
+  useViewConfig,
 } from '@hooks';
 import { useActions } from '@hooks';
 import { TabView } from '@layout';
@@ -27,26 +28,45 @@ import { useHotkeys } from '@mantine/hooks';
 import { abis } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
-import { getDetailPanel } from '@views';
 
-import { ROUTE, getColumns } from './columns';
-import { abisDetailPanels } from './detailPanels';
-import { abisFacets } from './facets';
+import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
 export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
+  // === SECTION 2.5: ViewConfig Hook ===
+  const { config: viewConfig } = useViewConfig({
+    viewName: 'abis',
+  });
+
+  // Generate facets from ViewConfig - ViewConfig always available in Wails
+  // Generate facets from ViewConfig - no fallbacks needed in Wails
+  const facetsFromConfig = useMemo((): DataFacetConfig[] => {
+    // Define the correct order for Names facets
+    const facetOrder = ['downloaded', 'known', 'functions', 'events'];
+    return facetOrder
+      .filter((facetId) => viewConfig.facets[facetId]) // Only include facets that exist
+      .map((facetId) => {
+        const facetConfig = viewConfig.facets[facetId];
+        return {
+          id: facetId as types.DataFacet,
+          label: facetConfig?.name || facetId,
+          dividerBefore: facetConfig?.dividerBefore,
+        };
+      });
+  }, [viewConfig.facets]);
+
   const activeFacetHook = useActiveFacet({
-    facets: abisFacets,
-    viewRoute: ROUTE,
+    facets: facetsFromConfig,
+    viewRoute: 'abis',
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<abis.AbisPage | null>(null);
   const viewStateKey = useMemo(
     (): project.ViewStateKey => ({
-      viewName: ROUTE,
+      viewName: 'abis',
       facetName: getCurrentDataFacet(),
     }),
     [getCurrentDataFacet],
@@ -192,7 +212,7 @@ export const Abis = () => {
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
-    getColumns(getCurrentDataFacet()),
+    viewConfig?.facets?.[getCurrentDataFacet()]?.columns || [],
     {
       showActions: true,
       actions: ['remove'],
@@ -209,6 +229,16 @@ export const Abis = () => {
   );
 
   const perTabContent = useMemo(() => {
+    const _facetConfig = viewConfig?.facets?.[getCurrentDataFacet()];
+
+    // Create detail panel from ViewConfig
+    const detailPanel = createDetailPanelFromViewConfig(
+      viewConfig,
+      getCurrentDataFacet,
+      'Abis Details',
+    );
+
+    // All Abis facets should be tables (IsForm: false) - no form rendering needed
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -217,15 +247,12 @@ export const Abis = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={headerActions}
-        detailPanel={getDetailPanel(
-          ROUTE,
-          getCurrentDataFacet(),
-          abisDetailPanels,
-        )}
+        detailPanel={detailPanel}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
       />
     );
   }, [
+    viewConfig,
     currentData,
     currentColumns,
     pageData?.isFetching,
@@ -251,7 +278,7 @@ export const Abis = () => {
   // === SECTION 7: Render ===
   return (
     <div className="mainView">
-      <TabView tabs={tabs} route={ROUTE} />
+      <TabView tabs={tabs} route="abis" />
       {error && (
         <div>
           <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>

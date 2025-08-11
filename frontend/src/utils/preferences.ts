@@ -14,8 +14,6 @@ function getDefaults(): preferences.AppPreferences {
     return cachedDefaults;
   }
 
-  console.warn('Preferences defaults not initialized, using fallback values');
-
   return preferences.AppPreferences.createFrom({
     version: '1.0',
     name: 'TrueBlocks-DalleDress',

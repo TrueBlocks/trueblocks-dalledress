@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+
 	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
@@ -251,7 +251,7 @@ func (c *ExportsCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	default:
 		return nil, types.NewValidationError("exports", dataFacet, "GetPage",
-			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
+			fmt.Errorf("GetPage unsupported dataFacet: %v", dataFacet))
 	}
 
 	return page, nil
@@ -288,7 +288,6 @@ func (c *ExportsCollection) getSummaryPage(
 	page := &ExportsPage{
 		Facet: dataFacet,
 	}
-	logging.LogBackend(string(page.Facet))
 
 	switch dataFacet {
 	// EXISTING_CODE
@@ -380,7 +379,7 @@ func (c *ExportsCollection) getSummaryPage(
 	// EXISTING_CODE
 	default:
 		return nil, types.NewValidationError("exports", dataFacet, "getSummaryPage",
-			fmt.Errorf("unsupported dataFacet: %v", dataFacet))
+			fmt.Errorf("getSummaryPage unsupported dataFacet: %v", dataFacet))
 	}
 }
 

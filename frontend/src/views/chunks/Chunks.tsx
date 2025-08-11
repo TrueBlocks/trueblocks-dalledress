@@ -18,32 +18,70 @@ import {
   useColumns,
   useEvent,
   usePayload,
+  useViewConfig,
 } from '@hooks';
 import { FormView, TabView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { chunks } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
-import { getDetailPanel } from '@views';
 
-import { ROUTE, getColumns } from './columns';
-import { chunksDetailPanels } from './detailPanels';
-import { chunksFacets } from './facets';
+import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
 export const Chunks = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
+
+  // === SECTION 2.5: Initial ViewConfig Load ===
+  const { config: viewConfig } = useViewConfig({
+    viewName: 'chunks',
+  });
+
+  // Convert ViewConfig to DataFacetConfig format for useActiveFacet
+  const facetsFromConfig = useMemo((): DataFacetConfig[] => {
+    if (!viewConfig?.facets) {
+      // Fallback to default facets if ViewConfig not loaded yet
+      return [
+        {
+          id: types.DataFacet.STATS,
+          label: 'Stats',
+        },
+        {
+          id: types.DataFacet.INDEX,
+          label: 'Index',
+        },
+        {
+          id: types.DataFacet.BLOOMS,
+          label: 'Blooms',
+        },
+        {
+          id: types.DataFacet.MANIFEST,
+          label: 'Manifest',
+        },
+      ];
+    }
+    // Maintain specific order for chunks facets: Stats, Index, Blooms, Manifest
+    const orderedKeys = ['stats', 'index', 'blooms', 'manifest'];
+    const availableKeys = Object.keys(viewConfig.facets);
+    const sortedKeys = orderedKeys.filter((key) => availableKeys.includes(key));
+
+    return sortedKeys.map((facetKey) => ({
+      id: facetKey as types.DataFacet,
+      label: viewConfig.facets[facetKey]?.name || facetKey,
+    }));
+  }, [viewConfig?.facets]);
+
   const activeFacetHook = useActiveFacet({
-    facets: chunksFacets,
-    viewRoute: ROUTE,
+    facets: facetsFromConfig,
+    viewRoute: 'chunks',
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<chunks.ChunksPage | null>(null);
   const viewStateKey = useMemo(
     (): project.ViewStateKey => ({
-      viewName: ROUTE,
+      viewName: 'chunks',
       facetName: getCurrentDataFacet(),
     }),
     [getCurrentDataFacet],
@@ -139,7 +177,7 @@ export const Chunks = () => {
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
-    getColumns(getCurrentDataFacet()),
+    viewConfig?.facets?.[getCurrentDataFacet()]?.columns || [],
     {
       showActions: false,
       actions: [],
@@ -150,18 +188,12 @@ export const Chunks = () => {
     { rowActions: [] },
   );
 
-  const isForm = useCallback((facet: types.DataFacet) => {
-    switch (facet) {
-      case types.DataFacet.MANIFEST:
-        return true;
-      default:
-        return false;
-    }
-  }, []);
-
   const perTabContent = useMemo(() => {
     const facet = getCurrentDataFacet();
-    if (isForm(facet)) {
+    const currentFacetConfig = viewConfig?.facets?.[facet];
+
+    if (currentFacetConfig?.isForm) {
+      // Form view for MANIFEST facet
       const chunksData = currentData[0] as unknown as Record<string, unknown>;
       if (!chunksData) {
         return <div>No chunks data available</div>;
@@ -169,34 +201,49 @@ export const Chunks = () => {
       return (
         <FormView
           title="Chunks Information"
-          formFields={getColumns(getCurrentDataFacet()).map((field) => {
-            let value = chunksData?.[field.name as string] ?? field.value;
-            if (
-              value !== undefined &&
-              typeof value !== 'string' &&
-              typeof value !== 'number' &&
-              typeof value !== 'boolean'
-            ) {
-              value = JSON.stringify(value);
-            }
-            if (
-              value !== undefined &&
-              typeof value !== 'string' &&
-              typeof value !== 'number' &&
-              typeof value !== 'boolean'
-            ) {
-              value = undefined;
-            }
-            return {
-              ...field,
-              value,
+          formFields={[
+            {
+              key: 'version',
+              name: 'version',
+              header: 'Version',
+              label: 'Version',
+              type: 'text',
+              width: '100px',
               readOnly: true,
-            };
-          })}
+              value: (chunksData?.version as string) ?? '',
+            },
+            {
+              key: 'chain',
+              name: 'chain',
+              header: 'Chain',
+              label: 'Chain',
+              type: 'text',
+              width: '100px',
+              readOnly: true,
+              value: (chunksData?.chain as string) ?? '',
+            },
+            {
+              key: 'specification',
+              name: 'specification',
+              header: 'Specification',
+              label: 'Specification',
+              type: 'ipfshash',
+              width: '100px',
+              readOnly: true,
+              value: (chunksData?.specification as string) ?? '',
+            },
+          ]}
           onSubmit={() => {}}
         />
       );
     }
+
+    // Table view for other facets (STATS, INDEX, BLOOMS)
+    const detailPanel = createDetailPanelFromViewConfig(
+      viewConfig,
+      getCurrentDataFacet,
+      'Chunks Details',
+    );
 
     return (
       <BaseTab<Record<string, unknown>>
@@ -206,11 +253,7 @@ export const Chunks = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={[]}
-        detailPanel={getDetailPanel(
-          ROUTE,
-          getCurrentDataFacet(),
-          chunksDetailPanels,
-        )}
+        detailPanel={detailPanel}
       />
     );
   }, [
@@ -219,8 +262,8 @@ export const Chunks = () => {
     pageData?.isFetching,
     error,
     viewStateKey,
-    isForm,
     getCurrentDataFacet,
+    viewConfig,
   ]);
 
   const tabs = useMemo(
@@ -238,7 +281,7 @@ export const Chunks = () => {
   // === SECTION 7: Render ===
   return (
     <div className="mainView">
-      <TabView tabs={tabs} route={ROUTE} />
+      <TabView tabs={tabs} route="chunks" />
       {error && (
         <div>
           <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>

@@ -40,5 +40,11 @@ func (a *App) ReloadChunks(payload *types.Payload) error {
 	return nil
 }
 
+// GetChunksConfig returns the ViewConfig for the Chunks view
+func (a *App) GetChunksConfig(payload types.Payload) (*types.ViewConfig, error) {
+	collection := chunks.GetChunksCollection(&payload)
+	return collection.GetConfig()
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

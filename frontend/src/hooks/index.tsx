@@ -8,6 +8,7 @@ export * from './useActions';
 export * from './useColumns';
 export * from './useDateTime';
 export * from './useEvent';
+export * from './getViewConfig';
 export * from './useIconSets';
 export * from './usePayload';
 export * from './useSilencedDialog';

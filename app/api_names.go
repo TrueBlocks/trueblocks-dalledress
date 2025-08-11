@@ -50,5 +50,10 @@ func (a *App) ReloadNames(payload *types.Payload) error {
 	return nil
 }
 
+func (a *App) GetNamesConfig(payload types.Payload) (*types.ViewConfig, error) {
+	collection := names.GetNamesCollection(&payload)
+	return collection.GetConfig()
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

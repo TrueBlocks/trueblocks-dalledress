@@ -251,7 +251,7 @@ describe('useActiveFacet Hook Tests (Focused Hook implementation)', () => {
         }),
       );
 
-      expect(result.current.activeFacet).toBe('dashboard'); // fallback to DASHBOARD when no facets
+      expect(result.current.activeFacet).toBe('downloaded'); // fallback to DOWNLOADED when no facets
       expect(result.current.availableFacets).toEqual([]);
     });
 

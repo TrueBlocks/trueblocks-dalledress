@@ -40,5 +40,10 @@ func (a *App) ReloadStatus(payload *types.Payload) error {
 	return nil
 }
 
+func (a *App) GetStatusConfig(payload types.Payload) (*types.ViewConfig, error) {
+	collection := status.GetStatusCollection(&payload)
+	return collection.GetConfig()
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

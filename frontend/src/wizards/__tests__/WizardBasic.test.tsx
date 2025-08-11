@@ -62,84 +62,98 @@ vi.mock('../hooks', () => ({
 }));
 
 // Mock for useFormHotkeys to handle ESC key
-vi.mock('@hooks', () => ({
-  useFormHotkeys: ({ onCancel }: { onCancel?: () => void }) => {
-    useEffect(() => {
-      const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-          onCancel?.();
-        }
-      };
+vi.mock('@hooks', async (importOriginal) => {
+  const original = await importOriginal();
 
-      document.addEventListener('keydown', handleKeyDown);
-      return () => {
-        document.removeEventListener('keydown', handleKeyDown);
-      };
-    }, [onCancel]);
-  },
-  useIconSets: () => ({
-    Abis: () => null,
-    Chuncks: () => null,
-    Export: () => null,
-    Monitors: () => null,
-    Names: () => null,
+  // Icon mocks
+  const iconNames = [
+    'Home',
+    'Khedra',
+    'Exports',
+    'Monitors',
+    'Abis',
+    'Names',
+    'Chunks',
+    'Contracts',
+    'Status',
+    'DalleDress',
+    'Settings',
+    'Wizard',
+    'Switch',
+    'File',
+    'Twitter',
+    'Github',
+    'Website',
+    'Email',
+    'Add',
+    'Edit',
+    'Delete',
+    'Undelete',
+    'Remove',
+    'Export',
+    'ChevronLeft',
+    'ChevronRight',
+    'ChevronUp',
+    'ChevronDown',
+    'Light',
+    'Dark',
+    'Autoname',
+  ];
+  const iconMocks = Object.fromEntries(
+    iconNames.map((name) => [name, () => null]),
+  );
 
-    Home: () => null,
-    Khedra: () => null,
-    DalleDress: () => null,
-    Settings: () => null,
-    Wizard: () => null,
-    Switch: () => null,
-    File: () => null,
-    Twitter: () => null,
-    Github: () => null,
-    Website: () => null,
-    Email: () => null,
-    Add: () => null,
-    Edit: () => null,
-    Delete: () => null,
-    Undelete: () => null,
-    Remove: () => null,
-    ChevronLeft: () => null,
-    ChevronRight: () => null,
-    ChevronUp: () => null,
-    ChevronDown: () => null,
-    Light: () => null,
-    Dark: () => null,
-  }),
-  useActiveProject: () => ({
-    // State values that come from focused hooks
-    lastTheme: 'light',
-    lastLanguage: 'en',
-    lastView: 'home',
-    menuCollapsed: false,
-    helpCollapsed: false,
-    lastFacetMap: {},
-    loading: false,
-    activeAddress: '0x123',
-    activeChain: 'mainnet',
-    activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
-    effectiveAddress: '0x123',
-    effectiveChain: 'mainnet',
-    lastProject: 'test-project',
-    // Actions
-    setActiveAddress: vi.fn(),
-    setActiveChain: vi.fn(),
-    setActiveContract: vi.fn(),
-    switchProject: vi.fn(),
-    toggleTheme: vi.fn(),
-    changeLanguage: vi.fn(),
-    setMenuCollapsed: vi.fn(),
-    setHelpCollapsed: vi.fn(),
-    setLastFacet: vi.fn(),
-    setLastView: vi.fn(),
-    setViewAndFacet: vi.fn(),
-    // Computed values
-    isDarkMode: false,
-    hasActiveProject: true,
-    canExport: true,
-  }),
-}));
+  return {
+    ...(original as object),
+    useFormHotkeys: ({ onCancel }: { onCancel?: () => void }) => {
+      useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+          if (event.key === 'Escape') {
+            onCancel?.();
+          }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+          document.removeEventListener('keydown', handleKeyDown);
+        };
+      }, [onCancel]);
+    },
+    useIconSets: () => iconMocks,
+    useActiveProject: () => ({
+      // State values that come from focused hooks
+      lastTheme: 'light',
+      lastLanguage: 'en',
+      lastView: 'home',
+      menuCollapsed: false,
+      helpCollapsed: false,
+      lastFacetMap: {},
+      loading: false,
+      activeAddress: '0x123',
+      activeChain: 'mainnet',
+      activeContract: '0x52df6e4d9989e7cf4739d687c765e75323a1b14c',
+      effectiveAddress: '0x123',
+      effectiveChain: 'mainnet',
+      lastProject: 'test-project',
+      // Actions
+      setActiveAddress: vi.fn(),
+      setActiveChain: vi.fn(),
+      setActiveContract: vi.fn(),
+      switchProject: vi.fn(),
+      toggleTheme: vi.fn(),
+      changeLanguage: vi.fn(),
+      setMenuCollapsed: vi.fn(),
+      setHelpCollapsed: vi.fn(),
+      setLastFacet: vi.fn(),
+      setLastView: vi.fn(),
+      setViewAndFacet: vi.fn(),
+      // Computed values
+      isDarkMode: false,
+      hasActiveProject: true,
+      canExport: true,
+    }),
+  };
+});
 
 describe('Wizard', () => {
   beforeEach(() => {

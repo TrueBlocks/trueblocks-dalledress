@@ -19,6 +19,7 @@ import {
   useColumns,
   useEvent,
   usePayload,
+  useViewConfig,
 } from '@hooks';
 import {
   ActionType,
@@ -32,18 +33,39 @@ import { useHotkeys } from '@mantine/hooks';
 import { names } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
-import { getDetailPanel } from '@views';
+import { createDetailPanelFromViewConfig } from '@views';
 
-import { ROUTE, getColumns } from './columns';
-import { namesDetailPanels } from './detailPanels';
-import { namesFacets } from './facets';
+const ROUTE = 'names' as const;
 
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
+
+  // ViewConfig hook - guaranteed to be available in Wails
+  const { config: viewConfig } = useViewConfig({
+    viewName: 'names',
+  });
+
+  // Generate facets from ViewConfig - no fallbacks needed in Wails
+  const facetsFromConfig = useMemo((): DataFacetConfig[] => {
+    // Define the correct order for Names facets
+    const facetOrder = ['all', 'custom', 'prefund', 'regular', 'baddress'];
+
+    return facetOrder
+      .filter((facetId) => viewConfig.facets[facetId]) // Only include facets that exist
+      .map((facetId) => {
+        const facetConfig = viewConfig.facets[facetId];
+        return {
+          id: facetId as types.DataFacet,
+          label: facetConfig?.name || facetId,
+          dividerBefore: facetConfig?.dividerBefore,
+        };
+      });
+  }, [viewConfig.facets]);
+
   const activeFacetHook = useActiveFacet({
-    facets: namesFacets,
+    facets: facetsFromConfig,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
@@ -293,8 +315,10 @@ export const Names = () => {
   }, [config.headerActions, config.isWalletConnected, handlers]);
 
   // === SECTION 6: UI Configuration ===
+  const currentFacetConfig = viewConfig.facets[getCurrentDataFacet()];
+
   const currentColumns = useColumns(
-    getColumns(getCurrentDataFacet()),
+    currentFacetConfig?.columns || [],
     {
       showActions: true,
       actions: ['delete', 'remove', 'update', 'autoname'],
@@ -321,10 +345,10 @@ export const Names = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={headerActions}
-        detailPanel={getDetailPanel(
-          ROUTE,
-          getCurrentDataFacet(),
-          namesDetailPanels,
+        detailPanel={createDetailPanelFromViewConfig(
+          viewConfig,
+          getCurrentDataFacet,
+          'Names Details',
         )}
         onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
@@ -344,6 +368,7 @@ export const Names = () => {
     handleRemove,
     handleAutoname,
     handleUpdate,
+    viewConfig,
   ]);
 
   const tabs = useMemo(
@@ -356,6 +381,11 @@ export const Names = () => {
         dividerBefore: facetConfig.dividerBefore,
       })),
     [availableFacets, perTabContent],
+  );
+
+  const handleConfirmModalClose = useCallback(
+    () => setConfirmModal((prev) => ({ ...prev, opened: false })),
+    [],
   );
 
   // === SECTION 7: Render ===
@@ -375,10 +405,7 @@ export const Names = () => {
       />
       <ConfirmModal
         opened={confirmModal.opened}
-        onClose={useCallback(
-          () => setConfirmModal((prev) => ({ ...prev, opened: false })),
-          [],
-        )}
+        onClose={handleConfirmModalClose}
         onConfirm={confirmModal.onConfirm}
         title={confirmModal.title}
         message={confirmModal.message}

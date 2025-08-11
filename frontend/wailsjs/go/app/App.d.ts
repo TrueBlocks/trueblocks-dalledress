@@ -54,6 +54,8 @@ export function FileSave(arg1:menu.CallbackData):Promise<void>;
 
 export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
+export function GetAbisConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
 export function GetAbisPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
 
 export function GetAbisSummary(arg1:types.Payload):Promise<types.Summary>;
@@ -70,11 +72,17 @@ export function GetAppPreferences():Promise<preferences.AppPreferences>;
 
 export function GetChainList():Promise<utils.ChainList>;
 
+export function GetChunksConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
 export function GetChunksPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
 
 export function GetChunksSummary(arg1:types.Payload):Promise<types.Summary>;
 
+export function GetCollectionFacets(arg1:string):Promise<Array<types.DataFacet>>;
+
 export function GetContext():Promise<context.Context>;
+
+export function GetContractsConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetContractsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<contracts.ContractsPage>;
 
@@ -83,6 +91,8 @@ export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
 export function GetDebugCollapsed():Promise<boolean>;
 
 export function GetDefaultAppPreferences():Promise<preferences.AppPreferences>;
+
+export function GetExportsConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetExportsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<exports.ExportsPage>;
 
@@ -104,9 +114,13 @@ export function GetLastView():Promise<string>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
+export function GetMonitorsConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
 export function GetMonitorsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
 
 export function GetMonitorsSummary(arg1:types.Payload):Promise<types.Summary>;
+
+export function GetNamesConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetNamesPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<names.NamesPage>;
 
@@ -123,6 +137,8 @@ export function GetProjectAddress():Promise<base.Address>;
 export function GetProjectViewState(arg1:string):Promise<Record<string, project.FilterState>>;
 
 export function GetRegisteredViews():Promise<Array<string>>;
+
+export function GetStatusConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetStatusPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<status.StatusPage>;
 

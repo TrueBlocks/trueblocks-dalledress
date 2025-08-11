@@ -40,5 +40,10 @@ func (a *App) ReloadContracts(payload *types.Payload) error {
 	return nil
 }
 
+func (a *App) GetContractsConfig(payload types.Payload) (*types.ViewConfig, error) {
+	collection := contracts.GetContractsCollection(&payload)
+	return collection.GetConfig()
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

@@ -1021,6 +1021,26 @@ export namespace types {
 		    return a;
 		}
 	}
+	export class ActionConfig {
+	    name: string;
+	    label: string;
+	    icon: string;
+	    confirmation: boolean;
+	    facets: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new ActionConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.label = source["label"];
+	        this.icon = source["icon"];
+	        this.confirmation = source["confirmation"];
+	        this.facets = source["facets"];
+	    }
+	}
 	export class CacheItem {
 	    items: any[];
 	    lastCached?: string;
@@ -1267,6 +1287,30 @@ export namespace types {
 		    return a;
 		}
 	}
+	export class ColumnConfig {
+	    key: string;
+	    header: string;
+	    accessor: string;
+	    width: number;
+	    sortable: boolean;
+	    filterable: boolean;
+	    formatter: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ColumnConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.key = source["key"];
+	        this.header = source["header"];
+	        this.accessor = source["accessor"];
+	        this.width = source["width"];
+	        this.sortable = source["sortable"];
+	        this.filterable = source["filterable"];
+	        this.formatter = source["formatter"];
+	    }
+	}
 	export class Contract {
 	    abi?: Abi;
 	    address: base.Address;
@@ -1291,6 +1335,98 @@ export namespace types {
 	        this.lastUpdated = source["lastUpdated"];
 	        this.name = source["name"];
 	        this.readResults = source["readResults"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class DetailFieldConfig {
+	    key: string;
+	    label: string;
+	    formatter: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DetailFieldConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.key = source["key"];
+	        this.label = source["label"];
+	        this.formatter = source["formatter"];
+	    }
+	}
+	export class DetailPanelConfig {
+	    title: string;
+	    collapsed: boolean;
+	    fields: DetailFieldConfig[];
+	
+	    static createFrom(source: any = {}) {
+	        return new DetailPanelConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.title = source["title"];
+	        this.collapsed = source["collapsed"];
+	        this.fields = this.convertValues(source["fields"], DetailFieldConfig);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class FacetConfig {
+	    name: string;
+	    store: string;
+	    isForm: boolean;
+	    dividerBefore: boolean;
+	    columns: ColumnConfig[];
+	    detailPanels: DetailPanelConfig[];
+	    actions: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new FacetConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.store = source["store"];
+	        this.isForm = source["isForm"];
+	        this.dividerBefore = source["dividerBefore"];
+	        this.columns = this.convertValues(source["columns"], ColumnConfig);
+	        this.detailPanels = this.convertValues(source["detailPanels"], DetailPanelConfig);
+	        this.actions = source["actions"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2223,6 +2359,40 @@ export namespace types {
 	        this.transactionIndex = source["transactionIndex"];
 	        this.log = this.convertValues(source["log"], Log);
 	        this.transaction = this.convertValues(source["transaction"], Transaction);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ViewConfig {
+	    viewName: string;
+	    facets: Record<string, FacetConfig>;
+	    actions: Record<string, ActionConfig>;
+	
+	    static createFrom(source: any = {}) {
+	        return new ViewConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.viewName = source["viewName"];
+	        this.facets = this.convertValues(source["facets"], FacetConfig, true);
+	        this.actions = this.convertValues(source["actions"], ActionConfig, true);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

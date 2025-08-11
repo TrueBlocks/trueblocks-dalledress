@@ -367,6 +367,14 @@ func (m MockCollection) AccumulateItem(item interface{}, summary *types.Summary)
 
 func (m MockCollection) ResetSummary() {}
 
+func (m MockCollection) GetConfig() (*types.ViewConfig, error) {
+	return &types.ViewConfig{
+		ViewName: m.name,
+		Facets:   make(map[string]types.FacetConfig),
+		Actions:  make(map[string]types.ActionConfig),
+	}, nil
+}
+
 func TestRegisterCollection(t *testing.T) {
 	app := &App{
 		Projects:    project.NewManager(),

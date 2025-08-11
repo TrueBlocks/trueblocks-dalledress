@@ -12,6 +12,8 @@ export function Crud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<vo
 
 export function ExportData(arg1:types.Payload):Promise<string>;
 
+export function GetConfig():Promise<types.ViewConfig>;
+
 export function GetPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<types.Page>;
 
 export function GetStoreName(arg1:types.DataFacet,arg2:string,arg3:string):Promise<string>;

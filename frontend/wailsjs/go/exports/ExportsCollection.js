@@ -14,6 +14,10 @@ export function ExportData(arg1) {
   return window['go']['exports']['ExportsCollection']['ExportData'](arg1);
 }
 
+export function GetConfig() {
+  return window['go']['exports']['ExportsCollection']['GetConfig']();
+}
+
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['exports']['ExportsCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

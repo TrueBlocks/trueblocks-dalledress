@@ -15,57 +15,35 @@ import {
   DataFacetConfig,
   toPageDataProp,
   useActiveFacet,
-  useActiveProject,
   useColumns,
   useEvent,
   usePayload,
+  useViewConfig,
 } from '@hooks';
 import { TabView } from '@layout';
-import {
-  Alert,
-  Container,
-  Loader,
-  Select,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Alert, Container, Stack, Text, Title } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { contracts } from '@models';
 import { msgs, project, types } from '@models';
-import {
-  Debugger,
-  addressToHex,
-  getDisplayAddress,
-  useErrorHandler,
-} from '@utils';
-import { getDetailPanel } from '@views';
+import { Debugger, useErrorHandler } from '@utils';
+import { toProperCase } from 'src/utils/toProper';
 
-import { ROUTE, getColumns } from './columns';
+import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 import { ContractDashboard, ContractExecute } from './components';
-import { contractsDetailPanels } from './detailPanels';
-import { contractsFacets } from './facets';
+
+const ROUTE = 'contracts';
 
 // Tiny component for consistent facet titles
 interface FacetTitleProps {
   facet: types.DataFacet;
   contractName?: string;
   contractAddress?: string;
-  onContractChange?: (address: string) => void;
-  availableContracts?: Array<{
-    value: string;
-    label: string;
-    name: string;
-    address: string;
-  }>;
 }
 
 const FacetTitle: React.FC<FacetTitleProps> = ({
   facet,
   contractName,
   contractAddress,
-  onContractChange,
-  availableContracts = [],
 }) => {
   const getTitleForFacet = (facet: types.DataFacet): string => {
     switch (facet) {
@@ -83,37 +61,9 @@ const FacetTitle: React.FC<FacetTitleProps> = ({
   return (
     <div>
       <Title order={3}>{getTitleForFacet(facet)}</Title>
-      {onContractChange ? (
-        <Select
-          data={availableContracts}
-          value={contractAddress}
-          onChange={(value) => {
-            if (value && onContractChange) {
-              onContractChange(value);
-            }
-          }}
-          variant="unstyled"
-          styles={{
-            input: {
-              fontSize: '14px',
-              color: 'var(--mantine-color-dimmed)',
-              padding: 0,
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-            },
-            dropdown: {
-              fontSize: '14px',
-            },
-          }}
-          comboboxProps={{
-            position: 'bottom-start',
-            middlewares: { flip: false, shift: false },
-          }}
-        />
-      ) : (
-        <Text size="sm" c="dimmed">
-          {contractName || 'Unknown Contract'} {'·'} {contractAddress}
+      {contractName && (
+        <Text size="sm" color="dimmed">
+          {contractName} ({contractAddress})
         </Text>
       )}
     </div>
@@ -122,19 +72,49 @@ const FacetTitle: React.FC<FacetTitleProps> = ({
 
 export const Contracts = () => {
   // === SECTION 2: Hook Initialization ===
-  const { activeContract, setActiveContract } = useActiveProject();
-  const [contractAbi, setContractAbi] = useState<types.Contract | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [detailError, setDetailError] = useState<string | null>(null);
-
   const renderCnt = useRef(0);
   const createPayload = usePayload();
+
+  // === SECTION 2.5: Initial ViewConfig Load ===
+  const { config: viewConfig } = useViewConfig({
+    viewName: 'contracts',
+  });
+
+  // Generate facets from ViewConfig
+  const contractsFacets: DataFacetConfig[] = useMemo(() => {
+    if (!viewConfig?.facets) {
+      // Fallback to default facets if ViewConfig not loaded yet
+      return [
+        {
+          id: types.DataFacet.DASHBOARD,
+          label: toProperCase(types.DataFacet.DASHBOARD),
+        },
+        {
+          id: types.DataFacet.EXECUTE,
+          label: toProperCase(types.DataFacet.EXECUTE),
+        },
+        {
+          id: types.DataFacet.EVENTS,
+          label: toProperCase(types.DataFacet.EVENTS),
+        },
+      ];
+    }
+    // Maintain specific order for contracts facets
+    const orderedKeys = ['dashboard', 'execute', 'events'];
+    const availableKeys = Object.keys(viewConfig.facets);
+    const sortedKeys = orderedKeys.filter((key) => availableKeys.includes(key));
+
+    return sortedKeys.map((facetKey) => ({
+      id: facetKey as types.DataFacet,
+      label: viewConfig.facets[facetKey]?.name || toProperCase(facetKey),
+    }));
+  }, [viewConfig]);
+
   const activeFacetHook = useActiveFacet({
     facets: contractsFacets,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
-  const isForm = getCurrentDataFacet() !== types.DataFacet.EVENTS;
 
   const [pageData, setPageData] = useState<contracts.ContractsPage | null>(
     null,
@@ -156,19 +136,13 @@ export const Contracts = () => {
   const fetchData = useCallback(async () => {
     clearError();
     try {
-      const payload = createPayload(getCurrentDataFacet());
-      if (isForm && activeContract) {
-        payload.address = activeContract;
-      }
-
       const result = await GetContractsPage(
-        payload,
+        createPayload(getCurrentDataFacet()),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
         filter,
       );
-
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
@@ -184,8 +158,6 @@ export const Contracts = () => {
     filter,
     setTotalItems,
     handleError,
-    isForm,
-    activeContract,
   ]);
 
   const currentData = useMemo(() => {
@@ -197,44 +169,11 @@ export const Contracts = () => {
       case types.DataFacet.EXECUTE:
         return pageData.contracts || [];
       case types.DataFacet.EVENTS:
-        if (pageData.logs && Array.isArray(pageData.logs)) {
-          const processedLogs = pageData.logs.map((event) => ({
-            ...event,
-            // Add contract info if available
-            compressedLog: (() => {
-              const anyEvent = event as unknown as Record<string, unknown>;
-              if (
-                anyEvent.articulatedLog &&
-                typeof anyEvent.articulatedLog === 'object'
-              ) {
-                const artLog = anyEvent.articulatedLog as Record<
-                  string,
-                  unknown
-                >;
-                return artLog.name ? `${artLog.name}()` : '';
-              }
-              return '';
-            })(),
-          }));
-          return processedLogs;
-        }
-        return [];
+        return pageData.logs || [];
       default:
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
-
-  // Generate dynamic contract list from backend data
-  const availableContracts = useMemo(() => {
-    if (!pageData?.contracts) return [];
-
-    return pageData.contracts.map((contract: types.Contract) => ({
-      value: addressToHex(contract.address),
-      label: `${contract.name || 'Unknown'} · ${getDisplayAddress(contract.address)}`,
-      name: contract.name || 'Unknown',
-      address: addressToHex(contract.address),
-    }));
-  }, [pageData?.contracts]);
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -249,14 +188,10 @@ export const Contracts = () => {
     },
   );
 
-  useEvent(msgs.EventType.MANAGER, (message: string) => {
-    if (
-      message === 'active_address_changed' ||
-      message === 'active_chain_changed'
-    ) {
-      fetchData();
-    }
-  });
+  // Listen for active address/chain/period changes to refresh data
+  useEvent(msgs.EventType.ADDRESS_CHANGED, fetchData);
+  useEvent(msgs.EventType.CHAIN_CHANGED, fetchData);
+  useEvent(msgs.EventType.PERIOD_CHANGED, fetchData);
 
   useEffect(() => {
     fetchData();
@@ -276,11 +211,11 @@ export const Contracts = () => {
   useHotkeys([['mod+r', handleReload]]);
 
   // === SECTION 5: CRUD Operations ===
-  // No CRUD operations for Contracts view
+  // TODO: Add CRUD operations for Contracts view when needed
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
-    getColumns(getCurrentDataFacet()),
+    viewConfig?.facets?.[getCurrentDataFacet()]?.columns || [],
     {
       showActions: false,
       actions: [],
@@ -291,31 +226,68 @@ export const Contracts = () => {
     { rowActions: [] },
   );
 
+  // Create detail panel from ViewConfig
+  const detailPanel = useMemo(() => {
+    return createDetailPanelFromViewConfig(
+      viewConfig,
+      getCurrentDataFacet,
+      'Contract Details',
+    );
+  }, [viewConfig, getCurrentDataFacet]);
+
   const perTabContent = useMemo(() => {
     const currentFacet = getCurrentDataFacet();
-    if (activeContract) {
+    const facetConfig = viewConfig?.facets?.[currentFacet];
+
+    // Check if this facet should be displayed as a form using ViewConfig
+    if (facetConfig?.isForm) {
+      if (!pageData?.contracts || pageData.contracts.length === 0) {
+        return (
+          <Container size="lg" py="xl">
+            <Alert color="yellow" title="No contracts available">
+              No contracts available for {facetConfig.name?.toLowerCase()} view
+            </Alert>
+          </Container>
+        );
+      }
+
+      // Use the first contract or selected contract
+      const contractState = pageData.contracts[0];
+      if (!contractState) {
+        return (
+          <Container size="lg" py="xl">
+            <Alert color="yellow" title="No contract data">
+              No contract data available
+            </Alert>
+          </Container>
+        );
+      }
+
       return (
-        <div style={{ padding: '20px' }}>
+        <Container size="lg" py="xl">
           <Stack gap="md">
-            <FacetTitle facet={currentFacet} contractAddress={activeContract} />
-            <BaseTab<Record<string, unknown>>
-              data={currentData as unknown as Record<string, unknown>[]}
-              columns={currentColumns}
-              loading={!!pageData?.isFetching}
-              error={error}
-              viewStateKey={viewStateKey}
-              headerActions={[]}
-              detailPanel={getDetailPanel(
-                ROUTE,
-                getCurrentDataFacet(),
-                contractsDetailPanels,
-              )}
+            <FacetTitle
+              facet={currentFacet}
+              contractName={contractState.name}
+              contractAddress={contractState.address?.toString()}
             />
+            {currentFacet === types.DataFacet.DASHBOARD ? (
+              <ContractDashboard
+                contractState={contractState}
+                onRefresh={() => fetchData()}
+              />
+            ) : currentFacet === types.DataFacet.EXECUTE ? (
+              <ContractExecute
+                contractState={contractState}
+                functionName="all"
+              />
+            ) : null}
           </Stack>
-        </div>
+        </Container>
       );
     }
 
+    // For Events and other facets, use regular table view
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -324,21 +296,19 @@ export const Contracts = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={[]}
-        detailPanel={getDetailPanel(
-          ROUTE,
-          getCurrentDataFacet(),
-          contractsDetailPanels,
-        )}
+        detailPanel={detailPanel}
       />
     );
   }, [
+    getCurrentDataFacet,
+    viewConfig?.facets,
+    pageData,
     currentData,
     currentColumns,
-    pageData?.isFetching,
     error,
     viewStateKey,
-    getCurrentDataFacet,
-    activeContract,
+    detailPanel,
+    fetchData,
   ]);
 
   const tabs = useMemo(
@@ -352,166 +322,6 @@ export const Contracts = () => {
       })),
     [availableFacets, perTabContent],
   );
-
-  // === SECTION 6.5: Contract Detail Loading Effect ===
-  useEffect(() => {
-    const loadContractDetail = async () => {
-      if (!isForm || !activeContract) {
-        return;
-      }
-
-      try {
-        setDetailLoading(true);
-        setDetailError(null);
-
-        if (pageData?.isFetching) {
-          return;
-        }
-
-        let contractData = pageData?.contracts?.find(
-          (contract: types.Contract) =>
-            addressToHex(contract.address)?.toLowerCase() ===
-            activeContract.toLowerCase(),
-        );
-
-        // If the activeContract is not found, fall back to the first available contract
-        if (
-          !contractData &&
-          pageData?.contracts &&
-          pageData.contracts.length > 0
-        ) {
-          contractData = pageData.contracts[0];
-          if (contractData) {
-            const newAddress = addressToHex(contractData.address);
-
-            // Update the active contract in the system
-            await setActiveContract(newAddress);
-
-            setDetailLoading(false);
-            return; // Exit early, the component will re-render with the new activeContract
-          }
-        }
-
-        if (contractData) {
-          setContractAbi(contractData);
-          setDetailLoading(false);
-        } else {
-          setDetailLoading(false);
-        }
-      } catch (err) {
-        setDetailError(
-          err instanceof Error
-            ? err.message
-            : 'Failed to load contract details',
-        );
-        setDetailLoading(false);
-      }
-    };
-
-    loadContractDetail();
-  }, [isForm, activeContract, pageData, setActiveContract]);
-
-  // === SECTION 6.6: Early Return for Detail View ===
-  if (isForm) {
-    if (detailLoading || !contractAbi || pageData?.isFetching) {
-      return (
-        <Container size="lg" py="xl">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '200px',
-            }}
-          >
-            <Loader size="lg" />
-            <Text ml="md">Loading contract details...</Text>
-          </div>
-        </Container>
-      );
-    }
-
-    if (detailError) {
-      return (
-        <Container size="lg" py="xl">
-          <Alert color="red" title="Error loading contract">
-            {detailError}
-          </Alert>
-        </Container>
-      );
-    }
-
-    if (!contractAbi.abi) {
-      return (
-        <Container size="lg" py="xl">
-          <Alert color="yellow" title="No ABI found">
-            No ABI found for contract address: {activeContract}
-          </Alert>
-        </Container>
-      );
-    }
-
-    // Generate facets from the ABI
-    return (
-      <div className="mainView">
-        <TabView
-          tabs={contractsFacets.map((facetConfig: DataFacetConfig) => ({
-            key: facetConfig.id,
-            label: facetConfig.label,
-            value: facetConfig.id,
-            content: (
-              <div style={{ padding: '20px' }}>
-                <Stack gap="md">
-                  <FacetTitle
-                    facet={facetConfig.id}
-                    contractName={contractAbi.name}
-                    contractAddress={addressToHex(contractAbi.address)}
-                    availableContracts={availableContracts}
-                    onContractChange={async (address: string) => {
-                      await setActiveContract(address);
-                    }}
-                  />
-                  {facetConfig.id === types.DataFacet.DASHBOARD ? (
-                    <ContractDashboard
-                      contractState={contractAbi}
-                      onRefresh={() => {
-                        // TODO: Implement refresh logic for contract state
-                      }}
-                    />
-                  ) : facetConfig.id === types.DataFacet.EXECUTE ? (
-                    <ContractExecute
-                      contractState={contractAbi}
-                      functionName="all" // Pass a special value to indicate all functions
-                      onTransaction={(_txData) => {
-                        // TODO: Implement transaction handling
-                      }}
-                    />
-                  ) : (
-                    <Alert
-                      color="blue"
-                      title={`Contract: ${contractAbi.name || 'Unknown'}`}
-                    >
-                      Address: {activeContract}
-                      <br />
-                      Facet: {facetConfig.label} (ID: {facetConfig.id})
-                      <br />
-                      ABI Functions: {contractAbi.abi?.functions?.length || 0}
-                    </Alert>
-                  )}
-                </Stack>
-              </div>
-            ),
-          }))}
-          route={ROUTE}
-        />
-        <Debugger
-          rowActions={[]}
-          headerActions={[]}
-          count={++renderCnt.current}
-        />
-      </div>
-    );
-  }
 
   // === SECTION 7: Render ===
   return (
@@ -533,4 +343,5 @@ export const Contracts = () => {
 };
 
 // EXISTING_CODE
+
 // EXISTING_CODE

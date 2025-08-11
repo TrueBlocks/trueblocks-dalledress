@@ -74,6 +74,10 @@ export function FileSaveAs(arg1) {
   return window['go']['app']['App']['FileSaveAs'](arg1);
 }
 
+export function GetAbisConfig(arg1) {
+  return window['go']['app']['App']['GetAbisConfig'](arg1);
+}
+
 export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetAbisPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -106,6 +110,10 @@ export function GetChainList() {
   return window['go']['app']['App']['GetChainList']();
 }
 
+export function GetChunksConfig(arg1) {
+  return window['go']['app']['App']['GetChunksConfig'](arg1);
+}
+
 export function GetChunksPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetChunksPage'](arg1, arg2, arg3, arg4, arg5);
 }
@@ -114,8 +122,16 @@ export function GetChunksSummary(arg1) {
   return window['go']['app']['App']['GetChunksSummary'](arg1);
 }
 
+export function GetCollectionFacets(arg1) {
+  return window['go']['app']['App']['GetCollectionFacets'](arg1);
+}
+
 export function GetContext() {
   return window['go']['app']['App']['GetContext']();
+}
+
+export function GetContractsConfig(arg1) {
+  return window['go']['app']['App']['GetContractsConfig'](arg1);
 }
 
 export function GetContractsPage(arg1, arg2, arg3, arg4, arg5) {
@@ -132,6 +148,10 @@ export function GetDebugCollapsed() {
 
 export function GetDefaultAppPreferences() {
   return window['go']['app']['App']['GetDefaultAppPreferences']();
+}
+
+export function GetExportsConfig(arg1) {
+  return window['go']['app']['App']['GetExportsConfig'](arg1);
 }
 
 export function GetExportsPage(arg1, arg2, arg3, arg4, arg5) {
@@ -174,12 +194,20 @@ export function GetMarkdown(arg1, arg2, arg3) {
   return window['go']['app']['App']['GetMarkdown'](arg1, arg2, arg3);
 }
 
+export function GetMonitorsConfig(arg1) {
+  return window['go']['app']['App']['GetMonitorsConfig'](arg1);
+}
+
 export function GetMonitorsPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetMonitorsPage'](arg1, arg2, arg3, arg4, arg5);
 }
 
 export function GetMonitorsSummary(arg1) {
   return window['go']['app']['App']['GetMonitorsSummary'](arg1);
+}
+
+export function GetNamesConfig(arg1) {
+  return window['go']['app']['App']['GetNamesConfig'](arg1);
 }
 
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
@@ -212,6 +240,10 @@ export function GetProjectViewState(arg1) {
 
 export function GetRegisteredViews() {
   return window['go']['app']['App']['GetRegisteredViews']();
+}
+
+export function GetStatusConfig(arg1) {
+  return window['go']['app']['App']['GetStatusConfig'](arg1);
 }
 
 export function GetStatusPage(arg1, arg2, arg3, arg4, arg5) {

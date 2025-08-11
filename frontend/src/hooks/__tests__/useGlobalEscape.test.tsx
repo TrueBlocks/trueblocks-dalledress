@@ -21,7 +21,7 @@ describe('useGlobalEscape', () => {
     const TestComponent = () => {
       useGlobalEscape({
         enabled: false,
-        onEscape: () => console.log('escaped'),
+        onEscape: () => {},
       });
       return <div>Test</div>;
     };

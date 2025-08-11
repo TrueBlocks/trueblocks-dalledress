@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { NodeStatus, ProjectSelectionModal, getBarWidth } from '@components';
 import { ViewContextProvider, WalletConnectProvider } from '@contexts';
 import {
+  initializeAllViewConfigs,
   useActiveProject,
   useAppHealth,
   useAppHotkeys,
@@ -49,11 +50,24 @@ function globalNavKeySquelcher(e: KeyboardEvent) {
 
 export const App = () => {
   const [showProjectModal, setShowProjectModal] = useState(false);
+  const [viewConfigsLoading, setViewConfigsLoading] = useState(true);
   const { hasActiveProject } = useActiveProject();
 
   useEffect(() => {
+    // Initialize view configurations at app startup
+    initializeAllViewConfigs()
+      .then(({ isLoading }) => {
+        setViewConfigsLoading(isLoading);
+      })
+      .catch((error: unknown) => {
+        Log(
+          'WARNING: Failed to initialize view configurations: ' + String(error),
+        );
+        setViewConfigsLoading(false);
+      });
+
     // Initialize preferences defaults cache on app startup
-    initializePreferencesDefaults().catch((error) => {
+    initializePreferencesDefaults().catch((error: unknown) => {
       Log(
         'WARNING: Failed to initialize preferences defaults: ' + String(error),
       );
@@ -102,7 +116,7 @@ export const App = () => {
     setShowProjectModal(false);
   };
 
-  if (!ready) return <div>Not ready</div>;
+  if (!ready || viewConfigsLoading) return <div>Not ready</div>;
 
   const header = { height: 60 };
   const footer = { height: 40 };

@@ -19,6 +19,7 @@ import {
   useColumns,
   useEvent,
   usePayload,
+  useViewConfig,
 } from '@hooks';
 import { useActions } from '@hooks';
 import { TabView } from '@layout';
@@ -27,16 +28,39 @@ import { useHotkeys } from '@mantine/hooks';
 import { monitors } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
-import { getDetailPanel } from '@views';
+import { toProperCase } from 'src/utils/toProper';
 
-import { ROUTE, getColumns } from './columns';
-import { monitorsDetailPanels } from './detailPanels';
-import { monitorsFacets } from './facets';
+import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
+
+const ROUTE = 'monitors';
 
 export const Monitors = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
+
+  // === SECTION 2.5: Initial ViewConfig Load ===
+  const { config: viewConfig } = useViewConfig({
+    viewName: 'monitors',
+  });
+
+  // Generate facets from ViewConfig
+  const monitorsFacets: DataFacetConfig[] = useMemo(() => {
+    if (!viewConfig?.facets) {
+      // Fallback to default facets if ViewConfig not loaded yet
+      return [
+        {
+          id: types.DataFacet.MONITORS,
+          label: toProperCase(types.DataFacet.MONITORS),
+        },
+      ];
+    }
+    return Object.keys(viewConfig.facets).map((facetKey) => ({
+      id: facetKey as types.DataFacet,
+      label: toProperCase(facetKey),
+    }));
+  }, [viewConfig]);
+
   const activeFacetHook = useActiveFacet({
     facets: monitorsFacets,
     viewRoute: ROUTE,
@@ -186,7 +210,7 @@ export const Monitors = () => {
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
-    getColumns(getCurrentDataFacet()),
+    viewConfig?.facets?.[getCurrentDataFacet()]?.columns || [],
     {
       showActions: true,
       actions: ['delete', 'remove'],
@@ -203,6 +227,15 @@ export const Monitors = () => {
     config,
   );
 
+  // Create detail panel from ViewConfig
+  const detailPanel = useMemo(() => {
+    return createDetailPanelFromViewConfig(
+      viewConfig,
+      getCurrentDataFacet,
+      'Monitor Details',
+    );
+  }, [viewConfig, getCurrentDataFacet]);
+
   const perTabContent = useMemo(() => {
     return (
       <BaseTab<Record<string, unknown>>
@@ -214,11 +247,7 @@ export const Monitors = () => {
         headerActions={headerActions}
         onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
-        detailPanel={getDetailPanel(
-          ROUTE,
-          getCurrentDataFacet(),
-          monitorsDetailPanels,
-        )}
+        detailPanel={detailPanel}
       />
     );
   }, [
@@ -228,7 +257,7 @@ export const Monitors = () => {
     error,
     viewStateKey,
     headerActions,
-    getCurrentDataFacet,
+    detailPanel,
     handleToggle,
     handleRemove,
   ]);

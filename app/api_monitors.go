@@ -50,6 +50,11 @@ func (a *App) ReloadMonitors(payload *types.Payload) error {
 	return nil
 }
 
+func (a *App) GetMonitorsConfig(payload types.Payload) (*types.ViewConfig, error) {
+	collection := monitors.GetMonitorsCollection(&payload)
+	return collection.GetConfig()
+}
+
 // EXISTING_CODE
 func (a *App) MonitorsClean(payload *types.Payload, addresses []string) error {
 	collection := monitors.GetMonitorsCollection(payload)

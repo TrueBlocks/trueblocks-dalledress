@@ -21,5 +21,6 @@ type Collection interface {
 	GetStoreName(facet DataFacet, chain, address string) string
 	GetSummary() Summary
 	ExportData(payload *Payload) (string, error)
+	GetConfig() (*ViewConfig, error)
 	SummaryAccumulator
 }

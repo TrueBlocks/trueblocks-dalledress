@@ -18,22 +18,55 @@ import {
   useColumns,
   useEvent,
   usePayload,
+  useViewConfig,
 } from '@hooks';
-import { FormView, TabView } from '@layout';
+import { TabView } from '@layout';
+import { FormView } from '@layout';
 import { useHotkeys } from '@mantine/hooks';
 import { status } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, useErrorHandler } from '@utils';
-import { getDetailPanel } from '@views';
+import { toProperCase } from 'src/utils/toProper';
 
-import { ROUTE, getColumns } from './columns';
-import { statusDetailPanels } from './detailPanels';
-import { statusFacets } from './facets';
+import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
+
+const ROUTE = 'status';
 
 export const Status = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
+
+  // === SECTION 2.5: Initial ViewConfig Load ===
+  const { config: viewConfig } = useViewConfig({
+    viewName: 'status',
+  });
+
+  // Generate facets from ViewConfig
+  const statusFacets: DataFacetConfig[] = useMemo(() => {
+    if (!viewConfig?.facets) {
+      // Fallback to default facets if ViewConfig not loaded yet
+      return [
+        {
+          id: types.DataFacet.STATUS,
+          label: toProperCase(types.DataFacet.STATUS),
+        },
+        {
+          id: types.DataFacet.CACHES,
+          label: toProperCase(types.DataFacet.CACHES),
+        },
+        {
+          id: types.DataFacet.CHAINS,
+          label: toProperCase(types.DataFacet.CHAINS),
+        },
+      ];
+    }
+    return Object.keys(viewConfig.facets).map((facetKey) => ({
+      id: facetKey as types.DataFacet,
+      label: toProperCase(facetKey),
+    }));
+  }, [viewConfig]);
+
   const activeFacetHook = useActiveFacet({
     facets: statusFacets,
     viewRoute: ROUTE,
@@ -137,7 +170,7 @@ export const Status = () => {
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useColumns(
-    getColumns(getCurrentDataFacet()),
+    viewConfig?.facets?.[getCurrentDataFacet()]?.columns || [],
     {
       showActions: false,
       actions: [],
@@ -148,54 +181,59 @@ export const Status = () => {
     { rowActions: [] },
   );
 
-  const isForm = useCallback((facet: types.DataFacet) => {
-    switch (facet) {
-      case types.DataFacet.STATUS:
-        return true;
-      default:
-        return false;
-    }
-  }, []);
+  // Create detail panel from ViewConfig
+  const detailPanel = useMemo(() => {
+    return createDetailPanelFromViewConfig(
+      viewConfig,
+      getCurrentDataFacet,
+      'Status Details',
+    );
+  }, [viewConfig, getCurrentDataFacet]);
 
   const perTabContent = useMemo(() => {
-    const facet = getCurrentDataFacet();
-    if (isForm(facet)) {
-      const statusData = currentData[0] as unknown as Record<string, unknown>;
-      if (!statusData) {
-        return <div>No status data available</div>;
-      }
+    const currentFacet = getCurrentDataFacet();
+    const facetConfig = viewConfig?.facets?.[currentFacet];
+
+    // Check if this facet should be displayed as a form
+    if (facetConfig?.isForm && currentData.length > 0) {
+      const statusData = currentData[0] as types.Status;
+
+      // Convert columns to form fields with values
+      const fieldsWithValues = currentColumns.map((column) => {
+        const rawValue = statusData[
+          column.name as keyof types.Status
+        ] as unknown;
+        let displayValue = '';
+
+        // Convert complex types to strings for display
+        if (typeof rawValue === 'string') {
+          displayValue = rawValue;
+        } else if (typeof rawValue === 'boolean') {
+          displayValue = rawValue ? 'Yes' : 'No';
+        } else if (typeof rawValue === 'number') {
+          displayValue = rawValue.toString();
+        } else if (rawValue && typeof rawValue === 'object') {
+          displayValue = JSON.stringify(rawValue);
+        } else if (rawValue !== null && rawValue !== undefined) {
+          displayValue = String(rawValue);
+        }
+
+        return {
+          ...column,
+          value: displayValue,
+        };
+      });
+
       return (
         <FormView
-          title="Status Information"
-          formFields={getColumns(getCurrentDataFacet()).map((field) => {
-            let value = statusData?.[field.name as string] ?? field.value;
-            if (
-              value !== undefined &&
-              typeof value !== 'string' &&
-              typeof value !== 'number' &&
-              typeof value !== 'boolean'
-            ) {
-              value = JSON.stringify(value);
-            }
-            if (
-              value !== undefined &&
-              typeof value !== 'string' &&
-              typeof value !== 'number' &&
-              typeof value !== 'boolean'
-            ) {
-              value = undefined;
-            }
-            return {
-              ...field,
-              value,
-              readOnly: true,
-            };
-          })}
-          onSubmit={() => {}}
+          formFields={fieldsWithValues}
+          title="System Status"
+          onSubmit={() => {}} // No submit functionality for status
         />
       );
     }
 
+    // Default table view
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -204,21 +242,18 @@ export const Status = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={[]}
-        detailPanel={getDetailPanel(
-          ROUTE,
-          getCurrentDataFacet(),
-          statusDetailPanels,
-        )}
+        detailPanel={detailPanel}
       />
     );
   }, [
+    getCurrentDataFacet,
+    viewConfig,
     currentData,
     currentColumns,
     pageData?.isFetching,
     error,
     viewStateKey,
-    isForm,
-    getCurrentDataFacet,
+    detailPanel,
   ]);
 
   const tabs = useMemo(
@@ -251,5 +286,7 @@ export const Status = () => {
     </div>
   );
 };
+
+// EXISTING_CODE
 
 // EXISTING_CODE

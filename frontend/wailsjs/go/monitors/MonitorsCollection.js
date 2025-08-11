@@ -18,6 +18,10 @@ export function ExportData(arg1) {
   return window['go']['monitors']['MonitorsCollection']['ExportData'](arg1);
 }
 
+export function GetConfig() {
+  return window['go']['monitors']['MonitorsCollection']['GetConfig']();
+}
+
 export function GetPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['monitors']['MonitorsCollection']['GetPage'](arg1, arg2, arg3, arg4, arg5);
 }

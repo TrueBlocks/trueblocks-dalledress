@@ -91,7 +91,6 @@ const MonitorsPanel = buildDetailPanelFromColumns<Record<string, unknown>>(
   getColumns(types.DataFacet.MONITORS),
   monitorsMeta,
   {
-    promptWidthPx: 220,
     formatters,
     extras,
     collapsedSections: ['Stats'],

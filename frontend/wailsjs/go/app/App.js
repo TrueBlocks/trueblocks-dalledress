@@ -122,10 +122,6 @@ export function GetChunksSummary(arg1) {
   return window['go']['app']['App']['GetChunksSummary'](arg1);
 }
 
-export function GetCollectionFacets(arg1) {
-  return window['go']['app']['App']['GetCollectionFacets'](arg1);
-}
-
 export function GetContext() {
   return window['go']['app']['App']['GetContext']();
 }

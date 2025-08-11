@@ -68,25 +68,41 @@ func getNamesColumns() []types.ColumnConfig {
 func getNamesDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Identity",
+			Title:     "Name Identity",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{Key: "address", Label: "Address", Formatter: "address"},
 				{Key: "name", Label: "Name"},
-			},
-		},
-		{
-			Title: "Token",
-			Fields: []types.DetailFieldConfig{
 				{Key: "symbol", Label: "Symbol"},
 				{Key: "decimals", Label: "Decimals"},
 			},
 		},
 		{
-			Title:     "Metadata",
-			Collapsed: true, // This section starts collapsed like in detailPanels.tsx
+			Title:     "Classification",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
-				{Key: "tags", Label: "Tags"},
 				{Key: "source", Label: "Source"},
+				{Key: "tags", Label: "Tags"},
+				{Key: "deleted", Label: "Deleted", Formatter: "boolean"},
+			},
+		},
+		{
+			Title:     "Contract Properties",
+			Collapsed: false,
+			Fields: []types.DetailFieldConfig{
+				{Key: "isContract", Label: "Is Contract", Formatter: "boolean"},
+				{Key: "isCustom", Label: "Is Custom", Formatter: "boolean"},
+				{Key: "isErc20", Label: "Is ERC20", Formatter: "boolean"},
+				{Key: "isErc721", Label: "Is ERC721", Formatter: "boolean"},
+				{Key: "isPrefund", Label: "Is Prefund", Formatter: "boolean"},
+			},
+		},
+		{
+			Title:     "Prefund Information",
+			Collapsed: false,
+			Fields: []types.DetailFieldConfig{
+				{Key: "prefund", Label: "Prefund Amount", Formatter: "wei"},
+				{Key: "parts", Label: "Parts"},
 			},
 		},
 	}

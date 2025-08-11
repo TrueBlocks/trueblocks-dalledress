@@ -75,15 +75,17 @@ func getFunctionsColumns() []types.ColumnConfig {
 func getAbisDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "ABI Identity",
+			Title:     "ABI Identity",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{Key: "address", Label: "Address", Formatter: "address"},
 				{Key: "name", Label: "Name"},
-				{Key: "path", Label: "Path"},
+				{Key: "path", Label: "File Path"},
 			},
 		},
 		{
-			Title: "Statistics",
+			Title:     "Content Statistics",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{Key: "nFunctions", Label: "Number of Functions", Formatter: "number"},
 				{Key: "nEvents", Label: "Number of Events", Formatter: "number"},
@@ -91,19 +93,27 @@ func getAbisDetailPanels() []types.DetailPanelConfig {
 			},
 		},
 		{
-			Title: "Properties",
+			Title:     "ABI Properties",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{Key: "isEmpty", Label: "Is Empty", Formatter: "boolean"},
 				{Key: "isKnown", Label: "Is Known", Formatter: "boolean"},
 				{Key: "hasConstructor", Label: "Has Constructor", Formatter: "boolean"},
-				{Key: "hasFallback", Label: "Has Fallback", Formatter: "boolean"},
+				{Key: "hasFallback", Label: "Has Fallback Function", Formatter: "boolean"},
 			},
 		},
 		{
-			Title:     "Metadata",
-			Collapsed: true, // This section starts collapsed
+			Title:     "File Metadata",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{Key: "lastModDate", Label: "Last Modified", Formatter: "timestamp"},
+			},
+		},
+		{
+			Title:     "Functions List",
+			Collapsed: false,
+			Fields: []types.DetailFieldConfig{
+				{Key: "functions", Label: "Available Functions", Formatter: "json"},
 			},
 		},
 	}
@@ -112,16 +122,18 @@ func getAbisDetailPanels() []types.DetailPanelConfig {
 func getFunctionsDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Function Details",
+			Title:     "Function Overview",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{Key: "name", Label: "Function Name"},
-				{Key: "type", Label: "Type"},
-				{Key: "encoding", Label: "Encoding"},
-				{Key: "signature", Label: "Signature"},
+				{Key: "type", Label: "Function Type"},
+				{Key: "encoding", Label: "Encoding Hash"},
+				{Key: "signature", Label: "Function Signature"},
 			},
 		},
 		{
-			Title: "Function Properties",
+			Title:     "Function Properties",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{Key: "stateMutability", Label: "State Mutability"},
 				{Key: "constant", Label: "Constant", Formatter: "boolean"},
@@ -129,12 +141,24 @@ func getFunctionsDetailPanels() []types.DetailPanelConfig {
 			},
 		},
 		{
-			Title:     "Parameters",
-			Collapsed: true, // This section starts collapsed
+			Title:     "Input Parameters",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
-				{Key: "inputs", Label: "Inputs"},
-				{Key: "outputs", Label: "Outputs"},
-				{Key: "message", Label: "Message"},
+				{Key: "inputs", Label: "Input Parameters", Formatter: "json"},
+			},
+		},
+		{
+			Title:     "Output Parameters",
+			Collapsed: false,
+			Fields: []types.DetailFieldConfig{
+				{Key: "outputs", Label: "Output Parameters", Formatter: "json"},
+			},
+		},
+		{
+			Title:     "Additional Information",
+			Collapsed: false,
+			Fields: []types.DetailFieldConfig{
+				{Key: "message", Label: "Error Message"},
 			},
 		},
 	}

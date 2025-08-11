@@ -102,28 +102,84 @@ func getStatementsColumns() []types.ColumnConfig {
 func getStatementsDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Statement",
+			Title: "Statement Summary",
 			Fields: []types.DetailFieldConfig{
-				{Key: "date", Label: "Timestamp", Formatter: "datetime"},
-				{Key: "begBal", Label: "Begin Balance", Formatter: "wei"},
-				{Key: "amountIn", Label: "In", Formatter: "wei"},
-				{Key: "amountOut", Label: "Out", Formatter: "wei"},
-				{Key: "endBal", Label: "End Balance", Formatter: "wei"},
+				{Key: "date", Label: "Date", Formatter: "datetime"},
+				{Key: "accountedFor", Label: "Account", Formatter: "address"},
+				{Key: "reconciled", Label: "Reconciled"},
+				{Key: "reconciliationType", Label: "Type"},
 			},
 		},
 		{
-			Title: "Asset Info",
+			Title: "Asset Information",
 			Fields: []types.DetailFieldConfig{
 				{Key: "asset", Label: "Asset", Formatter: "address"},
 				{Key: "symbol", Label: "Symbol"},
 				{Key: "decimals", Label: "Decimals"},
+				{Key: "spotPrice", Label: "Spot Price"},
+				{Key: "priceSource", Label: "Price Source"},
 			},
 		},
 		{
-			Title: "Transaction",
+			Title: "Balance Reconciliation",
 			Fields: []types.DetailFieldConfig{
-				{Key: "gasUsed", Label: "Gas Used", Formatter: "gas"},
-				{Key: "reconciliationType", Label: "Type"},
+				{Key: "begBal", Label: "Begin Balance", Formatter: "wei"},
+				{Key: "totalIn", Label: "Total In", Formatter: "wei"},
+				{Key: "totalOut", Label: "Total Out", Formatter: "wei"},
+				{Key: "amountNet", Label: "Net Amount", Formatter: "wei"},
+				{Key: "endBal", Label: "End Balance", Formatter: "wei"},
+				{Key: "endBalCalc", Label: "Calculated End Balance", Formatter: "wei"},
+			},
+		},
+		{
+			Title: "Inflow Details",
+			Fields: []types.DetailFieldConfig{
+				{Key: "amountIn", Label: "Amount In", Formatter: "wei"},
+				{Key: "internalIn", Label: "Internal In", Formatter: "wei"},
+				{Key: "selfDestructIn", Label: "Self Destruct In", Formatter: "wei"},
+				{Key: "minerBaseRewardIn", Label: "Base Reward In", Formatter: "wei"},
+				{Key: "minerTxFeeIn", Label: "Tx Fee In", Formatter: "wei"},
+				{Key: "prefundIn", Label: "Prefund In", Formatter: "wei"},
+			},
+		},
+		{
+			Title: "Outflow Details",
+			Fields: []types.DetailFieldConfig{
+				{Key: "amountOut", Label: "Amount Out", Formatter: "wei"},
+				{Key: "internalOut", Label: "Internal Out", Formatter: "wei"},
+				{Key: "selfDestructOut", Label: "Self Destruct Out", Formatter: "wei"},
+				{Key: "gasOut", Label: "Gas Out", Formatter: "wei"},
+			},
+		},
+		{
+			Title: "Transaction Details",
+			Fields: []types.DetailFieldConfig{
+				{Key: "blockNumber", Label: "Block Number"},
+				{Key: "transactionIndex", Label: "Transaction Index"},
+				{Key: "logIndex", Label: "Log Index"},
+				{Key: "transactionHash", Label: "Transaction Hash", Formatter: "hash"},
+				{Key: "sender", Label: "Sender", Formatter: "address"},
+				{Key: "recipient", Label: "Recipient", Formatter: "address"},
+			},
+		},
+		{
+			Title: "Reconciliation Analysis",
+			Fields: []types.DetailFieldConfig{
+				{Key: "prevBal", Label: "Previous Balance", Formatter: "wei"},
+				{Key: "begBalDiff", Label: "Begin Balance Diff", Formatter: "wei"},
+				{Key: "endBalDiff", Label: "End Balance Diff", Formatter: "wei"},
+				{Key: "correctingReasons", Label: "Correcting Reasons"},
+			},
+		},
+		{
+			Title: "Correction Entries",
+			Fields: []types.DetailFieldConfig{
+				{Key: "correctBegBalIn", Label: "Correct Begin Bal In", Formatter: "wei"},
+				{Key: "correctAmountIn", Label: "Correct Amount In", Formatter: "wei"},
+				{Key: "correctEndBalIn", Label: "Correct End Bal In", Formatter: "wei"},
+				{Key: "correctBegBalOut", Label: "Correct Begin Bal Out", Formatter: "wei"},
+				{Key: "correctAmountOut", Label: "Correct Amount Out", Formatter: "wei"},
+				{Key: "correctEndBalOut", Label: "Correct End Bal Out", Formatter: "wei"},
 			},
 		},
 	}
@@ -144,24 +200,30 @@ func getBalancesColumns() []types.ColumnConfig {
 func getBalancesDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Balance",
+			Title: "Balance Information",
 			Fields: []types.DetailFieldConfig{
-				{Key: "date", Label: "Date", Formatter: "datetime"},
 				{Key: "balance", Label: "Balance", Formatter: "wei"},
+				{Key: "priorBalance", Label: "Prior Balance", Formatter: "wei"},
+				{Key: "totalSupply", Label: "Total Supply", Formatter: "wei"},
+				{Key: "type", Label: "Token Type"},
 			},
 		},
 		{
-			Title: "Addresses",
+			Title: "Token Details",
 			Fields: []types.DetailFieldConfig{
+				{Key: "address", Label: "Token Address", Formatter: "address"},
 				{Key: "holder", Label: "Holder", Formatter: "address"},
-				{Key: "address", Label: "Address", Formatter: "address"},
+				{Key: "symbol", Label: "Symbol"},
+				{Key: "name", Label: "Token Name"},
+				{Key: "decimals", Label: "Decimals"},
 			},
 		},
 		{
-			Title: "Token Info",
+			Title: "Transaction Context",
 			Fields: []types.DetailFieldConfig{
-				{Key: "symbol", Label: "Symbol"},
-				{Key: "decimals", Label: "Decimals"},
+				{Key: "blockNumber", Label: "Block Number"},
+				{Key: "transactionIndex", Label: "Transaction Index"},
+				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
 			},
 		},
 	}
@@ -183,12 +245,40 @@ func getTransfersColumns() []types.ColumnConfig {
 func getTransfersDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Transfer",
+			Title: "Transfer Details",
 			Fields: []types.DetailFieldConfig{
-				{Key: "from", Label: "From", Formatter: "address"},
-				{Key: "to", Label: "To", Formatter: "address"},
-				{Key: "amount", Label: "Amount", Formatter: "wei"},
+				{Key: "sender", Label: "Sender", Formatter: "address"},
+				{Key: "recipient", Label: "Recipient", Formatter: "address"},
+				{Key: "holder", Label: "Holder", Formatter: "address"},
 				{Key: "asset", Label: "Asset", Formatter: "address"},
+				{Key: "decimals", Label: "Decimals"},
+			},
+		},
+		{
+			Title: "Amount Breakdown",
+			Fields: []types.DetailFieldConfig{
+				{Key: "amountIn", Label: "Amount In", Formatter: "wei"},
+				{Key: "amountOut", Label: "Amount Out", Formatter: "wei"},
+				{Key: "internalIn", Label: "Internal In", Formatter: "wei"},
+				{Key: "internalOut", Label: "Internal Out", Formatter: "wei"},
+				{Key: "gasOut", Label: "Gas Out", Formatter: "wei"},
+			},
+		},
+		{
+			Title: "Mining Rewards",
+			Fields: []types.DetailFieldConfig{
+				{Key: "minerBaseRewardIn", Label: "Base Reward In", Formatter: "wei"},
+				{Key: "minerNephewRewardIn", Label: "Nephew Reward In", Formatter: "wei"},
+				{Key: "minerTxFeeIn", Label: "Tx Fee In", Formatter: "wei"},
+				{Key: "minerUncleRewardIn", Label: "Uncle Reward In", Formatter: "wei"},
+			},
+		},
+		{
+			Title: "Special Transfers",
+			Fields: []types.DetailFieldConfig{
+				{Key: "selfDestructIn", Label: "Self Destruct In", Formatter: "wei"},
+				{Key: "selfDestructOut", Label: "Self Destruct Out", Formatter: "wei"},
+				{Key: "prefundIn", Label: "Prefund In", Formatter: "wei"},
 			},
 		},
 		{
@@ -218,20 +308,42 @@ func getTransactionsColumns() []types.ColumnConfig {
 func getTransactionsDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Transaction",
+			Title: "Transaction Overview",
 			Fields: []types.DetailFieldConfig{
 				{Key: "hash", Label: "Hash", Formatter: "hash"},
 				{Key: "from", Label: "From", Formatter: "address"},
 				{Key: "to", Label: "To", Formatter: "address"},
 				{Key: "value", Label: "Value", Formatter: "wei"},
+				{Key: "isError", Label: "Error Status"},
+				{Key: "hasToken", Label: "Has Token"},
 			},
 		},
 		{
-			Title: "Block Info",
+			Title: "Gas Information",
 			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block"},
-				{Key: "transactionIndex", Label: "Index"},
+				{Key: "gas", Label: "Gas Limit"},
 				{Key: "gasUsed", Label: "Gas Used", Formatter: "gas"},
+				{Key: "gasPrice", Label: "Gas Price", Formatter: "gas"},
+				{Key: "maxFeePerGas", Label: "Max Fee Per Gas", Formatter: "gas"},
+				{Key: "maxPriorityFeePerGas", Label: "Max Priority Fee", Formatter: "gas"},
+			},
+		},
+		{
+			Title: "Block Context",
+			Fields: []types.DetailFieldConfig{
+				{Key: "blockNumber", Label: "Block Number"},
+				{Key: "blockHash", Label: "Block Hash", Formatter: "hash"},
+				{Key: "transactionIndex", Label: "Transaction Index"},
+				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
+			},
+		},
+		{
+			Title: "Transaction Details",
+			Fields: []types.DetailFieldConfig{
+				{Key: "nonce", Label: "Nonce"},
+				{Key: "type", Label: "Transaction Type"},
+				{Key: "input", Label: "Input Data"},
+				{Key: "articulatedTx", Label: "Articulated Transaction", Formatter: "json"},
 			},
 		},
 	}
@@ -251,18 +363,19 @@ func getWithdrawalsColumns() []types.ColumnConfig {
 func getWithdrawalsDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Withdrawal",
+			Title: "Withdrawal Details",
 			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Address", Formatter: "address"},
+				{Key: "address", Label: "Recipient Address", Formatter: "address"},
 				{Key: "amount", Label: "Amount", Formatter: "wei"},
-				{Key: "validatorIndex", Label: "Validator"},
+				{Key: "validatorIndex", Label: "Validator Index"},
+				{Key: "index", Label: "Withdrawal Index"},
 			},
 		},
 		{
-			Title: "Block Info",
+			Title: "Block Information",
 			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block"},
-				{Key: "index", Label: "Index"},
+				{Key: "blockNumber", Label: "Block Number"},
+				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
 			},
 		},
 	}
@@ -283,19 +396,33 @@ func getAssetsColumns() []types.ColumnConfig {
 func getAssetsDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Asset",
+			Title: "Asset Information",
 			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Address", Formatter: "address"},
-				{Key: "holder", Label: "Holder", Formatter: "address"},
-				{Key: "name", Label: "Name"},
+				{Key: "address", Label: "Contract Address", Formatter: "address"},
+				{Key: "name", Label: "Token Name"},
 				{Key: "symbol", Label: "Symbol"},
+				{Key: "decimals", Label: "Decimals"},
+				{Key: "totalSupply", Label: "Total Supply", Formatter: "wei"},
 			},
 		},
 		{
-			Title: "Token Info",
+			Title: "Asset Classification",
 			Fields: []types.DetailFieldConfig{
-				{Key: "decimals", Label: "Decimals"},
-				{Key: "totalSupply", Label: "Total Supply", Formatter: "wei"},
+				{Key: "source", Label: "Source"},
+				{Key: "tags", Label: "Tags"},
+				{Key: "isContract", Label: "Is Contract"},
+				{Key: "isCustom", Label: "Is Custom"},
+				{Key: "isErc20", Label: "Is ERC20"},
+				{Key: "isErc721", Label: "Is ERC721"},
+				{Key: "isPrefund", Label: "Is Prefund"},
+				{Key: "deleted", Label: "Deleted"},
+			},
+		},
+		{
+			Title: "Additional Data",
+			Fields: []types.DetailFieldConfig{
+				{Key: "parts", Label: "Parts"},
+				{Key: "prefund", Label: "Prefund Amount", Formatter: "wei"},
 			},
 		},
 	}
@@ -316,21 +443,37 @@ func getLogsColumns() []types.ColumnConfig {
 func getLogsDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Log",
+			Title: "Log Overview",
 			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Address", Formatter: "address"},
-				{Key: "topic0", Label: "Topic0", Formatter: "hash"},
-				{Key: "topic1", Label: "Topic1", Formatter: "hash"},
-				{Key: "topic2", Label: "Topic2", Formatter: "hash"},
-				{Key: "topic3", Label: "Topic3", Formatter: "hash"},
+				{Key: "address", Label: "Contract Address", Formatter: "address"},
+				{Key: "data", Label: "Data"},
+				{Key: "logIndex", Label: "Log Index"},
 			},
 		},
 		{
-			Title: "Transaction Info",
+			Title: "Topics",
 			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block"},
-				{Key: "transactionIndex", Label: "Tx Index"},
-				{Key: "logIndex", Label: "Log Index"},
+				{Key: "topics.0", Label: "Topic 0 (Event Signature)", Formatter: "hash"},
+				{Key: "topics.1", Label: "Topic 1", Formatter: "hash"},
+				{Key: "topics.2", Label: "Topic 2", Formatter: "hash"},
+				{Key: "topics.3", Label: "Topic 3", Formatter: "hash"},
+			},
+		},
+		{
+			Title: "Transaction Context",
+			Fields: []types.DetailFieldConfig{
+				{Key: "blockNumber", Label: "Block Number"},
+				{Key: "blockHash", Label: "Block Hash", Formatter: "hash"},
+				{Key: "transactionHash", Label: "Transaction Hash", Formatter: "hash"},
+				{Key: "transactionIndex", Label: "Transaction Index"},
+				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
+			},
+		},
+		{
+			Title: "Articulated Information",
+			Fields: []types.DetailFieldConfig{
+				{Key: "articulatedLog", Label: "Articulated Log", Formatter: "json"},
+				{Key: "compressedLog", Label: "Compressed Log"},
 			},
 		},
 	}
@@ -352,20 +495,49 @@ func getTracesColumns() []types.ColumnConfig {
 func getTracesDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Trace",
+			Title: "Trace Overview",
+			Fields: []types.DetailFieldConfig{
+				{Key: "type", Label: "Trace Type"},
+				{Key: "error", Label: "Error"},
+				{Key: "subtraces", Label: "Subtraces Count"},
+				{Key: "traceAddress", Label: "Trace Address"},
+			},
+		},
+		{
+			Title: "Trace Action",
 			Fields: []types.DetailFieldConfig{
 				{Key: "from", Label: "From", Formatter: "address"},
 				{Key: "to", Label: "To", Formatter: "address"},
 				{Key: "value", Label: "Value", Formatter: "wei"},
-				{Key: "type", Label: "Type"},
+				{Key: "gas", Label: "Gas Limit"},
+				{Key: "callType", Label: "Call Type"},
+				{Key: "input", Label: "Input Data"},
 			},
 		},
 		{
-			Title: "Transaction Info",
+			Title: "Trace Result",
 			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block"},
-				{Key: "transactionIndex", Label: "Tx Index"},
-				{Key: "traceIndex", Label: "Trace Index"},
+				{Key: "gasUsed", Label: "Gas Used", Formatter: "gas"},
+				{Key: "output", Label: "Output"},
+				{Key: "address", Label: "Created Address", Formatter: "address"},
+				{Key: "code", Label: "Code"},
+			},
+		},
+		{
+			Title: "Transaction Context",
+			Fields: []types.DetailFieldConfig{
+				{Key: "blockNumber", Label: "Block Number"},
+				{Key: "blockHash", Label: "Block Hash", Formatter: "hash"},
+				{Key: "transactionHash", Label: "Transaction Hash", Formatter: "hash"},
+				{Key: "transactionIndex", Label: "Transaction Index"},
+				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
+			},
+		},
+		{
+			Title: "Articulated Information",
+			Fields: []types.DetailFieldConfig{
+				{Key: "articulatedTrace", Label: "Articulated Trace", Formatter: "json"},
+				{Key: "compressedTrace", Label: "Compressed Trace"},
 			},
 		},
 	}
@@ -387,20 +559,42 @@ func getReceiptsColumns() []types.ColumnConfig {
 func getReceiptsDetailPanels() []types.DetailPanelConfig {
 	return []types.DetailPanelConfig{
 		{
-			Title: "Receipt",
+			Title: "Receipt Overview",
 			Fields: []types.DetailFieldConfig{
-				{Key: "transactionHash", Label: "Tx Hash", Formatter: "hash"},
-				{Key: "from", Label: "From", Formatter: "address"},
-				{Key: "to", Label: "To", Formatter: "address"},
+				{Key: "transactionHash", Label: "Transaction Hash", Formatter: "hash"},
 				{Key: "status", Label: "Status"},
+				{Key: "isError", Label: "Is Error"},
+				{Key: "contractAddress", Label: "Contract Address", Formatter: "address"},
 			},
 		},
 		{
-			Title: "Gas Info",
+			Title: "Transaction Details",
+			Fields: []types.DetailFieldConfig{
+				{Key: "from", Label: "From", Formatter: "address"},
+				{Key: "to", Label: "To", Formatter: "address"},
+				{Key: "transactionIndex", Label: "Transaction Index"},
+			},
+		},
+		{
+			Title: "Gas Information",
 			Fields: []types.DetailFieldConfig{
 				{Key: "gasUsed", Label: "Gas Used", Formatter: "gas"},
-				{Key: "blockNumber", Label: "Block"},
-				{Key: "transactionIndex", Label: "Index"},
+				{Key: "cumulativeGasUsed", Label: "Cumulative Gas Used", Formatter: "gas"},
+				{Key: "effectiveGasPrice", Label: "Effective Gas Price", Formatter: "gas"},
+			},
+		},
+		{
+			Title: "Block Context",
+			Fields: []types.DetailFieldConfig{
+				{Key: "blockNumber", Label: "Block Number"},
+				{Key: "blockHash", Label: "Block Hash", Formatter: "hash"},
+			},
+		},
+		{
+			Title: "Additional Information",
+			Fields: []types.DetailFieldConfig{
+				{Key: "logsBloom", Label: "Logs Bloom"},
+				{Key: "logs", Label: "Log Count"},
 			},
 		},
 	}

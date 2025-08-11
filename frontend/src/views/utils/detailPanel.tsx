@@ -14,7 +14,6 @@ export interface MetaOverlay {
   detailOnly?: boolean;
   formatters?: Record<string, (value: any) => string>;
   extras?: Record<string, any>;
-  promptWidthPx?: number;
 }
 
 /**
@@ -106,7 +105,6 @@ export const buildDetailPanelFromColumns = <T extends Record<string, unknown>>(
     collapsedSections?: string[];
     formatters?: Record<string, (value: any) => string>;
     extras?: Record<string, any>;
-    promptWidthPx?: number;
   },
 ) => {
   const DetailPanel = (rowData: T | null) => {
@@ -243,7 +241,6 @@ export const buildDetailPanelFromConfigs = <T extends Record<string, unknown>>(
     return (
       <DetailTable
         sections={sections}
-        promptWidthPx={220}
         defaultCollapsedSections={['Statistics']} // Start with some sections collapsed
       />
     );

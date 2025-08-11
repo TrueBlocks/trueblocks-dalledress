@@ -78,8 +78,6 @@ export function GetChunksPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sd
 
 export function GetChunksSummary(arg1:types.Payload):Promise<types.Summary>;
 
-export function GetCollectionFacets(arg1:string):Promise<Array<types.DataFacet>>;
-
 export function GetContext():Promise<context.Context>;
 
 export function GetContractsConfig(arg1:types.Payload):Promise<types.ViewConfig>;

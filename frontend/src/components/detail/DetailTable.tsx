@@ -8,14 +8,12 @@ type Section = { name: string; rows: Row[] };
 
 interface DetailTableProps {
   sections: Section[];
-  promptWidthPx?: number;
   className?: string;
   defaultCollapsedSections?: string[];
 }
 
 export const DetailTable = ({
   sections,
-  promptWidthPx = 220,
   className,
   defaultCollapsedSections = [],
 }: DetailTableProps) => {
@@ -30,50 +28,33 @@ export const DetailTable = ({
       return next;
     });
   };
-  const styleVar = {
-    ['--detail-prompt-width']: `${promptWidthPx}px`,
-  } as Record<string, string>;
   return (
-    <table
-      className={`detail-table fixed-prompt-width${className ? ` ${className}` : ''}`}
-      style={styleVar}
-    >
-      <tbody>
-        {sections.map((s) => {
-          const isCollapsed = collapsed.has(s.name);
-          return (
-            <Fragment key={s.name}>
-              <tr key={`${s.name}-header`}>
-                <th
-                  colSpan={2}
-                  onClick={() => toggle(s.name)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <span style={{ fontSize: '0.75em' }}>
-                    {isCollapsed ? '▶' : '▼'}
-                  </span>{' '}
-                  {s.name}
-                </th>
-              </tr>
-              {!isCollapsed &&
-                s.rows.map((r, i) => (
-                  <tr key={`${s.name}-${i}`}>
-                    <td
-                      className="prompt"
-                      style={{ width: `${promptWidthPx}px` }}
-                    >
-                      {r.label}
-                    </td>
-                    <td>{r.value}</td>
-                  </tr>
-                ))}
-              <tr className="separator" key={`${s.name}-separator`}>
-                <td colSpan={2} />
-              </tr>
-            </Fragment>
-          );
-        })}
-      </tbody>
-    </table>
+    <div className={`detail-table${className ? ` ${className}` : ''}`}>
+      {sections.map((s, sectionIndex) => {
+        const isCollapsed = collapsed.has(s.name);
+        return (
+          <Fragment key={s.name}>
+            <div
+              key={`${s.name}-header`}
+              onClick={() => toggle(s.name)}
+              className={`detail-section-header ${sectionIndex === 0 ? 'first-section-header' : ''}`}
+            >
+              <span style={{ fontSize: '0.75em' }}>
+                {isCollapsed ? '▶' : '▼'}
+              </span>{' '}
+              {s.name}
+            </div>
+            {!isCollapsed &&
+              s.rows.map((r, i) => (
+                <Fragment key={`${s.name}-${i}`}>
+                  <div className="detail-row-prompt">{r.label}</div>
+                  <div className="detail-row-value">{r.value}</div>
+                </Fragment>
+              ))}
+            <div className="detail-separator" key={`${s.name}-separator`} />
+          </Fragment>
+        );
+      })}
+    </div>
   );
 };

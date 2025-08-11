@@ -107,11 +107,10 @@ func getColumns() []types.ColumnConfig {
 }
 
 func getDetailPanels() []types.DetailPanelConfig {
-	// Static panel configuration
-
 	return []types.DetailPanelConfig{
 		{
-			Title: "Overview",
+			Title:     "Monitor Overview",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{
 					Key:       "name",
@@ -123,14 +122,25 @@ func getDetailPanels() []types.DetailPanelConfig {
 					Label:     "Address",
 					Formatter: "address",
 				},
+				{
+					Key:       "deleted",
+					Label:     "Deleted",
+					Formatter: "boolean",
+				},
+				{
+					Key:       "isStaged",
+					Label:     "Staged",
+					Formatter: "boolean",
+				},
 			},
 		},
 		{
-			Title: "Statistics",
+			Title:     "File Statistics",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{
 					Key:       "nRecords",
-					Label:     "Records",
+					Label:     "Total Records",
 					Formatter: "number",
 				},
 				{
@@ -140,23 +150,19 @@ func getDetailPanels() []types.DetailPanelConfig {
 				},
 				{
 					Key:       "isEmpty",
-					Label:     "Empty",
+					Label:     "Is Empty",
 					Formatter: "boolean",
 				},
 			},
 		},
 		{
-			Title: "Scanning",
+			Title:     "Scanning Information",
+			Collapsed: false,
 			Fields: []types.DetailFieldConfig{
 				{
 					Key:       "lastScanned",
 					Label:     "Last Scanned",
 					Formatter: "timestamp",
-				},
-				{
-					Key:       "lastScanAge",
-					Label:     "Age",
-					Formatter: "computed",
 				},
 			},
 		},

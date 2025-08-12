@@ -190,7 +190,7 @@ func (c *MonitorsCollection) ExportData(payload *types.Payload) (string, error) 
 	case MonitorsMonitors:
 		return c.monitorsFacet.ExportData(payload, string(MonitorsMonitors))
 	default:
-		return "", fmt.Errorf("unsupported monitors facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported monitors facet: %s", payload.DataFacet)
 	}
 }
 

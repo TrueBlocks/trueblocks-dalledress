@@ -517,7 +517,7 @@ func (c *ExportsCollection) ExportData(payload *types.Payload) (string, error) {
 	case ExportsReceipts:
 		return c.receiptsFacet.ExportData(payload, string(ExportsReceipts))
 	default:
-		return "", fmt.Errorf("unsupported exports facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported exports facet: %s", payload.DataFacet)
 	}
 }
 

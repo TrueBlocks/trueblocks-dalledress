@@ -1,5 +1,5 @@
 import { CancelFetch, Reload } from '@app';
-import { useActiveProject, usePreferences } from '@hooks';
+import { useActiveProject, usePayload, usePreferences } from '@hooks';
 import { msgs, types } from '@models';
 import { LogError, emitEvent, registerHotkeys, useEmitters } from '@utils';
 import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
@@ -33,6 +33,7 @@ type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
 export const useAppHotkeys = (): void => {
   const [currentLocation] = useLocation();
   const { getLastFacet } = useActiveProject();
+  const createPayload = usePayload();
   const {
     debugCollapsed,
     setDebugCollapsed,
@@ -167,11 +168,9 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+r',
             label: 'Reload',
             action: () => {
-              Reload(
-                types.Payload.createFrom({ dataFacet: currentFacet }),
-              ).then(() => {
-                // do nothing
-              });
+              Reload(createPayload(currentFacet as types.DataFacet)).then(
+                () => {},
+              );
             },
           },
           e,

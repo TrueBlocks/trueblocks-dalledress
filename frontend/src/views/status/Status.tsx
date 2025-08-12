@@ -9,24 +9,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetStatusPage, Reload } from '@app';
-import {
-  Action,
-  BaseTab,
-  ConfirmModal,
-  ExportFormatModal,
-  usePagination,
-} from '@components';
+import { BaseTab, usePagination } from '@components';
+import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
-import { buildFacetConfigs, useActions } from '@hooks';
 import {
   DataFacetConfig,
+  buildFacetConfigs,
+  useActions,
   useActiveFacet,
   useEvent,
   useFacetColumns,
+  useFacetForm,
   usePayload,
   useViewConfig,
 } from '@hooks';
-import { useFacetForm } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
@@ -38,23 +34,21 @@ import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'status';
-
 export const Status = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-
   // === SECTION 2.5: Initial ViewConfig Load ===
   const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
   assertRouteConsistency(ROUTE, viewConfig);
 
-  const statusFacets: DataFacetConfig[] = useMemo(
+  const facetsFromConfig: DataFacetConfig[] = useMemo(
     () => buildFacetConfigs(viewConfig),
     [viewConfig],
   );
 
   const activeFacetHook = useActiveFacet({
-    facets: statusFacets,
+    facets: facetsFromConfig,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
@@ -112,7 +106,7 @@ export const Status = () => {
       case types.DataFacet.CHAINS:
         return pageData.chains || [];
       default:
-        LogError('[STATUS] unexpected facet=' + String(facet));
+        LogError('[Status] unexpected facet=' + String(facet));
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
@@ -142,9 +136,7 @@ export const Status = () => {
   const handleReload = useCallback(async () => {
     clearError();
     try {
-      Reload(createPayload(getCurrentDataFacet())).then(() => {
-        // The data will reload when the DataLoaded event is fired.
-      });
+      Reload(createPayload(getCurrentDataFacet())).then(() => {});
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
@@ -152,7 +144,7 @@ export const Status = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: Actions (standardized placeholder) ===
+  // === SECTION 5: Actions ===
   const { handlers, config, exportFormatModal, confirmModal } = useActions({
     collection: ROUTE,
     viewStateKey,
@@ -175,6 +167,8 @@ export const Status = () => {
     createPayload,
     getCurrentDataFacet,
   });
+
+  const {} = handlers;
 
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
@@ -221,14 +215,15 @@ export const Status = () => {
     { rowActions: [] },
   );
 
-  // Create detail panel from ViewConfig
-  const detailPanel = useMemo(() => {
-    return createDetailPanelFromViewConfig(
-      viewConfig,
-      getCurrentDataFacet,
-      'Status Details',
-    );
-  }, [viewConfig, getCurrentDataFacet]);
+  const detailPanel = useMemo(
+    () =>
+      createDetailPanelFromViewConfig(
+        viewConfig,
+        getCurrentDataFacet,
+        'Status Details',
+      ),
+    [viewConfig, getCurrentDataFacet],
+  );
 
   const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
     viewConfig,
@@ -254,13 +249,13 @@ export const Status = () => {
       />
     );
   }, [
-    isForm,
-    formNode,
     currentData,
     currentColumns,
     pageData?.isFetching,
     error,
     viewStateKey,
+    isForm,
+    formNode,
     headerActions,
     detailPanel,
   ]);

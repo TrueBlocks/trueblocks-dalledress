@@ -1,5 +1,6 @@
 {{- $class := .Class -}}
 {{- $lower := toLower $class -}}
+{{- $isNames := and (eq $class "Names") }}
 // Copyright 2016, 2026 The Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
@@ -22,11 +23,11 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 			Name:          "{{toProper .Name}}",
 			Store:         "{{toLower .Store}}",
 			IsForm:        {{.IsForm}},
-			DividerBefore: {{.DividerBefore}},
+			DividerBefore: {{and (eq .Name "Prefund") $isNames}},
 			Columns:       get{{$class}}{{toProper .Name}}Columns(),
 			DetailPanels:  get{{$class}}{{toProper .Name}}DetailPanels(),
 			Actions:       []string{ {{- range .Cruds}}{{printf "%q" .}}, {{- end}}},
-			HeaderActions: []string{ {{- range .HeaderActions}}{{printf "%q" .}}, {{- end}}},
+			// HeaderActions: []string{ { {- range .HeaderActions} }{ {printf "%q" .} }, { {- end} }},
 		},
 		{{- end}}
 	}
@@ -36,62 +37,9 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 		Facets:     facets,
 		FacetOrder: []string{ {{- range .Facets}}{{printf "%q" (toLower .Name)}}, {{- end}}},
 		Actions: map[string]types.ActionConfig{
-			{{- range .Actions}}
-			"{{.Name}}": {Name: "{{.Name}}", Label: "{{.Label}}", Icon: "{{.Icon}}"{{if .Confirmation}}, Confirmation: true{{end}}{{if .Facets}}, Facets: []string{ {{- range .Facets}}{{printf "%q" .}}, {{- end}} }{{end}}},
-			{{- end}}
+			// { {- range .Actions} }
+			// "{ {.Name} }": {Name: "{ {.Name} }", Label: "{ {.Label} }", Icon: "{ {.Icon} }"{ {if .Confirmation} }, Confirmation: true{ {end} }{ {if .Facets} }, Facets: []string{ { {- range .Facets} }{ {printf "%q" .} }, { {- end} } }{ {end}} },
+			// { {- end} }
 		},
 	}, nil
 }
-
-// Auto-generated columns from Structure metadata
-{{- range .Facets}}
-func get{{$class}}{{toProper .Name}}Columns() []types.ColumnConfig {
-	cols := []types.ColumnConfig{}
-	{{- $structName := or .Struct (toProper (toSingular .Store)) -}}
-	{{- $added := false -}}
-	{{- range $.Structures}}
-		{{- if eq .class $structName}}
-			{{- range .members}}
-				{{- $key := .name -}}
-				{{- $typ := .type -}}
-				{{- $fmt := "" -}}
-				{{- if or (eq $typ "address") (contains $typ "address") }}{{ $fmt = "address" }}{{ end -}}
-				{{- if or (eq $typ "hash") (contains $typ "hash") }}{{ $fmt = "hash" }}{{ end -}}
-				{{- if eq $typ "timestamp" }}{{ $fmt = "timestamp" }}{{ end -}}
-				{{- if eq $typ "datetime" }}{{ $fmt = "datetime" }}{{ end -}}
-				{{- if eq $typ "bool" }}{{ $fmt = "boolean" }}{{ end -}}
-				{{- if or (contains $typ "int") (contains $typ "uint") (eq $typ "float") (eq $typ "value") }}{{ $fmt = (or $fmt "number") }}{{ end -}}
-				cols = append(cols, types.ColumnConfig{
-					Key: "{{$key}}", Header: "{{toProper $key}}", Accessor: "{{$key}}",
-					Width: {{- if eq $fmt "address" -}}340{{- else if eq $fmt "hash" -}}300{{- else if or (eq $fmt "timestamp") (eq $fmt "datetime") -}}150{{- else if or (eq $fmt "boolean") (eq $fmt "number") -}}120{{- else -}}200{{- end -}},
-					Sortable: true, Filterable: false, Formatter: "{{$fmt}}",
-				})
-			{{- end}}
-			{{- $added = true -}}
-		{{- end}}
-	{{- end}}
-	// Append Actions column when row actions exist
-	{{- if .Cruds }}
-	cols = append(cols, types.ColumnConfig{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80})
-	{{- end}}
-	return cols
-}
-
-func get{{$class}}{{toProper .Name}}DetailPanels() []types.DetailPanelConfig {
-	panels := []types.DetailPanelConfig{}
-	{{- $structName := or .Struct (toProper (toSingular .Store)) -}}
-	{{- range $.Structures}}
-		{{- if eq .class $structName}}
-		panels = append(panels, types.DetailPanelConfig{
-			Title: "{{toProper .class}} Details",
-			Fields: []types.DetailFieldConfig{
-				{{- range .members}}
-				{Key: "{{.name}}", Label: "{{toProper .name}}"{{- if (or (eq .type "address") (contains .type "address")) }}, Formatter: "address"{{- end}}{{- if (or (eq .type "hash") (contains .type "hash")) }}, Formatter: "hash"{{- end}}{{- if (eq .type "bool") }}, Formatter: "boolean"{{- end}}{{- if (or (contains .type "int") (contains .type "uint") (eq .type "float") (eq .type "value")) }}, Formatter: "number"{{- end}}},
-				{{- end}}
-			},
-		})
-		{{- end}}
-	{{- end}}
-	return panels
-}
-{{- end}}

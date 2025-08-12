@@ -286,7 +286,7 @@ func (c *NamesCollection) ExportData(payload *types.Payload) (string, error) {
 	case NamesBaddress:
 		return c.baddressFacet.ExportData(payload, string(NamesBaddress))
 	default:
-		return "", fmt.Errorf("unsupported names facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported names facet: %s", payload.DataFacet)
 	}
 }
 

@@ -170,7 +170,7 @@ func (c *{{$class}}Collection) ExportData(payload *types.Payload) (string, error
 		return c.{{toLower .Name}}Facet.ExportData{{if $isContracts}}Pointers{{end}}(payload, string({{$class}}{{.Name}}))
 	{{- end}}
 	default:
-		return "", fmt.Errorf("unsupported {{$lower}} facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported {{$lower}} facet: %s", payload.DataFacet)
 	}
 }
 

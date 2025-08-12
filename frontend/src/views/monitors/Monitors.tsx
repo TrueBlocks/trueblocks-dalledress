@@ -19,6 +19,7 @@ import {
   useActiveFacet,
   useEvent,
   useFacetColumns,
+  useFacetForm,
   usePayload,
   useViewConfig,
 } from '@hooks';
@@ -33,23 +34,21 @@ import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'monitors';
-
 export const Monitors = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-
   // === SECTION 2.5: Initial ViewConfig Load ===
   const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
   assertRouteConsistency(ROUTE, viewConfig);
 
-  const monitorsFacets: DataFacetConfig[] = useMemo(
+  const facetsFromConfig: DataFacetConfig[] = useMemo(
     () => buildFacetConfigs(viewConfig),
     [viewConfig],
   );
 
   const activeFacetHook = useActiveFacet({
-    facets: monitorsFacets,
+    facets: facetsFromConfig,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
@@ -103,7 +102,7 @@ export const Monitors = () => {
       case types.DataFacet.MONITORS:
         return pageData.monitors || [];
       default:
-        LogError('[MONITORS] unexpected facet=' + String(facet));
+        LogError('[Monitors] unexpected facet=' + String(facet));
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
@@ -133,9 +132,7 @@ export const Monitors = () => {
   const handleReload = useCallback(async () => {
     clearError();
     try {
-      Reload(createPayload(getCurrentDataFacet())).then(() => {
-        // The data will reload when the DataLoaded event is fired.
-      });
+      Reload(createPayload(getCurrentDataFacet())).then(() => {});
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
@@ -143,7 +140,7 @@ export const Monitors = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: CRUD Operations ===
+  // === SECTION 5: Actions ===
   const { handlers, config, exportFormatModal, confirmModal } = useActions({
     collection: ROUTE,
     viewStateKey,
@@ -166,9 +163,9 @@ export const Monitors = () => {
   const { handleRemove, handleToggle } = handlers;
 
   const headerActions = useMemo(() => {
-    if (!config.headerActions.length) return [];
-    return [
-      <Group gap="xs" style={{ flexShrink: 0 }} key="header-actions-group">
+    if (!config.headerActions.length) return null;
+    return (
+      <Group gap="xs" style={{ flexShrink: 0 }}>
         {config.headerActions.map((action) => {
           const handlerKey =
             `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
@@ -192,8 +189,8 @@ export const Monitors = () => {
             />
           );
         })}
-      </Group>,
-    ];
+      </Group>
+    );
   }, [config.headerActions, config.isWalletConnected, handlers]);
 
   // === SECTION 6: UI Configuration ===
@@ -216,16 +213,28 @@ export const Monitors = () => {
     config,
   );
 
-  // Create detail panel from ViewConfig
-  const detailPanel = useMemo(() => {
-    return createDetailPanelFromViewConfig(
-      viewConfig,
-      getCurrentDataFacet,
-      'Monitor Details',
-    );
-  }, [viewConfig, getCurrentDataFacet]);
+  const detailPanel = useMemo(
+    () =>
+      createDetailPanelFromViewConfig(
+        viewConfig,
+        getCurrentDataFacet,
+        'Monitors Details',
+      ),
+    [viewConfig, getCurrentDataFacet],
+  );
+
+  const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
+    viewConfig,
+    getCurrentDataFacet,
+    currentData: currentData as unknown as Record<string, unknown>[],
+    currentColumns:
+      currentColumns as unknown as import('@components').FormField<
+        Record<string, unknown>
+      >[],
+  });
 
   const perTabContent = useMemo(() => {
+    if (isForm && formNode) return formNode;
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -234,9 +243,9 @@ export const Monitors = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={headerActions}
+        detailPanel={detailPanel}
         onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
-        detailPanel={detailPanel}
       />
     );
   }, [
@@ -245,6 +254,8 @@ export const Monitors = () => {
     pageData?.isFetching,
     error,
     viewStateKey,
+    isForm,
+    formNode,
     headerActions,
     detailPanel,
     handleToggle,

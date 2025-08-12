@@ -307,7 +307,7 @@ func (c *ChunksCollection) ExportData(payload *types.Payload) (string, error) {
 	case ChunksManifest:
 		return c.manifestFacet.ExportData(payload, string(ChunksManifest))
 	default:
-		return "", fmt.Errorf("unsupported chunks facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported chunks facet: %s", payload.DataFacet)
 	}
 }
 

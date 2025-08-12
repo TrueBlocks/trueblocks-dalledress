@@ -244,7 +244,7 @@ func (c *ContractsCollection) ExportData(payload *types.Payload) (string, error)
 	case ContractsEvents:
 		return c.eventsFacet.ExportDataPointers(payload, string(ContractsEvents))
 	default:
-		return "", fmt.Errorf("unsupported contracts facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported contracts facet: %s", payload.DataFacet)
 	}
 }
 

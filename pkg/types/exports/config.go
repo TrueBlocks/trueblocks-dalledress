@@ -367,7 +367,7 @@ func getWithdrawalsColumns() []types.ColumnConfig {
 		{Key: "index", Header: "Index", Accessor: "index", Width: 80},
 		{Key: "validatorIndex", Header: "Validator", Accessor: "validatorIndex", Width: 100},
 		{Key: "address", Header: "Address", Accessor: "address", Width: 340, Formatter: "address"},
-		{Key: "amount", Header: "Amount", Accessor: "amount", Width: 150, Formatter: "wei"},
+		{Key: "amount", Header: "Amount", Accessor: "amount", Width: 150, Formatter: "ether"},
 		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
 	}
 }
@@ -378,7 +378,7 @@ func getWithdrawalsDetailPanels() []types.DetailPanelConfig {
 			Title: "Withdrawal Details",
 			Fields: []types.DetailFieldConfig{
 				{Key: "address", Label: "Recipient Address", Formatter: "address"},
-				{Key: "amount", Label: "Amount", Formatter: "wei"},
+				{Key: "amount", Label: "Amount", Formatter: "ether"},
 				{Key: "validatorIndex", Label: "Validator Index"},
 				{Key: "index", Label: "Withdrawal Index"},
 			},

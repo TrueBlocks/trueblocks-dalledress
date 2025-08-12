@@ -254,7 +254,7 @@ func (c *StatusCollection) ExportData(payload *types.Payload) (string, error) {
 	case StatusChains:
 		return c.chainsFacet.ExportData(payload, string(StatusChains))
 	default:
-		return "", fmt.Errorf("unsupported status facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported status facet: %s", payload.DataFacet)
 	}
 }
 

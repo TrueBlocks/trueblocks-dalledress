@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-
 	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
@@ -147,7 +146,7 @@ func (c *AbisCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	default:
 		return nil, types.NewValidationError("abis", dataFacet, "GetPage",
-			fmt.Errorf("GetPage unsupported dataFacet: %v", dataFacet))
+			fmt.Errorf("[GetPage] unsupported dataFacet: %v", dataFacet))
 	}
 
 	return page, nil
@@ -183,12 +182,16 @@ func (c *AbisCollection) getSummaryPage(
 		return nil, types.NewStoreError("exports", dataFacet, "getSummaryPage", err)
 	}
 
+	page := &AbisPage{
+		Facet: dataFacet,
+	}
+
 	switch dataFacet {
 	// EXISTING_CODE
 	// EXISTING_CODE
 	default:
 		return nil, types.NewValidationError("abis", dataFacet, "getSummaryPage",
-			fmt.Errorf("getSummaryPage unsupported dataFacet: %v", dataFacet))
+			fmt.Errorf("[getSummaryPage] unsupported dataFacet: %v %v", dataFacet, page.Facet))
 	}
 }
 
@@ -200,7 +203,7 @@ func (c *AbisCollection) generateSummariesForPeriod(dataFacet types.DataFacet, p
 	// EXISTING_CODE
 	// EXISTING_CODE
 	default:
-		return fmt.Errorf("unsupported dataFacet for summary generation: %v", dataFacet)
+		return fmt.Errorf("[generateSummariesForPeriod] unsupported dataFacet for summary generation: %v", dataFacet)
 	}
 }
 

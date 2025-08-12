@@ -13,7 +13,6 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-
 	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
@@ -136,7 +135,7 @@ func (c *ContractsCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	default:
 		return nil, types.NewValidationError("contracts", dataFacet, "GetPage",
-			fmt.Errorf("GetPage unsupported dataFacet: %v", dataFacet))
+			fmt.Errorf("[GetPage] unsupported dataFacet: %v", dataFacet))
 	}
 
 	return page, nil
@@ -172,12 +171,16 @@ func (c *ContractsCollection) getSummaryPage(
 		return nil, types.NewStoreError("exports", dataFacet, "getSummaryPage", err)
 	}
 
+	page := &ContractsPage{
+		Facet: dataFacet,
+	}
+
 	switch dataFacet {
 	// EXISTING_CODE
 	// EXISTING_CODE
 	default:
 		return nil, types.NewValidationError("contracts", dataFacet, "getSummaryPage",
-			fmt.Errorf("getSummaryPage unsupported dataFacet: %v", dataFacet))
+			fmt.Errorf("[getSummaryPage] unsupported dataFacet: %v %v", dataFacet, page.Facet))
 	}
 }
 
@@ -189,7 +192,7 @@ func (c *ContractsCollection) generateSummariesForPeriod(dataFacet types.DataFac
 	// EXISTING_CODE
 	// EXISTING_CODE
 	default:
-		return fmt.Errorf("unsupported dataFacet for summary generation: %v", dataFacet)
+		return fmt.Errorf("[generateSummariesForPeriod] unsupported dataFacet for summary generation: %v", dataFacet)
 	}
 }
 

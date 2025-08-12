@@ -1,6 +1,10 @@
 // Copyright 2016, 2026 The Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
 // === SECTION 1: Imports & Dependencies ===
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -30,18 +34,15 @@ import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'chunks';
-
 export const Chunks = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-
   // === SECTION 2.5: Initial ViewConfig Load ===
   const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
   assertRouteConsistency(ROUTE, viewConfig);
 
-  // Convert ViewConfig to DataFacetConfig format for useActiveFacet
-  const facetsFromConfig = useMemo(
+  const facetsFromConfig: DataFacetConfig[] = useMemo(
     () => buildFacetConfigs(viewConfig),
     [viewConfig],
   );
@@ -107,7 +108,7 @@ export const Chunks = () => {
       case types.DataFacet.MANIFEST:
         return pageData.manifest || [];
       default:
-        LogError('[CHUNKS] unexpected facet=' + String(facet));
+        LogError('[Chunks] unexpected facet=' + String(facet));
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
@@ -137,9 +138,7 @@ export const Chunks = () => {
   const handleReload = useCallback(async () => {
     clearError();
     try {
-      Reload(createPayload(getCurrentDataFacet())).then(() => {
-        // The data will reload when the DataLoaded event is fired.
-      });
+      Reload(createPayload(getCurrentDataFacet())).then(() => {});
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
@@ -147,7 +146,7 @@ export const Chunks = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: Actions (standardized placeholder) ===
+  // === SECTION 5: Actions ===
   const { handlers, config, exportFormatModal, confirmModal } = useActions({
     collection: ROUTE,
     viewStateKey,
@@ -162,20 +161,47 @@ export const Chunks = () => {
     crudFunc: async (
       _payload: types.Payload,
       _op: crud.Operation,
-      _item:
-        | types.ChunkStats
-        | types.ChunkIndex
-        | types.ChunkBloom
-        | types.Manifest,
+      _item: Record<string, unknown>,
     ) => {},
     pageFunc: GetChunksPage,
     pageClass: chunks.ChunksPage,
-    updateItem: types.ChunkStats.createFrom({}) as unknown as types.ChunkStats,
+    updateItem: {},
     createPayload,
     getCurrentDataFacet,
   });
 
-  // header actions are built lazily inside perTabContent
+  const {} = handlers;
+
+  const headerActions = useMemo(() => {
+    if (!config.headerActions.length) return null;
+    return (
+      <Group gap="xs" style={{ flexShrink: 0 }}>
+        {config.headerActions.map((action) => {
+          const handlerKey =
+            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
+          const handler = handlers[handlerKey] as () => void;
+          return (
+            <Action
+              key={action.type}
+              icon={
+                action.icon as keyof ReturnType<
+                  typeof import('@hooks').useIconSets
+                >
+              }
+              onClick={handler}
+              title={
+                action.requiresWallet && !config.isWalletConnected
+                  ? `${action.title} (requires wallet connection)`
+                  : action.title
+              }
+              hotkey={action.type === 'export' ? 'mod+x' : undefined}
+              size="sm"
+            />
+          );
+        })}
+      </Group>
+    );
+  }, [config.headerActions, config.isWalletConnected, handlers]);
 
   // === SECTION 6: UI Configuration ===
   const currentColumns = useFacetColumns(
@@ -213,35 +239,6 @@ export const Chunks = () => {
 
   const perTabContent = useMemo(() => {
     if (isForm && formNode) return formNode;
-
-    const headerActions = config.headerActions.length ? (
-      <Group gap="xs" style={{ flexShrink: 0 }}>
-        {config.headerActions.map((action) => {
-          const handlerKey = `handle${
-            action.type.charAt(0).toUpperCase() + action.type.slice(1)
-          }` as keyof typeof handlers;
-          const handler = handlers[handlerKey] as () => void;
-          return (
-            <Action
-              key={action.type}
-              icon={
-                action.icon as keyof ReturnType<
-                  typeof import('@hooks').useIconSets
-                >
-              }
-              onClick={handler}
-              title={
-                action.requiresWallet && !config.isWalletConnected
-                  ? `${action.title} (requires wallet connection)`
-                  : action.title
-              }
-              hotkey={action.type === 'export' ? 'mod+x' : undefined}
-              size="sm"
-            />
-          );
-        })}
-      </Group>
-    ) : null;
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -254,17 +251,15 @@ export const Chunks = () => {
       />
     );
   }, [
-    isForm,
-    formNode,
     currentData,
     currentColumns,
     pageData?.isFetching,
     error,
     viewStateKey,
+    isForm,
+    formNode,
+    headerActions,
     detailPanel,
-    config.headerActions,
-    config.isWalletConnected,
-    handlers,
   ]);
 
   const tabs = useMemo(

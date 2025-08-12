@@ -19,6 +19,7 @@ import {
   useActiveFacet,
   useEvent,
   useFacetColumns,
+  useFacetForm,
   usePayload,
   useViewConfig,
 } from '@hooks';
@@ -41,7 +42,7 @@ export const Abis = () => {
   const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
   assertRouteConsistency(ROUTE, viewConfig);
 
-  const facetsFromConfig = useMemo(
+  const facetsFromConfig: DataFacetConfig[] = useMemo(
     () => buildFacetConfigs(viewConfig),
     [viewConfig],
   );
@@ -227,8 +228,18 @@ export const Abis = () => {
     [viewConfig, getCurrentDataFacet],
   );
 
+  const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
+    viewConfig,
+    getCurrentDataFacet,
+    currentData: currentData as unknown as Record<string, unknown>[],
+    currentColumns:
+      currentColumns as unknown as import('@components').FormField<
+        Record<string, unknown>
+      >[],
+  });
+
   const perTabContent = useMemo(() => {
-    // if (isForm && formNode) return formNode;
+    if (isForm && formNode) return formNode;
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -247,8 +258,8 @@ export const Abis = () => {
     pageData?.isFetching,
     error,
     viewStateKey,
-    // isForm,
-    // formNode,
+    isForm,
+    formNode,
     headerActions,
     detailPanel,
     handleRemove,

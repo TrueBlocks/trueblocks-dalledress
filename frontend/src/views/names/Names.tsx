@@ -14,37 +14,37 @@ import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
+  buildFacetConfigs,
+  useActionMsgs,
+  useActions,
   useActiveFacet,
   useEvent,
   useFacetColumns,
+  useFacetForm,
   usePayload,
+  useSilencedDialog,
   useViewConfig,
 } from '@hooks';
-import { buildFacetConfigs } from '@hooks';
-import { useActionMsgs, useActions, useSilencedDialog } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { names } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
-import { createDetailPanelFromViewConfig } from '@views';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
+import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'names';
-
 export const Names = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-
-  // ViewConfig hook - guaranteed to be available in Wails
+  // === SECTION 2.5: Initial ViewConfig Load ===
   const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
   assertRouteConsistency(ROUTE, viewConfig);
 
-  // Generate facets from ViewConfig - no fallbacks needed in Wails
-  const facetsFromConfig = useMemo(
+  const facetsFromConfig: DataFacetConfig[] = useMemo(
     () => buildFacetConfigs(viewConfig),
     [viewConfig],
   );
@@ -90,7 +90,6 @@ export const Names = () => {
       setPageData(result);
       setTotalItems(result.totalItems || 0);
     } catch (err: unknown) {
-      // LogError('[NAMES] fetchData error ' + String(err));
       handleError(err, `Failed to fetch ${getCurrentDataFacet()}`);
     }
   }, [
@@ -110,9 +109,13 @@ export const Names = () => {
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.ALL:
+        return pageData.names || [];
       case types.DataFacet.CUSTOM:
+        return pageData.names || [];
       case types.DataFacet.PREFUND:
+        return pageData.names || [];
       case types.DataFacet.REGULAR:
+        return pageData.names || [];
       case types.DataFacet.BADDRESS:
         return pageData.names || [];
       default:
@@ -146,17 +149,15 @@ export const Names = () => {
   const handleReload = useCallback(async () => {
     clearError();
     try {
-      const payload = createPayload(getCurrentDataFacet());
-      Reload(payload).then(() => {});
+      Reload(createPayload(getCurrentDataFacet())).then(() => {});
     } catch (err: unknown) {
-      // LogError('[NAMES] handleReload error ' + String(err));
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
   }, [clearError, getCurrentDataFacet, createPayload, handleError]);
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: CRUD Operations ===
+  // === SECTION 5: Actions ===
   const { handlers, config, exportFormatModal, confirmModal } = useActions({
     collection: ROUTE,
     viewStateKey,
@@ -260,7 +261,18 @@ export const Names = () => {
     [viewConfig, getCurrentDataFacet],
   );
 
+  const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
+    viewConfig,
+    getCurrentDataFacet,
+    currentData: currentData as unknown as Record<string, unknown>[],
+    currentColumns:
+      currentColumns as unknown as import('@components').FormField<
+        Record<string, unknown>
+      >[],
+  });
+
   const perTabContent = useMemo(() => {
+    if (isForm && formNode) return formNode;
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -282,6 +294,8 @@ export const Names = () => {
     pageData?.isFetching,
     error,
     viewStateKey,
+    isForm,
+    formNode,
     headerActions,
     detailPanel,
     handleToggle,

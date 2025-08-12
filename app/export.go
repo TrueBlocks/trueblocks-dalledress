@@ -35,7 +35,7 @@ func (a *App) ExportData(payload *types.Payload) error {
 
 	collection := getCollection(payload)
 	if collection == nil {
-		err := fmt.Errorf("unsupported collection type: %s", payload.Collection)
+		err := fmt.Errorf("[ExportData] unsupported collection type: %s", payload.Collection)
 		msgs.EmitError("unsupported collection type", err)
 		return err
 	}

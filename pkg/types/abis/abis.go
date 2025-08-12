@@ -316,7 +316,7 @@ func (c *AbisCollection) ExportData(payload *types.Payload) (string, error) {
 	case AbisEvents:
 		return c.eventsFacet.ExportData(payload, string(AbisEvents))
 	default:
-		return "", fmt.Errorf("unsupported abis facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported abis facet: %s", payload.DataFacet)
 	}
 }
 

@@ -14,37 +14,35 @@ import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
+  buildFacetConfigs,
   useActions,
   useActiveFacet,
   useEvent,
   useFacetColumns,
+  useFacetForm,
   usePayload,
   useViewConfig,
 } from '@hooks';
-import { buildFacetConfigs } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { exports } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
-import { createDetailPanelFromViewConfig } from '@views';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
+import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'exports';
-
 export const Exports = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-
-  // ViewConfig hook - guaranteed to be available in Wails
+  // === SECTION 2.5: Initial ViewConfig Load ===
   const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
   assertRouteConsistency(ROUTE, viewConfig);
 
-  // Generate facets from ViewConfig - no fallbacks needed in Wails
-  const facetsFromConfig = useMemo(
+  const facetsFromConfig: DataFacetConfig[] = useMemo(
     () => buildFacetConfigs(viewConfig),
     [viewConfig],
   );
@@ -65,18 +63,16 @@ export const Exports = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
   // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
-    const currentFacet = getCurrentDataFacet();
-
     try {
       const result = await GetExportsPage(
-        createPayload(currentFacet),
+        createPayload(getCurrentDataFacet()),
         pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
@@ -98,6 +94,34 @@ export const Exports = () => {
     setTotalItems,
     handleError,
   ]);
+
+  const currentData = useMemo(() => {
+    if (!pageData) return [];
+    const facet = getCurrentDataFacet();
+    switch (facet) {
+      case types.DataFacet.STATEMENTS:
+        return pageData.statements || [];
+      case types.DataFacet.BALANCES:
+        return pageData.balances || [];
+      case types.DataFacet.TRANSFERS:
+        return pageData.transfers || [];
+      case types.DataFacet.TRANSACTIONS:
+        return pageData.transactions || [];
+      case types.DataFacet.WITHDRAWALS:
+        return pageData.withdrawals || [];
+      case types.DataFacet.ASSETS:
+        return pageData.assets || [];
+      case types.DataFacet.LOGS:
+        return pageData.logs || [];
+      case types.DataFacet.TRACES:
+        return pageData.traces || [];
+      case types.DataFacet.RECEIPTS:
+        return pageData.receipts || [];
+      default:
+        LogError('[Exports] unexpected facet=' + String(facet));
+        return [];
+    }
+  }, [pageData, getCurrentDataFacet]);
 
   // === SECTION 4: Event Handling ===
   useEvent(
@@ -124,9 +148,7 @@ export const Exports = () => {
   const handleReload = useCallback(async () => {
     clearError();
     try {
-      Reload(createPayload(getCurrentDataFacet())).then(() => {
-        // The data will reload when the DataLoaded event is fired.
-      });
+      Reload(createPayload(getCurrentDataFacet())).then(() => {});
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
@@ -134,24 +156,27 @@ export const Exports = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
+  // === SECTION 5: Actions ===
   const { handlers, config, exportFormatModal, confirmModal } = useActions({
     collection: ROUTE,
     viewStateKey,
     pagination,
-    goToPage: () => {}, // Exports typically don't have pagination navigation
+    goToPage: goToPage,
     sort,
     filter,
     viewConfig,
     pageData,
     setPageData,
     setTotalItems,
-    crudFunc: () => Promise.resolve(), // Exports don't have CRUD operations
+    crudFunc: () => Promise.resolve(),
     pageFunc: GetExportsPage,
     pageClass: exports.ExportsPage,
     updateItem: undefined,
     createPayload,
     getCurrentDataFacet,
   });
+
+  const {} = handlers;
 
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
@@ -185,34 +210,6 @@ export const Exports = () => {
   }, [config.headerActions, config.isWalletConnected, handlers]);
 
   // === SECTION 6: UI Configuration ===
-  const currentData = useMemo(() => {
-    if (!pageData) return [];
-    const facet = getCurrentDataFacet();
-    switch (facet) {
-      case types.DataFacet.STATEMENTS:
-        return pageData.statements || [];
-      case types.DataFacet.BALANCES:
-        return pageData.balances || [];
-      case types.DataFacet.TRANSFERS:
-        return pageData.transfers || [];
-      case types.DataFacet.TRANSACTIONS:
-        return pageData.transactions || [];
-      case types.DataFacet.WITHDRAWALS:
-        return pageData.withdrawals || [];
-      case types.DataFacet.ASSETS:
-        return pageData.assets || [];
-      case types.DataFacet.LOGS:
-        return pageData.logs || [];
-      case types.DataFacet.TRACES:
-        return pageData.traces || [];
-      case types.DataFacet.RECEIPTS:
-        return pageData.receipts || [];
-      default:
-        LogError('[EXPORTS] unexpected facet=' + String(facet));
-        return [];
-    }
-  }, [pageData, getCurrentDataFacet]);
-
   const currentColumns = useFacetColumns(
     viewConfig,
     getCurrentDataFacet,
@@ -236,8 +233,19 @@ export const Exports = () => {
     [viewConfig, getCurrentDataFacet],
   );
 
-  const perTabContent = useMemo(
-    () => (
+  const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
+    viewConfig,
+    getCurrentDataFacet,
+    currentData: currentData as unknown as Record<string, unknown>[],
+    currentColumns:
+      currentColumns as unknown as import('@components').FormField<
+        Record<string, unknown>
+      >[],
+  });
+
+  const perTabContent = useMemo(() => {
+    if (isForm && formNode) return formNode;
+    return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
@@ -247,17 +255,18 @@ export const Exports = () => {
         headerActions={headerActions}
         detailPanel={detailPanel}
       />
-    ),
-    [
-      currentData,
-      currentColumns,
-      pageData?.isFetching,
-      error,
-      viewStateKey,
-      headerActions,
-      detailPanel,
-    ],
-  );
+    );
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    viewStateKey,
+    isForm,
+    formNode,
+    headerActions,
+    detailPanel,
+  ]);
 
   const tabs = useMemo(
     () =>

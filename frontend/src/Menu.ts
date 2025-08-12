@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 import { SetInitialized } from '@app';
-import { DalleDress, Home, Khedra, Projects, Settings } from '@views';
+import { DalleDress, Khedra, Projects, Settings } from '@views';
 import {
   Abis,
   Chunks,
@@ -34,7 +34,7 @@ export const MenuItems: MenuItem[] = [
     label: 'Home',
     path: '/',
     position: 'top',
-    component: Home,
+    component: Projects,
     hotkey: 'mod+1',
     altHotkey: 'alt+1',
     type: 'navigation',

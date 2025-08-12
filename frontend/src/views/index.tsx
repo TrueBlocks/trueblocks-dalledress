@@ -5,10 +5,9 @@
  * This file was auto generated. Do not edit.
  */
 
-export { Home } from './home';
+export { Projects } from './projects';
 export { DalleDress } from './DalleDress';
 export { Khedra } from './Khedra';
-export { Projects } from './projects/Projects';
 
 export { Exports } from './exports';
 export { Monitors } from './monitors';

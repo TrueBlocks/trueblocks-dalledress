@@ -42,7 +42,7 @@ export const ExportFormatModal = ({
           setSelectedFormat(lastFormat || 'csv');
         })
         .catch((error: Error) => {
-          LogError(`[EXPORT FORMAT MODAL] Error loading format: ${error}`);
+          LogError(`[ExportFormatModal] Error loading format: ${error}`);
           setSelectedFormat('csv');
         })
         .finally(() => {
@@ -60,14 +60,14 @@ export const ExportFormatModal = ({
         // If user chose "don't show again", silence the dialog
         if (dontShowAgain) {
           await SilenceDialog('exportFormat');
-          LogError('[EXPORT FORMAT MODAL] Export format dialog silenced');
+          LogError('[ExportFormatModal] Export format dialog silenced');
         }
 
         // Close modal and proceed with export
         onClose();
         onFormatSelected(format);
       } catch (error) {
-        LogError(`[EXPORT FORMAT MODAL] Error saving preferences: ${error}`);
+        LogError(`[ExportFormatModal] Error saving preferences: ${error}`);
         // Still proceed with export even if preference saving fails
         onClose();
         onFormatSelected(format);

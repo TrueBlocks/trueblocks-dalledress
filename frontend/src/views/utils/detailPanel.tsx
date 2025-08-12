@@ -1,3 +1,6 @@
+// TODO: BOGUS
+//   1. Can we move this up a folder to avoid confusing extra utils folder
+//   2. Why must we disable this lint?
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { types } from '@models';
 

@@ -1,7 +1,7 @@
 /**
  * Utility functions for converting Wei values to Ether display format
  */
-import { LogError } from 'src/utils/log';
+import { LogError } from '@utils';
 
 /**
  * Converts a Wei value (as string) to Ether with appropriate formatting

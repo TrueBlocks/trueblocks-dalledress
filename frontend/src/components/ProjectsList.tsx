@@ -14,6 +14,7 @@ export const ProjectsList = () => {
   const [, navigate] = useLocation();
 
   useEvent(msgs.EventType.MANAGER, (_message?: string) => {
+    // TODO: BOGUS - DOES NOTHING
     Log('Projects updated via manager event');
   });
 

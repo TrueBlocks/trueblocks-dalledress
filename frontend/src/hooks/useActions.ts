@@ -209,7 +209,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     pendingPayload: null,
   });
 
-  // Unified confirm modal (Aspect D abstraction)
+  // Unified confirm modal
   const [confirmModal, setConfirmModal] = useState<{
     opened: boolean;
     title: string;
@@ -391,7 +391,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     (format: string) => {
       const payload = exportFormatModal.pendingPayload;
       if (!payload) {
-        Log('[EXPORT FRONTEND] No pending payload found');
+        LogError('[handleFormatSelected] No pending payload found');
         return;
       }
 
@@ -588,7 +588,6 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
   );
   const handleToggle = useCallback(
     (address: string) => {
-      // No confirmation required for delete/undelete
       performToggle(address);
     },
     [performToggle],
@@ -798,7 +797,6 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
   );
   const handleAutoname = useCallback(
     (address: string) => {
-      // No confirmation required for autoname
       performAutoname(address);
     },
     [performAutoname],
@@ -931,7 +929,6 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     collection,
     emitSuccess,
   ]);
-
   const handleClean = useCallback(() => {
     if (!cleanFunc) return;
     askConfirmOrExecute({

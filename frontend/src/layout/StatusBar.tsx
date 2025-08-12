@@ -24,6 +24,7 @@ export const StatusBar = () => {
   });
 
   useEvent(msgs.EventType.ERROR, (message: string) => {
+    // TODO: BOGUS - DO I NEED TO EVEN SAY IT?
     if (
       message.toLowerCase().includes('facet') &&
       message.toLowerCase().includes('downloaded')

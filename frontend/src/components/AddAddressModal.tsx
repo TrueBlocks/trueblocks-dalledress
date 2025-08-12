@@ -50,8 +50,9 @@ export const AddAddressModal = ({
         onSubmit();
       }
     } catch (err) {
-      LogError(`Failed to add addresses: ${err}`);
-      setError(`Failed to add addresses: ${err}`);
+      const errorMsg = `Failed to add addresses: ${err}`;
+      LogError(errorMsg);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

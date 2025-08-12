@@ -15,8 +15,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { base } from '@models';
-import { LogError, addressToHex, getDisplayAddress } from '@utils';
-import { Log } from '@utils';
+import { Log, LogError, addressToHex, getDisplayAddress } from '@utils';
 
 import { GetAddresses } from '../../wailsjs/go/project/Project';
 

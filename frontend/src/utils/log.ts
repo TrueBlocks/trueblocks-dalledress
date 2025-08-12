@@ -1,11 +1,11 @@
 import { LogFrontend } from '@app';
 
 export const Log = (...args: string[]) => {
-  // forces it to by synchronous
+  // Calls LogFrontend asynchronously and ignores the returned promise
   LogFrontend(args.join(' ')).then(() => {});
 };
 
 export const LogError = (...args: string[]) => {
-  // forces it to by synchronous
+  // Calls LogFrontend asynchronously and ignores the returned promise
   LogFrontend('❌ ERROR: ' + args.join(' ')).then(() => {});
 };

@@ -1,10 +1,8 @@
 import { useCallback } from 'react';
 
 import { CancelAllFetches } from '@app';
+import { LogError, useEmitters } from '@utils';
 import { useHotkeys } from 'react-hotkeys-hook';
-
-import { useEmitters } from '../utils/eventUtils';
-import { LogError } from '../utils/log';
 
 interface UseGlobalEscapeProps {
   enabled?: boolean;

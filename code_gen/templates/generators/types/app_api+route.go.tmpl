@@ -54,5 +54,11 @@ func (a *App) Reload{{$class}}(payload *types.Payload) error {
 	return nil
 }
 
+// Get{{$class}}Config returns the view configuration for {{$lower}}
+func (a *App) Get{{$class}}Config(payload types.Payload) (*types.ViewConfig, error) {
+	collection := {{$lower}}.Get{{$class}}Collection(&payload)
+	return collection.GetConfig()
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

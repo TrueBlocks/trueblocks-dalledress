@@ -50,6 +50,7 @@ func (a *App) ReloadMonitors(payload *types.Payload) error {
 	return nil
 }
 
+// GetMonitorsConfig returns the view configuration for monitors
 func (a *App) GetMonitorsConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := monitors.GetMonitorsCollection(&payload)
 	return collection.GetConfig()

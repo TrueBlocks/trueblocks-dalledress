@@ -50,6 +50,7 @@ func (a *App) ReloadAbis(payload *types.Payload) error {
 	return nil
 }
 
+// GetAbisConfig returns the view configuration for abis
 func (a *App) GetAbisConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := abis.GetAbisCollection(&payload)
 	return collection.GetConfig()

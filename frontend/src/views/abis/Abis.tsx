@@ -14,14 +14,14 @@ import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
+  buildFacetConfigs,
+  useActions,
   useActiveFacet,
   useEvent,
   useFacetColumns,
   usePayload,
   useViewConfig,
 } from '@hooks';
-import { buildFacetConfigs } from '@hooks';
-import { useActions } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
@@ -33,17 +33,14 @@ import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'abis';
-
 export const Abis = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-  // === SECTION 2.5: ViewConfig Hook ===
+  // === SECTION 2.5: Initial ViewConfig Load ===
   const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
   assertRouteConsistency(ROUTE, viewConfig);
 
-  // Generate facets from ViewConfig - ViewConfig always available in Wails
-  // Generate facets from ViewConfig - no fallbacks needed in Wails
   const facetsFromConfig = useMemo(
     () => buildFacetConfigs(viewConfig),
     [viewConfig],
@@ -110,7 +107,7 @@ export const Abis = () => {
       case types.DataFacet.EVENTS:
         return pageData.functions || [];
       default:
-        LogError('[ABIS] unexpected facet=' + String(facet));
+        LogError('[Abis] unexpected facet=' + String(facet));
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
@@ -140,9 +137,7 @@ export const Abis = () => {
   const handleReload = useCallback(async () => {
     clearError();
     try {
-      Reload(createPayload(getCurrentDataFacet())).then(() => {
-        // The data will reload when the DataLoaded event is fired.
-      });
+      Reload(createPayload(getCurrentDataFacet())).then(() => {});
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
@@ -150,7 +145,7 @@ export const Abis = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: CRUD Operations ===
+  // === SECTION 5: Actions ===
   const { handlers, config, exportFormatModal, confirmModal } = useActions({
     collection: ROUTE,
     viewStateKey,
@@ -215,7 +210,9 @@ export const Abis = () => {
         [getCurrentDataFacet],
       ),
     },
-    { handleRemove },
+    {
+      handleRemove,
+    },
     pageData,
     config,
   );
@@ -230,8 +227,9 @@ export const Abis = () => {
     [viewConfig, getCurrentDataFacet],
   );
 
-  const perTabContent = useMemo(
-    () => (
+  const perTabContent = useMemo(() => {
+    // if (isForm && formNode) return formNode;
+    return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
         columns={currentColumns}
@@ -242,18 +240,19 @@ export const Abis = () => {
         detailPanel={detailPanel}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
       />
-    ),
-    [
-      currentData,
-      currentColumns,
-      pageData?.isFetching,
-      error,
-      viewStateKey,
-      headerActions,
-      detailPanel,
-      handleRemove,
-    ],
-  );
+    );
+  }, [
+    currentData,
+    currentColumns,
+    pageData?.isFetching,
+    error,
+    viewStateKey,
+    // isForm,
+    // formNode,
+    headerActions,
+    detailPanel,
+    handleRemove,
+  ]);
 
   const tabs = useMemo(
     () =>

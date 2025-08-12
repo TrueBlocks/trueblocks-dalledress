@@ -40,6 +40,7 @@ func (a *App) ReloadContracts(payload *types.Payload) error {
 	return nil
 }
 
+// GetContractsConfig returns the view configuration for contracts
 func (a *App) GetContractsConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := contracts.GetContractsCollection(&payload)
 	return collection.GetConfig()

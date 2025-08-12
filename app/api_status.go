@@ -40,6 +40,7 @@ func (a *App) ReloadStatus(payload *types.Payload) error {
 	return nil
 }
 
+// GetStatusConfig returns the view configuration for status
 func (a *App) GetStatusConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := status.GetStatusCollection(&payload)
 	return collection.GetConfig()

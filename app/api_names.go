@@ -50,6 +50,7 @@ func (a *App) ReloadNames(payload *types.Payload) error {
 	return nil
 }
 
+// GetNamesConfig returns the view configuration for names
 func (a *App) GetNamesConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := names.GetNamesCollection(&payload)
 	return collection.GetConfig()

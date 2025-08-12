@@ -218,7 +218,7 @@ export const {{$class}} = () => {
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (
-      <Group gap="xs" style={{ flexShrink: 0 }}>
+      <Group gap="xs" style={ { flexShrink: 0 } }>
         {config.headerActions.map((action) => {
           const handlerKey =
             `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;

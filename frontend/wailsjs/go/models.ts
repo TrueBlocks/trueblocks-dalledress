@@ -841,6 +841,14 @@ export namespace status {
 
 export namespace types {
 	
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
+	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -870,14 +878,6 @@ export namespace types {
 	    STATUS = "status",
 	    CACHES = "caches",
 	    CHAINS = "chains",
-	}
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];
@@ -1413,6 +1413,7 @@ export namespace types {
 	    columns: ColumnConfig[];
 	    detailPanels: DetailPanelConfig[];
 	    actions: string[];
+	    headerActions: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new FacetConfig(source);
@@ -1427,6 +1428,7 @@ export namespace types {
 	        this.columns = this.convertValues(source["columns"], ColumnConfig);
 	        this.detailPanels = this.convertValues(source["detailPanels"], DetailPanelConfig);
 	        this.actions = source["actions"];
+	        this.headerActions = source["headerActions"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2383,6 +2385,7 @@ export namespace types {
 	    viewName: string;
 	    facets: Record<string, FacetConfig>;
 	    actions: Record<string, ActionConfig>;
+	    facetOrder: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new ViewConfig(source);
@@ -2393,6 +2396,7 @@ export namespace types {
 	        this.viewName = source["viewName"];
 	        this.facets = this.convertValues(source["facets"], FacetConfig, true);
 	        this.actions = this.convertValues(source["actions"], ActionConfig, true);
+	        this.facetOrder = source["facetOrder"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

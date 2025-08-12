@@ -1,5 +1,5 @@
 import { GetUserInfoStatus, IsInitialized } from '@app';
-import { Log } from 'src/utils/log';
+import { LogError } from 'src/utils/log';
 
 const disabled = true;
 
@@ -18,7 +18,7 @@ export const checkAndNavigateToWizard = async (
         try {
           navigate('/wizard', { replace: true });
         } catch (navError) {
-          Log(`Failed to navigate to wizard: ${navError}`);
+          LogError(`Failed to navigate to wizard: ${navError}`);
           window.location.href = '/wizard';
         }
       }
@@ -31,19 +31,19 @@ export const checkAndNavigateToWizard = async (
       try {
         navigate('/wizard', { replace: true });
       } catch (navError) {
-        Log(`Failed to navigate to wizard: ${navError}`);
+        LogError(`Failed to navigate to wizard: ${navError}`);
         window.location.href = '/wizard';
       }
     }
 
     return state.missingNameEmail ? 0 : state.rpcUnavailable ? 1 : 2;
   } catch (err) {
-    Log(`Failed to check wizard state: ${err}`);
+    LogError(`Failed to check wizard state: ${err}`);
     if (!inWizard) {
       try {
         navigate('/wizard', { replace: true });
       } catch (navError) {
-        Log(`Failed to navigate to wizard: ${navError}`);
+        LogError(`Failed to navigate to wizard: ${navError}`);
         window.location.href = '/wizard';
       }
     }

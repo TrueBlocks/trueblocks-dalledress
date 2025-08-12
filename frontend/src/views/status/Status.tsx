@@ -9,28 +9,35 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetStatusPage, Reload } from '@app';
-import { BaseTab, usePagination } from '@components';
+import {
+  Action,
+  BaseTab,
+  ConfirmModal,
+  ExportFormatModal,
+  usePagination,
+} from '@components';
 import { useFiltering, useSorting } from '@contexts';
+import { buildFacetConfigs, useActions } from '@hooks';
 import {
   DataFacetConfig,
-  toPageDataProp,
   useActiveFacet,
-  useColumns,
   useEvent,
+  useFacetColumns,
   usePayload,
   useViewConfig,
 } from '@hooks';
+import { useFacetForm } from '@hooks';
 import { TabView } from '@layout';
-import { FormView } from '@layout';
+import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { status } from '@models';
-import { msgs, project, types } from '@models';
-import { Debugger, useErrorHandler } from '@utils';
-import { toProperCase } from 'src/utils/toProper';
+import { crud, msgs, project, types } from '@models';
+import { Debugger, LogError, useErrorHandler } from '@utils';
 
+import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
-const ROUTE = 'status';
+const ROUTE: ViewRoute = 'status';
 
 export const Status = () => {
   // === SECTION 2: Hook Initialization ===
@@ -38,34 +45,13 @@ export const Status = () => {
   const createPayload = usePayload();
 
   // === SECTION 2.5: Initial ViewConfig Load ===
-  const { config: viewConfig } = useViewConfig({
-    viewName: 'status',
-  });
+  const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
+  assertRouteConsistency(ROUTE, viewConfig);
 
-  // Generate facets from ViewConfig
-  const statusFacets: DataFacetConfig[] = useMemo(() => {
-    if (!viewConfig?.facets) {
-      // Fallback to default facets if ViewConfig not loaded yet
-      return [
-        {
-          id: types.DataFacet.STATUS,
-          label: toProperCase(types.DataFacet.STATUS),
-        },
-        {
-          id: types.DataFacet.CACHES,
-          label: toProperCase(types.DataFacet.CACHES),
-        },
-        {
-          id: types.DataFacet.CHAINS,
-          label: toProperCase(types.DataFacet.CHAINS),
-        },
-      ];
-    }
-    return Object.keys(viewConfig.facets).map((facetKey) => ({
-      id: facetKey as types.DataFacet,
-      label: toProperCase(facetKey),
-    }));
-  }, [viewConfig]);
+  const statusFacets: DataFacetConfig[] = useMemo(
+    () => buildFacetConfigs(viewConfig),
+    [viewConfig],
+  );
 
   const activeFacetHook = useActiveFacet({
     facets: statusFacets,
@@ -83,7 +69,7 @@ export const Status = () => {
   );
 
   const { error, handleError, clearError } = useErrorHandler();
-  const { pagination, setTotalItems } = usePagination(viewStateKey);
+  const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
@@ -126,6 +112,7 @@ export const Status = () => {
       case types.DataFacet.CHAINS:
         return pageData.chains || [];
       default:
+        LogError('[STATUS] unexpected facet=' + String(facet));
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
@@ -134,7 +121,7 @@ export const Status = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'status') {
+      if (payload?.collection === ROUTE) {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
@@ -165,19 +152,72 @@ export const Status = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: CRUD Operations ===
-  // No CRUD operations for Status view
+  // === SECTION 5: Actions (standardized placeholder) ===
+  const { handlers, config, exportFormatModal, confirmModal } = useActions({
+    collection: ROUTE,
+    viewStateKey,
+    pagination,
+    goToPage,
+    sort,
+    filter,
+    viewConfig,
+    pageData,
+    setPageData,
+    setTotalItems,
+    crudFunc: async (
+      _payload: types.Payload,
+      _op: crud.Operation,
+      _item: types.Status,
+    ) => {},
+    pageFunc: GetStatusPage,
+    pageClass: status.StatusPage,
+    updateItem: types.Status.createFrom({}),
+    createPayload,
+    getCurrentDataFacet,
+  });
+
+  const headerActions = useMemo(() => {
+    if (!config.headerActions.length) return null;
+    return (
+      <Group gap="xs" style={{ flexShrink: 0 }}>
+        {config.headerActions.map((action) => {
+          const handlerKey =
+            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
+          const handler = handlers[handlerKey] as () => void;
+          return (
+            <Action
+              key={action.type}
+              icon={
+                action.icon as keyof ReturnType<
+                  typeof import('@hooks').useIconSets
+                >
+              }
+              onClick={handler}
+              title={
+                action.requiresWallet && !config.isWalletConnected
+                  ? `${action.title} (requires wallet connection)`
+                  : action.title
+              }
+              hotkey={action.type === 'export' ? 'mod+x' : undefined}
+              size="sm"
+            />
+          );
+        })}
+      </Group>
+    );
+  }, [config.headerActions, config.isWalletConnected, handlers]);
 
   // === SECTION 6: UI Configuration ===
-  const currentColumns = useColumns(
-    viewConfig?.facets?.[getCurrentDataFacet()]?.columns || [],
+  const currentColumns = useFacetColumns(
+    viewConfig,
+    getCurrentDataFacet,
     {
       showActions: false,
       actions: [],
       getCanRemove: useCallback((_row: unknown) => false, []),
     },
     {},
-    toPageDataProp(pageData),
+    pageData,
     { rowActions: [] },
   );
 
@@ -190,50 +230,18 @@ export const Status = () => {
     );
   }, [viewConfig, getCurrentDataFacet]);
 
+  const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
+    viewConfig,
+    getCurrentDataFacet,
+    currentData: currentData as unknown as Record<string, unknown>[],
+    currentColumns:
+      currentColumns as unknown as import('@components').FormField<
+        Record<string, unknown>
+      >[],
+  });
+
   const perTabContent = useMemo(() => {
-    const currentFacet = getCurrentDataFacet();
-    const facetConfig = viewConfig?.facets?.[currentFacet];
-
-    // Check if this facet should be displayed as a form
-    if (facetConfig?.isForm && currentData.length > 0) {
-      const statusData = currentData[0] as types.Status;
-
-      // Convert columns to form fields with values
-      const fieldsWithValues = currentColumns.map((column) => {
-        const rawValue = statusData[
-          column.name as keyof types.Status
-        ] as unknown;
-        let displayValue = '';
-
-        // Convert complex types to strings for display
-        if (typeof rawValue === 'string') {
-          displayValue = rawValue;
-        } else if (typeof rawValue === 'boolean') {
-          displayValue = rawValue ? 'Yes' : 'No';
-        } else if (typeof rawValue === 'number') {
-          displayValue = rawValue.toString();
-        } else if (rawValue && typeof rawValue === 'object') {
-          displayValue = JSON.stringify(rawValue);
-        } else if (rawValue !== null && rawValue !== undefined) {
-          displayValue = String(rawValue);
-        }
-
-        return {
-          ...column,
-          value: displayValue,
-        };
-      });
-
-      return (
-        <FormView
-          formFields={fieldsWithValues}
-          title="System Status"
-          onSubmit={() => {}} // No submit functionality for status
-        />
-      );
-    }
-
-    // Default table view
+    if (isForm && formNode) return formNode;
     return (
       <BaseTab<Record<string, unknown>>
         data={currentData as unknown as Record<string, unknown>[]}
@@ -241,18 +249,19 @@ export const Status = () => {
         loading={!!pageData?.isFetching}
         error={error}
         viewStateKey={viewStateKey}
-        headerActions={[]}
+        headerActions={headerActions}
         detailPanel={detailPanel}
       />
     );
   }, [
-    getCurrentDataFacet,
-    viewConfig,
+    isForm,
+    formNode,
     currentData,
     currentColumns,
     pageData?.isFetching,
     error,
     viewStateKey,
+    headerActions,
     detailPanel,
   ]);
 
@@ -279,14 +288,26 @@ export const Status = () => {
         </div>
       )}
       <Debugger
-        rowActions={[]}
-        headerActions={[]}
+        rowActions={config.rowActions}
+        headerActions={config.headerActions}
         count={++renderCnt.current}
+      />
+      <ConfirmModal
+        opened={confirmModal.opened}
+        onClose={confirmModal.onClose}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        dialogKey={confirmModal.dialogKey}
+      />
+      <ExportFormatModal
+        opened={exportFormatModal.opened}
+        onClose={exportFormatModal.onClose}
+        onFormatSelected={exportFormatModal.onFormatSelected}
       />
     </div>
   );
 };
 
 // EXISTING_CODE
-
 // EXISTING_CODE

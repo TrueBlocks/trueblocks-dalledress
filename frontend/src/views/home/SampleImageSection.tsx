@@ -4,7 +4,7 @@ import { GetImageURL } from '@app';
 import { useEvent, useIconSets } from '@hooks';
 import { ActionIcon, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { msgs } from '@models';
-import { Log } from '@utils';
+import { LogError } from '@utils';
 
 interface SampleImageSectionProps {
   onViewGallery?: () => void;
@@ -29,7 +29,7 @@ export const SampleImageSection = ({
       const url = await GetImageURL(`samples/sample1.png?v=${cacheBuster}`);
       setSampleImageUrl(url || '');
     } catch (err) {
-      Log(`Error loading sample image: ${err}`);
+      LogError(`Loading sample image: ${err}`);
       setError('Failed to load image');
       setSampleImageUrl('');
     } finally {

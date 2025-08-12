@@ -12,7 +12,7 @@ import { FormField, WizardForm } from '@components';
 import { useIconSets } from '@hooks';
 import { ActionIcon, Card, Group, Tabs, Text } from '@mantine/core';
 import { preferences } from '@models';
-import { useEmitters } from '@utils';
+import { LogError, useEmitters } from '@utils';
 
 import { WizardStepProps } from '.';
 import { WizardStateData } from './WizardTypes';
@@ -86,6 +86,7 @@ export const StepChainInfo = ({
           clearForm();
         }
       } catch (error) {
+        LogError(`Error trying to load chains: ${error}`);
         emitStatus(`Error trying to load chains: ${error}`);
       }
     };
@@ -149,6 +150,7 @@ export const StepChainInfo = ({
 
       emitStatus('Chain removed successfully');
     } catch (error) {
+      LogError(`Error removing chain: ${error}`);
       emitStatus(`Error removing chain: ${error}`);
     }
   };
@@ -202,6 +204,7 @@ export const StepChainInfo = ({
       );
       return true;
     } catch (error) {
+      LogError(`Error saving chain: ${error}`);
       emitStatus(`Error saving chain: ${error}`);
       return false;
     }

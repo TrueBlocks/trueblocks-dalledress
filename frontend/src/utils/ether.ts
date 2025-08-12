@@ -1,8 +1,7 @@
 /**
  * Utility functions for converting Wei values to Ether display format
  */
-// import { Log } from 'src/utils/log';
-import { Log } from 'src/utils/log';
+import { LogError } from 'src/utils/log';
 
 /**
  * Converts a Wei value (as string) to Ether with appropriate formatting
@@ -54,7 +53,7 @@ export function formatWeiToEther(weiValue: string | number): string {
 
     return `${etherInt.toString()}.${formattedDecimal}`;
   } catch (error) {
-    Log(`Error formatting Wei to Ether: ${error}`);
+    LogError(`Formatting Wei to Ether: ${error}`);
     return `${weiValue}`;
   }
 }
@@ -127,7 +126,7 @@ export function formatWeiToGigawei(weiValue: string | number): string {
 
     return `${gigaweiInt.toString()}.${formattedDecimal}`;
   } catch (error) {
-    Log(`Error formatting Wei to Gigawei: ${error}`);
+    LogError(`Formatting Wei to Gigawei: ${error}`);
     return `${weiValue}`;
   }
 }

@@ -14,7 +14,7 @@ import {
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
 import { msgs } from '@models';
-import { Log, initializePreferencesDefaults } from '@utils';
+import { LogError, initializePreferencesDefaults } from '@utils';
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-react';
 import { Router } from 'wouter';
 
@@ -60,17 +60,13 @@ export const App = () => {
         setViewConfigsLoading(isLoading);
       })
       .catch((error: unknown) => {
-        Log(
-          'WARNING: Failed to initialize view configurations: ' + String(error),
-        );
+        LogError('Failed to initialize view configurations: ' + String(error));
         setViewConfigsLoading(false);
       });
 
     // Initialize preferences defaults cache on app startup
     initializePreferencesDefaults().catch((error: unknown) => {
-      Log(
-        'WARNING: Failed to initialize preferences defaults: ' + String(error),
-      );
+      LogError('Failed to initialize preferences defaults: ' + String(error));
     });
 
     window.addEventListener('keydown', globalNavKeySquelcher, {
@@ -170,8 +166,8 @@ export const App = () => {
             projectId={
               (import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string) ||
               (() => {
-                Log(
-                  'ERROR: VITE_WALLETCONNECT_PROJECT_ID not set in environment variables',
+                LogError(
+                  'VITE_WALLETCONNECT_PROJECT_ID not set in environment variables',
                 );
                 return 'MISSING_PROJECT_ID';
               })()

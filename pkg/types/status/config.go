@@ -10,29 +10,35 @@ func (c *StatusCollection) GetConfig() (*types.ViewConfig, error) {
 		ViewName: "status",
 		Facets: map[string]types.FacetConfig{
 			"status": {
-				Name:         "Status",
-				Store:        "status",
-				IsForm:       true,
-				Columns:      getStatusColumns(),
-				DetailPanels: getStatusDetailPanels(),
-				Actions:      []string{}, // Status view has no actions
+				Name:          "Status",
+				Store:         "status",
+				IsForm:        true,
+				Columns:       getStatusColumns(),
+				DetailPanels:  getStatusDetailPanels(),
+				Actions:       []string{}, // Status view has no actions
+				HeaderActions: []string{},
 			},
 			"caches": {
-				Name:         "Caches",
-				Store:        "caches",
-				Columns:      getCachesColumns(),
-				DetailPanels: getCachesDetailPanels(),
-				Actions:      []string{}, // Caches view has no actions
+				Name:          "Caches",
+				Store:         "caches",
+				Columns:       getCachesColumns(),
+				DetailPanels:  getCachesDetailPanels(),
+				Actions:       []string{}, // Caches view has no actions
+				HeaderActions: []string{"export"},
 			},
 			"chains": {
-				Name:         "Chains",
-				Store:        "chains",
-				Columns:      getChainsColumns(),
-				DetailPanels: getChainsDetailPanels(),
-				Actions:      []string{}, // Chains view has no actions
+				Name:          "Chains",
+				Store:         "chains",
+				Columns:       getChainsColumns(),
+				DetailPanels:  getChainsDetailPanels(),
+				Actions:       []string{}, // Chains view has no actions
+				HeaderActions: []string{"export"},
 			},
 		},
-		Actions: make(map[string]types.ActionConfig), // Status view has no actions
+		Actions: map[string]types.ActionConfig{
+			"export": {Name: "export", Label: "Export Data", Icon: "Export"},
+		},
+		FacetOrder: []string{"status", "caches", "chains"},
 	}, nil
 }
 

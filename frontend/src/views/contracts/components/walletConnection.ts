@@ -1,6 +1,6 @@
 import { useWalletConnectContext } from '@contexts';
 import { useWallet } from '@hooks';
-import { Log } from '@utils';
+import { Log, LogError } from '@utils';
 import { useRequest } from '@walletconnect/modal-sign-react';
 
 import { PreparedTransaction } from './transactionBuilder';
@@ -103,7 +103,7 @@ export const useWalletConnection = ({
       const errorMessage =
         error instanceof Error ? error.message : 'Transaction failed';
 
-      Log('❌ WalletConnect transaction error:', JSON.stringify(error));
+      LogError('WalletConnect transaction error:', JSON.stringify(error));
 
       if (onError) {
         onError(errorMessage);

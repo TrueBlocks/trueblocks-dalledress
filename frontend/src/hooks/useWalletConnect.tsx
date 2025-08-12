@@ -69,7 +69,7 @@ export const useWalletConnect = () => {
       //   'Wallet connection failed:',
       //   err instanceof Error ? err.message : String(err),
       // );
-      // Log('Error details:', JSON.stringify(err));
+      // LogError('Details:', JSON.stringify(err));
       // Make sure we reset the connecting state on error
       setIsConnecting(false);
     } finally {

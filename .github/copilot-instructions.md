@@ -36,6 +36,44 @@ This is a **Wails desktop application** with Go backend (`app/`) and React front
 - **No custom strings for DataFacet** - always use `types.DataFacet.*` values
 - **No custom ViewStateKey** - always use `{ viewName: string, tabName: types.DataFacet }`
 
+## Header Actions Contract
+
+Backend provides a single source of truth for header-level actions per facet, and the frontend must treat this as always-present (possibly empty).
+
+### Backend
+- Every facet config must define `HeaderActions []string` and it must never be nil. Use `[]` when there are no header actions for a facet.
+- All data-table facets must include `export` in `HeaderActions`. A data-table facet is any facet with `isForm == false`.
+- Action identifiers must align with the frontend `ActionType` values used by `useActions()` (e.g., `add`, `export`, `publish`, `pin`). Do not invent new strings.
+- When you introduce a new action identifier, also expose metadata in the backend `Actions` map (title/label/icon) to keep UI consistent, then run `wails generate module`.
+- Per-view notes (in addition to the universal `export` on all non-form facets):
+  - Names: all facets include `add` (and `export` by the rule above). The `CUSTOM` facet additionally includes `publish` and `pin`.
+  - Exports: all facets include `export` (already satisfied by the rule).
+  - Monitors: include `export` (row actions like `delete`, `remove` remain as row-only).
+  - Abis, Chunks, Status: include `export` on non-form facets (e.g., abis: all; chunks: stats/index/blooms; status: caches/chains). Form facets like `status` and `manifest` do not include `export`.
+  - Contracts: table facets like `events` include `export`. Form facets like `dashboard` and `execute` do not include `export` and manage their own controls.
+
+### Frontend
+- Assume `config.headerActions` is always an array. Do not null-check it. Use length checks only, e.g., `if (!config.headerActions.length) return null`.
+- Render header actions using the identifiers from `config.headerActions` and map them to handlers from `useActions()` (e.g., `handleAdd`, `handleExport`, `handlePublish`, `handlePin`).
+- Do not hard-code action strings; rely on backend-provided identifiers and the `useActions()` wiring.
+- If backend header actions change, regenerate models (`wails generate module`) and restart dev mode with `yarn start`.
+
+### Reference: current facets by `isForm`
+
+Data-table facets (must include `export`):
+- abis: downloaded, known, functions, events
+- names: all, custom, prefund, regular, baddress
+- exports: statements, balances, transfers, transactions, withdrawals, assets, logs, traces, receipts
+- monitors: monitors
+- chunks: stats, index, blooms
+- status: caches, chains
+- contracts: events
+
+Form facets (do not include `export`):
+- status: status
+- chunks: manifest
+- contracts: dashboard, execute
+
 ## View Architecture Pattern
 
 Each view follows this structure:
@@ -206,3 +244,42 @@ This makes the caching discussion even more interesting because:
 - But serialization still exists - JSON-like marshaling between JS objects and Go structs
 - Caching is still beneficial - Avoids repeated marshaling overhead
 - Cache coherence is still the real problem - Backend transforms data without frontend awareness
+
+## Information for future AI coders
+
+- All main views follow a common structure: Imports → Hooks → Data fetching → Events → Actions (useActions) → Columns/forms → Render.
+- The matrix below is the single source of truth for cross-view consistency. Treat it as the checklist when refactoring or adding views.
+- Goal: a fully parameterized, generatable view scaffold driven by backend `ViewConfig`.
+- Start by reading the matrix, then focus on the next non-green row (if any). Don’t revisit already-green rows unless new inconsistencies appear.
+- Prefer the most recently refactored view as the reference implementation.
+- Keep all changes lint- and test-compliant. Run `yarn lint && yarn test` regularly during refactors.
+
+## Cross-view consistency matrix
+
+Views in scope: Monitors, Names, Abis, Contracts, Status, Chunks, Exports
+
+Legend (Key → Aspect):
+- A: Form facet(s) present
+- B: Form rendering abstracted (useFacetForm)
+- C: Dynamic enabledActions per facet (backend-driven via ViewConfig)
+- D: Confirm modal logic abstracted (centralized, per-operation silencing for remove/clean)
+- E: Export format modal (unified, respects IsDialogSilenced)
+- F: Inline facet-specific branching minimized inside perTabContent
+- I: Header action mapping to handlers (config.headerActions → useActions handlers)
+
+All Greens (fully consistent):
+
+| Key | Monitors | Names | Abis | Contracts | Status | Chunks | Exports |
+|-----|----------|-------|------|-----------|--------|--------|---------|
+| A   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
+| B   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
+| C   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
+| D   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
+| E   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
+| F   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
+| I   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
+
+Notes:
+- Header vs row actions are derived from backend `ViewConfig` per facet: `headerActions` vs `actions`, mapped through ACTION_DEFINITIONS and exposed by `useActions` as `config.headerActions` and `config.rowActions`.
+- Confirm prompts only for remove and clean, using dialog keys `confirm.remove` and `confirm.clean` with per-operation silencing.
+- Export uses ExportFormatModal unless `IsDialogSilenced('exportFormat')` is true.

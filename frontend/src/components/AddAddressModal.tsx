@@ -4,7 +4,7 @@ import { AddAddressesToProject } from '@app';
 import { useActiveProject, useIconSets } from '@hooks';
 import { Button, Group, Modal, Paper, Stack, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { Log } from '@utils';
+import { LogError } from '@utils';
 
 import { AddressInput } from './AddressInput';
 
@@ -50,9 +50,8 @@ export const AddAddressModal = ({
         onSubmit();
       }
     } catch (err) {
-      const errorMsg = `Failed to add addresses: ${err}`;
-      Log(errorMsg);
-      setError(errorMsg);
+      LogError(`Failed to add addresses: ${err}`);
+      setError(`Failed to add addresses: ${err}`);
     } finally {
       setLoading(false);
     }

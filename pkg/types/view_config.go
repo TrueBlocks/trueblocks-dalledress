@@ -2,9 +2,10 @@ package types
 
 // ViewConfig represents the complete configuration for a view
 type ViewConfig struct {
-	ViewName string                  `json:"viewName" wails:"viewName"`
-	Facets   map[string]FacetConfig  `json:"facets" wails:"facets"`
-	Actions  map[string]ActionConfig `json:"actions" wails:"actions"`
+	ViewName   string                  `json:"viewName" wails:"viewName"`
+	Facets     map[string]FacetConfig  `json:"facets" wails:"facets"`
+	Actions    map[string]ActionConfig `json:"actions" wails:"actions"`
+	FacetOrder []string                `json:"facetOrder" wails:"facetOrder"`
 }
 
 // FacetConfig represents configuration for a single facet within a view
@@ -16,6 +17,7 @@ type FacetConfig struct {
 	Columns       []ColumnConfig      `json:"columns" wails:"columns"`
 	DetailPanels  []DetailPanelConfig `json:"detailPanels" wails:"detailPanels"`
 	Actions       []string            `json:"actions" wails:"actions"`
+	HeaderActions []string            `json:"headerActions" wails:"headerActions"`
 }
 
 // ColumnConfig represents a table column configuration

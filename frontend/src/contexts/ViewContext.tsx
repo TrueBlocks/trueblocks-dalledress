@@ -13,7 +13,7 @@ import {
   SetProjectViewState,
 } from '@app';
 import { project, sdk, types } from '@models';
-import { Log, createEmptySortSpec } from '@utils';
+import { LogError, createEmptySortSpec } from '@utils';
 
 import { viewStateKeyToString } from '.';
 
@@ -179,7 +179,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
 
           await SetProjectViewState(viewStateKey.viewName, updatedViewStates);
         } catch (error) {
-          Log(`Failed to persist sorting state to backend: ${error}`);
+          LogError(`Failed to persist sorting state to backend: ${error}`);
         }
       })();
     },
@@ -229,7 +229,7 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
 
           await SetProjectViewState(viewStateKey.viewName, updatedViewStates);
         } catch (error) {
-          Log(`Failed to persist filtering state to backend: ${error}`);
+          LogError(`Failed to persist filtering state to backend: ${error}`);
         }
       })();
     },
@@ -272,13 +272,13 @@ export const ViewContextProvider = ({ children }: { children: ReactNode }) => {
             }
           });
         } catch (viewError) {
-          Log(`No stored state for view ${viewName}: ${viewError}`);
+          LogError(`No stored state for view ${viewName}: ${viewError}`);
         }
       }
 
       setViewPagination({});
     } catch (error) {
-      Log(`Failed to restore project filter states: ${error}`);
+      LogError(`Failed to restore project filter states: ${error}`);
     }
   }, []);
 

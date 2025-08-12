@@ -5,7 +5,7 @@ import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIconSets } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
-import { Log } from '@utils';
+import { LogError } from '@utils';
 
 interface MonitorsPanelProps {
   onViewAll?: () => void;
@@ -46,7 +46,7 @@ export const MonitorsPanel = ({
       }
       setError(null);
     } catch (err) {
-      Log(`Error fetching monitors summary: ${err}`);
+      LogError(`Fetching monitors summary: ${err}`);
       setError('Failed to load monitors');
     } finally {
       if (showLoading) setLoading(false);

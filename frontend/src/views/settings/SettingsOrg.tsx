@@ -37,7 +37,6 @@ export const SettingsOrg = () => {
       ...prevFormData,
       [name]: value,
     }));
-    // Log(`${name} = ${JSON.stringify(value)}`);
   };
 
   const formFields: FormField<Record<string, unknown>>[] = [

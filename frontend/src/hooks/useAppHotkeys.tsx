@@ -1,7 +1,7 @@
 import { CancelFetch, Reload } from '@app';
 import { useActiveProject, usePreferences } from '@hooks';
 import { msgs, types } from '@models';
-import { Log, emitEvent, registerHotkeys, useEmitters } from '@utils';
+import { LogError, emitEvent, registerHotkeys, useEmitters } from '@utils';
 import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
 import { MenuItems } from 'src/Menu';
 import { useLocation } from 'wouter';
@@ -82,9 +82,7 @@ export const useAppHotkeys = (): void => {
           break;
       }
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      Log(errorMessage);
+      LogError(error instanceof Error ? error.message : String(error));
 
       if (
         (hkType.type === 'navigation' || hkType.type === 'dev') &&

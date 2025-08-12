@@ -3,7 +3,7 @@ import { useViewContext } from '@contexts';
 import { useActiveProject, useEvent, useIconSets } from '@hooks';
 import { Group, List, Paper, Text, ThemeIcon, Title } from '@mantine/core';
 import { msgs } from '@models';
-import { Log } from '@utils';
+import { Log, LogError } from '@utils';
 import { useLocation } from 'wouter';
 
 export const ProjectsList = () => {
@@ -30,7 +30,7 @@ export const ProjectsList = () => {
       const targetView = lastView || '/';
       navigate(targetView);
     } catch (error) {
-      Log(`Error switching projects: ${error}`);
+      LogError(`Switching projects: ${error}`);
     }
   };
 
@@ -38,7 +38,7 @@ export const ProjectsList = () => {
     try {
       await closeProject(id);
     } catch (error) {
-      Log(`Error closing project: ${error}`);
+      LogError(`Closing project: ${error}`);
     }
   };
 

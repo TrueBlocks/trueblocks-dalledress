@@ -246,7 +246,7 @@ export const setupWailsMocks = ({
           (currentAppMock as any)[key] = vi.fn(overrideFn as any);
         } else {
           // This is test infrastructure code, so we'll just skip logging the warning
-          // since the mocked Log from global-mocks.tsx should handle actual Log calls
+          // since the mocks from global-mocks.tsx should handle actual calls
         }
       }
     }

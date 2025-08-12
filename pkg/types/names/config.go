@@ -9,18 +9,22 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 	// Create facet configurations - Names uses tables for all facets (no forms)
 	facets := map[string]types.FacetConfig{
 		"all": {
-			Name:         "All",
-			Store:        "names",
-			IsForm:       false,
-			Columns:      getNamesColumns(),
-			DetailPanels: getNamesDetailPanels(),
+			Name:          "All",
+			Store:         "names",
+			IsForm:        false,
+			Columns:       getNamesColumns(),
+			DetailPanels:  getNamesDetailPanels(),
+			HeaderActions: []string{"add", "export"},
+			Actions:       []string{"update"},
 		},
 		"custom": {
-			Name:         "Custom",
-			Store:        "names",
-			IsForm:       false,
-			Columns:      getNamesColumns(),
-			DetailPanels: getNamesDetailPanels(),
+			Name:          "Custom",
+			Store:         "names",
+			IsForm:        false,
+			Columns:       getNamesColumns(),
+			DetailPanels:  getNamesDetailPanels(),
+			HeaderActions: []string{"add", "publish", "pin", "export"},
+			Actions:       []string{"delete", "remove", "update"},
 		},
 		"prefund": {
 			Name:          "Prefund",
@@ -29,27 +33,42 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			DividerBefore: true, // Divider appears before this facet (after Custom)
 			Columns:       getNamesColumns(),
 			DetailPanels:  getNamesDetailPanels(),
+			HeaderActions: []string{"add", "export"},
+			Actions:       []string{"update"},
 		},
 		"regular": {
-			Name:         "Regular",
-			Store:        "names",
-			IsForm:       false,
-			Columns:      getNamesColumns(),
-			DetailPanels: getNamesDetailPanels(),
+			Name:          "Regular",
+			Store:         "names",
+			IsForm:        false,
+			Columns:       getNamesColumns(),
+			DetailPanels:  getNamesDetailPanels(),
+			HeaderActions: []string{"add", "export"},
+			Actions:       []string{"update"},
 		},
 		"baddress": {
-			Name:         "Baddress",
-			Store:        "names",
-			IsForm:       false,
-			Columns:      getNamesColumns(),
-			DetailPanels: getNamesDetailPanels(),
+			Name:          "Baddress",
+			Store:         "names",
+			IsForm:        false,
+			Columns:       getNamesColumns(),
+			DetailPanels:  getNamesDetailPanels(),
+			HeaderActions: []string{"add", "export"},
+			Actions:       []string{"update"},
 		},
 	}
 
 	return &types.ViewConfig{
-		ViewName: "names",
-		Facets:   facets,
-		Actions:  make(map[string]types.ActionConfig), // Names uses CRUD actions handled by useActions hook
+		ViewName:   "names",
+		Facets:     facets,
+		FacetOrder: []string{"all", "custom", "prefund", "regular", "baddress"},
+		Actions: map[string]types.ActionConfig{
+			"add":     {Name: "add", Label: "Add Name", Icon: "Add"},
+			"publish": {Name: "publish", Label: "Publish", Icon: "Publish"},
+			"pin":     {Name: "pin", Label: "Pin", Icon: "Pin"},
+			"export":  {Name: "export", Label: "Export Names", Icon: "Export"},
+			"delete":  {Name: "delete", Label: "Delete", Icon: "Delete"},
+			"remove":  {Name: "remove", Label: "Remove", Icon: "Remove"},
+			"update":  {Name: "update", Label: "Modify", Icon: "Edit"},
+		}, // Names uses CRUD actions handled by useActions hook
 	}, nil
 }
 

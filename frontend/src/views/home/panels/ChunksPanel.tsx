@@ -5,7 +5,7 @@ import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIconSets } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
-import { Log } from '@utils';
+import { LogError } from '@utils';
 
 interface ChunksPanelProps {
   onViewAll?: () => void;
@@ -49,7 +49,7 @@ export const ChunksPanel = ({ onViewAll }: ChunksPanelProps) => {
       }
       setError(null);
     } catch (err) {
-      Log(`Error fetching chunks summary: ${err}`);
+      LogError(`Fetching chunks summary: ${err}`);
       setError('Failed to load chunks');
       setSummary((prev) => ({ ...prev, indexHealth: 'error' }));
     } finally {

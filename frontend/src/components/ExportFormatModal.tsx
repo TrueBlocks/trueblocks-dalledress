@@ -10,7 +10,7 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { Log } from '@utils';
+import { LogError } from '@utils';
 
 export interface ExportFormatModalProps {
   opened: boolean;
@@ -39,11 +39,10 @@ export const ExportFormatModal = ({
       setLoading(true);
       GetFormat()
         .then((lastFormat: string) => {
-          Log(`[EXPORT FORMAT MODAL] Loaded last format: ${lastFormat}`);
           setSelectedFormat(lastFormat || 'csv');
         })
         .catch((error: Error) => {
-          Log(`[EXPORT FORMAT MODAL] Error loading format: ${error}`);
+          LogError(`[EXPORT FORMAT MODAL] Error loading format: ${error}`);
           setSelectedFormat('csv');
         })
         .finally(() => {
@@ -54,26 +53,21 @@ export const ExportFormatModal = ({
 
   const handleFormatSelect = useCallback(
     async (format: string) => {
-      Log(
-        `[EXPORT FORMAT MODAL] Format selected: ${format}, dontShowAgain: ${dontShowAgain}`,
-      );
-
       try {
         // Save the selected format preference
         await SetFormat(format);
-        Log(`[EXPORT FORMAT MODAL] Format preference saved: ${format}`);
 
         // If user chose "don't show again", silence the dialog
         if (dontShowAgain) {
           await SilenceDialog('exportFormat');
-          Log('[EXPORT FORMAT MODAL] Export format dialog silenced');
+          LogError('[EXPORT FORMAT MODAL] Export format dialog silenced');
         }
 
         // Close modal and proceed with export
         onClose();
         onFormatSelected(format);
       } catch (error) {
-        Log(`[EXPORT FORMAT MODAL] Error saving preferences: ${error}`);
+        LogError(`[EXPORT FORMAT MODAL] Error saving preferences: ${error}`);
         // Still proceed with export even if preference saving fails
         onClose();
         onFormatSelected(format);
@@ -96,7 +90,6 @@ export const ExportFormatModal = ({
   }, [opened, selectedFormat, loading, handleFormatSelect]);
 
   const handleCancel = () => {
-    Log('[EXPORT FORMAT MODAL] Export cancelled by user');
     onClose();
   };
 

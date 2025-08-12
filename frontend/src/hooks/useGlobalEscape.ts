@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { CancelAllFetches } from '@app';
-import { Log, useEmitters } from '@utils';
+import { LogError, useEmitters } from '@utils';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 interface UseGlobalEscapeProps {
@@ -29,7 +29,7 @@ export const useGlobalEscape = ({
       }
       onEscape?.();
     } catch (error) {
-      Log('ERROR: Failed to cancel fetches:', JSON.stringify(error));
+      LogError('Failed to cancel fetches:', JSON.stringify(error));
       emitStatus('Failed to cancel active fetches');
     }
   }, [emitStatus, onEscape]);

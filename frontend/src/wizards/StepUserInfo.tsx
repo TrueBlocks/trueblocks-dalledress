@@ -3,6 +3,7 @@ import { ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 import { GetUserPreferences } from '@app';
 import { FormField, WizardForm } from '@components';
 import { useEmitters } from '@utils';
+import { LogError } from 'wailsjs/runtime/runtime';
 
 import { WizardStepProps } from '.';
 import { WizardStateData } from './WizardTypes';
@@ -30,6 +31,7 @@ export const StepUserInfo = ({
           });
         }
       } catch (error) {
+        LogError(`Error trying to load user info: ${error}`);
         emitStatus(`Error trying to load user info: ${error}`);
       }
     };

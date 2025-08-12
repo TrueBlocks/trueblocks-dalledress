@@ -5,7 +5,7 @@ import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIconSets } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
-import { Log } from '@utils';
+import { LogError } from '@utils';
 
 interface AbisPanelProps {
   onViewAll?: () => void;
@@ -41,7 +41,7 @@ export const AbisPanel = ({ onViewAll, onAddAbi }: AbisPanelProps) => {
       }
       setError(null);
     } catch (err) {
-      Log(`Error fetching Abis summary: ${err}`);
+      LogError(`Fetching Abis summary: ${err}`);
       setError('Failed to load Abis');
     } finally {
       if (showLoading) setLoading(false);

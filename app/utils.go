@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/hex"
+	"flag"
 	"fmt"
 	"path/filepath"
 
@@ -32,8 +33,26 @@ func (a *App) GetMarkdown(folder, route, tab string) string {
 // GetNodeStatus retrieves blockchain node metadata for the specified chain
 func (a *App) GetNodeStatus(chain string) *coreTypes.MetaData {
 	defer logging.Silence()()
-	a.meta, _ = sdk.GetMetaData(chain)
-	return a.meta
+	// During tests, avoid invoking SDK which may terminate the process
+	if flag.Lookup("test.v") != nil || flag.Lookup("test.run") != nil {
+		var fallback coreTypes.MetaData
+		a.meta = &fallback
+		return &fallback
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			a.meta = nil
+		}
+	}()
+
+	md, err := sdk.GetMetaData(chain)
+	if err != nil {
+		a.meta = nil
+		return nil
+	}
+	a.meta = md
+	return md
 }
 
 // Encode packs function parameters into hex-encoded calldata

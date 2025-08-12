@@ -20,7 +20,7 @@ import {
   Title,
 } from '@mantine/core';
 import { types } from '@models';
-import { Log, addressToHex } from '@utils';
+import { LogError, addressToHex } from '@utils';
 
 import { TransactionReviewModal } from './TransactionReviewModal';
 import { getWriteFunctions } from './facetGeneration';
@@ -160,6 +160,7 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
       setReviewModalOpened(false);
     },
     onError: (error) => {
+      LogError(`Transaction failed: ${error}`);
       setTransactionResult(`Transaction failed: ${error}`);
     },
   });
@@ -346,7 +347,7 @@ export const ContractExecute: React.FC<ContractExecuteProps> = ({
     try {
       await sendTransaction(preparedTx);
     } catch (error) {
-      Log(`Transaction failed: ${error}`);
+      LogError(`Transaction failed: ${error}`);
     }
   };
 

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { GetAppPreferences, SetAppPreferences } from '@app';
 import { Button, Checkbox, Group, Modal, Stack, Text } from '@mantine/core';
-import { Log, updateAppPreferencesSafely } from '@utils';
+import { LogError, updateAppPreferencesSafely } from '@utils';
 
 interface ConfirmModalProps {
   opened: boolean;
@@ -28,7 +28,7 @@ export const ConfirmModal = ({
   const [dontAskAgain, setDontAskAgain] = useState(false);
 
   const handleConfirm = useCallback(async () => {
-    if (dontAskAgain) {
+    if (dontAskAgain && dialogKey) {
       try {
         // Save the silenced dialog preference
         const currentPrefs = await GetAppPreferences();
@@ -40,8 +40,8 @@ export const ConfirmModal = ({
         });
         await SetAppPreferences(updatedPrefs);
       } catch (error) {
-        Log(
-          'ERROR: Failed to save silenced dialog preference:',
+        LogError(
+          'Failed to save silenced dialog preference:',
           JSON.stringify(error),
         );
         // Continue with the action even if saving preferences fails

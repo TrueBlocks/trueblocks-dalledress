@@ -10,29 +10,29 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetMonitorsPage, MonitorsCrud, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { Action } from '@components';
+import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
-  toPageDataProp,
+  buildFacetConfigs,
+  useActions,
   useActiveFacet,
-  useColumns,
   useEvent,
+  useFacetColumns,
   usePayload,
   useViewConfig,
 } from '@hooks';
-import { useActions } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { monitors } from '@models';
 import { msgs, project, types } from '@models';
-import { Debugger, useErrorHandler } from '@utils';
-import { toProperCase } from 'src/utils/toProper';
+import { Debugger, LogError, useErrorHandler } from '@utils';
 
+import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
 
-const ROUTE = 'monitors';
+const ROUTE: ViewRoute = 'monitors';
 
 export const Monitors = () => {
   // === SECTION 2: Hook Initialization ===
@@ -40,26 +40,13 @@ export const Monitors = () => {
   const createPayload = usePayload();
 
   // === SECTION 2.5: Initial ViewConfig Load ===
-  const { config: viewConfig } = useViewConfig({
-    viewName: 'monitors',
-  });
+  const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
+  assertRouteConsistency(ROUTE, viewConfig);
 
-  // Generate facets from ViewConfig
-  const monitorsFacets: DataFacetConfig[] = useMemo(() => {
-    if (!viewConfig?.facets) {
-      // Fallback to default facets if ViewConfig not loaded yet
-      return [
-        {
-          id: types.DataFacet.MONITORS,
-          label: toProperCase(types.DataFacet.MONITORS),
-        },
-      ];
-    }
-    return Object.keys(viewConfig.facets).map((facetKey) => ({
-      id: facetKey as types.DataFacet,
-      label: toProperCase(facetKey),
-    }));
-  }, [viewConfig]);
+  const monitorsFacets: DataFacetConfig[] = useMemo(
+    () => buildFacetConfigs(viewConfig),
+    [viewConfig],
+  );
 
   const activeFacetHook = useActiveFacet({
     facets: monitorsFacets,
@@ -116,6 +103,7 @@ export const Monitors = () => {
       case types.DataFacet.MONITORS:
         return pageData.monitors || [];
       default:
+        LogError('[MONITORS] unexpected facet=' + String(facet));
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
@@ -124,7 +112,7 @@ export const Monitors = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'monitors') {
+      if (payload?.collection === ROUTE) {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
@@ -156,14 +144,14 @@ export const Monitors = () => {
   useHotkeys([['mod+r', handleReload]]);
 
   // === SECTION 5: CRUD Operations ===
-  const { handlers, config } = useActions({
-    collection: 'monitors',
+  const { handlers, config, exportFormatModal, confirmModal } = useActions({
+    collection: ROUTE,
     viewStateKey,
     pagination,
     goToPage,
     sort,
     filter,
-    enabledActions: ['delete', 'remove'],
+    viewConfig,
     pageData,
     setPageData,
     setTotalItems,
@@ -178,9 +166,9 @@ export const Monitors = () => {
   const { handleRemove, handleToggle } = handlers;
 
   const headerActions = useMemo(() => {
-    if (!config.headerActions?.length) return null;
-    return (
-      <Group gap="xs" style={{ flexShrink: 0 }}>
+    if (!config.headerActions.length) return [];
+    return [
+      <Group gap="xs" style={{ flexShrink: 0 }} key="header-actions-group">
         {config.headerActions.map((action) => {
           const handlerKey =
             `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
@@ -204,13 +192,14 @@ export const Monitors = () => {
             />
           );
         })}
-      </Group>
-    );
+      </Group>,
+    ];
   }, [config.headerActions, config.isWalletConnected, handlers]);
 
   // === SECTION 6: UI Configuration ===
-  const currentColumns = useColumns(
-    viewConfig?.facets?.[getCurrentDataFacet()]?.columns || [],
+  const currentColumns = useFacetColumns(
+    viewConfig,
+    getCurrentDataFacet,
     {
       showActions: true,
       actions: ['delete', 'remove'],
@@ -223,7 +212,7 @@ export const Monitors = () => {
       handleRemove,
       handleToggle,
     },
-    toPageDataProp(pageData),
+    pageData,
     config,
   );
 
@@ -289,8 +278,22 @@ export const Monitors = () => {
         headerActions={config.headerActions}
         count={++renderCnt.current}
       />
+      <ConfirmModal
+        opened={confirmModal.opened}
+        onClose={confirmModal.onClose}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        dialogKey={confirmModal.dialogKey}
+      />
+      <ExportFormatModal
+        opened={exportFormatModal.opened}
+        onClose={exportFormatModal.onClose}
+        onFormatSelected={exportFormatModal.onFormatSelected}
+      />
     </div>
   );
 };
 
+// EXISTING_CODE
 // EXISTING_CODE

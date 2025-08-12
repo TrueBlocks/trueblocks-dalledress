@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { base } from '@models';
-import { addressToHex, getDisplayAddress } from '@utils';
+import { LogError, addressToHex, getDisplayAddress } from '@utils';
 import { Log } from '@utils';
 
 import { GetAddresses } from '../../wailsjs/go/project/Project';
@@ -60,7 +60,7 @@ export const AddressSelector = () => {
       const projectAddresses = await GetAddresses();
       setAddresses(projectAddresses || []);
     } catch (error) {
-      Log(`Error loading addresses: ${error}`);
+      LogError(`Loading addresses: ${error}`);
     }
   };
 
@@ -88,7 +88,7 @@ export const AddressSelector = () => {
         Log(`Switched to address: ${getDisplayAddress(selectedAddr)}`);
       }
     } catch (error) {
-      Log(`Error switching address: ${error}`);
+      LogError(`Switching address: ${error}`);
     } finally {
       setLoading(false);
     }
@@ -109,7 +109,7 @@ export const AddressSelector = () => {
         throw new Error('Invalid address format');
       }
     } catch (error) {
-      Log(`Error adding address: ${error}`);
+      LogError(`Adding address: ${error}`);
       form.setFieldError('address', `Failed to add address: ${error}`);
     } finally {
       setLoading(false);

@@ -8,18 +8,25 @@ import (
 func (c *MonitorsCollection) GetConfig() (*types.ViewConfig, error) {
 	facets := map[string]types.FacetConfig{
 		"monitors": {
-			Name:         "Monitors",
-			Store:        "monitors",
-			Columns:      getColumns(),
-			DetailPanels: getDetailPanels(),
-			Actions:      []string{"delete", "remove"},
+			Name:          "Monitors",
+			Store:         "monitors",
+			Columns:       getColumns(),
+			DetailPanels:  getDetailPanels(),
+			Actions:       []string{"delete", "remove"},
+			HeaderActions: []string{"export"},
 		},
 	}
 
 	return &types.ViewConfig{
-		ViewName: "monitors",
-		Facets:   facets,
+		ViewName:   "monitors",
+		Facets:     facets,
+		FacetOrder: []string{"monitors"},
 		Actions: map[string]types.ActionConfig{
+			"export": {
+				Name:  "export",
+				Label: "Export Data",
+				Icon:  "Export",
+			},
 			"delete": {
 				Name:         "delete",
 				Label:        "Delete",

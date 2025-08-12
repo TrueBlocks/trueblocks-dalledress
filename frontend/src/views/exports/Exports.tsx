@@ -10,26 +10,29 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetExportsPage, Reload } from '@app';
 import { BaseTab, usePagination } from '@components';
-import { Action, ExportFormatModal } from '@components';
+import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
 import {
-  ActionType,
   DataFacetConfig,
-  toPageDataProp,
   useActions,
   useActiveFacet,
-  useColumns,
   useEvent,
+  useFacetColumns,
   usePayload,
   useViewConfig,
 } from '@hooks';
+import { buildFacetConfigs } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { exports } from '@models';
 import { msgs, project, types } from '@models';
-import { Debugger, useErrorHandler } from '@utils';
+import { Debugger, LogError, useErrorHandler } from '@utils';
 import { createDetailPanelFromViewConfig } from '@views';
+
+import { ViewRoute, assertRouteConsistency } from '../routes';
+
+const ROUTE: ViewRoute = 'exports';
 
 export const Exports = () => {
   // === SECTION 2: Hook Initialization ===
@@ -37,47 +40,25 @@ export const Exports = () => {
   const createPayload = usePayload();
 
   // ViewConfig hook - guaranteed to be available in Wails
-  const { config: viewConfig } = useViewConfig({
-    viewName: 'exports',
-  });
+  const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
+  assertRouteConsistency(ROUTE, viewConfig);
 
   // Generate facets from ViewConfig - no fallbacks needed in Wails
-  const facetsFromConfig = useMemo((): DataFacetConfig[] => {
-    // Define the correct order for Exports facets
-    const facetOrder = [
-      'statements',
-      'balances',
-      'transfers',
-      'transactions',
-      'withdrawals',
-      'assets',
-      'logs',
-      'traces',
-      'receipts',
-    ];
-
-    return facetOrder
-      .filter((facetId) => viewConfig.facets[facetId]) // Only include facets that exist
-      .map((facetId) => {
-        const facetConfig = viewConfig.facets[facetId];
-        return {
-          id: facetId as types.DataFacet,
-          label: facetConfig?.name || facetId,
-          dividerBefore: facetConfig?.dividerBefore,
-        };
-      });
-  }, [viewConfig.facets]);
+  const facetsFromConfig = useMemo(
+    () => buildFacetConfigs(viewConfig),
+    [viewConfig],
+  );
 
   const activeFacetHook = useActiveFacet({
     facets: facetsFromConfig,
-    viewRoute: 'exports',
+    viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<exports.ExportsPage | null>(null);
   const viewStateKey = useMemo(
     (): project.ViewStateKey => ({
-      viewName: 'exports',
+      viewName: ROUTE,
       facetName: getCurrentDataFacet(),
     }),
     [getCurrentDataFacet],
@@ -122,7 +103,7 @@ export const Exports = () => {
   useEvent(
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
-      if (payload?.collection === 'exports') {
+      if (payload?.collection === ROUTE) {
         const eventDataFacet = payload.dataFacet;
         if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
@@ -153,20 +134,14 @@ export const Exports = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: Actions Configuration ===
-  const enabledActions = useMemo(() => {
-    // Auto-enable Export for all DataTable views that are not forms
-    return ['export'] as ActionType[];
-  }, []);
-
-  const { handlers, config, exportFormatModal } = useActions({
-    collection: 'exports',
+  const { handlers, config, exportFormatModal, confirmModal } = useActions({
+    collection: ROUTE,
     viewStateKey,
     pagination,
     goToPage: () => {}, // Exports typically don't have pagination navigation
     sort,
     filter,
-    enabledActions,
+    viewConfig,
     pageData,
     setPageData,
     setTotalItems,
@@ -179,7 +154,7 @@ export const Exports = () => {
   });
 
   const headerActions = useMemo(() => {
-    if (!config.headerActions?.length) return null;
+    if (!config.headerActions.length) return null;
     return (
       <Group gap="xs" style={{ flexShrink: 0 }}>
         {config.headerActions.map((action) => {
@@ -233,20 +208,32 @@ export const Exports = () => {
       case types.DataFacet.RECEIPTS:
         return pageData.receipts || [];
       default:
+        LogError('[EXPORTS] unexpected facet=' + String(facet));
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
 
-  const currentColumns = useColumns(
-    viewConfig.facets[getCurrentDataFacet()]?.columns || [],
+  const currentColumns = useFacetColumns(
+    viewConfig,
+    getCurrentDataFacet,
     {
       showActions: false,
       actions: [],
       getCanRemove: useCallback((_row: unknown) => false, []),
     },
     {},
-    toPageDataProp(pageData),
+    pageData,
     { rowActions: [] },
+  );
+
+  const detailPanel = useMemo(
+    () =>
+      createDetailPanelFromViewConfig(
+        viewConfig,
+        getCurrentDataFacet,
+        'Exports Details',
+      ),
+    [viewConfig, getCurrentDataFacet],
   );
 
   const perTabContent = useMemo(
@@ -258,11 +245,7 @@ export const Exports = () => {
         error={error}
         viewStateKey={viewStateKey}
         headerActions={headerActions}
-        detailPanel={createDetailPanelFromViewConfig(
-          viewConfig,
-          getCurrentDataFacet,
-          'Exports Details',
-        )}
+        detailPanel={detailPanel}
       />
     ),
     [
@@ -272,8 +255,7 @@ export const Exports = () => {
       error,
       viewStateKey,
       headerActions,
-      getCurrentDataFacet,
-      viewConfig,
+      detailPanel,
     ],
   );
 
@@ -292,7 +274,7 @@ export const Exports = () => {
   // === SECTION 7: Render ===
   return (
     <div className="mainView">
-      <TabView tabs={tabs} route="exports" />
+      <TabView tabs={tabs} route={ROUTE} />
       {error && (
         <div>
           <h3>{`Error fetching ${getCurrentDataFacet()}`}</h3>
@@ -304,6 +286,14 @@ export const Exports = () => {
         headerActions={[]}
         count={++renderCnt.current}
       />
+      <ConfirmModal
+        opened={confirmModal.opened}
+        onClose={confirmModal.onClose}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        dialogKey={confirmModal.dialogKey}
+      />
       <ExportFormatModal
         opened={exportFormatModal.opened}
         onClose={exportFormatModal.onClose}
@@ -312,3 +302,6 @@ export const Exports = () => {
     </div>
   );
 };
+
+// EXISTING_CODE
+// EXISTING_CODE

@@ -5,7 +5,7 @@ import { DashboardCard, StatusIndicator } from '@components';
 import { useEvent, useIconSets } from '@hooks';
 import { Badge, Button, Group, Stack, Text } from '@mantine/core';
 import { msgs, types } from '@models';
-import { Log } from '@utils';
+import { LogError } from '@utils';
 
 interface NamesPanelProps {
   onViewAll?: () => void;
@@ -40,7 +40,7 @@ export const NamesPanel = ({ onViewAll, onAddName }: NamesPanelProps) => {
       }
       setError(null);
     } catch (err) {
-      Log(`Error fetching names summary: ${err}`);
+      LogError(`Fetching names summary: ${err}`);
       setError('Failed to load names');
     } finally {
       if (showLoading) setLoading(false);

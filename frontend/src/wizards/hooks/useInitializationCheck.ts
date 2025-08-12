@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 
 import { GetUserInfoStatus } from '@app';
 import { useAppNavigation } from '@hooks';
-import { Log, checkAndNavigateToWizard } from '@utils';
+import { LogError, checkAndNavigateToWizard } from '@utils';
 
 import { WizardState } from '..';
 
@@ -23,12 +23,12 @@ export const useInitializationCheck = (
       try {
         await checkAndNavigateToWizard(navigate, isWizard);
       } catch (err) {
-        Log(`Failed to check wizard state: ${err}`);
+        LogError(`Failed to check wizard state: ${err}`);
         if (!isWizard) {
           try {
             navigate('/wizard');
           } catch (navError) {
-            Log(`Failed to check wizard state: ${navError}`);
+            LogError(`Failed to check wizard state: ${navError}`);
             window.location.href = '/wizard';
           }
         }
@@ -51,7 +51,7 @@ export const useInitializationCheck = (
         }
         return 2;
       } catch (error) {
-        Log(`Failed to verify completion step: ${error}`);
+        LogError(`Failed to verify completion step: ${error}`);
         return state.ui.activeStep;
       }
     }

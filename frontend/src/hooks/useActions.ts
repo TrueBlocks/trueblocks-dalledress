@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ExportData, IsDialogSilenced } from '@app';
 import { useWalletGatedAction } from '@hooks';
 import { crud, project, sdk, types } from '@models';
-import { Log, addressToHex, useErrorHandler } from '@utils';
+import { Log, LogError, addressToHex, useErrorHandler } from '@utils';
 
 import {
   TransactionData,
@@ -53,8 +53,8 @@ export interface CollectionActionsConfig<TPageData, TItem> {
   sort: ReturnType<typeof import('@contexts').useSorting>['sort'];
   filter: ReturnType<typeof import('@contexts').useFiltering>['filter'];
 
-  // Enabled actions for this collection
-  enabledActions: ActionDefinition['type'][];
+  // Backend-provided view configuration (used to derive actions per facet)
+  viewConfig: types.ViewConfig;
 
   // State management
   pageData: TPageData | null;
@@ -164,7 +164,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     goToPage,
     sort,
     filter,
-    enabledActions,
+    viewConfig,
     pageData,
     setPageData,
     setTotalItems,
@@ -209,6 +209,66 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     pendingPayload: null,
   });
 
+  // Unified confirm modal (Aspect D abstraction)
+  const [confirmModal, setConfirmModal] = useState<{
+    opened: boolean;
+    title: string;
+    message: string;
+    dialogKey: string;
+    onConfirm: (() => void) | null;
+  }>({
+    opened: false,
+    title: '',
+    message: '',
+    dialogKey: '',
+    onConfirm: null,
+  });
+
+  const openConfirm = useCallback(
+    (opts: {
+      title: string;
+      message: string;
+      dialogKey: string;
+      onConfirm: () => void;
+    }) => {
+      setConfirmModal({
+        opened: true,
+        title: opts.title,
+        message: opts.message,
+        dialogKey: opts.dialogKey,
+        onConfirm: opts.onConfirm,
+      });
+    },
+    [],
+  );
+  const closeConfirm = useCallback(
+    () => setConfirmModal((p) => ({ ...p, opened: false })),
+    [],
+  );
+
+  // Check silenced state and either execute immediately or open confirm
+  const askConfirmOrExecute = useCallback(
+    async (opts: {
+      title: string;
+      message: string;
+      dialogKey: string;
+      onConfirm: () => void;
+    }) => {
+      try {
+        const silenced = await IsDialogSilenced(opts.dialogKey);
+        if (silenced) {
+          opts.onConfirm();
+          return;
+        }
+      } catch (error) {
+        // Fall through to showing confirm if check fails
+        LogError('Checking dialog silence state:', String(error));
+      }
+      openConfirm(opts);
+    },
+    [openConfirm],
+  );
+
   // Execute pending publish when wallet connects
   const executePendingPublish = useCallback(() => {
     if (!pendingPublish || !isWalletConnected) return;
@@ -251,7 +311,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
         transactionData,
       });
     } catch (error) {
-      Log('Error creating pending publish transaction:', String(error));
+      LogError('Creating pending publish transaction:', String(error));
     }
   }, [pendingPublish, isWalletConnected]);
 
@@ -263,35 +323,25 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
   // Items property name (derived from collection name)
   const itemsProperty = collection;
 
-  // Filter actions based on enabled actions
-  const availableActions = useMemo(() => {
-    return enabledActions
-      .map((actionType) => {
-        const baseAction = ACTION_DEFINITIONS[actionType];
-        if (!baseAction) return null;
-        return baseAction;
-      })
-      .filter((action): action is ActionDefinition => {
-        return !!action;
-      });
-  }, [enabledActions]);
+  // Derive actions dynamically from backend ViewConfig for current facet
+  const { headerActions, rowActions } = useMemo(() => {
+    const facetKey = currentDataFacet as unknown as string;
+    const facetCfg = viewConfig?.facets?.[facetKey];
+    const headerIds: string[] = facetCfg?.headerActions || [];
+    const rowIds: string[] = facetCfg?.actions || [];
 
-  // Separate actions by level
-  const headerActions = useMemo(
-    () =>
-      availableActions.filter(
-        (action) => action.level === 'header' || action.level === 'both',
-      ),
-    [availableActions],
-  );
+    const toDef = (id: string): ActionDefinition | null =>
+      ACTION_DEFINITIONS[id] || null;
 
-  const rowActions = useMemo(
-    () =>
-      availableActions.filter(
-        (action) => action.level === 'row' || action.level === 'both',
-      ),
-    [availableActions],
-  );
+    return {
+      headerActions: headerIds
+        .map(toDef)
+        .filter((a): a is ActionDefinition => Boolean(a)),
+      rowActions: rowIds
+        .map(toDef)
+        .filter((a): a is ActionDefinition => Boolean(a)),
+    };
+  }, [viewConfig, currentDataFacet]);
 
   const { clearError, handleError } = useErrorHandler();
 
@@ -315,7 +365,9 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
             // do nothing - the backend did it all
           })
           .catch((error) => {
-            Log(`[EXPORT FRONTEND] Export failed for ${collection}: ${error}`);
+            LogError(
+              `[EXPORT FRONTEND] Export failed for ${collection}: ${error}`,
+            );
           });
       } else {
         setExportFormatModal({
@@ -324,7 +376,9 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
         });
       }
     } catch (error) {
-      Log(`[EXPORT FRONTEND] Error checking dialog silence state: ${error}`);
+      LogError(
+        `[EXPORT FRONTEND] Error checking dialog silence state: ${error}`,
+      );
       setExportFormatModal({
         opened: true,
         pendingPayload: payload,
@@ -347,7 +401,9 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           // do nothing - the backend did it all
         })
         .catch((error) => {
-          Log(`[EXPORT FRONTEND] Export failed for ${collection}: ${error}`);
+          LogError(
+            `[EXPORT FRONTEND] Export failed for ${collection}: ${error}`,
+          );
         });
     },
     [collection, exportFormatModal.pendingPayload],
@@ -420,7 +476,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
 
       Log('Transaction modal state set to opened');
     } catch (error) {
-      Log('Error creating publish transaction:', String(error));
+      LogError('Creating publish transaction:', String(error));
     }
   }, [collection, isWalletConnected, createWalletGatedAction]);
 
@@ -429,7 +485,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     // TODO: Implement pin functionality
   }, [collection]);
 
-  const handleToggle = useCallback(
+  const performToggle = useCallback(
     (address: string) => {
       clearError();
 
@@ -530,8 +586,15 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       emitSuccess,
     ],
   );
+  const handleToggle = useCallback(
+    (address: string) => {
+      // No confirmation required for delete/undelete
+      performToggle(address);
+    },
+    [performToggle],
+  );
 
-  const handleRemove = useCallback(
+  const performRemove = useCallback(
     (address: string) => {
       clearError();
 
@@ -629,8 +692,19 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       emitSuccess,
     ],
   );
+  const handleRemove = useCallback(
+    (address: string) => {
+      askConfirmOrExecute({
+        title: 'Confirm Remove',
+        message: 'Permanently remove this item?',
+        dialogKey: 'confirm.remove',
+        onConfirm: () => performRemove(address),
+      });
+    },
+    [askConfirmOrExecute, performRemove],
+  );
 
-  const handleAutoname = useCallback(
+  const performAutoname = useCallback(
     (address: string) => {
       clearError();
 
@@ -722,6 +796,13 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       emitSuccess,
     ],
   );
+  const handleAutoname = useCallback(
+    (address: string) => {
+      // No confirmation required for autoname
+      performAutoname(address);
+    },
+    [performAutoname],
+  );
 
   const handleUpdate = useCallback(
     (data: Record<string, unknown>) => {
@@ -812,7 +893,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     ],
   );
 
-  const handleClean = useCallback(async () => {
+  const performClean = useCallback(async () => {
     if (!cleanFunc) return;
 
     clearError();
@@ -850,6 +931,18 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     collection,
     emitSuccess,
   ]);
+
+  const handleClean = useCallback(() => {
+    if (!cleanFunc) return;
+    askConfirmOrExecute({
+      title: 'Confirm Clean',
+      message: 'This will clean cached data. Continue?',
+      dialogKey: 'confirm.clean',
+      onConfirm: () => {
+        void performClean();
+      },
+    });
+  }, [askConfirmOrExecute, cleanFunc, performClean]);
 
   // TODO: Implement handleCleanOne if needed for cleaning specific addresses
   // const handleCleanOne = useCallback(
@@ -943,6 +1036,14 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       collection,
       getCurrentDataFacet,
       isWalletConnected,
+    },
+    confirmModal: {
+      ...confirmModal,
+      onClose: closeConfirm,
+      onConfirm: () => {
+        if (confirmModal.onConfirm) confirmModal.onConfirm();
+        closeConfirm();
+      },
     },
     transactionModal: {
       ...transactionModal,

@@ -21,7 +21,7 @@ import {
 } from '@app';
 import { preferences, types } from '@models';
 import { EventsOn } from '@runtime';
-import { Log, addressToHex, updateAppPreferencesSafely } from '@utils';
+import { LogError, addressToHex, updateAppPreferencesSafely } from '@utils';
 
 export interface ProjectInfo {
   id: string;
@@ -194,7 +194,7 @@ class ProjectStore {
         this.eventListenersSetup = true;
       }
     } catch (error) {
-      Log('ERROR: Failed to load project data: ' + String(error));
+      LogError('Failed to load project data: ' + String(error));
       this.setState({ loading: false });
     }
   };
@@ -239,11 +239,11 @@ class ProjectStore {
         this.setState({ activeAddress: hexAddress });
       } else {
         const errorMsg = `Invalid address - ConvertToAddress returned: ${JSON.stringify(result)}`;
-        Log(`ERROR: ${errorMsg}`);
+        LogError(`${errorMsg}`);
         throw new Error(errorMsg);
       }
     } catch (error) {
-      Log(`ERROR: Failed to set active address: ${String(error)}`);
+      LogError(`Failed to set active address: ${String(error)}`);
       throw error;
     }
   };
@@ -300,9 +300,8 @@ class ProjectStore {
       const updatedPrefs = updateAppPreferencesSafely(currentPrefs, updates);
       await SetAppPreferences(updatedPrefs);
     } catch (error) {
-      Log(
-        'ERROR: Failed to update project management preferences: ' +
-          String(error),
+      LogError(
+        'Failed to update project management preferences: ' + String(error),
       );
       throw error;
     }
@@ -313,7 +312,7 @@ class ProjectStore {
       const projects = await GetOpenProjects();
       this.setState({ projects: (projects as ProjectInfo[]) || [] });
     } catch (error) {
-      Log('ERROR: Failed to refresh projects: ' + String(error));
+      LogError('Failed to refresh projects: ' + String(error));
       throw error;
     }
   };

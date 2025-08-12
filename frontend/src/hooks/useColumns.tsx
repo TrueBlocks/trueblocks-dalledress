@@ -27,9 +27,10 @@ interface ActionHandlers {
   handleToggle?: (addressStr: string) => void;
   handleRemove?: (addressStr: string) => void;
   handleAutoname?: (addressStr: string) => void;
+  handleUpdate?: (row: Record<string, unknown>) => void;
 }
 
-interface ActionConfig {
+export interface ActionConfig {
   rowActions: Array<{
     type: string;
     icon: string;
@@ -57,7 +58,10 @@ export const useColumns = (
       return baseColumns.filter((col) => col.key !== 'actions');
     }
 
-    const renderActions = (actionData: ActionData) => {
+    const renderActions = (
+      actionData: ActionData,
+      row: Record<string, unknown>,
+    ) => {
       const isDeleted = actionData.isDeleted;
       const newState = actionData.isProcessing ? !isDeleted : isDeleted;
 
@@ -85,7 +89,7 @@ export const useColumns = (
                   key={action.type}
                   icon="Remove"
                   onClick={() => handlers.handleRemove?.(actionData.addressStr)}
-                  disabled={actionData.isProcessing || !newState}
+                  disabled={actionData.isProcessing || !actionData.canRemove}
                   title="Remove"
                   size="sm"
                 />
@@ -102,6 +106,19 @@ export const useColumns = (
                   }
                   disabled={actionData.isProcessing}
                   title="Auto-generate name"
+                  size="sm"
+                />
+              );
+            }
+
+            if (action.type === 'update' && handlers.handleUpdate) {
+              return (
+                <Action
+                  key={action.type}
+                  icon="Edit"
+                  onClick={() => handlers.handleUpdate?.(row)}
+                  disabled={actionData.isProcessing}
+                  title="Modify"
                   size="sm"
                 />
               );
@@ -130,7 +147,7 @@ export const useColumns = (
           canRemove,
         };
 
-        return renderActions(actionData);
+        return renderActions(actionData, row);
       },
     };
 

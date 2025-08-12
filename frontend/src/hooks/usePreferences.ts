@@ -10,7 +10,7 @@ import {
   SetTheme,
 } from '@app';
 import { preferences } from '@models';
-import { Log, updateAppPreferencesSafely } from '@utils';
+import { LogError, updateAppPreferencesSafely } from '@utils';
 
 export interface UsePreferencesReturn {
   lastTheme: string;
@@ -103,7 +103,7 @@ class PreferencesStore {
         updates.recentProjects !== undefined &&
         !Array.isArray(updates.recentProjects)
       ) {
-        Log('ERROR: Invalid recentProjects value, must be an array');
+        LogError('Invalid recentProjects value, must be an array');
         throw new Error('recentProjects must be an array');
       }
 
@@ -111,7 +111,7 @@ class PreferencesStore {
         updates.silencedDialogs !== undefined &&
         typeof updates.silencedDialogs !== 'object'
       ) {
-        Log('ERROR: Invalid silencedDialogs value, must be an object');
+        LogError('Invalid silencedDialogs value, must be an object');
         throw new Error('silencedDialogs must be an object');
       }
 
@@ -123,14 +123,14 @@ class PreferencesStore {
           updates.bounds.width < 100 ||
           updates.bounds.height < 100)
       ) {
-        Log('ERROR: Invalid bounds value, must have valid width/height >= 100');
+        LogError('Invalid bounds value, must have valid width/height >= 100');
         throw new Error('bounds must have valid width and height >= 100');
       }
 
       const updatedPrefs = updateAppPreferencesSafely(currentPrefs, updates);
       await SetAppPreferences(updatedPrefs);
     } catch (error) {
-      Log('ERROR: Failed to update preferences: ' + String(error));
+      LogError('Failed to update preferences: ' + String(error));
       throw error;
     }
   };
@@ -151,7 +151,7 @@ class PreferencesStore {
         loading: false,
       });
     } catch (error) {
-      Log('ERROR: Failed to load preferences: ' + String(error));
+      LogError('Failed to load preferences: ' + String(error));
       this.setState({
         lastTheme: 'dark',
         lastLanguage: 'en',

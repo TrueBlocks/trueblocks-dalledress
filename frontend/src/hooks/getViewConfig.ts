@@ -8,7 +8,7 @@ import {
   GetStatusConfig,
 } from '@app';
 import { types } from '@models';
-import { Log } from '@utils';
+import { LogError } from '@utils';
 
 // Global cache for configs - they never change during app run
 const configCache = new Map<string, types.ViewConfig>();
@@ -71,7 +71,7 @@ export async function initializeAllViewConfigs(): Promise<{
 
       isInitialized = true;
     } catch (error) {
-      Log(`❌ FRONTEND: ViewConfig initialization failed: ${error}`);
+      LogError(`ViewConfig initialization failed: ${error}`);
       // Reset state so initialization can be retried
       initializationPromise = null;
       throw error;
@@ -118,7 +118,7 @@ export function useViewConfig({ viewName }: { viewName: string }): {
 
   // Just return the cached config - no loading state needed!
   const config = getViewConfig(viewName);
-
+  validateViewConfigOnce(config);
   return { config, isLoading };
 }
 
@@ -142,4 +142,30 @@ export function getInitializationStatus(): {
     cachedViews: Array.from(configCache.keys()),
     cacheSize: configCache.size,
   };
+}
+
+// One-time runtime validation of facet ordering coherence
+const validatedViews = new Set<string>();
+function validateViewConfigOnce(cfg: types.ViewConfig) {
+  if (!cfg || validatedViews.has(cfg.viewName)) return;
+  validatedViews.add(cfg.viewName);
+  const errs: string[] = [];
+  const order = cfg.facetOrder || [];
+  if (!order.length) {
+    errs.push('empty facetOrder');
+  }
+  const seen = new Set<string>();
+  for (const id of order) {
+    if (seen.has(id)) errs.push('duplicate ' + id);
+    seen.add(id);
+    if (!cfg.facets[id]) errs.push('unknown facet ' + id);
+  }
+  for (const key of Object.keys(cfg.facets)) {
+    if (!seen.has(key)) errs.push('missing in facetOrder ' + key);
+  }
+  if (errs.length) {
+    LogError(
+      '[FACET_ORDER_VALIDATION ' + cfg.viewName + '] ' + errs.join('; '),
+    );
+  }
 }

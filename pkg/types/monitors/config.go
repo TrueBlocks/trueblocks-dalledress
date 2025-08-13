@@ -10,14 +10,13 @@ func (c *MonitorsCollection) GetConfig() (*types.ViewConfig, error) {
 		"monitors": {
 			Name:          "Monitors",
 			Store:         "monitors",
-			Columns:       getColumns(),
-			DetailPanels:  getDetailPanels(),
+			Fields:        getFields(),
 			Actions:       []string{"delete", "remove"},
 			HeaderActions: []string{"export"},
 		},
 	}
 
-	return &types.ViewConfig{
+	cfg := &types.ViewConfig{
 		ViewName:   "monitors",
 		Facets:     facets,
 		FacetOrder: []string{"monitors"},
@@ -42,136 +41,25 @@ func (c *MonitorsCollection) GetConfig() (*types.ViewConfig, error) {
 				Facets:       []string{"monitors"},
 			},
 		},
-	}, nil
-}
-
-func getColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{
-			Key:        "address",
-			Header:     "Address",
-			Accessor:   "address",
-			Width:      340,
-			Sortable:   true,
-			Filterable: true,
-			Formatter:  "address",
-		},
-		{
-			Key:        "name",
-			Header:     "Name",
-			Accessor:   "name",
-			Width:      200,
-			Sortable:   true,
-			Filterable: true,
-			Formatter:  "",
-		},
-		{
-			Key:        "nRecords",
-			Header:     "Records",
-			Accessor:   "nRecords",
-			Width:      120,
-			Sortable:   true,
-			Filterable: false,
-			Formatter:  "number",
-		},
-		{
-			Key:        "fileSize",
-			Header:     "File Size",
-			Accessor:   "fileSize",
-			Width:      120,
-			Sortable:   true,
-			Filterable: false,
-			Formatter:  "fileSize",
-		},
-		{
-			Key:        "isEmpty",
-			Header:     "Empty",
-			Accessor:   "isEmpty",
-			Width:      80,
-			Sortable:   true,
-			Filterable: false,
-			Formatter:  "boolean",
-		},
-		{
-			Key:        "lastScanned",
-			Header:     "Last Scanned",
-			Accessor:   "lastScanned",
-			Width:      120,
-			Sortable:   true,
-			Filterable: false,
-			Formatter:  "timestamp",
-		},
-		{
-			Key:        "actions",
-			Header:     "Actions",
-			Accessor:   "actions",
-			Width:      80,
-			Sortable:   false,
-			Filterable: false,
-			Formatter:  "actions",
-		},
 	}
+	types.DeriveFacetFromFields(cfg)
+	types.NormalizeOrders(cfg)
+	return cfg, nil
 }
 
-func getDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title:     "Monitor Overview",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{
-					Key:       "name",
-					Label:     "Name",
-					Formatter: "",
-				},
-				{
-					Key:       "address",
-					Label:     "Address",
-					Formatter: "address",
-				},
-				{
-					Key:       "deleted",
-					Label:     "Deleted",
-					Formatter: "boolean",
-				},
-				{
-					Key:       "isStaged",
-					Label:     "Staged",
-					Formatter: "boolean",
-				},
-			},
-		},
-		{
-			Title:     "File Statistics",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{
-					Key:       "nRecords",
-					Label:     "Total Records",
-					Formatter: "number",
-				},
-				{
-					Key:       "fileSize",
-					Label:     "File Size",
-					Formatter: "fileSize",
-				},
-				{
-					Key:       "isEmpty",
-					Label:     "Is Empty",
-					Formatter: "boolean",
-				},
-			},
-		},
-		{
-			Title:     "Scanning Information",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{
-					Key:       "lastScanned",
-					Label:     "Last Scanned",
-					Formatter: "timestamp",
-				},
-			},
-		},
+func getFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Formatter: "address", Section: "Monitor Overview", InTable: true, InDetail: true, Width: 340, Sortable: true, Filterable: true, Order: 1, DetailOrder: 2},
+		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Name", Section: "Monitor Overview", InTable: true, InDetail: true, Width: 200, Sortable: true, Filterable: true, Order: 2, DetailOrder: 1},
+		{Key: "deleted", Label: "Deleted", ColumnLabel: "Deleted", DetailLabel: "Deleted", Formatter: "boolean", Section: "Monitor Overview", InTable: false, InDetail: true, DetailOrder: 3},
+		{Key: "isStaged", Label: "Staged", ColumnLabel: "Staged", DetailLabel: "Staged", Formatter: "boolean", Section: "Monitor Overview", InTable: false, InDetail: true, DetailOrder: 4},
+
+		{Key: "nRecords", Label: "Records", ColumnLabel: "Records", DetailLabel: "Total Records", Formatter: "number", Section: "File Statistics", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: false, Order: 3, DetailOrder: 5},
+		{Key: "fileSize", Label: "File Size", ColumnLabel: "File Size", DetailLabel: "File Size", Formatter: "fileSize", Section: "File Statistics", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: false, Order: 4, DetailOrder: 6},
+		{Key: "isEmpty", Label: "Empty", ColumnLabel: "Empty", DetailLabel: "Is Empty", Formatter: "boolean", Section: "File Statistics", InTable: true, InDetail: true, Width: 80, Sortable: true, Filterable: false, Order: 5, DetailOrder: 7},
+
+		{Key: "lastScanned", Label: "Last Scanned", ColumnLabel: "Last Scanned", DetailLabel: "Last Scanned", Formatter: "timestamp", Section: "Scanning Information", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: false, Order: 6, DetailOrder: 8},
+
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Sortable: false, Filterable: false, Order: 7},
 	}
 }

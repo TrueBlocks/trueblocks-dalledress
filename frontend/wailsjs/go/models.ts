@@ -1290,11 +1290,11 @@ export namespace types {
 	export class ColumnConfig {
 	    key: string;
 	    header: string;
-	    accessor: string;
 	    width: number;
 	    sortable: boolean;
 	    filterable: boolean;
 	    formatter: string;
+	    order: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new ColumnConfig(source);
@@ -1304,11 +1304,11 @@ export namespace types {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.key = source["key"];
 	        this.header = source["header"];
-	        this.accessor = source["accessor"];
 	        this.width = source["width"];
 	        this.sortable = source["sortable"];
 	        this.filterable = source["filterable"];
 	        this.formatter = source["formatter"];
+	        this.order = source["order"];
 	    }
 	}
 	export class Contract {
@@ -1359,6 +1359,7 @@ export namespace types {
 	    key: string;
 	    label: string;
 	    formatter: string;
+	    detailOrder: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DetailFieldConfig(source);
@@ -1369,6 +1370,7 @@ export namespace types {
 	        this.key = source["key"];
 	        this.label = source["label"];
 	        this.formatter = source["formatter"];
+	        this.detailOrder = source["detailOrder"];
 	    }
 	}
 	export class DetailPanelConfig {
@@ -1405,11 +1407,44 @@ export namespace types {
 		    return a;
 		}
 	}
+	export class FieldConfig {
+	    key: string;
+	    label: string;
+	    formatter: string;
+	    section: string;
+	    inTable: boolean;
+	    inDetail: boolean;
+	    width: number;
+	    sortable: boolean;
+	    filterable: boolean;
+	    order: number;
+	    detailOrder: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new FieldConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.key = source["key"];
+	        this.label = source["label"];
+	        this.formatter = source["formatter"];
+	        this.section = source["section"];
+	        this.inTable = source["inTable"];
+	        this.inDetail = source["inDetail"];
+	        this.width = source["width"];
+	        this.sortable = source["sortable"];
+	        this.filterable = source["filterable"];
+	        this.order = source["order"];
+	        this.detailOrder = source["detailOrder"];
+	    }
+	}
 	export class FacetConfig {
 	    name: string;
 	    store: string;
 	    isForm: boolean;
 	    dividerBefore: boolean;
+	    fields: FieldConfig[];
 	    columns: ColumnConfig[];
 	    detailPanels: DetailPanelConfig[];
 	    actions: string[];
@@ -1425,6 +1460,7 @@ export namespace types {
 	        this.store = source["store"];
 	        this.isForm = source["isForm"];
 	        this.dividerBefore = source["dividerBefore"];
+	        this.fields = this.convertValues(source["fields"], FieldConfig);
 	        this.columns = this.convertValues(source["columns"], ColumnConfig);
 	        this.detailPanels = this.convertValues(source["detailPanels"], DetailPanelConfig);
 	        this.actions = source["actions"];
@@ -1449,6 +1485,7 @@ export namespace types {
 		    return a;
 		}
 	}
+	
 	
 	export class Log {
 	    address: base.Address;

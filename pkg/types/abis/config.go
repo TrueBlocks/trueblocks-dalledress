@@ -6,15 +6,14 @@ import (
 
 // GetConfig returns the ViewConfig for the Abis view
 func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
-	return &types.ViewConfig{
+	cfg := &types.ViewConfig{
 		ViewName: "abis",
 		Facets: map[string]types.FacetConfig{
 			"downloaded": {
 				Name:          "Downloaded",
 				Store:         "downloaded",
 				IsForm:        false,
-				Columns:       getAbisColumns(),
-				DetailPanels:  getAbisDetailPanels(),
+				Fields:        getAbisFields(),
 				Actions:       []string{"remove"},
 				HeaderActions: []string{"export"},
 			},
@@ -22,8 +21,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 				Name:          "Known",
 				Store:         "known",
 				IsForm:        false,
-				Columns:       getAbisColumns(),
-				DetailPanels:  getAbisDetailPanels(),
+				Fields:        getAbisFields(),
 				Actions:       nil,
 				HeaderActions: []string{"export"},
 			},
@@ -31,8 +29,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 				Name:          "Functions",
 				Store:         "functions",
 				IsForm:        false,
-				Columns:       getFunctionsColumns(),
-				DetailPanels:  getFunctionsDetailPanels(),
+				Fields:        getFunctionFields(),
 				Actions:       nil,
 				HeaderActions: []string{"export"},
 			},
@@ -40,8 +37,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 				Name:          "Events",
 				Store:         "events",
 				IsForm:        false,
-				Columns:       getFunctionsColumns(), // Events use same structure as functions
-				DetailPanels:  getFunctionsDetailPanels(),
+				Fields:        getFunctionFields(),
 				Actions:       nil,
 				HeaderActions: []string{"export"},
 			},
@@ -51,123 +47,48 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			"export": {Name: "export", Label: "Export Data", Icon: "Export"},
 			"remove": {Name: "remove", Label: "Remove", Icon: "Remove"},
 		},
-	}, nil
+	}
+	types.DeriveFacetFromFields(cfg)
+	types.NormalizeOrders(cfg)
+	return cfg, nil
 }
 
-func getAbisColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "address", Header: "Address", Accessor: "address", Width: 340, Formatter: "address"},
-		{Key: "name", Header: "Name", Accessor: "name", Width: 200},
-		{Key: "nFunctions", Header: "Functions", Accessor: "nFunctions", Width: 100, Formatter: "number"},
-		{Key: "nEvents", Header: "Events", Accessor: "nEvents", Width: 100, Formatter: "number"},
-		{Key: "fileSize", Header: "File Size", Accessor: "fileSize", Width: 120, Formatter: "fileSize"},
-		{Key: "isEmpty", Header: "Empty", Accessor: "isEmpty", Width: 80, Formatter: "boolean"},
-		{Key: "isKnown", Header: "Known", Accessor: "isKnown", Width: 80, Formatter: "boolean"},
-		{Key: "lastModDate", Header: "Last Modified", Accessor: "lastModDate", Width: 150, Formatter: "timestamp"},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
+func getAbisFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Formatter: "address", Section: "ABI Identity", InTable: true, InDetail: true, Width: 340, Order: 1, DetailOrder: 1},
+		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Name", Section: "ABI Identity", InTable: true, InDetail: true, Width: 200, Order: 2, DetailOrder: 2},
+		{Key: "path", Label: "File Path", Section: "ABI Identity", InTable: false, InDetail: true, DetailOrder: 3},
+
+		{Key: "nFunctions", Label: "Functions", ColumnLabel: "Functions", DetailLabel: "Number of Functions", Formatter: "number", Section: "Content Statistics", InTable: true, InDetail: true, Width: 100, Order: 3, DetailOrder: 4},
+		{Key: "nEvents", Label: "Events", ColumnLabel: "Events", DetailLabel: "Number of Events", Formatter: "number", Section: "Content Statistics", InTable: true, InDetail: true, Width: 100, Order: 4, DetailOrder: 5},
+		{Key: "fileSize", Label: "File Size", ColumnLabel: "File Size", DetailLabel: "File Size", Formatter: "fileSize", Section: "Content Statistics", InTable: true, InDetail: true, Width: 120, Order: 5, DetailOrder: 6},
+
+		{Key: "isEmpty", Label: "Empty", ColumnLabel: "Empty", DetailLabel: "Is Empty", Formatter: "boolean", Section: "ABI Properties", InTable: true, InDetail: true, Width: 80, Order: 6, DetailOrder: 7},
+		{Key: "isKnown", Label: "Known", ColumnLabel: "Known", DetailLabel: "Is Known", Formatter: "boolean", Section: "ABI Properties", InTable: true, InDetail: true, Width: 80, Order: 7, DetailOrder: 8},
+		{Key: "hasConstructor", Label: "Has Constructor", ColumnLabel: "Has Constructor", DetailLabel: "Has Constructor", Formatter: "boolean", Section: "ABI Properties", InTable: false, InDetail: true, DetailOrder: 9},
+		{Key: "hasFallback", Label: "Has Fallback Function", ColumnLabel: "Has Fallback Function", DetailLabel: "Has Fallback Function", Formatter: "boolean", Section: "ABI Properties", InTable: false, InDetail: true, DetailOrder: 10},
+
+		{Key: "lastModDate", Label: "Last Modified", ColumnLabel: "Last Modified", DetailLabel: "Last Modified", Formatter: "timestamp", Section: "File Metadata", InTable: true, InDetail: true, Width: 150, Order: 8, DetailOrder: 11},
+
+		{Key: "functions", Label: "Available Functions", ColumnLabel: "Available Functions", DetailLabel: "Available Functions", Formatter: "json", Section: "Functions List", InTable: false, InDetail: true, DetailOrder: 12},
+
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 9},
 	}
 }
 
-func getFunctionsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "name", Header: "Name", Accessor: "name", Width: 200},
-		{Key: "type", Header: "Type", Accessor: "type", Width: 100},
-		{Key: "encoding", Header: "Encoding", Accessor: "encoding", Width: 250},
-		{Key: "signature", Header: "Signature", Accessor: "signature", Width: 300},
-		{Key: "stateMutability", Header: "State Mutability", Accessor: "stateMutability", Width: 150},
-		{Key: "constant", Header: "Constant", Accessor: "constant", Width: 100, Formatter: "boolean"},
-		{Key: "anonymous", Header: "Anonymous", Accessor: "anonymous", Width: 100, Formatter: "boolean"},
-	}
-}
+func getFunctionFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Function Name", Section: "Function Overview", InTable: true, InDetail: true, Width: 200, Order: 1, DetailOrder: 1},
+		{Key: "type", Label: "Type", ColumnLabel: "Type", DetailLabel: "Function Type", Section: "Function Overview", InTable: true, InDetail: true, Width: 100, Order: 2, DetailOrder: 2},
+		{Key: "encoding", Label: "Encoding", ColumnLabel: "Encoding", DetailLabel: "Encoding Hash", Section: "Function Overview", InTable: true, InDetail: true, Width: 250, Order: 3, DetailOrder: 3},
+		{Key: "signature", Label: "Signature", ColumnLabel: "Signature", DetailLabel: "Function Signature", Section: "Function Overview", InTable: true, InDetail: true, Width: 300, Order: 4, DetailOrder: 4},
 
-func getAbisDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title:     "ABI Identity",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Address", Formatter: "address"},
-				{Key: "name", Label: "Name"},
-				{Key: "path", Label: "File Path"},
-			},
-		},
-		{
-			Title:     "Content Statistics",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "nFunctions", Label: "Number of Functions", Formatter: "number"},
-				{Key: "nEvents", Label: "Number of Events", Formatter: "number"},
-				{Key: "fileSize", Label: "File Size", Formatter: "fileSize"},
-			},
-		},
-		{
-			Title:     "ABI Properties",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "isEmpty", Label: "Is Empty", Formatter: "boolean"},
-				{Key: "isKnown", Label: "Is Known", Formatter: "boolean"},
-				{Key: "hasConstructor", Label: "Has Constructor", Formatter: "boolean"},
-				{Key: "hasFallback", Label: "Has Fallback Function", Formatter: "boolean"},
-			},
-		},
-		{
-			Title:     "File Metadata",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "lastModDate", Label: "Last Modified", Formatter: "timestamp"},
-			},
-		},
-		{
-			Title:     "Functions List",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "functions", Label: "Available Functions", Formatter: "json"},
-			},
-		},
-	}
-}
+		{Key: "stateMutability", Label: "State Mutability", ColumnLabel: "State Mutability", DetailLabel: "State Mutability", Section: "Function Properties", InTable: true, InDetail: true, Width: 150, Order: 5, DetailOrder: 5},
+		{Key: "constant", Label: "Constant", ColumnLabel: "Constant", DetailLabel: "Constant", Formatter: "boolean", Section: "Function Properties", InTable: true, InDetail: true, Width: 100, Order: 6, DetailOrder: 6},
+		{Key: "anonymous", Label: "Anonymous", ColumnLabel: "Anonymous", DetailLabel: "Anonymous", Formatter: "boolean", Section: "Function Properties", InTable: true, InDetail: true, Width: 100, Order: 7, DetailOrder: 7},
 
-func getFunctionsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title:     "Function Overview",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "name", Label: "Function Name"},
-				{Key: "type", Label: "Function Type"},
-				{Key: "encoding", Label: "Encoding Hash"},
-				{Key: "signature", Label: "Function Signature"},
-			},
-		},
-		{
-			Title:     "Function Properties",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "stateMutability", Label: "State Mutability"},
-				{Key: "constant", Label: "Constant", Formatter: "boolean"},
-				{Key: "anonymous", Label: "Anonymous", Formatter: "boolean"},
-			},
-		},
-		{
-			Title:     "Input Parameters",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "inputs", Label: "Input Parameters", Formatter: "json"},
-			},
-		},
-		{
-			Title:     "Output Parameters",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "outputs", Label: "Output Parameters", Formatter: "json"},
-			},
-		},
-		{
-			Title:     "Additional Information",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "message", Label: "Error Message"},
-			},
-		},
+		{Key: "inputs", Label: "Input Parameters", ColumnLabel: "Input Parameters", DetailLabel: "Input Parameters", Formatter: "json", Section: "Input Parameters", InTable: false, InDetail: true, DetailOrder: 8},
+		{Key: "outputs", Label: "Output Parameters", ColumnLabel: "Output Parameters", DetailLabel: "Output Parameters", Formatter: "json", Section: "Output Parameters", InTable: false, InDetail: true, DetailOrder: 9},
+		{Key: "message", Label: "Error Message", ColumnLabel: "Error Message", DetailLabel: "Error Message", Section: "Additional Information", InTable: false, InDetail: true, DetailOrder: 10},
 	}
 }

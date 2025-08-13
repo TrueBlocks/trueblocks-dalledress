@@ -6,15 +6,14 @@ import (
 
 // GetConfig returns the ViewConfig for the Contracts view
 func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
-	return &types.ViewConfig{
+	cfg := &types.ViewConfig{
 		ViewName: "contracts",
 		Facets: map[string]types.FacetConfig{
 			"dashboard": {
 				Name:          "Dashboard",
 				Store:         "contracts",
 				IsForm:        true,
-				Columns:       getDashboardColumns(),
-				DetailPanels:  getDashboardDetailPanels(),
+				Fields:        getDashboardFields(),
 				Actions:       []string{"create", "update", "delete"},
 				HeaderActions: []string{"create", "update", "delete"},
 			},
@@ -22,16 +21,14 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 				Name:          "Execute",
 				Store:         "contracts",
 				IsForm:        true,
-				Columns:       getExecuteColumns(),
-				DetailPanels:  getExecuteDetailPanels(),
+				Fields:        getExecuteFields(),
 				Actions:       []string{"execute"},
 				HeaderActions: []string{"execute"},
 			},
 			"events": {
 				Name:          "Events",
 				Store:         "events",
-				Columns:       getEventsColumns(),
-				DetailPanels:  getEventsDetailPanels(),
+				Fields:        getEventsFields(),
 				Actions:       []string{"view", "export"},
 				HeaderActions: []string{"view", "export"},
 			},
@@ -69,97 +66,41 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 				Icon:  "download",
 			},
 		},
-	}, nil
+	}
+	types.DeriveFacetFromFields(cfg)
+	types.NormalizeOrders(cfg)
+	return cfg, nil
 }
 
-func getDashboardColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "address", Header: "Address", Accessor: "address", Width: 240},
-		{Key: "name", Header: "Name", Accessor: "name", Width: 200},
-		{Key: "symbol", Header: "Symbol", Accessor: "symbol", Width: 100},
-		{Key: "decimals", Header: "Decimals", Accessor: "decimals", Width: 100},
-		{Key: "source", Header: "Source", Accessor: "source", Width: 150},
+func getDashboardFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Section: "General", InTable: true, InDetail: true, Width: 240, Order: 1, DetailOrder: 1},
+		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Name", Section: "General", InTable: true, InDetail: true, Width: 200, Order: 2, DetailOrder: 2},
+		{Key: "symbol", Label: "Symbol", ColumnLabel: "Symbol", DetailLabel: "Symbol", Section: "General", InTable: true, InDetail: true, Width: 100, Order: 3, DetailOrder: 3},
+		{Key: "decimals", Label: "Decimals", ColumnLabel: "Decimals", DetailLabel: "Decimals", Section: "General", InTable: true, InDetail: true, Width: 100, Order: 4, DetailOrder: 4},
+		{Key: "source", Label: "Source", ColumnLabel: "Source", DetailLabel: "Source", Section: "Source", InTable: true, InDetail: true, Width: 150, Order: 5, DetailOrder: 5},
 	}
 }
 
-func getDashboardDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "General",
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Address"},
-				{Key: "name", Label: "Name"},
-				{Key: "symbol", Label: "Symbol"},
-				{Key: "decimals", Label: "Decimals"},
-			},
-		},
-		{
-			Title: "Source",
-			Fields: []types.DetailFieldConfig{
-				{Key: "source", Label: "Source"},
-			},
-		},
+func getExecuteFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Section: "General", InTable: true, InDetail: true, Width: 240, Order: 1, DetailOrder: 1},
+		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Name", Section: "General", InTable: true, InDetail: true, Width: 200, Order: 2, DetailOrder: 2},
+		{Key: "symbol", Label: "Symbol", ColumnLabel: "Symbol", DetailLabel: "Symbol", Section: "General", InTable: true, InDetail: true, Width: 100, Order: 3, DetailOrder: 3},
+		{Key: "decimals", Label: "Decimals", ColumnLabel: "Decimals", DetailLabel: "Decimals", Section: "General", InTable: true, InDetail: true, Width: 100, Order: 4, DetailOrder: 4},
+		{Key: "source", Label: "Source", ColumnLabel: "Source", DetailLabel: "Source", Section: "Execution", InTable: true, InDetail: true, Width: 150, Order: 5, DetailOrder: 5},
 	}
 }
 
-func getExecuteColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "address", Header: "Address", Accessor: "address", Width: 240},
-		{Key: "name", Header: "Name", Accessor: "name", Width: 200},
-		{Key: "symbol", Header: "Symbol", Accessor: "symbol", Width: 100},
-		{Key: "decimals", Header: "Decimals", Accessor: "decimals", Width: 100},
-		{Key: "source", Header: "Source", Accessor: "source", Width: 150},
-	}
-}
-
-func getExecuteDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "General",
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Address"},
-				{Key: "name", Label: "Name"},
-				{Key: "symbol", Label: "Symbol"},
-				{Key: "decimals", Label: "Decimals"},
-			},
-		},
-		{
-			Title: "Execution",
-			Fields: []types.DetailFieldConfig{
-				{Key: "source", Label: "Source"},
-			},
-		},
-	}
-}
-
-func getEventsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "date", Header: "Date", Accessor: "date", Width: 120},
-		{Key: "address", Header: "Address", Accessor: "address", Width: 340},
-		{Key: "name", Header: "Name", Accessor: "name", Width: 200},
-		{Key: "articulatedLog", Header: "Log Details", Accessor: "articulatedLog", Width: 120},
-	}
-}
-
-func getEventsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Block/Tx",
-			Fields: []types.DetailFieldConfig{
-				{Key: "date", Label: "Date"},
-				{Key: "blockNumber", Label: "Block Number"},
-				{Key: "transactionIndex", Label: "Transaction Index"},
-				{Key: "transactionHash", Label: "Transaction Hash"},
-			},
-		},
-		{
-			Title: "Event",
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Address"},
-				{Key: "name", Label: "Event Name"},
-				{Key: "signature", Label: "Signature"},
-				{Key: "articulatedLog", Label: "Articulated Log"},
-			},
-		},
+func getEventsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "date", Label: "Date", ColumnLabel: "Date", DetailLabel: "Date", Section: "Block/Tx", InTable: true, InDetail: true, Width: 120, Order: 1, DetailOrder: 1},
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Section: "Event", InTable: true, InDetail: true, Width: 340, Order: 2, DetailOrder: 5},
+		{Key: "name", Label: "Event Name", ColumnLabel: "Name", DetailLabel: "Event Name", Section: "Event", InTable: true, InDetail: true, Width: 200, Order: 3, DetailOrder: 6},
+		{Key: "articulatedLog", Label: "Articulated Log", ColumnLabel: "Log Details", DetailLabel: "Articulated Log", Section: "Event", InTable: true, InDetail: true, Width: 120, Order: 4, DetailOrder: 8},
+		{Key: "blockNumber", Label: "Block Number", ColumnLabel: "", DetailLabel: "Block Number", Section: "Block/Tx", InTable: false, InDetail: true, DetailOrder: 2},
+		{Key: "transactionIndex", Label: "Transaction Index", ColumnLabel: "", DetailLabel: "Transaction Index", Section: "Block/Tx", InTable: false, InDetail: true, DetailOrder: 3},
+		{Key: "transactionHash", Label: "Transaction Hash", ColumnLabel: "", DetailLabel: "Transaction Hash", Section: "Block/Tx", InTable: false, InDetail: true, DetailOrder: 4},
+		{Key: "signature", Label: "Signature", ColumnLabel: "", DetailLabel: "Signature", Section: "Event", InTable: false, InDetail: true, DetailOrder: 7},
 	}
 }

@@ -126,7 +126,7 @@ export const buildDetailPanelFromColumns = <T extends Record<string, unknown>>(
     > = {};
 
     columns.forEach((column) => {
-      const key = column.accessor || column.key;
+      const key = column.key;
       const columnMeta = meta[key];
       const sectionName = columnMeta?.section || 'General';
 
@@ -241,10 +241,15 @@ export const buildDetailPanelFromConfigs = <T extends Record<string, unknown>>(
         .filter(Boolean) as { label: string; value: React.ReactNode }[],
     }));
 
+    // Respect backend collapsed flags per panel; default to no collapsed sections
+    const defaultCollapsedSections = panelConfigs
+      .filter((p) => p.collapsed)
+      .map((p) => p.title);
+
     return (
       <DetailTable
         sections={sections}
-        defaultCollapsedSections={['Statistics']} // Start with some sections collapsed
+        defaultCollapsedSections={defaultCollapsedSections}
       />
     );
   };

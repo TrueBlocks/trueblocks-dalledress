@@ -6,608 +6,340 @@ import (
 
 // GetConfig returns the ViewConfig for the Exports view
 func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
-	// Create facet configurations - Exports has 9 different facets with unique columns for each
 	facets := map[string]types.FacetConfig{
 		"statements": {
 			Name:          "Statements",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getStatementsColumns(),
-			DetailPanels:  getStatementsDetailPanels(),
+			Fields:        getStatementsFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 		"balances": {
 			Name:          "Balances",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getBalancesColumns(),
-			DetailPanels:  getBalancesDetailPanels(),
+			Fields:        getBalancesFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 		"transfers": {
 			Name:          "Transfers",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getTransfersColumns(),
-			DetailPanels:  getTransfersDetailPanels(),
+			Fields:        getTransfersFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 		"transactions": {
 			Name:          "Transactions",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getTransactionsColumns(),
-			DetailPanels:  getTransactionsDetailPanels(),
+			Fields:        getTransactionsFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 		"withdrawals": {
 			Name:          "Withdrawals",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getWithdrawalsColumns(),
-			DetailPanels:  getWithdrawalsDetailPanels(),
+			Fields:        getWithdrawalsFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 		"assets": {
 			Name:          "Assets",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getAssetsColumns(),
-			DetailPanels:  getAssetsDetailPanels(),
+			Fields:        getAssetsFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 		"logs": {
 			Name:          "Logs",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getLogsColumns(),
-			DetailPanels:  getLogsDetailPanels(),
+			Fields:        getLogsFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 		"traces": {
 			Name:          "Traces",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getTracesColumns(),
-			DetailPanels:  getTracesDetailPanels(),
+			Fields:        getTracesFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 		"receipts": {
 			Name:          "Receipts",
 			Store:         "exports",
 			IsForm:        false,
-			Columns:       getReceiptsColumns(),
-			DetailPanels:  getReceiptsDetailPanels(),
+			Fields:        getReceiptsFields(),
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 		},
 	}
 
-	return &types.ViewConfig{
+	cfg := &types.ViewConfig{
 		ViewName:   "exports",
 		Facets:     facets,
 		FacetOrder: []string{"statements", "balances", "transfers", "transactions", "withdrawals", "assets", "logs", "traces", "receipts"},
 		Actions: map[string]types.ActionConfig{
 			"export": {Name: "export", Label: "Export Data", Icon: "Export"},
 		}, // Exports uses export actions handled by ExportFormatModal
-	}, nil
+	}
+	types.DeriveFacetFromFields(cfg)
+	types.NormalizeOrders(cfg)
+	return cfg, nil
 }
 
-// Helper functions for different export types
-// Each facet has different column structures based on the data type
+func getStatementsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "date", Label: "Date", ColumnLabel: "Date", DetailLabel: "Date", Formatter: "datetime", Section: "Statement Summary", InTable: true, InDetail: true, Width: 120, Order: 1, DetailOrder: 1},
+		{Key: "asset", Label: "Asset", ColumnLabel: "Asset", DetailLabel: "Asset", Formatter: "address", Section: "Asset Information", InTable: true, InDetail: true, Width: 340, Order: 2, DetailOrder: 6},
+		{Key: "symbol", Label: "Symbol", ColumnLabel: "Symbol", DetailLabel: "Symbol", Section: "Asset Information", InTable: true, InDetail: true, Width: 200, Order: 3, DetailOrder: 7},
+		{Key: "decimals", Label: "Decimals", ColumnLabel: "Decimals", DetailLabel: "Decimals", Section: "Asset Information", InTable: true, InDetail: true, Width: 100, Order: 4, DetailOrder: 8},
+		{Key: "begBal", Label: "Begin Balance", ColumnLabel: "Begin Balance", DetailLabel: "Begin Balance", Formatter: "wei", Section: "Balance Reconciliation", InTable: true, InDetail: true, Width: 150, Order: 5, DetailOrder: 11},
+		{Key: "amountIn", Label: "Amount In", ColumnLabel: "In", DetailLabel: "Amount In", Formatter: "wei", Section: "Inflow Details", InTable: true, InDetail: true, Width: 150, Order: 6, DetailOrder: 17},
+		{Key: "amountOut", Label: "Amount Out", ColumnLabel: "Out", DetailLabel: "Amount Out", Formatter: "wei", Section: "Outflow Details", InTable: true, InDetail: true, Width: 150, Order: 7, DetailOrder: 23},
+		{Key: "endBal", Label: "End Balance", ColumnLabel: "End Balance", DetailLabel: "End Balance", Formatter: "wei", Section: "Balance Reconciliation", InTable: true, InDetail: true, Width: 150, Order: 8, DetailOrder: 15},
+		{Key: "gasUsed", Label: "Gas Used", ColumnLabel: "Gas Used", DetailLabel: "Gas Used", Formatter: "gas", Section: "Statement Summary", InTable: true, InDetail: true, Width: 120, Order: 9, DetailOrder: 5},
+		{Key: "reconciliationType", Label: "Type", ColumnLabel: "Type", DetailLabel: "Type", Section: "Statement Summary", InTable: true, InDetail: true, Width: 100, Order: 10, DetailOrder: 4},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 11},
 
-func getStatementsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "date", Header: "Date", Accessor: "date", Width: 120, Formatter: "datetime"},
-		{Key: "asset", Header: "Asset", Accessor: "asset", Width: 340, Formatter: "address"},
-		{Key: "symbol", Header: "Symbol", Accessor: "symbol", Width: 200},
-		{Key: "decimals", Header: "Decimals", Accessor: "decimals", Width: 100},
-		{Key: "begBal", Header: "Begin Balance", Accessor: "begBal", Width: 150, Formatter: "wei"},
-		{Key: "amountIn", Header: "In", Accessor: "amountIn", Width: 150, Formatter: "wei"},
-		{Key: "amountOut", Header: "Out", Accessor: "amountOut", Width: 150, Formatter: "wei"},
-		{Key: "endBal", Header: "End Balance", Accessor: "endBal", Width: 150, Formatter: "wei"},
-		{Key: "gasUsed", Header: "Gas Used", Accessor: "gasUsed", Width: 120, Formatter: "gas"},
-		{Key: "reconciliationType", Header: "Type", Accessor: "reconciliationType", Width: 100},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
+		{Key: "accountedFor", Label: "Account", DetailLabel: "Account", Formatter: "address", Section: "Statement Summary", InTable: false, InDetail: true, DetailOrder: 2},
+		{Key: "reconciled", Label: "Reconciled", DetailLabel: "Reconciled", Section: "Statement Summary", InTable: false, InDetail: true, DetailOrder: 3},
+		{Key: "spotPrice", Label: "Spot Price", DetailLabel: "Spot Price", Section: "Asset Information", InTable: false, InDetail: true, DetailOrder: 9},
+		{Key: "priceSource", Label: "Price Source", DetailLabel: "Price Source", Section: "Asset Information", InTable: false, InDetail: true, DetailOrder: 10},
+
+		{Key: "totalIn", Label: "Total In", DetailLabel: "Total In", Formatter: "wei", Section: "Balance Reconciliation", InTable: false, InDetail: true, DetailOrder: 12},
+		{Key: "totalOut", Label: "Total Out", DetailLabel: "Total Out", Formatter: "wei", Section: "Balance Reconciliation", InTable: false, InDetail: true, DetailOrder: 13},
+		{Key: "amountNet", Label: "Net Amount", DetailLabel: "Net Amount", Formatter: "wei", Section: "Balance Reconciliation", InTable: false, InDetail: true, DetailOrder: 14},
+		{Key: "endBalCalc", Label: "Calculated End Balance", DetailLabel: "Calculated End Balance", Formatter: "wei", Section: "Balance Reconciliation", InTable: false, InDetail: true, DetailOrder: 16},
+
+		{Key: "internalIn", Label: "Internal In", DetailLabel: "Internal In", Formatter: "wei", Section: "Inflow Details", InTable: false, InDetail: true, DetailOrder: 18},
+		{Key: "selfDestructIn", Label: "Self Destruct In", DetailLabel: "Self Destruct In", Formatter: "wei", Section: "Inflow Details", InTable: false, InDetail: true, DetailOrder: 19},
+		{Key: "minerBaseRewardIn", Label: "Base Reward In", DetailLabel: "Base Reward In", Formatter: "wei", Section: "Inflow Details", InTable: false, InDetail: true, DetailOrder: 20},
+		{Key: "minerTxFeeIn", Label: "Tx Fee In", DetailLabel: "Tx Fee In", Formatter: "wei", Section: "Inflow Details", InTable: false, InDetail: true, DetailOrder: 21},
+		{Key: "prefundIn", Label: "Prefund In", DetailLabel: "Prefund In", Formatter: "wei", Section: "Inflow Details", InTable: false, InDetail: true, DetailOrder: 22},
+
+		{Key: "internalOut", Label: "Internal Out", DetailLabel: "Internal Out", Formatter: "wei", Section: "Outflow Details", InTable: false, InDetail: true, DetailOrder: 24},
+		{Key: "selfDestructOut", Label: "Self Destruct Out", DetailLabel: "Self Destruct Out", Formatter: "wei", Section: "Outflow Details", InTable: false, InDetail: true, DetailOrder: 25},
+		{Key: "gasOut", Label: "Gas Out", DetailLabel: "Gas Out", Formatter: "wei", Section: "Outflow Details", InTable: false, InDetail: true, DetailOrder: 26},
+
+		{Key: "blockNumber", Label: "Block Number", DetailLabel: "Block Number", Section: "Transaction Details", InTable: false, InDetail: true, DetailOrder: 27},
+		{Key: "transactionIndex", Label: "Transaction Index", DetailLabel: "Transaction Index", Section: "Transaction Details", InTable: false, InDetail: true, DetailOrder: 28},
+		{Key: "logIndex", Label: "Log Index", DetailLabel: "Log Index", Section: "Transaction Details", InTable: false, InDetail: true, DetailOrder: 29},
+		{Key: "transactionHash", Label: "Transaction Hash", DetailLabel: "Transaction Hash", Formatter: "hash", Section: "Transaction Details", InTable: false, InDetail: true, DetailOrder: 30},
+		{Key: "sender", Label: "Sender", DetailLabel: "Sender", Formatter: "address", Section: "Transaction Details", InTable: false, InDetail: true, DetailOrder: 31},
+		{Key: "recipient", Label: "Recipient", DetailLabel: "Recipient", Formatter: "address", Section: "Transaction Details", InTable: false, InDetail: true, DetailOrder: 32},
+
+		{Key: "prevBal", Label: "Previous Balance", DetailLabel: "Previous Balance", Formatter: "wei", Section: "Reconciliation Analysis", InTable: false, InDetail: true, DetailOrder: 33},
+		{Key: "begBalDiff", Label: "Begin Balance Diff", DetailLabel: "Begin Balance Diff", Formatter: "wei", Section: "Reconciliation Analysis", InTable: false, InDetail: true, DetailOrder: 34},
+		{Key: "endBalDiff", Label: "End Balance Diff", DetailLabel: "End Balance Diff", Formatter: "wei", Section: "Reconciliation Analysis", InTable: false, InDetail: true, DetailOrder: 35},
+		{Key: "correctingReasons", Label: "Correcting Reasons", DetailLabel: "Correcting Reasons", Section: "Reconciliation Analysis", InTable: false, InDetail: true, DetailOrder: 36},
+
+		{Key: "correctBegBalIn", Label: "Correct Begin Bal In", DetailLabel: "Correct Begin Bal In", Formatter: "wei", Section: "Correction Entries", InTable: false, InDetail: true, DetailOrder: 37},
+		{Key: "correctAmountIn", Label: "Correct Amount In", DetailLabel: "Correct Amount In", Formatter: "wei", Section: "Correction Entries", InTable: false, InDetail: true, DetailOrder: 38},
+		{Key: "correctEndBalIn", Label: "Correct End Bal In", DetailLabel: "Correct End Bal In", Formatter: "wei", Section: "Correction Entries", InTable: false, InDetail: true, DetailOrder: 39},
+		{Key: "correctBegBalOut", Label: "Correct Begin Bal Out", DetailLabel: "Correct Begin Bal Out", Formatter: "wei", Section: "Correction Entries", InTable: false, InDetail: true, DetailOrder: 40},
+		{Key: "correctAmountOut", Label: "Correct Amount Out", DetailLabel: "Correct Amount Out", Formatter: "wei", Section: "Correction Entries", InTable: false, InDetail: true, DetailOrder: 41},
+		{Key: "correctEndBalOut", Label: "Correct End Bal Out", DetailLabel: "Correct End Bal Out", Formatter: "wei", Section: "Correction Entries", InTable: false, InDetail: true, DetailOrder: 42},
 	}
 }
 
-func getStatementsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Statement Summary",
-			Fields: []types.DetailFieldConfig{
-				{Key: "date", Label: "Date", Formatter: "datetime"},
-				{Key: "accountedFor", Label: "Account", Formatter: "address"},
-				{Key: "reconciled", Label: "Reconciled"},
-				{Key: "reconciliationType", Label: "Type"},
-			},
-		},
-		{
-			Title: "Asset Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "asset", Label: "Asset", Formatter: "address"},
-				{Key: "symbol", Label: "Symbol"},
-				{Key: "decimals", Label: "Decimals"},
-				{Key: "spotPrice", Label: "Spot Price"},
-				{Key: "priceSource", Label: "Price Source"},
-			},
-		},
-		{
-			Title: "Balance Reconciliation",
-			Fields: []types.DetailFieldConfig{
-				{Key: "begBal", Label: "Begin Balance", Formatter: "wei"},
-				{Key: "totalIn", Label: "Total In", Formatter: "wei"},
-				{Key: "totalOut", Label: "Total Out", Formatter: "wei"},
-				{Key: "amountNet", Label: "Net Amount", Formatter: "wei"},
-				{Key: "endBal", Label: "End Balance", Formatter: "wei"},
-				{Key: "endBalCalc", Label: "Calculated End Balance", Formatter: "wei"},
-			},
-		},
-		{
-			Title: "Inflow Details",
-			Fields: []types.DetailFieldConfig{
-				{Key: "amountIn", Label: "Amount In", Formatter: "wei"},
-				{Key: "internalIn", Label: "Internal In", Formatter: "wei"},
-				{Key: "selfDestructIn", Label: "Self Destruct In", Formatter: "wei"},
-				{Key: "minerBaseRewardIn", Label: "Base Reward In", Formatter: "wei"},
-				{Key: "minerTxFeeIn", Label: "Tx Fee In", Formatter: "wei"},
-				{Key: "prefundIn", Label: "Prefund In", Formatter: "wei"},
-			},
-		},
-		{
-			Title: "Outflow Details",
-			Fields: []types.DetailFieldConfig{
-				{Key: "amountOut", Label: "Amount Out", Formatter: "wei"},
-				{Key: "internalOut", Label: "Internal Out", Formatter: "wei"},
-				{Key: "selfDestructOut", Label: "Self Destruct Out", Formatter: "wei"},
-				{Key: "gasOut", Label: "Gas Out", Formatter: "wei"},
-			},
-		},
-		{
-			Title: "Transaction Details",
-			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block Number"},
-				{Key: "transactionIndex", Label: "Transaction Index"},
-				{Key: "logIndex", Label: "Log Index"},
-				{Key: "transactionHash", Label: "Transaction Hash", Formatter: "hash"},
-				{Key: "sender", Label: "Sender", Formatter: "address"},
-				{Key: "recipient", Label: "Recipient", Formatter: "address"},
-			},
-		},
-		{
-			Title: "Reconciliation Analysis",
-			Fields: []types.DetailFieldConfig{
-				{Key: "prevBal", Label: "Previous Balance", Formatter: "wei"},
-				{Key: "begBalDiff", Label: "Begin Balance Diff", Formatter: "wei"},
-				{Key: "endBalDiff", Label: "End Balance Diff", Formatter: "wei"},
-				{Key: "correctingReasons", Label: "Correcting Reasons"},
-			},
-		},
-		{
-			Title: "Correction Entries",
-			Fields: []types.DetailFieldConfig{
-				{Key: "correctBegBalIn", Label: "Correct Begin Bal In", Formatter: "wei"},
-				{Key: "correctAmountIn", Label: "Correct Amount In", Formatter: "wei"},
-				{Key: "correctEndBalIn", Label: "Correct End Bal In", Formatter: "wei"},
-				{Key: "correctBegBalOut", Label: "Correct Begin Bal Out", Formatter: "wei"},
-				{Key: "correctAmountOut", Label: "Correct Amount Out", Formatter: "wei"},
-				{Key: "correctEndBalOut", Label: "Correct End Bal Out", Formatter: "wei"},
-			},
-		},
+func getBalancesFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "date", Label: "Date", ColumnLabel: "Date", DetailLabel: "Date", Formatter: "datetime", Section: "Balance Information", InTable: true, InDetail: true, Width: 120, Order: 1, DetailOrder: 1},
+		{Key: "holder", Label: "Holder", ColumnLabel: "Holder", DetailLabel: "Holder", Formatter: "address", Section: "Token Details", InTable: true, InDetail: true, Width: 340, Order: 2, DetailOrder: 7},
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Token Address", Formatter: "address", Section: "Token Details", InTable: true, InDetail: true, Width: 340, Order: 3, DetailOrder: 6},
+		{Key: "symbol", Label: "Symbol", ColumnLabel: "Symbol", DetailLabel: "Symbol", Section: "Token Details", InTable: true, InDetail: true, Width: 100, Order: 4, DetailOrder: 8},
+		{Key: "balance", Label: "Balance", ColumnLabel: "Balance", DetailLabel: "Balance", Formatter: "wei", Section: "Balance Information", InTable: true, InDetail: true, Width: 150, Order: 5, DetailOrder: 2},
+		{Key: "decimals", Label: "Decimals", ColumnLabel: "Decimals", DetailLabel: "Decimals", Section: "Token Details", InTable: true, InDetail: true, Width: 100, Order: 6, DetailOrder: 10},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 7},
+
+		{Key: "priorBalance", Label: "Prior Balance", DetailLabel: "Prior Balance", Formatter: "wei", Section: "Balance Information", InTable: false, InDetail: true, DetailOrder: 3},
+		{Key: "totalSupply", Label: "Total Supply", DetailLabel: "Total Supply", Formatter: "wei", Section: "Balance Information", InTable: false, InDetail: true, DetailOrder: 4},
+		{Key: "type", Label: "Token Type", DetailLabel: "Token Type", Section: "Balance Information", InTable: false, InDetail: true, DetailOrder: 5},
+
+		{Key: "name", Label: "Token Name", DetailLabel: "Token Name", Section: "Token Details", InTable: false, InDetail: true, DetailOrder: 9},
+
+		{Key: "blockNumber", Label: "Block Number", DetailLabel: "Block Number", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 11},
+		{Key: "transactionIndex", Label: "Transaction Index", DetailLabel: "Transaction Index", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 12},
+		{Key: "timestamp", Label: "Timestamp", DetailLabel: "Timestamp", Formatter: "datetime", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 13},
 	}
 }
 
-func getBalancesColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "date", Header: "Date", Accessor: "date", Width: 120, Formatter: "datetime"},
-		{Key: "holder", Header: "Holder", Accessor: "holder", Width: 340, Formatter: "address"},
-		{Key: "address", Header: "Address", Accessor: "address", Width: 340, Formatter: "address"},
-		{Key: "symbol", Header: "Symbol", Accessor: "symbol", Width: 100},
-		{Key: "balance", Header: "Balance", Accessor: "balance", Width: 150, Formatter: "wei"},
-		{Key: "decimals", Header: "Decimals", Accessor: "decimals", Width: 100},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
+func getTransfersFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "blockNumber", Label: "Block", ColumnLabel: "Block", DetailLabel: "Block", Section: "Transaction Info", InTable: true, InDetail: true, Width: 100, Order: 1, DetailOrder: 18},
+		{Key: "transactionIndex", Label: "Tx Index", ColumnLabel: "Tx Index", DetailLabel: "Tx Index", Section: "Transaction Info", InTable: true, InDetail: true, Width: 80, Order: 2, DetailOrder: 19},
+		{Key: "logIndex", Label: "Log Index", ColumnLabel: "Log Index", DetailLabel: "Log Index", Section: "Transaction Info", InTable: true, InDetail: true, Width: 80, Order: 3, DetailOrder: 20},
+		{Key: "from", Label: "From", ColumnLabel: "From", DetailLabel: "From", Formatter: "address", Section: "Transfer Details", InTable: true, InDetail: true, Width: 340, Order: 4, DetailOrder: 1},
+		{Key: "to", Label: "To", ColumnLabel: "To", DetailLabel: "To", Formatter: "address", Section: "Transfer Details", InTable: true, InDetail: true, Width: 340, Order: 5, DetailOrder: 2},
+		{Key: "asset", Label: "Asset", ColumnLabel: "Asset", DetailLabel: "Asset", Formatter: "address", Section: "Transfer Details", InTable: true, InDetail: true, Width: 340, Order: 6, DetailOrder: 4},
+		{Key: "amount", Label: "Amount", ColumnLabel: "Amount", DetailLabel: "Amount", Formatter: "wei", Section: "Amount Breakdown", InTable: true, InDetail: true, Width: 150, Order: 7, DetailOrder: 6},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 8},
+
+		{Key: "sender", Label: "Sender", DetailLabel: "Sender", Formatter: "address", Section: "Transfer Details", InTable: false, InDetail: true, DetailOrder: 3},
+		{Key: "recipient", Label: "Recipient", DetailLabel: "Recipient", Formatter: "address", Section: "Transfer Details", InTable: false, InDetail: true, DetailOrder: 4},
+		{Key: "holder", Label: "Holder", DetailLabel: "Holder", Formatter: "address", Section: "Transfer Details", InTable: false, InDetail: true, DetailOrder: 3},
+		{Key: "decimals", Label: "Decimals", DetailLabel: "Decimals", Section: "Transfer Details", InTable: false, InDetail: true, DetailOrder: 5},
+
+		{Key: "amountIn", Label: "Amount In", DetailLabel: "Amount In", Formatter: "wei", Section: "Amount Breakdown", InTable: false, InDetail: true, DetailOrder: 7},
+		{Key: "amountOut", Label: "Amount Out", DetailLabel: "Amount Out", Formatter: "wei", Section: "Amount Breakdown", InTable: false, InDetail: true, DetailOrder: 8},
+		{Key: "internalIn", Label: "Internal In", DetailLabel: "Internal In", Formatter: "wei", Section: "Amount Breakdown", InTable: false, InDetail: true, DetailOrder: 8},
+		{Key: "internalOut", Label: "Internal Out", DetailLabel: "Internal Out", Formatter: "wei", Section: "Amount Breakdown", InTable: false, InDetail: true, DetailOrder: 9},
+		{Key: "gasOut", Label: "Gas Out", DetailLabel: "Gas Out", Formatter: "wei", Section: "Amount Breakdown", InTable: false, InDetail: true, DetailOrder: 10},
+
+		{Key: "minerBaseRewardIn", Label: "Base Reward In", DetailLabel: "Base Reward In", Formatter: "wei", Section: "Mining Rewards", InTable: false, InDetail: true, DetailOrder: 11},
+		{Key: "minerNephewRewardIn", Label: "Nephew Reward In", DetailLabel: "Nephew Reward In", Formatter: "wei", Section: "Mining Rewards", InTable: false, InDetail: true, DetailOrder: 12},
+		{Key: "minerTxFeeIn", Label: "Tx Fee In", DetailLabel: "Tx Fee In", Formatter: "wei", Section: "Mining Rewards", InTable: false, InDetail: true, DetailOrder: 13},
+		{Key: "minerUncleRewardIn", Label: "Uncle Reward In", DetailLabel: "Uncle Reward In", Formatter: "wei", Section: "Mining Rewards", InTable: false, InDetail: true, DetailOrder: 14},
+
+		{Key: "selfDestructIn", Label: "Self Destruct In", DetailLabel: "Self Destruct In", Formatter: "wei", Section: "Special Transfers", InTable: false, InDetail: true, DetailOrder: 15},
+		{Key: "selfDestructOut", Label: "Self Destruct Out", DetailLabel: "Self Destruct Out", Formatter: "wei", Section: "Special Transfers", InTable: false, InDetail: true, DetailOrder: 16},
+		{Key: "prefundIn", Label: "Prefund In", DetailLabel: "Prefund In", Formatter: "wei", Section: "Special Transfers", InTable: false, InDetail: true, DetailOrder: 17},
 	}
 }
 
-func getBalancesDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Balance Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "balance", Label: "Balance", Formatter: "wei"},
-				{Key: "priorBalance", Label: "Prior Balance", Formatter: "wei"},
-				{Key: "totalSupply", Label: "Total Supply", Formatter: "wei"},
-				{Key: "type", Label: "Token Type"},
-			},
-		},
-		{
-			Title: "Token Details",
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Token Address", Formatter: "address"},
-				{Key: "holder", Label: "Holder", Formatter: "address"},
-				{Key: "symbol", Label: "Symbol"},
-				{Key: "name", Label: "Token Name"},
-				{Key: "decimals", Label: "Decimals"},
-			},
-		},
-		{
-			Title: "Transaction Context",
-			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block Number"},
-				{Key: "transactionIndex", Label: "Transaction Index"},
-				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
-			},
-		},
+func getTransactionsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "blockNumber", Label: "Block", ColumnLabel: "Block", DetailLabel: "Block Number", Section: "Block Context", InTable: true, InDetail: true, Width: 100, Order: 1, DetailOrder: 15},
+		{Key: "transactionIndex", Label: "Index", ColumnLabel: "Index", DetailLabel: "Transaction Index", Section: "Block Context", InTable: true, InDetail: true, Width: 80, Order: 2, DetailOrder: 17},
+		{Key: "hash", Label: "Hash", ColumnLabel: "Hash", DetailLabel: "Hash", Formatter: "hash", Section: "Transaction Overview", InTable: true, InDetail: true, Width: 340, Order: 3, DetailOrder: 1},
+		{Key: "from", Label: "From", ColumnLabel: "From", DetailLabel: "From", Formatter: "address", Section: "Transaction Overview", InTable: true, InDetail: true, Width: 340, Order: 4, DetailOrder: 2},
+		{Key: "to", Label: "To", ColumnLabel: "To", DetailLabel: "To", Formatter: "address", Section: "Transaction Overview", InTable: true, InDetail: true, Width: 340, Order: 5, DetailOrder: 3},
+		{Key: "value", Label: "Value", ColumnLabel: "Value", DetailLabel: "Value", Formatter: "wei", Section: "Transaction Overview", InTable: true, InDetail: true, Width: 150, Order: 6, DetailOrder: 4},
+		{Key: "gasUsed", Label: "Gas Used", ColumnLabel: "Gas Used", DetailLabel: "Gas Used", Formatter: "gas", Section: "Gas Information", InTable: true, InDetail: true, Width: 120, Order: 7, DetailOrder: 11},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 8},
+
+		{Key: "timestamp", Label: "Timestamp", DetailLabel: "Timestamp", Formatter: "datetime", Section: "Transaction Overview", InTable: false, InDetail: true, DetailOrder: 5},
+		{Key: "input", Label: "Input Data", DetailLabel: "Input Data", Section: "Transaction Overview", InTable: false, InDetail: true, DetailOrder: 6},
+		{Key: "articulatedTx", Label: "Articulated Transaction", DetailLabel: "Articulated Transaction", Formatter: "json", Section: "Transaction Overview", InTable: false, InDetail: true, DetailOrder: 7},
+		{Key: "isError", Label: "Error Status", DetailLabel: "Error Status", Section: "Transaction Overview", InTable: false, InDetail: true, DetailOrder: 8},
+		{Key: "hasToken", Label: "Has Token", DetailLabel: "Has Token", Section: "Transaction Overview", InTable: false, InDetail: true, DetailOrder: 9},
+
+		{Key: "gas", Label: "Gas Limit", DetailLabel: "Gas Limit", Section: "Gas Information", InTable: false, InDetail: true, DetailOrder: 10},
+		{Key: "gasPrice", Label: "Gas Price", DetailLabel: "Gas Price", Formatter: "gas", Section: "Gas Information", InTable: false, InDetail: true, DetailOrder: 12},
+		{Key: "maxFeePerGas", Label: "Max Fee Per Gas", DetailLabel: "Max Fee Per Gas", Formatter: "gas", Section: "Gas Information", InTable: false, InDetail: true, DetailOrder: 13},
+		{Key: "maxPriorityFeePerGas", Label: "Max Priority Fee", DetailLabel: "Max Priority Fee", Formatter: "gas", Section: "Gas Information", InTable: false, InDetail: true, DetailOrder: 14},
+
+		{Key: "blockHash", Label: "Block Hash", DetailLabel: "Block Hash", Formatter: "hash", Section: "Block Context", InTable: false, InDetail: true, DetailOrder: 16},
+
+		{Key: "nonce", Label: "Nonce", DetailLabel: "Nonce", Section: "Transaction Details", InTable: false, InDetail: true, DetailOrder: 18},
+		{Key: "type", Label: "Transaction Type", DetailLabel: "Transaction Type", Section: "Transaction Details", InTable: false, InDetail: true, DetailOrder: 19},
 	}
 }
 
-func getTransfersColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "blockNumber", Header: "Block", Accessor: "blockNumber", Width: 100},
-		{Key: "transactionIndex", Header: "Tx Index", Accessor: "transactionIndex", Width: 80},
-		{Key: "logIndex", Header: "Log Index", Accessor: "logIndex", Width: 80},
-		{Key: "from", Header: "From", Accessor: "from", Width: 340, Formatter: "address"},
-		{Key: "to", Header: "To", Accessor: "to", Width: 340, Formatter: "address"},
-		{Key: "asset", Header: "Asset", Accessor: "asset", Width: 340, Formatter: "address"},
-		{Key: "amount", Header: "Amount", Accessor: "amount", Width: 150, Formatter: "wei"},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
+func getWithdrawalsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "blockNumber", Label: "Block", ColumnLabel: "Block", DetailLabel: "Block Number", Section: "Block Information", InTable: true, InDetail: true, Width: 100, Order: 1, DetailOrder: 5},
+		{Key: "index", Label: "Index", ColumnLabel: "Index", DetailLabel: "Withdrawal Index", Section: "Withdrawal Details", InTable: true, InDetail: true, Width: 80, Order: 2, DetailOrder: 4},
+		{Key: "validatorIndex", Label: "Validator", ColumnLabel: "Validator", DetailLabel: "Validator Index", Section: "Withdrawal Details", InTable: true, InDetail: true, Width: 100, Order: 3, DetailOrder: 3},
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Recipient Address", Formatter: "address", Section: "Withdrawal Details", InTable: true, InDetail: true, Width: 340, Order: 4, DetailOrder: 1},
+		{Key: "amount", Label: "Amount", ColumnLabel: "Amount", DetailLabel: "Amount", Formatter: "ether", Section: "Withdrawal Details", InTable: true, InDetail: true, Width: 150, Order: 5, DetailOrder: 2},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 6},
+
+		{Key: "timestamp", Label: "Timestamp", DetailLabel: "Timestamp", Formatter: "datetime", Section: "Block Information", InTable: false, InDetail: true, DetailOrder: 6},
 	}
 }
 
-func getTransfersDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Transfer Details",
-			Fields: []types.DetailFieldConfig{
-				{Key: "sender", Label: "Sender", Formatter: "address"},
-				{Key: "recipient", Label: "Recipient", Formatter: "address"},
-				{Key: "holder", Label: "Holder", Formatter: "address"},
-				{Key: "asset", Label: "Asset", Formatter: "address"},
-				{Key: "decimals", Label: "Decimals"},
-			},
-		},
-		{
-			Title: "Amount Breakdown",
-			Fields: []types.DetailFieldConfig{
-				{Key: "amountIn", Label: "Amount In", Formatter: "wei"},
-				{Key: "amountOut", Label: "Amount Out", Formatter: "wei"},
-				{Key: "internalIn", Label: "Internal In", Formatter: "wei"},
-				{Key: "internalOut", Label: "Internal Out", Formatter: "wei"},
-				{Key: "gasOut", Label: "Gas Out", Formatter: "wei"},
-			},
-		},
-		{
-			Title: "Mining Rewards",
-			Fields: []types.DetailFieldConfig{
-				{Key: "minerBaseRewardIn", Label: "Base Reward In", Formatter: "wei"},
-				{Key: "minerNephewRewardIn", Label: "Nephew Reward In", Formatter: "wei"},
-				{Key: "minerTxFeeIn", Label: "Tx Fee In", Formatter: "wei"},
-				{Key: "minerUncleRewardIn", Label: "Uncle Reward In", Formatter: "wei"},
-			},
-		},
-		{
-			Title: "Special Transfers",
-			Fields: []types.DetailFieldConfig{
-				{Key: "selfDestructIn", Label: "Self Destruct In", Formatter: "wei"},
-				{Key: "selfDestructOut", Label: "Self Destruct Out", Formatter: "wei"},
-				{Key: "prefundIn", Label: "Prefund In", Formatter: "wei"},
-			},
-		},
-		{
-			Title: "Transaction Info",
-			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block"},
-				{Key: "transactionIndex", Label: "Tx Index"},
-				{Key: "logIndex", Label: "Log Index"},
-			},
-		},
+func getAssetsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Contract Address", Formatter: "address", Section: "Asset Information", InTable: true, InDetail: true, Width: 340, Order: 1, DetailOrder: 1},
+		{Key: "holder", Label: "Holder", ColumnLabel: "Holder", DetailLabel: "Holder", Formatter: "address", Section: "Asset Information", InTable: true, InDetail: true, Width: 340, Order: 2, DetailOrder: 2},
+		{Key: "symbol", Label: "Symbol", ColumnLabel: "Symbol", DetailLabel: "Symbol", Section: "Asset Information", InTable: true, InDetail: true, Width: 100, Order: 3, DetailOrder: 4},
+		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Token Name", Section: "Asset Information", InTable: true, InDetail: true, Width: 200, Order: 4, DetailOrder: 3},
+		{Key: "decimals", Label: "Decimals", ColumnLabel: "Decimals", DetailLabel: "Decimals", Section: "Asset Information", InTable: true, InDetail: true, Width: 100, Order: 5, DetailOrder: 5},
+		{Key: "totalSupply", Label: "Total Supply", ColumnLabel: "Total Supply", DetailLabel: "Total Supply", Formatter: "wei", Section: "Asset Information", InTable: true, InDetail: true, Width: 150, Order: 6, DetailOrder: 6},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 7},
+
+		{Key: "source", Label: "Source", DetailLabel: "Source", Section: "Asset Classification", InTable: false, InDetail: true, DetailOrder: 7},
+		{Key: "tags", Label: "Tags", DetailLabel: "Tags", Section: "Asset Classification", InTable: false, InDetail: true, DetailOrder: 8},
+		{Key: "isContract", Label: "Is Contract", DetailLabel: "Is Contract", Section: "Asset Classification", InTable: false, InDetail: true, DetailOrder: 9},
+		{Key: "isCustom", Label: "Is Custom", DetailLabel: "Is Custom", Section: "Asset Classification", InTable: false, InDetail: true, DetailOrder: 10},
+		{Key: "isErc20", Label: "Is ERC20", DetailLabel: "Is ERC20", Section: "Asset Classification", InTable: false, InDetail: true, DetailOrder: 11},
+		{Key: "isErc721", Label: "Is ERC721", DetailLabel: "Is ERC721", Section: "Asset Classification", InTable: false, InDetail: true, DetailOrder: 12},
+		{Key: "isPrefund", Label: "Is Prefund", DetailLabel: "Is Prefund", Section: "Asset Classification", InTable: false, InDetail: true, DetailOrder: 13},
+		{Key: "deleted", Label: "Deleted", DetailLabel: "Deleted", Section: "Asset Classification", InTable: false, InDetail: true, DetailOrder: 14},
+
+		{Key: "parts", Label: "Parts", DetailLabel: "Parts", Section: "Additional Data", InTable: false, InDetail: true, DetailOrder: 15},
+		{Key: "prefund", Label: "Prefund Amount", DetailLabel: "Prefund Amount", Formatter: "wei", Section: "Additional Data", InTable: false, InDetail: true, DetailOrder: 16},
 	}
 }
 
-func getTransactionsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "blockNumber", Header: "Block", Accessor: "blockNumber", Width: 100},
-		{Key: "transactionIndex", Header: "Index", Accessor: "transactionIndex", Width: 80},
-		{Key: "hash", Header: "Hash", Accessor: "hash", Width: 340, Formatter: "hash"},
-		{Key: "from", Header: "From", Accessor: "from", Width: 340, Formatter: "address"},
-		{Key: "to", Header: "To", Accessor: "to", Width: 340, Formatter: "address"},
-		{Key: "value", Header: "Value", Accessor: "value", Width: 150, Formatter: "wei"},
-		{Key: "gasUsed", Header: "Gas Used", Accessor: "gasUsed", Width: 120, Formatter: "gas"},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
+func getLogsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "blockNumber", Label: "Block", ColumnLabel: "Block", DetailLabel: "Block Number", Section: "Transaction Context", InTable: true, InDetail: true, Width: 100, Order: 1, DetailOrder: 8},
+		{Key: "transactionIndex", Label: "Tx Index", ColumnLabel: "Tx Index", DetailLabel: "Transaction Index", Section: "Transaction Context", InTable: true, InDetail: true, Width: 80, Order: 2, DetailOrder: 11},
+		{Key: "logIndex", Label: "Log Index", ColumnLabel: "Log Index", DetailLabel: "Log Index", Section: "Log Overview", InTable: true, InDetail: true, Width: 80, Order: 3, DetailOrder: 3},
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Contract Address", Formatter: "address", Section: "Log Overview", InTable: true, InDetail: true, Width: 340, Order: 4, DetailOrder: 1},
+		{Key: "topic0", Label: "Topic0", ColumnLabel: "Topic0", DetailLabel: "Topic 0 (Event Signature)", Formatter: "hash", Section: "Topics", InTable: true, InDetail: true, Width: 340, Order: 5, DetailOrder: 4},
+		{Key: "topic1", Label: "Topic1", ColumnLabel: "Topic1", DetailLabel: "Topic 1", Formatter: "hash", Section: "Topics", InTable: true, InDetail: true, Width: 340, Order: 6, DetailOrder: 5},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 7},
+
+		{Key: "data", Label: "Data", DetailLabel: "Data", Section: "Log Overview", InTable: false, InDetail: true, DetailOrder: 2},
+		{Key: "topic2", Label: "Topic 2", DetailLabel: "Topic 2", Formatter: "hash", Section: "Topics", InTable: false, InDetail: true, DetailOrder: 6},
+		{Key: "topic3", Label: "Topic 3", DetailLabel: "Topic 3", Formatter: "hash", Section: "Topics", InTable: false, InDetail: true, DetailOrder: 7},
+		{Key: "blockHash", Label: "Block Hash", DetailLabel: "Block Hash", Formatter: "hash", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 9},
+		{Key: "transactionHash", Label: "Transaction Hash", DetailLabel: "Transaction Hash", Formatter: "hash", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 10},
+		{Key: "timestamp", Label: "Timestamp", DetailLabel: "Timestamp", Formatter: "datetime", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 12},
+		{Key: "articulatedLog", Label: "Articulated Log", DetailLabel: "Articulated Log", Formatter: "json", Section: "Articulated Information", InTable: false, InDetail: true, DetailOrder: 13},
+		{Key: "compressedLog", Label: "Compressed Log", DetailLabel: "Compressed Log", Section: "Articulated Information", InTable: false, InDetail: true, DetailOrder: 14},
 	}
 }
 
-func getTransactionsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Transaction Overview",
-			Fields: []types.DetailFieldConfig{
-				{Key: "hash", Label: "Hash", Formatter: "hash"},
-				{Key: "from", Label: "From", Formatter: "address"},
-				{Key: "to", Label: "To", Formatter: "address"},
-				{Key: "value", Label: "Value", Formatter: "wei"},
-				{Key: "isError", Label: "Error Status"},
-				{Key: "hasToken", Label: "Has Token"},
-			},
-		},
-		{
-			Title: "Gas Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "gas", Label: "Gas Limit"},
-				{Key: "gasUsed", Label: "Gas Used", Formatter: "gas"},
-				{Key: "gasPrice", Label: "Gas Price", Formatter: "gas"},
-				{Key: "maxFeePerGas", Label: "Max Fee Per Gas", Formatter: "gas"},
-				{Key: "maxPriorityFeePerGas", Label: "Max Priority Fee", Formatter: "gas"},
-			},
-		},
-		{
-			Title: "Block Context",
-			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block Number"},
-				{Key: "blockHash", Label: "Block Hash", Formatter: "hash"},
-				{Key: "transactionIndex", Label: "Transaction Index"},
-				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
-			},
-		},
-		{
-			Title: "Transaction Details",
-			Fields: []types.DetailFieldConfig{
-				{Key: "nonce", Label: "Nonce"},
-				{Key: "type", Label: "Transaction Type"},
-				{Key: "input", Label: "Input Data"},
-				{Key: "articulatedTx", Label: "Articulated Transaction", Formatter: "json"},
-			},
-		},
+func getTracesFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "blockNumber", Label: "Block", ColumnLabel: "Block", DetailLabel: "Block Number", Section: "Transaction Context", InTable: true, InDetail: true, Width: 100, Order: 1, DetailOrder: 15},
+		{Key: "transactionIndex", Label: "Tx Index", ColumnLabel: "Tx Index", DetailLabel: "Transaction Index", Section: "Transaction Context", InTable: true, InDetail: true, Width: 80, Order: 2, DetailOrder: 18},
+		{Key: "traceIndex", Label: "Trace Index", ColumnLabel: "Trace Index", DetailLabel: "Trace Index", Section: "Transaction Context", InTable: true, InDetail: true, Width: 80, Order: 3, DetailOrder: 20},
+		{Key: "from", Label: "From", ColumnLabel: "From", DetailLabel: "From", Formatter: "address", Section: "Trace Action", InTable: true, InDetail: true, Width: 340, Order: 4, DetailOrder: 5},
+		{Key: "to", Label: "To", ColumnLabel: "To", DetailLabel: "To", Formatter: "address", Section: "Trace Action", InTable: true, InDetail: true, Width: 340, Order: 5, DetailOrder: 6},
+		{Key: "value", Label: "Value", ColumnLabel: "Value", DetailLabel: "Value", Formatter: "wei", Section: "Trace Action", InTable: true, InDetail: true, Width: 150, Order: 6, DetailOrder: 7},
+		{Key: "type", Label: "Type", ColumnLabel: "Type", DetailLabel: "Trace Type", Section: "Trace Overview", InTable: true, InDetail: true, Width: 100, Order: 7, DetailOrder: 1},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 8},
+
+		{Key: "error", Label: "Error", DetailLabel: "Error", Section: "Trace Overview", InTable: false, InDetail: true, DetailOrder: 2},
+		{Key: "subtraces", Label: "Subtraces Count", DetailLabel: "Subtraces Count", Section: "Trace Overview", InTable: false, InDetail: true, DetailOrder: 3},
+		{Key: "traceAddress", Label: "Trace Address", DetailLabel: "Trace Address", Section: "Trace Overview", InTable: false, InDetail: true, DetailOrder: 4},
+
+		{Key: "gas", Label: "Gas Limit", DetailLabel: "Gas Limit", Section: "Trace Action", InTable: false, InDetail: true, DetailOrder: 8},
+		{Key: "callType", Label: "Call Type", DetailLabel: "Call Type", Section: "Trace Action", InTable: false, InDetail: true, DetailOrder: 9},
+		{Key: "input", Label: "Input Data", DetailLabel: "Input Data", Section: "Trace Action", InTable: false, InDetail: true, DetailOrder: 10},
+
+		{Key: "gasUsed", Label: "Gas Used", DetailLabel: "Gas Used", Formatter: "gas", Section: "Trace Result", InTable: false, InDetail: true, DetailOrder: 11},
+		{Key: "output", Label: "Output", DetailLabel: "Output", Section: "Trace Result", InTable: false, InDetail: true, DetailOrder: 12},
+		{Key: "address", Label: "Created Address", DetailLabel: "Created Address", Formatter: "address", Section: "Trace Result", InTable: false, InDetail: true, DetailOrder: 13},
+		{Key: "code", Label: "Code", DetailLabel: "Code", Section: "Trace Result", InTable: false, InDetail: true, DetailOrder: 14},
+
+		{Key: "blockHash", Label: "Block Hash", DetailLabel: "Block Hash", Formatter: "hash", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 16},
+		{Key: "transactionHash", Label: "Transaction Hash", DetailLabel: "Transaction Hash", Formatter: "hash", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 17},
+		{Key: "timestamp", Label: "Timestamp", DetailLabel: "Timestamp", Formatter: "datetime", Section: "Transaction Context", InTable: false, InDetail: true, DetailOrder: 19},
+		{Key: "articulatedTrace", Label: "Articulated Trace", DetailLabel: "Articulated Trace", Formatter: "json", Section: "Articulated Information", InTable: false, InDetail: true, DetailOrder: 21},
+		{Key: "compressedTrace", Label: "Compressed Trace", DetailLabel: "Compressed Trace", Section: "Articulated Information", InTable: false, InDetail: true, DetailOrder: 22},
 	}
 }
 
-func getWithdrawalsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "blockNumber", Header: "Block", Accessor: "blockNumber", Width: 100},
-		{Key: "index", Header: "Index", Accessor: "index", Width: 80},
-		{Key: "validatorIndex", Header: "Validator", Accessor: "validatorIndex", Width: 100},
-		{Key: "address", Header: "Address", Accessor: "address", Width: 340, Formatter: "address"},
-		{Key: "amount", Header: "Amount", Accessor: "amount", Width: 150, Formatter: "ether"},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
-	}
-}
+func getReceiptsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "blockNumber", Label: "Block", ColumnLabel: "Block", DetailLabel: "Block Number", Section: "Block Context", InTable: true, InDetail: true, Width: 100, Order: 1, DetailOrder: 11},
+		{Key: "transactionIndex", Label: "Index", ColumnLabel: "Index", DetailLabel: "Transaction Index", Section: "Transaction Details", InTable: true, InDetail: true, Width: 80, Order: 2, DetailOrder: 7},
+		{Key: "transactionHash", Label: "Tx Hash", ColumnLabel: "Tx Hash", DetailLabel: "Transaction Hash", Formatter: "hash", Section: "Receipt Overview", InTable: true, InDetail: true, Width: 340, Order: 3, DetailOrder: 1},
+		{Key: "from", Label: "From", ColumnLabel: "From", DetailLabel: "From", Formatter: "address", Section: "Transaction Details", InTable: true, InDetail: true, Width: 340, Order: 4, DetailOrder: 5},
+		{Key: "to", Label: "To", ColumnLabel: "To", DetailLabel: "To", Formatter: "address", Section: "Transaction Details", InTable: true, InDetail: true, Width: 340, Order: 5, DetailOrder: 6},
+		{Key: "gasUsed", Label: "Gas Used", ColumnLabel: "Gas Used", DetailLabel: "Gas Used", Formatter: "gas", Section: "Gas Information", InTable: true, InDetail: true, Width: 120, Order: 6, DetailOrder: 8},
+		{Key: "status", Label: "Status", ColumnLabel: "Status", DetailLabel: "Status", Section: "Receipt Overview", InTable: true, InDetail: true, Width: 80, Order: 7, DetailOrder: 2},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 8},
 
-func getWithdrawalsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Withdrawal Details",
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Recipient Address", Formatter: "address"},
-				{Key: "amount", Label: "Amount", Formatter: "ether"},
-				{Key: "validatorIndex", Label: "Validator Index"},
-				{Key: "index", Label: "Withdrawal Index"},
-			},
-		},
-		{
-			Title: "Block Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block Number"},
-				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
-			},
-		},
-	}
-}
-
-func getAssetsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "address", Header: "Address", Accessor: "address", Width: 340, Formatter: "address"},
-		{Key: "holder", Header: "Holder", Accessor: "holder", Width: 340, Formatter: "address"},
-		{Key: "symbol", Header: "Symbol", Accessor: "symbol", Width: 100},
-		{Key: "name", Header: "Name", Accessor: "name", Width: 200},
-		{Key: "decimals", Header: "Decimals", Accessor: "decimals", Width: 100},
-		{Key: "totalSupply", Header: "Total Supply", Accessor: "totalSupply", Width: 150, Formatter: "wei"},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
-	}
-}
-
-func getAssetsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Asset Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Contract Address", Formatter: "address"},
-				{Key: "name", Label: "Token Name"},
-				{Key: "symbol", Label: "Symbol"},
-				{Key: "decimals", Label: "Decimals"},
-				{Key: "totalSupply", Label: "Total Supply", Formatter: "wei"},
-			},
-		},
-		{
-			Title: "Asset Classification",
-			Fields: []types.DetailFieldConfig{
-				{Key: "source", Label: "Source"},
-				{Key: "tags", Label: "Tags"},
-				{Key: "isContract", Label: "Is Contract"},
-				{Key: "isCustom", Label: "Is Custom"},
-				{Key: "isErc20", Label: "Is ERC20"},
-				{Key: "isErc721", Label: "Is ERC721"},
-				{Key: "isPrefund", Label: "Is Prefund"},
-				{Key: "deleted", Label: "Deleted"},
-			},
-		},
-		{
-			Title: "Additional Data",
-			Fields: []types.DetailFieldConfig{
-				{Key: "parts", Label: "Parts"},
-				{Key: "prefund", Label: "Prefund Amount", Formatter: "wei"},
-			},
-		},
-	}
-}
-
-func getLogsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "blockNumber", Header: "Block", Accessor: "blockNumber", Width: 100},
-		{Key: "transactionIndex", Header: "Tx Index", Accessor: "transactionIndex", Width: 80},
-		{Key: "logIndex", Header: "Log Index", Accessor: "logIndex", Width: 80},
-		{Key: "address", Header: "Address", Accessor: "address", Width: 340, Formatter: "address"},
-		{Key: "topic0", Header: "Topic0", Accessor: "topic0", Width: 340, Formatter: "hash"},
-		{Key: "topic1", Header: "Topic1", Accessor: "topic1", Width: 340, Formatter: "hash"},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
-	}
-}
-
-func getLogsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Log Overview",
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Contract Address", Formatter: "address"},
-				{Key: "data", Label: "Data"},
-				{Key: "logIndex", Label: "Log Index"},
-			},
-		},
-		{
-			Title: "Topics",
-			Fields: []types.DetailFieldConfig{
-				{Key: "topics.0", Label: "Topic 0 (Event Signature)", Formatter: "hash"},
-				{Key: "topics.1", Label: "Topic 1", Formatter: "hash"},
-				{Key: "topics.2", Label: "Topic 2", Formatter: "hash"},
-				{Key: "topics.3", Label: "Topic 3", Formatter: "hash"},
-			},
-		},
-		{
-			Title: "Transaction Context",
-			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block Number"},
-				{Key: "blockHash", Label: "Block Hash", Formatter: "hash"},
-				{Key: "transactionHash", Label: "Transaction Hash", Formatter: "hash"},
-				{Key: "transactionIndex", Label: "Transaction Index"},
-				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
-			},
-		},
-		{
-			Title: "Articulated Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "articulatedLog", Label: "Articulated Log", Formatter: "json"},
-				{Key: "compressedLog", Label: "Compressed Log"},
-			},
-		},
-	}
-}
-
-func getTracesColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "blockNumber", Header: "Block", Accessor: "blockNumber", Width: 100},
-		{Key: "transactionIndex", Header: "Tx Index", Accessor: "transactionIndex", Width: 80},
-		{Key: "traceIndex", Header: "Trace Index", Accessor: "traceIndex", Width: 80},
-		{Key: "from", Header: "From", Accessor: "from", Width: 340, Formatter: "address"},
-		{Key: "to", Header: "To", Accessor: "to", Width: 340, Formatter: "address"},
-		{Key: "value", Header: "Value", Accessor: "value", Width: 150, Formatter: "wei"},
-		{Key: "type", Header: "Type", Accessor: "type", Width: 100},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
-	}
-}
-
-func getTracesDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Trace Overview",
-			Fields: []types.DetailFieldConfig{
-				{Key: "type", Label: "Trace Type"},
-				{Key: "error", Label: "Error"},
-				{Key: "subtraces", Label: "Subtraces Count"},
-				{Key: "traceAddress", Label: "Trace Address"},
-			},
-		},
-		{
-			Title: "Trace Action",
-			Fields: []types.DetailFieldConfig{
-				{Key: "from", Label: "From", Formatter: "address"},
-				{Key: "to", Label: "To", Formatter: "address"},
-				{Key: "value", Label: "Value", Formatter: "wei"},
-				{Key: "gas", Label: "Gas Limit"},
-				{Key: "callType", Label: "Call Type"},
-				{Key: "input", Label: "Input Data"},
-			},
-		},
-		{
-			Title: "Trace Result",
-			Fields: []types.DetailFieldConfig{
-				{Key: "gasUsed", Label: "Gas Used", Formatter: "gas"},
-				{Key: "output", Label: "Output"},
-				{Key: "address", Label: "Created Address", Formatter: "address"},
-				{Key: "code", Label: "Code"},
-			},
-		},
-		{
-			Title: "Transaction Context",
-			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block Number"},
-				{Key: "blockHash", Label: "Block Hash", Formatter: "hash"},
-				{Key: "transactionHash", Label: "Transaction Hash", Formatter: "hash"},
-				{Key: "transactionIndex", Label: "Transaction Index"},
-				{Key: "timestamp", Label: "Timestamp", Formatter: "datetime"},
-			},
-		},
-		{
-			Title: "Articulated Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "articulatedTrace", Label: "Articulated Trace", Formatter: "json"},
-				{Key: "compressedTrace", Label: "Compressed Trace"},
-			},
-		},
-	}
-}
-
-func getReceiptsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "blockNumber", Header: "Block", Accessor: "blockNumber", Width: 100},
-		{Key: "transactionIndex", Header: "Index", Accessor: "transactionIndex", Width: 80},
-		{Key: "transactionHash", Header: "Tx Hash", Accessor: "transactionHash", Width: 340, Formatter: "hash"},
-		{Key: "from", Header: "From", Accessor: "from", Width: 340, Formatter: "address"},
-		{Key: "to", Header: "To", Accessor: "to", Width: 340, Formatter: "address"},
-		{Key: "gasUsed", Header: "Gas Used", Accessor: "gasUsed", Width: 120, Formatter: "gas"},
-		{Key: "status", Header: "Status", Accessor: "status", Width: 80},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
-	}
-}
-
-func getReceiptsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Receipt Overview",
-			Fields: []types.DetailFieldConfig{
-				{Key: "transactionHash", Label: "Transaction Hash", Formatter: "hash"},
-				{Key: "status", Label: "Status"},
-				{Key: "isError", Label: "Is Error"},
-				{Key: "contractAddress", Label: "Contract Address", Formatter: "address"},
-			},
-		},
-		{
-			Title: "Transaction Details",
-			Fields: []types.DetailFieldConfig{
-				{Key: "from", Label: "From", Formatter: "address"},
-				{Key: "to", Label: "To", Formatter: "address"},
-				{Key: "transactionIndex", Label: "Transaction Index"},
-			},
-		},
-		{
-			Title: "Gas Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "gasUsed", Label: "Gas Used", Formatter: "gas"},
-				{Key: "cumulativeGasUsed", Label: "Cumulative Gas Used", Formatter: "gas"},
-				{Key: "effectiveGasPrice", Label: "Effective Gas Price", Formatter: "gas"},
-			},
-		},
-		{
-			Title: "Block Context",
-			Fields: []types.DetailFieldConfig{
-				{Key: "blockNumber", Label: "Block Number"},
-				{Key: "blockHash", Label: "Block Hash", Formatter: "hash"},
-			},
-		},
-		{
-			Title: "Additional Information",
-			Fields: []types.DetailFieldConfig{
-				{Key: "logsBloom", Label: "Logs Bloom"},
-				{Key: "logs", Label: "Log Count"},
-			},
-		},
+		{Key: "isError", Label: "Is Error", DetailLabel: "Is Error", Section: "Receipt Overview", InTable: false, InDetail: true, DetailOrder: 3},
+		{Key: "contractAddress", Label: "Contract Address", DetailLabel: "Contract Address", Formatter: "address", Section: "Receipt Overview", InTable: false, InDetail: true, DetailOrder: 4},
+		{Key: "cumulativeGasUsed", Label: "Cumulative Gas Used", DetailLabel: "Cumulative Gas Used", Formatter: "gas", Section: "Gas Information", InTable: false, InDetail: true, DetailOrder: 9},
+		{Key: "effectiveGasPrice", Label: "Effective Gas Price", DetailLabel: "Effective Gas Price", Formatter: "gas", Section: "Gas Information", InTable: false, InDetail: true, DetailOrder: 10},
+		{Key: "blockHash", Label: "Block Hash", DetailLabel: "Block Hash", Formatter: "hash", Section: "Block Context", InTable: false, InDetail: true, DetailOrder: 12},
+		{Key: "logsBloom", Label: "Logs Bloom", DetailLabel: "Logs Bloom", Section: "Additional Information", InTable: false, InDetail: true, DetailOrder: 13},
+		{Key: "logs", Label: "Log Count", DetailLabel: "Log Count", Section: "Additional Information", InTable: false, InDetail: true, DetailOrder: 14},
 	}
 }

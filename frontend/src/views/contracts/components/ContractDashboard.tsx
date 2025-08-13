@@ -13,7 +13,6 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { types } from '@models';
-import { Log } from '@utils';
 
 import { getReadFunctions } from './facetGeneration';
 
@@ -56,33 +55,32 @@ export const ContractDashboard: React.FC<ContractDashboardProps> = ({
         // DINGLEBERRY: USE THE PARAMETER VALUES SINCE THIS NEVER IS NOT TRUE
         // Compare readResults with ABI output values
         // Find the matching function in the ABI by name
-        const abiFunctions = contractState.abi?.functions || [];
-        const matchingAbiFunction = abiFunctions.find(
-          (abiFunc) => abiFunc.name === func.name,
-        );
+        // const abiFunctions = contractState.abi?.functions || [];
+        // const matchingAbiFunction = abiFunctions.find(
+        //   (abiFunc) => abiFunc.name === func.name,
+        // );
 
-        if (
-          matchingAbiFunction &&
-          matchingAbiFunction.outputs &&
-          matchingAbiFunction.outputs.length > 0
-        ) {
-          matchingAbiFunction.outputs.forEach((output, index) => {
-            const abiOutputValue = output.value;
-            const readResultValue = Array.isArray(result)
-              ? result[index]
-              : result;
-
-            const isMatch =
-              JSON.stringify(abiOutputValue) ===
-              JSON.stringify(readResultValue);
-            const status = isMatch ? '✅' : '❌';
-            Log(
-              `Function ${func.name} output ${index} match: ${status} (ABI: ${JSON.stringify(
-                abiOutputValue,
-              )}, Read Result: ${JSON.stringify(readResultValue)})`,
-            );
-          });
-        }
+        // if (
+        //   matchingAbiFunction &&
+        //   matchingAbiFunction.outputs &&
+        //   matchingAbiFunction.outputs.length > 0
+        // ) {
+        //   matchingAbiFunction.outputs.forEach((output, index) => {
+        // const abiOutputValue = output.value;
+        // const readResultValue = Array.isArray(result)
+        //   ? result[index]
+        //   : result;
+        // // const isMatch =
+        // //   JSON.stringify(abiOutputValue) ===
+        // //   JSON.stringify(readResultValue);
+        // const status = isMatch ? '✅' : '❌';
+        // Log(
+        //   `Function ${func.name} output ${index} match: ${status} (ABI: ${JSON.stringify(
+        //     abiOutputValue,
+        //   )}, Read Result: ${JSON.stringify(readResultValue)})`,
+        // );
+        //   });
+        // }
 
         if (func.outputs && func.outputs.length > 0) {
           const updatedOutputs = func.outputs.map((output, index) => {

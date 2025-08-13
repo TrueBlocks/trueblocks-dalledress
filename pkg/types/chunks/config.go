@@ -6,15 +6,14 @@ import (
 
 // GetConfig returns the ViewConfig for the Chunks view
 func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
-	return &types.ViewConfig{
+	cfg := &types.ViewConfig{
 		ViewName: "chunks",
 		Facets: map[string]types.FacetConfig{
 			"stats": {
 				Name:          "Stats",
 				Store:         "chunks",
 				IsForm:        false,
-				Columns:       getStatsColumns(),
-				DetailPanels:  getStatsDetailPanels(),
+				Fields:        getStatsFields(),
 				Actions:       []string{},
 				HeaderActions: []string{"export"},
 			},
@@ -22,8 +21,7 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 				Name:          "Index",
 				Store:         "chunks",
 				IsForm:        false,
-				Columns:       getIndexColumns(),
-				DetailPanels:  getIndexDetailPanels(),
+				Fields:        getIndexFields(),
 				Actions:       []string{},
 				HeaderActions: []string{"export"},
 			},
@@ -31,8 +29,7 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 				Name:          "Blooms",
 				Store:         "chunks",
 				IsForm:        false,
-				Columns:       getBloomsColumns(),
-				DetailPanels:  getBloomsDetailPanels(),
+				Fields:        getBloomsFields(),
 				Actions:       []string{},
 				HeaderActions: []string{"export"},
 			},
@@ -40,8 +37,7 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 				Name:          "Manifest",
 				Store:         "chunks",
 				IsForm:        true, // MANIFEST is a form view
-				Columns:       nil,
-				DetailPanels:  getManifestDetailPanels(),
+				Fields:        getManifestFields(),
 				Actions:       []string{},
 				HeaderActions: []string{},
 			},
@@ -50,158 +46,56 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			"export": {Name: "export", Label: "Export Data", Icon: "Export"},
 		},
 		FacetOrder: []string{"stats", "index", "blooms", "manifest"},
-	}, nil
+	}
+	types.DeriveFacetFromFields(cfg)
+	types.NormalizeOrders(cfg)
+	return cfg, nil
 }
 
-func getStatsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "range", Header: "Range", Accessor: "range", Width: 150, Sortable: true, Filterable: true, Formatter: "blkrange"},
-		{Key: "nAddrs", Header: "Addrs", Accessor: "nAddrs", Width: 120, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "nApps", Header: "Apps", Accessor: "nApps", Width: 100, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "nBlocks", Header: "Blocks", Accessor: "nBlocks", Width: 120, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "nBlooms", Header: "Blooms", Accessor: "nBlooms", Width: 120, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "recWid", Header: "Rec Wid", Accessor: "recWid", Width: 120, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "bloomSz", Header: "Bloom Sz", Accessor: "bloomSz", Width: 120, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "chunkSz", Header: "Chunk Sz", Accessor: "chunkSz", Width: 120, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "addrsPerBlock", Header: "Addrs Per Block", Accessor: "addrsPerBlock", Width: 100, Sortable: true, Filterable: true, Formatter: "float64"},
-		{Key: "appsPerBlock", Header: "Apps Per Block", Accessor: "appsPerBlock", Width: 100, Sortable: true, Filterable: true, Formatter: "float64"},
-		{Key: "appsPerAddr", Header: "Apps Per Addr", Accessor: "appsPerAddr", Width: 100, Sortable: true, Filterable: true, Formatter: "float64"},
-		{Key: "ratio", Header: "Ratio", Accessor: "ratio", Width: 100, Sortable: true, Filterable: true, Formatter: "float64"},
+func getStatsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "range", Label: "Range", ColumnLabel: "Range", DetailLabel: "Range", Formatter: "blkrange", Section: "Range", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 1, DetailOrder: 1},
+		{Key: "nAddrs", Label: "Addresses", ColumnLabel: "Addrs", DetailLabel: "Addresses", Formatter: "number", Section: "Counts", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: true, Order: 2, DetailOrder: 2},
+		{Key: "nApps", Label: "Apps", ColumnLabel: "Apps", DetailLabel: "Apps", Formatter: "number", Section: "Counts", InTable: true, InDetail: true, Width: 100, Sortable: true, Filterable: true, Order: 3, DetailOrder: 3},
+		{Key: "nBlocks", Label: "Blocks", ColumnLabel: "Blocks", DetailLabel: "Blocks", Formatter: "number", Section: "Counts", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: true, Order: 4, DetailOrder: 4},
+		{Key: "nBlooms", Label: "Blooms", ColumnLabel: "Blooms", DetailLabel: "Blooms", Formatter: "number", Section: "Counts", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: true, Order: 5, DetailOrder: 5},
+		{Key: "recWid", Label: "Record Width", ColumnLabel: "Rec Wid", DetailLabel: "Record Width", Formatter: "number", Section: "Sizes", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: true, Order: 6, DetailOrder: 6},
+		{Key: "bloomSz", Label: "Bloom Size", ColumnLabel: "Bloom Sz", DetailLabel: "Bloom Size", Formatter: "number", Section: "Sizes", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: true, Order: 7, DetailOrder: 7},
+		{Key: "chunkSz", Label: "Chunk Size", ColumnLabel: "Chunk Sz", DetailLabel: "Chunk Size", Formatter: "number", Section: "Sizes", InTable: true, InDetail: true, Width: 120, Sortable: true, Filterable: true, Order: 8, DetailOrder: 8},
+		{Key: "addrsPerBlock", Label: "Addrs/Block", ColumnLabel: "Addrs Per Block", DetailLabel: "Addrs/Block", Formatter: "float64", Section: "Efficiency", InTable: true, InDetail: true, Width: 100, Sortable: true, Filterable: true, Order: 9, DetailOrder: 9},
+		{Key: "appsPerBlock", Label: "Apps/Block", ColumnLabel: "Apps Per Block", DetailLabel: "Apps/Block", Formatter: "float64", Section: "Efficiency", InTable: true, InDetail: true, Width: 100, Sortable: true, Filterable: true, Order: 10, DetailOrder: 10},
+		{Key: "appsPerAddr", Label: "Apps/Addr", ColumnLabel: "Apps Per Addr", DetailLabel: "Apps/Addr", Formatter: "float64", Section: "Efficiency", InTable: true, InDetail: true, Width: 100, Sortable: true, Filterable: true, Order: 11, DetailOrder: 11},
+		{Key: "ratio", Label: "Ratio", ColumnLabel: "Ratio", DetailLabel: "Ratio", Formatter: "float64", Section: "Efficiency", InTable: true, InDetail: true, Width: 100, Sortable: true, Filterable: true, Order: 12, DetailOrder: 12},
 	}
 }
 
-func getIndexColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "range", Header: "Range", Accessor: "range", Width: 150, Sortable: true, Filterable: true, Formatter: "blkrange"},
-		{Key: "magic", Header: "Magic", Accessor: "magic", Width: 150, Sortable: true, Filterable: true, Formatter: "text"},
-		{Key: "hash", Header: "Hash", Accessor: "hash", Width: 150, Sortable: true, Filterable: true, Formatter: "hash"},
-		{Key: "nAddresses", Header: "Addresses", Accessor: "nAddresses", Width: 150, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "nAppearances", Header: "Appearances", Accessor: "nAppearances", Width: 150, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "size", Header: "Size", Accessor: "size", Width: 150, Sortable: true, Filterable: true, Formatter: "number"},
+func getIndexFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "range", Label: "Range", ColumnLabel: "Range", DetailLabel: "Range", Formatter: "blkrange", Section: "Range", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 1, DetailOrder: 1},
+		{Key: "magic", Label: "Magic", ColumnLabel: "Magic", DetailLabel: "Magic", Formatter: "text", Section: "Identity", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 2, DetailOrder: 2},
+		{Key: "hash", Label: "Hash", ColumnLabel: "Hash", DetailLabel: "Hash", Formatter: "hash", Section: "Identity", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 3, DetailOrder: 3},
+		{Key: "nAddresses", Label: "Addresses", ColumnLabel: "Addresses", DetailLabel: "Addresses", Formatter: "number", Section: "Counts", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 4, DetailOrder: 4},
+		{Key: "nAppearances", Label: "Appearances", ColumnLabel: "Appearances", DetailLabel: "Appearances", Formatter: "number", Section: "Counts", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 5, DetailOrder: 5},
+		{Key: "size", Label: "Size", ColumnLabel: "Size", DetailLabel: "Size", Formatter: "number", Section: "Sizes", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 6, DetailOrder: 6},
 	}
 }
 
-func getBloomsColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "range", Header: "Range", Accessor: "range", Width: 150, Sortable: true, Filterable: true, Formatter: "blkrange"},
-		{Key: "magic", Header: "Magic", Accessor: "magic", Width: 150, Sortable: true, Filterable: true, Formatter: "text"},
-		{Key: "hash", Header: "Hash", Accessor: "hash", Width: 150, Sortable: true, Filterable: true, Formatter: "hash"},
-		{Key: "nBlooms", Header: "Blooms", Accessor: "nBlooms", Width: 150, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "nInserted", Header: "Inserted", Accessor: "nInserted", Width: 150, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "size", Header: "Size", Accessor: "size", Width: 150, Sortable: true, Filterable: true, Formatter: "number"},
-		{Key: "byteWidth", Header: "Byte Width", Accessor: "byteWidth", Width: 150, Sortable: true, Filterable: true, Formatter: "number"},
+func getBloomsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "range", Label: "Range", ColumnLabel: "Range", DetailLabel: "Range", Formatter: "blkrange", Section: "Range", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 1, DetailOrder: 1},
+		{Key: "magic", Label: "Magic", ColumnLabel: "Magic", DetailLabel: "Magic", Formatter: "text", Section: "Identity", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 2, DetailOrder: 2},
+		{Key: "hash", Label: "Hash", ColumnLabel: "Hash", DetailLabel: "Hash", Formatter: "hash", Section: "Identity", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 3, DetailOrder: 3},
+		{Key: "nBlooms", Label: "Blooms", ColumnLabel: "Blooms", DetailLabel: "Blooms", Formatter: "number", Section: "Counts", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 4, DetailOrder: 4},
+		{Key: "nInserted", Label: "Inserted", ColumnLabel: "Inserted", DetailLabel: "Inserted", Formatter: "number", Section: "Counts", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 5, DetailOrder: 5},
+		{Key: "size", Label: "Size", ColumnLabel: "Size", DetailLabel: "Size", Formatter: "number", Section: "Sizes", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 6, DetailOrder: 6},
+		{Key: "byteWidth", Label: "Byte Width", ColumnLabel: "Byte Width", DetailLabel: "Byte Width", Formatter: "number", Section: "Sizes", InTable: true, InDetail: true, Width: 150, Sortable: true, Filterable: true, Order: 7, DetailOrder: 7},
 	}
 }
 
-func getStatsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Range",
-			Fields: []types.DetailFieldConfig{
-				{Key: "range", Label: "Range"},
-			},
-		},
-		{
-			Title: "Counts",
-			Fields: []types.DetailFieldConfig{
-				{Key: "nAddrs", Label: "Addresses"},
-				{Key: "nApps", Label: "Apps"},
-				{Key: "nBlocks", Label: "Blocks"},
-				{Key: "nBlooms", Label: "Blooms"},
-			},
-		},
-		{
-			Title: "Sizes",
-			Fields: []types.DetailFieldConfig{
-				{Key: "recWid", Label: "Record Width"},
-				{Key: "bloomSz", Label: "Bloom Size"},
-				{Key: "chunkSz", Label: "Chunk Size"},
-			},
-		},
-		{
-			Title: "Efficiency",
-			Fields: []types.DetailFieldConfig{
-				{Key: "addrsPerBlock", Label: "Addrs/Block"},
-				{Key: "appsPerBlock", Label: "Apps/Block"},
-				{Key: "appsPerAddr", Label: "Apps/Addr"},
-				{Key: "ratio", Label: "Ratio"},
-			},
-		},
-	}
-}
-
-func getIndexDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Range",
-			Fields: []types.DetailFieldConfig{
-				{Key: "range", Label: "Range"},
-			},
-		},
-		{
-			Title: "Identity",
-			Fields: []types.DetailFieldConfig{
-				{Key: "magic", Label: "Magic"},
-				{Key: "hash", Label: "Hash", Formatter: "hash"},
-			},
-		},
-		{
-			Title: "Counts",
-			Fields: []types.DetailFieldConfig{
-				{Key: "nAddresses", Label: "Addresses"},
-				{Key: "nAppearances", Label: "Appearances"},
-			},
-		},
-		{
-			Title: "Sizes",
-			Fields: []types.DetailFieldConfig{
-				{Key: "size", Label: "Size"},
-			},
-		},
-	}
-}
-
-func getBloomsDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Range",
-			Fields: []types.DetailFieldConfig{
-				{Key: "range", Label: "Range"},
-			},
-		},
-		{
-			Title: "Identity",
-			Fields: []types.DetailFieldConfig{
-				{Key: "magic", Label: "Magic"},
-				{Key: "hash", Label: "Hash", Formatter: "hash"},
-			},
-		},
-		{
-			Title: "Counts",
-			Fields: []types.DetailFieldConfig{
-				{Key: "nBlooms", Label: "Blooms"},
-				{Key: "nInserted", Label: "Inserted"},
-			},
-		},
-		{
-			Title: "Sizes",
-			Fields: []types.DetailFieldConfig{
-				{Key: "size", Label: "Size"},
-				{Key: "byteWidth", Label: "Byte Width"},
-			},
-		},
-	}
-}
-
-func getManifestDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title: "Manifest",
-			Fields: []types.DetailFieldConfig{
-				{Key: "version", Label: "Version"},
-				{Key: "chain", Label: "Chain"},
-				{Key: "specification", Label: "Specification", Formatter: "hash"},
-			},
-		},
+func getManifestFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		{Key: "version", Label: "Version", ColumnLabel: "Version", DetailLabel: "Version", Section: "Manifest", InTable: true, InDetail: true, Width: 100, Order: 1, DetailOrder: 1},
+		{Key: "chain", Label: "Chain", ColumnLabel: "Chain", DetailLabel: "Chain", Section: "Manifest", InTable: true, InDetail: true, Width: 120, Order: 2, DetailOrder: 2},
+		{Key: "specification", Label: "Specification", ColumnLabel: "Specification", DetailLabel: "Specification", Formatter: "hash", Section: "Manifest", InTable: true, InDetail: true, Width: 200, Order: 3, DetailOrder: 3},
 	}
 }

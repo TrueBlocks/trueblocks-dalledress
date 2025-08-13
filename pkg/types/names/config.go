@@ -12,8 +12,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Name:          "All",
 			Store:         "names",
 			IsForm:        false,
-			Columns:       getNamesColumns(),
-			DetailPanels:  getNamesDetailPanels(),
+			Fields:        getNamesFields(),
 			HeaderActions: []string{"add", "export"},
 			Actions:       []string{"update"},
 		},
@@ -21,8 +20,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Name:          "Custom",
 			Store:         "names",
 			IsForm:        false,
-			Columns:       getNamesColumns(),
-			DetailPanels:  getNamesDetailPanels(),
+			Fields:        getNamesFields(),
 			HeaderActions: []string{"add", "publish", "pin", "export"},
 			Actions:       []string{"delete", "remove", "update"},
 		},
@@ -31,8 +29,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Store:         "names",
 			IsForm:        false,
 			DividerBefore: true, // Divider appears before this facet (after Custom)
-			Columns:       getNamesColumns(),
-			DetailPanels:  getNamesDetailPanels(),
+			Fields:        getNamesFields(),
 			HeaderActions: []string{"add", "export"},
 			Actions:       []string{"update"},
 		},
@@ -40,8 +37,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Name:          "Regular",
 			Store:         "names",
 			IsForm:        false,
-			Columns:       getNamesColumns(),
-			DetailPanels:  getNamesDetailPanels(),
+			Fields:        getNamesFields(),
 			HeaderActions: []string{"add", "export"},
 			Actions:       []string{"update"},
 		},
@@ -49,14 +45,13 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Name:          "Baddress",
 			Store:         "names",
 			IsForm:        false,
-			Columns:       getNamesColumns(),
-			DetailPanels:  getNamesDetailPanels(),
+			Fields:        getNamesFields(),
 			HeaderActions: []string{"add", "export"},
 			Actions:       []string{"update"},
 		},
 	}
 
-	return &types.ViewConfig{
+	cfg := &types.ViewConfig{
 		ViewName:   "names",
 		Facets:     facets,
 		FacetOrder: []string{"all", "custom", "prefund", "regular", "baddress"},
@@ -69,60 +64,37 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			"remove":  {Name: "remove", Label: "Remove", Icon: "Remove"},
 			"update":  {Name: "update", Label: "Modify", Icon: "Edit"},
 		}, // Names uses CRUD actions handled by useActions hook
-	}, nil
-}
-
-func getNamesColumns() []types.ColumnConfig {
-	return []types.ColumnConfig{
-		{Key: "address", Header: "Address", Accessor: "address", Width: 340, Formatter: "address"},
-		{Key: "name", Header: "Name", Accessor: "name", Width: 200},
-		{Key: "tags", Header: "Tags", Accessor: "tags", Width: 150},
-		{Key: "source", Header: "Source", Accessor: "source", Width: 120},
-		{Key: "symbol", Header: "Symbol", Accessor: "symbol", Width: 100},
-		{Key: "decimals", Header: "Decimals", Accessor: "decimals", Width: 100},
-		{Key: "actions", Header: "Actions", Accessor: "actions", Width: 80},
 	}
+	types.DeriveFacetFromFields(cfg)
+	types.NormalizeOrders(cfg)
+	return cfg, nil
 }
 
-func getNamesDetailPanels() []types.DetailPanelConfig {
-	return []types.DetailPanelConfig{
-		{
-			Title:     "Name Identity",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "address", Label: "Address", Formatter: "address"},
-				{Key: "name", Label: "Name"},
-				{Key: "symbol", Label: "Symbol"},
-				{Key: "decimals", Label: "Decimals"},
-			},
-		},
-		{
-			Title:     "Classification",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "source", Label: "Source"},
-				{Key: "tags", Label: "Tags"},
-				{Key: "deleted", Label: "Deleted", Formatter: "boolean"},
-			},
-		},
-		{
-			Title:     "Contract Properties",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "isContract", Label: "Is Contract", Formatter: "boolean"},
-				{Key: "isCustom", Label: "Is Custom", Formatter: "boolean"},
-				{Key: "isErc20", Label: "Is ERC20", Formatter: "boolean"},
-				{Key: "isErc721", Label: "Is ERC721", Formatter: "boolean"},
-				{Key: "isPrefund", Label: "Is Prefund", Formatter: "boolean"},
-			},
-		},
-		{
-			Title:     "Prefund Information",
-			Collapsed: false,
-			Fields: []types.DetailFieldConfig{
-				{Key: "prefund", Label: "Prefund Amount", Formatter: "wei"},
-				{Key: "parts", Label: "Parts"},
-			},
-		},
+func getNamesFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		// Name Identity section
+		{Key: "address", Label: "Address", Section: "Name Identity", InTable: true, InDetail: true, Width: 340, Formatter: "address", Order: 1, DetailOrder: 1},
+		{Key: "name", Label: "Name", Section: "Name Identity", InTable: true, InDetail: true, Width: 200, Order: 2, DetailOrder: 2},
+		{Key: "symbol", Label: "Symbol", Section: "Name Identity", InTable: true, InDetail: true, Width: 100, Order: 5, DetailOrder: 3},
+		{Key: "decimals", Label: "Decimals", Section: "Name Identity", InTable: true, InDetail: true, Width: 100, Order: 6, DetailOrder: 4},
+
+		// Classification section
+		{Key: "source", Label: "Source", Section: "Classification", InTable: true, InDetail: true, Width: 120, Order: 4, DetailOrder: 5},
+		{Key: "tags", Label: "Tags", Section: "Classification", InTable: true, InDetail: true, Width: 150, Order: 3, DetailOrder: 6},
+		{Key: "deleted", Label: "Deleted", Section: "Classification", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 7},
+
+		// Contract Properties section
+		{Key: "isContract", Label: "Is Contract", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 8},
+		{Key: "isCustom", Label: "Is Custom", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 9},
+		{Key: "isErc20", Label: "Is ERC20", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 10},
+		{Key: "isErc721", Label: "Is ERC721", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 11},
+		{Key: "isPrefund", Label: "Is Prefund", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 12},
+
+		// Prefund Information section
+		{Key: "prefund", Label: "Prefund Amount", Section: "Prefund Information", InTable: false, InDetail: true, Formatter: "wei", DetailOrder: 13},
+		{Key: "parts", Label: "Parts", Section: "Prefund Information", InTable: false, InDetail: true, DetailOrder: 14},
+
+		// Synthetic actions column for table only
+		{Key: "actions", Label: "Actions", Section: "Name Identity", InTable: true, InDetail: false, Width: 80, Order: 7},
 	}
 }

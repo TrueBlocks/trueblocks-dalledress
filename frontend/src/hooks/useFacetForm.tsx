@@ -53,7 +53,7 @@ export function useFacetForm<T extends Record<string, unknown>>({
     }
     // Prefer columns when available; otherwise derive fields from the data object directly (e.g., MANIFEST)
     type ColumnLike = FormField<T> & {
-      accessor?: string;
+      key?: string;
       detailLabel?: string;
     };
     const columnsToUse: ColumnLike[] =
@@ -70,7 +70,6 @@ export function useFacetForm<T extends Record<string, unknown>>({
       .map((column) => {
         const key = (column.name ||
           column.key ||
-          column.accessor ||
           column.header ||
           '') as keyof T & string;
         const raw = (data as Record<string, unknown>)[key as string];

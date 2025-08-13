@@ -2,56 +2,76 @@ package types
 
 // ViewConfig represents the complete configuration for a view
 type ViewConfig struct {
-	ViewName   string                  `json:"viewName" wails:"viewName"`
-	Facets     map[string]FacetConfig  `json:"facets" wails:"facets"`
-	Actions    map[string]ActionConfig `json:"actions" wails:"actions"`
-	FacetOrder []string                `json:"facetOrder" wails:"facetOrder"`
+	ViewName   string                  `json:"viewName"`
+	Facets     map[string]FacetConfig  `json:"facets"`
+	Actions    map[string]ActionConfig `json:"actions"`
+	FacetOrder []string                `json:"facetOrder"`
 }
 
 // FacetConfig represents configuration for a single facet within a view
 type FacetConfig struct {
-	Name          string              `json:"name" wails:"name"`
-	Store         string              `json:"store" wails:"store"`
-	IsForm        bool                `json:"isForm" wails:"isForm"`
-	DividerBefore bool                `json:"dividerBefore" wails:"dividerBefore"`
-	Columns       []ColumnConfig      `json:"columns" wails:"columns"`
-	DetailPanels  []DetailPanelConfig `json:"detailPanels" wails:"detailPanels"`
-	Actions       []string            `json:"actions" wails:"actions"`
-	HeaderActions []string            `json:"headerActions" wails:"headerActions"`
+	Name          string              `json:"name"`
+	Store         string              `json:"store"`
+	IsForm        bool                `json:"isForm"`
+	DividerBefore bool                `json:"dividerBefore"`
+	Fields        []FieldConfig       `json:"fields"`
+	Columns       []ColumnConfig      `json:"columns"`
+	DetailPanels  []DetailPanelConfig `json:"detailPanels"`
+	Actions       []string            `json:"actions"`
+	HeaderActions []string            `json:"headerActions"`
+}
+
+// FieldConfig is the single source-of-truth for facet fields
+// Header is derived from Label; do not duplicate.
+type FieldConfig struct {
+	Key         string `json:"key"`
+	Label       string `json:"label"`
+	Formatter   string `json:"formatter"`
+	Section     string `json:"section"`
+	InTable     bool   `json:"inTable"`
+	InDetail    bool   `json:"inDetail"`
+	Width       int    `json:"width"`
+	Sortable    bool   `json:"sortable"`
+	Filterable  bool   `json:"filterable"`
+	Order       int    `json:"order"`
+	DetailOrder int    `json:"detailOrder"`
+	ColumnLabel string `json:"-"`
+	DetailLabel string `json:"-"`
 }
 
 // ColumnConfig represents a table column configuration
 type ColumnConfig struct {
-	Key        string `json:"key" wails:"key"`
-	Header     string `json:"header" wails:"header"`
-	Accessor   string `json:"accessor" wails:"accessor"`
-	Width      int    `json:"width" wails:"width"`
-	Sortable   bool   `json:"sortable" wails:"sortable"`
-	Filterable bool   `json:"filterable" wails:"filterable"`
-	Formatter  string `json:"formatter" wails:"formatter"`
+	Key        string `json:"key"`
+	Header     string `json:"header"`
+	Width      int    `json:"width"`
+	Sortable   bool   `json:"sortable"`
+	Filterable bool   `json:"filterable"`
+	Formatter  string `json:"formatter"`
+	Order      int    `json:"order"`
 }
 
 // DetailPanelConfig represents a detail panel section
 type DetailPanelConfig struct {
-	Title     string              `json:"title" wails:"title"`
-	Collapsed bool                `json:"collapsed" wails:"collapsed"`
-	Fields    []DetailFieldConfig `json:"fields" wails:"fields"`
+	Title     string              `json:"title"`
+	Collapsed bool                `json:"collapsed"`
+	Fields    []DetailFieldConfig `json:"fields"`
 }
 
 // DetailFieldConfig represents a field in a detail panel
 type DetailFieldConfig struct {
-	Key       string `json:"key" wails:"key"`
-	Label     string `json:"label" wails:"label"`
-	Formatter string `json:"formatter" wails:"formatter"`
+	Key         string `json:"key"`
+	Label       string `json:"label"`
+	Formatter   string `json:"formatter"`
+	DetailOrder int    `json:"detailOrder"`
 }
 
 // ActionConfig represents an available action (delete, remove, etc.)
 type ActionConfig struct {
-	Name         string   `json:"name" wails:"name"`
-	Label        string   `json:"label" wails:"label"`
-	Icon         string   `json:"icon" wails:"icon"`
-	Confirmation bool     `json:"confirmation" wails:"confirmation"`
-	Facets       []string `json:"facets" wails:"facets"` // Which facets allow this action
+	Name         string   `json:"name"`
+	Label        string   `json:"label"`
+	Icon         string   `json:"icon"`
+	Confirmation bool     `json:"confirmation"`
+	Facets       []string `json:"facets"` // Which facets allow this action
 }
 
 /*

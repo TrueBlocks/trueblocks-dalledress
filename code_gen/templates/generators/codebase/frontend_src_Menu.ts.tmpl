@@ -70,8 +70,8 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    {{ hotkey $n }}
-  {{- $n = add $n 1 }}
+    hotkey: 'mod+comma',
+    altHotkey: 'alt+comma',
     type: 'navigation',
   },
   {

@@ -1410,8 +1410,6 @@ export namespace types {
 	    label: string;
 	    formatter: string;
 	    section: string;
-	    inTable: boolean;
-	    inDetail: boolean;
 	    width: number;
 	    sortable: boolean;
 	    filterable: boolean;
@@ -1428,8 +1426,6 @@ export namespace types {
 	        this.label = source["label"];
 	        this.formatter = source["formatter"];
 	        this.section = source["section"];
-	        this.inTable = source["inTable"];
-	        this.inDetail = source["inDetail"];
 	        this.width = source["width"];
 	        this.sortable = source["sortable"];
 	        this.filterable = source["filterable"];

@@ -28,13 +28,13 @@ type FieldConfig struct {
 	Label       string `json:"label"`
 	Formatter   string `json:"formatter"`
 	Section     string `json:"section"`
-	InTable     bool   `json:"inTable"`
-	InDetail    bool   `json:"inDetail"`
 	Width       int    `json:"width"`
 	Sortable    bool   `json:"sortable"`
 	Filterable  bool   `json:"filterable"`
 	Order       int    `json:"order"`
 	DetailOrder int    `json:"detailOrder"`
+	NoTable     bool   `json:"-"`
+	NoDetail    bool   `json:"-"`
 	ColumnLabel string `json:"-"`
 	DetailLabel string `json:"-"`
 }

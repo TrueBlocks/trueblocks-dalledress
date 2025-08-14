@@ -52,7 +52,7 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 			"export": {Name: "export", Label: "Export", Icon: "Export"},
 		},
 	}
-	types.DeriveFacetFromFields(cfg)
+	types.DeriveFacets(cfg)
 	types.NormalizeOrders(cfg)
 	return cfg, nil
 }
@@ -60,11 +60,11 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 func getContractsFields() []types.FieldConfig {
 	return []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Section: "General", InTable: true, InDetail: true, Width: 240, Order: 1, DetailOrder: 1},
-		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Name", Section: "General", InTable: true, InDetail: true, Width: 200, Order: 2, DetailOrder: 2},
-		{Key: "symbol", Label: "Symbol", ColumnLabel: "Symbol", DetailLabel: "Symbol", Section: "General", InTable: true, InDetail: true, Width: 100, Order: 3, DetailOrder: 3},
-		{Key: "decimals", Label: "Decimals", ColumnLabel: "Decimals", DetailLabel: "Decimals", Section: "General", InTable: true, InDetail: true, Width: 100, Order: 4, DetailOrder: 4},
-		{Key: "source", Label: "Source", ColumnLabel: "Source", DetailLabel: "Source", Section: "Source", InTable: true, InDetail: true, Width: 150, Order: 5, DetailOrder: 5},
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Section: "General", Width: 240, Order: 1, DetailOrder: 1},
+		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Name", Section: "General", Width: 200, Order: 2, DetailOrder: 2},
+		{Key: "symbol", Label: "Symbol", ColumnLabel: "Symbol", DetailLabel: "Symbol", Section: "General", Width: 100, Order: 3, DetailOrder: 3},
+		{Key: "decimals", Label: "Decimals", ColumnLabel: "Decimals", DetailLabel: "Decimals", Section: "General", Width: 100, Order: 4, DetailOrder: 4},
+		{Key: "source", Label: "Source", ColumnLabel: "Source", DetailLabel: "Source", Section: "Source", Width: 150, Order: 5, DetailOrder: 5},
 		// EXISTING_CODE
 	}
 }
@@ -72,14 +72,14 @@ func getContractsFields() []types.FieldConfig {
 func getLogsFields() []types.FieldConfig {
 	return []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "date", Label: "Date", ColumnLabel: "Date", DetailLabel: "Date", Section: "Block/Tx", InTable: true, InDetail: true, Width: 120, Order: 1, DetailOrder: 1},
-		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Section: "Event", InTable: true, InDetail: true, Width: 340, Order: 2, DetailOrder: 5},
-		{Key: "name", Label: "Event Name", ColumnLabel: "Name", DetailLabel: "Event Name", Section: "Event", InTable: true, InDetail: true, Width: 200, Order: 3, DetailOrder: 6},
-		{Key: "articulatedLog", Label: "Articulated Log", ColumnLabel: "Log Details", DetailLabel: "Articulated Log", Section: "Event", InTable: true, InDetail: true, Width: 120, Order: 4, DetailOrder: 8},
-		{Key: "blockNumber", Label: "Block Number", ColumnLabel: "", DetailLabel: "Block Number", Section: "Block/Tx", InTable: false, InDetail: true, DetailOrder: 2},
-		{Key: "transactionIndex", Label: "Transaction Index", ColumnLabel: "", DetailLabel: "Transaction Index", Section: "Block/Tx", InTable: false, InDetail: true, DetailOrder: 3},
-		{Key: "transactionHash", Label: "Transaction Hash", ColumnLabel: "", DetailLabel: "Transaction Hash", Section: "Block/Tx", InTable: false, InDetail: true, DetailOrder: 4},
-		{Key: "signature", Label: "Signature", ColumnLabel: "", DetailLabel: "Signature", Section: "Event", InTable: false, InDetail: true, DetailOrder: 7},
+		{Key: "date", Label: "Date", ColumnLabel: "Date", DetailLabel: "Date", Section: "Block/Tx", Width: 120, Order: 1, DetailOrder: 1},
+		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Section: "Event", Width: 340, Order: 2, DetailOrder: 5},
+		{Key: "name", Label: "Event Name", ColumnLabel: "Name", DetailLabel: "Event Name", Section: "Event", Width: 200, Order: 3, DetailOrder: 6},
+		{Key: "articulatedLog", Label: "Articulated Log", ColumnLabel: "Log Details", DetailLabel: "Articulated Log", Section: "Event", Width: 120, Order: 4, DetailOrder: 8},
+		{Key: "blockNumber", Label: "Block Number", ColumnLabel: "", DetailLabel: "Block Number", Section: "Block/Tx", NoTable: true, DetailOrder: 2},
+		{Key: "transactionIndex", Label: "Transaction Index", ColumnLabel: "", DetailLabel: "Transaction Index", Section: "Block/Tx", NoTable: true, DetailOrder: 3},
+		{Key: "transactionHash", Label: "Transaction Hash", ColumnLabel: "", DetailLabel: "Transaction Hash", Section: "Block/Tx", NoTable: true, DetailOrder: 4},
+		{Key: "signature", Label: "Signature", ColumnLabel: "", DetailLabel: "Signature", Section: "Event", NoTable: true, DetailOrder: 7},
 		// EXISTING_CODE
 	}
 }

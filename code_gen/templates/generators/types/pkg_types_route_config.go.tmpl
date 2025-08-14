@@ -41,7 +41,7 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 		{{- end }}
 		},
 	}
-	types.DeriveFacetFromFields(cfg)
+	types.DeriveFacets(cfg)
 	types.NormalizeOrders(cfg)
 	return cfg, nil
 }

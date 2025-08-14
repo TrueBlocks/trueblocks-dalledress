@@ -78,7 +78,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			"update":   {Name: "update", Label: "Update", Icon: "Update"},
 		},
 	}
-	types.DeriveFacetFromFields(cfg)
+	types.DeriveFacets(cfg)
 	types.NormalizeOrders(cfg)
 	return cfg, nil
 }
@@ -86,21 +86,21 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 func getNamesFields() []types.FieldConfig {
 	return []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "address", Label: "Address", Section: "Name Identity", InTable: true, InDetail: true, Width: 340, Formatter: "address", Order: 1, DetailOrder: 1},
-		{Key: "name", Label: "Name", Section: "Name Identity", InTable: true, InDetail: true, Width: 200, Order: 2, DetailOrder: 2},
-		{Key: "symbol", Label: "Symbol", Section: "Name Identity", InTable: true, InDetail: true, Width: 100, Order: 5, DetailOrder: 3},
-		{Key: "decimals", Label: "Decimals", Section: "Name Identity", InTable: true, InDetail: true, Width: 100, Order: 6, DetailOrder: 4},
-		{Key: "source", Label: "Source", Section: "Classification", InTable: true, InDetail: true, Width: 120, Order: 4, DetailOrder: 5},
-		{Key: "tags", Label: "Tags", Section: "Classification", InTable: true, InDetail: true, Width: 150, Order: 3, DetailOrder: 6},
-		{Key: "deleted", Label: "Deleted", Section: "Classification", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 7},
-		{Key: "isContract", Label: "Is Contract", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 8},
-		{Key: "isCustom", Label: "Is Custom", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 9},
-		{Key: "isErc20", Label: "Is ERC20", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 10},
-		{Key: "isErc721", Label: "Is ERC721", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 11},
-		{Key: "isPrefund", Label: "Is Prefund", Section: "Contract Properties", InTable: false, InDetail: true, Formatter: "boolean", DetailOrder: 12},
-		{Key: "prefund", Label: "Prefund Amount", Section: "Prefund Information", InTable: false, InDetail: true, Formatter: "wei", DetailOrder: 13},
-		{Key: "parts", Label: "Parts", Section: "Prefund Information", InTable: false, InDetail: true, DetailOrder: 14},
-		{Key: "actions", Label: "Actions", Section: "Name Identity", InTable: true, InDetail: false, Width: 80, Order: 7},
+		{Key: "address", Label: "Address", Section: "Name Identity", Width: 340, Formatter: "address", Order: 1, DetailOrder: 1},
+		{Key: "name", Label: "Name", Section: "Name Identity", Width: 200, Order: 2, DetailOrder: 2},
+		{Key: "symbol", Label: "Symbol", Section: "Name Identity", Width: 100, Order: 5, DetailOrder: 3},
+		{Key: "decimals", Label: "Decimals", Section: "Name Identity", Width: 100, Order: 6, DetailOrder: 4},
+		{Key: "source", Label: "Source", Section: "Classification", Width: 120, Order: 4, DetailOrder: 5},
+		{Key: "tags", Label: "Tags", Section: "Classification", Width: 150, Order: 3, DetailOrder: 6},
+		{Key: "deleted", Label: "Deleted", Section: "Classification", NoTable: true, Formatter: "boolean", DetailOrder: 7},
+		{Key: "isContract", Label: "Is Contract", Section: "Contract Properties", NoTable: true, Formatter: "boolean", DetailOrder: 8},
+		{Key: "isCustom", Label: "Is Custom", Section: "Contract Properties", NoTable: true, Formatter: "boolean", DetailOrder: 9},
+		{Key: "isErc20", Label: "Is ERC20", Section: "Contract Properties", NoTable: true, Formatter: "boolean", DetailOrder: 10},
+		{Key: "isErc721", Label: "Is ERC721", Section: "Contract Properties", NoTable: true, Formatter: "boolean", DetailOrder: 11},
+		{Key: "isPrefund", Label: "Is Prefund", Section: "Contract Properties", NoTable: true, Formatter: "boolean", DetailOrder: 12},
+		{Key: "prefund", Label: "Prefund Amount", Section: "Prefund Information", NoTable: true, Formatter: "wei", DetailOrder: 13},
+		{Key: "parts", Label: "Parts", Section: "Prefund Information", NoTable: true, DetailOrder: 14},
+		{Key: "actions", Label: "Actions", Section: "Name Identity", NoDetail: true, Width: 80, Order: 7},
 		// EXISTING_CODE
 	}
 }

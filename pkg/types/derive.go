@@ -1,8 +1,8 @@
 package types
 
-// DeriveFacetFromFields populates Columns and DetailPanels from Fields when present.
+// DeriveFacets populates Columns and DetailPanels from Fields when present.
 // It preserves existing Columns/DetailPanels if Fields is empty.
-func DeriveFacetFromFields(vc *ViewConfig) {
+func DeriveFacets(vc *ViewConfig) {
 	if vc == nil || vc.Facets == nil {
 		return
 	}
@@ -14,7 +14,7 @@ func DeriveFacetFromFields(vc *ViewConfig) {
 		panelsMap := map[string][]DetailFieldConfig{}
 
 		for _, f := range facet.Fields {
-			if f.InTable {
+			if !f.NoTable {
 				header := f.Label
 				if f.ColumnLabel != "" {
 					header = f.ColumnLabel
@@ -29,7 +29,7 @@ func DeriveFacetFromFields(vc *ViewConfig) {
 					Order:      f.Order,
 				})
 			}
-			if f.InDetail {
+			if !f.NoDetail {
 				sec := f.Section
 				if sec == "" {
 					sec = "General"
@@ -51,7 +51,7 @@ func DeriveFacetFromFields(vc *ViewConfig) {
 		sectionOrder := make([]string, 0, len(panelsMap))
 		seen := map[string]bool{}
 		for _, f := range facet.Fields {
-			if !f.InDetail {
+			if f.NoDetail {
 				continue
 			}
 			sec := f.Section

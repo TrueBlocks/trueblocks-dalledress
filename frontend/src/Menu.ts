@@ -121,21 +121,12 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    label: 'Projects',
-    path: '/projects',
-    position: 'bottom',
-    component: Projects,
-    hotkey: 'mod+shift+1',
-    altHotkey: 'alt+shift+1',
-    type: 'navigation',
-  },
-  {
     label: 'Settings',
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+shift+2',
-    altHotkey: 'alt+shift+2',
+    hotkey: 'mod+comma',
+    altHotkey: 'alt+comma',
     type: 'navigation',
   },
   {

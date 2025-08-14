@@ -1,6 +1,4 @@
 {{- $class := .Class -}}
-{{/* Keep Contracts special-cased for now */}}
-{{- if ne $class "Contracts" -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
 
@@ -18,9 +16,7 @@
 
 {{/* Crud related */}}
 {{- $hasCrud := or $isNames (or $isAbis $isMonitors) -}}
-{{- $crudStrs := .CrudStrs -}}
-{{- $cruds := replace $crudStrs ", 'undelete'" "" -}}
-{{- $hasDelete := contains $crudStrs "delete" -}}
+{{- $actionStrs := .RowActionsFe -}}
 
 {{/* Build API imports based on view type */}}
 {{- $apis := printf "Get%sPage, Reload" $class -}}
@@ -58,11 +54,14 @@ import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { {{$lower}} } from '@models';
-import { {{if and (not $hasCrud) (not $isExports)}}crud, {{end}}msgs, project, types } from '@models';
+import { {{if and (not $hasCrud) (not (or $isExports $isChunks) )}}crud, {{end}}msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
+{{- if $isContracts }}
+import { renderers } from './components';
+{{- end }}
 
 const ROUTE: ViewRoute = '{{$lower}}';
 export const {{$class}} = () => {
@@ -177,13 +176,7 @@ export const {{$class}} = () => {
     collection: ROUTE,
     viewStateKey,
     pagination,
-    {{- if $hasCrud }}
     goToPage,
-    {{- else if $isExports }}
-    goToPage: () => {},
-    {{- else }}
-    goToPage,
-    {{- end }}
     sort,
     filter,
     viewConfig,
@@ -192,7 +185,7 @@ export const {{$class}} = () => {
     setTotalItems,
     {{- if $hasCrud }}
     crudFunc: {{$class}}Crud,
-    {{- else if $isExports }}
+    {{- else if (or $isExports $isChunks) }}
     crudFunc: () => Promise.resolve(),
     {{- else }}
     crudFunc: async (
@@ -203,7 +196,7 @@ export const {{$class}} = () => {
     {{- end }}
     pageFunc: Get{{$class}}Page,
     pageClass: {{$lower}}.{{$class}}Page,
-    {{- if $isExports }}
+    {{- if (or $isExports $isChunks) }}
     updateItem: undefined,
     {{- else }}
     updateItem: types.{{$single}}.createFrom({}),
@@ -211,9 +204,10 @@ export const {{$class}} = () => {
     createPayload,
     getCurrentDataFacet,
   });
+  {{- if .Handlers }}
 
-  const { {{.Handlers}} } = handlers;
-
+    const { {{.Handlers}} } = handlers;
+  {{- end }}
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (
@@ -251,7 +245,7 @@ export const {{$class}} = () => {
     getCurrentDataFacet,
     {
       showActions: {{if $hasCrud}}true{{else}}false{{end}},
-      actions: [{{if $hasCrud}}{{$cruds}}{{end}}],
+      actions: [{{if $hasCrud}}{{$actionStrs}}{{end}}],
       getCanRemove: useCallback(
         {{- if or $isNames $isMonitors }}
         (row: unknown) => Boolean((row as unknown as types.{{$single}})?.deleted),
@@ -288,6 +282,9 @@ export const {{$class}} = () => {
       currentColumns as unknown as import('@components').FormField<
         Record<string, unknown>
       >[],
+{{- if $isContracts }}
+    renderers: renderers(pageData, fetchData),
+{{- end }}
   });
 
   const perTabContent = useMemo(() => {
@@ -302,7 +299,7 @@ export const {{$class}} = () => {
         headerActions={headerActions}
         detailPanel={detailPanel}
         {{- if $hasCrud}}
-        {{- if $hasDelete}}
+        {{- if .HasDelete}}
         onDelete={(rowData) => handleToggle(String(rowData.address || ''))}
         {{- end}}
         onRemove={(rowData) => handleRemove(String(rowData.address || ''))}
@@ -323,7 +320,7 @@ export const {{$class}} = () => {
     formNode,
     headerActions,
     detailPanel,
-    {{- if $hasCrud}}{{- if $hasDelete}}handleToggle,{{- end}} handleRemove, {{- if $isNames}}handleAutoname, handleUpdate,{{- end}}{{- end}}
+    {{- if $hasCrud}}{{- if .HasDelete}}handleToggle,{{- end}} handleRemove, {{- if $isNames}}handleAutoname, handleUpdate,{{- end}}{{- end}}
   ]);
 
   const tabs = useMemo(
@@ -349,8 +346,8 @@ export const {{$class}} = () => {
         </div>
       )}
       <Debugger
-        rowActions={ {{if $hasCrud}}config.rowActions{{else}}[]{{end}} }
-        headerActions={ {{if $hasCrud}}config.headerActions{{else}}[]{{end}} }
+        rowActions={ config.rowActions }
+        headerActions={ config.headerActions }
         count={++renderCnt.current}
       />
       <ConfirmModal
@@ -372,4 +369,3 @@ export const {{$class}} = () => {
 
 // EXISTING_CODE
 // EXISTING_CODE
-{{- end -}}

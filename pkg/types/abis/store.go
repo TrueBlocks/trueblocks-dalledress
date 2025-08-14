@@ -42,6 +42,9 @@ func (c *AbisCollection) getAbisStore(payload *types.Payload, facet types.DataFa
 	abisStoreMu.Lock()
 	defer abisStoreMu.Unlock()
 
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	chain := payload.Chain
 	address := payload.Address
 	theStore := abisStore
@@ -77,6 +80,10 @@ func (c *AbisCollection) getAbisStore(payload *types.Payload, facet types.DataFa
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		abisStore = theStore
 	}
 
@@ -86,6 +93,9 @@ func (c *AbisCollection) getAbisStore(payload *types.Payload, facet types.DataFa
 func (c *AbisCollection) getFunctionsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Function] {
 	functionsStoreMu.Lock()
 	defer functionsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -122,6 +132,10 @@ func (c *AbisCollection) getFunctionsStore(payload *types.Payload, facet types.D
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		functionsStore = theStore
 	}
 

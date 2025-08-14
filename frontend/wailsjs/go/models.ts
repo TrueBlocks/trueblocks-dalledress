@@ -1026,7 +1026,6 @@ export namespace types {
 	    label: string;
 	    icon: string;
 	    confirmation: boolean;
-	    facets: string[];
 	
 	    static createFrom(source: any = {}) {
 	        return new ActionConfig(source);
@@ -1038,7 +1037,6 @@ export namespace types {
 	        this.label = source["label"];
 	        this.icon = source["icon"];
 	        this.confirmation = source["confirmation"];
-	        this.facets = source["facets"];
 	    }
 	}
 	export class CacheItem {

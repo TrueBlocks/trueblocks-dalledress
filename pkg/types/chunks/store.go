@@ -48,6 +48,9 @@ func (c *ChunksCollection) getBloomsStore(payload *types.Payload, facet types.Da
 	bloomsStoreMu.Lock()
 	defer bloomsStoreMu.Unlock()
 
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	chain := payload.Chain
 	address := payload.Address
 	theStore := bloomsStore
@@ -87,6 +90,10 @@ func (c *ChunksCollection) getBloomsStore(payload *types.Payload, facet types.Da
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		bloomsStore = theStore
 	}
 
@@ -96,6 +103,9 @@ func (c *ChunksCollection) getBloomsStore(payload *types.Payload, facet types.Da
 func (c *ChunksCollection) getIndexStore(payload *types.Payload, facet types.DataFacet) *store.Store[Index] {
 	indexStoreMu.Lock()
 	defer indexStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -140,6 +150,10 @@ func (c *ChunksCollection) getIndexStore(payload *types.Payload, facet types.Dat
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		indexStore = theStore
 	}
 
@@ -149,6 +163,9 @@ func (c *ChunksCollection) getIndexStore(payload *types.Payload, facet types.Dat
 func (c *ChunksCollection) getManifestStore(payload *types.Payload, facet types.DataFacet) *store.Store[Manifest] {
 	manifestStoreMu.Lock()
 	defer manifestStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -189,6 +206,10 @@ func (c *ChunksCollection) getManifestStore(payload *types.Payload, facet types.
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		manifestStore = theStore
 	}
 
@@ -198,6 +219,9 @@ func (c *ChunksCollection) getManifestStore(payload *types.Payload, facet types.
 func (c *ChunksCollection) getStatsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Stats] {
 	statsStoreMu.Lock()
 	defer statsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -238,6 +262,10 @@ func (c *ChunksCollection) getStatsStore(payload *types.Payload, facet types.Dat
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		statsStore = theStore
 	}
 

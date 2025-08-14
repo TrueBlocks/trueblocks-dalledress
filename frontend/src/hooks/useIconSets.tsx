@@ -34,8 +34,8 @@ export type IconSet = {
   Website: IconType;
   Email: IconType;
 
-  Add: IconType;
-  Edit: IconType;
+  Create: IconType;
+  Update: IconType;
   Copy: IconType;
   Delete: IconType;
   Undelete: IconType;
@@ -87,8 +87,8 @@ const faIcons: IconSet = {
   Email: Icons.FaEnvelope,
 
   // Actions
-  Add: Icons.FaPlus,
-  Edit: Icons.FaEdit,
+  Create: Icons.FaPlus,
+  Update: Icons.FaEdit,
   Copy: Icons.FaCopy,
   Delete: Icons.FaTimes,
   Undelete: Icons.FaUndo,
@@ -144,8 +144,8 @@ const biIcons: IconSet = {
   Email: Icons.BiEnvelope,
 
   // Actions
-  Add: Icons.BiPlus,
-  Edit: Icons.BiPencil,
+  Create: Icons.BiPlus,
+  Update: Icons.BiPencil,
   Copy: Icons.BiCopy,
   Delete: Icons.BiX,
   Undelete: Icons.BiUndo,
@@ -242,10 +242,10 @@ export const useIconSets = (
     const Email: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Email, { size, ...props });
 
-    const Add: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Add, { size, ...props });
-    const Edit: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.Edit, { size, ...props });
+    const Create: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Create, { size, ...props });
+    const Update: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Update, { size, ...props });
     const Copy: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Copy, { size, ...props });
     const Delete: FC<IconProps> = (props = {}) =>
@@ -305,8 +305,8 @@ export const useIconSets = (
       Website,
       Email,
 
-      Add,
-      Edit,
+      Create,
+      Update,
       Copy,
       Delete,
       Undelete,

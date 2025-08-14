@@ -24,22 +24,36 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 			Store:         "{{toLower .Store}}",
 			IsForm:        {{.IsForm}},
 			DividerBefore: {{and (eq .Name "Prefund") $isNames}},
-			Columns:       get{{$class}}{{toProper .Name}}Columns(),
-			DetailPanels:  get{{$class}}{{toProper .Name}}DetailPanels(),
-			Actions:       []string{ {{- range .Cruds}}{{printf "%q" .}}, {{- end}}},
-			// HeaderActions: []string{ { {- range .HeaderActions} }{ {printf "%q" .} }, { {- end} }},
+			Fields:        get{{toProper .Store}}Fields(),
+			Actions:       []string{ {{if ne (.RowActionsBe .Name) "\"\""}}{{.RowActionsBe .Name}}{{else}}{{end}} },
+			HeaderActions: []string{ {{if ne (.HeaderActionsBe .Name) "\"\""}}{{.HeaderActionsBe .Name}}{{else}}{{end}} },
 		},
 		{{- end}}
 	}
 
-	return &types.ViewConfig{
+	cfg := &types.ViewConfig{
 		ViewName:   "{{$lower}}",
 		Facets:     facets,
 		FacetOrder: []string{ {{- range .Facets}}{{printf "%q" (toLower .Name)}}, {{- end}}},
-		Actions: map[string]types.ActionConfig{
-			// { {- range .Actions} }
-			// "{ {.Name} }": {Name: "{ {.Name} }", Label: "{ {.Label} }", Icon: "{ {.Icon} }"{ {if .Confirmation} }, Confirmation: true{ {end} }{ {if .Facets} }, Facets: []string{ { {- range .Facets} }{ {printf "%q" .} }, { {- end} } }{ {end}} },
-			// { {- end} }
+		Actions:    map[string]types.ActionConfig{
+		{{- range .AllActions }}
+			{{.}}
+		{{- end }}
 		},
-	}, nil
+	}
+	types.DeriveFacetFromFields(cfg)
+	types.NormalizeOrders(cfg)
+	return cfg, nil
 }
+{{- range .Stores }}
+
+func get{{.Name}}Fields() []types.FieldConfig {
+	return []types.FieldConfig{
+		// EXISTING_CODE
+		// EXISTING_CODE
+	}
+}
+{{- end }}
+
+// EXISTING_CODE
+// EXISTING_CODE

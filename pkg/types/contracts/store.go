@@ -40,9 +40,11 @@ func (c *ContractsCollection) getContractsStore(payload *types.Payload, facet ty
 	contractsStoreMu.Lock()
 	defer contractsStoreMu.Unlock()
 
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	chain := payload.Chain
 	address := payload.Address
-	// contract := payload.Contract
 	theStore := contractsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -68,12 +70,15 @@ func (c *ContractsCollection) getContractsStore(payload *types.Payload, facet ty
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
 
+		// EXISTING_CODE
+		// TODO: BOGUS Fix this mocking
 		// Add mock data to store
 		mockContracts := sdk.CreateContracts()
 		for i, c := range mockContracts {
 			theStore.AddItem(c, i)
 		}
 		theStore.ChangeState(0, store.StateLoaded, "Mock data loaded")
+		// EXISTING_CODE
 
 		contractsStore = theStore
 	}
@@ -85,11 +90,14 @@ func (c *ContractsCollection) getLogsStore(payload *types.Payload, facet types.D
 	logsStoreMu.Lock()
 	defer logsStoreMu.Unlock()
 
-	chain := payload.Chain
-	address := payload.Address
-	// TODO: WE NEED THIS ON THE PAYLOAD
+	// EXISTING_CODE
+	// TODO: BOGUS WE NEED THIS ON THE PAYLOAD
 	// contract := payload.Contract
 	contract := "0x8fbea07446ddf4518b1a7ba2b4f11bd140a8df41"
+	// EXISTING_CODE
+
+	chain := payload.Chain
+	address := payload.Address
 	theStore := logsStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
@@ -125,6 +133,10 @@ func (c *ContractsCollection) getLogsStore(payload *types.Payload, facet types.D
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		logsStore = theStore
 	}
 
@@ -150,15 +162,6 @@ func (c *ContractsCollection) GetStoreName(dataFacet types.DataFacet, chain, add
 
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 func GetContractsCount(payload *types.Payload) (int, error) {
-	// chain := payload.Chain
-	// countOpts := sdk.ContractsOptions{
-	// 	Globals: sdk.Globals{Cache: true, Chain: chain},
-	// }
-	// if countResult, _, err := countOpts.ContractsCount(); err != nil {
-	// 	return 0, fmt.Errorf("ContractsCount query error: %v", err)
-	// } else if len(countResult) > 0 {
-	// 	return int(countResult[0].Count), nil
-	// }
 	return 0, nil
 }
 

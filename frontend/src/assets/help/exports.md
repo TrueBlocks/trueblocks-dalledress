@@ -35,7 +35,7 @@ This is the help file for the Exports view.
   - source: Source
   - tags: Tags
 
-- **Balances Store (12 members)**
+- **Balances Store (11 members)**
 
   - blockNumber: the number of the block
   - transactionIndex: the zero-indexed position of the transaction in the block
@@ -48,7 +48,6 @@ This is the help file for the Exports view.
   - balance: Balance
   - priorBalance: Prior Balance
   - decimals: Decimals
-  - actions: Actions
 
 - **Logs Store (14 members)**
 

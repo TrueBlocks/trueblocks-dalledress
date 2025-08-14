@@ -68,6 +68,9 @@ func (c *ExportsCollection) getAssetsStore(payload *types.Payload, facet types.D
 	assetsStoreMu.Lock()
 	defer assetsStoreMu.Unlock()
 
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	chain := payload.Chain
 	address := payload.Address
 	storeKey := getStoreKey(chain, address)
@@ -104,6 +107,10 @@ func (c *ExportsCollection) getAssetsStore(payload *types.Payload, facet types.D
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		assetsStore[storeKey] = theStore
 	}
 
@@ -113,6 +120,9 @@ func (c *ExportsCollection) getAssetsStore(payload *types.Payload, facet types.D
 func (c *ExportsCollection) getBalancesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Balance] {
 	balancesStoreMu.Lock()
 	defer balancesStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -150,6 +160,10 @@ func (c *ExportsCollection) getBalancesStore(payload *types.Payload, facet types
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		balancesStore[storeKey] = theStore
 	}
 
@@ -159,6 +173,9 @@ func (c *ExportsCollection) getBalancesStore(payload *types.Payload, facet types
 func (c *ExportsCollection) getLogsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Log] {
 	logsStoreMu.Lock()
 	defer logsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -197,6 +214,10 @@ func (c *ExportsCollection) getLogsStore(payload *types.Payload, facet types.Dat
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		logsStore[storeKey] = theStore
 	}
 
@@ -206,6 +227,9 @@ func (c *ExportsCollection) getLogsStore(payload *types.Payload, facet types.Dat
 func (c *ExportsCollection) getReceiptsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Receipt] {
 	receiptsStoreMu.Lock()
 	defer receiptsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -243,6 +267,10 @@ func (c *ExportsCollection) getReceiptsStore(payload *types.Payload, facet types
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		receiptsStore[storeKey] = theStore
 	}
 
@@ -252,6 +280,9 @@ func (c *ExportsCollection) getReceiptsStore(payload *types.Payload, facet types
 func (c *ExportsCollection) getStatementsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Statement] {
 	statementsStoreMu.Lock()
 	defer statementsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -290,6 +321,10 @@ func (c *ExportsCollection) getStatementsStore(payload *types.Payload, facet typ
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		statementsStore[storeKey] = theStore
 	}
 
@@ -299,6 +334,9 @@ func (c *ExportsCollection) getStatementsStore(payload *types.Payload, facet typ
 func (c *ExportsCollection) getTracesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Trace] {
 	tracesStoreMu.Lock()
 	defer tracesStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -336,6 +374,10 @@ func (c *ExportsCollection) getTracesStore(payload *types.Payload, facet types.D
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		tracesStore[storeKey] = theStore
 	}
 
@@ -345,6 +387,9 @@ func (c *ExportsCollection) getTracesStore(payload *types.Payload, facet types.D
 func (c *ExportsCollection) getTransactionsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Transaction] {
 	transactionsStoreMu.Lock()
 	defer transactionsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -382,6 +427,10 @@ func (c *ExportsCollection) getTransactionsStore(payload *types.Payload, facet t
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		transactionsStore[storeKey] = theStore
 	}
 
@@ -391,6 +440,9 @@ func (c *ExportsCollection) getTransactionsStore(payload *types.Payload, facet t
 func (c *ExportsCollection) getTransfersStore(payload *types.Payload, facet types.DataFacet) *store.Store[Transfer] {
 	transfersStoreMu.Lock()
 	defer transfersStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -429,6 +481,10 @@ func (c *ExportsCollection) getTransfersStore(payload *types.Payload, facet type
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		transfersStore[storeKey] = theStore
 	}
 
@@ -438,6 +494,9 @@ func (c *ExportsCollection) getTransfersStore(payload *types.Payload, facet type
 func (c *ExportsCollection) getWithdrawalsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Withdrawal] {
 	withdrawalsStoreMu.Lock()
 	defer withdrawalsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -475,6 +534,10 @@ func (c *ExportsCollection) getWithdrawalsStore(payload *types.Payload, facet ty
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		withdrawalsStore[storeKey] = theStore
 	}
 

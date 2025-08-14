@@ -31,7 +31,7 @@ export const Projects = () => {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { File, Add } = useIconSets();
+  const { File, Create } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
   const { projects, loading, lastView, newProject, switchProject } =
     useActiveProject();
@@ -148,14 +148,14 @@ export const Projects = () => {
               />
             )}
             <Action
-              icon="Edit"
-              title="Edit project"
+              icon="Update"
+              title="Update project"
               color="gray"
               variant="light"
               size="sm"
               onClick={() => {
                 // TODO: Implement project editing
-                Log('Edit project clicked - not implemented yet');
+                Log('Update project clicked - not implemented yet');
               }}
             />
             <Action
@@ -186,7 +186,7 @@ export const Projects = () => {
           </div>
 
           <Button
-            leftSection={<Add size={16} />}
+            leftSection={<Create size={16} />}
             onClick={() => setShowCreateForm(!showCreateForm)}
             variant={showCreateForm ? 'light' : 'filled'}
           >
@@ -239,7 +239,7 @@ export const Projects = () => {
                   <Button
                     type="submit"
                     loading={creating}
-                    leftSection={<Add size={16} />}
+                    leftSection={<Create size={16} />}
                   >
                     Create Project
                   </Button>
@@ -294,7 +294,7 @@ export const Projects = () => {
                 </div>
                 {!searchQuery && (
                   <Button
-                    leftSection={<Add size={16} />}
+                    leftSection={<Create size={16} />}
                     onClick={() => setShowCreateForm(true)}
                   >
                     Create Your First Project

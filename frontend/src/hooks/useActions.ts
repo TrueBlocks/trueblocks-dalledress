@@ -21,7 +21,7 @@ const UNCHAINED_INDEX_CONTRACT = '0x0c316b7042b419d07d343f2f4f5bd54ff731183d';
 export type ActionType =
   | 'publish'
   | 'pin'
-  | 'add'
+  | 'create'
   | 'delete'
   | 'remove'
   | 'autoname'
@@ -104,12 +104,12 @@ const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
     title: 'Pin',
     icon: 'Pin',
   },
-  add: {
-    type: 'add',
+  create: {
+    type: 'create',
     level: 'header',
     requiresWallet: false,
-    title: 'Add',
-    icon: 'Add',
+    title: 'Create',
+    icon: 'Create',
   },
   export: {
     type: 'export',
@@ -151,7 +151,7 @@ const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
     level: 'row',
     requiresWallet: false,
     title: 'Update',
-    icon: 'Edit',
+    icon: 'Update',
   },
 };
 
@@ -346,9 +346,9 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
   const { clearError, handleError } = useErrorHandler();
 
   // Handler implementations
-  const handleAdd = useCallback(() => {
-    Log(`Adding ${collection}`);
-    // TODO: Implement add functionality
+  const handleCreate = useCallback(() => {
+    Log(`Creating ${collection}`);
+    // TODO: Implement create functionality
   }, [collection]);
 
   const handleExport = useCallback(async () => {
@@ -1000,7 +1000,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
   // Map action types to handlers
   const handlers = useMemo(
     () => ({
-      handleAdd,
+      handleCreate,
       handleExport,
       handlePublish,
       handlePin,
@@ -1011,7 +1011,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       handleClean,
     }),
     [
-      handleAdd,
+      handleCreate,
       handleExport,
       handlePublish,
       handlePin,

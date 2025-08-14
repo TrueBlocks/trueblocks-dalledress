@@ -36,6 +36,9 @@ func (c *MonitorsCollection) getMonitorsStore(payload *types.Payload, facet type
 	monitorsStoreMu.Lock()
 	defer monitorsStoreMu.Unlock()
 
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	chain := payload.Chain
 	address := payload.Address
 	theStore := monitorsStore
@@ -71,6 +74,10 @@ func (c *MonitorsCollection) getMonitorsStore(payload *types.Payload, facet type
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		monitorsStore = theStore
 	}
 

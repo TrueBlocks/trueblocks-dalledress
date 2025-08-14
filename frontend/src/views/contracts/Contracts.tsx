@@ -25,7 +25,6 @@ import {
 } from '@hooks';
 import { TabView } from '@layout';
 import { Group } from '@mantine/core';
-import { Alert, Container, Stack, Text, Title } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { contracts } from '@models';
 import { crud, msgs, project, types } from '@models';
@@ -33,64 +32,24 @@ import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
-import { ContractDashboard, ContractExecute } from './components';
+import { renderers } from './components';
 
 const ROUTE: ViewRoute = 'contracts';
-
-// Tiny component for consistent facet titles
-interface FacetTitleProps {
-  facet: types.DataFacet;
-  contractName?: string;
-  contractAddress?: string;
-}
-
-const FacetTitle: React.FC<FacetTitleProps> = ({
-  facet,
-  contractName,
-  contractAddress,
-}) => {
-  const getTitleForFacet = (facet: types.DataFacet): string => {
-    switch (facet) {
-      case types.DataFacet.DASHBOARD:
-        return 'Contract Dashboard';
-      case types.DataFacet.EXECUTE:
-        return 'Contract Interactions';
-      case types.DataFacet.EVENTS:
-        return 'Contract Events';
-      default:
-        return 'Contract';
-    }
-  };
-
-  return (
-    <div>
-      <Title order={3}>{getTitleForFacet(facet)}</Title>
-      {contractName && (
-        <Text size="sm" color="dimmed">
-          {contractName} ({contractAddress})
-        </Text>
-      )}
-    </div>
-  );
-};
-
 export const Contracts = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
-
   // === SECTION 2.5: Initial ViewConfig Load ===
   const { config: viewConfig } = useViewConfig({ viewName: ROUTE });
   assertRouteConsistency(ROUTE, viewConfig);
 
-  // Generate facets from ViewConfig
-  const contractsFacets: DataFacetConfig[] = useMemo(
+  const facetsFromConfig: DataFacetConfig[] = useMemo(
     () => buildFacetConfigs(viewConfig),
     [viewConfig],
   );
 
   const activeFacetHook = useActiveFacet({
-    facets: contractsFacets,
+    facets: facetsFromConfig,
     viewRoute: ROUTE,
   });
   const { availableFacets, getCurrentDataFacet } = activeFacetHook;
@@ -150,7 +109,7 @@ export const Contracts = () => {
       case types.DataFacet.EVENTS:
         return pageData.logs || [];
       default:
-        LogError('[CONTRACTS] unexpected facet=' + String(facet));
+        LogError('[Contracts] unexpected facet=' + String(facet));
         return [];
     }
   }, [pageData, getCurrentDataFacet]);
@@ -180,9 +139,7 @@ export const Contracts = () => {
   const handleReload = useCallback(async () => {
     clearError();
     try {
-      Reload(createPayload(getCurrentDataFacet())).then(() => {
-        // The data will reload when the DataLoaded event is fired.
-      });
+      Reload(createPayload(getCurrentDataFacet())).then(() => {});
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
@@ -190,7 +147,7 @@ export const Contracts = () => {
 
   useHotkeys([['mod+r', handleReload]]);
 
-  // === SECTION 5: Actions (standardized placeholder) ===
+  // === SECTION 5: Actions ===
   const { handlers, config, exportFormatModal, confirmModal } = useActions({
     collection: ROUTE,
     viewStateKey,
@@ -213,15 +170,13 @@ export const Contracts = () => {
     createPayload,
     getCurrentDataFacet,
   });
-
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (
       <Group gap="xs" style={{ flexShrink: 0 }}>
         {config.headerActions.map((action) => {
-          const handlerKey = `handle${
-            action.type.charAt(0).toUpperCase() + action.type.slice(1)
-          }` as keyof typeof handlers;
+          const handlerKey =
+            `handle${action.type.charAt(0).toUpperCase() + action.type.slice(1)}` as keyof typeof handlers;
           const handler = handlers[handlerKey] as () => void;
           return (
             <Action
@@ -260,14 +215,15 @@ export const Contracts = () => {
     { rowActions: [] },
   );
 
-  // Create detail panel from ViewConfig
-  const detailPanel = useMemo(() => {
-    return createDetailPanelFromViewConfig(
-      viewConfig,
-      getCurrentDataFacet,
-      'Contract Details',
-    );
-  }, [viewConfig, getCurrentDataFacet]);
+  const detailPanel = useMemo(
+    () =>
+      createDetailPanelFromViewConfig(
+        viewConfig,
+        getCurrentDataFacet,
+        'Contracts Details',
+      ),
+    [viewConfig, getCurrentDataFacet],
+  );
 
   const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
     viewConfig,
@@ -277,62 +233,7 @@ export const Contracts = () => {
       currentColumns as unknown as import('@components').FormField<
         Record<string, unknown>
       >[],
-    renderers: {
-      [types.DataFacet.DASHBOARD]: () => {
-        const contractState = pageData?.contracts?.[0];
-        if (!contractState) {
-          return (
-            <Container size="lg" py="xl">
-              <Alert color="yellow" title="No contract data">
-                No contract data available
-              </Alert>
-            </Container>
-          );
-        }
-        return (
-          <Container size="lg" py="xl">
-            <Stack gap="md">
-              <FacetTitle
-                facet={types.DataFacet.DASHBOARD}
-                contractName={contractState.name}
-                contractAddress={contractState.address?.toString()}
-              />
-              <ContractDashboard
-                contractState={contractState}
-                onRefresh={() => fetchData()}
-              />
-            </Stack>
-          </Container>
-        );
-      },
-      [types.DataFacet.EXECUTE]: () => {
-        const contractState = pageData?.contracts?.[0];
-        if (!contractState) {
-          return (
-            <Container size="lg" py="xl">
-              <Alert color="yellow" title="No contract data">
-                No contract data available
-              </Alert>
-            </Container>
-          );
-        }
-        return (
-          <Container size="lg" py="xl">
-            <Stack gap="md">
-              <FacetTitle
-                facet={types.DataFacet.EXECUTE}
-                contractName={contractState.name}
-                contractAddress={contractState.address?.toString()}
-              />
-              <ContractExecute
-                contractState={contractState}
-                functionName="all"
-              />
-            </Stack>
-          </Container>
-        );
-      },
-    },
+    renderers: renderers(pageData, fetchData),
   });
 
   const perTabContent = useMemo(() => {
@@ -349,13 +250,13 @@ export const Contracts = () => {
       />
     );
   }, [
-    isForm,
-    formNode,
     currentData,
     currentColumns,
     pageData?.isFetching,
     error,
     viewStateKey,
+    isForm,
+    formNode,
     headerActions,
     detailPanel,
   ]);

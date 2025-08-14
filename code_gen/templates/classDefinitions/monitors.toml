@@ -12,6 +12,6 @@ disable_go = false
 [[facets]]
 name = "Monitors"
 store = "Monitors"
-cruds = ["delete", "undelete", "remove"]
+actions = ["delete", "undelete", "remove-confirm", "export"]
 viewType = ""
 

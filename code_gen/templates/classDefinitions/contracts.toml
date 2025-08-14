@@ -11,14 +11,15 @@
 [[facets]]
     name = "Dashboard"
     store = "Contracts"
-    viewType = ""
+    viewType = "dashboard"
 
 [[facets]]
     name = "Execute"
     store = "Contracts"
-    viewType = ""
+    viewType = "dashboard"
 
 [[facets]]
     name = "Events" 
     store = "Logs"
+    actions = ["export"]
     viewType = ""

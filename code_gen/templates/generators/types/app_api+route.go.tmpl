@@ -16,8 +16,9 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/{{$lower}}"
 
 	//
-	{{- if .HasCruds}}
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"{{end}}
+	{{- if .HasCrudActions}}
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
+	{{- end}}
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
     // EXISTING_CODE
     // EXISTING_CODE
@@ -33,7 +34,7 @@ func (a *App) Get{{$class}}Page(
 	return getCollectionPage[*{{$lower}}.{{$class}}Page](collection, payload, first, pageSize, sort, filter)
 }
 
-{{if .HasCruds}}func (a *App) {{$class}}Crud(
+{{if .HasCrudActions}}func (a *App) {{$class}}Crud(
 	payload *types.Payload,
 	op crud.Operation,
 	item *{{$lower}}.{{$single}},

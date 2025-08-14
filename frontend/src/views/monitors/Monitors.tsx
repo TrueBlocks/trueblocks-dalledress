@@ -161,7 +161,6 @@ export const Monitors = () => {
   });
 
   const { handleRemove, handleToggle } = handlers;
-
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (

@@ -15,14 +15,12 @@ import { useFiltering, useSorting } from '@contexts';
 import {
   DataFacetConfig,
   buildFacetConfigs,
-  useActionMsgs,
   useActions,
   useActiveFacet,
   useEvent,
   useFacetColumns,
   useFacetForm,
   usePayload,
-  useSilencedDialog,
   useViewConfig,
 } from '@hooks';
 import { TabView } from '@layout';
@@ -53,8 +51,7 @@ export const Names = () => {
     facets: facetsFromConfig,
     viewRoute: ROUTE,
   });
-  const { availableFacets, getCurrentDataFacet, setActiveFacet } =
-    activeFacetHook;
+  const { availableFacets, getCurrentDataFacet } = activeFacetHook;
 
   const [pageData, setPageData] = useState<names.NamesPage | null>(null);
   const viewStateKey = useMemo(
@@ -70,19 +67,13 @@ export const Names = () => {
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
 
-  // Names-specific state
-  const { emitSuccess: _emitSuccess } = useActionMsgs(ROUTE);
-  const { isSilenced: _isSilenced } = useSilencedDialog('createCustomName');
-
   // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
     clearError();
     try {
-      const payload = createPayload(getCurrentDataFacet());
-      const first = pagination.currentPage * pagination.pageSize;
       const result = await GetNamesPage(
-        payload,
-        first,
+        createPayload(getCurrentDataFacet()),
+        pagination.currentPage * pagination.pageSize,
         pagination.pageSize,
         sort,
         filter,
@@ -105,7 +96,7 @@ export const Names = () => {
   ]);
 
   const currentData = useMemo(() => {
-    if (!pageData) return [] as types.Name[];
+    if (!pageData) return [];
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.ALL:
@@ -119,8 +110,8 @@ export const Names = () => {
       case types.DataFacet.BADDRESS:
         return pageData.names || [];
       default:
-        LogError('[NAMES] unexpected facet=' + String(facet));
-        return [] as types.Name[];
+        LogError('[Names] unexpected facet=' + String(facet));
+        return [];
     }
   }, [pageData, getCurrentDataFacet]);
 
@@ -173,31 +164,11 @@ export const Names = () => {
     pageFunc: GetNamesPage,
     pageClass: names.NamesPage,
     updateItem: types.Name.createFrom({}),
-    postFunc: useCallback((item: types.Name): types.Name => {
-      const rawDecimals = (item as unknown as Record<string, unknown>).decimals;
-      const rawParts = (item as unknown as Record<string, unknown>).parts;
-      const decimals =
-        typeof rawDecimals === 'string'
-          ? parseInt(rawDecimals || '0', 10) || 0
-          : (rawDecimals as number | undefined);
-      const parts =
-        typeof rawParts === 'string'
-          ? parseInt(rawParts || '0', 10) || undefined
-          : (rawParts as number | undefined);
-      item = types.Name.createFrom({
-        ...item,
-        decimals,
-        parts,
-        source: item.source || 'TrueBlocks',
-      });
-      return item;
-    }, []),
     createPayload,
     getCurrentDataFacet,
   });
 
   const { handleAutoname, handleRemove, handleToggle, handleUpdate } = handlers;
-
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (
@@ -235,7 +206,7 @@ export const Names = () => {
     getCurrentDataFacet,
     {
       showActions: true,
-      actions: ['delete', 'remove', 'update', 'autoname'],
+      actions: ['autoname', 'delete', 'remove', 'update'],
       getCanRemove: useCallback(
         (row: unknown) => Boolean((row as unknown as types.Name)?.deleted),
         [],
@@ -245,7 +216,6 @@ export const Names = () => {
       handleAutoname,
       handleRemove,
       handleToggle,
-      handleUpdate,
     },
     pageData,
     config,
@@ -316,12 +286,6 @@ export const Names = () => {
     [availableFacets, perTabContent],
   );
 
-  // When autoname confirmed and not already on CUSTOM facet, switch facets (post-confirm behavior)
-  // This effect watches for a completed autoname action by inspecting modal state transitions.
-  // For simplicity, rely on refresh triggered by DATA_LOADED event after backend processes autoname.
-
-  const handleConfirmModalClose = confirmModal.onClose;
-
   // === SECTION 7: Render ===
   return (
     <div className="mainView">
@@ -339,14 +303,8 @@ export const Names = () => {
       />
       <ConfirmModal
         opened={confirmModal.opened}
-        onClose={handleConfirmModalClose}
-        onConfirm={() => {
-          const wasCustom = getCurrentDataFacet() === types.DataFacet.CUSTOM;
-          confirmModal.onConfirm();
-          if (!wasCustom) {
-            setActiveFacet(types.DataFacet.CUSTOM);
-          }
-        }}
+        onClose={confirmModal.onClose}
+        onConfirm={confirmModal.onConfirm}
         title={confirmModal.title}
         message={confirmModal.message}
         dialogKey={confirmModal.dialogKey}

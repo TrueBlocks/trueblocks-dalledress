@@ -27,7 +27,7 @@ import { TabView } from '@layout';
 import { Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { chunks } from '@models';
-import { crud, msgs, project, types } from '@models';
+import { msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
@@ -158,20 +158,13 @@ export const Chunks = () => {
     pageData,
     setPageData,
     setTotalItems,
-    crudFunc: async (
-      _payload: types.Payload,
-      _op: crud.Operation,
-      _item: Record<string, unknown>,
-    ) => {},
+    crudFunc: () => Promise.resolve(),
     pageFunc: GetChunksPage,
     pageClass: chunks.ChunksPage,
-    updateItem: {},
+    updateItem: undefined,
     createPayload,
     getCurrentDataFacet,
   });
-
-  const {} = handlers;
-
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (

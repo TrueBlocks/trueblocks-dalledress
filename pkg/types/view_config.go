@@ -67,11 +67,10 @@ type DetailFieldConfig struct {
 
 // ActionConfig represents an available action (delete, remove, etc.)
 type ActionConfig struct {
-	Name         string   `json:"name"`
-	Label        string   `json:"label"`
-	Icon         string   `json:"icon"`
-	Confirmation bool     `json:"confirmation"`
-	Facets       []string `json:"facets"` // Which facets allow this action
+	Name         string `json:"name"`
+	Label        string `json:"label"`
+	Icon         string `json:"icon"`
+	Confirmation bool   `json:"confirmation"`
 }
 
 /*

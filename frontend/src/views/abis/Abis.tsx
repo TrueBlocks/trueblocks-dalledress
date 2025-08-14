@@ -167,7 +167,6 @@ export const Abis = () => {
   });
 
   const { handleRemove } = handlers;
-
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (

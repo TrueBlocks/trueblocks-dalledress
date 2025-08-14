@@ -25,7 +25,7 @@ export const AddAddressModal = ({
 }: AddAddressModalProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { Add } = useIconSets();
+  const { Create } = useIconSets();
   const { hasActiveProject } = useActiveProject();
 
   const form = useForm<AddAddressForm>({
@@ -88,7 +88,7 @@ export const AddAddressModal = ({
           <form onSubmit={form.onSubmit(handleAddAddresses)}>
             <Stack gap="md">
               <Group gap="xs">
-                <Add size={20} />
+                <Create size={20} />
                 <Title order={4}>Add Addresses</Title>
               </Group>
               <AddressInput form={form} fieldName="addresses" rows={6} />
@@ -99,7 +99,7 @@ export const AddAddressModal = ({
                 <Button
                   type="submit"
                   loading={loading}
-                  leftSection={<Add size={16} />}
+                  leftSection={<Create size={16} />}
                 >
                   Add Addresses
                 </Button>

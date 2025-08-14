@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 
 import { Action } from '@components';
 import { FormField } from '@components';
+import { ActionType } from '@hooks';
 import { types } from '@models';
 import { addressToHex } from '@utils';
-import { ActionType } from 'src/hooks/useActions';
 
 import type { ActionData } from './useActionConfig';
 
@@ -115,10 +115,10 @@ export const useColumns = (
               return (
                 <Action
                   key={action.type}
-                  icon="Edit"
+                  icon="Update"
                   onClick={() => handlers.handleUpdate?.(row)}
                   disabled={actionData.isProcessing}
-                  title="Modify"
+                  title="Update"
                   size="sm"
                 />
               );

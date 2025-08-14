@@ -110,7 +110,7 @@ export const SettingsOrg = () => {
 
   return (
     <FormView<IndexableOrg>
-      title="Edit / Manage Your Settings"
+      title="Update / Manage Your Settings"
       formFields={formFields}
       onSubmit={handleSubmit}
       onChange={handleChange}

@@ -161,7 +161,7 @@ export const Exports = () => {
     collection: ROUTE,
     viewStateKey,
     pagination,
-    goToPage: goToPage,
+    goToPage,
     sort,
     filter,
     viewConfig,
@@ -175,9 +175,6 @@ export const Exports = () => {
     createPayload,
     getCurrentDataFacet,
   });
-
-  const {} = handlers;
-
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (
@@ -291,8 +288,8 @@ export const Exports = () => {
         </div>
       )}
       <Debugger
-        rowActions={[]}
-        headerActions={[]}
+        rowActions={config.rowActions}
+        headerActions={config.headerActions}
         count={++renderCnt.current}
       />
       <ConfirmModal

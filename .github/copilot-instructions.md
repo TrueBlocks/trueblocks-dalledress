@@ -43,10 +43,10 @@ Backend provides a single source of truth for header-level actions per facet, an
 ### Backend
 - Every facet config must define `HeaderActions []string` and it must never be nil. Use `[]` when there are no header actions for a facet.
 - All data-table facets must include `export` in `HeaderActions`. A data-table facet is any facet with `isForm == false`.
-- Action identifiers must align with the frontend `ActionType` values used by `useActions()` (e.g., `add`, `export`, `publish`, `pin`). Do not invent new strings.
+- Action identifiers must align with the frontend `ActionType` values used by `useActions()` (e.g., `create`, `export`, `publish`, `pin`). Do not invent new strings.
 - When you introduce a new action identifier, also expose metadata in the backend `Actions` map (title/label/icon) to keep UI consistent, then run `wails generate module`.
 - Per-view notes (in addition to the universal `export` on all non-form facets):
-  - Names: all facets include `add` (and `export` by the rule above). The `CUSTOM` facet additionally includes `publish` and `pin`.
+  - Names: all facets include `create` (and `export` by the rule above). The `CUSTOM` facet additionally includes `publish` and `pin`.
   - Exports: all facets include `export` (already satisfied by the rule).
   - Monitors: include `export` (row actions like `delete`, `remove` remain as row-only).
   - Abis, Chunks, Status: include `export` on non-form facets (e.g., abis: all; chunks: stats/index/blooms; status: caches/chains). Form facets like `status` and `manifest` do not include `export`.

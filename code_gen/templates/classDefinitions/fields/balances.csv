@@ -10,4 +10,3 @@ name            , string   ,           ,            ,         ,        8, Token 
 balance         , ether    ,           ,            ,         ,        9, Balance
 priorBalance    , ether    ,           , calc       ,         ,       10, Prior Balance
 decimals        , int64    ,           ,            ,         ,       11, Decimals
-actions         , string   ,           , width=120px,         ,       12, Actions

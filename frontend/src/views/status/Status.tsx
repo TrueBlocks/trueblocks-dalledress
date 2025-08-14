@@ -167,9 +167,6 @@ export const Status = () => {
     createPayload,
     getCurrentDataFacet,
   });
-
-  const {} = handlers;
-
   const headerActions = useMemo(() => {
     if (!config.headerActions.length) return null;
     return (

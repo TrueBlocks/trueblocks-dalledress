@@ -1,9 +1,8 @@
 {{- $class := .Class -}}
-{{/* TODO: remove this */}}
-{{- if ne $class "Contracts" -}}
 {{- $lower := toLower $class -}}
 {{- $single := toSingular $class -}}
 {{- $isExports := eq .Class "Exports" -}}
+{{- $isContracts := eq .Class "Contracts" -}}
 {{- $isNames := eq .Class "Names" -}}
 // Copyright 2016, 2026 The Authors. All rights reserved.
 // Use of this source code is governed by a license that can
@@ -47,6 +46,9 @@ func (c *{{$class}}Collection) get{{.Name}}Store(payload *types.Payload, facet t
 	{{toLower .Name}}StoreMu.Lock()
 	defer {{toLower .Name}}StoreMu.Unlock()
 
+	// EXISTING_CODE
+	// EXISTING_CODE
+	
 	chain := payload.Chain
 	address := payload.Address
 {{if $isExports}}	storeKey := getStoreKey(chain, address)
@@ -75,6 +77,10 @@ func (c *{{$class}}Collection) get{{.Name}}Store(payload *types.Payload, facet t
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+		
 		{{toLower .Name}}Store{{if $isExports}}[storeKey]{{end}} = theStore
 	}
 
@@ -104,7 +110,8 @@ func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet, chain, ad
 // TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
 {{- $val := .Class}}
 {{if $isExports}}{{$val = toSingular .Class}}{{end -}}
-func Get{{.Class}}Count(payload *types.Payload) (int, error) {
+func Get{{$class}}Count(payload *types.Payload) (int, error) {
+	{{- if not $isContracts }}
 	chain := payload.Chain
 	{{if $isExports}}address := payload.Address
 	{{end -}}
@@ -118,6 +125,7 @@ func Get{{.Class}}Count(payload *types.Payload) (int, error) {
 	} else if len(countResult) > 0 {
 		return int(countResult[0].Count), nil
 	}
+	{{- end }}
 	return 0, nil
 }
 
@@ -151,4 +159,3 @@ func Get{{.Class}}Collection(payload *types.Payload) *{{.Class}}Collection {
 
 // EXISTING_CODE
 // EXISTING_CODE
-{{- end -}}

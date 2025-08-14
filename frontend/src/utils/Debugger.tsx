@@ -98,7 +98,7 @@ const ActionsList: React.FC<{
           > = {
             delete: { bgColor: '#e74c3c', textColor: 'white' },
             remove: { bgColor: '#e74c3c', textColor: 'white' },
-            add: { bgColor: '#2ecc71', textColor: 'white' },
+            create: { bgColor: '#2ecc71', textColor: 'white' },
             update: { bgColor: '#2ecc71', textColor: 'white' },
             autoname: { bgColor: '#f39c12', textColor: 'white' },
             publish: { bgColor: '#9b59b6', textColor: 'white' },

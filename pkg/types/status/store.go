@@ -44,6 +44,9 @@ func (c *StatusCollection) getCachesStore(payload *types.Payload, facet types.Da
 	cachesStoreMu.Lock()
 	defer cachesStoreMu.Unlock()
 
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	chain := payload.Chain
 	address := payload.Address
 	theStore := cachesStore
@@ -78,6 +81,10 @@ func (c *StatusCollection) getCachesStore(payload *types.Payload, facet types.Da
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		cachesStore = theStore
 	}
 
@@ -87,6 +94,9 @@ func (c *StatusCollection) getCachesStore(payload *types.Payload, facet types.Da
 func (c *StatusCollection) getChainsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Chain] {
 	chainsStoreMu.Lock()
 	defer chainsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -122,6 +132,10 @@ func (c *StatusCollection) getChainsStore(payload *types.Payload, facet types.Da
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		chainsStore = theStore
 	}
 
@@ -131,6 +145,9 @@ func (c *StatusCollection) getChainsStore(payload *types.Payload, facet types.Da
 func (c *StatusCollection) getStatusStore(payload *types.Payload, facet types.DataFacet) *store.Store[Status] {
 	statusStoreMu.Lock()
 	defer statusStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
@@ -166,6 +183,10 @@ func (c *StatusCollection) getStatusStore(payload *types.Payload, facet types.Da
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		statusStore = theStore
 	}
 

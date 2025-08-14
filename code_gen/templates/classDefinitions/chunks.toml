@@ -10,16 +10,19 @@ disable_go = false
 [[facets]]
 name = "Stats"
 store = "Stats"
+actions = ["export"]
 viewType = ""
 
 [[facets]]
 name = "Index"
 store = "Index"
+actions = ["export"]
 viewType = ""
 
 [[facets]]
 name = "Blooms"
 store = "Blooms"
+actions = ["export"]
 viewType = ""
 
 [[facets]]

@@ -1,3 +1,11 @@
+// Copyright 2016, 2026 The Authors. All rights reserved.
+// Use of this source code is governed by a license that can
+// be found in the LICENSE file.
+/*
+ * Parts of this file were auto generated. Edit only those parts of
+ * the code inside of 'EXISTING_CODE' tags.
+ */
+
 package abis
 
 import (
@@ -6,45 +14,51 @@ import (
 
 // GetConfig returns the ViewConfig for the Abis view
 func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
-	cfg := &types.ViewConfig{
-		ViewName: "abis",
-		Facets: map[string]types.FacetConfig{
-			"downloaded": {
-				Name:          "Downloaded",
-				Store:         "downloaded",
-				IsForm:        false,
-				Fields:        getAbisFields(),
-				Actions:       []string{"remove"},
-				HeaderActions: []string{"export"},
-			},
-			"known": {
-				Name:          "Known",
-				Store:         "known",
-				IsForm:        false,
-				Fields:        getAbisFields(),
-				Actions:       nil,
-				HeaderActions: []string{"export"},
-			},
-			"functions": {
-				Name:          "Functions",
-				Store:         "functions",
-				IsForm:        false,
-				Fields:        getFunctionFields(),
-				Actions:       nil,
-				HeaderActions: []string{"export"},
-			},
-			"events": {
-				Name:          "Events",
-				Store:         "events",
-				IsForm:        false,
-				Fields:        getFunctionFields(),
-				Actions:       nil,
-				HeaderActions: []string{"export"},
-			},
+	facets := map[string]types.FacetConfig{
+		"downloaded": {
+			Name:          "Downloaded",
+			Store:         "abis",
+			IsForm:        false,
+			DividerBefore: false,
+			Fields:        getAbisFields(),
+			Actions:       []string{"remove"},
+			HeaderActions: []string{"export"},
 		},
+		"known": {
+			Name:          "Known",
+			Store:         "abis",
+			IsForm:        false,
+			DividerBefore: false,
+			Fields:        getAbisFields(),
+			Actions:       []string{},
+			HeaderActions: []string{"export"},
+		},
+		"functions": {
+			Name:          "Functions",
+			Store:         "functions",
+			IsForm:        false,
+			DividerBefore: false,
+			Fields:        getFunctionsFields(),
+			Actions:       []string{},
+			HeaderActions: []string{"export"},
+		},
+		"events": {
+			Name:          "Events",
+			Store:         "functions",
+			IsForm:        false,
+			DividerBefore: false,
+			Fields:        getFunctionsFields(),
+			Actions:       []string{},
+			HeaderActions: []string{"export"},
+		},
+	}
+
+	cfg := &types.ViewConfig{
+		ViewName:   "abis",
+		Facets:     facets,
 		FacetOrder: []string{"downloaded", "known", "functions", "events"},
 		Actions: map[string]types.ActionConfig{
-			"export": {Name: "export", Label: "Export Data", Icon: "Export"},
+			"export": {Name: "export", Label: "Export", Icon: "Export"},
 			"remove": {Name: "remove", Label: "Remove", Icon: "Remove"},
 		},
 	}
@@ -55,6 +69,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 
 func getAbisFields() []types.FieldConfig {
 	return []types.FieldConfig{
+		// EXISTING_CODE
 		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Formatter: "address", Section: "ABI Identity", InTable: true, InDetail: true, Width: 340, Order: 1, DetailOrder: 1},
 		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Name", Section: "ABI Identity", InTable: true, InDetail: true, Width: 200, Order: 2, DetailOrder: 2},
 		{Key: "path", Label: "File Path", Section: "ABI Identity", InTable: false, InDetail: true, DetailOrder: 3},
@@ -73,11 +88,13 @@ func getAbisFields() []types.FieldConfig {
 		{Key: "functions", Label: "Available Functions", ColumnLabel: "Available Functions", DetailLabel: "Available Functions", Formatter: "json", Section: "Functions List", InTable: false, InDetail: true, DetailOrder: 12},
 
 		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", InTable: true, InDetail: false, Width: 80, Order: 9},
+		// EXISTING_CODE
 	}
 }
 
-func getFunctionFields() []types.FieldConfig {
+func getFunctionsFields() []types.FieldConfig {
 	return []types.FieldConfig{
+		// EXISTING_CODE
 		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Function Name", Section: "Function Overview", InTable: true, InDetail: true, Width: 200, Order: 1, DetailOrder: 1},
 		{Key: "type", Label: "Type", ColumnLabel: "Type", DetailLabel: "Function Type", Section: "Function Overview", InTable: true, InDetail: true, Width: 100, Order: 2, DetailOrder: 2},
 		{Key: "encoding", Label: "Encoding", ColumnLabel: "Encoding", DetailLabel: "Encoding Hash", Section: "Function Overview", InTable: true, InDetail: true, Width: 250, Order: 3, DetailOrder: 3},
@@ -90,5 +107,9 @@ func getFunctionFields() []types.FieldConfig {
 		{Key: "inputs", Label: "Input Parameters", ColumnLabel: "Input Parameters", DetailLabel: "Input Parameters", Formatter: "json", Section: "Input Parameters", InTable: false, InDetail: true, DetailOrder: 8},
 		{Key: "outputs", Label: "Output Parameters", ColumnLabel: "Output Parameters", DetailLabel: "Output Parameters", Formatter: "json", Section: "Output Parameters", InTable: false, InDetail: true, DetailOrder: 9},
 		{Key: "message", Label: "Error Message", ColumnLabel: "Error Message", DetailLabel: "Error Message", Section: "Additional Information", InTable: false, InDetail: true, DetailOrder: 10},
+		// EXISTING_CODE
 	}
 }
+
+// EXISTING_CODE
+// EXISTING_CODE

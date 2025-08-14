@@ -27,7 +27,7 @@ export const StepChainInfo = ({
 }: WizardStepProps) => {
   const { rpcUrl, chainName, chainId, symbol, remoteExplorer } = state.data;
   const { rpcError, chainError } = state.validation;
-  const { Add, Delete } = useIconSets();
+  const { Create, Delete } = useIconSets();
   const [chains, setChains] = useState<preferences.Chain[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>('new');
   const firstInputRef = useRef<HTMLInputElement>(null);
@@ -314,7 +314,7 @@ export const StepChainInfo = ({
                 {chain.chain}
               </Tabs.Tab>
             ))}
-            <Tabs.Tab value="new" rightSection={<Add size={12} />}>
+            <Tabs.Tab value="new" rightSection={<Create size={12} />}>
               Add Chain
             </Tabs.Tab>
           </Tabs.List>

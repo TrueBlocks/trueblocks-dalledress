@@ -33,7 +33,7 @@ export const AddressSelector = () => {
   const [loading, setLoading] = useState(false);
   const [addModalOpened, setAddModalOpened] = useState(false);
   const { activeAddress } = useActiveProject();
-  const { Add, Switch } = useIconSets();
+  const { Create, Switch } = useIconSets();
 
   const form = useForm<AddAddressForm>({
     initialValues: { address: '' },
@@ -137,7 +137,7 @@ export const AddressSelector = () => {
             onClick={() => setAddModalOpened(true)}
             disabled={loading}
           >
-            <Add size={16} />
+            <Create size={16} />
           </ActionIcon>
         </Tooltip>
       </Group>

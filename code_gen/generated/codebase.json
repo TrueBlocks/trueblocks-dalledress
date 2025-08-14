@@ -131,8 +131,9 @@
                         {
                             "name": "Downloaded",
                             "store": "Abis",
-                            "cruds": [
-                                "remove"
+                            "actions": [
+                                "remove",
+                                "export"
                             ],
                             "viewType": "",
                             "attributes": ""
@@ -140,21 +141,27 @@
                         {
                             "name": "Known",
                             "store": "Abis",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Functions",
                             "store": "Functions",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Events",
                             "store": "Functions",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         }
@@ -518,14 +525,6 @@
                             "docOrder": 11,
                             "description": "Decimals",
                             "num": 11
-                        },
-                        {
-                            "name": "actions",
-                            "type": "string",
-                            "attributes": "width=120px",
-                            "docOrder": 12,
-                            "description": "Actions",
-                            "num": 12
                         }
                     ]
                 },
@@ -676,28 +675,34 @@
                         {
                             "name": "Stats",
                             "store": "Stats",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Index",
                             "store": "Index",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Blooms",
                             "store": "Blooms",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Manifest",
                             "store": "Manifest",
-                            "cruds": null,
+                            "actions": null,
                             "viewType": "dashboard",
                             "attributes": ""
                         }
@@ -1207,63 +1212,81 @@
                         {
                             "name": "Statements",
                             "store": "Statements",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Balances",
                             "store": "Balances",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Transfers",
                             "store": "Transfers",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Transactions",
                             "store": "Transactions",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Withdrawals",
                             "store": "Withdrawals",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Assets",
                             "store": "Assets",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Logs",
                             "store": "Logs",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Traces",
                             "store": "Traces",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Receipts",
                             "store": "Receipts",
-                            "cruds": null,
+                            "actions": [
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         }
@@ -1355,10 +1378,11 @@
                         {
                             "name": "Monitors",
                             "store": "Monitors",
-                            "cruds": [
+                            "actions": [
                                 "delete",
                                 "undelete",
-                                "remove"
+                                "remove",
+                                "export"
                             ],
                             "viewType": "",
                             "attributes": ""
@@ -1486,19 +1510,28 @@
                         {
                             "name": "All",
                             "store": "Names",
-                            "cruds": null,
+                            "actions": [
+                                "autoname",
+                                "create",
+                                "export",
+                                "update"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Custom",
                             "store": "Names",
-                            "cruds": [
+                            "actions": [
+                                "autoname",
+                                "create",
                                 "delete",
-                                "undelete",
+                                "export",
+                                "pin",
+                                "publish",
                                 "remove",
-                                "update",
-                                "autoname"
+                                "undelete",
+                                "update"
                             ],
                             "viewType": "",
                             "attributes": ""
@@ -1506,21 +1539,33 @@
                         {
                             "name": "Prefund",
                             "store": "Names",
-                            "cruds": null,
+                            "actions": [
+                                "create",
+                                "export",
+                                "update"
+                            ],
                             "viewType": "",
                             "attributes": "dividerBefore"
                         },
                         {
                             "name": "Regular",
                             "store": "Names",
-                            "cruds": null,
+                            "actions": [
+                                "autoname",
+                                "create",
+                                "export",
+                                "update"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         },
                         {
                             "name": "Baddress",
                             "store": "Names",
-                            "cruds": null,
+                            "actions": [
+                                "create",
+                                "export"
+                            ],
                             "viewType": "",
                             "attributes": ""
                         }
@@ -1692,63 +1737,81 @@
                 {
                     "name": "Statements",
                     "store": "Statements",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Balances",
                     "store": "Balances",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Transfers",
                     "store": "Transfers",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Transactions",
                     "store": "Transactions",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Withdrawals",
                     "store": "Withdrawals",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Assets",
                     "store": "Assets",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Logs",
                     "store": "Logs",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Traces",
                     "store": "Traces",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Receipts",
                     "store": "Receipts",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 }
@@ -2333,10 +2396,11 @@
                 {
                     "name": "Monitors",
                     "store": "Monitors",
-                    "cruds": [
+                    "actions": [
                         "delete",
                         "undelete",
-                        "remove"
+                        "remove",
+                        "export"
                     ],
                     "viewType": "",
                     "attributes": ""
@@ -2910,8 +2974,9 @@
                 {
                     "name": "Downloaded",
                     "store": "Abis",
-                    "cruds": [
-                        "remove"
+                    "actions": [
+                        "remove",
+                        "export"
                     ],
                     "viewType": "",
                     "attributes": ""
@@ -2919,21 +2984,27 @@
                 {
                     "name": "Known",
                     "store": "Abis",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Functions",
                     "store": "Functions",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Events",
                     "store": "Functions",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 }
@@ -3047,19 +3118,28 @@
                 {
                     "name": "All",
                     "store": "Names",
-                    "cruds": null,
+                    "actions": [
+                        "autoname",
+                        "create",
+                        "export",
+                        "update"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Custom",
                     "store": "Names",
-                    "cruds": [
+                    "actions": [
+                        "autoname",
+                        "create",
                         "delete",
-                        "undelete",
+                        "export",
+                        "pin",
+                        "publish",
                         "remove",
-                        "update",
-                        "autoname"
+                        "undelete",
+                        "update"
                     ],
                     "viewType": "",
                     "attributes": ""
@@ -3067,21 +3147,33 @@
                 {
                     "name": "Prefund",
                     "store": "Names",
-                    "cruds": null,
+                    "actions": [
+                        "create",
+                        "export",
+                        "update"
+                    ],
                     "viewType": "",
                     "attributes": "dividerBefore"
                 },
                 {
                     "name": "Regular",
                     "store": "Names",
-                    "cruds": null,
+                    "actions": [
+                        "autoname",
+                        "create",
+                        "export",
+                        "update"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Baddress",
                     "store": "Names",
-                    "cruds": null,
+                    "actions": [
+                        "create",
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 }
@@ -3233,14 +3325,6 @@
                     "docOrder": 11,
                     "description": "Decimals",
                     "num": 11
-                },
-                {
-                    "name": "actions",
-                    "type": "string",
-                    "attributes": "width=120px",
-                    "docOrder": 12,
-                    "description": "Actions",
-                    "num": 12
                 }
             ]
         },
@@ -3819,28 +3903,34 @@
                 {
                     "name": "Stats",
                     "store": "Stats",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Index",
                     "store": "Index",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Blooms",
                     "store": "Blooms",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Manifest",
                     "store": "Manifest",
-                    "cruds": null,
+                    "actions": null,
                     "viewType": "dashboard",
                     "attributes": ""
                 }
@@ -3913,21 +4003,23 @@
                 {
                     "name": "Dashboard",
                     "store": "Contracts",
-                    "cruds": null,
-                    "viewType": "",
+                    "actions": null,
+                    "viewType": "dashboard",
                     "attributes": ""
                 },
                 {
                     "name": "Execute",
                     "store": "Contracts",
-                    "cruds": null,
-                    "viewType": "",
+                    "actions": null,
+                    "viewType": "dashboard",
                     "attributes": ""
                 },
                 {
                     "name": "Events",
                     "store": "Logs",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 }
@@ -4278,21 +4370,25 @@
                 {
                     "name": "Status",
                     "store": "Status",
-                    "cruds": null,
+                    "actions": null,
                     "viewType": "dashboard",
                     "attributes": ""
                 },
                 {
                     "name": "Caches",
                     "store": "Caches",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 },
                 {
                     "name": "Chains",
                     "store": "Chains",
-                    "cruds": null,
+                    "actions": [
+                        "export"
+                    ],
                     "viewType": "",
                     "attributes": ""
                 }

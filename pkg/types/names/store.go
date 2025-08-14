@@ -36,6 +36,9 @@ func (c *NamesCollection) getNamesStore(payload *types.Payload, facet types.Data
 	namesStoreMu.Lock()
 	defer namesStoreMu.Unlock()
 
+	// EXISTING_CODE
+	// EXISTING_CODE
+
 	chain := payload.Chain
 	address := payload.Address
 	theStore := namesStore
@@ -75,6 +78,10 @@ func (c *NamesCollection) getNamesStore(payload *types.Payload, facet types.Data
 
 		storeName := c.GetStoreName(facet, chain, address)
 		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
 		namesStore = theStore
 	}
 

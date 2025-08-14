@@ -38,7 +38,7 @@ export const ProjectSelectionModal = ({
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingOpen, setLoadingOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { File, Add } = useIconSets();
+  const { File, Create } = useIconSets();
   const { restoreProjectFilterStates } = useViewContext();
   const { projects, lastView, newProject, openProjectFile, hasActiveProject } =
     useActiveProject();
@@ -175,7 +175,7 @@ export const ProjectSelectionModal = ({
           <Paper p="md" withBorder>
             <Stack gap="md">
               <Group gap="xs">
-                <Add size={20} />
+                <Create size={20} />
                 <Title order={4}>Create New Project</Title>
               </Group>
 
@@ -192,7 +192,7 @@ export const ProjectSelectionModal = ({
                     type="submit"
                     loading={loadingCreate}
                     disabled={isLoading}
-                    leftSection={<Add size={16} />}
+                    leftSection={<Create size={16} />}
                     fullWidth
                   >
                     Create Project

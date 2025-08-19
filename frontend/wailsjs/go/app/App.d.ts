@@ -104,6 +104,8 @@ export function GetFormat():Promise<string>;
 
 export function GetImageURL(arg1:string):Promise<string>;
 
+export function GetKhedraControlURL():Promise<string>;
+
 export function GetLanguage():Promise<string>;
 
 export function GetLastFacet(arg1:string):Promise<string>;

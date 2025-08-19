@@ -174,6 +174,10 @@ export function GetImageURL(arg1) {
   return window['go']['app']['App']['GetImageURL'](arg1);
 }
 
+export function GetKhedraControlURL() {
+  return window['go']['app']['App']['GetKhedraControlURL']();
+}
+
 export function GetLanguage() {
   return window['go']['app']['App']['GetLanguage']();
 }

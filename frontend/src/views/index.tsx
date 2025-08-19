@@ -7,7 +7,6 @@
 
 export { Projects } from './projects';
 export { DalleDress } from './DalleDress';
-export { Khedra } from './Khedra';
 
 export { Exports } from './exports';
 export { Monitors } from './monitors';
@@ -16,6 +15,7 @@ export { Names } from './names';
 export { Chunks } from './chunks';
 export { Contracts } from './contracts';
 export { Status } from './status';
+export { Khedra } from './khedra';
 
 export * from './settings';
 export * from './utils';

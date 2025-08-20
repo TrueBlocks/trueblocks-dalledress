@@ -1,0 +1,26 @@
+# DalleDress Collection Definition
+
+[collection]
+name = "dalle"
+label = "DalleDress"
+description = "Multi-facet generative art collection for DalleDress"
+
+[facets.generator]
+label = "Generator"
+isForm = true
+
+[facets.series]
+label = "Series"
+isForm = false
+
+[facets.databases]
+label = "Databases"
+isForm = false
+
+[facets.events]
+label = "Events"
+isForm = false
+
+[facets.gallery]
+label = "Gallery"
+isForm = false

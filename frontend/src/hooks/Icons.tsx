@@ -12,6 +12,7 @@ import {
   BiFile,
   BiHistory,
   BiHome,
+  BiImage,
   BiListUl,
   BiQuestionMark,
   BiUser,
@@ -21,6 +22,7 @@ import {
   FaDesktop,
   FaFileContract,
   FaHistory,
+  FaImage,
   FaIndustry,
   FaListAlt,
   FaQuestionCircle,
@@ -28,15 +30,6 @@ import {
 } from 'react-icons/fa';
 
 // EXISTING_CODE
-
-// Add to the above imports
-// Exports
-// Monitors
-// Abis
-// Names
-// Chunks
-// Contracts
-// Status
 
 /*
 List of other icons sets
@@ -147,6 +140,7 @@ export const FaChunks = FaIndustry;
 export const FaContracts = FaFileContract;
 export const FaAbis = FaListAlt;
 export const FaNames = FaUser;
+export const FaDalleDress = FaImage;
 export const FaMissing = FaQuestionCircle;
 
 export const BiStatus = BiCog;
@@ -156,6 +150,7 @@ export const BiChunks = BiBuildings;
 export const BiContracts = BiFile;
 export const BiAbis = BiListUl;
 export const BiNames = BiUser;
+export const BiDalleDress = BiImage;
 export const BiMissing = BiQuestionMark;
 
 // EXISTING_CODE
@@ -168,3 +163,4 @@ export const BiMissing = BiQuestionMark;
 // Chunks
 // Contracts
 // Status
+// DalleDress

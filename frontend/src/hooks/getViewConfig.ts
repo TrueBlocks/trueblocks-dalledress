@@ -2,6 +2,7 @@ import {
   GetAbisConfig,
   GetChunksConfig,
   GetContractsConfig,
+  GetDalleDressConfig,
   GetExportsConfig,
   GetMonitorsConfig,
   GetNamesConfig,
@@ -55,6 +56,7 @@ export async function initializeAllViewConfigs(): Promise<{
         { name: 'monitors', getter: GetMonitorsConfig },
         { name: 'names', getter: GetNamesConfig },
         { name: 'status', getter: GetStatusConfig },
+        { name: 'dalledress', getter: GetDalleDressConfig },
       ];
 
       // Load all configs in parallel

@@ -10,6 +10,7 @@ export const VIEW_ROUTES = [
   'monitors',
   'names',
   'status',
+  'dalledress',
 ] as const;
 
 export type ViewRoute = (typeof VIEW_ROUTES)[number];

@@ -14,10 +14,6 @@ export function AddAddressesToProject(arg1) {
   return window['go']['app']['App']['AddAddressesToProject'](arg1);
 }
 
-export function BuildDalleDressForProject() {
-  return window['go']['app']['App']['BuildDalleDressForProject']();
-}
-
 export function CancelAllFetches() {
   return window['go']['app']['App']['CancelAllFetches']();
 }
@@ -136,6 +132,18 @@ export function GetContractsPage(arg1, arg2, arg3, arg4, arg5) {
 
 export function GetContractsSummary(arg1) {
   return window['go']['app']['App']['GetContractsSummary'](arg1);
+}
+
+export function GetDalleDressConfig(arg1) {
+  return window['go']['app']['App']['GetDalleDressConfig'](arg1);
+}
+
+export function GetDalleDressPage(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['app']['App']['GetDalleDressPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function GetDalleDressSummary(arg1) {
+  return window['go']['app']['App']['GetDalleDressSummary'](arg1);
 }
 
 export function GetDebugCollapsed() {
@@ -332,6 +340,10 @@ export function ReloadChunks(arg1) {
 
 export function ReloadContracts(arg1) {
   return window['go']['app']['App']['ReloadContracts'](arg1);
+}
+
+export function ReloadDalleDress(arg1) {
+  return window['go']['app']['App']['ReloadDalleDress'](arg1);
 }
 
 export function ReloadExports(arg1) {

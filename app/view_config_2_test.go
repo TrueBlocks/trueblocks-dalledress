@@ -33,6 +33,7 @@ func TestViewConfigHeaderActionsExport(t *testing.T) {
 		{"monitors", a.GetMonitorsConfig, "monitors", types.DataFacet("monitors")},
 		{"names", a.GetNamesConfig, "names", types.DataFacet("all")},
 		{"status", a.GetStatusConfig, "status", types.DataFacet("status")},
+		{"dalledress", a.GetDalleDressConfig, "dalledress", types.DataFacet("generator")},
 	}
 
 	for _, tc := range tests {

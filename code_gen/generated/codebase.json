@@ -1575,6 +1575,10 @@
         }
     ],
     "structures": [
+        {},
+        {},
+        {},
+        {},
         {
             "members": [
                 {
@@ -4386,6 +4390,60 @@
                 {
                     "name": "Chains",
                     "store": "Chains",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "attributes": ""
+                }
+            ]
+        },
+        {
+            "class": "DalleDress",
+            "doc_group": "001-Route",
+            "doc_route": "700-dalledress",
+            "doc_descr": "multi-facet generative art collection for DalleDress",
+            "produced_by": "dalledress",
+            "facets": [
+                {
+                    "name": "Generator",
+                    "store": "Generator",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "dashboard",
+                    "attributes": ""
+                },
+                {
+                    "name": "Series",
+                    "store": "Series",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "attributes": ""
+                },
+                {
+                    "name": "Databases",
+                    "store": "Databases",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "attributes": ""
+                },
+                {
+                    "name": "Events",
+                    "store": "Logs",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "attributes": ""
+                },
+                {
+                    "name": "Gallery",
+                    "store": "Logs",
                     "actions": [
                         "export"
                     ],

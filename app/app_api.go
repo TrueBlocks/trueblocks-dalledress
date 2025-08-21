@@ -32,6 +32,8 @@ func (a *App) Reload(payload *types.Payload) error {
 		return a.ReloadContracts(payload)
 	case "status":
 		return a.ReloadStatus(payload)
+	case "dalledress":
+		return a.ReloadDalleDress(payload)
 	default:
 		panic("unknown view in Reload" + a.GetLastView())
 	}
@@ -47,6 +49,7 @@ func (a *App) GetRegisteredViews() []string {
 		"chunks",
 		"contracts",
 		"status",
+		"dalledress",
 	}
 }
 

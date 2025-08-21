@@ -1,0 +1,5 @@
+field,label,type,required,description
+databaseName,Database Name,string,true,Name of the database
+count,Count,int,false,Number of entries
+sample,Sample,string,false,Sample entry
+filtered,Filtered,bool,false,Is database filtered by series

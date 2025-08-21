@@ -1,26 +1,46 @@
-# DalleDress Collection Definition
+[settings]
+    class = "DalleDress"
+    doc_group = "001-Route"
+    doc_descr = "multi-facet generative art collection for DalleDress"
+    doc_route = "700-dalledress"
+    attributes = ""
+    produced_by = "dalledress"
+    disable_go = false
 
-[collection]
-name = "dalle"
-label = "DalleDress"
-description = "Multi-facet generative art collection for DalleDress"
+[[facets]]
+    name = "Generator"
+    store = "Generator"
+    localStore = true
+    viewType = "dashboard"
+    actions = ["export"]
+    isForm = true
 
-[facets.generator]
-label = "Generator"
-isForm = true
+[[facets]]
+    name = "Series"
+    store = "Series"
+    localStore = true
+    viewType = ""
+    actions = ["export"]
+    isForm = false
 
-[facets.series]
-label = "Series"
-isForm = false
+[[facets]]
+    name = "Databases"
+    store = "Databases"
+    localStore = true
+    viewType = ""
+    actions = ["export"]
+    isForm = false
 
-[facets.databases]
-label = "Databases"
-isForm = false
+[[facets]]
+    name = "Events"
+    store = "Logs"
+    viewType = ""
+    actions = ["export"]
+    isForm = false
 
-[facets.events]
-label = "Events"
-isForm = false
-
-[facets.gallery]
-label = "Gallery"
-isForm = false
+[[facets]]
+    name = "Gallery"
+    store = "Logs"
+    viewType = ""
+    actions = ["export"]
+    isForm = false

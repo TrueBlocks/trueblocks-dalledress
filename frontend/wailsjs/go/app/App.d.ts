@@ -12,6 +12,7 @@ import {utils} from '../models';
 import {chunks} from '../models';
 import {context} from '../models';
 import {contracts} from '../models';
+import {dalledress} from '../models';
 import {exports} from '../models';
 import {monitors} from '../models';
 import {names} from '../models';
@@ -23,8 +24,6 @@ export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Abi):
 export function AddAddressToProject(arg1:string):Promise<void>;
 
 export function AddAddressesToProject(arg1:string):Promise<void>;
-
-export function BuildDalleDressForProject():Promise<Record<string, any>>;
 
 export function CancelAllFetches():Promise<number>;
 
@@ -85,6 +84,12 @@ export function GetContractsConfig(arg1:types.Payload):Promise<types.ViewConfig>
 export function GetContractsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<contracts.ContractsPage>;
 
 export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
+
+export function GetDalleDressConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
+export function GetDalleDressPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<dalledress.DalleDressPage>;
+
+export function GetDalleDressSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetDebugCollapsed():Promise<boolean>;
 
@@ -183,6 +188,8 @@ export function ReloadAbis(arg1:types.Payload):Promise<void>;
 export function ReloadChunks(arg1:types.Payload):Promise<void>;
 
 export function ReloadContracts(arg1:types.Payload):Promise<void>;
+
+export function ReloadDalleDress(arg1:types.Payload):Promise<void>;
 
 export function ReloadExports(arg1:types.Payload):Promise<void>;
 

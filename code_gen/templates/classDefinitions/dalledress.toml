@@ -10,7 +10,6 @@
 [[facets]]
     name = "Generator"
     store = "Generator"
-    localStore = true
     viewType = "dashboard"
     actions = ["export"]
     isForm = true
@@ -18,7 +17,6 @@
 [[facets]]
     name = "Series"
     store = "Series"
-    localStore = true
     viewType = ""
     actions = ["export"]
     isForm = false
@@ -26,7 +24,6 @@
 [[facets]]
     name = "Databases"
     store = "Databases"
-    localStore = true
     viewType = ""
     actions = ["export"]
     isForm = false

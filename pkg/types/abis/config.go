@@ -23,6 +23,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getAbisFields(),
 			Actions:       []string{"remove"},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"known": {
 			Name:          "Known",
@@ -32,6 +33,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getAbisFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"functions": {
 			Name:          "Functions",
@@ -41,6 +43,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getFunctionsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"events": {
 			Name:          "Events",
@@ -50,6 +53,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getFunctionsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 	}
 

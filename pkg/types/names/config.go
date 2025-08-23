@@ -23,6 +23,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getNamesFields(),
 			Actions:       []string{"autoname", "update"},
 			HeaderActions: []string{"create", "export"},
+			RendererTypes: "",
 		},
 		"custom": {
 			Name:          "Custom",
@@ -32,6 +33,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getNamesFields(),
 			Actions:       []string{"autoname", "delete", "remove", "update"},
 			HeaderActions: []string{"create", "export", "pin", "publish"},
+			RendererTypes: "",
 		},
 		"prefund": {
 			Name:          "Prefund",
@@ -41,6 +43,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getNamesFields(),
 			Actions:       []string{"update"},
 			HeaderActions: []string{"create", "export"},
+			RendererTypes: "",
 		},
 		"regular": {
 			Name:          "Regular",
@@ -50,6 +53,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getNamesFields(),
 			Actions:       []string{"autoname", "update"},
 			HeaderActions: []string{"create", "export"},
+			RendererTypes: "",
 		},
 		"baddress": {
 			Name:          "Baddress",
@@ -59,6 +63,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getNamesFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"create", "export"},
+			RendererTypes: "",
 		},
 	}
 

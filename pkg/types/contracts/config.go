@@ -23,6 +23,7 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getContractsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{},
+			RendererTypes: "facet",
 		},
 		"execute": {
 			Name:          "Execute",
@@ -32,6 +33,7 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getContractsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{},
+			RendererTypes: "facet",
 		},
 		"events": {
 			Name:          "Events",
@@ -41,6 +43,7 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getLogsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 	}
 

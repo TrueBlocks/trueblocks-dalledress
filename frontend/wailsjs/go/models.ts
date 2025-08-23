@@ -1443,6 +1443,7 @@ export namespace types {
 	    detailPanels: DetailPanelConfig[];
 	    actions: string[];
 	    headerActions: string[];
+	    rendererTypes: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new FacetConfig(source);
@@ -1459,6 +1460,7 @@ export namespace types {
 	        this.detailPanels = this.convertValues(source["detailPanels"], DetailPanelConfig);
 	        this.actions = source["actions"];
 	        this.headerActions = source["headerActions"];
+	        this.rendererTypes = source["rendererTypes"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

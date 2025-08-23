@@ -23,6 +23,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getStatementsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "detail",
 		},
 		"balances": {
 			Name:          "Balances",
@@ -32,6 +33,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getBalancesFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"transfers": {
 			Name:          "Transfers",
@@ -41,6 +43,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getTransfersFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"transactions": {
 			Name:          "Transactions",
@@ -50,6 +53,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getTransactionsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"withdrawals": {
 			Name:          "Withdrawals",
@@ -59,6 +63,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getWithdrawalsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"assets": {
 			Name:          "Assets",
@@ -68,6 +73,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getAssetsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"logs": {
 			Name:          "Logs",
@@ -77,6 +83,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getLogsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"traces": {
 			Name:          "Traces",
@@ -86,6 +93,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getTracesFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"receipts": {
 			Name:          "Receipts",
@@ -95,6 +103,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getReceiptsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 	}
 

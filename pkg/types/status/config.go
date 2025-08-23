@@ -23,6 +23,7 @@ func (c *StatusCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getStatusFields(),
 			Actions:       []string{},
 			HeaderActions: []string{},
+			RendererTypes: "",
 		},
 		"caches": {
 			Name:          "Caches",
@@ -32,6 +33,7 @@ func (c *StatusCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getCachesFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 		"chains": {
 			Name:          "Chains",
@@ -41,6 +43,7 @@ func (c *StatusCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getChainsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 	}
 

@@ -134,6 +134,10 @@ export function GetContractsSummary(arg1) {
   return window['go']['app']['App']['GetContractsSummary'](arg1);
 }
 
+export function GetDalleDressConfig(arg1) {
+  return window['go']['app']['App']['GetDalleDressConfig'](arg1);
+}
+
 export function GetDebugCollapsed() {
   return window['go']['app']['App']['GetDebugCollapsed']();
 }

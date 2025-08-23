@@ -29,7 +29,7 @@ import {
 
 // EXISTING_CODE
 
-// Add to the above imports
+// Add new icons to the above list for each of these views
 // Exports
 // Monitors
 // Abis

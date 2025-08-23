@@ -23,6 +23,7 @@ func (c *MonitorsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getMonitorsFields(),
 			Actions:       []string{"delete", "remove"},
 			HeaderActions: []string{"export"},
+			RendererTypes: "",
 		},
 	}
 

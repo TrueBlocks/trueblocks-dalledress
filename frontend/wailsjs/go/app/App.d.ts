@@ -84,6 +84,8 @@ export function GetContractsPage(arg1:types.Payload,arg2:number,arg3:number,arg4
 
 export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
 
+export function GetDalleDressConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
 export function GetDebugCollapsed():Promise<boolean>;
 
 export function GetDefaultAppPreferences():Promise<preferences.AppPreferences>;

@@ -19,6 +19,7 @@ type FacetConfig struct {
 	DetailPanels  []DetailPanelConfig `json:"detailPanels"`
 	Actions       []string            `json:"actions"`
 	HeaderActions []string            `json:"headerActions"`
+	RendererTypes string              `json:"rendererTypes"`
 }
 
 // FieldConfig is the single source-of-truth for facet fields
@@ -72,39 +73,3 @@ type ActionConfig struct {
 	Icon         string `json:"icon"`
 	Confirmation bool   `json:"confirmation"`
 }
-
-/*
-FUTURE FEATURES (commented for reference):
-
-// Conditional Detail Panels
-type PanelSelectorConfig struct {
-	Condition ConditionConfig     `json:"condition"`
-	Panels    []DetailPanelConfig `json:"panels"`
-}
-
-type ConditionConfig struct {
-	Field    string      `json:"field"`
-	Operator string      `json:"operator"` // "equals", "contains", "exists"
-	Value    interface{} `json:"value"`
-}
-
-// User Customization
-type UserViewConfig struct {
-	BaseConfig ViewConfig          `json:"baseConfig"`
-	Overrides  ViewConfigOverrides `json:"overrides"`
-}
-
-type ViewConfigOverrides struct {
-	HiddenColumns []string                   `json:"hiddenColumns"`
-	ColumnOrder   []string                   `json:"columnOrder"`
-	CustomPanels  []DetailPanelConfig        `json:"customPanels"`
-	Facets        map[string]FacetOverrides  `json:"facets"`
-}
-
-// Computed Fields
-type ComputedFieldConfig struct {
-	Key        string `json:"key"`
-	Expression string `json:"expression"` // JS expression or function name
-	DependsOn  []string `json:"dependsOn"` // Field dependencies
-}
-*/

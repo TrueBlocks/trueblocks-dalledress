@@ -103,6 +103,7 @@ func (pr *Progress) Tick(currentTotalCount, expectedTotal int) {
 				Summary:       pr.summaryProvider.GetSummary(),
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "streaming",
+				Operation:     "load",
 			}
 			collectionPayload.Collection = pr.collectionName
 			collectionPayload.DataFacet = pr.dataFacet
@@ -131,6 +132,7 @@ func (pr *Progress) Heartbeat(currentTotalCount, expectedTotal int) {
 				Summary:       pr.summaryProvider.GetSummary(),
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "streaming",
+				Operation:     "load",
 			}
 			collectionPayload.Collection = pr.collectionName
 			collectionPayload.DataFacet = pr.dataFacet

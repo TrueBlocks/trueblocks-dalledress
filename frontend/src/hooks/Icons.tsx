@@ -12,6 +12,7 @@ import {
   BiFile,
   BiHistory,
   BiHome,
+  BiImage,
   BiListUl,
   BiQuestionMark,
   BiUser,
@@ -21,6 +22,7 @@ import {
   FaDesktop,
   FaFileContract,
   FaHistory,
+  FaImage,
   FaIndustry,
   FaListAlt,
   FaQuestionCircle,
@@ -147,6 +149,7 @@ export const FaChunks = FaIndustry;
 export const FaContracts = FaFileContract;
 export const FaAbis = FaListAlt;
 export const FaNames = FaUser;
+export const FaDalleDress = FaImage;
 export const FaMissing = FaQuestionCircle;
 
 export const BiStatus = BiCog;
@@ -156,6 +159,7 @@ export const BiChunks = BiBuildings;
 export const BiContracts = BiFile;
 export const BiAbis = BiListUl;
 export const BiNames = BiUser;
+export const BiDalleDress = BiImage;
 export const BiMissing = BiQuestionMark;
 
 // EXISTING_CODE

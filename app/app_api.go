@@ -10,7 +10,17 @@ package app
 
 // EXISTING_CODE
 import (
+	"fmt"
+
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/contracts"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/status"
 )
 
 // EXISTING_CODE
@@ -47,6 +57,28 @@ func (a *App) GetRegisteredViews() []string {
 		"chunks",
 		"contracts",
 		"status",
+	}
+}
+
+func getCollection(payload *types.Payload) types.Collection {
+	switch payload.Collection {
+	case "exports":
+		return exports.GetExportsCollection(payload)
+	case "monitors":
+		return monitors.GetMonitorsCollection(payload)
+	case "abis":
+		return abis.GetAbisCollection(payload)
+	case "names":
+		return names.GetNamesCollection(payload)
+	case "chunks":
+		return chunks.GetChunksCollection(payload)
+	case "contracts":
+		return contracts.GetContractsCollection(payload)
+	case "status":
+		return status.GetStatusCollection(payload)
+	default:
+		logging.LogBackend(fmt.Sprintf("Warning: Unknown collection type: %s", payload.Collection))
+		return nil
 	}
 }
 

@@ -34,6 +34,7 @@ type DataLoadedPayload struct {
 	Error         string    `json:"error,omitempty"`
 	Timestamp     int64     `json:"timestamp"`
 	EventPhase    string    `json:"eventPhase"`
+	Operation     string    `json:"operation,omitempty"`
 }
 
 type ProjectPayload struct {

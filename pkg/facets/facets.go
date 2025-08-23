@@ -353,6 +353,7 @@ func (r *Facet[T]) OnStateChanged(state store.StoreState, reason string) {
 				Summary:       r.summaryProvider.GetSummary(),
 				Timestamp:     time.Now().Unix(),
 				EventPhase:    "complete",
+				Operation:     "load",
 			}
 			collectionPayload.Collection = r.collectionName
 			collectionPayload.DataFacet = r.dataFacet

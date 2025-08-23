@@ -4,7 +4,7 @@ module github.com/TrueBlocks/trueblocks-dalledress
 go 1.23.8
 
 require (
-	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250808074549-9748b58a6ce1
+	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250819215522-14adadd17718
 	github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250504164335-8b49b03dddef
 	github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250807032030-14a066956db5
 	github.com/fsnotify/fsnotify v1.9.0
@@ -15,6 +15,8 @@ require (
 	github.com/wailsapp/wails/v2 v2.10.1
 	golang.org/x/text v0.24.0
 )
+
+replace github.com/TrueBlocks/trueblocks-dalle/v2 => ./dalle
 
 require (
 	git.sr.ht/~sbinet/gg v0.6.0 // indirect

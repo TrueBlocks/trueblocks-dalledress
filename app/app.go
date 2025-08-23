@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"embed"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"

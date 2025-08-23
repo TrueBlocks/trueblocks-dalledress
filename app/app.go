@@ -79,8 +79,7 @@ func NewApp(assets embed.FS) (*App, *menu.Menu) {
 		}
 	}
 
-	app.Dalle = dalle.NewContext("./output")
-
+	app.Dalle = dalle.NewContext()
 	appMenu := app.buildAppMenu()
 	return app, appMenu
 }

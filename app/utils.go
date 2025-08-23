@@ -9,7 +9,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/markdown"
 
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -62,44 +61,6 @@ func (a *App) Encode(fn sdk.Function, params []interface{}) (string, error) {
 		return "", fmt.Errorf("failed to pack function call: %w", err)
 	}
 	return "0x" + hex.EncodeToString(packed), nil
-}
-
-// BuildDalleDressForProject generates AI art for the active project's address
-func (a *App) BuildDalleDressForProject() (map[string]interface{}, error) {
-	active := a.GetActiveProject()
-	if active == nil {
-		return nil, fmt.Errorf("no active project")
-	}
-	addr := active.GetActiveAddress()
-	if addr == base.ZeroAddr {
-		return nil, fmt.Errorf("project address is not set")
-	}
-
-	// Always resolve ENS/address using ConvertToAddress
-	resolved, ok := a.ConvertToAddress(addr.Hex())
-	if !ok || resolved == base.ZeroAddr {
-		return nil, fmt.Errorf("invalid address or ENS name")
-	}
-
-	if a.Dalle == nil {
-		return nil, fmt.Errorf("dalle service not available")
-	}
-
-	dress, err := a.Dalle.MakeDalleDress(resolved.Hex())
-	if err != nil {
-		return nil, err
-	}
-
-	imagePath := filepath.Join("generated", dress.Filename+".png")
-	imageURL := ""
-	if a.fileServer != nil {
-		imageURL = a.fileServer.GetURL(imagePath)
-	}
-
-	return map[string]interface{}{
-		"imageUrl": imageURL,
-		"parts":    dress,
-	}, nil
 }
 
 // GetChainList returns the list of supported blockchain chains

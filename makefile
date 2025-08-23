@@ -14,6 +14,7 @@ lint:
 
 test:
 	@export $(grep -v '^#' ../.env | xargs) >/dev/null && yarn test
+	@cd dalle ; make test ; cd - >/dev/null 2>&1 
 
 generate:
 	@cd ~/Development/trueblocks-core/build && make -j 12 goMaker && cd -

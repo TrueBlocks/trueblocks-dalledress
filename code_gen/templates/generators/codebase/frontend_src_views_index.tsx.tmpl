@@ -5,15 +5,15 @@
  * This file was auto generated. Do not edit.
  */
 
-export { Projects } from './projects';
-export { DalleDress } from './DalleDress';
-export { Khedra } from './Khedra';
-
 {{range .Structures -}}
   {{- if and (not .DisableGo) (ne .Class "") }}
 export { {{.Class}} } from './{{ toLower .Class }}';
   {{- end }}
 {{- end }}
+
+export { DalleDress } from './dalledress';
+export { Khedra } from './khedra';
+export { Projects } from './projects';
 
 export * from './settings';
 export * from './utils';

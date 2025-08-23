@@ -2,6 +2,8 @@
 //   1. Can we move this up a folder to avoid confusing extra utils folder
 //   2. Why must we disable this lint?
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ReactNode } from 'react';
+
 import { types } from '@models';
 
 import { DetailTable } from '../../components/detail/DetailTable';
@@ -24,19 +26,29 @@ export interface MetaOverlay {
  * This function encapsulates all ViewConfig integration logic and returns
  * a simple detail panel function for use in BaseTab.
  */
-export const createDetailPanelFromViewConfig = <
-  T extends Record<string, unknown>,
->(
+export type DetailPanelFn<T = any> = (row: T | null) => ReactNode;
+
+export const createDetailPanel = <T extends Record<string, unknown>>(
   viewConfig: types.ViewConfig | null | undefined,
   getCurrentDataFacet: () => string,
   fallbackName = 'Details',
-) => {
+  customPanels: Record<string, DetailPanelFn<any>> = {},
+): DetailPanelFn<T> => {
   // Get the current facet configuration
   const currentFacetConfig = viewConfig?.facets?.[getCurrentDataFacet()];
 
+  // Check for a custom panel override first (viewName.facetKey or viewName)
+  if (viewConfig?.viewName) {
+    const facet = getCurrentDataFacet();
+    const key = `${viewConfig.viewName}.${facet}`;
+    if (customPanels[key]) return customPanels[key] as DetailPanelFn<T>;
+    if (customPanels[viewConfig.viewName])
+      return customPanels[viewConfig.viewName] as DetailPanelFn<T>;
+  }
+
   // If we have ViewConfig detail panels, use them
   if (currentFacetConfig?.detailPanels?.length) {
-    return buildDetailPanelFromConfigs(currentFacetConfig.detailPanels);
+    return buildDetailPanelFromConfigs<T>(currentFacetConfig.detailPanels);
   }
 
   // Otherwise, return a fallback detail panel
@@ -290,33 +302,3 @@ function formatFieldValue(value: any, formatter?: string): string {
       return String(value);
   }
 }
-
-/**
- * Generic function to get the appropriate detail panel for a view and facet.
- * Looks up custom detail panels from the provided configuration, falls back
- * to the default renderer if no custom panel is found.
- *
- * @param viewName - The name of the view (e.g., 'monitors', 'exports')
- * @param facet - The current data facet
- * @param customPanels - Configuration object with custom detail panel functions
- * @returns The appropriate detail panel function
- */
-export const getDetailPanel = <T extends Record<string, unknown>>(
-  viewName: string,
-  facet: string,
-  customPanels: Record<string, (rowData: T | null) => React.ReactNode> = {},
-) => {
-  // Check for a custom panel for this specific facet
-  const customPanelKey = `${viewName}.${facet}`;
-  if (customPanels[customPanelKey]) {
-    return customPanels[customPanelKey];
-  }
-
-  // Check for a view-wide custom panel
-  if (customPanels[viewName]) {
-    return customPanels[viewName];
-  }
-
-  // Fall back to the default panel
-  return createDefaultDetailPanel<T>();
-};

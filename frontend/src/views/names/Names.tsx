@@ -31,7 +31,7 @@ import { msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
-import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
+import { createDetailPanel } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'names';
 export const Names = () => {
@@ -222,12 +222,7 @@ export const Names = () => {
   );
 
   const detailPanel = useMemo(
-    () =>
-      createDetailPanelFromViewConfig(
-        viewConfig,
-        getCurrentDataFacet,
-        'Names Details',
-      ),
+    () => createDetailPanel(viewConfig, getCurrentDataFacet, 'Names Details'),
     [viewConfig, getCurrentDataFacet],
   );
 

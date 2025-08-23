@@ -31,8 +31,8 @@ import { msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
-import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
-import { renderers } from './components/Statement';
+import { createDetailPanel } from '../utils/detailPanel';
+import { renderers } from './components';
 
 const ROUTE: ViewRoute = 'exports';
 export const Exports = () => {
@@ -221,17 +221,16 @@ export const Exports = () => {
     { rowActions: [] },
   );
 
-  const detailPanel = useMemo(() => {
-    const facet = getCurrentDataFacet();
-    if (facet === types.DataFacet.STATEMENTS) {
-      return renderers['exports.statements'];
-    }
-    return createDetailPanelFromViewConfig(
-      viewConfig,
-      getCurrentDataFacet,
-      'Exports Details',
-    );
-  }, [viewConfig, getCurrentDataFacet]);
+  const detailPanel = useMemo(
+    () =>
+      createDetailPanel(
+        viewConfig,
+        getCurrentDataFacet,
+        'Exports Details',
+        renderers,
+      ),
+    [viewConfig, getCurrentDataFacet],
+  );
 
   const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
     viewConfig,

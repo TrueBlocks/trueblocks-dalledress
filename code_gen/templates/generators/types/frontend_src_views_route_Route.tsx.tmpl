@@ -13,6 +13,9 @@
 
 {{/* Determine Features */}}
 {{- $hasForms := .HasForms -}}
+{{- $hasPanelRenderers := $isExports -}}
+{{- $hasFacetRenderers := $isContracts -}}
+{{- $hasRenderers := or $hasPanelRenderers $hasFacetRenderers -}}
 
 {{/* Crud related */}}
 {{- $hasCrud := or $isNames (or $isAbis $isMonitors) -}}
@@ -58,8 +61,8 @@ import { {{if and (not $hasCrud) (not (or $isExports $isChunks) )}}crud, {{end}}
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
-import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
-{{- if $isContracts }}
+import { createDetailPanel } from '../utils/detailPanel';
+{{- if $hasRenderers }}
 import { renderers } from './components';
 {{- end }}
 
@@ -266,10 +269,13 @@ export const {{$class}} = () => {
 
   const detailPanel = useMemo(
     () =>
-      createDetailPanelFromViewConfig(
+      createDetailPanel(
         viewConfig,
         getCurrentDataFacet,
         '{{toProper $lower}} Details',
+{{- if $hasPanelRenderers }}
+        renderers,
+{{- end }}
       ),
     [viewConfig, getCurrentDataFacet],
   );
@@ -282,7 +288,7 @@ export const {{$class}} = () => {
       currentColumns as unknown as import('@components').FormField<
         Record<string, unknown>
       >[],
-{{- if $isContracts }}
+{{- if $hasFacetRenderers }}
     renderers: renderers(pageData, fetchData),
 {{- end }}
   });

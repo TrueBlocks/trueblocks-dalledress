@@ -31,7 +31,7 @@ import { msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
-import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
+import { createDetailPanel } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'chunks';
 export const Chunks = () => {
@@ -211,12 +211,7 @@ export const Chunks = () => {
   );
 
   const detailPanel = useMemo(
-    () =>
-      createDetailPanelFromViewConfig(
-        viewConfig,
-        getCurrentDataFacet,
-        'Chunks Details',
-      ),
+    () => createDetailPanel(viewConfig, getCurrentDataFacet, 'Chunks Details'),
     [viewConfig, getCurrentDataFacet],
   );
 

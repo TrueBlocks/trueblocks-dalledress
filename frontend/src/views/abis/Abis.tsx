@@ -31,7 +31,7 @@ import { msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
-import { createDetailPanelFromViewConfig } from '../utils/detailPanel';
+import { createDetailPanel } from '../utils/detailPanel';
 
 const ROUTE: ViewRoute = 'abis';
 export const Abis = () => {
@@ -218,12 +218,7 @@ export const Abis = () => {
   );
 
   const detailPanel = useMemo(
-    () =>
-      createDetailPanelFromViewConfig(
-        viewConfig,
-        getCurrentDataFacet,
-        'Abis Details',
-      ),
+    () => createDetailPanel(viewConfig, getCurrentDataFacet, 'Abis Details'),
     [viewConfig, getCurrentDataFacet],
   );
 

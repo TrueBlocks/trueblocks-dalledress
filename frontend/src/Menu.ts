@@ -134,8 +134,8 @@ export const MenuItems: MenuItem[] = [
     label: 'Wizard',
     position: 'hidden',
     component: Wizard,
-    hotkey: 'mod+shift+3',
-    altHotkey: 'alt+shift+3',
+    hotkey: 'mod+shift+1',
+    altHotkey: 'alt+shift+1',
     type: 'dev',
     action: async () => {
       await SetInitialized(false);

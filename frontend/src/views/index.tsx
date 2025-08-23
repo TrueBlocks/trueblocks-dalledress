@@ -12,8 +12,8 @@ export { Names } from './names';
 export { Chunks } from './chunks';
 export { Contracts } from './contracts';
 export { Status } from './status';
-export { DalleDress } from './dalledress';
 
+export { DalleDress } from './dalledress';
 export { Khedra } from './khedra';
 export { Projects } from './projects';
 

@@ -14,10 +14,6 @@ export function AddAddressesToProject(arg1) {
   return window['go']['app']['App']['AddAddressesToProject'](arg1);
 }
 
-export function BuildDalleDressForProject() {
-  return window['go']['app']['App']['BuildDalleDressForProject']();
-}
-
 export function CancelAllFetches() {
   return window['go']['app']['App']['CancelAllFetches']();
 }

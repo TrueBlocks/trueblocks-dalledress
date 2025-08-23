@@ -24,8 +24,6 @@ export function AddAddressToProject(arg1:string):Promise<void>;
 
 export function AddAddressesToProject(arg1:string):Promise<void>;
 
-export function BuildDalleDressForProject():Promise<Record<string, any>>;
-
 export function CancelAllFetches():Promise<number>;
 
 export function CancelFetch(arg1:types.DataFacet):Promise<void>;

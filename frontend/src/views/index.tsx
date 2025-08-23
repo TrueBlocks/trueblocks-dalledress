@@ -5,9 +5,6 @@
  * This file was auto generated. Do not edit.
  */
 
-export { Projects } from './projects';
-export { DalleDress } from './DalleDress';
-
 export { Exports } from './exports';
 export { Monitors } from './monitors';
 export { Abis } from './abis';
@@ -15,7 +12,10 @@ export { Names } from './names';
 export { Chunks } from './chunks';
 export { Contracts } from './contracts';
 export { Status } from './status';
+export { DalleDress } from './dalledress';
+
 export { Khedra } from './khedra';
+export { Projects } from './projects';
 
 export * from './settings';
 export * from './utils';

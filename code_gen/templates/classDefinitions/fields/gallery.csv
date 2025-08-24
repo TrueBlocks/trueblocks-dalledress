@@ -1,0 +1,8 @@
+field,label,type,required,description
+thumbnail,Thumbnail,string,true,Path to thumbnail image
+filename,Filename,string,true,Image filename
+series,Series,string,true,Series name
+orientation,Orientation,string,false,Image orientation
+enhanced,Enhanced,bool,false,Has enhanced prompt
+createdAt,Created At,datetime,true,Image creation timestamp
+sizeKB,Size (KB),int,false,Image file size in KB

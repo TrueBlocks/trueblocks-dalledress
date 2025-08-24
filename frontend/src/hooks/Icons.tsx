@@ -39,6 +39,7 @@ import {
 // Chunks
 // Contracts
 // Status
+// DalleDress
 
 /*
 List of other icons sets

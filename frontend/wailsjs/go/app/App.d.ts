@@ -12,11 +12,13 @@ import {utils} from '../models';
 import {chunks} from '../models';
 import {context} from '../models';
 import {contracts} from '../models';
+import {dalledress} from '../models';
 import {exports} from '../models';
 import {monitors} from '../models';
 import {names} from '../models';
 import {status} from '../models';
 import {app} from '../models';
+import {dalle} from '../models';
 
 export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Abi):Promise<void>;
 
@@ -85,6 +87,10 @@ export function GetContractsPage(arg1:types.Payload,arg2:number,arg3:number,arg4
 export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetDalleDressConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
+export function GetDalleDressPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<dalledress.DalleDressPage>;
+
+export function GetDalleDressSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetDebugCollapsed():Promise<boolean>;
 
@@ -184,6 +190,8 @@ export function ReloadChunks(arg1:types.Payload):Promise<void>;
 
 export function ReloadContracts(arg1:types.Payload):Promise<void>;
 
+export function ReloadDalleDress(arg1:types.Payload):Promise<void>;
+
 export function ReloadExports(arg1:types.Payload):Promise<void>;
 
 export function ReloadMonitors(arg1:types.Payload):Promise<void>;
@@ -201,6 +209,8 @@ export function RestoreProjectContext(arg1:string):Promise<void>;
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 
 export function SaveProject():Promise<void>;
+
+export function SeriesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:dalle.Series):Promise<void>;
 
 export function SetActiveAddress(arg1:string):Promise<void>;
 

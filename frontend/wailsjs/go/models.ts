@@ -204,6 +204,130 @@ export namespace crud {
 
 }
 
+export namespace dalle {
+	
+	export class Database {
+	    id: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Database(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	    }
+	}
+	export class Generator {
+	    id: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Generator(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	    }
+	}
+	export class Series {
+	    last?: number;
+	    suffix: string;
+	    adverbs: string[];
+	    adjectives: string[];
+	    nouns: string[];
+	    emotions: string[];
+	    occupations: string[];
+	    actions: string[];
+	    artstyles: string[];
+	    litstyles: string[];
+	    colors: string[];
+	    orientations: string[];
+	    gazes: string[];
+	    backstyles: string[];
+	    modifiedAt?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Series(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.last = source["last"];
+	        this.suffix = source["suffix"];
+	        this.adverbs = source["adverbs"];
+	        this.adjectives = source["adjectives"];
+	        this.nouns = source["nouns"];
+	        this.emotions = source["emotions"];
+	        this.occupations = source["occupations"];
+	        this.actions = source["actions"];
+	        this.artstyles = source["artstyles"];
+	        this.litstyles = source["litstyles"];
+	        this.colors = source["colors"];
+	        this.orientations = source["orientations"];
+	        this.gazes = source["gazes"];
+	        this.backstyles = source["backstyles"];
+	        this.modifiedAt = source["modifiedAt"];
+	    }
+	}
+
+}
+
+export namespace dalledress {
+	
+	export class DalleDressPage {
+	    facet: types.DataFacet;
+	    databases: dalle.Database[];
+	    generator: dalle.Generator[];
+	    logs: types.Log[];
+	    series: dalle.Series[];
+	    totalItems: number;
+	    expectedTotal: number;
+	    isFetching: boolean;
+	    state: types.LoadState;
+	
+	    static createFrom(source: any = {}) {
+	        return new DalleDressPage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.facet = source["facet"];
+	        this.databases = this.convertValues(source["databases"], dalle.Database);
+	        this.generator = this.convertValues(source["generator"], dalle.Generator);
+	        this.logs = this.convertValues(source["logs"], types.Log);
+	        this.series = this.convertValues(source["series"], dalle.Series);
+	        this.totalItems = source["totalItems"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isFetching = source["isFetching"];
+	        this.state = source["state"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
 export namespace exports {
 	
 	export class ExportsPage {
@@ -852,6 +976,10 @@ export namespace types {
 	    MANIFEST = "manifest",
 	    DASHBOARD = "dashboard",
 	    EXECUTE = "execute",
+	    GENERATOR = "generator",
+	    SERIES = "series",
+	    DATABASES = "databases",
+	    GALLERY = "gallery",
 	    STATEMENTS = "statements",
 	    BALANCES = "balances",
 	    TRANSFERS = "transfers",

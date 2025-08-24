@@ -27,7 +27,7 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        get{{toProper .Store}}Fields(),
 			Actions:       []string{ {{if ne (.RowActionsBe .Name) "\"\""}}{{.RowActionsBe .Name}}{{else}}{{end}} },
 			HeaderActions: []string{ {{if ne (.HeaderActionsBe .Name) "\"\""}}{{.HeaderActionsBe .Name}}{{else}}{{end}} },
-			RendererTypes: "",
+			RendererTypes: "{{.Renderer}}",
 		},
 		{{- end}}
 	}

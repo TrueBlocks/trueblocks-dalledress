@@ -38,7 +38,10 @@ export interface ActionDefinition {
   icon: string;
 }
 
-export interface CollectionActionsConfig<TPageData, TItem> {
+export interface CollectionActionsConfig<
+  TPageData extends { totalItems: number },
+  TItem,
+> {
   collection: string;
   viewStateKey: project.ViewStateKey;
   pagination: ReturnType<
@@ -521,7 +524,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           return item;
         });
 
-        setPageData((prev) => {
+        setPageData((prev: TPageData | null) => {
           if (!prev) return prev;
           return new pageClass({
             ...prev,
@@ -542,7 +545,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           })
           .catch((err: unknown) => {
             handleError(err, `Failed to toggle delete for ${address}`);
-            setPageData((prev) => {
+            setPageData((prev: TPageData | null) => {
               if (!prev) return prev;
               return new pageClass({
                 ...prev,
@@ -601,7 +604,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           return itemAddress !== address;
         });
 
-        setPageData((prev) => {
+        setPageData((prev: TPageData | null) => {
           if (!prev) return prev;
           return new pageClass({
             ...prev,
@@ -641,7 +644,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           })
           .catch((err: unknown) => {
             handleError(err, `Failed to remove ${address}`);
-            setPageData((prev) => {
+            setPageData((prev: TPageData | null) => {
               if (!prev) return prev;
               return new pageClass({
                 ...prev,
@@ -716,7 +719,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           return item;
         });
 
-        setPageData((prev) => {
+        setPageData((prev: TPageData | null) => {
           if (!prev) return prev;
           return new pageClass({
             ...prev,
@@ -746,7 +749,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           })
           .catch((err: unknown) => {
             handleError(err, `Failed to auto-name ${address}`);
-            setPageData((prev) => {
+            setPageData((prev: TPageData | null) => {
               if (!prev) return prev;
               return new pageClass({
                 ...prev,
@@ -825,7 +828,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
           optimisticValues = [processedItem as TItem, ...original];
         }
 
-        setPageData((prev) => {
+        setPageData((prev: TPageData | null) => {
           if (!prev) return prev;
           return new pageClass({
             ...prev,
@@ -845,7 +848,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
             }
           })
           .catch((err: unknown) => {
-            setPageData((prev) => {
+            setPageData((prev: TPageData | null) => {
               if (!prev) return prev;
               return new pageClass({
                 ...prev,

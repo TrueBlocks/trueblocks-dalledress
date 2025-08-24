@@ -138,6 +138,14 @@ export function GetDalleDressConfig(arg1) {
   return window['go']['app']['App']['GetDalleDressConfig'](arg1);
 }
 
+export function GetDalleDressPage(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['app']['App']['GetDalleDressPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function GetDalleDressSummary(arg1) {
+  return window['go']['app']['App']['GetDalleDressSummary'](arg1);
+}
+
 export function GetDebugCollapsed() {
   return window['go']['app']['App']['GetDebugCollapsed']();
 }
@@ -334,6 +342,10 @@ export function ReloadContracts(arg1) {
   return window['go']['app']['App']['ReloadContracts'](arg1);
 }
 
+export function ReloadDalleDress(arg1) {
+  return window['go']['app']['App']['ReloadDalleDress'](arg1);
+}
+
 export function ReloadExports(arg1) {
   return window['go']['app']['App']['ReloadExports'](arg1);
 }
@@ -368,6 +380,10 @@ export function SaveBounds(arg1, arg2, arg3, arg4) {
 
 export function SaveProject() {
   return window['go']['app']['App']['SaveProject']();
+}
+
+export function SeriesCrud(arg1, arg2, arg3) {
+  return window['go']['app']['App']['SeriesCrud'](arg1, arg2, arg3);
 }
 
 export function SetActiveAddress(arg1) {

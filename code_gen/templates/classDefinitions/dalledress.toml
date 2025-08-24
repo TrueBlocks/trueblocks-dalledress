@@ -1,0 +1,45 @@
+[settings]
+    class = "DalleDress"
+    doc_group = "001-Route"
+    doc_descr = "multi-facet generative art collection for DalleDress"
+    doc_route = "700-dalledress"
+    attributes = ""
+    produced_by = "dalledress"
+    disable_go = false
+
+[[facets]]
+    name = "Generator"
+    store = "Generator"
+    actions = ["export"]
+    viewType = "dashboard"
+    renderer = "facet"
+    isForm = true
+
+[[facets]]
+    name = "Series"
+    store = "Series"
+    actions = ["export"]
+    viewType = ""
+    isForm = false
+
+[[facets]]
+    name = "Databases"
+    store = "Databases"
+    actions = ["export"]
+    viewType = ""
+    isForm = false
+
+[[facets]]
+    name = "Events"
+    store = "Logs"
+    actions = ["export"]
+    viewType = ""
+    isForm = false
+
+[[facets]]
+    name = "Gallery"
+    store = "Logs"
+    actions = ["export"]
+    viewType = "dashboard"
+    renderer = "facet"
+    isForm = false

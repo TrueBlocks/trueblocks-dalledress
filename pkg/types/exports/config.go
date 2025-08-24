@@ -23,7 +23,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getStatementsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
-			RendererTypes: "detail",
+			RendererTypes: "panel",
 		},
 		"balances": {
 			Name:          "Balances",

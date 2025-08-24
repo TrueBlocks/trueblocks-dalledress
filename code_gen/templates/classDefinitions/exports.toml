@@ -12,6 +12,7 @@ name = "Statements"
 store = "Statements"
 actions = ["export"]
 viewType = ""
+renderer = "panel"
 
 [[facets]]
 name = "Balances"

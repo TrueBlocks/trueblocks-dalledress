@@ -12,11 +12,13 @@
     name = "Dashboard"
     store = "Contracts"
     viewType = "dashboard"
+    renderer = "facet"
 
 [[facets]]
     name = "Execute"
     store = "Contracts"
     viewType = "dashboard"
+    renderer = "facet"
 
 [[facets]]
     name = "Events" 

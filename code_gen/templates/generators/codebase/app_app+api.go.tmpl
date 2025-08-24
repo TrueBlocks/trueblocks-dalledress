@@ -36,5 +36,18 @@ func (a *App) GetRegisteredViews() []string {
 	}
 }
 
+func getCollection(payload *types.Payload) types.Collection {
+	switch payload.Collection {
+	{{- range .Structures }}
+	{{- if and (not (eq .Class "")) (not .DisableGo) }}
+	case "{{toLower .Class}}":
+		return {{toLower .Class}}.Get{{ .Class }}Collection(payload)
+	{{- end }}
+	{{- end }}
+	default:
+		logging.LogBackend(fmt.Sprintf("Warning: Unknown collection type: %s", payload.Collection))
+		return nil
+	}
+}
 // EXISTING_CODE
 // EXISTING_CODE

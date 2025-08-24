@@ -19,10 +19,10 @@ export type IconSet = {
   Chunks: IconType;
   Contracts: IconType;
   Status: IconType;
+  DalleDress: IconType;
 
   Home: IconType;
   Khedra: IconType;
-  DalleDress: IconType;
   Settings: IconType;
   Wizard: IconType;
 
@@ -68,11 +68,11 @@ const faIcons: IconSet = {
   Chunks: Icons.FaChunks,
   Contracts: Icons.FaContracts,
   Status: Icons.FaStatus,
+  DalleDress: Icons.FaDalleDress,
 
   // App navigation
   Home: Icons.FaHome,
   Khedra: Icons.FaIndustry,
-  DalleDress: Icons.FaPalette,
   Settings: Icons.FaCog,
   Wizard: Icons.FaHatWizard,
 
@@ -125,11 +125,11 @@ const biIcons: IconSet = {
   Chunks: Icons.BiChunks,
   Contracts: Icons.BiContracts,
   Status: Icons.BiStatus,
+  DalleDress: Icons.BiDalleDress,
 
   // App navigation
   Home: Icons.BiHome,
   Khedra: Icons.BiBuildings,
-  DalleDress: Icons.BiPalette,
   Settings: Icons.BiCog,
   Wizard: Icons.BiCog,
 
@@ -216,13 +216,13 @@ export const useIconSets = (
       createElement(iconSet.Contracts, { size, ...props });
     const Status: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Status, { size, ...props });
+    const DalleDress: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.DalleDress, { size, ...props });
 
     const Home: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Home, { size, ...props });
     const Khedra: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Khedra, { size, ...props });
-    const DalleDress: FC<IconProps> = (props = {}) =>
-      createElement(iconSet.DalleDress, { size, ...props });
     const Settings: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Settings, { size, ...props });
     const Wizard: FC<IconProps> = (props = {}) =>
@@ -290,10 +290,10 @@ export const useIconSets = (
       Chunks,
       Contracts,
       Status,
+      DalleDress,
 
       Home,
       Khedra,
-      DalleDress,
       Settings,
       Wizard,
 

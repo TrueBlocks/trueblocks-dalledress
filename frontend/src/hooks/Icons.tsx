@@ -12,8 +12,8 @@ import {
   BiFile,
   BiHistory,
   BiHome,
-  BiImage,
   BiListUl,
+  BiPalette,
   BiQuestionMark,
   BiUser,
 } from 'react-icons/bi';
@@ -22,9 +22,9 @@ import {
   FaDesktop,
   FaFileContract,
   FaHistory,
-  FaImage,
   FaIndustry,
   FaListAlt,
+  FaPalette,
   FaQuestionCircle,
   FaUser,
 } from 'react-icons/fa';
@@ -91,7 +91,6 @@ export {
   BiLogoGithub,
   BiLogoTwitter,
   BiMoon,
-  BiPalette,
   BiPencil,
   BiPlus,
   BiQuestionMark,
@@ -130,7 +129,6 @@ export {
   FaListAlt,
   FaMagic,
   FaMoon,
-  FaPalette,
   FaPlus,
   FaQuestionCircle,
   FaRandom,
@@ -149,7 +147,7 @@ export const FaChunks = FaIndustry;
 export const FaContracts = FaFileContract;
 export const FaAbis = FaListAlt;
 export const FaNames = FaUser;
-export const FaDalleDress = FaImage;
+export const FaDalleDress = FaPalette;
 export const FaMissing = FaQuestionCircle;
 
 export const BiStatus = BiCog;
@@ -159,7 +157,7 @@ export const BiChunks = BiBuildings;
 export const BiContracts = BiFile;
 export const BiAbis = BiListUl;
 export const BiNames = BiUser;
-export const BiDalleDress = BiImage;
+export const BiDalleDress = BiPalette;
 export const BiMissing = BiQuestionMark;
 
 // EXISTING_CODE
@@ -172,3 +170,4 @@ export const BiMissing = BiQuestionMark;
 // Chunks
 // Contracts
 // Status
+// DalleDress

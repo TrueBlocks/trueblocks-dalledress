@@ -39,29 +39,18 @@ export interface ActionDefinition {
 }
 
 export interface CollectionActionsConfig<TPageData, TItem> {
-  // Collection identifier
   collection: string;
-
-  // Current context
   viewStateKey: project.ViewStateKey;
-
-  // Required hooks from parent component
   pagination: ReturnType<
     typeof import('@components').usePagination
   >['pagination'];
   goToPage: ReturnType<typeof import('@components').usePagination>['goToPage'];
   sort: ReturnType<typeof import('@contexts').useSorting>['sort'];
   filter: ReturnType<typeof import('@contexts').useFiltering>['filter'];
-
-  // Backend-provided view configuration (used to derive actions per facet)
   viewConfig: types.ViewConfig;
-
-  // State management
   pageData: TPageData | null;
   setPageData: React.Dispatch<React.SetStateAction<TPageData | null>>;
   setTotalItems: (total: number) => void;
-
-  // API functions
   crudFunc: (
     payload: types.Payload,
     operation: crud.Operation,
@@ -74,16 +63,10 @@ export interface CollectionActionsConfig<TPageData, TItem> {
     sort: sdk.SortSpec,
     filter: string,
   ) => Promise<TPageData>;
-
-  // Collection-specific classes and items
   pageClass: new (data: Record<string, unknown>) => TPageData;
   updateItem: TItem;
-
-  // Optional functions
   cleanFunc?: (payload: types.Payload, addresses: string[]) => Promise<void>;
   postFunc?: (item: TItem) => TItem;
-
-  // Helper functions
   createPayload: (facet: types.DataFacet, address?: string) => types.Payload;
   getCurrentDataFacet: () => types.DataFacet;
 }

@@ -13,12 +13,6 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-
-	{{- range .Structures }}
-	{{- if and (not (eq .Class "")) (not .DisableGo) }}
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/{{ toLower .Class }}"
-	{{- end }}
-	{{- end }}
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 )
 
@@ -61,18 +55,4 @@ func (a *App) ExportData(payload *types.Payload) error {
 	msgs.EmitStatus(statusMsg)
 
 	return nil
-}
-
-func getCollection(payload *types.Payload) types.Collection {
-	switch payload.Collection {
-	{{- range .Structures }}
-	{{- if and (not (eq .Class "")) (not .DisableGo) }}
-	case "{{toLower .Class}}":
-		return {{toLower .Class}}.Get{{ .Class }}Collection(payload)
-	{{- end }}
-	{{- end }}
-	default:
-		logging.LogBackend(fmt.Sprintf("Warning: Unknown collection type: %s", payload.Collection))
-		return nil
-	}
 }

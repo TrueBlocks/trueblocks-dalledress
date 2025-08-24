@@ -6,11 +6,12 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 import { SetInitialized } from '@app';
-import { DalleDress, Khedra, Projects, Settings } from '@views';
+import { Khedra, Projects, Settings } from '@views';
 import {
   Abis,
   Chunks,
   Contracts,
+  DalleDress,
   Exports,
   Monitors,
   Names,

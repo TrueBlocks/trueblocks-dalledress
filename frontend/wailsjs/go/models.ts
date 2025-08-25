@@ -401,9 +401,6 @@ export namespace dalledress {
 	    series: dalle.Series[];
 	    gallery: GalleryItem[];
 	    currentDress?: dalle.DalleDress;
-	    galleryCacheHit: boolean;
-	    galleryScanned: number;
-	    galleryScanMillis: number;
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
@@ -422,9 +419,6 @@ export namespace dalledress {
 	        this.series = this.convertValues(source["series"], dalle.Series);
 	        this.gallery = this.convertValues(source["gallery"], GalleryItem);
 	        this.currentDress = this.convertValues(source["currentDress"], dalle.DalleDress);
-	        this.galleryCacheHit = source["galleryCacheHit"];
-	        this.galleryScanned = source["galleryScanned"];
-	        this.galleryScanMillis = source["galleryScanMillis"];
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];

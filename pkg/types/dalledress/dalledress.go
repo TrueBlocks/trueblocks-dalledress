@@ -305,8 +305,7 @@ func (c *DalleDressCollection) RefreshGallery() {
 }
 
 // getGalleryItems returns cached gallery items performing incremental scan per series
-func (c *DalleDressCollection) getGalleryItems() (items []*GalleryItem, cacheHit bool, scannedSeries int, scanDur time.Duration) {
-	start := time.Now()
+func (c *DalleDressCollection) getGalleryItems() (items []*GalleryItem) {
 	root := dallev2OutputDir()
 
 	// snapshot existing cache state
@@ -348,7 +347,7 @@ func (c *DalleDressCollection) getGalleryItems() (items []*GalleryItem, cacheHit
 		}
 	}
 	if len(changedSeries) == 0 && cached != nil {
-		return cached, true, 0, time.Since(start)
+		return cached
 	}
 
 	// build existing map for unchanged reuse
@@ -434,9 +433,10 @@ func (c *DalleDressCollection) getGalleryItems() (items []*GalleryItem, cacheHit
 	c.galleryCache = merged
 	c.gallerySeriesInfo = current
 	c.galleryCacheMux.Unlock()
-	return merged, false, len(changedSeries), time.Since(start)
+	return merged
 }
 
 // dallev2OutputDir isolates external call for easier test mocking
 func dallev2OutputDir() string { return dallev2.OutputDir() }
+
 // EXISTING_CODE

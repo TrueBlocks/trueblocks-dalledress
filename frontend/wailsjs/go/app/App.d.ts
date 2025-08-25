@@ -12,13 +12,13 @@ import {utils} from '../models';
 import {chunks} from '../models';
 import {context} from '../models';
 import {contracts} from '../models';
+import {dalle} from '../models';
 import {dalledress} from '../models';
 import {exports} from '../models';
 import {monitors} from '../models';
 import {names} from '../models';
 import {status} from '../models';
 import {app} from '../models';
-import {dalle} from '../models';
 
 export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Abi):Promise<void>;
 
@@ -87,6 +87,8 @@ export function GetContractsPage(arg1:types.Payload,arg2:number,arg3:number,arg4
 export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetDalleDressConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
+export function GetDalleDressCurrent(arg1:types.Payload,arg2:string):Promise<dalle.DalleDress>;
 
 export function GetDalleDressPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<dalledress.DalleDressPage>;
 

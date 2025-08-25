@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 
+import { GetDalleDressCurrent } from '@app';
 import { useActiveProject } from '@hooks';
 import {
   Button,
@@ -22,7 +23,7 @@ import {
   Textarea,
   Title,
 } from '@mantine/core';
-import { dalledress, project, types } from '@models';
+import { dalle, dalledress, project, types } from '@models';
 import { Log } from '@utils';
 
 import { GalleryControls } from './GalleryControls';
@@ -35,10 +36,15 @@ function GeneratorRenderer({
   pageData: dalledress.DalleDressPage | null;
 }) {
   const { activeAddress, setActiveAddress } = useActiveProject();
-  const [selectedSeries, setSelectedSeries] = useState<string | null>(null);
+  const [selectedSeries, setSelectedSeries] = useState<string | null>('empty');
   const [selectedThumb, setSelectedThumb] = useState<string | null>(null);
 
-  const current = pageData?.currentDress || null;
+  const [current, setCurrent] = useState<dalle.DalleDress | null>(
+    pageData?.currentDress || null,
+  );
+  useEffect(() => {
+    setCurrent(pageData?.currentDress || null);
+  }, [pageData?.currentDress]);
   const galleryItems = useMemo(
     () => (pageData?.gallery ? [...pageData.gallery] : []),
     [pageData?.gallery],
@@ -46,10 +52,16 @@ function GeneratorRenderer({
 
   const seriesOptions = useMemo(() => {
     const set = new Set<string>();
+    set.add('empty');
     galleryItems.forEach((g) => {
       if (g.series) set.add(g.series);
     });
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
+    const arr = Array.from(set).sort((a, b) => a.localeCompare(b));
+    if (arr[0] !== 'empty') {
+      const rest = arr.filter((s) => s !== 'empty');
+      return ['empty', ...rest];
+    }
+    return arr;
   }, [galleryItems]);
 
   const addressOptions = useMemo(() => {
@@ -102,6 +114,30 @@ function GeneratorRenderer({
     Log('generator:thumb:select:' + item.relPath);
   }, []);
 
+  useEffect(() => {
+    if (!selectedSeries) return;
+    const match = galleryItems.find(
+      (g) =>
+        g.series === selectedSeries &&
+        (!activeAddress || g.address === activeAddress),
+    );
+    if (match) setSelectedThumb(match.relPath);
+  }, [selectedSeries, activeAddress, galleryItems]);
+
+  useEffect(() => {
+    if (!activeAddress || !selectedSeries) return;
+    GetDalleDressCurrent(
+      {
+        collection: 'dalledress',
+        dataFacet: types.DataFacet.GENERATOR,
+        address: activeAddress,
+      },
+      selectedSeries,
+    ).then((dd) => {
+      setCurrent(dd as unknown as dalle.DalleDress);
+    });
+  }, [activeAddress, selectedSeries]);
+
   const attributes = useMemo(() => current?.attributes || [], [current]);
 
   const selectedGalleryItem = useMemo(() => {
@@ -140,7 +176,10 @@ function GeneratorRenderer({
                 label="Series"
                 placeholder="Series"
                 value={selectedSeries}
-                data={seriesOptions.map((s) => ({ value: s, label: s }))}
+                data={seriesOptions.map((s) => ({
+                  value: s,
+                  label: s === 'empty' ? '<empty>' : s,
+                }))}
                 onChange={handleSeriesChange}
                 w={220}
                 size="xs"

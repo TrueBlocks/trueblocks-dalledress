@@ -16,6 +16,7 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
+	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 	// EXISTING_CODE
 )
 
@@ -55,6 +56,17 @@ func (a *App) SeriesCrud(
 ) error {
 	collection := dalledress.GetDalleDressCollection(payload)
 	return collection.SeriesCrud(payload, op, item)
+}
+
+func (a *App) GetDalleDressCurrent(payload *types.Payload, series string) (*dalle.DalleDress, error) {
+	if payload == nil || payload.Address == "" { // fast track if no address
+		return &dalle.DalleDress{}, nil
+	}
+	if series == "" { // default series
+		series = "empty"
+	}
+	cd := dalledress.GetCurrentDressFor(series, payload.Address)
+	return cd, nil
 }
 
 // EXISTING_CODE

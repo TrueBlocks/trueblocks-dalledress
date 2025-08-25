@@ -138,6 +138,10 @@ export function GetDalleDressConfig(arg1) {
   return window['go']['app']['App']['GetDalleDressConfig'](arg1);
 }
 
+export function GetDalleDressCurrent(arg1, arg2) {
+  return window['go']['app']['App']['GetDalleDressCurrent'](arg1, arg2);
+}
+
 export function GetDalleDressPage(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['app']['App']['GetDalleDressPage'](arg1, arg2, arg3, arg4, arg5);
 }

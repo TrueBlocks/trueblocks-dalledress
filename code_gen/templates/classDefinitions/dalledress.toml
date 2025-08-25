@@ -9,7 +9,7 @@
 
 [[facets]]
     name = "Generator"
-    store = "Generator"
+    store = "dalle.DalleDress"
     actions = ["export"]
     viewType = "dashboard"
     renderer = "facet"
@@ -17,14 +17,14 @@
 
 [[facets]]
     name = "Series"
-    store = "Series"
+    store = "dalle.Series"
     actions = ["export"]
     viewType = ""
     isForm = false
 
 [[facets]]
     name = "Databases"
-    store = "Databases"
+    store = "dalle.Database"
     actions = ["export"]
     viewType = ""
     isForm = false
@@ -38,7 +38,7 @@
 
 [[facets]]
     name = "Gallery"
-    store = "Logs"
+    store = "dalle.DalleDress"
     actions = ["export"]
     viewType = "dashboard"
     renderer = "facet"

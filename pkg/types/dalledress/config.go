@@ -58,7 +58,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 		"gallery": {
 			Name:          "Gallery",
 			Store:         "logs",
-			IsForm:        true,
+			IsForm:        false,
 			DividerBefore: false,
 			Fields:        getLogsFields(),
 			Actions:       []string{},

@@ -34,7 +34,7 @@ import { Debugger, LogError, useErrorHandler } from '@utils';
 import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanel } from '../utils/detailPanel';
 import { SeriesModal } from './components';
-// import { renderers } from './components';
+import { renderers } from './components';
 import { useSeriesModal } from './hooks/seriesModal';
 
 const ROUTE: ViewRoute = 'dalledress';
@@ -242,6 +242,10 @@ export const DalleDress = () => {
     [viewConfig, getCurrentDataFacet],
   );
 
+  const rendererMap = useMemo(
+    () => renderers(pageData, viewStateKey),
+    [pageData, viewStateKey],
+  );
   const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
     viewConfig,
     getCurrentDataFacet,
@@ -250,9 +254,18 @@ export const DalleDress = () => {
       currentColumns as unknown as import('@components').FormField<
         Record<string, unknown>
       >[],
+    renderers: rendererMap,
   });
 
   const perTabContent = useMemo(() => {
+    const facet = getCurrentDataFacet();
+    // Prefer custom renderer for certain facets even if no data yet
+    if (
+      rendererMap[facet] &&
+      (facet === types.DataFacet.GENERATOR || facet === types.DataFacet.GALLERY)
+    ) {
+      return rendererMap[facet]();
+    }
     if (isForm && formNode) return formNode;
     return (
       <BaseTab<Record<string, unknown>>
@@ -267,13 +280,15 @@ export const DalleDress = () => {
       />
     );
   }, [
-    currentData,
+    getCurrentDataFacet,
+    rendererMap,
     currentColumns,
+    isForm,
+    formNode,
+    currentData,
     pageData?.isFetching,
     error,
     viewStateKey,
-    isForm,
-    formNode,
     headerActions,
     detailPanel,
   ]);

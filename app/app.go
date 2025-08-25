@@ -23,6 +23,7 @@ import (
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
+	dallev2 "github.com/TrueBlocks/trueblocks-dalle/v2"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -116,11 +117,15 @@ func (a *App) Startup(ctx context.Context) {
 	a.Preferences.User = user
 	a.Preferences.App = appPrefs
 
-	a.fileServer = fileserver.NewFileServer()
-	if err := a.fileServer.Start(); err != nil {
-		msgs.EmitError("Failed to start file server", err)
+	// Initialize file server directly on the dalle OutputDir
+	if out := dallev2.OutputDir(); out != "" {
+		if _, err := os.Stat(out); err == nil {
+			a.fileServer = fileserver.NewFileServer(out)
+			if err := a.fileServer.Start(); err != nil {
+				msgs.EmitError("Failed to start image file server", err)
+			}
+		}
 	}
-	go a.watchImagesDir()
 
 	if len(a.Preferences.App.RecentProjects) > 0 {
 		mostRecentPath := a.Preferences.App.RecentProjects[0]

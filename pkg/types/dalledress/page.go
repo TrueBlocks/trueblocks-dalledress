@@ -11,8 +11,10 @@ package dalledress
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
+
 	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
@@ -20,15 +22,19 @@ import (
 )
 
 type DalleDressPage struct {
-	Facet         types.DataFacet `json:"facet"`
-	Databases     []*Database     `json:"databases"`
-	Generator     []*Generator    `json:"generator"`
-	Logs          []*Log          `json:"logs"`
-	Series        []*Series       `json:"series"`
-	TotalItems    int             `json:"totalItems"`
-	ExpectedTotal int             `json:"expectedTotal"`
-	IsFetching    bool            `json:"isFetching"`
-	State         types.LoadState `json:"state"`
+	Facet             types.DataFacet `json:"facet"`
+	Databases         []*Database     `json:"databases"`
+	Generator         []*Generator    `json:"generator"`
+	Logs              []*Log          `json:"logs"`
+	Series            []*Series       `json:"series"`
+	Gallery           []*GalleryItem  `json:"gallery"`
+	GalleryCacheHit   bool            `json:"galleryCacheHit"`
+	GalleryScanned    int             `json:"galleryScanned"`
+	GalleryScanMillis int64           `json:"galleryScanMillis"`
+	TotalItems        int             `json:"totalItems"`
+	ExpectedTotal     int             `json:"expectedTotal"`
+	IsFetching        bool            `json:"isFetching"`
+	State             types.LoadState `json:"state"`
 }
 
 func (p *DalleDressPage) GetFacet() types.DataFacet {
@@ -168,6 +174,7 @@ func (c *DalleDressCollection) GetPage(
 		sortFunc := func(items []Log, sort sdk.SortSpec) error {
 			return sdk.SortLogs(items, sort)
 		}
+		start := time.Now()
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
 		} else {
@@ -176,6 +183,19 @@ func (c *DalleDressCollection) GetPage(
 				gallery = append(gallery, &result.Items[i])
 			}
 			page.Logs, page.TotalItems, page.State = gallery, result.TotalItems, result.State
+			// EXISTING_CODE
+			items, cacheHit, scannedSeries, scanDur := c.getGalleryItems()
+			page.Gallery = items
+			page.GalleryCacheHit = cacheHit
+			page.GalleryScanned = scannedSeries
+			page.GalleryScanMillis = scanDur.Milliseconds()
+			totalDur := time.Since(start)
+			size := 0
+			for _, gi := range items {
+				size += int(gi.FileSize)
+			}
+			fmt.Printf("GALLERY_METRICS cacheHit=%v scannedSeries=%d scan=%dms total=%dms items=%d bytes=%d\n", cacheHit, scannedSeries, scanDur.Milliseconds(), totalDur.Milliseconds(), len(items), size)
+			// EXISTING_CODE
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()

@@ -8,12 +8,9 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 )
 
 // FileServer handles serving generated images via HTTP
@@ -26,11 +23,14 @@ type FileServer struct {
 	mutex     sync.Mutex
 }
 
+// currentInstance holds a reference to the most recently started file server.
+var currentInstance *FileServer
+
 // NewFileServer creates a new file server instance
-func NewFileServer() *FileServer {
+func NewFileServer(basePath string) *FileServer {
 	return &FileServer{
-		basePath:  "", // Will be set in Start() method
-		port:      0,  // Will be determined
+		basePath:  basePath,
+		port:      0,
 		running:   false,
 		urlPrefix: "/images/",
 	}
@@ -45,22 +45,11 @@ func (fs *FileServer) Start() error {
 		return nil // Already running
 	}
 
-	// Determine storage location
-	basePath, err := fs.getStorageLocation()
-	if err != nil {
-		return fmt.Errorf("failed to determine storage location: %w", err)
+	if fs.basePath == "" {
+		return fmt.Errorf("file server requires basePath")
 	}
-	fs.basePath = basePath
-
-	// Ensure directory exists
-	if err := os.MkdirAll(fs.basePath, 0755); err != nil {
-		return fmt.Errorf("failed to create image directory: %w", err)
-	}
-
-	// Create sample files in the base path
-	if err := CreateSampleFiles(fs.basePath); err != nil {
-		log.Printf("Warning: failed to create sample files: %v", err)
-		// Continue even if sample creation fails - this is non-critical
+	if stat, err := os.Stat(fs.basePath); err != nil || !stat.IsDir() {
+		return fmt.Errorf("file server basePath invalid: %s", fs.basePath)
 	}
 
 	// Find available port
@@ -87,11 +76,15 @@ func (fs *FileServer) Start() error {
 	// Start server in goroutine
 	go func() {
 		fs.running = true
+		currentInstance = fs
 		log.Printf("File server started at http://127.0.0.1:%d serving files from %s", fs.port, fs.basePath)
 		if err := fs.server.ListenAndServe(); err != http.ErrServerClosed {
 			log.Printf("File server error: %v", err)
 		}
 		fs.running = false
+		if currentInstance == fs { // reset global if this instance stops
+			currentInstance = nil
+		}
 	}()
 
 	return nil
@@ -126,44 +119,24 @@ func (fs *FileServer) Stop() error {
 func (fs *FileServer) UpdateBasePath(newPath string) error {
 	fs.mutex.Lock()
 	defer fs.mutex.Unlock()
-
-	// Verify that the new path exists
-	if _, err := os.Stat(newPath); err != nil {
-		if os.IsNotExist(err) {
-			// Try to create the directory
-			if err := os.MkdirAll(newPath, 0755); err != nil {
-				return fmt.Errorf("failed to create directory at new path: %w", err)
-			}
-		} else {
-			return fmt.Errorf("error checking new path: %w", err)
-		}
+	if newPath == "" {
+		return fmt.Errorf("new path empty")
 	}
-
-	// If server is running, we need to restart it with new path
-	if fs.running {
-		// Shutdown the current server
-		log.Printf("Restarting file server with new base path: %s", newPath)
-
-		// Create a context with timeout for shutdown
+	if stat, err := os.Stat(newPath); err != nil || !stat.IsDir() {
+		return fmt.Errorf("invalid new path: %s", newPath)
+	}
+	if fs.running && fs.server != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-
-		// Shutdown the server
 		if err := fs.server.Shutdown(ctx); err != nil {
-			return fmt.Errorf("error shutting down file server: %w", err)
+			return fmt.Errorf("shutdown: %w", err)
 		}
-
 		fs.running = false
 	}
-
-	// Update the base path
 	fs.basePath = newPath
-
-	// If server was running, restart it
 	if fs.server != nil {
 		return fs.Start()
 	}
-
 	return nil
 }
 
@@ -172,6 +145,24 @@ func (fs *FileServer) GetBasePath() string {
 	fs.mutex.Lock()
 	defer fs.mutex.Unlock()
 	return fs.basePath
+}
+
+// GetBaseURL returns the base URL (including trailing slash) for the active file server instance.
+func (fs *FileServer) GetBaseURL() string {
+	fs.mutex.Lock()
+	defer fs.mutex.Unlock()
+	if !fs.running || fs.port == 0 {
+		return ""
+	}
+	return fmt.Sprintf("http://127.0.0.1:%d%s", fs.port, fs.urlPrefix)
+}
+
+// CurrentBaseURL returns the base URL for the globally tracked running file server, if any.
+func CurrentBaseURL() string {
+	if currentInstance == nil {
+		return ""
+	}
+	return currentInstance.GetBaseURL()
 }
 
 // Helper function to find an available port
@@ -191,14 +182,6 @@ func findAvailablePort(basePort int) (int, error) {
 // It always uses a subdirectory named "images" inside the application's folder
 // within the user's Documents directory. If the user's home directory cannot be
 // determined, it returns an error.
-func (fs *FileServer) getStorageLocation() (string, error) {
-	if userDir, err := os.UserHomeDir(); err != nil {
-		return "", fmt.Errorf("failed to get user home directory: %w", err)
-	} else {
-		appId := preferences.GetAppId()
-		return filepath.Join(userDir, "Documents", appId.AppName, "images"), nil
-	}
-}
 
 // GetURL returns the URL for accessing a specific image
 func (fs *FileServer) GetURL(relativePath string) string {

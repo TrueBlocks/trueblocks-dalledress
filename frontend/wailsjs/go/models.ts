@@ -279,12 +279,42 @@ export namespace dalle {
 
 export namespace dalledress {
 	
+	export class GalleryItem {
+	    series: string;
+	    address: string;
+	    url: string;
+	    relPath: string;
+	    fileName: string;
+	    index: number;
+	    modifiedAt: number;
+	    fileSize: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new GalleryItem(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.series = source["series"];
+	        this.address = source["address"];
+	        this.url = source["url"];
+	        this.relPath = source["relPath"];
+	        this.fileName = source["fileName"];
+	        this.index = source["index"];
+	        this.modifiedAt = source["modifiedAt"];
+	        this.fileSize = source["fileSize"];
+	    }
+	}
 	export class DalleDressPage {
 	    facet: types.DataFacet;
 	    databases: dalle.Database[];
 	    generator: dalle.Generator[];
 	    logs: types.Log[];
 	    series: dalle.Series[];
+	    gallery: GalleryItem[];
+	    galleryCacheHit: boolean;
+	    galleryScanned: number;
+	    galleryScanMillis: number;
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
@@ -301,6 +331,10 @@ export namespace dalledress {
 	        this.generator = this.convertValues(source["generator"], dalle.Generator);
 	        this.logs = this.convertValues(source["logs"], types.Log);
 	        this.series = this.convertValues(source["series"], dalle.Series);
+	        this.gallery = this.convertValues(source["gallery"], GalleryItem);
+	        this.galleryCacheHit = source["galleryCacheHit"];
+	        this.galleryScanned = source["galleryScanned"];
+	        this.galleryScanMillis = source["galleryScanMillis"];
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];

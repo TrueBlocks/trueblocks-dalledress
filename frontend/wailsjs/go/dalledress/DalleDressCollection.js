@@ -38,6 +38,10 @@ export function NeedsUpdate(arg1) {
   return window['go']['dalledress']['DalleDressCollection']['NeedsUpdate'](arg1);
 }
 
+export function RefreshGallery() {
+  return window['go']['dalledress']['DalleDressCollection']['RefreshGallery']();
+}
+
 export function Reset(arg1) {
   return window['go']['dalledress']['DalleDressCollection']['Reset'](arg1);
 }

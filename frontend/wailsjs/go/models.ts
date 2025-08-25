@@ -206,6 +206,94 @@ export namespace crud {
 
 export namespace dalle {
 	
+	export class Attribute {
+	    database: string;
+	    name: string;
+	    bytes: string;
+	    number: number;
+	    factor: number;
+	    count: number;
+	    selector: number;
+	    value: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Attribute(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.database = source["database"];
+	        this.name = source["name"];
+	        this.bytes = source["bytes"];
+	        this.number = source["number"];
+	        this.factor = source["factor"];
+	        this.count = source["count"];
+	        this.selector = source["selector"];
+	        this.value = source["value"];
+	    }
+	}
+	export class DalleDress {
+	    original: string;
+	    fileName: string;
+	    seed: string;
+	    prompt: string;
+	    dataPrompt: string;
+	    titlePrompt: string;
+	    tersePrompt: string;
+	    enhancedPrompt: string;
+	    attributes: Attribute[];
+	    seedChunks: string[];
+	    selectedTokens: string[];
+	    selectedRecords: string[];
+	    imageUrl: string;
+	    annotatedPath: string;
+	    ipfsHash: string;
+	    cacheHit: boolean;
+	    completed: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new DalleDress(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.original = source["original"];
+	        this.fileName = source["fileName"];
+	        this.seed = source["seed"];
+	        this.prompt = source["prompt"];
+	        this.dataPrompt = source["dataPrompt"];
+	        this.titlePrompt = source["titlePrompt"];
+	        this.tersePrompt = source["tersePrompt"];
+	        this.enhancedPrompt = source["enhancedPrompt"];
+	        this.attributes = this.convertValues(source["attributes"], Attribute);
+	        this.seedChunks = source["seedChunks"];
+	        this.selectedTokens = source["selectedTokens"];
+	        this.selectedRecords = source["selectedRecords"];
+	        this.imageUrl = source["imageUrl"];
+	        this.annotatedPath = source["annotatedPath"];
+	        this.ipfsHash = source["ipfsHash"];
+	        this.cacheHit = source["cacheHit"];
+	        this.completed = source["completed"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class Database {
 	    id: string;
 	    name: string;
@@ -312,6 +400,7 @@ export namespace dalledress {
 	    logs: types.Log[];
 	    series: dalle.Series[];
 	    gallery: GalleryItem[];
+	    currentDress?: dalle.DalleDress;
 	    galleryCacheHit: boolean;
 	    galleryScanned: number;
 	    galleryScanMillis: number;
@@ -332,6 +421,7 @@ export namespace dalledress {
 	        this.logs = this.convertValues(source["logs"], types.Log);
 	        this.series = this.convertValues(source["series"], dalle.Series);
 	        this.gallery = this.convertValues(source["gallery"], GalleryItem);
+	        this.currentDress = this.convertValues(source["currentDress"], dalle.DalleDress);
 	        this.galleryCacheHit = source["galleryCacheHit"];
 	        this.galleryScanned = source["galleryScanned"];
 	        this.galleryScanMillis = source["galleryScanMillis"];

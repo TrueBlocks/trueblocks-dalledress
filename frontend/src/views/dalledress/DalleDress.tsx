@@ -106,7 +106,7 @@ export const DalleDress = () => {
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.GENERATOR:
-        return pageData.generator || [];
+        return [];
       case types.DataFacet.SERIES:
         return pageData.series || [];
       case types.DataFacet.DATABASES:

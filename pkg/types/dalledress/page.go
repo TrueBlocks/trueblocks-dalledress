@@ -19,22 +19,24 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
 	// EXISTING_CODE
+	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 )
 
 type DalleDressPage struct {
-	Facet             types.DataFacet `json:"facet"`
-	Databases         []*Database     `json:"databases"`
-	Generator         []*Generator    `json:"generator"`
-	Logs              []*Log          `json:"logs"`
-	Series            []*Series       `json:"series"`
-	Gallery           []*GalleryItem  `json:"gallery"`
-	GalleryCacheHit   bool            `json:"galleryCacheHit"`
-	GalleryScanned    int             `json:"galleryScanned"`
-	GalleryScanMillis int64           `json:"galleryScanMillis"`
-	TotalItems        int             `json:"totalItems"`
-	ExpectedTotal     int             `json:"expectedTotal"`
-	IsFetching        bool            `json:"isFetching"`
-	State             types.LoadState `json:"state"`
+	Facet             types.DataFacet   `json:"facet"`
+	Databases         []*Database       `json:"databases"`
+	Generator         []*Generator      `json:"generator"`
+	Logs              []*Log            `json:"logs"`
+	Series            []*Series         `json:"series"`
+	Gallery           []*GalleryItem    `json:"gallery"`
+	CurrentDress      *dalle.DalleDress `json:"currentDress"`
+	GalleryCacheHit   bool              `json:"galleryCacheHit"`
+	GalleryScanned    int               `json:"galleryScanned"`
+	GalleryScanMillis int64             `json:"galleryScanMillis"`
+	TotalItems        int               `json:"totalItems"`
+	ExpectedTotal     int               `json:"expectedTotal"`
+	IsFetching        bool              `json:"isFetching"`
+	State             types.LoadState   `json:"state"`
 }
 
 func (p *DalleDressPage) GetFacet() types.DataFacet {
@@ -94,6 +96,24 @@ func (c *DalleDressCollection) GetPage(
 				generator = append(generator, &result.Items[i])
 			}
 			page.Generator, page.TotalItems, page.State = generator, result.TotalItems, result.State
+			// Build gallery subset & select latest current dress based on annotated modification time
+			items, _, _, _ := c.getGalleryItems()
+			if payload != nil && payload.Address != "" {
+				latest, ordered := selectLatestGalleryItem(items, payload.Address)
+				page.Gallery = ordered
+				if latest != nil {
+					// Load sidecars for latest (series + address)
+					if cd := loadCurrentDressFromSidecars(latest.Series, payload.Address); cd != nil {
+						page.CurrentDress = cd
+					} else if page.CurrentDress == nil { // fallback empty struct so frontend has object shape
+						page.CurrentDress = &dalle.DalleDress{}
+					}
+				} else if page.CurrentDress == nil {
+					page.CurrentDress = &dalle.DalleDress{}
+				}
+			} else if page.CurrentDress == nil {
+				page.CurrentDress = &dalle.DalleDress{}
+			}
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()

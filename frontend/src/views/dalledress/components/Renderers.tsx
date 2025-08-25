@@ -7,8 +7,8 @@ import {
   useState,
 } from 'react';
 
+import { useActiveProject } from '@hooks';
 import {
-  Box,
   Button,
   Center,
   Container,
@@ -16,7 +16,9 @@ import {
   Group,
   Image,
   ScrollArea,
+  Select,
   Stack,
+  Text,
   Textarea,
   Title,
 } from '@mantine/core';
@@ -24,6 +26,7 @@ import { dalledress, project, types } from '@models';
 import { Log } from '@utils';
 
 import { GalleryControls } from './GalleryControls';
+import { GeneratorThumb } from './GeneratorThumb';
 import { SeriesGallery } from './SeriesGallery';
 
 function GeneratorRenderer({
@@ -31,98 +34,243 @@ function GeneratorRenderer({
 }: {
   pageData: dalledress.DalleDressPage | null;
 }) {
-  const sampleJson = JSON.stringify(pageData?.generator?.[0] || {}, null, 2);
+  const { activeAddress, setActiveAddress } = useActiveProject();
+  const [selectedSeries, setSelectedSeries] = useState<string | null>(null);
+  const [selectedThumb, setSelectedThumb] = useState<string | null>(null);
+
+  const current = pageData?.currentDress || null;
+  const galleryItems = useMemo(
+    () => (pageData?.gallery ? [...pageData.gallery] : []),
+    [pageData?.gallery],
+  );
+
+  const seriesOptions = useMemo(() => {
+    const set = new Set<string>();
+    galleryItems.forEach((g) => {
+      if (g.series) set.add(g.series);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [galleryItems]);
+
+  const addressOptions = useMemo(() => {
+    const set = new Set<string>();
+    if (activeAddress) set.add(activeAddress);
+    galleryItems.forEach((g) => set.add(g.address));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [galleryItems, activeAddress]);
+
+  useEffect(() => {
+    if (!activeAddress && addressOptions.length) {
+      const first = addressOptions[0];
+      if (first) setActiveAddress(first);
+    }
+  }, [activeAddress, addressOptions, setActiveAddress]);
+
+  useEffect(() => {
+    if (!selectedSeries) {
+      const firstForAddress = galleryItems.find(
+        (g) => g.address === activeAddress && g.series,
+      );
+      if (firstForAddress?.series) setSelectedSeries(firstForAddress.series);
+      if (!selectedThumb && firstForAddress)
+        setSelectedThumb(firstForAddress.relPath);
+    }
+  }, [selectedSeries, selectedThumb, galleryItems, activeAddress]);
+
+  const handleAddressChange = useCallback(
+    (value: string | null) => {
+      if (!value) return;
+      Log('generator:address:' + value);
+      setActiveAddress(value);
+    },
+    [setActiveAddress],
+  );
+
+  const handleSeriesChange = useCallback((value: string | null) => {
+    setSelectedSeries(value);
+    if (value) Log('generator:series:' + value);
+  }, []);
+
+  const handleGenerate = useCallback(() => {
+    if (!activeAddress || !selectedSeries) return;
+    Log('generator:generate');
+  }, [activeAddress, selectedSeries]);
+
+  const handleThumbSelect = useCallback((item: dalledress.GalleryItem) => {
+    setSelectedThumb(item.relPath);
+    if (item.series) setSelectedSeries(item.series);
+    Log('generator:thumb:select:' + item.relPath);
+  }, []);
+
+  const attributes = useMemo(() => current?.attributes || [], [current]);
+
+  const selectedGalleryItem = useMemo(() => {
+    if (!selectedThumb) return null;
+    return galleryItems.find((g) => g.relPath === selectedThumb) || null;
+  }, [selectedThumb, galleryItems]);
+
+  const displayImageUrl = useMemo(() => {
+    if (current?.imageUrl) return current.imageUrl;
+    if (selectedGalleryItem?.url) return selectedGalleryItem.url;
+    const firstForAddress = galleryItems.find(
+      (g) => g.address === activeAddress,
+    );
+    if (firstForAddress?.url) return firstForAddress.url;
+    if (galleryItems?.length) return galleryItems[0]?.url || '';
+    return '';
+  }, [current?.imageUrl, selectedGalleryItem, galleryItems, activeAddress]);
+
   return (
     <Container size="xl" py="md">
       <Grid gutter="md">
-        <Grid.Col span={9}>
+        <Grid.Col span={10}>
           <Stack gap="xs">
-            <Group justify="space-between" align="center">
-              <Box style={{ flex: 1 }}>
-                <Textarea
-                  value={''}
-                  placeholder="Enter an address or ENS"
-                  autosize
-                  minRows={1}
-                  styles={{ input: { fontFamily: 'monospace' } }}
-                  readOnly
-                />
-              </Box>
-              <Group gap="xs">
-                <Button size="xs" variant="default">
-                  Generate
-                </Button>
-                <Button size="xs" variant="default">
-                  Regenerate
-                </Button>
-              </Group>
+            <Group align="flex-end" gap="sm" wrap="nowrap">
+              <Select
+                label="Address"
+                placeholder="Select address"
+                searchable
+                value={activeAddress || null}
+                data={addressOptions.map((a) => ({ value: a, label: a }))}
+                onChange={handleAddressChange}
+                w={380}
+                size="xs"
+              />
+              <Select
+                label="Series"
+                placeholder="Series"
+                value={selectedSeries}
+                data={seriesOptions.map((s) => ({ value: s, label: s }))}
+                onChange={handleSeriesChange}
+                w={220}
+                size="xs"
+                disabled={!seriesOptions.length}
+              />
+              <Button
+                size="xs"
+                variant="default"
+                onClick={handleGenerate}
+                disabled={!activeAddress || !selectedSeries}
+                style={{ alignSelf: 'flex-end' }}
+              >
+                Generate
+              </Button>
             </Group>
-            <Grid gutter="xs">
-              <Grid.Col span={4}>
-                <Stack gap="xs">
-                  <Title order={6}>Data</Title>
-                  <ScrollArea
-                    h={300}
-                    scrollbarSize={4}
-                    type="auto"
-                    offsetScrollbars
-                  >
-                    <Box
-                      p={4}
+            <Stack gap="md">
+              <div>
+                <Title order={6}>Image</Title>
+                <div
+                  style={{
+                    border: '1px solid #444',
+                    background: '#222',
+                    marginTop: 4,
+                    width: '100%',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {displayImageUrl ? (
+                    <Image
+                      alt="Generated"
+                      fit="contain"
+                      radius="sm"
+                      src={displayImageUrl}
                       style={{
-                        background: '#111',
-                        color: '#0f0',
-                        fontSize: 11,
-                        fontFamily: 'monospace',
+                        display: 'block',
+                        width: '100%',
+                        height: 'auto',
+                        objectFit: 'contain',
                       }}
-                    >
-                      <pre style={{ margin: 0 }}>{sampleJson}</pre>
-                    </Box>
-                  </ScrollArea>
-                  <Title order={6}>Flagged</Title>
-                  <Box h={40} style={{ border: '1px solid #444' }} />
-                  <Title order={6}>History</Title>
-                  <Group gap={4} wrap="nowrap" style={{ overflowX: 'auto' }}>
-                    {(pageData?.generator || []).slice(0, 8).map((_g, i) => (
-                      <Box
-                        key={i}
-                        w={80}
-                        h={60}
-                        style={{ background: '#222', border: '1px solid #333' }}
-                      />
-                    ))}
-                  </Group>
-                </Stack>
-              </Grid.Col>
-              <Grid.Col span={8}>
-                <Stack gap="xs">
-                  <Title order={6}>Generated</Title>
-                  <Center
-                    style={{
-                      border: '1px solid #444',
-                      background: '#222',
-                      height: 260,
-                    }}
+                      onError={() => Log('generator:image:error')}
+                    />
+                  ) : (
+                    <Center h={160}>
+                      <Text size="xs" c="dimmed">
+                        No image
+                      </Text>
+                    </Center>
+                  )}
+                </div>
+              </div>
+              <div>
+                <Title order={6}>Attributes</Title>
+                <ScrollArea
+                  h={120}
+                  scrollbarSize={4}
+                  type="auto"
+                  offsetScrollbars
+                  style={{ marginTop: 4 }}
+                >
+                  <Stack
+                    gap={2}
+                    style={{ fontFamily: 'monospace', fontSize: 11 }}
                   >
-                    <Image alt="Generated" fit="contain" radius="sm" />
-                  </Center>
+                    {attributes.length === 0 && (
+                      <Text size="xs" c="dimmed">
+                        No attributes
+                      </Text>
+                    )}
+                    {attributes.map((a, i) => (
+                      <Text key={i} size="xs">
+                        {a.name}:{' '}
+                        {a.value || a.selector || a.number || a.count || ''}
+                      </Text>
+                    ))}
+                  </Stack>
+                </ScrollArea>
+              </div>
+              <div>
+                <Title order={6}>Prompt</Title>
+                <Textarea
+                  value={current?.prompt || ''}
+                  placeholder="Prompt"
+                  autosize
+                  minRows={4}
+                  styles={{
+                    input: { fontFamily: 'monospace', fontSize: 12 },
+                  }}
+                  readOnly
+                  style={{ marginTop: 4 }}
+                />
+              </div>
+              {!!current?.enhancedPrompt && (
+                <div>
+                  <Title order={6}>Enhanced Prompt</Title>
                   <Textarea
-                    value={''}
-                    placeholder="Prompt"
+                    value={current?.enhancedPrompt || ''}
+                    placeholder="Enhanced Prompt"
                     autosize
-                    minRows={6}
+                    minRows={4}
                     styles={{
                       input: { fontFamily: 'monospace', fontSize: 12 },
                     }}
                     readOnly
+                    style={{ marginTop: 4 }}
                   />
-                </Stack>
-              </Grid.Col>
-            </Grid>
+                </div>
+              )}
+              <div>
+                <Title order={6}>Thumbnails</Title>
+                <Group
+                  gap={4}
+                  wrap="nowrap"
+                  style={{ overflowX: 'auto', marginTop: 4 }}
+                >
+                  {galleryItems.map((g) => (
+                    <GeneratorThumb
+                      key={g.relPath}
+                      item={g}
+                      onSelect={handleThumbSelect}
+                      selected={g.relPath === selectedThumb}
+                    />
+                  ))}
+                </Group>
+              </div>
+            </Stack>
           </Stack>
         </Grid.Col>
-        <Grid.Col span={3}>
-          <Stack gap="xs">
+        <Grid.Col span={2}>
+          <Stack gap="xs" style={{ width: 140, marginLeft: 'auto' }}>
             {[
               'Connect',
               'Claim',
@@ -132,7 +280,13 @@ function GeneratorRenderer({
               'Eject',
               'Merch',
             ].map((label) => (
-              <Button key={label} variant="default" size="sm" fullWidth>
+              <Button
+                key={label}
+                variant="default"
+                size="xs"
+                fullWidth
+                onClick={() => Log('generator:button:' + label.toLowerCase())}
+              >
                 {label}
               </Button>
             ))}
@@ -176,7 +330,7 @@ function GalleryRenderer({ pageData, viewStateKey }: GalleryRendererProps) {
     const names = Object.keys(g).sort((a, b) => a.localeCompare(b));
     names.forEach((s) => {
       const arr = g[s];
-      if (!arr) return; // safety
+      if (!arr) return;
       if (controls.sortMode === 'address') {
         arr.sort((a, b) => {
           const ad = a.address.localeCompare(b.address);

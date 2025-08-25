@@ -5,23 +5,31 @@ import { Log, getDisplayAddress } from '@utils';
 export interface DalleDressCardProps {
   item: dalledress.GalleryItem;
   onClick?: (item: dalledress.GalleryItem) => void;
+  onDoubleClick?: (item: dalledress.GalleryItem) => void;
   selected?: boolean;
 }
 
 export const DalleDressCard = ({
   item,
   onClick,
+  onDoubleClick,
   selected,
 }: DalleDressCardProps) => {
   const handleClick = () => {
     Log('gallery:click:' + item.relPath);
     onClick?.(item);
   };
+  const handleDoubleClick = () => {
+    Log('gallery:dblclick:' + item.relPath);
+    onDoubleClick?.(item);
+  };
   return (
     <Card
       p={4}
       radius="sm"
       withBorder
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
       style={{
         cursor: 'pointer',
         borderColor: selected ? 'var(--mantine-color-blue-5)' : undefined,
@@ -33,7 +41,6 @@ export const DalleDressCard = ({
           : undefined,
         transition: 'box-shadow 120ms, border-color 120ms, background 160ms',
       }}
-      onClick={handleClick}
       data-relpath={item.relPath}
     >
       <Stack gap={4} align="stretch">

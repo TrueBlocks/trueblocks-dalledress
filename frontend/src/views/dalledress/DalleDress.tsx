@@ -25,7 +25,7 @@ import {
   useViewConfig,
 } from '@hooks';
 import { TabView } from '@layout';
-import { Group } from '@mantine/core';
+import { Group, Stack } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { dalle, dalledress } from '@models';
 import { crud, msgs, project, types } from '@models';
@@ -55,7 +55,8 @@ export const DalleDress = () => {
     facets: facetsFromConfig,
     viewRoute: ROUTE,
   });
-  const { availableFacets, getCurrentDataFacet } = activeFacetHook;
+  const { availableFacets, getCurrentDataFacet, setActiveFacet } =
+    activeFacetHook;
 
   const [pageData, setPageData] = useState<dalledress.DalleDressPage | null>(
     null,
@@ -243,8 +244,8 @@ export const DalleDress = () => {
   );
 
   const rendererMap = useMemo(
-    () => renderers(pageData, viewStateKey),
-    [pageData, viewStateKey],
+    () => renderers(pageData, viewStateKey, setActiveFacet),
+    [pageData, viewStateKey, setActiveFacet],
   );
   const { isForm, node: formNode } = useFacetForm<Record<string, unknown>>({
     viewConfig,
@@ -264,7 +265,12 @@ export const DalleDress = () => {
       rendererMap[facet] &&
       (facet === types.DataFacet.GENERATOR || facet === types.DataFacet.GALLERY)
     ) {
-      return rendererMap[facet]();
+      return (
+        <Stack gap="xs">
+          {headerActions}
+          {rendererMap[facet]()}
+        </Stack>
+      );
     }
     if (isForm && formNode) return formNode;
     return (

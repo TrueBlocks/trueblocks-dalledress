@@ -22,7 +22,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			DividerBefore: false,
 			Fields:        getGeneratorFields(),
 			Actions:       []string{},
-			HeaderActions: []string{"export"},
+			HeaderActions: []string{},
 			RendererTypes: "facet",
 		},
 		"series": {
@@ -62,7 +62,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			DividerBefore: false,
 			Fields:        getLogsFields(),
 			Actions:       []string{},
-			HeaderActions: []string{"export"},
+			HeaderActions: []string{},
 			RendererTypes: "facet",
 		},
 	}

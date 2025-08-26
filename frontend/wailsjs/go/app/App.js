@@ -134,6 +134,10 @@ export function GetContractsSummary(arg1) {
   return window['go']['app']['App']['GetContractsSummary'](arg1);
 }
 
+export function GetDalleAudioURL(arg1, arg2) {
+  return window['go']['app']['App']['GetDalleAudioURL'](arg1, arg2);
+}
+
 export function GetDalleDressConfig(arg1) {
   return window['go']['app']['App']['GetDalleDressConfig'](arg1);
 }
@@ -326,6 +330,10 @@ export function OpenProjectFile(arg1) {
   return window['go']['app']['App']['OpenProjectFile'](arg1);
 }
 
+export function ReadToMe(arg1, arg2) {
+  return window['go']['app']['App']['ReadToMe'](arg1, arg2);
+}
+
 export function RegisterCollection(arg1) {
   return window['go']['app']['App']['RegisterCollection'](arg1);
 }
@@ -484,6 +492,10 @@ export function SetViewAndFacet(arg1, arg2) {
 
 export function SilenceDialog(arg1) {
   return window['go']['app']['App']['SilenceDialog'](arg1);
+}
+
+export function Speak(arg1, arg2) {
+  return window['go']['app']['App']['Speak'](arg1, arg2);
 }
 
 export function SwitchToProject(arg1) {

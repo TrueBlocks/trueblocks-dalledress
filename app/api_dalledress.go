@@ -70,3 +70,36 @@ func (a *App) GetDalleDressCurrent(payload *types.Payload, series string) (*dall
 }
 
 // EXISTING_CODE
+func (a *App) Speak(payload *types.Payload, series string) (string, error) {
+	if payload == nil || payload.Address == "" {
+		return "", nil
+	}
+	if series == "" {
+		series = "empty"
+	}
+	return dalle.Speak(series, payload.Address)
+}
+
+func (a *App) ReadToMe(payload *types.Payload, series string) (string, error) {
+	if payload == nil || payload.Address == "" {
+		return "", nil
+	}
+	if series == "" {
+		series = "empty"
+	}
+	return dalle.ReadToMe(series, payload.Address)
+}
+
+func (a *App) GetDalleAudioURL(payload *types.Payload, series string) (string, error) {
+	if payload == nil || payload.Address == "" {
+		return "", nil
+	}
+	if series == "" {
+		series = "empty"
+	}
+	base := ""
+	if a.fileServer != nil {
+		base = a.fileServer.GetBaseURL()
+	}
+	return dalle.AudioURL(base, series, payload.Address)
+}

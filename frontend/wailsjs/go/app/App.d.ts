@@ -86,6 +86,8 @@ export function GetContractsPage(arg1:types.Payload,arg2:number,arg3:number,arg4
 
 export function GetContractsSummary(arg1:types.Payload):Promise<types.Summary>;
 
+export function GetDalleAudioURL(arg1:types.Payload,arg2:string):Promise<string>;
+
 export function GetDalleDressConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetDalleDressCurrent(arg1:types.Payload,arg2:string):Promise<dalle.DalleDress>;
@@ -182,6 +184,8 @@ export function NewProject(arg1:string,arg2:string):Promise<void>;
 
 export function OpenProjectFile(arg1:string):Promise<void>;
 
+export function ReadToMe(arg1:types.Payload,arg2:string):Promise<string>;
+
 export function RegisterCollection(arg1:types.Collection):Promise<void>;
 
 export function Reload(arg1:types.Payload):Promise<void>;
@@ -261,6 +265,8 @@ export function SetUserPreferences(arg1:preferences.UserPreferences):Promise<voi
 export function SetViewAndFacet(arg1:string,arg2:string):Promise<string>;
 
 export function SilenceDialog(arg1:string):Promise<void>;
+
+export function Speak(arg1:types.Payload,arg2:string):Promise<string>;
 
 export function SwitchToProject(arg1:string):Promise<void>;
 

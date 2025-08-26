@@ -250,6 +250,7 @@ export namespace dalle {
 	    ipfsHash: string;
 	    cacheHit: boolean;
 	    completed: boolean;
+	    requestedSeries: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DalleDress(source);
@@ -274,6 +275,7 @@ export namespace dalle {
 	        this.ipfsHash = source["ipfsHash"];
 	        this.cacheHit = source["cacheHit"];
 	        this.completed = source["completed"];
+	        this.requestedSeries = source["requestedSeries"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1083,6 +1085,14 @@ export namespace status {
 
 export namespace types {
 	
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
+	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -1116,14 +1126,6 @@ export namespace types {
 	    STATUS = "status",
 	    CACHES = "caches",
 	    CHAINS = "chains",
-	}
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];

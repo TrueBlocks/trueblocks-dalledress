@@ -22,7 +22,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			DividerBefore: false,
 			Fields:        getGeneratorFields(),
 			Actions:       []string{},
-			HeaderActions: []string{},
+			HeaderActions: []string{"speak"},
 			RendererTypes: "facet",
 		},
 		"series": {
@@ -77,6 +77,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			"edit":      {Name: "edit", Label: "Edit", Icon: "Edit"},
 			"delete":    {Name: "delete", Label: "Delete", Icon: "Delete"},
 			"duplicate": {Name: "duplicate", Label: "Duplicate", Icon: "Duplicate"},
+			"speak":     {Name: "speak", Label: "Speak", Icon: "Speak"},
 		},
 	}
 	types.DeriveFacets(cfg)

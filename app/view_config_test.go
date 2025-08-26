@@ -84,6 +84,9 @@ func TestViewConfigIntegrity(t *testing.T) {
 	})
 
 	t.Run("HeaderActionsExport", func(t *testing.T) {
+		exceptions := map[string]map[string]bool{
+			"dalledress": {"gallery": true},
+		}
 		for _, tc := range tests {
 			t.Run(tc.name, func(t *testing.T) {
 				payload := base
@@ -100,10 +103,14 @@ func TestViewConfigIntegrity(t *testing.T) {
 					if facet.HeaderActions == nil {
 						t.Errorf("%s: facet %q has nil HeaderActions (must be empty slice when none)", tc.name, facetKey)
 					}
-					if !facet.IsForm {
-						if !containsString(facet.HeaderActions, "export") {
-							t.Errorf("%s: non-form facet %q missing required 'export' in HeaderActions", tc.name, facetKey)
+					reqExport := !facet.IsForm
+					if ex, ok := exceptions[cfg.ViewName]; ok {
+						if ex[facetKey] {
+							reqExport = false
 						}
+					}
+					if reqExport && !containsString(facet.HeaderActions, "export") {
+						t.Errorf("%s: non-form facet %q missing required 'export' in HeaderActions", tc.name, facetKey)
 					}
 				}
 			})

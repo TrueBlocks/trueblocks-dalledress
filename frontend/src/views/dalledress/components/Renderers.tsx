@@ -7,8 +7,8 @@ import {
   useState,
 } from 'react';
 
-import { GetDalleDressCurrent } from '@app';
-import { useActiveProject } from '@hooks';
+import { GetDalleAudioURL, GetDalleDressCurrent } from '@app';
+import { useActiveProject, useIconSets } from '@hooks';
 import type { DataFacet } from '@hooks';
 import {
   Button,
@@ -32,12 +32,14 @@ import { SeriesGallery } from './SeriesGallery';
 let pendingGeneratorSelection: {
   address?: string;
   series?: string | null;
+  relPath?: string | null;
 } | null = null;
 export const setPendingGeneratorSelection = (
   address: string,
   series: string | null,
+  relPath?: string | null,
 ) => {
-  pendingGeneratorSelection = { address, series };
+  pendingGeneratorSelection = { address, series, relPath };
 };
 
 function GeneratorRenderer({
@@ -51,6 +53,12 @@ function GeneratorRenderer({
   const [current, setCurrent] = useState<dalle.DalleDress | null>(
     pageData?.currentDress || null,
   );
+  const [speaking, setSpeaking] = useState(false);
+  const [audioUrl, setAudioUrl] = useState('');
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const thumbRowRef = useRef<HTMLDivElement | null>(null);
+  const icons = useIconSets();
+  const SpeakIcon = icons.Speak;
 
   useEffect(() => {
     setCurrent(pageData?.currentDress || null);
@@ -156,7 +164,7 @@ function GeneratorRenderer({
 
   useEffect(() => {
     if (!pendingGeneratorSelection) return;
-    const { address, series } = pendingGeneratorSelection;
+    const { address, series, relPath } = pendingGeneratorSelection;
     let changed = false;
     if (address && address !== activeAddress) {
       setActiveAddress(address);
@@ -168,8 +176,54 @@ function GeneratorRenderer({
       changed = true;
       Log('generator:pref:series:' + series);
     }
+    if (relPath) {
+      setSelectedThumb(relPath);
+    }
     if (changed) pendingGeneratorSelection = null;
   }, [activeAddress, selectedSeries, setActiveAddress]);
+
+  useEffect(() => {
+    if (!selectedThumb || !thumbRowRef.current) return;
+    const el = thumbRowRef.current.querySelector(
+      `[data-relpath="${selectedThumb}"]`,
+    );
+    if (el && 'scrollIntoView' in el)
+      (el as HTMLElement).scrollIntoView({
+        inline: 'nearest',
+        block: 'nearest',
+      });
+  }, [selectedThumb]);
+
+  const handleThumbKey = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (!galleryItems.length) return;
+      const idx = selectedThumb
+        ? galleryItems.findIndex((g) => g.relPath === selectedThumb)
+        : -1;
+      let nextIdx = idx;
+      if (e.key === 'ArrowRight') {
+        nextIdx = (idx + 1 + galleryItems.length) % galleryItems.length;
+        e.preventDefault();
+      } else if (e.key === 'ArrowLeft') {
+        nextIdx = (idx - 1 + galleryItems.length) % galleryItems.length;
+        e.preventDefault();
+      } else if (e.key === 'Home') {
+        nextIdx = 0;
+        e.preventDefault();
+      } else if (e.key === 'End') {
+        nextIdx = galleryItems.length - 1;
+        e.preventDefault();
+      } else {
+        return;
+      }
+      const next = galleryItems[nextIdx];
+      if (next) {
+        setSelectedThumb(next.relPath);
+        if (next.series) setSelectedSeries(next.series);
+      }
+    },
+    [galleryItems, selectedThumb, setSelectedSeries],
+  );
 
   const attributes = useMemo(() => current?.attributes || [], [current]);
   const selectedGalleryItem = useMemo(() => {
@@ -332,7 +386,69 @@ function GeneratorRenderer({
             </div>
             {!!current?.enhancedPrompt && (
               <div>
-                <Title order={6}>Enhanced Prompt</Title>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Title order={6} style={{ flexGrow: 1 }}>
+                    Enhanced Prompt
+                  </Title>
+                  <Button
+                    variant="default"
+                    size="xs"
+                    loading={speaking}
+                    onClick={async () => {
+                      // TODO: BOGUS - SHOULDN'T THIS USE handleSpeech (which is a stub, so copy it)
+                      if (!current?.enhancedPrompt) return;
+                      if (!activeAddress) return;
+                      if (!selectedSeries) return;
+                      try {
+                        setSpeaking(true);
+                        const url = await GetDalleAudioURL(
+                          {
+                            collection: 'dalledress',
+                            dataFacet: types.DataFacet.GENERATOR,
+                            address: activeAddress,
+                          },
+                          selectedSeries,
+                        );
+                        if (typeof url === 'string' && url) {
+                          Log('readtome:url:' + url.slice(-80));
+                          setAudioUrl(url);
+                          if (audioRef.current) {
+                            if (audioRef.current.src === url) {
+                              try {
+                                audioRef.current.currentTime = 0;
+                              } catch {}
+                            }
+                            try {
+                              await audioRef.current.play();
+                            } catch {}
+                          }
+                        } else {
+                          Log('readtome:url:none');
+                        }
+                      } catch (e: unknown) {
+                        const msg = e instanceof Error ? e.message : 'error';
+                        Log('readtome:error:' + msg.slice(0, 200));
+                      } finally {
+                        setSpeaking(false);
+                      }
+                    }}
+                    leftSection={<SpeakIcon size={12} />}
+                  >
+                    Speak
+                  </Button>
+                </div>
+                {audioUrl && (
+                  <audio
+                    ref={audioRef}
+                    src={audioUrl}
+                    controls
+                    style={{ width: '100%', marginTop: 6 }}
+                    onPlay={() => Log('readtome:play:start')}
+                    onEnded={() => Log('readtome:play:end')}
+                    onError={() => Log('readtome:play:error')}
+                    autoPlay
+                  />
+                )}
                 <ScrollArea
                   h={160}
                   scrollbarSize={4}
@@ -368,9 +484,16 @@ function GeneratorRenderer({
                   padding: '4px 2px',
                   marginTop: 4,
                 }}
+                ref={thumbRowRef}
+                tabIndex={0}
+                onKeyDown={handleThumbKey}
               >
                 {galleryItems.map((g) => (
-                  <div key={g.relPath} style={{ width: 72, flex: '0 0 auto' }}>
+                  <div
+                    key={g.relPath}
+                    data-relpath={g.relPath}
+                    style={{ width: 72, flex: '0 0 auto' }}
+                  >
                     <DalleDressCard
                       item={g}
                       onClick={handleThumbSelect}
@@ -392,25 +515,21 @@ function GeneratorRenderer({
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {[
-                'Connect',
-                'Claim',
-                'Mint',
-                'Burn',
-                'Trade',
-                'Eject',
-                'Merch',
-              ].map((label) => (
-                <Button
-                  key={label}
-                  variant="default"
-                  size="xs"
-                  fullWidth
-                  onClick={() => Log('generator:button:' + label.toLowerCase())}
-                >
-                  {label}
-                </Button>
-              ))}
+              {['Claim', 'Mint', 'Burn', 'Trade', 'Eject', 'Merch'].map(
+                (label) => (
+                  <Button
+                    key={label}
+                    variant="default"
+                    size="xs"
+                    fullWidth
+                    onClick={() =>
+                      Log('generator:button:' + label.toLowerCase())
+                    }
+                  >
+                    {label}
+                  </Button>
+                ),
+              )}
             </div>
           </div>
         </div>

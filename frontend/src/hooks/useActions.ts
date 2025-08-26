@@ -27,7 +27,8 @@ export type ActionType =
   | 'autoname'
   | 'export'
   | 'clean'
-  | 'update';
+  | 'update'
+  | 'speak';
 
 // Action definition with level, wallet requirements
 export interface ActionDefinition {
@@ -138,6 +139,13 @@ const ACTION_DEFINITIONS: Record<string, ActionDefinition> = {
     requiresWallet: false,
     title: 'Update',
     icon: 'Update',
+  },
+  speak: {
+    type: 'speak',
+    level: 'header',
+    requiresWallet: false,
+    title: 'Speak',
+    icon: 'Speak',
   },
 };
 
@@ -336,6 +344,15 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
     Log(`Creating ${collection}`);
     // TODO: Implement create functionality
   }, [collection]);
+
+  const handleSpeak = useCallback(() => {
+    Log(
+      `[Speak] action invoked for collection=${collection} facet=${String(
+        currentDataFacet,
+      )}`,
+    );
+    // Placeholder: extend to do TTS or other functionality
+  }, [collection, currentDataFacet]);
 
   const handleExport = useCallback(async () => {
     const facet = getCurrentDataFacet();
@@ -995,6 +1012,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       handleAutoname,
       handleUpdate,
       handleClean,
+      handleSpeak,
     }),
     [
       handleCreate,
@@ -1006,6 +1024,7 @@ export const useActions = <TPageData extends { totalItems: number }, TItem>(
       handleAutoname,
       handleUpdate,
       handleClean,
+      handleSpeak,
       // TODO: Add handleCleanOne when implemented
       // handleCleanOne,
     ],

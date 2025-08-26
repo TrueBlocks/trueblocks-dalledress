@@ -44,6 +44,7 @@ export type IconSet = {
   Export: IconType;
   Publish: IconType;
   Pin: IconType;
+  Speak: IconType;
 
   ChevronLeft: IconType;
   ChevronRight: IconType;
@@ -97,6 +98,7 @@ const faIcons: IconSet = {
   Export: Icons.FaDownload,
   Publish: Icons.FaGlobe,
   Pin: Icons.FaListAlt,
+  Speak: Icons.FaBullhornIcon,
 
   // Navigation
   ChevronLeft: Icons.FaAngleDoubleLeft,
@@ -154,6 +156,7 @@ const biIcons: IconSet = {
   Export: Icons.BiDownload,
   Publish: Icons.BiGlobe,
   Pin: Icons.BiListUl,
+  Speak: Icons.BiVolumeFullIcon,
 
   // Navigation
   ChevronLeft: Icons.BiChevronsLeft,
@@ -262,6 +265,8 @@ export const useIconSets = (
       createElement(iconSet.Publish, { size, ...props });
     const Pin: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Pin, { size, ...props });
+    const Speak: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Speak, { size, ...props });
 
     const ChevronLeft: FC<IconProps> = (props = {}) =>
       createElement(iconSet.ChevronLeft, { size, ...props });
@@ -315,6 +320,7 @@ export const useIconSets = (
       Export,
       Publish,
       Pin,
+      Speak,
 
       ChevronLeft,
       ChevronRight,

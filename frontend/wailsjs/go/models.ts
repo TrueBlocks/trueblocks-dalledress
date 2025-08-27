@@ -246,7 +246,9 @@ export namespace dalle {
 	    selectedTokens: string[];
 	    selectedRecords: string[];
 	    imageUrl: string;
+	    generatedPath: string;
 	    annotatedPath: string;
+	    downloadMode: string;
 	    ipfsHash: string;
 	    cacheHit: boolean;
 	    completed: boolean;
@@ -271,7 +273,9 @@ export namespace dalle {
 	        this.selectedTokens = source["selectedTokens"];
 	        this.selectedRecords = source["selectedRecords"];
 	        this.imageUrl = source["imageUrl"];
+	        this.generatedPath = source["generatedPath"];
 	        this.annotatedPath = source["annotatedPath"];
+	        this.downloadMode = source["downloadMode"];
 	        this.ipfsHash = source["ipfsHash"];
 	        this.cacheHit = source["cacheHit"];
 	        this.completed = source["completed"];
@@ -1085,14 +1089,6 @@ export namespace status {
 
 export namespace types {
 	
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
-	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -1126,6 +1122,14 @@ export namespace types {
 	    STATUS = "status",
 	    CACHES = "caches",
 	    CHAINS = "chains",
+	}
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];

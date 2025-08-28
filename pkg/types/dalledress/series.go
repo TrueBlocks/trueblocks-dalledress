@@ -40,7 +40,7 @@ func (c *DalleDressCollection) SeriesCrud(
 				}
 			}
 		}
-		item.SaveSeries(seriesDir, seriesDir+"/"+item.Suffix+".json", item.Last)
+		item.SaveSeries(item.Suffix, item.Last)
 		// update ModifiedAt from file system
 		if fi, err := os.Stat(seriesDir + "/" + item.Suffix + ".json"); err == nil {
 			item.ModifiedAt = fi.ModTime().UTC().Format(time.RFC3339)

@@ -3,7 +3,8 @@ import { ReactElement } from 'react';
 import { Alert, Container, Stack, Text, Title } from '@mantine/core';
 import { contracts, types } from '@models';
 
-import { ContractDashboard, ContractExecute } from '.';
+import { ContractDashboard } from './Dashboard/ContractDashboard';
+import { ContractExecute } from './Execute/ContractExecute';
 
 function Dashboard({
   contractState,

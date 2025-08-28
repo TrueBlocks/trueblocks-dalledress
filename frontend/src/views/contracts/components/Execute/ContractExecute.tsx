@@ -21,21 +21,19 @@ import {
 } from '@mantine/core';
 import { types } from '@models';
 import { LogError, addressToHex } from '@utils';
-
-import { TransactionReviewModal } from './TransactionReviewModal';
-import { getWriteFunctions } from './facetGeneration';
-import {
-  isArrayType,
-  isStructType,
-  validateSolidityValue,
-} from './solidityValidation';
 import {
   PreparedTransaction,
   TransactionData,
   buildTransaction,
+  isArrayType,
+  isStructType,
+  useWalletConnection,
+  validateSolidityValue,
   validateTransactionInputs,
-} from './transactionBuilder';
-import { useWalletConnection } from './walletConnection';
+} from '@utils';
+
+import { getWriteFunctions } from '../Dashboard/facetGeneration';
+import { TransactionReviewModal } from './TransactionReviewModal';
 
 interface ContractExecuteProps {
   contractState: types.Contract;

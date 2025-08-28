@@ -1,6 +1,8 @@
 import { Encode } from '@app';
 import { types } from '@models';
 
+// TODO: BOGUS - IT MIGHT BE BETTER TO CREATE A @contracts or @contract_utils folder than put these in @utils
+
 export interface TransactionData {
   to: string;
   function: types.Function;

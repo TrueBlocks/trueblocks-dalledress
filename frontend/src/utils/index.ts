@@ -12,3 +12,8 @@ export * from './wizardUtils';
 export * from './useErrorHandler';
 export * from './sortSpec';
 export * from './hashes';
+
+export * from './solidityValidation';
+export * from './transactionBuilder';
+export * from './walletConnection';
+export * from './contractErrors';

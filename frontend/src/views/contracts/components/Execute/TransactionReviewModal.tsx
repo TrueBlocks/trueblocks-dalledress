@@ -13,12 +13,11 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-
 import {
   PreparedTransaction,
   TransactionData,
   prepareTransaction,
-} from './transactionBuilder';
+} from '@utils';
 
 interface TransactionReviewModalProps {
   opened: boolean;

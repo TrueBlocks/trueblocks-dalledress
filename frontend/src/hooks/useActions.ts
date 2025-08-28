@@ -4,12 +4,8 @@ import { ExportData, IsDialogSilenced } from '@app';
 import { useWalletGatedAction } from '@hooks';
 import { crud, project, sdk, types } from '@models';
 import { Log, LogError, addressToHex, useErrorHandler } from '@utils';
-
-import {
-  TransactionData,
-  buildTransaction,
-} from '../views/contracts/components/transactionBuilder';
 // TODO: BOGUS add an @contracts alias for this import
+import { TransactionData, buildTransaction } from '@utils';
 
 import { useActionMsgs } from './useActionMsgs';
 

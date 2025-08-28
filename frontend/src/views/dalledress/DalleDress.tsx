@@ -30,11 +30,11 @@ import { useHotkeys } from '@mantine/hooks';
 import { dalle, dalledress } from '@models';
 import { crud, msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
+import { renderers } from 'src/views/dalledress/renderers/Renderers';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanel } from '../utils/detailPanel';
 import { SeriesModal } from './components';
-import { renderers } from './components';
 import { useSeriesModal } from './hooks/seriesModal';
 
 const ROUTE: ViewRoute = 'dalledress';

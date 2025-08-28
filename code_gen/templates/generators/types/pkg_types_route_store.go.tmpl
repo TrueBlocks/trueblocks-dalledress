@@ -107,28 +107,6 @@ func (c *{{$class}}Collection) GetStoreName(dataFacet types.DataFacet, chain, ad
 	return name
 }
 
-// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-{{- $val := .Class}}
-{{if $isExports}}{{$val = toSingular .Class}}{{end -}}
-func Get{{$class}}Count(payload *types.Payload) (int, error) {
-	{{- if not $isContracts }}
-	chain := payload.Chain
-	{{if $isExports}}address := payload.Address
-	{{end -}}
-	countOpts := sdk.{{$val}}Options{
-		Globals: sdk.Globals{Cache: true, Chain: chain},
-		{{if $isExports}}Addrs: []string{address},
-		{{end -}}
-	}
-	if countResult, _, err := countOpts.{{$val}}Count(); err != nil {
-		return 0, fmt.Errorf("{{$val}}Count query error: %v", err)
-	} else if len(countResult) > 0 {
-		return int(countResult[0].Count), nil
-	}
-	{{- end }}
-	return 0, nil
-}
-
 var (
 	collections   = make(map[store.CollectionKey]*{{.Class}}Collection)
 	collectionsMu sync.Mutex

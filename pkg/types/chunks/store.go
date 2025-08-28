@@ -291,20 +291,6 @@ func (c *ChunksCollection) GetStoreName(dataFacet types.DataFacet, chain, addres
 	return name
 }
 
-// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetChunksCount(payload *types.Payload) (int, error) {
-	chain := payload.Chain
-	countOpts := sdk.ChunksOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chain},
-	}
-	if countResult, _, err := countOpts.ChunksCount(); err != nil {
-		return 0, fmt.Errorf("ChunksCount query error: %v", err)
-	} else if len(countResult) > 0 {
-		return int(countResult[0].Count), nil
-	}
-	return 0, nil
-}
-
 var (
 	collections   = make(map[store.CollectionKey]*ChunksCollection)
 	collectionsMu sync.Mutex

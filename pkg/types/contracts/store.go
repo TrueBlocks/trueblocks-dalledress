@@ -160,11 +160,6 @@ func (c *ContractsCollection) GetStoreName(dataFacet types.DataFacet, chain, add
 	return name
 }
 
-// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetContractsCount(payload *types.Payload) (int, error) {
-	return 0, nil
-}
-
 var (
 	collections   = make(map[store.CollectionKey]*ContractsCollection)
 	collectionsMu sync.Mutex

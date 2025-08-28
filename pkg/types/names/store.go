@@ -109,20 +109,6 @@ func (c *NamesCollection) GetStoreName(dataFacet types.DataFacet, chain, address
 	return name
 }
 
-// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetNamesCount(payload *types.Payload) (int, error) {
-	chain := payload.Chain
-	countOpts := sdk.NamesOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chain},
-	}
-	if countResult, _, err := countOpts.NamesCount(); err != nil {
-		return 0, fmt.Errorf("NamesCount query error: %v", err)
-	} else if len(countResult) > 0 {
-		return int(countResult[0].Count), nil
-	}
-	return 0, nil
-}
-
 var (
 	collections   = make(map[store.CollectionKey]*NamesCollection)
 	collectionsMu sync.Mutex

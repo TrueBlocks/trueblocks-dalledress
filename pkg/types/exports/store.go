@@ -572,22 +572,6 @@ func (c *ExportsCollection) GetStoreName(dataFacet types.DataFacet, chain, addre
 	return name
 }
 
-// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetExportsCount(payload *types.Payload) (int, error) {
-	chain := payload.Chain
-	address := payload.Address
-	countOpts := sdk.ExportOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chain},
-		Addrs:   []string{address},
-	}
-	if countResult, _, err := countOpts.ExportCount(); err != nil {
-		return 0, fmt.Errorf("ExportCount query error: %v", err)
-	} else if len(countResult) > 0 {
-		return int(countResult[0].Count), nil
-	}
-	return 0, nil
-}
-
 var (
 	collections   = make(map[store.CollectionKey]*ExportsCollection)
 	collectionsMu sync.Mutex
@@ -610,59 +594,6 @@ func GetExportsCollection(payload *types.Payload) *ExportsCollection {
 }
 
 // EXISTING_CODE
-func GetExportsCount2(dataFacet string, payload *types.Payload) (int, error) {
-	switch types.DataFacet(dataFacet) {
-	case ExportsTransactions:
-		return getExportsTransactionsCount(payload)
-	case ExportsStatements:
-		return getExportsStatementsCount(payload)
-	case ExportsTransfers:
-		return getExportsTransfersCount(payload)
-	case ExportsBalances:
-		return getExportsBalancesCount(payload)
-	case ExportsWithdrawals:
-		return getExportsWithdrawalsCount(payload)
-	case ExportsAssets:
-		return getExportsAssetsCount(payload)
-	default:
-		return 0, fmt.Errorf("unknown dataFacet: %s", dataFacet)
-	}
-}
-
-func getExportsTransactionsCount(payload *types.Payload) (int, error) {
-	listOpts := sdk.ListOptions{
-		Globals: sdk.Globals{Cache: true, Chain: payload.Chain},
-		Addrs:   []string{payload.Address},
-	}
-
-	// Use ExportCount for optimized counting
-	if results, _, err := listOpts.ListCount(); err != nil {
-		return 0, fmt.Errorf("failed to get exports transactions count: %w", err)
-	} else {
-		return int(results[0].Count), nil
-	}
-}
-
-func getExportsStatementsCount(payload *types.Payload) (int, error) {
-	return getExportsTransactionsCount(payload)
-}
-
-func getExportsTransfersCount(payload *types.Payload) (int, error) {
-	return getExportsTransactionsCount(payload)
-}
-
-func getExportsBalancesCount(payload *types.Payload) (int, error) {
-	return getExportsTransactionsCount(payload)
-}
-
-func getExportsWithdrawalsCount(payload *types.Payload) (int, error) {
-	return getExportsTransactionsCount(payload)
-}
-
-func getExportsAssetsCount(payload *types.Payload) (int, error) {
-	return getExportsTransactionsCount(payload)
-}
-
 // ResetExportsStore resets a specific store for a given chain, address, and dataFacet
 func ResetExportsStore(payload *types.Payload, dataFacet types.DataFacet) {
 	storeKey := getStoreKey(payload.Chain, payload.Address)

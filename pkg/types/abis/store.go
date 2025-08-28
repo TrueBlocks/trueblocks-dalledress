@@ -161,20 +161,6 @@ func (c *AbisCollection) GetStoreName(dataFacet types.DataFacet, chain, address 
 	return name
 }
 
-// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetAbisCount(payload *types.Payload) (int, error) {
-	chain := payload.Chain
-	countOpts := sdk.AbisOptions{
-		Globals: sdk.Globals{Cache: true, Chain: chain},
-	}
-	if countResult, _, err := countOpts.AbisCount(); err != nil {
-		return 0, fmt.Errorf("AbisCount query error: %v", err)
-	} else if len(countResult) > 0 {
-		return int(countResult[0].Count), nil
-	}
-	return 0, nil
-}
-
 var (
 	collections   = make(map[store.CollectionKey]*AbisCollection)
 	collectionsMu sync.Mutex

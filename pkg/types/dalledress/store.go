@@ -243,20 +243,6 @@ func (c *DalleDressCollection) GetStoreName(dataFacet types.DataFacet, chain, ad
 	return name
 }
 
-// TODO: THIS SHOULD BE PER STORE - SEE EXPORT COMMENTS
-func GetDalleDressCount(payload *types.Payload) (int, error) {
-	// chain := payload.Chain
-	// countOpts := sdk.DalleDressOptions{
-	// 	Globals: sdk.Globals{Cache: true, Chain: chain},
-	// }
-	// if countResult, _, err := countOpts.DalleDressCount(); err != nil {
-	// 	return 0, fmt.Errorf("DalleDressCount query error: %v", err)
-	// } else if len(countResult) > 0 {
-	// 	return int(countResult[0].Count), nil
-	// }
-	return 0, nil
-}
-
 var (
 	collections   = make(map[store.CollectionKey]*DalleDressCollection)
 	collectionsMu sync.Mutex

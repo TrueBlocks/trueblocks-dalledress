@@ -69,7 +69,6 @@ func (a *App) GetDalleDressCurrent(payload *types.Payload, series string) (*dall
 	return cd, nil
 }
 
-// EXISTING_CODE
 func (a *App) Speak(payload *types.Payload, series string) (string, error) {
 	if payload == nil || payload.Address == "" {
 		return "", nil
@@ -103,3 +102,5 @@ func (a *App) GetDalleAudioURL(payload *types.Payload, series string) (string, e
 	}
 	return dalle.AudioURL(base, series, payload.Address)
 }
+
+// EXISTING_CODE

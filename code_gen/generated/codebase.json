@@ -1308,6 +1308,328 @@
                             "attributes": ""
                         }
                     ]
+                },
+                {
+                    "class": "Statements",
+                    "doc_group": "04-Admin",
+                    "doc_route": "118-statement",
+                    "doc_descr": "A reconciliation statement",
+                    "produced_by": "exports",
+                    "disable_go": true,
+                    "members": [
+                        {
+                            "name": "blockNumber",
+                            "type": "blknum",
+                            "attributes": "noui",
+                            "docOrder": 1,
+                            "description": "the number of the block",
+                            "num": 1
+                        },
+                        {
+                            "name": "transactionIndex",
+                            "type": "txnum",
+                            "attributes": "noui",
+                            "docOrder": 2,
+                            "description": "the zero-indexed position of the transaction in the block",
+                            "num": 2
+                        },
+                        {
+                            "name": "logIndex",
+                            "type": "lognum",
+                            "attributes": "noui",
+                            "docOrder": 3,
+                            "description": "the zero-indexed position the log in the block, if applicable",
+                            "num": 3
+                        },
+                        {
+                            "name": "transactionHash",
+                            "type": "hash",
+                            "attributes": "noui",
+                            "docOrder": 4,
+                            "description": "the hash of the transaction that triggered this reconciliation",
+                            "num": 4
+                        },
+                        {
+                            "name": "timestamp",
+                            "type": "timestamp",
+                            "attributes": "noui",
+                            "docOrder": 5,
+                            "description": "the Unix timestamp of the object",
+                            "num": 5
+                        },
+                        {
+                            "name": "date",
+                            "type": "datetime",
+                            "attributes": "calc|width=120px",
+                            "docOrder": 6,
+                            "description": "the timestamp as a date",
+                            "num": 6
+                        },
+                        {
+                            "name": "asset",
+                            "type": "address",
+                            "attributes": "readOnly",
+                            "docOrder": 7,
+                            "description": "0xeeee...eeee for ETH reconciliations, the token address otherwise",
+                            "num": 7
+                        },
+                        {
+                            "name": "symbol",
+                            "type": "string",
+                            "docOrder": 8,
+                            "description": "either ETH, WEI, or the symbol of the asset being reconciled as extracted from the chain",
+                            "num": 8
+                        },
+                        {
+                            "name": "decimals",
+                            "type": "value",
+                            "docOrder": 9,
+                            "description": "the value of `decimals` from an ERC20 contract or, if ETH or WEI, then 18",
+                            "num": 9
+                        },
+                        {
+                            "name": "spotPrice",
+                            "type": "float",
+                            "docOrder": 10,
+                            "description": "the on-chain price in USD (or if a token in ETH, or zero) at the time of the transaction",
+                            "num": 10
+                        },
+                        {
+                            "name": "priceSource",
+                            "type": "string",
+                            "docOrder": 11,
+                            "description": "the on-chain source from which the spot price was taken",
+                            "num": 11
+                        },
+                        {
+                            "name": "accountedFor",
+                            "type": "address",
+                            "attributes": "readOnly",
+                            "docOrder": 12,
+                            "description": "the address being accounted for in this reconciliation",
+                            "num": 12
+                        },
+                        {
+                            "name": "sender",
+                            "type": "address",
+                            "attributes": "readOnly",
+                            "docOrder": 13,
+                            "description": "the initiator of the transfer (the sender)",
+                            "num": 13
+                        },
+                        {
+                            "name": "recipient",
+                            "type": "address",
+                            "attributes": "readOnly",
+                            "docOrder": 14,
+                            "description": "the receiver of the transfer (the recipient)",
+                            "num": 14
+                        },
+                        {
+                            "name": "begBal",
+                            "type": "int256",
+                            "docOrder": 15,
+                            "description": "the on-chain or running beginning balance prior to the transaction (see notes about intra-block reconciliations)",
+                            "num": 15
+                        },
+                        {
+                            "name": "amountNet",
+                            "type": "int256",
+                            "attributes": "calc",
+                            "docOrder": 16,
+                            "description": "totalIn - totalOut",
+                            "num": 16
+                        },
+                        {
+                            "name": "endBal",
+                            "type": "int256",
+                            "docOrder": 17,
+                            "description": "the on-chain or running balance after the transaction (see notes about intra-block reconciliations)",
+                            "num": 17
+                        },
+                        {
+                            "name": "reconciled",
+                            "type": "bool",
+                            "docOrder": 18,
+                            "description": "true if `endBal === endBalCalc` and `begBal === prevBal`. `false` otherwise.",
+                            "num": 18
+                        },
+                        {
+                            "name": "totalIn",
+                            "type": "int256",
+                            "docOrder": 19,
+                            "description": "the sum of the following `In` fields",
+                            "num": 19
+                        },
+                        {
+                            "name": "amountIn",
+                            "type": "int256",
+                            "docOrder": 20,
+                            "description": "the top-level value of the incoming transfer for the accountedFor address",
+                            "num": 20
+                        },
+                        {
+                            "name": "internalIn",
+                            "type": "int256",
+                            "docOrder": 21,
+                            "description": "the internal value of the incoming transfer for the accountedFor address",
+                            "num": 21
+                        },
+                        {
+                            "name": "selfDestructIn",
+                            "type": "int256",
+                            "docOrder": 22,
+                            "description": "the incoming value of a self-destruct if recipient is the accountedFor address",
+                            "num": 22
+                        },
+                        {
+                            "name": "minerBaseRewardIn",
+                            "type": "int256",
+                            "docOrder": 23,
+                            "description": "the base fee reward if the miner is the accountedFor address",
+                            "num": 23
+                        },
+                        {
+                            "name": "minerNephewRewardIn",
+                            "type": "int256",
+                            "docOrder": 24,
+                            "description": "the nephew reward if the miner is the accountedFor address",
+                            "num": 24
+                        },
+                        {
+                            "name": "minerTxFeeIn",
+                            "type": "int256",
+                            "docOrder": 25,
+                            "description": "the transaction fee reward if the miner is the accountedFor address",
+                            "num": 25
+                        },
+                        {
+                            "name": "minerUncleRewardIn",
+                            "type": "int256",
+                            "docOrder": 26,
+                            "description": "the uncle reward if the miner who won the uncle block is the accountedFor address",
+                            "num": 26
+                        },
+                        {
+                            "name": "correctBegBalIn",
+                            "type": "int256",
+                            "docOrder": 27,
+                            "description": "for unreconciled transfers, increase in beginning balance need to match previous balance",
+                            "num": 27
+                        },
+                        {
+                            "name": "correctAmountIn",
+                            "type": "int256",
+                            "docOrder": 28,
+                            "description": "for unreconciled transfers, increase in the amount of a transfer",
+                            "num": 28
+                        },
+                        {
+                            "name": "correctEndBalIn",
+                            "type": "int256",
+                            "docOrder": 29,
+                            "description": "for unreconciled transfers, increase in ending balance need to match running balance or block balance",
+                            "num": 29
+                        },
+                        {
+                            "name": "prefundIn",
+                            "type": "int256",
+                            "docOrder": 30,
+                            "description": "at block zero (0) only, the amount of genesis income for the accountedFor address",
+                            "num": 30
+                        },
+                        {
+                            "name": "totalOut",
+                            "type": "int256",
+                            "docOrder": 31,
+                            "description": "the sum of the following `Out` fields",
+                            "num": 31
+                        },
+                        {
+                            "name": "amountOut",
+                            "type": "int256",
+                            "docOrder": 32,
+                            "description": "the amount (in units of the asset) of regular outflow during this transaction",
+                            "num": 32
+                        },
+                        {
+                            "name": "internalOut",
+                            "type": "int256",
+                            "docOrder": 33,
+                            "description": "the value of any internal value transfers out of the accountedFor account",
+                            "num": 33
+                        },
+                        {
+                            "name": "correctBegBalOut",
+                            "type": "int256",
+                            "docOrder": 34,
+                            "description": "for unreconciled transfers, decrease in beginning balance need to match previous balance",
+                            "num": 34
+                        },
+                        {
+                            "name": "correctAmountOut",
+                            "type": "int256",
+                            "docOrder": 35,
+                            "description": "for unreconciled transfers, decrease in the amount of a transfer",
+                            "num": 35
+                        },
+                        {
+                            "name": "correctEndBalOut",
+                            "type": "int256",
+                            "docOrder": 36,
+                            "description": "for unreconciled transfers, decrease in ending balance need to match running balance or block balance",
+                            "num": 36
+                        },
+                        {
+                            "name": "selfDestructOut",
+                            "type": "int256",
+                            "docOrder": 37,
+                            "description": "the value of the self-destructed value out if the accountedFor address was self-destructed",
+                            "num": 37
+                        },
+                        {
+                            "name": "gasOut",
+                            "type": "int256",
+                            "docOrder": 38,
+                            "description": "if the transaction's original sender is the accountedFor address, the amount of gas expended",
+                            "num": 38
+                        },
+                        {
+                            "name": "prevBal",
+                            "type": "int256",
+                            "docOrder": 39,
+                            "description": "the account balance for the given asset for the previous reconciliation",
+                            "num": 39
+                        },
+                        {
+                            "name": "begBalDiff",
+                            "type": "int256",
+                            "docOrder": 40,
+                            "description": "difference between expected beginning balance and balance at last reconciliation, if non-zero, the reconciliation failed",
+                            "num": 40
+                        },
+                        {
+                            "name": "endBalDiff",
+                            "type": "int256",
+                            "docOrder": 41,
+                            "description": "endBal - endBalCalc, if non-zero, the reconciliation failed",
+                            "num": 41
+                        },
+                        {
+                            "name": "endBalCalc",
+                            "type": "int256",
+                            "docOrder": 42,
+                            "description": "begBal + amountNet",
+                            "num": 42
+                        },
+                        {
+                            "name": "correctingReasons",
+                            "type": "string",
+                            "docOrder": 43,
+                            "description": "for unreconciled transfers, the reasons for the correcting entries, if any",
+                            "num": 43
+                        }
+                    ]
                 }
             ]
         },
@@ -1600,8 +1922,6 @@
     "structures": [
         {},
         {},
-        {},
-        {},
         {
             "members": [
                 {
@@ -1652,52 +1972,6 @@
                     "docOrder": 7,
                     "description": "the chain's native token symbol",
                     "num": 7
-                }
-            ]
-        },
-        {
-            "members": [
-                {
-                    "name": "lastCached",
-                    "type": "string",
-                    "docOrder": 1,
-                    "description": "the last time this cache was updated",
-                    "num": 1
-                },
-                {
-                    "name": "nFiles",
-                    "type": "uint64",
-                    "docOrder": 2,
-                    "description": "the number of files in the cache",
-                    "num": 2
-                },
-                {
-                    "name": "nFolders",
-                    "type": "uint64",
-                    "docOrder": 3,
-                    "description": "the number of folders in the cache",
-                    "num": 3
-                },
-                {
-                    "name": "path",
-                    "type": "string",
-                    "docOrder": 4,
-                    "description": "the path to the cache",
-                    "num": 4
-                },
-                {
-                    "name": "sizeInBytes",
-                    "type": "uint64",
-                    "docOrder": 5,
-                    "description": "the size of the cache in bytes",
-                    "num": 5
-                },
-                {
-                    "name": "type",
-                    "type": "string",
-                    "docOrder": 6,
-                    "description": "the type of cache",
-                    "num": 6
                 }
             ]
         },
@@ -1855,14 +2129,10 @@
         },
         {
             "class": "Statements",
-            "doc_group": "01-Accounts",
+            "doc_group": "04-Admin",
             "doc_route": "118-statement",
-            "doc_descr": "a statement, including all inflows and outflows, for a single transfer of an asset (including ETH) to or from a given address",
-            "produced_by": "export",
-            "contained_by": "transaction",
-            "cache_as": "group",
-            "cache_by": "statement",
-            "cache_type": "cacheable",
+            "doc_descr": "A reconciliation statement",
+            "produced_by": "exports",
             "disable_go": true,
             "members": [
                 {
@@ -2653,6 +2923,214 @@
             ]
         },
         {
+            "class": "Transactions",
+            "doc_group": "02-Chain Data",
+            "doc_route": "206-transaction",
+            "doc_descr": "transaction data as returned from the RPC (with slight enhancements)",
+            "produced_by": "transactions,export",
+            "contained_by": "block",
+            "cache_by": "tx",
+            "cache_type": "cacheable",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "chainId",
+                    "type": "string",
+                    "attributes": "noui|removed",
+                    "num": 1
+                },
+                {
+                    "name": "hash",
+                    "type": "hash",
+                    "attributes": "noui",
+                    "docOrder": 1,
+                    "description": "the hash of the transaction",
+                    "num": 6
+                },
+                {
+                    "name": "blockHash",
+                    "type": "hash",
+                    "attributes": "noui",
+                    "docOrder": 2,
+                    "description": "the hash of the block containing this transaction",
+                    "num": 7
+                },
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "attributes": "noui",
+                    "docOrder": 3,
+                    "description": "the number of the block",
+                    "num": 2
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "attributes": "noui",
+                    "docOrder": 4,
+                    "description": "the zero-indexed position of the transaction in the block",
+                    "num": 3
+                },
+                {
+                    "name": "nonce",
+                    "type": "value",
+                    "docOrder": 5,
+                    "description": "sequence number of the transactions sent by the sender",
+                    "num": 10
+                },
+                {
+                    "name": "timestamp",
+                    "type": "timestamp",
+                    "attributes": "noui",
+                    "docOrder": 6,
+                    "description": "the Unix timestamp of the object",
+                    "num": 4
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "attributes": "calc|width=120px",
+                    "docOrder": 7,
+                    "description": "the timestamp as a date",
+                    "num": 5
+                },
+                {
+                    "name": "from",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 8,
+                    "description": "address from which the transaction was sent",
+                    "num": 8
+                },
+                {
+                    "name": "to",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 9,
+                    "description": "address to which the transaction was sent",
+                    "num": 9
+                },
+                {
+                    "name": "value",
+                    "type": "wei",
+                    "docOrder": 10,
+                    "description": "the amount of wei sent with this transactions",
+                    "num": 11
+                },
+                {
+                    "name": "ether",
+                    "type": "ether",
+                    "attributes": "calc",
+                    "docOrder": 11,
+                    "description": "if --ether is specified, the value in ether",
+                    "num": 12
+                },
+                {
+                    "name": "gas",
+                    "type": "gas",
+                    "docOrder": 12,
+                    "description": "the maximum number of gas allowed for this transaction",
+                    "num": 13
+                },
+                {
+                    "name": "traces",
+                    "type": "Traces",
+                    "attributes": "noui",
+                    "num": 22,
+                    "isArray": true
+                },
+                {
+                    "name": "gasCost",
+                    "type": "gas",
+                    "attributes": "calc",
+                    "docOrder": 13,
+                    "description": "the number of wei per unit of gas the sender is willing to spend",
+                    "num": 15
+                },
+                {
+                    "name": "maxFeePerGas",
+                    "type": "gas",
+                    "num": 16
+                },
+                {
+                    "name": "maxPriorityFeePerGas",
+                    "type": "gas",
+                    "num": 17
+                },
+                {
+                    "name": "gasPrice",
+                    "type": "gas",
+                    "docOrder": 13,
+                    "description": "the number of wei per unit of gas the sender is willing to spend",
+                    "num": 14
+                },
+                {
+                    "name": "input",
+                    "type": "bytes",
+                    "docOrder": 14,
+                    "description": "byte data either containing a message or funcational data for a smart contracts. See the --articulate",
+                    "num": 18
+                },
+                {
+                    "name": "receipt",
+                    "type": "Receipt",
+                    "attributes": "noui",
+                    "docOrder": 15,
+                    "num": 21,
+                    "isPointer": true
+                },
+                {
+                    "name": "statements",
+                    "type": "Statements",
+                    "attributes": "noui|calc",
+                    "docOrder": 16,
+                    "description": "array of reconciliation statements",
+                    "num": 25,
+                    "isArray": true
+                },
+                {
+                    "name": "articulatedTx",
+                    "type": "Function",
+                    "attributes": "noui",
+                    "docOrder": 17,
+                    "num": 23,
+                    "isPointer": true
+                },
+                {
+                    "name": "hasToken",
+                    "type": "bool",
+                    "docOrder": 18,
+                    "description": "`true` if the transaction is token related, `false` otherwise",
+                    "num": 20
+                },
+                {
+                    "name": "isError",
+                    "type": "bool",
+                    "docOrder": 19,
+                    "description": "`true` if the transaction ended in error, `false` otherwise",
+                    "num": 19
+                },
+                {
+                    "name": "compressedTx",
+                    "type": "string",
+                    "attributes": "calc",
+                    "docOrder": 20,
+                    "description": "truncated, more readable version of the articulation",
+                    "num": 24
+                },
+                {
+                    "name": "gasUsed",
+                    "type": "gas",
+                    "num": 26
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "num": 27
+                }
+            ]
+        },
+        {
             "class": "Receipt",
             "doc_group": "02-Chain Data",
             "doc_route": "212-receipt",
@@ -2756,6 +3234,118 @@
                     "num": 14
                 }
             ]
+        },
+        {
+            "class": "Receipts",
+            "doc_group": "02-Chain Data",
+            "doc_route": "212-receipt",
+            "doc_descr": "receipt data as returned from the RPC (with slight enhancements)",
+            "produced_by": "receipts,export",
+            "contained_by": "transaction",
+            "cache_as": "group",
+            "cache_by": "block",
+            "cache_type": "cacheable",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "blockHash",
+                    "type": "hash",
+                    "docOrder": 1,
+                    "num": 1
+                },
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "docOrder": 2,
+                    "num": 2
+                },
+                {
+                    "name": "contractAddress",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "docOrder": 3,
+                    "description": "the address of the newly created contract, if any",
+                    "num": 3
+                },
+                {
+                    "name": "cumulativeGasUsed",
+                    "type": "gas",
+                    "upgrades": "2.5.8:string",
+                    "num": 4
+                },
+                {
+                    "name": "from",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "num": 5
+                },
+                {
+                    "name": "gasUsed",
+                    "type": "gas",
+                    "docOrder": 4,
+                    "description": "the amount of gas actually used by the transaction",
+                    "num": 6
+                },
+                {
+                    "name": "effectiveGasPrice",
+                    "type": "gas",
+                    "num": 7
+                },
+                {
+                    "name": "isError",
+                    "type": "bool",
+                    "docOrder": 5,
+                    "num": 8
+                },
+                {
+                    "name": "logs",
+                    "type": "Log",
+                    "attributes": "noui",
+                    "docOrder": 6,
+                    "description": "a possibly empty array of logs",
+                    "num": 9,
+                    "isArray": true
+                },
+                {
+                    "name": "logsBloom",
+                    "type": "string",
+                    "attributes": "noui|removed",
+                    "num": 10
+                },
+                {
+                    "name": "status",
+                    "type": "value",
+                    "docOrder": 7,
+                    "upgrades": "2.5.9:uint32",
+                    "description": "`1` on transaction suceess, `null` if tx precedes Byzantium, `0` otherwise",
+                    "num": 11
+                },
+                {
+                    "name": "to",
+                    "type": "address",
+                    "attributes": "readOnly",
+                    "num": 12
+                },
+                {
+                    "name": "transactionHash",
+                    "type": "hash",
+                    "docOrder": 8,
+                    "num": 13
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "docOrder": 9,
+                    "num": 14
+                }
+            ]
+        },
+        {
+            "class": "Database",
+            "doc_group": "09-DalleDress",
+            "doc_route": "215-database",
+            "doc_descr": "Database used to generate dalle dress prompts",
+            "disable_go": true
         },
         {
             "class": "Log",
@@ -2884,6 +3474,141 @@
                     "num": 14
                 }
             ]
+        },
+        {
+            "class": "Logs",
+            "doc_group": "02-Chain Data",
+            "doc_route": "215-log",
+            "doc_descr": "log data as returned from the RPC (with slight enhancements)",
+            "produced_by": "logs,export,blocks,transactions",
+            "contained_by": "receipt, function",
+            "cache_as": "group",
+            "cache_by": "block",
+            "cache_type": "cacheable",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "blockNumber",
+                    "type": "blknum",
+                    "attributes": "noui",
+                    "docOrder": 1,
+                    "description": "the number of the block",
+                    "num": 1
+                },
+                {
+                    "name": "transactionIndex",
+                    "type": "txnum",
+                    "attributes": "noui",
+                    "docOrder": 2,
+                    "description": "the zero-indexed position of the transaction in the block",
+                    "num": 2
+                },
+                {
+                    "name": "logIndex",
+                    "type": "lognum",
+                    "attributes": "noui",
+                    "docOrder": 3,
+                    "description": "the zero-indexed position of this log relative to the block",
+                    "num": 3
+                },
+                {
+                    "name": "timestamp",
+                    "type": "timestamp",
+                    "attributes": "noui",
+                    "docOrder": 4,
+                    "description": "the timestamp of the block this log appears in",
+                    "num": 4
+                },
+                {
+                    "name": "date",
+                    "type": "datetime",
+                    "attributes": "calc",
+                    "docOrder": 5,
+                    "description": "the timestamp as a date",
+                    "num": 5
+                },
+                {
+                    "name": "address",
+                    "type": "address",
+                    "docOrder": 6,
+                    "description": "the smart contract that emitted this log",
+                    "num": 6
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "attributes": "calc",
+                    "docOrder": 7,
+                    "description": "the name of the smart contract if any",
+                    "num": 7
+                },
+                {
+                    "name": "topics",
+                    "type": "topic",
+                    "attributes": "noui",
+                    "docOrder": 8,
+                    "description": "the first topic hashes event signature of the log, up to 3 additional index parameters may appear",
+                    "num": 8,
+                    "isArray": true
+                },
+                {
+                    "name": "data",
+                    "type": "bytes",
+                    "attributes": "noui",
+                    "docOrder": 9,
+                    "description": "any remaining un-indexed parameters to the event",
+                    "num": 9
+                },
+                {
+                    "name": "transactionHash",
+                    "type": "hash",
+                    "attributes": "noui",
+                    "docOrder": 10,
+                    "description": "the hash of the transction",
+                    "num": 10
+                },
+                {
+                    "name": "blockHash",
+                    "type": "hash",
+                    "attributes": "noui",
+                    "docOrder": 11,
+                    "description": "the hash of the block",
+                    "num": 11
+                },
+                {
+                    "name": "articulatedLog",
+                    "type": "Function",
+                    "attributes": "calc",
+                    "docOrder": 12,
+                    "description": "a human-readable version of the topic and data fields",
+                    "num": 12,
+                    "isPointer": true
+                },
+                {
+                    "name": "compressedLog",
+                    "type": "string",
+                    "attributes": "noui",
+                    "docOrder": 13,
+                    "upgrades": "2.5.10:string",
+                    "description": "a truncated, more readable version of the articulation",
+                    "num": 13
+                },
+                {
+                    "name": "isNFT",
+                    "type": "bool",
+                    "attributes": "noui",
+                    "docOrder": 14,
+                    "description": "true if the log is an NFT transfer",
+                    "num": 14
+                }
+            ]
+        },
+        {
+            "class": "Series",
+            "doc_group": "09-DalleDress",
+            "doc_route": "215-series",
+            "doc_descr": "Series filter used to generate dalle dress prompts",
+            "disable_go": true
         },
         {
             "class": "TraceAction",
@@ -4286,6 +5011,117 @@
             ]
         },
         {
+            "class": "Caches",
+            "doc_group": "002-Support",
+            "doc_route": "600-status",
+            "doc_descr": "data model for caches",
+            "produced_by": "status",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "lastCached",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "the last time this cache was updated",
+                    "num": 1
+                },
+                {
+                    "name": "nFiles",
+                    "type": "uint64",
+                    "docOrder": 2,
+                    "description": "the number of files in the cache",
+                    "num": 2
+                },
+                {
+                    "name": "nFolders",
+                    "type": "uint64",
+                    "docOrder": 3,
+                    "description": "the number of folders in the cache",
+                    "num": 3
+                },
+                {
+                    "name": "path",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "the path to the cache",
+                    "num": 4
+                },
+                {
+                    "name": "sizeInBytes",
+                    "type": "uint64",
+                    "docOrder": 5,
+                    "description": "the size of the cache in bytes",
+                    "num": 5
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "docOrder": 6,
+                    "description": "the type of cache",
+                    "num": 6
+                }
+            ]
+        },
+        {
+            "class": "Chains",
+            "doc_group": "002-Support",
+            "doc_route": "600-status",
+            "doc_descr": "data model for chains",
+            "produced_by": "status",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "chain",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "the chain identifier",
+                    "num": 1
+                },
+                {
+                    "name": "chainId",
+                    "type": "uint64",
+                    "docOrder": 2,
+                    "description": "the chain ID",
+                    "num": 2
+                },
+                {
+                    "name": "ipfsGateway",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "the IPFS gateway URL",
+                    "num": 3
+                },
+                {
+                    "name": "localExplorer",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "the local block explorer URL",
+                    "num": 4
+                },
+                {
+                    "name": "remoteExplorer",
+                    "type": "string",
+                    "docOrder": 5,
+                    "description": "the remote block explorer URL",
+                    "num": 5
+                },
+                {
+                    "name": "rpcProvider",
+                    "type": "string",
+                    "docOrder": 6,
+                    "description": "the RPC provider URL",
+                    "num": 6
+                },
+                {
+                    "name": "symbol",
+                    "type": "string",
+                    "docOrder": 7,
+                    "description": "the chain's native token symbol",
+                    "num": 7
+                }
+            ]
+        },
+        {
             "class": "Status",
             "doc_group": "001-Route",
             "doc_route": "600-status",
@@ -4459,7 +5295,7 @@
             "facets": [
                 {
                     "name": "Generator",
-                    "store": "Generator",
+                    "store": "dalle.DalleDress",
                     "actions": [
                         "export"
                     ],
@@ -4469,7 +5305,7 @@
                 },
                 {
                     "name": "Series",
-                    "store": "Series",
+                    "store": "dalle.Series",
                     "actions": [
                         "export"
                     ],
@@ -4479,7 +5315,7 @@
                 },
                 {
                     "name": "Databases",
-                    "store": "Databases",
+                    "store": "dalle.Database",
                     "actions": [
                         "export"
                     ],
@@ -4499,7 +5335,7 @@
                 },
                 {
                     "name": "Gallery",
-                    "store": "Logs",
+                    "store": "dalle.DalleDress",
                     "actions": [
                         "export"
                     ],

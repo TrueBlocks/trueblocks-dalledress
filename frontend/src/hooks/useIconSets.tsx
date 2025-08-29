@@ -98,7 +98,7 @@ const faIcons: IconSet = {
   Export: Icons.FaDownload,
   Publish: Icons.FaGlobe,
   Pin: Icons.FaListAlt,
-  Speak: Icons.FaBullhornIcon,
+  Speak: Icons.FaBullhorn,
 
   // Navigation
   ChevronLeft: Icons.FaAngleDoubleLeft,
@@ -156,7 +156,7 @@ const biIcons: IconSet = {
   Export: Icons.BiDownload,
   Publish: Icons.BiGlobe,
   Pin: Icons.BiListUl,
-  Speak: Icons.BiVolumeFullIcon,
+  Speak: Icons.BiVolumeFull,
 
   // Navigation
   ChevronLeft: Icons.BiChevronsLeft,

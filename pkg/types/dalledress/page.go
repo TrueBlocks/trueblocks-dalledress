@@ -13,26 +13,24 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-
 	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
 	// EXISTING_CODE
-	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 )
 
 type DalleDressPage struct {
-	Facet         types.DataFacet   `json:"facet"`
-	Databases     []*Database       `json:"databases"`
-	Generator     []*Generator      `json:"generator"`
-	Logs          []*Log            `json:"logs"`
-	Series        []*Series         `json:"series"`
-	Gallery       []*GalleryItem    `json:"gallery"`
-	CurrentDress  *dalle.DalleDress `json:"currentDress"`
-	TotalItems    int               `json:"totalItems"`
-	ExpectedTotal int               `json:"expectedTotal"`
-	IsFetching    bool              `json:"isFetching"`
-	State         types.LoadState   `json:"state"`
+	Facet         types.DataFacet `json:"facet"`
+	Logs          []*Log          `json:"logs"`
+	DalleDresses  []*DalleDress   `json:"dalleDresses"`
+	Databases     []*Database     `json:"databases"`
+	Series        []*Series       `json:"series"`
+	TotalItems    int             `json:"totalItems"`
+	ExpectedTotal int             `json:"expectedTotal"`
+	IsFetching    bool            `json:"isFetching"`
+	State         types.LoadState `json:"state"`
+	CurrentDress  *DalleDress     `json:"currentDress"`
+	Gallery       []*GalleryItem  `json:"gallery"` // BINGY_JOE
 }
 
 func (p *DalleDressPage) GetFacet() types.DataFacet {
@@ -62,6 +60,13 @@ func (c *DalleDressCollection) GetPage(
 	filter string,
 ) (types.Page, error) {
 	dataFacet := payload.DataFacet
+	// BINGY_JOE
+	const UnpaginatedPageSize = 1_000_000_000
+	if dataFacet == DalleDressGenerator || dataFacet == DalleDressGallery {
+		first = 0
+		pageSize = UnpaginatedPageSize
+	}
+	// BINGY_JOE
 
 	page := &DalleDressPage{
 		Facet: dataFacet,
@@ -75,23 +80,23 @@ func (c *DalleDressCollection) GetPage(
 	switch dataFacet {
 	case DalleDressGenerator:
 		facet := c.generatorFacet
-		var filterFunc func(*Generator) bool
+		var filterFunc func(*DalleDress) bool
 		if filter != "" {
-			filterFunc = func(item *Generator) bool {
+			filterFunc = func(item *DalleDress) bool {
 				return c.matchesGeneratorFilter(item, filter)
 			}
 		}
-		sortFunc := func(items []Generator, sort sdk.SortSpec) error {
-			return nil // sdk.SortGenerator(items, sort)
+		sortFunc := func(items []DalleDress, sort sdk.SortSpec) error {
+			return nil // sdk.SortDalleDress(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
 		} else {
-			generator := make([]*Generator, 0, len(result.Items))
+			generator := make([]*DalleDress, 0, len(result.Items))
 			for i := range result.Items {
 				generator = append(generator, &result.Items[i])
 			}
-			page.Generator, page.TotalItems, page.State = generator, result.TotalItems, result.State
+			page.DalleDresses, page.TotalItems, page.State = generator, result.TotalItems, result.State
 			items := c.getGalleryItems()
 			if payload != nil && payload.Address != "" {
 				latest, ordered := selectLatestGalleryItem(items, payload.Address)
@@ -100,13 +105,13 @@ func (c *DalleDressCollection) GetPage(
 					if cd := loadCurrentDressFromSidecars(latest.Series, payload.Address); cd != nil {
 						page.CurrentDress = cd
 					} else if page.CurrentDress == nil {
-						page.CurrentDress = &dalle.DalleDress{}
+						page.CurrentDress = &DalleDress{}
 					}
 				} else if page.CurrentDress == nil {
-					page.CurrentDress = &dalle.DalleDress{}
+					page.CurrentDress = &DalleDress{}
 				}
 			} else if page.CurrentDress == nil {
-				page.CurrentDress = &dalle.DalleDress{}
+				page.CurrentDress = &DalleDress{}
 			}
 		}
 		page.IsFetching = facet.IsFetching()
@@ -179,26 +184,26 @@ func (c *DalleDressCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	case DalleDressGallery:
 		facet := c.galleryFacet
-		var filterFunc func(*Log) bool
+		var filterFunc func(*DalleDress) bool
 		if filter != "" {
-			filterFunc = func(item *Log) bool {
+			filterFunc = func(item *DalleDress) bool {
 				return c.matchesGalleryFilter(item, filter)
 			}
 		}
-		sortFunc := func(items []Log, sort sdk.SortSpec) error {
-			return sdk.SortLogs(items, sort)
+		sortFunc := func(items []DalleDress, sort sdk.SortSpec) error {
+			return nil // dalle.SortDalleDress(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
 		} else {
-			gallery := make([]*Log, 0, len(result.Items))
+			gallery := make([]*DalleDress, 0, len(result.Items))
 			for i := range result.Items {
 				gallery = append(gallery, &result.Items[i])
 			}
-			page.Logs, page.TotalItems, page.State = gallery, result.TotalItems, result.State
-			// EXISTING_CODE
+			page.DalleDresses, page.TotalItems, page.State = gallery, result.TotalItems, result.State
+			// BINGY_JOE
 			page.Gallery = c.getGalleryItems()
-			// EXISTING_CODE
+			// BINGY_JOE
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
@@ -266,7 +271,7 @@ func (c *DalleDressCollection) generateSummariesForPeriod(dataFacet types.DataFa
 }
 
 // EXISTING_CODE
-func (c *DalleDressCollection) matchesGeneratorFilter(item *Generator, filter string) bool {
+func (c *DalleDressCollection) matchesGeneratorFilter(item *DalleDress, filter string) bool {
 	_ = item   // delint
 	_ = filter // delint
 	return true
@@ -296,7 +301,7 @@ func (c *DalleDressCollection) matchesEventFilter(item *Log, filter string) bool
 	return true
 }
 
-func (c *DalleDressCollection) matchesGalleryFilter(item *Log, filter string) bool {
+func (c *DalleDressCollection) matchesGalleryFilter(item *DalleDress, filter string) bool {
 	_ = item   // delint
 	_ = filter // delint
 	return true

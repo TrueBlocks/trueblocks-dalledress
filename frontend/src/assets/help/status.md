@@ -13,17 +13,30 @@ the code inside of 'EXISTING_CODE' tags.
 
 ## Facets
 
-- Status Facet uses Status store.
-- Caches Facet uses Caches store.
-- Chains Facet uses Chains store.
+- Status Facet uses sdk.Status store.
+- Caches Facet uses sdk.Caches store.
+- Chains Facet uses sdk.Chains store.
 
 ## Stores
 
-- **Caches Store (0 members)**
+- **Caches Store (6 members)**
 
+  - lastCached: the last time this cache was updated
+  - nFiles: the number of files in the cache
+  - nFolders: the number of folders in the cache
+  - path: the path to the cache
+  - sizeInBytes: the size of the cache in bytes
+  - type: the type of cache
 
-- **Chains Store (0 members)**
+- **Chains Store (7 members)**
 
+  - chain: the chain identifier
+  - chainId: the chain ID
+  - ipfsGateway: the IPFS gateway URL
+  - localExplorer: the local block explorer URL
+  - remoteExplorer: the remote block explorer URL
+  - rpcProvider: the RPC provider URL
+  - symbol: the chain's native token symbol
 
 - **Status Store (18 members)**
 

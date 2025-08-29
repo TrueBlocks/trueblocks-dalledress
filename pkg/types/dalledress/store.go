@@ -26,108 +26,24 @@ import (
 // EXISTING_CODE
 // EXISTING_CODE
 
-type Generator = dalle.Generator
-type Database = dalle.Database
 type Log = sdk.Log
+type DalleDress = dalle.DalleDress
+type Database = dalle.Database
 type Series = dalle.Series
 
 var (
-	databasesStore   *store.Store[Database]
-	databasesStoreMu sync.Mutex
-
-	generatorStore   *store.Store[Generator]
-	generatorStoreMu sync.Mutex
-
 	logsStore   *store.Store[Log]
 	logsStoreMu sync.Mutex
+
+	dalledressStore   *store.Store[DalleDress]
+	dalledressStoreMu sync.Mutex
+
+	databasesStore   *store.Store[Database]
+	databasesStoreMu sync.Mutex
 
 	seriesStore   *store.Store[Series]
 	seriesStoreMu sync.Mutex
 )
-
-func (c *DalleDressCollection) getDatabasesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Database] {
-	databasesStoreMu.Lock()
-	defer databasesStoreMu.Unlock()
-
-	// EXISTING_CODE
-	// EXISTING_CODE
-
-	chain := payload.Chain
-	address := payload.Address
-	theStore := databasesStore
-	if theStore == nil {
-		queryFunc := func(ctx *output.RenderCtx) error {
-			// EXISTING_CODE
-			// EXISTING_CODE
-			return nil
-		}
-
-		processFunc := func(item interface{}) *Database {
-			if it, ok := item.(*Database); ok {
-				return it
-			}
-			return nil
-		}
-
-		mappingFunc := func(item *Database) (key interface{}, includeInMap bool) {
-			// EXISTING_CODE
-			// EXISTING_CODE
-			return nil, false
-		}
-
-		storeName := c.GetStoreName(facet, chain, address)
-		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
-
-		// EXISTING_CODE
-		// EXISTING_CODE
-
-		databasesStore = theStore
-	}
-
-	return theStore
-}
-
-func (c *DalleDressCollection) getGeneratorStore(payload *types.Payload, facet types.DataFacet) *store.Store[Generator] {
-	generatorStoreMu.Lock()
-	defer generatorStoreMu.Unlock()
-
-	// EXISTING_CODE
-	// EXISTING_CODE
-
-	chain := payload.Chain
-	address := payload.Address
-	theStore := generatorStore
-	if theStore == nil {
-		queryFunc := func(ctx *output.RenderCtx) error {
-			// EXISTING_CODE
-			// EXISTING_CODE
-			return nil
-		}
-
-		processFunc := func(item interface{}) *Generator {
-			if it, ok := item.(*Generator); ok {
-				return it
-			}
-			return nil
-		}
-
-		mappingFunc := func(item *Generator) (key interface{}, includeInMap bool) {
-			// EXISTING_CODE
-			// EXISTING_CODE
-			return nil, false
-		}
-
-		storeName := c.GetStoreName(facet, chain, address)
-		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
-
-		// EXISTING_CODE
-		// EXISTING_CODE
-
-		generatorStore = theStore
-	}
-
-	return theStore
-}
 
 func (c *DalleDressCollection) getLogsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Log] {
 	logsStoreMu.Lock()
@@ -171,6 +87,95 @@ func (c *DalleDressCollection) getLogsStore(payload *types.Payload, facet types.
 	return theStore
 }
 
+func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet types.DataFacet) *store.Store[DalleDress] {
+	dalledressStoreMu.Lock()
+	defer dalledressStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
+
+	chain := payload.Chain
+	address := payload.Address
+	theStore := dalledressStore
+	if theStore == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			// need query
+			return nil
+		}
+
+		processFunc := func(item interface{}) *DalleDress {
+			if it, ok := item.(*DalleDress); ok {
+				return it
+			}
+			return nil
+		}
+
+		mappingFunc := func(item *DalleDress) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			if item != nil {
+				k := item.Original + ":" + item.AnnotatedPath
+				return k, true
+			}
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		storeName := c.GetStoreName(facet, chain, address)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
+		dalledressStore = theStore
+	}
+
+	return theStore
+}
+
+func (c *DalleDressCollection) getDatabasesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Database] {
+	databasesStoreMu.Lock()
+	defer databasesStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
+
+	chain := payload.Chain
+	address := payload.Address
+	theStore := databasesStore
+	if theStore == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil
+		}
+
+		processFunc := func(item interface{}) *Database {
+			if it, ok := item.(*Database); ok {
+				return it
+			}
+			return nil
+		}
+
+		mappingFunc := func(item *Database) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		storeName := c.GetStoreName(facet, chain, address)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
+		databasesStore = theStore
+	}
+
+	return theStore
+}
+
 func (c *DalleDressCollection) getSeriesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Series] {
 	seriesStoreMu.Lock()
 	defer seriesStoreMu.Unlock()
@@ -184,13 +189,13 @@ func (c *DalleDressCollection) getSeriesStore(payload *types.Payload, facet type
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			// EXISTING_CODE
 			seriesDir := filepath.Join(dalle.DataDir(), "series")
 			models, _ := dalle.LoadSeriesModels(seriesDir)
 			dalle.SortSeries(models, "suffix", true)
 			for i, m := range models {
 				theStore.AddItem(m, i)
 			}
+			// EXISTING_CODE
 			return nil
 		}
 
@@ -228,7 +233,7 @@ func (c *DalleDressCollection) GetStoreName(dataFacet types.DataFacet, chain, ad
 	name := ""
 	switch dataFacet {
 	case DalleDressGenerator:
-		name = "dalledress-generator"
+		name = "dalledress-dalledress"
 	case DalleDressSeries:
 		name = "dalledress-series"
 	case DalleDressDatabases:
@@ -236,7 +241,7 @@ func (c *DalleDressCollection) GetStoreName(dataFacet types.DataFacet, chain, ad
 	case DalleDressEvents:
 		name = "dalledress-logs"
 	case DalleDressGallery:
-		name = "dalledress-logs"
+		name = "dalledress-dalledress"
 	default:
 		return ""
 	}

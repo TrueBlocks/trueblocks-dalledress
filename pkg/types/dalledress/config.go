@@ -17,10 +17,10 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 	facets := map[string]types.FacetConfig{
 		"generator": {
 			Name:          "Generator",
-			Store:         "generator",
+			Store:         "dalledresses",
 			IsForm:        true,
 			DividerBefore: false,
-			Fields:        getGeneratorFields(),
+			Fields:        getDalleDressFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"speak"},
 			RendererTypes: "facet",
@@ -57,10 +57,10 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 		},
 		"gallery": {
 			Name:          "Gallery",
-			Store:         "logs",
-			IsForm:        false,
+			Store:         "dalledresses",
+			IsForm:        true,
 			DividerBefore: false,
-			Fields:        getLogsFields(),
+			Fields:        getDalleDressFields(),
 			Actions:       []string{},
 			HeaderActions: []string{},
 			RendererTypes: "facet",
@@ -85,24 +85,6 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 	return cfg, nil
 }
 
-func getDatabasesFields() []types.FieldConfig {
-	return []types.FieldConfig{
-		// EXISTING_CODE
-		{Key: "databaseName", Label: "Database Name", ColumnLabel: "Database", DetailLabel: "Database Name", Section: "General", Width: 200, Order: 1, DetailOrder: 1},
-		{Key: "count", Label: "Count", ColumnLabel: "Count", DetailLabel: "Count", Section: "General", Width: 100, Order: 2, DetailOrder: 2},
-		{Key: "sample", Label: "Sample", ColumnLabel: "Sample", DetailLabel: "Sample", Section: "General", Width: 300, Order: 3, DetailOrder: 3},
-		{Key: "filtered", Label: "Filtered", ColumnLabel: "Filtered", DetailLabel: "Filtered", Section: "General", Width: 80, Order: 4, DetailOrder: 4},
-		// EXISTING_CODE
-	}
-}
-
-func getGeneratorFields() []types.FieldConfig {
-	return []types.FieldConfig{
-		// EXISTING_CODE
-		// EXISTING_CODE
-	}
-}
-
 func getLogsFields() []types.FieldConfig {
 	return []types.FieldConfig{
 		// EXISTING_CODE
@@ -114,6 +96,25 @@ func getLogsFields() []types.FieldConfig {
 		{Key: "transactionIndex", Label: "Transaction Index", ColumnLabel: "", DetailLabel: "Transaction Index", Section: "Block/Tx", NoTable: true, DetailOrder: 3},
 		{Key: "transactionHash", Label: "Transaction Hash", ColumnLabel: "", DetailLabel: "Transaction Hash", Section: "Block/Tx", NoTable: true, DetailOrder: 4},
 		{Key: "signature", Label: "Signature", ColumnLabel: "", DetailLabel: "Signature", Section: "Event", NoTable: true, DetailOrder: 7},
+		// EXISTING_CODE
+	}
+}
+
+func getDalleDressFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		// MISSING
+		// EXISTING_CODE
+		// EXISTING_CODE
+	}
+}
+
+func getDatabasesFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		// EXISTING_CODE
+		{Key: "databaseName", Label: "Database Name", ColumnLabel: "Database", DetailLabel: "Database Name", Section: "General", Width: 200, Order: 1, DetailOrder: 1},
+		{Key: "count", Label: "Count", ColumnLabel: "Count", DetailLabel: "Count", Section: "General", Width: 100, Order: 2, DetailOrder: 2},
+		{Key: "sample", Label: "Sample", ColumnLabel: "Sample", DetailLabel: "Sample", Section: "General", Width: 300, Order: 3, DetailOrder: 3},
+		{Key: "filtered", Label: "Filtered", ColumnLabel: "Filtered", DetailLabel: "Filtered", Section: "General", Width: 80, Order: 4, DetailOrder: 4},
 		// EXISTING_CODE
 	}
 }

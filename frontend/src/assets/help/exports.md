@@ -14,15 +14,15 @@ This is the help file for the Exports view.
 
 ## Facets
 
-- Statements Facet uses Statements store.
-- Balances Facet uses Balances store.
-- Transfers Facet uses Transfers store.
-- Transactions Facet uses Transactions store.
-- Withdrawals Facet uses Withdrawals store.
-- Assets Facet uses Assets store.
-- Logs Facet uses Logs store.
-- Traces Facet uses Traces store.
-- Receipts Facet uses Receipts store.
+- Statements Facet uses sdk.Statements store.
+- Balances Facet uses sdk.Balances store.
+- Transfers Facet uses sdk.Transfers store.
+- Transactions Facet uses sdk.Transactions store.
+- Withdrawals Facet uses sdk.Withdrawals store.
+- Assets Facet uses sdk.Assets store.
+- Logs Facet uses sdk.Logs store.
+- Traces Facet uses sdk.Traces store.
+- Receipts Facet uses sdk.Receipts store.
 
 ## Stores
 

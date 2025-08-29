@@ -16,10 +16,8 @@ import {
   BiPalette,
   BiQuestionMark,
   BiUser,
-  BiVolumeFull,
 } from 'react-icons/bi';
 import {
-  FaBullhorn,
   FaCircleNotch,
   FaDesktop,
   FaFileContract,
@@ -103,6 +101,7 @@ export {
   BiTrash,
   BiUndo,
   BiUser,
+  BiVolumeFull,
   BiX,
 } from 'react-icons/bi';
 
@@ -163,9 +162,6 @@ export const BiAbis = BiListUl;
 export const BiNames = BiUser;
 export const BiDalleDress = BiPalette;
 export const BiMissing = BiQuestionMark;
-// TODO: BOGUS - THIS ISN'T RIGHT - THESE ARE NOT VIEW LEVEL ICONS
-export const FaBullhornIcon = FaBullhorn;
-export const BiVolumeFullIcon = BiVolumeFull;
 
 // EXISTING_CODE
 

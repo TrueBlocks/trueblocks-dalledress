@@ -30,12 +30,12 @@ import { useHotkeys } from '@mantine/hooks';
 import { dalle, dalledress } from '@models';
 import { crud, msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
-import { renderers } from 'src/views/dalledress/renderers/Renderers';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanel } from '../utils/detailPanel';
 import { SeriesModal } from './components';
 import { useSeriesModal } from './hooks/seriesModal';
+import { renderers } from './renderers';
 
 const ROUTE: ViewRoute = 'dalledress';
 export const DalleDress = () => {
@@ -107,7 +107,7 @@ export const DalleDress = () => {
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.GENERATOR:
-        return [];
+        return pageData.dalleDresses || [];
       case types.DataFacet.SERIES:
         return pageData.series || [];
       case types.DataFacet.DATABASES:
@@ -115,7 +115,7 @@ export const DalleDress = () => {
       case types.DataFacet.EVENTS:
         return pageData.logs || [];
       case types.DataFacet.GALLERY:
-        return pageData.logs || [];
+        return pageData.dalleDresses || [];
       default:
         LogError('[DalleDress] unexpected facet=' + String(facet));
         return [];
@@ -127,7 +127,8 @@ export const DalleDress = () => {
     msgs.EventType.DATA_LOADED,
     (_message: string, payload?: Record<string, unknown>) => {
       if (payload?.collection === ROUTE) {
-        if (payload.dataFacet === getCurrentDataFacet()) {
+        const eventDataFacet = payload.dataFacet;
+        if (eventDataFacet === getCurrentDataFacet()) {
           fetchData();
         }
       }
@@ -177,7 +178,7 @@ export const DalleDress = () => {
     },
     pageFunc: GetDalleDressPage,
     pageClass: dalledress.DalleDressPage,
-    updateItem: types.Log.createFrom({}),
+    updateItem: dalle.DalleDress.createFrom({}),
     createPayload,
     getCurrentDataFacet,
   });

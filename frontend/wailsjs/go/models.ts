@@ -314,20 +314,6 @@ export namespace dalle {
 	        this.name = source["name"];
 	    }
 	}
-	export class Generator {
-	    id: string;
-	    name: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Generator(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.name = source["name"];
-	    }
-	}
 	export class Series {
 	    last?: number;
 	    suffix: string;
@@ -401,16 +387,16 @@ export namespace dalledress {
 	}
 	export class DalleDressPage {
 	    facet: types.DataFacet;
-	    databases: dalle.Database[];
-	    generator: dalle.Generator[];
 	    logs: types.Log[];
+	    dalleDresses: dalle.DalleDress[];
+	    databases: dalle.Database[];
 	    series: dalle.Series[];
-	    gallery: GalleryItem[];
-	    currentDress?: dalle.DalleDress;
 	    totalItems: number;
 	    expectedTotal: number;
 	    isFetching: boolean;
 	    state: types.LoadState;
+	    currentDress?: dalle.DalleDress;
+	    gallery: GalleryItem[];
 	
 	    static createFrom(source: any = {}) {
 	        return new DalleDressPage(source);
@@ -419,16 +405,16 @@ export namespace dalledress {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.facet = source["facet"];
-	        this.databases = this.convertValues(source["databases"], dalle.Database);
-	        this.generator = this.convertValues(source["generator"], dalle.Generator);
 	        this.logs = this.convertValues(source["logs"], types.Log);
+	        this.dalleDresses = this.convertValues(source["dalleDresses"], dalle.DalleDress);
+	        this.databases = this.convertValues(source["databases"], dalle.Database);
 	        this.series = this.convertValues(source["series"], dalle.Series);
-	        this.gallery = this.convertValues(source["gallery"], GalleryItem);
-	        this.currentDress = this.convertValues(source["currentDress"], dalle.DalleDress);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];
 	        this.state = source["state"];
+	        this.currentDress = this.convertValues(source["currentDress"], dalle.DalleDress);
+	        this.gallery = this.convertValues(source["gallery"], GalleryItem);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

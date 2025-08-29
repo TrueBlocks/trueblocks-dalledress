@@ -13,10 +13,10 @@ the code inside of 'EXISTING_CODE' tags.
 
 ## Facets
 
-- Stats Facet uses Stats store.
-- Index Facet uses Index store.
-- Blooms Facet uses Blooms store.
-- Manifest Facet uses Manifest store.
+- Stats Facet uses sdk.Stats store.
+- Index Facet uses sdk.Index store.
+- Blooms Facet uses sdk.Blooms store.
+- Manifest Facet uses sdk.Manifest store.
 
 ## Stores
 

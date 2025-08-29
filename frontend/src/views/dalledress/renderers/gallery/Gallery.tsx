@@ -52,13 +52,6 @@ export function Gallery({
   );
   const [selected, setSelected] = useState<string | null>(null);
 
-  const scrollSelectedIntoView = useCallback((relPath: string | null) => {
-    if (!relPath || !scrollRef.current) return;
-    const el = scrollRef.current.querySelector(`[data-relpath="${relPath}"]`);
-    if (el && 'scrollIntoView' in el)
-      (el as HTMLElement).scrollIntoView({ block: 'nearest' });
-  }, []);
-
   const handleItemClick = useCallback((item: dalledress.GalleryItem) => {
     setSelected(item.relPath);
   }, []);
@@ -72,6 +65,13 @@ export function Gallery({
     },
     [setActiveFacet],
   );
+
+  const scrollSelectedIntoView = useCallback((relPath: string | null) => {
+    if (!relPath || !scrollRef.current) return;
+    const el = scrollRef.current.querySelector(`[data-relpath="${relPath}"]`);
+    if (el && 'scrollIntoView' in el)
+      (el as HTMLElement).scrollIntoView({ block: 'nearest' });
+  }, []);
 
   useEffect(() => {
     scrollSelectedIntoView(selected);

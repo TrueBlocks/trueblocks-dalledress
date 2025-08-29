@@ -13,11 +13,11 @@ the code inside of 'EXISTING_CODE' tags.
 
 ## Facets
 
-- All Facet uses Names store.
-- Custom Facet uses Names store.
-- Prefund Facet uses Names store.
-- Regular Facet uses Names store.
-- Baddress Facet uses Names store.
+- All Facet uses sdk.Names store.
+- Custom Facet uses sdk.Names store.
+- Prefund Facet uses sdk.Names store.
+- Regular Facet uses sdk.Names store.
+- Baddress Facet uses sdk.Names store.
 
 ## Stores
 

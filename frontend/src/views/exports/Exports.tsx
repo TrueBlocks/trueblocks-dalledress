@@ -32,7 +32,7 @@ import { Debugger, LogError, useErrorHandler } from '@utils';
 
 import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanel } from '../utils/detailPanel';
-import { renderers } from './components';
+import { renderers } from './renderers';
 
 const ROUTE: ViewRoute = 'exports';
 export const Exports = () => {

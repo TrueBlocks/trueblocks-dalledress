@@ -17,9 +17,8 @@ import (
 	"sync"
 	"time"
 
-	dallev2 "github.com/TrueBlocks/trueblocks-dalle/v2"
-
 	// EXISTING_CODE
+	dallev2 "github.com/TrueBlocks/trueblocks-dalle/v2"
 	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
@@ -43,13 +42,14 @@ func init() {
 }
 
 type DalleDressCollection struct {
-	generatorFacet    *facets.Facet[Generator]
-	seriesFacet       *facets.Facet[Series]
-	databasesFacet    *facets.Facet[Database]
-	eventsFacet       *facets.Facet[Log]
-	galleryFacet      *facets.Facet[Log]
-	summary           types.Summary
-	summaryMutex      sync.RWMutex
+	generatorFacet *facets.Facet[DalleDress]
+	seriesFacet    *facets.Facet[Series]
+	databasesFacet *facets.Facet[Database]
+	eventsFacet    *facets.Facet[Log]
+	galleryFacet   *facets.Facet[DalleDress]
+	summary        types.Summary
+	summaryMutex   sync.RWMutex
+	//
 	galleryCache      []*GalleryItem
 	gallerySeriesInfo map[string]int64
 	galleryCacheMux   sync.RWMutex
@@ -67,8 +67,8 @@ func (c *DalleDressCollection) initializeFacets(payload *types.Payload) {
 	c.generatorFacet = facets.NewFacet(
 		DalleDressGenerator,
 		isGenerator,
-		isDupGenerator(),
-		c.getGeneratorStore(payload, DalleDressGenerator),
+		isDupDalleDress(),
+		c.getDalleDressStore(payload, DalleDressGenerator),
 		"dalledress",
 		c,
 	)
@@ -103,14 +103,14 @@ func (c *DalleDressCollection) initializeFacets(payload *types.Payload) {
 	c.galleryFacet = facets.NewFacet(
 		DalleDressGallery,
 		isGallery,
-		isDupLog(),
-		c.getLogsStore(payload, DalleDressGallery),
+		isDupDalleDress(),
+		c.getDalleDressStore(payload, DalleDressGallery),
 		"dalledress",
 		c,
 	)
 }
 
-func isGenerator(item *Generator) bool {
+func isGenerator(item *DalleDress) bool {
 	// EXISTING_CODE
 	return true
 	// EXISTING_CODE
@@ -134,25 +134,25 @@ func isEvent(item *Log) bool {
 	// EXISTING_CODE
 }
 
-func isGallery(item *Log) bool {
+func isGallery(item *DalleDress) bool {
 	// EXISTING_CODE
 	return true
 	// EXISTING_CODE
 }
 
-func isDupDatabase() func(existing []*Database, newItem *Database) bool {
-	// EXISTING_CODE
-	return nil
-	// EXISTING_CODE
-}
-
-func isDupGenerator() func(existing []*Generator, newItem *Generator) bool {
-	// EXISTING_CODE
-	return nil
-	// EXISTING_CODE
-}
-
 func isDupLog() func(existing []*Log, newItem *Log) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func isDupDalleDress() func(existing []*DalleDress, newItem *DalleDress) bool {
+	// EXISTING_CODE
+	return nil
+	// EXISTING_CODE
+}
+
+func isDupDatabase() func(existing []*Database, newItem *Database) bool {
 	// EXISTING_CODE
 	return nil
 	// EXISTING_CODE
@@ -283,7 +283,7 @@ func (c *DalleDressCollection) ExportData(payload *types.Payload) (string, error
 	case DalleDressGenerator:
 		return c.generatorFacet.ExportData(payload, string(DalleDressGenerator))
 	case DalleDressSeries:
-		return c.exportSeriesData(payload)
+		return c.seriesFacet.ExportData(payload, string(DalleDressSeries))
 	case DalleDressDatabases:
 		return c.databasesFacet.ExportData(payload, string(DalleDressDatabases))
 	case DalleDressEvents:

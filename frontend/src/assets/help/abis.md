@@ -16,10 +16,10 @@ Welcome to the **Abis** view! This section provides information about managing a
 
 ## Facets
 
-- Downloaded Facet uses Abis store.
-- Known Facet uses Abis store.
-- Functions Facet uses Functions store.
-- Events Facet uses Functions store.
+- Downloaded Facet uses sdk.Abis store.
+- Known Facet uses sdk.Abis store.
+- Functions Facet uses sdk.Functions store.
+- Events Facet uses sdk.Functions store.
 
 ## Stores
 

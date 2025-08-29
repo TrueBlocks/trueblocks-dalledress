@@ -13,19 +13,13 @@ the code inside of 'EXISTING_CODE' tags.
 
 ## Facets
 
-- Generator Facet uses Generator store.
-- Series Facet uses Series store.
-- Databases Facet uses Databases store.
-- Events Facet uses Logs store.
-- Gallery Facet uses Logs store.
+- Generator Facet uses dalle.DalleDress store.
+- Series Facet uses dalle.Series store.
+- Databases Facet uses dalle.Database store.
+- Events Facet uses sdk.Logs store.
+- Gallery Facet uses dalle.DalleDress store.
 
 ## Stores
-
-- **Databases Store (0 members)**
-
-
-- **Generator Store (0 members)**
-
 
 - **Logs Store (14 members)**
 
@@ -44,8 +38,17 @@ the code inside of 'EXISTING_CODE' tags.
   - compressedLog: a truncated, more readable version of the articulation
   - isNFT: true if the log is an NFT transfer
 
+- **DalleDress Store (0 members)**
+
+// SHOULD NOT BE EMPTY
+
+- **Database Store (0 members)**
+
+// SHOULD NOT BE EMPTY
+
 - **Series Store (0 members)**
 
+// SHOULD NOT BE EMPTY
 
 // EXISTING_CODE
 // EXISTING_CODE

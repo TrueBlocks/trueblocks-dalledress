@@ -14,7 +14,7 @@ the code inside of 'EXISTING_CODE' tags.
 ## Facets
 {{if .Facets}}
 {{- range .Facets}}
-- {{.Name}} Facet uses {{.Store}} store.
+- {{.Name}} Facet uses {{.StoreSource}}.{{.StoreName}} store.
 {{- end}}
 {{- end}}
 
@@ -22,10 +22,14 @@ the code inside of 'EXISTING_CODE' tags.
 {{if .Stores}}
 {{- range .Stores}}
 - **{{.Name}} Store ({{.NMembers}} members)**
+{{if not .Members -}}
+// No members -- create a {{toLower .Name}}.csv in the templates folder
+{{- else -}}
 {{range .Members}}
   - {{.Name}}: {{.Description}}
 {{- end}}
 {{end}}
+{{- end -}}
 {{- end}}
 // EXISTING_CODE
 // EXISTING_CODE

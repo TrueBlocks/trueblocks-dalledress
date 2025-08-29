@@ -60,7 +60,7 @@ import { Debugger, LogError, useErrorHandler } from '@utils';
 import { ViewRoute, assertRouteConsistency } from '../routes';
 import { createDetailPanel } from '../utils/detailPanel';
 {{- if ne .RendererTypes "" }}
-import { renderers } from './components';
+import { renderers } from './renderers';
 {{- end }}
 
 const ROUTE: ViewRoute = '{{$lower}}';

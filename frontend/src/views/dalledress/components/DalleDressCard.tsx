@@ -1,6 +1,6 @@
 import { Box, Card, Image, Stack, Text } from '@mantine/core';
 import { dalledress } from '@models';
-import { Log, getDisplayAddress } from '@utils';
+import { getDisplayAddress } from '@utils';
 
 export interface DalleDressCardProps {
   item: dalledress.GalleryItem;
@@ -16,11 +16,9 @@ export const DalleDressCard = ({
   selected,
 }: DalleDressCardProps) => {
   const handleClick = () => {
-    Log('gallery:click:' + item.relPath);
     onClick?.(item);
   };
   const handleDoubleClick = () => {
-    Log('gallery:dblclick:' + item.relPath);
     onDoubleClick?.(item);
   };
   return (

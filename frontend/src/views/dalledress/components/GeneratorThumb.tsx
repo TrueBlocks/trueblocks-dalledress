@@ -1,6 +1,5 @@
 import { Badge, Card, Image, Stack, Text } from '@mantine/core';
 import { dalledress } from '@models';
-import { Log } from '@utils';
 
 export interface GeneratorThumbProps {
   item: dalledress.GalleryItem;
@@ -14,7 +13,6 @@ export const GeneratorThumb = ({
   selected,
 }: GeneratorThumbProps) => {
   const handleClick = () => {
-    Log('generator:thumb:select:' + item.relPath);
     onSelect?.(item);
   };
   return (

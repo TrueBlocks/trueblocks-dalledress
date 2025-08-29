@@ -24,7 +24,7 @@
 
 [[facets]]
     name = "Databases"
-    store = "dalle.Database"
+    store = "dalle.Databases"
     actions = ["export"]
     viewType = ""
     isForm = false

@@ -1,7 +1,6 @@
 package fileserver
 
 import (
-	"log"
 	"mime"
 	"net/http"
 )
@@ -43,7 +42,6 @@ func SecurityMiddleware(next http.Handler) http.Handler {
 // LoggingMiddleware logs information about requests
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("File server: %s %s", r.Method, r.URL.Path)
 		next.ServeHTTP(w, r)
 	})
 }

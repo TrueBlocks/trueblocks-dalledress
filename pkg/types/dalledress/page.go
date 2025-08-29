@@ -92,16 +92,14 @@ func (c *DalleDressCollection) GetPage(
 				generator = append(generator, &result.Items[i])
 			}
 			page.Generator, page.TotalItems, page.State = generator, result.TotalItems, result.State
-			// Build gallery subset & select latest current dress based on annotated modification time
 			items := c.getGalleryItems()
 			if payload != nil && payload.Address != "" {
 				latest, ordered := selectLatestGalleryItem(items, payload.Address)
 				page.Gallery = ordered
 				if latest != nil {
-					// Load sidecars for latest (series + address)
 					if cd := loadCurrentDressFromSidecars(latest.Series, payload.Address); cd != nil {
 						page.CurrentDress = cd
-					} else if page.CurrentDress == nil { // fallback empty struct so frontend has object shape
+					} else if page.CurrentDress == nil {
 						page.CurrentDress = &dalle.DalleDress{}
 					}
 				} else if page.CurrentDress == nil {

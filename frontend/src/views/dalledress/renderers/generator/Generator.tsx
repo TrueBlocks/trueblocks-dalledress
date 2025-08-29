@@ -53,7 +53,7 @@ export function Generator({
     setCurrent(pageData?.currentDress || null);
   }, [pageData?.currentDress]);
 
-  const galleryItems = useMemo(
+  const filteredGalleryItems = useMemo(
     () => (pageData?.gallery ? [...pageData.gallery] : []),
     [pageData?.gallery],
   );
@@ -61,7 +61,7 @@ export function Generator({
   const seriesOptions = useMemo(() => {
     const set = new Set<string>();
     set.add('empty');
-    galleryItems.forEach((g) => {
+    filteredGalleryItems.forEach((g) => {
       if (g.series) set.add(g.series);
     });
     const arr = Array.from(set).sort((a, b) => a.localeCompare(b));
@@ -70,14 +70,14 @@ export function Generator({
       return ['empty', ...rest];
     }
     return arr;
-  }, [galleryItems]);
+  }, [filteredGalleryItems]);
 
   const addressOptions = useMemo(() => {
     const set = new Set<string>();
     if (activeAddress) set.add(activeAddress);
-    galleryItems.forEach((g) => set.add(g.address));
+    filteredGalleryItems.forEach((g) => set.add(g.address));
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [galleryItems, activeAddress]);
+  }, [filteredGalleryItems, activeAddress]);
 
   useEffect(() => {
     if (!activeAddress && addressOptions.length) {
@@ -88,13 +88,13 @@ export function Generator({
 
   useEffect(() => {
     if (!selectedSeries) {
-      const first = galleryItems.find(
+      const first = filteredGalleryItems.find(
         (g) => g.address === activeAddress && g.series,
       );
       if (first?.series) setSelectedSeries(first.series);
       if (!selectedThumb && first) setSelectedThumb(first.relPath);
     }
-  }, [selectedSeries, selectedThumb, galleryItems, activeAddress]);
+  }, [selectedSeries, selectedThumb, filteredGalleryItems, activeAddress]);
 
   const handleAddressChange = useCallback(
     (value: string | null) => {
@@ -131,13 +131,13 @@ export function Generator({
 
   useEffect(() => {
     if (!selectedSeries) return;
-    const match = galleryItems.find(
+    const match = filteredGalleryItems.find(
       (g) =>
         g.series === selectedSeries &&
         (!activeAddress || g.address === activeAddress),
     );
     if (match) setSelectedThumb(match.relPath);
-  }, [selectedSeries, activeAddress, galleryItems]);
+  }, [selectedSeries, activeAddress, filteredGalleryItems]);
 
   useEffect(() => {
     if (!activeAddress || !selectedSeries) return;
@@ -185,50 +185,50 @@ export function Generator({
 
   const handleThumbKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!galleryItems.length) return;
+      if (!filteredGalleryItems.length) return;
       const idx = selectedThumb
-        ? galleryItems.findIndex((g) => g.relPath === selectedThumb)
+        ? filteredGalleryItems.findIndex((g) => g.relPath === selectedThumb)
         : -1;
       let nextIdx = idx;
       if (e.key === 'ArrowRight') {
-        nextIdx = (idx + 1 + galleryItems.length) % galleryItems.length;
+        nextIdx = (idx + 1 + filteredGalleryItems.length) % filteredGalleryItems.length;
         e.preventDefault();
       } else if (e.key === 'ArrowLeft') {
-        nextIdx = (idx - 1 + galleryItems.length) % galleryItems.length;
+        nextIdx = (idx - 1 + filteredGalleryItems.length) % filteredGalleryItems.length;
         e.preventDefault();
       } else if (e.key === 'Home') {
         nextIdx = 0;
         e.preventDefault();
       } else if (e.key === 'End') {
-        nextIdx = galleryItems.length - 1;
+        nextIdx = filteredGalleryItems.length - 1;
         e.preventDefault();
       } else {
         return;
       }
-      const next = galleryItems[nextIdx];
+      const next = filteredGalleryItems[nextIdx];
       if (next) {
         setSelectedThumb(next.relPath);
         if (next.series) setSelectedSeries(next.series);
       }
     },
-    [galleryItems, selectedThumb, setSelectedSeries],
+    [filteredGalleryItems, selectedThumb, setSelectedSeries],
   );
 
   const attributes = useMemo(() => current?.attributes || [], [current]);
   const selectedGalleryItem = useMemo(() => {
     if (!selectedThumb) return null;
-    return galleryItems.find((g) => g.relPath === selectedThumb) || null;
-  }, [selectedThumb, galleryItems]);
+    return filteredGalleryItems.find((g) => g.relPath === selectedThumb) || null;
+  }, [selectedThumb, filteredGalleryItems]);
 
   const displayImageUrl = useMemo(() => {
     if (current?.imageUrl) return current.imageUrl;
     if (selectedGalleryItem?.url) return selectedGalleryItem.url;
-    const first = galleryItems.find((g) => g.address === activeAddress);
+    const first = filteredGalleryItems.find((g) => g.address === activeAddress);
     if (first?.url) return first.url;
-    if (galleryItems.length && galleryItems[0])
-      return galleryItems[0].url || '';
+    if (filteredGalleryItems.length && filteredGalleryItems[0])
+      return filteredGalleryItems[0].url || '';
     return '';
-  }, [current?.imageUrl, selectedGalleryItem, galleryItems, activeAddress]);
+  }, [current?.imageUrl, selectedGalleryItem, filteredGalleryItems, activeAddress]);
 
   return (
     <Container size="xl" py="md">
@@ -477,7 +477,7 @@ export function Generator({
                 tabIndex={0}
                 onKeyDown={handleThumbKey}
               >
-                {galleryItems.map((g) => (
+                {filteredGalleryItems.map((g) => (
                   <div
                     key={g.relPath}
                     data-relpath={g.relPath}

@@ -107,7 +107,7 @@ export const DalleDress = () => {
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.GENERATOR:
-        return pageData.dalleDresses || [];
+        return pageData.dalledress || [];
       case types.DataFacet.SERIES:
         return pageData.series || [];
       case types.DataFacet.DATABASES:
@@ -115,7 +115,7 @@ export const DalleDress = () => {
       case types.DataFacet.EVENTS:
         return pageData.logs || [];
       case types.DataFacet.GALLERY:
-        return pageData.dalleDresses || [];
+        return pageData.dalledress || [];
       default:
         LogError('[DalleDress] unexpected facet=' + String(facet));
         return [];
@@ -261,7 +261,6 @@ export const DalleDress = () => {
 
   const perTabContent = useMemo(() => {
     const facet = getCurrentDataFacet();
-    // Prefer custom renderer for certain facets even if no data yet
     if (
       rendererMap[facet] &&
       (facet === types.DataFacet.GENERATOR || facet === types.DataFacet.GALLERY)

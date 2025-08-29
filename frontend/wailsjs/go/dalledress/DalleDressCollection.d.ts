@@ -23,8 +23,6 @@ export function LoadData(arg1:types.DataFacet):Promise<void>;
 
 export function NeedsUpdate(arg1:types.DataFacet):Promise<boolean>;
 
-export function RefreshGallery():Promise<void>;
-
 export function Reset(arg1:types.DataFacet):Promise<void>;
 
 export function ResetSummary():Promise<void>;

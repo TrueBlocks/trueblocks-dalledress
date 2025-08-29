@@ -1922,6 +1922,7 @@
     "structures": [
         {},
         {},
+        {},
         {
             "members": [
                 {
@@ -3341,7 +3342,7 @@
             ]
         },
         {
-            "class": "Database",
+            "class": "Databases",
             "doc_group": "09-DalleDress",
             "doc_route": "215-database",
             "doc_descr": "Database used to generate dalle dress prompts",
@@ -5315,7 +5316,7 @@
                 },
                 {
                     "name": "Databases",
-                    "store": "dalle.Database",
+                    "store": "dalle.Databases",
                     "actions": [
                         "export"
                     ],

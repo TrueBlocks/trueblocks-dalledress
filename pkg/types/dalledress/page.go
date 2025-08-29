@@ -16,13 +16,14 @@ import (
 	//
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	// EXISTING_CODE
+	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 	// EXISTING_CODE
 )
 
 type DalleDressPage struct {
 	Facet         types.DataFacet `json:"facet"`
 	Logs          []*Log          `json:"logs"`
-	DalleDresses  []*DalleDress   `json:"dalleDresses"`
+	DalleDress    []*DalleDress   `json:"dalledress"`
 	Databases     []*Database     `json:"databases"`
 	Series        []*Series       `json:"series"`
 	TotalItems    int             `json:"totalItems"`
@@ -87,7 +88,7 @@ func (c *DalleDressCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []DalleDress, sort sdk.SortSpec) error {
-			return nil // sdk.SortDalleDress(items, sort)
+			return dalle.SortDalleDress(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
@@ -96,7 +97,7 @@ func (c *DalleDressCollection) GetPage(
 			for i := range result.Items {
 				generator = append(generator, &result.Items[i])
 			}
-			page.DalleDresses, page.TotalItems, page.State = generator, result.TotalItems, result.State
+			page.DalleDress, page.TotalItems, page.State = generator, result.TotalItems, result.State
 			items := c.getGalleryItems()
 			if payload != nil && payload.Address != "" {
 				latest, ordered := selectLatestGalleryItem(items, payload.Address)
@@ -125,7 +126,7 @@ func (c *DalleDressCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Series, sort sdk.SortSpec) error {
-			return nil // sdk.SortSeries(items, sort)
+			return dalle.SortSeries(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
@@ -147,7 +148,7 @@ func (c *DalleDressCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []Database, sort sdk.SortSpec) error {
-			return nil // sdk.SortDatabases(items, sort)
+			return dalle.SortDatabases(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
@@ -191,7 +192,7 @@ func (c *DalleDressCollection) GetPage(
 			}
 		}
 		sortFunc := func(items []DalleDress, sort sdk.SortSpec) error {
-			return nil // dalle.SortDalleDress(items, sort)
+			return dalle.SortDalleDress(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
@@ -200,7 +201,7 @@ func (c *DalleDressCollection) GetPage(
 			for i := range result.Items {
 				gallery = append(gallery, &result.Items[i])
 			}
-			page.DalleDresses, page.TotalItems, page.State = gallery, result.TotalItems, result.State
+			page.DalleDress, page.TotalItems, page.State = gallery, result.TotalItems, result.State
 			// BINGY_JOE
 			page.Gallery = c.getGalleryItems()
 			// BINGY_JOE

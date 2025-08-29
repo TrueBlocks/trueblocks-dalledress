@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { GetDalleAudioURL, GetDalleDressCurrent } from '@app';
+import { GetDalleDressCurrent } from '@app';
 import { useActiveProject, useIconSets } from '@hooks';
 import {
   Button,
@@ -17,6 +17,8 @@ import {
 import { dalle, dalledress, types } from '@models';
 import { Log } from '@utils';
 import { DalleDressCard } from 'src/views/dalledress/components';
+
+import { useSpeakPrompt } from '../../hooks/useSpeakPrompt';
 
 let pendingGeneratorSelection: {
   address?: string;
@@ -42,9 +44,11 @@ export function Generator({
   const [current, setCurrent] = useState<dalle.DalleDress | null>(
     pageData?.currentDress || null,
   );
-  const [speaking, setSpeaking] = useState(false);
-  const [audioUrl, setAudioUrl] = useState('');
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { speaking, audioUrl, audioRef, speak } = useSpeakPrompt({
+    activeAddress: activeAddress || null,
+    selectedSeries,
+    hasEnhancedPrompt: !!current?.enhancedPrompt,
+  });
   const thumbRowRef = useRef<HTMLDivElement | null>(null);
   const icons = useIconSets();
   const SpeakIcon = icons.Speak;
@@ -191,10 +195,12 @@ export function Generator({
         : -1;
       let nextIdx = idx;
       if (e.key === 'ArrowRight') {
-        nextIdx = (idx + 1 + filteredGalleryItems.length) % filteredGalleryItems.length;
+        nextIdx =
+          (idx + 1 + filteredGalleryItems.length) % filteredGalleryItems.length;
         e.preventDefault();
       } else if (e.key === 'ArrowLeft') {
-        nextIdx = (idx - 1 + filteredGalleryItems.length) % filteredGalleryItems.length;
+        nextIdx =
+          (idx - 1 + filteredGalleryItems.length) % filteredGalleryItems.length;
         e.preventDefault();
       } else if (e.key === 'Home') {
         nextIdx = 0;
@@ -217,7 +223,9 @@ export function Generator({
   const attributes = useMemo(() => current?.attributes || [], [current]);
   const selectedGalleryItem = useMemo(() => {
     if (!selectedThumb) return null;
-    return filteredGalleryItems.find((g) => g.relPath === selectedThumb) || null;
+    return (
+      filteredGalleryItems.find((g) => g.relPath === selectedThumb) || null
+    );
   }, [selectedThumb, filteredGalleryItems]);
 
   const displayImageUrl = useMemo(() => {
@@ -228,7 +236,12 @@ export function Generator({
     if (filteredGalleryItems.length && filteredGalleryItems[0])
       return filteredGalleryItems[0].url || '';
     return '';
-  }, [current?.imageUrl, selectedGalleryItem, filteredGalleryItems, activeAddress]);
+  }, [
+    current?.imageUrl,
+    selectedGalleryItem,
+    filteredGalleryItems,
+    activeAddress,
+  ]);
 
   return (
     <Container size="xl" py="md">
@@ -383,44 +396,7 @@ export function Generator({
                     variant="default"
                     size="xs"
                     loading={speaking}
-                    onClick={async () => {
-                      // TODO: BOGUS - SHOULDN'T THIS USE handleSpeech (which is a stub, so copy it)
-                      if (!current?.enhancedPrompt) return;
-                      if (!activeAddress) return;
-                      if (!selectedSeries) return;
-                      try {
-                        setSpeaking(true);
-                        const url = await GetDalleAudioURL(
-                          {
-                            collection: 'dalledress',
-                            dataFacet: types.DataFacet.GENERATOR,
-                            address: activeAddress,
-                          },
-                          selectedSeries,
-                        );
-                        if (typeof url === 'string' && url) {
-                          Log('readtome:url:' + url.slice(-80));
-                          setAudioUrl(url);
-                          if (audioRef.current) {
-                            if (audioRef.current.src === url) {
-                              try {
-                                audioRef.current.currentTime = 0;
-                              } catch {}
-                            }
-                            try {
-                              await audioRef.current.play();
-                            } catch {}
-                          }
-                        } else {
-                          Log('readtome:url:none');
-                        }
-                      } catch (e: unknown) {
-                        const msg = e instanceof Error ? e.message : 'error';
-                        Log('readtome:error:' + msg.slice(0, 200));
-                      } finally {
-                        setSpeaking(false);
-                      }
-                    }}
+                    onClick={speak}
                     leftSection={<SpeakIcon size={12} />}
                   >
                     Speak

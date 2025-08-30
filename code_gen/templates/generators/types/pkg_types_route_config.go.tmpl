@@ -21,10 +21,10 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 		{{- range .Facets}}
 		"{{toLower .Name}}": {
 			Name:          "{{toProper .Name}}",
-			Store:         "{{toLower .Store}}",
+			Store:         "{{toLower .StoreName}}",
 			IsForm:        {{.IsForm}},
 			DividerBefore: {{and (eq .Name "Prefund") $isNames}},
-			Fields:        get{{toProper .Store}}Fields(),
+			Fields:        get{{toProper .StoreName}}Fields(),
 			Actions:       []string{ {{if ne (.RowActionsBe .Name) "\"\""}}{{.RowActionsBe .Name}}{{else}}{{end}} },
 			HeaderActions: []string{ {{if ne (.HeaderActionsBe .Name) "\"\""}}{{.HeaderActionsBe .Name}}{{else}}{{end}} },
 			RendererTypes: "{{.Renderer}}",
@@ -48,7 +48,7 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 }
 {{- range .Stores }}
 
-func get{{.Name}}Fields() []types.FieldConfig {
+func get{{firstUpper (toLower .Name)}}Fields() []types.FieldConfig {
 	return []types.FieldConfig{
 		// EXISTING_CODE
 		// EXISTING_CODE

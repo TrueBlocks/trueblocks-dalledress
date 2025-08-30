@@ -1,5 +1,5 @@
-field       , label        , type  , required, description
-databaseName, Database Name, string, true    , Name of the database
-count       , Count        , int   , false   , Number of entries
-sample      , Sample       , string, false   , Sample entry
-filtered    , Filtered     , bool  , false   , Is database filtered by series
+name        , type  , required, docOrder, description
+databaseName, string, true    ,        1, Name of the database
+count       , value , false   ,        2, Number of entries
+sample      , string, false   ,        3, Sample entry
+filtered    , bool  , false   ,        4, Is database filtered by series

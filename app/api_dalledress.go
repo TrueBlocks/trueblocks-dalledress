@@ -13,9 +13,10 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dalledress"
 
 	//
-	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
-	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
+	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+
+	// EXISTING_CODE
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 	// EXISTING_CODE
 )
@@ -28,6 +29,15 @@ func (a *App) GetDalleDressPage(
 ) (*dalledress.DalleDressPage, error) {
 	collection := dalledress.GetDalleDressCollection(payload)
 	return getCollectionPage[*dalledress.DalleDressPage](collection, payload, first, pageSize, sort, filter)
+}
+
+func (a *App) DalleDressCrud(
+	payload *types.Payload,
+	op crud.Operation,
+	item *any,
+) error {
+	collection := dalledress.GetDalleDressCollection(payload)
+	return collection.Crud(payload, op, item)
 }
 
 func (a *App) GetDalleDressSummary(payload *types.Payload) types.Summary {
@@ -49,15 +59,6 @@ func (a *App) GetDalleDressConfig(payload types.Payload) (*types.ViewConfig, err
 }
 
 // EXISTING_CODE
-func (a *App) SeriesCrud(
-	payload *types.Payload,
-	op crud.Operation,
-	item *dalledress.Series,
-) error {
-	collection := dalledress.GetDalleDressCollection(payload)
-	return collection.SeriesCrud(payload, op, item)
-}
-
 func (a *App) GetDalleDressCurrent(payload *types.Payload, series string) (*dalle.DalleDress, error) {
 	if payload == nil || payload.Address == "" { // fast track if no address
 		return &dalle.DalleDress{}, nil

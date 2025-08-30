@@ -12,17 +12,17 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
-// SeriesCrud handles create, update, remove for series facet
-func (c *DalleDressCollection) SeriesCrud(
+// seriesCrud handles create, update, remove for series facet
+func (c *DalleDressCollection) seriesCrud(
 	payload *types.Payload,
 	op crud.Operation,
 	item *Series,
 ) error {
 	if payload.DataFacet != DalleDressSeries {
-		return fmt.Errorf("SeriesCrud invalid facet: %s", payload.DataFacet)
+		return fmt.Errorf("seriesCrud invalid facet: %s", payload.DataFacet)
 	}
 	if item == nil {
-		return fmt.Errorf("SeriesCrud missing item")
+		return fmt.Errorf("seriesCrud missing item")
 	}
 	seriesDir := filepath.Join(dalle.DataDir(), "series")
 	// Support a pseudo duplicate operation encoded by passing an item whose Suffix ends with "-copy" pattern AND op == crud.Create with a source indicated in item.Last (temporary convention) is overkill.

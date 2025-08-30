@@ -15,7 +15,7 @@ the code inside of 'EXISTING_CODE' tags.
 
 - Generator Facet uses dalle.DalleDress store.
 - Series Facet uses dalle.Series store.
-- Databases Facet uses dalle.Database store.
+- Databases Facet uses dalle.Databases store.
 - Events Facet uses sdk.Logs store.
 - Gallery Facet uses dalle.DalleDress store.
 
@@ -38,17 +38,47 @@ the code inside of 'EXISTING_CODE' tags.
   - compressedLog: a truncated, more readable version of the articulation
   - isNFT: true if the log is an NFT transfer
 
-- **DalleDress Store (0 members)**
+- **DalleDress Store (20 members)**
+
+  - original: The original value
+  - fileName: The fileName value
+  - seed: The seed value
+  - prompt: The prompt value
+  - dataPrompt: The dataPrompt value
+  - titlePrompt: The titlePrompt value
+  - tersePrompt: The tersePrompt value
+  - enhancedPrompt: The enhancedPrompt value
+  - attributes: The attributes value
+  - seedChunks: The seedChunks value
+  - selectedTokens: The selectedTokens value
+  - selectedRecords: The selectedRecords value
+  - imageUrl: The imageUrl value
+  - generatedPath: The generatedPath value
+  - annotatedPath: The annotatedPath value
+  - downloadMode: The downloadMode value
+  - ipfsHash: The ipfsHash value
+  - cacheHit: The cacheHit value
+  - completed: The completed value
+  - requestedSeries: The requestedSeries value
+
+- **Databases Store (0 members)**
 
 // SHOULD NOT BE EMPTY
 
-- **Database Store (0 members)**
+- **Series Store (12 members)**
 
-// SHOULD NOT BE EMPTY
-
-- **Series Store (0 members)**
-
-// SHOULD NOT BE EMPTY
+  - suffix: Series identifier
+  - last: Last used index
+  - adverbs: List of adverbs
+  - adjectives: List of adjectives
+  - nouns: List of nouns
+  - emotions: List of emotions
+  - artstyles: List of art styles
+  - colors: List of colors
+  - orientations: List of orientations
+  - gazes: List of gazes
+  - backstyles: List of back styles
+  - modifiedAt: Last modified timestamp
 
 // EXISTING_CODE
 // EXISTING_CODE

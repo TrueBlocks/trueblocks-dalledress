@@ -11,7 +11,6 @@ package dalledress
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"sync"
 
@@ -104,7 +103,6 @@ func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet 
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
 			// EXISTING_CODE
-			// need query
 			return nil
 		}
 
@@ -281,133 +279,32 @@ func GetDalleDressCollection(payload *types.Payload) *DalleDressCollection {
 // getGalleryItems returns cached gallery items performing incremental scan per series
 func (c *DalleDressCollection) getGalleryItems() (items []*GalleryItem) {
 	root := dalle.OutputDir()
+	seriesList := make([]*GalleryItem, 0, 512)
 
-	// snapshot existing cache state
-	c.galleryCacheMux.RLock()
-	cached := c.galleryCache
-	prevSeriesInfo := make(map[string]int64, len(c.gallerySeriesInfo))
-	for k, v := range c.gallerySeriesInfo {
-		prevSeriesInfo[k] = v
-	}
-	c.galleryCacheMux.RUnlock()
-
-	current := make(map[string]int64)
 	entries, err := os.ReadDir(root)
 	if err == nil {
 		for _, e := range entries {
 			if !e.IsDir() {
 				continue
 			}
-			annotatedPath := filepath.Join(root, e.Name(), "annotated")
-			if info, ierr := os.Stat(annotatedPath); ierr == nil && info.IsDir() {
-				current[e.Name()] = info.ModTime().Unix()
+			series := e.Name()
+			if seriesItems, err := collectGalleryItemsForSeries(root, series); err == nil && len(seriesItems) > 0 {
+				seriesList = append(seriesList, seriesItems...)
 			}
 		}
 	}
 
-	changedSeries := make([]string, 0, len(current))
-	if len(current) != len(prevSeriesInfo) {
-		for series := range current {
-			if prevSeriesInfo[series] != current[series] {
-				changedSeries = append(changedSeries, series)
+	sort.SliceStable(seriesList, func(i, j int) bool {
+		if seriesList[i].Series == seriesList[j].Series {
+			if seriesList[i].Index == seriesList[j].Index {
+				return seriesList[i].FileName < seriesList[j].FileName
 			}
+			return seriesList[i].Index < seriesList[j].Index
 		}
-		// removed series handled by absence
-	} else {
-		for series, m := range current {
-			if prevSeriesInfo[series] != m {
-				changedSeries = append(changedSeries, series)
-			}
-		}
-	}
-	if len(changedSeries) == 0 && cached != nil {
-		return cached
-	}
-
-	// build existing map for unchanged reuse
-	existingBySeries := make(map[string][]*GalleryItem)
-	for _, it := range cached {
-		existingBySeries[it.Series] = append(existingBySeries[it.Series], it)
-	}
-
-	// If only one series changed, keep it simple sequentially
-	merged := make([]*GalleryItem, 0, 512)
-	if len(changedSeries) == 1 {
-		changed := changedSeries[0]
-		// reuse other series directly
-		for series, items := range existingBySeries {
-			if series == changed {
-				continue
-			}
-			merged = append(merged, items...)
-		}
-		if seriesItems, err := collectGalleryItemsForSeries(root, changed); err == nil && len(seriesItems) > 0 {
-			merged = append(merged, seriesItems...)
-		}
-	} else {
-		// multi-series change -> parallelize rescans
-		changedSet := make(map[string]struct{}, len(changedSeries))
-		for _, s := range changedSeries {
-			changedSet[s] = struct{}{}
-		}
-		for series, items := range existingBySeries { // keep unchanged first
-			if _, ok := changedSet[series]; !ok {
-				merged = append(merged, items...)
-			}
-		}
-		workerCount := runtime.NumCPU()
-		if workerCount > len(changedSeries) {
-			workerCount = len(changedSeries)
-		}
-		if workerCount < 2 {
-			workerCount = 2
-		}
-		jobs := make(chan string, len(changedSeries))
-		results := make(chan []*GalleryItem, len(changedSeries))
-		var wg sync.WaitGroup
-		worker := func() {
-			defer wg.Done()
-			for series := range jobs {
-				if seriesItems, err := collectGalleryItemsForSeries(root, series); err == nil && len(seriesItems) > 0 {
-					results <- seriesItems
-				} else {
-					results <- nil
-				}
-			}
-		}
-		wg.Add(workerCount)
-		for i := 0; i < workerCount; i++ {
-			go worker()
-		}
-		for _, s := range changedSeries {
-			jobs <- s
-		}
-		close(jobs)
-		wg.Wait()
-		close(results)
-		for r := range results {
-			if len(r) > 0 {
-				merged = append(merged, r...)
-			}
-		}
-	}
-
-	// final sort
-	sort.SliceStable(merged, func(i, j int) bool {
-		if merged[i].Series == merged[j].Series {
-			if merged[i].Index == merged[j].Index {
-				return merged[i].FileName < merged[j].FileName
-			}
-			return merged[i].Index < merged[j].Index
-		}
-		return merged[i].Series < merged[j].Series
+		return seriesList[i].Series < seriesList[j].Series
 	})
 
-	c.galleryCacheMux.Lock()
-	c.galleryCache = merged
-	c.gallerySeriesInfo = current
-	c.galleryCacheMux.Unlock()
-	return merged
+	return seriesList
 }
 
 // EXISTING_CODE

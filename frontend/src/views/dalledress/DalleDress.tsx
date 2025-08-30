@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetDalleDressPage, Reload } from '@app';
-import { SeriesCrud } from '@app';
+import { DalleDressCrud } from '@app';
 import { BaseTab, usePagination } from '@components';
 import { Action, ConfirmModal, ExportFormatModal } from '@components';
 import { useFiltering, useSorting } from '@contexts';
@@ -173,7 +173,7 @@ export const DalleDress = () => {
       item: unknown,
     ) => {
       if (getCurrentDataFacet() === types.DataFacet.SERIES) {
-        await SeriesCrud(payload, op, item as unknown as dalle.Series);
+        await DalleDressCrud(payload, op, item as unknown as dalle.Series);
       }
     },
     pageFunc: GetDalleDressPage,

@@ -54,16 +54,16 @@ func TestSeriesCrudEmitsOperation(t *testing.T) {
 	defer unsub()
 
 	series := &Series{Suffix: "alpha", Last: 1}
-	if err := coll.SeriesCrud(payload, crud.Create, series); err != nil {
+	if err := coll.Crud(payload, crud.Create, series); err != nil {
 		t.Fatalf("create: %v", err)
 	}
 	wait()
 	series.Last = 2
-	if err := coll.SeriesCrud(payload, crud.Update, series); err != nil {
+	if err := coll.Crud(payload, crud.Update, series); err != nil {
 		t.Fatalf("update: %v", err)
 	}
 	wait()
-	if err := coll.SeriesCrud(payload, crud.Remove, &Series{Suffix: "alpha"}); err != nil {
+	if err := coll.Crud(payload, crud.Remove, &Series{Suffix: "alpha"}); err != nil {
 		t.Fatalf("remove: %v", err)
 	}
 	wait()
@@ -95,10 +95,10 @@ func TestSeriesExportCSV(t *testing.T) {
 	// seed two series
 	s1 := &Series{Suffix: "one", Last: 3, Adverbs: []string{"quick"}}
 	s2 := &Series{Suffix: "two", Last: 4, Colors: []string{"red", "blue"}}
-	if err := coll.SeriesCrud(payload, crud.Create, s1); err != nil {
+	if err := coll.Crud(payload, crud.Create, s1); err != nil {
 		t.Fatalf("create1: %v", err)
 	}
-	if err := coll.SeriesCrud(payload, crud.Create, s2); err != nil {
+	if err := coll.Crud(payload, crud.Create, s2); err != nil {
 		t.Fatalf("create2: %v", err)
 	}
 

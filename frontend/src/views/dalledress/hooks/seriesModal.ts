@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { SeriesCrud } from '@app';
+import { DalleDressCrud } from '@app';
 import { crud, dalle, types } from '@models';
 
 export interface UseSeriesModalConfig {
@@ -35,7 +35,7 @@ export const useSeriesModal = ({
         seriesModalState.mode === 'edit'
           ? crud.Operation.UPDATE
           : crud.Operation.CREATE;
-      SeriesCrud(payload, op, s).then(() => {});
+      DalleDressCrud(payload, op, s).then(() => {});
       setSeriesModalState((prev) => ({ ...prev, opened: false }));
     },
     [getCurrentDataFacet, createPayload, collection, seriesModalState.mode],

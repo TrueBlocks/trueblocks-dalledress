@@ -1920,9 +1920,45 @@
         }
     ],
     "structures": [
-        {},
-        {},
-        {},
+        {
+            "members": [
+                {
+                    "name": "activeAddress",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "Current active address in project",
+                    "num": 1
+                },
+                {
+                    "name": "series",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "Selected series",
+                    "num": 2
+                },
+                {
+                    "name": "prompt",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "Generated prompt",
+                    "num": 3
+                },
+                {
+                    "name": "imagePath",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "Path to generated image",
+                    "num": 4
+                },
+                {
+                    "name": "createdAt",
+                    "type": "datetime",
+                    "docOrder": 5,
+                    "description": "Generation timestamp",
+                    "num": 5
+                }
+            ]
+        },
         {
             "members": [
                 {
@@ -1972,6 +2008,91 @@
                     "type": "string",
                     "docOrder": 7,
                     "description": "the chain's native token symbol",
+                    "num": 7
+                }
+            ]
+        },
+        {
+            "members": [
+                {
+                    "name": "databaseName",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "Name of the database",
+                    "num": 1
+                },
+                {
+                    "name": "count",
+                    "type": "value",
+                    "docOrder": 2,
+                    "description": "Number of entries",
+                    "num": 2
+                },
+                {
+                    "name": "sample",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "Sample entry",
+                    "num": 3
+                },
+                {
+                    "name": "filtered",
+                    "type": "bool",
+                    "docOrder": 4,
+                    "description": "Is database filtered by series",
+                    "num": 4
+                }
+            ]
+        },
+        {
+            "members": [
+                {
+                    "name": "thumbnail",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "Path to thumbnail image",
+                    "num": 1
+                },
+                {
+                    "name": "filename",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "Image filename",
+                    "num": 2
+                },
+                {
+                    "name": "series",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "Series name",
+                    "num": 3
+                },
+                {
+                    "name": "orientation",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "Image orientation",
+                    "num": 4
+                },
+                {
+                    "name": "enhanced",
+                    "type": "bool",
+                    "docOrder": 5,
+                    "description": "Has enhanced prompt",
+                    "num": 5
+                },
+                {
+                    "name": "createdAt",
+                    "type": "datetime",
+                    "docOrder": 6,
+                    "description": "Image creation timestamp",
+                    "num": 6
+                },
+                {
+                    "name": "sizeKB",
+                    "type": "value",
+                    "docOrder": 7,
+                    "description": "Image file size in KB",
                     "num": 7
                 }
             ]
@@ -3342,6 +3463,71 @@
             ]
         },
         {
+            "class": "Attribute",
+            "doc_group": "09-Attribute",
+            "doc_route": "215-attribute",
+            "doc_descr": "Database used to generate dalle dress prompts",
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "database",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "The database value",
+                    "num": 1
+                },
+                {
+                    "name": "name",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "The name value",
+                    "num": 2
+                },
+                {
+                    "name": "bytes",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "The bytes value",
+                    "num": 3
+                },
+                {
+                    "name": "number",
+                    "type": "uint64",
+                    "docOrder": 4,
+                    "description": "The number value",
+                    "num": 4
+                },
+                {
+                    "name": "factor",
+                    "type": "float64",
+                    "docOrder": 5,
+                    "description": "The factor value",
+                    "num": 5
+                },
+                {
+                    "name": "count",
+                    "type": "uint64",
+                    "docOrder": 6,
+                    "description": "The count value",
+                    "num": 6
+                },
+                {
+                    "name": "selector",
+                    "type": "uint64",
+                    "docOrder": 7,
+                    "description": "The selector value",
+                    "num": 7
+                },
+                {
+                    "name": "value",
+                    "type": "string",
+                    "docOrder": 8,
+                    "description": "The value value",
+                    "num": 8
+                }
+            ]
+        },
+        {
             "class": "Databases",
             "doc_group": "09-DalleDress",
             "doc_route": "215-database",
@@ -3609,7 +3795,102 @@
             "doc_group": "09-DalleDress",
             "doc_route": "215-series",
             "doc_descr": "Series filter used to generate dalle dress prompts",
-            "disable_go": true
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "suffix",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "Series identifier",
+                    "num": 1
+                },
+                {
+                    "name": "last",
+                    "type": "value",
+                    "docOrder": 2,
+                    "description": "Last used index",
+                    "num": 2
+                },
+                {
+                    "name": "adverbs",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "List of adverbs",
+                    "num": 3,
+                    "isArray": true
+                },
+                {
+                    "name": "adjectives",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "List of adjectives",
+                    "num": 4,
+                    "isArray": true
+                },
+                {
+                    "name": "nouns",
+                    "type": "string",
+                    "docOrder": 5,
+                    "description": "List of nouns",
+                    "num": 5,
+                    "isArray": true
+                },
+                {
+                    "name": "emotions",
+                    "type": "string",
+                    "docOrder": 6,
+                    "description": "List of emotions",
+                    "num": 6,
+                    "isArray": true
+                },
+                {
+                    "name": "artstyles",
+                    "type": "string",
+                    "docOrder": 7,
+                    "description": "List of art styles",
+                    "num": 7,
+                    "isArray": true
+                },
+                {
+                    "name": "colors",
+                    "type": "string",
+                    "docOrder": 8,
+                    "description": "List of colors",
+                    "num": 8,
+                    "isArray": true
+                },
+                {
+                    "name": "orientations",
+                    "type": "string",
+                    "docOrder": 9,
+                    "description": "List of orientations",
+                    "num": 9,
+                    "isArray": true
+                },
+                {
+                    "name": "gazes",
+                    "type": "string",
+                    "docOrder": 10,
+                    "description": "List of gazes",
+                    "num": 10,
+                    "isArray": true
+                },
+                {
+                    "name": "backstyles",
+                    "type": "string",
+                    "docOrder": 11,
+                    "description": "List of back styles",
+                    "num": 11,
+                    "isArray": true
+                },
+                {
+                    "name": "modifiedAt",
+                    "type": "datetime",
+                    "docOrder": 12,
+                    "description": "Last modified timestamp",
+                    "num": 12
+                }
+            ]
         },
         {
             "class": "TraceAction",
@@ -5293,13 +5574,157 @@
             "doc_route": "700-dalledress",
             "doc_descr": "multi-facet generative art collection for DalleDress",
             "produced_by": "dalledress",
+            "members": [
+                {
+                    "name": "original",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "The original value",
+                    "num": 1
+                },
+                {
+                    "name": "fileName",
+                    "type": "string",
+                    "docOrder": 2,
+                    "description": "The fileName value",
+                    "num": 2
+                },
+                {
+                    "name": "seed",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "The seed value",
+                    "num": 3
+                },
+                {
+                    "name": "prompt",
+                    "type": "string",
+                    "docOrder": 4,
+                    "description": "The prompt value",
+                    "num": 4
+                },
+                {
+                    "name": "dataPrompt",
+                    "type": "string",
+                    "docOrder": 5,
+                    "description": "The dataPrompt value",
+                    "num": 5
+                },
+                {
+                    "name": "titlePrompt",
+                    "type": "string",
+                    "docOrder": 6,
+                    "description": "The titlePrompt value",
+                    "num": 6
+                },
+                {
+                    "name": "tersePrompt",
+                    "type": "string",
+                    "docOrder": 7,
+                    "description": "The tersePrompt value",
+                    "num": 7
+                },
+                {
+                    "name": "enhancedPrompt",
+                    "type": "string",
+                    "docOrder": 8,
+                    "description": "The enhancedPrompt value",
+                    "num": 8
+                },
+                {
+                    "name": "attributes",
+                    "type": "Attribute",
+                    "docOrder": 9,
+                    "description": "The attributes value",
+                    "num": 9,
+                    "isArray": true
+                },
+                {
+                    "name": "seedChunks",
+                    "type": "string",
+                    "docOrder": 10,
+                    "description": "The seedChunks value",
+                    "num": 10,
+                    "isArray": true
+                },
+                {
+                    "name": "selectedTokens",
+                    "type": "string",
+                    "docOrder": 11,
+                    "description": "The selectedTokens value",
+                    "num": 11,
+                    "isArray": true
+                },
+                {
+                    "name": "selectedRecords",
+                    "type": "string",
+                    "docOrder": 12,
+                    "description": "The selectedRecords value",
+                    "num": 12,
+                    "isArray": true
+                },
+                {
+                    "name": "imageUrl",
+                    "type": "string",
+                    "docOrder": 13,
+                    "description": "The imageUrl value",
+                    "num": 13
+                },
+                {
+                    "name": "generatedPath",
+                    "type": "string",
+                    "docOrder": 14,
+                    "description": "The generatedPath value",
+                    "num": 14
+                },
+                {
+                    "name": "annotatedPath",
+                    "type": "string",
+                    "docOrder": 15,
+                    "description": "The annotatedPath value",
+                    "num": 15
+                },
+                {
+                    "name": "downloadMode",
+                    "type": "string",
+                    "docOrder": 16,
+                    "description": "The downloadMode value",
+                    "num": 16
+                },
+                {
+                    "name": "ipfsHash",
+                    "type": "string",
+                    "docOrder": 17,
+                    "description": "The ipfsHash value",
+                    "num": 17
+                },
+                {
+                    "name": "cacheHit",
+                    "type": "bool",
+                    "docOrder": 18,
+                    "description": "The cacheHit value",
+                    "num": 18
+                },
+                {
+                    "name": "completed",
+                    "type": "bool",
+                    "docOrder": 19,
+                    "description": "The completed value",
+                    "num": 19
+                },
+                {
+                    "name": "requestedSeries",
+                    "type": "string",
+                    "docOrder": 20,
+                    "description": "The requestedSeries value",
+                    "num": 20
+                }
+            ],
             "facets": [
                 {
                     "name": "Generator",
                     "store": "dalle.DalleDress",
-                    "actions": [
-                        "export"
-                    ],
+                    "actions": [],
                     "viewType": "dashboard",
                     "renderer": "facet",
                     "attributes": ""
@@ -5308,6 +5733,10 @@
                     "name": "Series",
                     "store": "dalle.Series",
                     "actions": [
+                        "update",
+                        "create",
+                        "delete",
+                        "remove",
                         "export"
                     ],
                     "viewType": "",

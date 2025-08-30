@@ -40,6 +40,8 @@ export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
 
+export function DalleDressCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
+
 export function Encode(arg1:types.Function,arg2:Array<any>):Promise<string>;
 
 export function ExportData(arg1:types.Payload):Promise<void>;
@@ -215,8 +217,6 @@ export function RestoreProjectContext(arg1:string):Promise<void>;
 export function SaveBounds(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
 
 export function SaveProject():Promise<void>;
-
-export function SeriesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:dalle.Series):Promise<void>;
 
 export function SetActiveAddress(arg1:string):Promise<void>;
 

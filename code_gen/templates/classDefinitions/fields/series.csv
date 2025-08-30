@@ -1,13 +1,13 @@
-field       , label       , type    , required, description
-suffix      , Series Name , string  , true    , Series identifier
-last        , Last Index  , int     , false   , Last used index
-adverbs     , Adverbs     , string[], false   , List of adverbs
-adjectives  , Adjectives  , string[], false   , List of adjectives
-nouns       , Nouns       , string[], false   , List of nouns
-emotions    , Emotions    , string[], false   , List of emotions
-artstyles   , Art Styles  , string[], false   , List of art styles
-colors      , Colors      , string[], false   , List of colors
-orientations, Orientations, string[], false   , List of orientations
-gazes       , Gazes       , string[], false   , List of gazes
-backstyles  , Back Styles , string[], false   , List of back styles
-modifiedAt  , Modified At , datetime, false   , Last modified timestamp
+name        , type    , required, docOrder, description
+suffix      , string  , true    ,        1, Series identifier
+last        , value   , false   ,        2, Last used index
+adverbs     , []string, false   ,        3, List of adverbs
+adjectives  , []string, false   ,        4, List of adjectives
+nouns       , []string, false   ,        5, List of nouns
+emotions    , []string, false   ,        6, List of emotions
+artstyles   , []string, false   ,        7, List of art styles
+colors      , []string, false   ,        8, List of colors
+orientations, []string, false   ,        9, List of orientations
+gazes       , []string, false   ,       10, List of gazes
+backstyles  , []string, false   ,       11, List of back styles
+modifiedAt  , datetime, false   ,       12, Last modified timestamp

@@ -45,16 +45,11 @@ type DalleDressCollection struct {
 	galleryFacet   *facets.Facet[DalleDress]
 	summary        types.Summary
 	summaryMutex   sync.RWMutex
-	//
-	galleryCache      []*GalleryItem
-	gallerySeriesInfo map[string]int64
-	galleryCacheMux   sync.RWMutex
 }
 
 func NewDalleDressCollection(payload *types.Payload) *DalleDressCollection {
 	c := &DalleDressCollection{}
 	c.ResetSummary()
-	c.gallerySeriesInfo = make(map[string]int64)
 	c.initializeFacets(payload)
 	return c
 }

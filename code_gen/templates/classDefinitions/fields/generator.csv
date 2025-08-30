@@ -1,6 +1,6 @@
-field,label,type,required,description
-activeAddress,Active Address,string,true,Current active address in project
-series,Series,string,true,Selected series
-prompt,Prompt,string,false,Generated prompt
-imagePath,Image Path,string,false,Path to generated image
-createdAt,Created At,datetime,false,Generation timestamp
+name         , type    , required, docOrder, description
+activeAddress, string  , true    ,        1, Current active address in project
+series       , string  , true    ,        2, Selected series
+prompt       , string  , false   ,        3, Generated prompt
+imagePath    , string  , false   ,        4, Path to generated image
+createdAt    , datetime, false   ,        5, Generation timestamp

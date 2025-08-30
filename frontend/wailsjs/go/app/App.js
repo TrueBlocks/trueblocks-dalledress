@@ -42,6 +42,10 @@ export function ConvertToAddress(arg1) {
   return window['go']['app']['App']['ConvertToAddress'](arg1);
 }
 
+export function DalleDressCrud(arg1, arg2, arg3) {
+  return window['go']['app']['App']['DalleDressCrud'](arg1, arg2, arg3);
+}
+
 export function Encode(arg1, arg2) {
   return window['go']['app']['App']['Encode'](arg1, arg2);
 }
@@ -392,10 +396,6 @@ export function SaveBounds(arg1, arg2, arg3, arg4) {
 
 export function SaveProject() {
   return window['go']['app']['App']['SaveProject']();
-}
-
-export function SeriesCrud(arg1, arg2, arg3) {
-  return window['go']['app']['App']['SeriesCrud'](arg1, arg2, arg3);
 }
 
 export function SetActiveAddress(arg1) {

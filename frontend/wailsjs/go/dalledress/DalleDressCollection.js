@@ -6,6 +6,10 @@ export function AccumulateItem(arg1, arg2) {
   return window['go']['dalledress']['DalleDressCollection']['AccumulateItem'](arg1, arg2);
 }
 
+export function Crud(arg1, arg2, arg3) {
+  return window['go']['dalledress']['DalleDressCollection']['Crud'](arg1, arg2, arg3);
+}
+
 export function ExportData(arg1) {
   return window['go']['dalledress']['DalleDressCollection']['ExportData'](arg1);
 }
@@ -44,8 +48,4 @@ export function Reset(arg1) {
 
 export function ResetSummary() {
   return window['go']['dalledress']['DalleDressCollection']['ResetSummary']();
-}
-
-export function SeriesCrud(arg1, arg2, arg3) {
-  return window['go']['dalledress']['DalleDressCollection']['SeriesCrud'](arg1, arg2, arg3);
 }

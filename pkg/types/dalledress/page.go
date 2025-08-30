@@ -31,7 +31,7 @@ type DalleDressPage struct {
 	IsFetching    bool            `json:"isFetching"`
 	State         types.LoadState `json:"state"`
 	CurrentDress  *DalleDress     `json:"currentDress"`
-	Gallery       []*GalleryItem  `json:"gallery"` // BINGY_JOE
+	Gallery       []*DalleDress   `json:"gallery"` // BINGY_JOE
 }
 
 func (p *DalleDressPage) GetFacet() types.DataFacet {

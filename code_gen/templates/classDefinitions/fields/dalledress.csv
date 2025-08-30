@@ -18,4 +18,4 @@ downloadMode   , string     ,         ,       16, The downloadMode value
 ipfsHash       , string     ,         ,       17, The ipfsHash value
 cacheHit       , bool       ,         ,       18, The cacheHit value
 completed      , bool       ,         ,       19, The completed value
-requestedSeries, string     ,         ,       20, The requestedSeries value
+series         , string     ,         ,       20, The series value

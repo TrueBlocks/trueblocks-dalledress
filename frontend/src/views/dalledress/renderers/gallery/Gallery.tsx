@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { DataFacet } from '@hooks';
 import { Center, Container, Title } from '@mantine/core';
-import { dalledress, project, types } from '@models';
+import { dalle, dalledress, project, types } from '@models';
 import {
   GalleryControls,
   SeriesGallery,
@@ -25,20 +25,20 @@ export function Gallery({
     columns: number;
   }>({ sortMode: 'series', columns: 6 });
 
-  const galleryItems = useMemo(
+  const galleryItems: dalle.DalleDress[] = useMemo(
     () => (pageData?.gallery ? [...pageData.gallery] : []),
     [pageData?.gallery],
   );
 
   const grouped = useMemo(() => {
-    const out: Record<string, dalledress.GalleryItem[]> = {};
+    const item: Record<string, dalle.DalleDress[]> = {};
     galleryItems.forEach((it) => {
       const key =
-        controls.sortMode === 'series' ? it.series || '' : it.address || '';
-      if (!out[key]) out[key] = [];
-      out[key].push(it);
+        controls.sortMode === 'series' ? it.series || '' : it.original || '';
+      if (!item[key]) item[key] = [];
+      item[key].push(it);
     });
-    return out;
+    return item;
   }, [galleryItems, controls.sortMode]);
 
   const seriesNames = useMemo(
@@ -52,23 +52,25 @@ export function Gallery({
   );
   const [selected, setSelected] = useState<string | null>(null);
 
-  const handleItemClick = useCallback((item: dalledress.GalleryItem) => {
-    setSelected(item.relPath);
+  const handleItemClick = useCallback((item: dalle.DalleDress) => {
+    setSelected(item.annotatedPath);
   }, []);
 
   const handleItemDoubleClick = useCallback(
-    (item: dalledress.GalleryItem) => {
-      setSelected(item.relPath);
-      setPendingGeneratorSelection(item.address, item.series);
+    (item: dalle.DalleDress) => {
+      setSelected(item.annotatedPath);
+      setPendingGeneratorSelection(item.original, item.series);
       if (setActiveFacet)
         setActiveFacet(types.DataFacet.GENERATOR as DataFacet);
     },
     [setActiveFacet],
   );
 
-  const scrollSelectedIntoView = useCallback((relPath: string | null) => {
-    if (!relPath || !scrollRef.current) return;
-    const el = scrollRef.current.querySelector(`[data-relpath="${relPath}"]`);
+  const scrollSelectedIntoView = useCallback((annotatedPath: string | null) => {
+    if (!annotatedPath || !scrollRef.current) return;
+    const el = scrollRef.current.querySelector(
+      `[data-relpath="${annotatedPath}"]`,
+    );
     if (el && 'scrollIntoView' in el)
       (el as HTMLElement).scrollIntoView({ block: 'nearest' });
   }, []);
@@ -80,16 +82,16 @@ export function Gallery({
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!flattened.length) return;
-      const idx = flattened.findIndex((f) => f.relPath === selected);
+      const idx = flattened.findIndex((f) => f.annotatedPath === selected);
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         const next =
           flattened[(idx + 1 + flattened.length) % flattened.length] || null;
-        if (next) setSelected(next.relPath);
+        if (next) setSelected(next.annotatedPath);
         e.preventDefault();
       } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
         const next =
           flattened[(idx - 1 + flattened.length) % flattened.length] || null;
-        if (next) setSelected(next.relPath);
+        if (next) setSelected(next.annotatedPath);
         e.preventDefault();
       } else if (e.key === 'Enter') {
         if (idx >= 0 && flattened[idx]) handleItemDoubleClick(flattened[idx]);

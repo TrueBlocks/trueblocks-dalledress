@@ -1,14 +1,14 @@
 import { Box, SimpleGrid, Title } from '@mantine/core';
-import { dalledress } from '@models';
+import { dalle } from '@models';
 
 import { DalleDressCard } from './DalleDressCard';
 
 export interface SeriesGalleryProps {
   series: string;
-  items: dalledress.GalleryItem[];
+  items: dalle.DalleDress[];
   columns: number;
-  onItemClick?: (item: dalledress.GalleryItem) => void;
-  onItemDoubleClick?: (item: dalledress.GalleryItem) => void;
+  onItemClick?: (item: dalle.DalleDress) => void;
+  onItemDoubleClick?: (item: dalle.DalleDress) => void;
   selectedRelPath?: string | null;
 }
 
@@ -27,11 +27,11 @@ export const SeriesGallery = ({
     <SimpleGrid cols={columns} spacing={6} verticalSpacing={6}>
       {items.map((it) => (
         <DalleDressCard
-          key={it.relPath}
+          key={it.annotatedPath}
           item={it}
           onClick={onItemClick}
           onDoubleClick={onItemDoubleClick}
-          selected={it.relPath === selectedRelPath}
+          selected={it.annotatedPath === selectedRelPath}
         />
       ))}
     </SimpleGrid>

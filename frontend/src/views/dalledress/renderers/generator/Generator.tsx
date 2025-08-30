@@ -23,14 +23,14 @@ import { useSpeakPrompt } from '../../hooks/useSpeakPrompt';
 let pendingGeneratorSelection: {
   address?: string;
   series?: string | null;
-  relPath?: string | null;
+  annotatedPath?: string | null;
 } | null = null;
 export const setPendingGeneratorSelection = (
   address: string,
   series: string | null,
-  relPath?: string | null,
+  annotatedPath?: string | null,
 ) => {
-  pendingGeneratorSelection = { address, series, relPath };
+  pendingGeneratorSelection = { address, series, annotatedPath };
 };
 
 export function Generator({
@@ -79,7 +79,7 @@ export function Generator({
   const addressOptions = useMemo(() => {
     const set = new Set<string>();
     if (activeAddress) set.add(activeAddress);
-    filteredGalleryItems.forEach((g) => set.add(g.address));
+    filteredGalleryItems.forEach((g) => set.add(g.original));
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [filteredGalleryItems, activeAddress]);
 
@@ -93,10 +93,10 @@ export function Generator({
   useEffect(() => {
     if (!selectedSeries) {
       const first = filteredGalleryItems.find(
-        (g) => g.address === activeAddress && g.series,
+        (g) => g.original === activeAddress && g.series,
       );
       if (first?.series) setSelectedSeries(first.series);
-      if (!selectedThumb && first) setSelectedThumb(first.relPath);
+      if (!selectedThumb && first) setSelectedThumb(first.annotatedPath);
     }
   }, [selectedSeries, selectedThumb, filteredGalleryItems, activeAddress]);
 
@@ -119,15 +119,15 @@ export function Generator({
     Log('generator:generate');
   }, [activeAddress, selectedSeries]);
 
-  const handleThumbSelect = useCallback((item: dalledress.GalleryItem) => {
-    setSelectedThumb(item.relPath);
+  const handleThumbSelect = useCallback((item: dalle.DalleDress) => {
+    setSelectedThumb(item.annotatedPath);
     if (item.series) setSelectedSeries(item.series);
-    Log('generator:thumb:select:' + item.relPath);
+    Log('generator:thumb:select:' + item.annotatedPath);
   }, []);
 
   const handleThumbDouble = useCallback(
-    (item: dalledress.GalleryItem) => {
-      Log('generator:thumb:dbl:' + item.relPath);
+    (item: dalle.DalleDress) => {
+      Log('generator:thumb:dbl:' + item.annotatedPath);
       handleThumbSelect(item);
     },
     [handleThumbSelect],
@@ -138,9 +138,9 @@ export function Generator({
     const match = filteredGalleryItems.find(
       (g) =>
         g.series === selectedSeries &&
-        (!activeAddress || g.address === activeAddress),
+        (!activeAddress || g.original === activeAddress),
     );
-    if (match) setSelectedThumb(match.relPath);
+    if (match) setSelectedThumb(match.annotatedPath);
   }, [selectedSeries, activeAddress, filteredGalleryItems]);
 
   useEffect(() => {
@@ -157,7 +157,7 @@ export function Generator({
 
   useEffect(() => {
     if (!pendingGeneratorSelection) return;
-    const { address, series, relPath } = pendingGeneratorSelection;
+    const { address, series, annotatedPath } = pendingGeneratorSelection;
     let changed = false;
     if (address && address !== activeAddress) {
       setActiveAddress(address);
@@ -169,8 +169,8 @@ export function Generator({
       changed = true;
       Log('generator:pref:series:' + series);
     }
-    if (relPath) {
-      setSelectedThumb(relPath);
+    if (annotatedPath) {
+      setSelectedThumb(annotatedPath);
     }
     if (changed) pendingGeneratorSelection = null;
   }, [activeAddress, selectedSeries, setActiveAddress]);
@@ -191,7 +191,9 @@ export function Generator({
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!filteredGalleryItems.length) return;
       const idx = selectedThumb
-        ? filteredGalleryItems.findIndex((g) => g.relPath === selectedThumb)
+        ? filteredGalleryItems.findIndex(
+            (g) => g.annotatedPath === selectedThumb,
+          )
         : -1;
       let nextIdx = idx;
       if (e.key === 'ArrowRight') {
@@ -213,7 +215,7 @@ export function Generator({
       }
       const next = filteredGalleryItems[nextIdx];
       if (next) {
-        setSelectedThumb(next.relPath);
+        setSelectedThumb(next.annotatedPath);
         if (next.series) setSelectedSeries(next.series);
       }
     },
@@ -224,17 +226,20 @@ export function Generator({
   const selectedGalleryItem = useMemo(() => {
     if (!selectedThumb) return null;
     return (
-      filteredGalleryItems.find((g) => g.relPath === selectedThumb) || null
+      filteredGalleryItems.find((g) => g.annotatedPath === selectedThumb) ||
+      null
     );
   }, [selectedThumb, filteredGalleryItems]);
 
   const displayImageUrl = useMemo(() => {
     if (current?.imageUrl) return current.imageUrl;
-    if (selectedGalleryItem?.url) return selectedGalleryItem.url;
-    const first = filteredGalleryItems.find((g) => g.address === activeAddress);
-    if (first?.url) return first.url;
+    if (selectedGalleryItem?.imageUrl) return selectedGalleryItem.imageUrl;
+    const first = filteredGalleryItems.find(
+      (g) => g.original === activeAddress,
+    );
+    if (first?.imageUrl) return first.imageUrl;
     if (filteredGalleryItems.length && filteredGalleryItems[0])
-      return filteredGalleryItems[0].url || '';
+      return filteredGalleryItems[0].imageUrl || '';
     return '';
   }, [
     current?.imageUrl,
@@ -455,15 +460,15 @@ export function Generator({
               >
                 {filteredGalleryItems.map((g) => (
                   <div
-                    key={g.relPath}
-                    data-relpath={g.relPath}
+                    key={g.annotatedPath}
+                    data-relpath={g.annotatedPath}
                     style={{ width: 72, flex: '0 0 auto' }}
                   >
                     <DalleDressCard
                       item={g}
                       onClick={handleThumbSelect}
                       onDoubleClick={handleThumbDouble}
-                      selected={g.relPath === selectedThumb}
+                      selected={g.annotatedPath === selectedThumb}
                     />
                   </div>
                 ))}

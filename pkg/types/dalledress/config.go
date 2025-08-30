@@ -128,7 +128,7 @@ func getDalledressFields() []types.FieldConfig {
 		{Key: "ipfsHash", Label: "IPFS Hash", ColumnLabel: "IPFS Hash", DetailLabel: "IPFS Hash", Section: "General", Order: 17, DetailOrder: 17},
 		{Key: "cacheHit", Label: "Cache Hit", ColumnLabel: "Cache Hit", DetailLabel: "Cache Hit", Section: "General", Order: 18, DetailOrder: 18},
 		{Key: "completed", Label: "Completed", ColumnLabel: "Completed", DetailLabel: "Completed", Section: "General", Order: 19, DetailOrder: 19},
-		{Key: "requestedSeries", Label: "Requested Series", ColumnLabel: "Requested Series", DetailLabel: "Requested Series", Section: "General", Order: 20, DetailOrder: 20},
+		{Key: "series", Label: "Series", ColumnLabel: "Series", DetailLabel: "Series", Section: "General", Order: 20, DetailOrder: 20},
 		// EXISTING_CODE
 	}
 }

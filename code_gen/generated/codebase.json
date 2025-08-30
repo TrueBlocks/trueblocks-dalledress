@@ -5713,10 +5713,10 @@
                     "num": 19
                 },
                 {
-                    "name": "requestedSeries",
+                    "name": "series",
                     "type": "string",
                     "docOrder": 20,
-                    "description": "The requestedSeries value",
+                    "description": "The series value",
                     "num": 20
                 }
             ],

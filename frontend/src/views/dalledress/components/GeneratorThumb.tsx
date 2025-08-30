@@ -1,9 +1,9 @@
 import { Badge, Card, Image, Stack, Text } from '@mantine/core';
-import { dalledress } from '@models';
+import { dalle } from '@models';
 
 export interface GeneratorThumbProps {
-  item: dalledress.GalleryItem;
-  onSelect?: (item: dalledress.GalleryItem) => void;
+  item: dalle.DalleDress;
+  onSelect?: (item: dalle.DalleDress) => void;
   selected?: boolean;
 }
 
@@ -33,7 +33,7 @@ export const GeneratorThumb = ({
           style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1' }}
         >
           <Image
-            src={item.url}
+            src={item.imageUrl}
             alt={item.fileName}
             fit="cover"
             radius="xs"

@@ -1,11 +1,11 @@
 import { Box, Card, Image, Stack, Text } from '@mantine/core';
-import { dalledress } from '@models';
+import { dalle } from '@models';
 import { getDisplayAddress } from '@utils';
 
 export interface DalleDressCardProps {
-  item: dalledress.GalleryItem;
-  onClick?: (item: dalledress.GalleryItem) => void;
-  onDoubleClick?: (item: dalledress.GalleryItem) => void;
+  item: dalle.DalleDress;
+  onClick?: (item: dalle.DalleDress) => void;
+  onDoubleClick?: (item: dalle.DalleDress) => void;
   selected?: boolean;
 }
 
@@ -39,7 +39,7 @@ export const DalleDressCard = ({
           : undefined,
         transition: 'box-shadow 120ms, border-color 120ms, background 160ms',
       }}
-      data-relpath={item.relPath}
+      data-relpath={item.annotatedPath}
     >
       <Stack gap={4} align="stretch">
         <Box
@@ -53,7 +53,7 @@ export const DalleDressCard = ({
           }}
         >
           <Image
-            src={item.url}
+            src={item.imageUrl}
             alt={item.fileName}
             radius="xs"
             fit="cover"
@@ -62,8 +62,7 @@ export const DalleDressCard = ({
           />
         </Box>
         <Text size="xs" fw={500} truncate>
-          {item.index >= 0 ? `#${item.index} ` : ''}
-          {getDisplayAddress(item.address || '')}
+          {getDisplayAddress(item.original || '')}
         </Text>
       </Stack>
     </Card>

@@ -12,12 +12,14 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 
 	// EXISTING_CODE
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 	// EXISTING_CODE
 
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 
@@ -102,6 +104,37 @@ func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet 
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
+			items := c.getGalleryItems()
+			for i, gi := range items {
+				if gi == nil || gi.Original == "" {
+					continue
+				}
+				dd := loadCurrentDressFromSidecars(gi.Series, gi.Original)
+				if dd == nil {
+					filename := sanitizeFilename(gi.Original)
+					annotatedPath := filepath.Join(dalle.OutputDir(), gi.AnnotatedPath)
+					dd = &DalleDress{
+						Original:      gi.Original,
+						FileName:      filename,
+						AnnotatedPath: annotatedPath,
+						Completed:     true,
+						CacheHit:      true,
+					}
+				}
+				if dd.AnnotatedPath == "" && gi.AnnotatedPath != "" {
+					dd.AnnotatedPath = filepath.Join(dalle.OutputDir(), gi.AnnotatedPath)
+				}
+				if gi.ImageURL != "" {
+					dd.ImageURL = gi.ImageURL
+				} else if gi.AnnotatedPath != "" {
+					base := fileserver.CurrentBaseURL()
+					if base != "" {
+						served := strings.ReplaceAll(gi.AnnotatedPath, string(filepath.Separator), "/")
+						dd.ImageURL = base + served
+					}
+				}
+				theStore.AddItem(dd, i)
+			}
 			// EXISTING_CODE
 			return nil
 		}
@@ -276,10 +309,10 @@ func GetDalleDressCollection(payload *types.Payload) *DalleDressCollection {
 }
 
 // EXISTING_CODE
-// getGalleryItems returns cached gallery items performing incremental scan per series
-func (c *DalleDressCollection) getGalleryItems() (items []*GalleryItem) {
+// getGalleryItems returns cached items performing incremental scan per series
+func (c *DalleDressCollection) getGalleryItems() (items []*DalleDress) {
 	root := dalle.OutputDir()
-	seriesList := make([]*GalleryItem, 0, 512)
+	seriesList := make([]*DalleDress, 0, 512)
 
 	entries, err := os.ReadDir(root)
 	if err == nil {
@@ -296,10 +329,7 @@ func (c *DalleDressCollection) getGalleryItems() (items []*GalleryItem) {
 
 	sort.SliceStable(seriesList, func(i, j int) bool {
 		if seriesList[i].Series == seriesList[j].Series {
-			if seriesList[i].Index == seriesList[j].Index {
-				return seriesList[i].FileName < seriesList[j].FileName
-			}
-			return seriesList[i].Index < seriesList[j].Index
+			return seriesList[i].FileName < seriesList[j].FileName
 		}
 		return seriesList[i].Series < seriesList[j].Series
 	})

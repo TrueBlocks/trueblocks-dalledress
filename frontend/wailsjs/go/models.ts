@@ -235,6 +235,8 @@ export namespace dalle {
 	export class DalleDress {
 	    original: string;
 	    fileName: string;
+	    fileSize: number;
+	    modifiedAt: number;
 	    seed: string;
 	    prompt: string;
 	    dataPrompt: string;
@@ -252,7 +254,7 @@ export namespace dalle {
 	    ipfsHash: string;
 	    cacheHit: boolean;
 	    completed: boolean;
-	    requestedSeries: string;
+	    series: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DalleDress(source);
@@ -262,6 +264,8 @@ export namespace dalle {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.original = source["original"];
 	        this.fileName = source["fileName"];
+	        this.fileSize = source["fileSize"];
+	        this.modifiedAt = source["modifiedAt"];
 	        this.seed = source["seed"];
 	        this.prompt = source["prompt"];
 	        this.dataPrompt = source["dataPrompt"];
@@ -279,7 +283,7 @@ export namespace dalle {
 	        this.ipfsHash = source["ipfsHash"];
 	        this.cacheHit = source["cacheHit"];
 	        this.completed = source["completed"];
-	        this.requestedSeries = source["requestedSeries"];
+	        this.series = source["series"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -359,32 +363,6 @@ export namespace dalle {
 
 export namespace dalledress {
 	
-	export class GalleryItem {
-	    series: string;
-	    address: string;
-	    url: string;
-	    relPath: string;
-	    fileName: string;
-	    index: number;
-	    modifiedAt: number;
-	    fileSize: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new GalleryItem(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.series = source["series"];
-	        this.address = source["address"];
-	        this.url = source["url"];
-	        this.relPath = source["relPath"];
-	        this.fileName = source["fileName"];
-	        this.index = source["index"];
-	        this.modifiedAt = source["modifiedAt"];
-	        this.fileSize = source["fileSize"];
-	    }
-	}
 	export class DalleDressPage {
 	    facet: types.DataFacet;
 	    logs: types.Log[];
@@ -396,7 +374,7 @@ export namespace dalledress {
 	    isFetching: boolean;
 	    state: types.LoadState;
 	    currentDress?: dalle.DalleDress;
-	    gallery: GalleryItem[];
+	    gallery: dalle.DalleDress[];
 	
 	    static createFrom(source: any = {}) {
 	        return new DalleDressPage(source);
@@ -414,7 +392,7 @@ export namespace dalledress {
 	        this.isFetching = source["isFetching"];
 	        this.state = source["state"];
 	        this.currentDress = this.convertValues(source["currentDress"], dalle.DalleDress);
-	        this.gallery = this.convertValues(source["gallery"], GalleryItem);
+	        this.gallery = this.convertValues(source["gallery"], dalle.DalleDress);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

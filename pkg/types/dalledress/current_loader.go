@@ -34,7 +34,7 @@ func loadCurrentDressFromSidecars(series, address string) *dallev2.DalleDress {
 		// Minimal reconstruction; seed/attributes intentionally omitted to avoid re-execution logic
 		dd = &dallev2.DalleDress{
 			Original: address,
-			Filename: filename,
+			FileName: filename,
 		}
 		// Attempt to read individual prompt files
 		dd.Prompt = readIfExists(filepath.Join(root, series, "prompt", filename+".txt"))
@@ -75,11 +75,11 @@ func readIfExists(p string) string {
 }
 
 // selectLatestGalleryItem returns the latest modified gallery item for address (across series) and a sorted slice for thumbnails.
-func selectLatestGalleryItem(all []*GalleryItem, address string) (latest *GalleryItem, sorted []*GalleryItem) {
+func selectLatestGalleryItem(all []*DalleDress, address string) (latest *DalleDress, sorted []*DalleDress) {
 	addr := strings.ToLower(address)
-	filtered := make([]*GalleryItem, 0, 32)
+	filtered := make([]*DalleDress, 0, 32)
 	for _, gi := range all {
-		if gi.Address == addr {
+		if gi.Original == addr {
 			filtered = append(filtered, gi)
 		}
 	}

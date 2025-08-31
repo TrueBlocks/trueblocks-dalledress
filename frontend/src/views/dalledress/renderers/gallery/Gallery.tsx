@@ -4,7 +4,7 @@ import type { DataFacet } from '@hooks';
 import { Center, Container, Title } from '@mantine/core';
 import { dalle, dalledress, project, types } from '@models';
 
-import { GalleryControls, SeriesGallery } from '../../components';
+import { GalleryControls, GalleryGrouping } from '../../components';
 import { useDalleDressSelection } from '../../store';
 
 export type GalleryProps = {
@@ -52,20 +52,7 @@ export function Gallery({
   );
   const [selected, setSelected] = useState<string | null>(null);
 
-  const handleItemClick = useCallback((item: dalle.DalleDress) => {
-    setSelected(item.annotatedPath);
-  }, []);
-
   const { setDressSelection } = useDalleDressSelection();
-  const handleItemDoubleClick = useCallback(
-    (item: dalle.DalleDress) => {
-      setSelected(item.annotatedPath);
-      setDressSelection(item.original, item.series, item.annotatedPath);
-      if (setActiveFacet)
-        setActiveFacet(types.DataFacet.GENERATOR as DataFacet);
-    },
-    [setActiveFacet, setDressSelection],
-  );
 
   const scrollSelectedIntoView = useCallback((annotatedPath: string | null) => {
     if (!annotatedPath || !scrollRef.current) return;
@@ -79,6 +66,20 @@ export function Gallery({
   useEffect(() => {
     scrollSelectedIntoView(selected);
   }, [selected, scrollSelectedIntoView]);
+
+  const handleItemClick = useCallback((item: dalle.DalleDress) => {
+    setSelected(item.annotatedPath);
+  }, []);
+
+  const handleItemDoubleClick = useCallback(
+    (item: dalle.DalleDress) => {
+      setSelected(item.annotatedPath);
+      setDressSelection(item.original, item.series, item.annotatedPath);
+      if (setActiveFacet)
+        setActiveFacet(types.DataFacet.GENERATOR as DataFacet);
+    },
+    [setActiveFacet, setDressSelection],
+  );
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -141,14 +142,14 @@ export function Gallery({
         }}
       >
         {seriesNames.map((series) => (
-          <SeriesGallery
+          <GalleryGrouping
             key={series || 'unknown'}
             series={series}
             items={grouped[series] || []}
             columns={controls.columns}
             onItemClick={handleItemClick}
             onItemDoubleClick={handleItemDoubleClick}
-            selectedRelPath={selected}
+            selected={selected}
           />
         ))}
       </div>

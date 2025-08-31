@@ -1,21 +1,21 @@
 import { useSyncExternalStore } from 'react';
 
-interface DalleDressSelectionState {
+interface SelectionState {
   orig: string | null;
   series: string | null;
   path: string | null;
 }
 
-const initial: DalleDressSelectionState = {
+const initial: SelectionState = {
   orig: null,
   series: null,
   path: null,
 };
 
-class DalleDressSelectionStore {
-  private state: DalleDressSelectionState = { ...initial };
+class SelectionStore {
+  private state: SelectionState = { ...initial };
   private listeners = new Set<() => void>();
-  private setState(updates: Partial<DalleDressSelectionState>) {
+  private setState(updates: Partial<SelectionState>) {
     this.state = { ...this.state, ...updates };
     this.listeners.forEach((l) => l());
   }
@@ -25,7 +25,7 @@ class DalleDressSelectionStore {
     return () => this.listeners.delete(listener);
   };
 
-  getSnapshot = (): DalleDressSelectionState => this.state;
+  getSnapshot = (): SelectionState => this.state;
 
   setOriginal(orig: string | null) {
     this.setState({ orig });
@@ -42,12 +42,13 @@ class DalleDressSelectionStore {
   setAll(orig: string | null, series: string | null, path: string | null) {
     this.setState({ orig, series, path });
   }
+
   clear() {
     this.setState({ ...initial });
   }
 }
 
-const store = new DalleDressSelectionStore();
+const store = new SelectionStore();
 
 export const useDalleDressSelection = () => {
   const sel = useSyncExternalStore(store.subscribe, store.getSnapshot);

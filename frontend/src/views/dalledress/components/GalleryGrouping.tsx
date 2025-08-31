@@ -3,23 +3,23 @@ import { dalle } from '@models';
 
 import { DalleDressCard } from './DalleDressCard';
 
-export interface SeriesGalleryProps {
-  series: string;
+export interface GalleryGroupingProps {
   items: dalle.DalleDress[];
+  series: string;
   columns: number;
+  selected?: string | null;
   onItemClick?: (item: dalle.DalleDress) => void;
   onItemDoubleClick?: (item: dalle.DalleDress) => void;
-  selectedRelPath?: string | null;
 }
 
-export const SeriesGallery = ({
+export const GalleryGrouping = ({
   series,
   items,
   columns,
   onItemClick,
   onItemDoubleClick,
-  selectedRelPath,
-}: SeriesGalleryProps) => (
+  selected,
+}: GalleryGroupingProps) => (
   <Box mb="lg">
     <Title order={5} mb={6} style={{ fontFamily: 'monospace' }}>
       {series || 'unknown'} ({items.length})
@@ -31,7 +31,7 @@ export const SeriesGallery = ({
           item={it}
           onClick={onItemClick}
           onDoubleClick={onItemDoubleClick}
-          selected={it.annotatedPath === selectedRelPath}
+          selected={it.annotatedPath === selected}
         />
       ))}
     </SimpleGrid>

@@ -45,10 +45,18 @@ export function Generator({
     setCurrent(pageData?.currentDress || null);
   }, [pageData?.currentDress]);
 
-  const galleryItems = useMemo(
-    () => (pageData?.dalledress ? [...pageData.dalledress] : []),
-    [pageData?.dalledress],
-  );
+  const {
+    orig,
+    series,
+    getPath,
+    clearDressSelection,
+    ingestGalleryItems,
+    galleryItems,
+  } = useGalleryStore();
+
+  useEffect(() => {
+    ingestGalleryItems(pageData?.dalledress || []);
+  }, [pageData?.dalledress, ingestGalleryItems]);
 
   const seriesOptions = useMemo(() => {
     const set = new Set<string>();
@@ -143,7 +151,6 @@ export function Generator({
     ).then((dd) => setCurrent(dd as unknown as dalle.DalleDress));
   }, [activeAddress, selectedSeries]);
 
-  const { orig, series, getPath, clearDressSelection } = useGalleryStore();
   useEffect(() => {
     if (!orig && !series) return;
     let changed = false;
@@ -182,35 +189,49 @@ export function Generator({
       });
   }, [selected]);
 
+  const thumbItems = useMemo(() => {
+    const effectiveOrig = orig || null;
+    if (!effectiveOrig) return galleryItems;
+    return galleryItems.filter((g) => g.original === effectiveOrig);
+  }, [galleryItems, orig]);
+
+  useEffect(() => {
+    if (!selected) return;
+    if (!thumbItems.find((g) => g.annotatedPath === selected)) {
+      const first = thumbItems[0];
+      if (first) setSelected(first.annotatedPath);
+    }
+  }, [thumbItems, selected]);
+
   const handleThumbKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!galleryItems.length) return;
+      if (!thumbItems.length) return;
       const idx = selected
-        ? galleryItems.findIndex((g) => g.annotatedPath === selected)
+        ? thumbItems.findIndex((g) => g.annotatedPath === selected)
         : -1;
       let nextIdx = idx;
       if (e.key === 'ArrowRight') {
-        nextIdx = (idx + 1 + galleryItems.length) % galleryItems.length;
+        nextIdx = (idx + 1 + thumbItems.length) % thumbItems.length;
         e.preventDefault();
       } else if (e.key === 'ArrowLeft') {
-        nextIdx = (idx - 1 + galleryItems.length) % galleryItems.length;
+        nextIdx = (idx - 1 + thumbItems.length) % thumbItems.length;
         e.preventDefault();
       } else if (e.key === 'Home') {
         nextIdx = 0;
         e.preventDefault();
       } else if (e.key === 'End') {
-        nextIdx = galleryItems.length - 1;
+        nextIdx = thumbItems.length - 1;
         e.preventDefault();
       } else {
         return;
       }
-      const next = galleryItems[nextIdx];
+      const next = thumbItems[nextIdx];
       if (next) {
         setSelected(next.annotatedPath);
         if (next.series) setSelectedSeries(next.series);
       }
     },
-    [galleryItems, selected, setSelectedSeries],
+    [thumbItems, selected, setSelectedSeries],
   );
 
   const attributes = useMemo(() => current?.attributes || [], [current]);
@@ -439,7 +460,7 @@ export function Generator({
                 tabIndex={0}
                 onKeyDown={handleThumbKey}
               >
-                {galleryItems.map((g) => (
+                {thumbItems.map((g) => (
                   <div
                     key={g.annotatedPath}
                     data-relpath={g.annotatedPath}

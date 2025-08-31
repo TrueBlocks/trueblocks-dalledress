@@ -26,27 +26,26 @@ export function Gallery({
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const [selected, setSelected] = useState<string | null>(null);
-  const { setDressSelection } = useGalleryStore();
+  const {
+    setDressSelection,
+    ingestGalleryItems,
+    galleryItems,
+    groupedBySeries,
+    groupedByAddress,
+    getSeriesNames,
+    getAddressKeys,
+  } = useGalleryStore();
 
-  const galleryItems: dalle.DalleDress[] = useMemo(
-    () => (pageData?.dalledress ? [...pageData.dalledress] : []),
-    [pageData?.dalledress],
-  );
+  useEffect(() => {
+    ingestGalleryItems(pageData?.dalledress || []);
+  }, [pageData?.dalledress, ingestGalleryItems]);
 
-  const grouped = useMemo(() => {
-    const item: Record<string, dalle.DalleDress[]> = {};
-    galleryItems.forEach((it) => {
-      const key =
-        controls.sortMode === 'series' ? it.series || '' : it.original || '';
-      if (!item[key]) item[key] = [];
-      item[key].push(it);
-    });
-    return item;
-  }, [galleryItems, controls.sortMode]);
-
+  const grouped =
+    controls.sortMode === 'series' ? groupedBySeries : groupedByAddress;
   const seriesNames = useMemo(
-    () => Object.keys(grouped).sort((a, b) => a.localeCompare(b)),
-    [grouped],
+    () =>
+      controls.sortMode === 'series' ? getSeriesNames() : getAddressKeys(),
+    [controls.sortMode, getSeriesNames, getAddressKeys],
   );
 
   const flattened = useMemo(

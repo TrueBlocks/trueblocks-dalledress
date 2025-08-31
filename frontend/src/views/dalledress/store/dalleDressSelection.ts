@@ -1,13 +1,21 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
+import { dalle } from '@models';
+
 interface GalleryState {
   orig: string | null;
   series: string | null;
+  galleryItems: dalle.DalleDress[];
+  groupedBySeries: Record<string, dalle.DalleDress[]>;
+  groupedByAddress: Record<string, dalle.DalleDress[]>;
 }
 
 const initial: GalleryState = {
   orig: null,
   series: null,
+  galleryItems: [],
+  groupedBySeries: {},
+  groupedByAddress: {},
 };
 
 class GalleryStore {
@@ -40,6 +48,21 @@ class GalleryStore {
   clear() {
     this.setState({ ...initial });
   }
+
+  ingest(items: dalle.DalleDress[] | null) {
+    const list = items ? [...items] : [];
+    const groupedBySeries: Record<string, dalle.DalleDress[]> = {};
+    const groupedByAddress: Record<string, dalle.DalleDress[]> = {};
+    for (const it of list) {
+      const sKey = it.series || '';
+      if (!groupedBySeries[sKey]) groupedBySeries[sKey] = [];
+      groupedBySeries[sKey].push(it);
+      const aKey = it.original || '';
+      if (!groupedByAddress[aKey]) groupedByAddress[aKey] = [];
+      groupedByAddress[aKey].push(it);
+    }
+    this.setState({ galleryItems: list, groupedBySeries, groupedByAddress });
+  }
 }
 
 const store = new GalleryStore();
@@ -63,6 +86,18 @@ export const useGalleryStore = () => {
     [],
   );
   const clearDressSelection = useCallback(() => store.clear(), []);
+  const ingestGalleryItems = useCallback(
+    (items: dalle.DalleDress[] | null) => store.ingest(items),
+    [],
+  );
+  const getSeriesNames = useCallback(
+    () => Object.keys(sel.groupedBySeries).sort((a, b) => a.localeCompare(b)),
+    [sel.groupedBySeries],
+  );
+  const getAddressKeys = useCallback(
+    () => Object.keys(sel.groupedByAddress).sort((a, b) => a.localeCompare(b)),
+    [sel.groupedByAddress],
+  );
   return {
     ...sel,
     getPath,
@@ -70,5 +105,8 @@ export const useGalleryStore = () => {
     setDressSeries,
     setDressSelection,
     clearDressSelection,
+    ingestGalleryItems,
+    getSeriesNames,
+    getAddressKeys,
   };
 };

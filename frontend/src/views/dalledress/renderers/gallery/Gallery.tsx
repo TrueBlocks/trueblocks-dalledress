@@ -5,7 +5,7 @@ import { Center, Container, Title } from '@mantine/core';
 import { dalle, dalledress, project, types } from '@models';
 
 import { GalleryControls, GalleryGrouping } from '../../components';
-import { useDalleDressSelection } from '../../store';
+import { useGalleryStore } from '../../store';
 
 export type GalleryProps = {
   pageData: dalledress.DalleDressPage | null;
@@ -18,12 +18,15 @@ export function Gallery({
   viewStateKey,
   setActiveFacet,
 }: GalleryProps) {
-  const keyScopeRef = useRef<HTMLDivElement | null>(null);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
   const [controls, setControls] = useState<{
     sortMode: 'series' | 'address';
     columns: number;
   }>({ sortMode: 'series', columns: 6 });
+  const keyScopeRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const [selected, setSelected] = useState<string | null>(null);
+  const { setDressSelection } = useGalleryStore();
 
   const galleryItems: dalle.DalleDress[] = useMemo(
     () => (pageData?.dalledress ? [...pageData.dalledress] : []),
@@ -50,10 +53,8 @@ export function Gallery({
     () => seriesNames.flatMap((s) => grouped[s] || []),
     [seriesNames, grouped],
   );
-  const [selected, setSelected] = useState<string | null>(null);
 
-  const { setDressSelection } = useDalleDressSelection();
-
+  // --------------------------------------
   const scrollSelectedIntoView = useCallback((annotatedPath: string | null) => {
     if (!annotatedPath || !scrollRef.current) return;
     const el = scrollRef.current.querySelector(
@@ -67,6 +68,7 @@ export function Gallery({
     scrollSelectedIntoView(selected);
   }, [selected, scrollSelectedIntoView]);
 
+  // --------------------------------------
   const handleItemClick = useCallback((item: dalle.DalleDress) => {
     setSelected(item.annotatedPath);
   }, []);
@@ -74,7 +76,7 @@ export function Gallery({
   const handleItemDoubleClick = useCallback(
     (item: dalle.DalleDress) => {
       setSelected(item.annotatedPath);
-      setDressSelection(item.original, item.series, item.annotatedPath);
+      setDressSelection(item.original, item.series);
       if (setActiveFacet)
         setActiveFacet(types.DataFacet.GENERATOR as DataFacet);
     },
@@ -102,6 +104,7 @@ export function Gallery({
     [flattened, selected, handleItemDoubleClick],
   );
 
+  // --------------------------------------
   return (
     <Container
       size="xl"

@@ -1,21 +1,19 @@
-import { useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
-interface SelectionState {
+interface GalleryState {
   orig: string | null;
   series: string | null;
-  path: string | null;
 }
 
-const initial: SelectionState = {
+const initial: GalleryState = {
   orig: null,
   series: null,
-  path: null,
 };
 
-class SelectionStore {
-  private state: SelectionState = { ...initial };
+class GalleryStore {
+  private state: GalleryState = { ...initial };
   private listeners = new Set<() => void>();
-  private setState(updates: Partial<SelectionState>) {
+  private setState(updates: Partial<GalleryState>) {
     this.state = { ...this.state, ...updates };
     this.listeners.forEach((l) => l());
   }
@@ -25,7 +23,7 @@ class SelectionStore {
     return () => this.listeners.delete(listener);
   };
 
-  getSnapshot = (): SelectionState => this.state;
+  getSnapshot = (): GalleryState => this.state;
 
   setOriginal(orig: string | null) {
     this.setState({ orig });
@@ -35,12 +33,8 @@ class SelectionStore {
     this.setState({ series });
   }
 
-  setPath(path: string | null) {
-    this.setState({ path });
-  }
-
-  setAll(orig: string | null, series: string | null, path: string | null) {
-    this.setState({ orig, series, path });
+  setAll(orig: string | null, series: string | null) {
+    this.setState({ orig, series });
   }
 
   clear() {
@@ -48,23 +42,33 @@ class SelectionStore {
   }
 }
 
-const store = new SelectionStore();
+const store = new GalleryStore();
 
-export const useDalleDressSelection = () => {
+export const useGalleryStore = () => {
   const sel = useSyncExternalStore(store.subscribe, store.getSnapshot);
+  const getPath = useCallback(() => {
+    if (!sel.series || !sel.orig) return null;
+    return `./${sel.series}/annotated/${sel.orig}.png`;
+  }, [sel.series, sel.orig]);
+  const setDressOriginal = useCallback(
+    (orig: string | null) => store.setOriginal(orig),
+    [],
+  );
+  const setDressSeries = useCallback(
+    (series: string | null) => store.setSeries(series),
+    [],
+  );
+  const setDressSelection = useCallback(
+    (orig: string | null, series: string | null) => store.setAll(orig, series),
+    [],
+  );
+  const clearDressSelection = useCallback(() => store.clear(), []);
   return {
     ...sel,
-    setDressOriginal: (orig: string | null) => store.setOriginal(orig),
-    setDressSeries: (series: string | null) => store.setSeries(series),
-    setDressPath: (path: string | null) => store.setPath(path),
-    setDressSelection: (
-      orig: string | null,
-      series: string | null,
-      path: string | null,
-    ) => store.setAll(orig, series, path),
-    clearDressSelection: () => store.clear(),
+    getPath,
+    setDressOriginal,
+    setDressSeries,
+    setDressSelection,
+    clearDressSelection,
   };
 };
-
-// test-only helper
-export const __resetDressSelectionForTests = () => store.clear();

@@ -3,11 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DataFacet } from '@hooks';
 import { Center, Container, Title } from '@mantine/core';
 import { dalle, dalledress, project, types } from '@models';
-import {
-  GalleryControls,
-  SeriesGallery,
-} from 'src/views/dalledress/components';
-import { setPendingGeneratorSelection } from 'src/views/dalledress/renderers/generator';
+
+import { GalleryControls, SeriesGallery } from '../../components';
+import { useDalleDressSelection } from '../../store';
 
 export function Gallery({
   pageData,
@@ -56,14 +54,15 @@ export function Gallery({
     setSelected(item.annotatedPath);
   }, []);
 
+  const { setDressSelection } = useDalleDressSelection();
   const handleItemDoubleClick = useCallback(
     (item: dalle.DalleDress) => {
       setSelected(item.annotatedPath);
-      setPendingGeneratorSelection(item.original, item.series);
+      setDressSelection(item.original, item.series, item.annotatedPath);
       if (setActiveFacet)
         setActiveFacet(types.DataFacet.GENERATOR as DataFacet);
     },
-    [setActiveFacet],
+    [setActiveFacet, setDressSelection],
   );
 
   const scrollSelectedIntoView = useCallback((annotatedPath: string | null) => {

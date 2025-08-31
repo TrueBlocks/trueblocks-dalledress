@@ -1,1 +1,1 @@
-export { Generator, setPendingGeneratorSelection } from './Generator';
+export * from './Generator';

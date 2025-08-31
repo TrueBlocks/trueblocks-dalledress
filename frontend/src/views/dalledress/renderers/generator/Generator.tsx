@@ -17,21 +17,9 @@ import {
 import { dalle, dalledress, types } from '@models';
 import { Log } from '@utils';
 import { DalleDressCard } from 'src/views/dalledress/components';
+import { useDalleDressSelection } from 'src/views/dalledress/store';
 
 import { useSpeakPrompt } from '../../hooks/useSpeakPrompt';
-
-let pendingGeneratorSelection: {
-  address?: string;
-  series?: string | null;
-  annotatedPath?: string | null;
-} | null = null;
-export const setPendingGeneratorSelection = (
-  address: string,
-  series: string | null,
-  annotatedPath?: string | null,
-) => {
-  pendingGeneratorSelection = { address, series, annotatedPath };
-};
 
 export function Generator({
   pageData,
@@ -155,25 +143,34 @@ export function Generator({
     ).then((dd) => setCurrent(dd as unknown as dalle.DalleDress));
   }, [activeAddress, selectedSeries]);
 
+  const { orig, series, path, clearDressSelection } = useDalleDressSelection();
   useEffect(() => {
-    if (!pendingGeneratorSelection) return;
-    const { address, series, annotatedPath } = pendingGeneratorSelection;
+    if (!orig && !series && !path) return;
     let changed = false;
-    if (address && address !== activeAddress) {
-      setActiveAddress(address);
+    if (orig && orig !== activeAddress) {
+      setActiveAddress(orig);
       changed = true;
-      Log('generator:pref:address:' + address);
+      Log('generator:pref:address:' + orig);
     }
     if (series && series !== selectedSeries) {
       setSelectedSeries(series);
       changed = true;
       Log('generator:pref:series:' + series);
     }
-    if (annotatedPath) {
-      setSelectedThumb(annotatedPath);
+    if (path) {
+      setSelectedThumb(path);
     }
-    if (changed) pendingGeneratorSelection = null;
-  }, [activeAddress, selectedSeries, setActiveAddress]);
+    if (changed) clearDressSelection();
+  }, [
+    orig,
+    series,
+    path,
+    activeAddress,
+    selectedSeries,
+    setActiveAddress,
+    setSelectedSeries,
+    clearDressSelection,
+  ]);
 
   useEffect(() => {
     if (!selectedThumb || !thumbRowRef.current) return;

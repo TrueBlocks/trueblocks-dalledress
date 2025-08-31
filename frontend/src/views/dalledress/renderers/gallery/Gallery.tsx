@@ -7,15 +7,17 @@ import { dalle, dalledress, project, types } from '@models';
 import { GalleryControls, SeriesGallery } from '../../components';
 import { useDalleDressSelection } from '../../store';
 
+export type GalleryProps = {
+  pageData: dalledress.DalleDressPage | null;
+  viewStateKey?: project.ViewStateKey;
+  setActiveFacet?: (f: DataFacet) => void;
+};
+
 export function Gallery({
   pageData,
   viewStateKey,
   setActiveFacet,
-}: {
-  pageData: dalledress.DalleDressPage | null;
-  viewStateKey?: project.ViewStateKey;
-  setActiveFacet?: (f: DataFacet) => void;
-}) {
+}: GalleryProps) {
   const keyScopeRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [controls, setControls] = useState<{
@@ -24,8 +26,8 @@ export function Gallery({
   }>({ sortMode: 'series', columns: 6 });
 
   const galleryItems: dalle.DalleDress[] = useMemo(
-    () => (pageData?.gallery ? [...pageData.gallery] : []),
-    [pageData?.gallery],
+    () => (pageData?.dalledress ? [...pageData.dalledress] : []),
+    [pageData?.dalledress],
   );
 
   const grouped = useMemo(() => {

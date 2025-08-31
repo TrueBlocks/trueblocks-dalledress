@@ -31,7 +31,6 @@ type DalleDressPage struct {
 	IsFetching    bool            `json:"isFetching"`
 	State         types.LoadState `json:"state"`
 	CurrentDress  *DalleDress     `json:"currentDress"`
-	Gallery       []*DalleDress   `json:"gallery"` // BINGY_JOE
 }
 
 func (p *DalleDressPage) GetFacet() types.DataFacet {
@@ -98,22 +97,6 @@ func (c *DalleDressCollection) GetPage(
 				generator = append(generator, &result.Items[i])
 			}
 			page.DalleDress, page.TotalItems, page.State = generator, result.TotalItems, result.State
-			items := c.getGalleryItems()
-			if payload != nil && payload.Address != "" {
-				latest, ordered := selectLatestGalleryItem(items, payload.Address)
-				page.Gallery = ordered
-				if latest != nil {
-					if cd := loadCurrentDressFromSidecars(latest.Series, payload.Address); cd != nil {
-						page.CurrentDress = cd
-					} else if page.CurrentDress == nil {
-						page.CurrentDress = &DalleDress{}
-					}
-				} else if page.CurrentDress == nil {
-					page.CurrentDress = &DalleDress{}
-				}
-			} else if page.CurrentDress == nil {
-				page.CurrentDress = &DalleDress{}
-			}
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
@@ -202,9 +185,6 @@ func (c *DalleDressCollection) GetPage(
 				gallery = append(gallery, &result.Items[i])
 			}
 			page.DalleDress, page.TotalItems, page.State = gallery, result.TotalItems, result.State
-			// BINGY_JOE
-			page.Gallery = c.getGalleryItems()
-			// BINGY_JOE
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()

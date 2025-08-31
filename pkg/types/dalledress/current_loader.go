@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	dallev2 "github.com/TrueBlocks/trueblocks-dalle/v2"
@@ -72,25 +71,4 @@ func readIfExists(p string) string {
 		return ""
 	}
 	return string(b)
-}
-
-// selectLatestGalleryItem returns the latest modified gallery item for address (across series) and a sorted slice for thumbnails.
-func selectLatestGalleryItem(all []*DalleDress, address string) (latest *DalleDress, sorted []*DalleDress) {
-	addr := strings.ToLower(address)
-	filtered := make([]*DalleDress, 0, 32)
-	for _, gi := range all {
-		if gi.Original == addr {
-			filtered = append(filtered, gi)
-		}
-	}
-	sort.Slice(filtered, func(i, j int) bool {
-		if filtered[i].ModifiedAt == filtered[j].ModifiedAt {
-			return filtered[i].FileName < filtered[j].FileName
-		}
-		return filtered[i].ModifiedAt > filtered[j].ModifiedAt // newest first
-	})
-	if len(filtered) > 0 {
-		latest = filtered[0]
-	}
-	return latest, filtered
 }

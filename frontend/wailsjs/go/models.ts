@@ -374,7 +374,6 @@ export namespace dalledress {
 	    isFetching: boolean;
 	    state: types.LoadState;
 	    currentDress?: dalle.DalleDress;
-	    gallery: dalle.DalleDress[];
 	
 	    static createFrom(source: any = {}) {
 	        return new DalleDressPage(source);
@@ -392,7 +391,6 @@ export namespace dalledress {
 	        this.isFetching = source["isFetching"];
 	        this.state = source["state"];
 	        this.currentDress = this.convertValues(source["currentDress"], dalle.DalleDress);
-	        this.gallery = this.convertValues(source["gallery"], dalle.DalleDress);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

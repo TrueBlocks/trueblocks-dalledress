@@ -46,8 +46,8 @@ export function Generator({
   }, [pageData?.currentDress]);
 
   const filteredGalleryItems = useMemo(
-    () => (pageData?.gallery ? [...pageData.gallery] : []),
-    [pageData?.gallery],
+    () => (pageData?.dalledress ? [...pageData.dalledress] : []),
+    [pageData?.dalledress],
   );
 
   const seriesOptions = useMemo(() => {

@@ -11,7 +11,12 @@ export const HelpBar = () => {
   const [markdown, setMarkdown] = useState<string>('Loading...');
   const [currentLocation] = useLocation();
   const { lastView } = useActiveProject();
-  const { helpCollapsed, setHelpCollapsed } = usePreferences();
+  const {
+    helpCollapsed,
+    setHelpCollapsed,
+    chromeCollapsed,
+    setChromeCollapsed,
+  } = usePreferences();
 
   useEffect(() => {
     var headerText = currentLocation.startsWith('/')
@@ -40,6 +45,30 @@ export const HelpBar = () => {
       fetchMarkdown();
     }
   }, [currentLocation, helpCollapsed, lastView]);
+
+  if (chromeCollapsed) {
+    return (
+      <AppShell.Aside
+        style={{
+          transition: 'width 0.2s ease',
+          width: 25,
+          borderLeft: '1px solid var(--mantine-color-dark-4)',
+          padding: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+        }}
+      >
+        <ChevronButton
+          collapsed={chromeCollapsed}
+          onToggle={() => setChromeCollapsed(false)}
+          direction="right"
+          title="Restore layout"
+        />
+      </AppShell.Aside>
+    );
+  }
 
   return (
     <AppShell.Aside p="md" style={{ transition: 'width 0.2s ease' }}>

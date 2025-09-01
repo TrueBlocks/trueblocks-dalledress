@@ -34,6 +34,7 @@ export const Footer = () => {
             collapsed={chromeCollapsed}
             onToggle={() => setChromeCollapsed(!chromeCollapsed)}
             direction="down"
+            title="Restore layout"
           />
           {!chromeCollapsed && <FilePanel />}
         </Flex>

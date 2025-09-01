@@ -4,10 +4,12 @@ export const ChevronButton = ({
   collapsed,
   onToggle,
   direction = 'none',
+  title,
 }: {
   collapsed: boolean;
   onToggle: () => void;
   direction?: 'left' | 'right' | 'up' | 'down' | 'none';
+  title?: string;
 }) => {
   if (direction === 'none') {
     return (
@@ -19,6 +21,7 @@ export const ChevronButton = ({
         variant="subtle"
         size="sm"
         radius="md"
+        title={title}
       />
     );
   }
@@ -43,6 +46,7 @@ export const ChevronButton = ({
       variant="subtle"
       size="sm"
       radius="md"
+      title={title}
     />
   );
 };

@@ -106,7 +106,7 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+m',
             label: 'Toggle menu panel',
             action: () => {
-              setMenuCollapsed(!menuCollapsed);
+              if (!chromeCollapsed) setMenuCollapsed(!menuCollapsed);
             },
           },
           e,
@@ -122,7 +122,7 @@ export const useAppHotkeys = (): void => {
             hotkey: 'mod+h',
             label: 'Toggle help panel',
             action: () => {
-              setHelpCollapsed(!helpCollapsed);
+              if (!chromeCollapsed) setHelpCollapsed(!helpCollapsed);
             },
           },
           e,

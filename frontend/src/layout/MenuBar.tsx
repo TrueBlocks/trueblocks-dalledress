@@ -10,7 +10,12 @@ interface MenuBarProps {
 
 export const MenuBar = ({ disabled = false }: MenuBarProps) => {
   const [currentLocation, navigate] = useLocation();
-  const { menuCollapsed, setMenuCollapsed } = usePreferences();
+  const {
+    menuCollapsed,
+    setMenuCollapsed,
+    chromeCollapsed,
+    setChromeCollapsed,
+  } = usePreferences();
 
   const topMenuItems = MenuItems.filter((item) => item.position === 'top');
   const botMenuItems = MenuItems.filter((item) => item.position === 'bottom');
@@ -41,6 +46,31 @@ export const MenuBar = ({ disabled = false }: MenuBarProps) => {
       </Button>
     );
   };
+
+  if (chromeCollapsed) {
+    return (
+      <AppShell.Navbar
+        style={{
+          padding: 0,
+          height: 'calc(100vh - 30px)',
+          width: 25,
+          transition: 'width 0.2s ease',
+          borderRight: '1px solid var(--mantine-color-dark-4)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+        }}
+      >
+        <ChevronButton
+          collapsed={chromeCollapsed}
+          onToggle={() => setChromeCollapsed(false)}
+          direction="left"
+          title="Restore layout"
+        />
+      </AppShell.Navbar>
+    );
+  }
 
   return (
     <AppShell.Navbar

@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 import { dalle } from '@models';
 
@@ -33,14 +33,6 @@ class GalleryStore {
 
   getSnapshot = (): GalleryState => this.state;
 
-  setOriginal(orig: string | null) {
-    this.setState({ orig });
-  }
-
-  setSeries(series: string | null) {
-    this.setState({ series });
-  }
-
   setAll(orig: string | null, series: string | null) {
     this.setState({ orig, series });
   }
@@ -69,44 +61,47 @@ const store = new GalleryStore();
 
 export const useGalleryStore = () => {
   const sel = useSyncExternalStore(store.subscribe, store.getSnapshot);
-  const getPath = useCallback(() => {
+  const getSelection = useCallback(() => {
     if (!sel.series || !sel.orig) return null;
     return `./${sel.series}/annotated/${sel.orig}.png`;
   }, [sel.series, sel.orig]);
-  const setDressOriginal = useCallback(
-    (orig: string | null) => store.setOriginal(orig),
-    [],
-  );
-  const setDressSeries = useCallback(
-    (series: string | null) => store.setSeries(series),
-    [],
-  );
-  const setDressSelection = useCallback(
+  const setSelection = useCallback(
     (orig: string | null, series: string | null) => store.setAll(orig, series),
     [],
   );
-  const clearDressSelection = useCallback(() => store.clear(), []);
-  const ingestGalleryItems = useCallback(
+  const clearSelection = useCallback(() => store.clear(), []);
+  const ingestItems = useCallback(
     (items: dalle.DalleDress[] | null) => store.ingest(items),
     [],
   );
-  const getSeriesNames = useCallback(
-    () => Object.keys(sel.groupedBySeries).sort((a, b) => a.localeCompare(b)),
-    [sel.groupedBySeries],
-  );
-  const getAddressKeys = useCallback(
-    () => Object.keys(sel.groupedByAddress).sort((a, b) => a.localeCompare(b)),
-    [sel.groupedByAddress],
-  );
+  const useDerived = (sortMode: 'series' | 'address') => {
+    const groupNames = useMemo(() => {
+      if (sortMode === 'series')
+        return Object.keys(sel.groupedBySeries).sort((a, b) =>
+          a.localeCompare(b),
+        );
+      return Object.keys(sel.groupedByAddress).sort((a, b) =>
+        a.localeCompare(b),
+      );
+    }, [sortMode]);
+    const groupedItems = useMemo(() => {
+      if (sortMode === 'series') return sel.groupedBySeries;
+      return sel.groupedByAddress;
+    }, [sortMode]);
+    const flattenedItems = useMemo(
+      () => groupNames.flatMap((s) => groupedItems[s] || []),
+      [groupNames, groupedItems],
+    );
+    return { groupNames, groupedItems, flattenedItems };
+  };
   return {
-    ...sel,
-    getPath,
-    setDressOriginal,
-    setDressSeries,
-    setDressSelection,
-    clearDressSelection,
-    ingestGalleryItems,
-    getSeriesNames,
-    getAddressKeys,
+    orig: sel.orig,
+    series: sel.series,
+    galleryItems: sel.galleryItems,
+    getSelection,
+    setSelection,
+    clearSelection,
+    ingestItems,
+    useDerived,
   };
 };

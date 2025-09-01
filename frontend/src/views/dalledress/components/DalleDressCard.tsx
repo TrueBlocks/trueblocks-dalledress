@@ -1,6 +1,7 @@
 import { Box, Card, Image, Stack, Text } from '@mantine/core';
 import { dalle } from '@models';
 import { getDisplayAddress } from '@utils';
+import { Log } from '@utils';
 
 export interface DalleDressCardProps {
   item: dalle.DalleDress;
@@ -15,10 +16,15 @@ export const DalleDressCard = ({
   onDoubleClick,
   selected,
 }: DalleDressCardProps) => {
+  if (selected) {
+    Log('DalleDressCard:selected=' + String(item.annotatedPath));
+  }
   const handleClick = () => {
+    Log('DalleDressCard:click=' + String(item.annotatedPath));
     onClick?.(item);
   };
   const handleDoubleClick = () => {
+    Log('DalleDressCard:dblclick=' + String(item.annotatedPath));
     onDoubleClick?.(item);
   };
   return (

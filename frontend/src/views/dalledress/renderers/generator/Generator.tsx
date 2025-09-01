@@ -48,15 +48,15 @@ export function Generator({
   const {
     orig,
     series,
-    getPath,
-    clearDressSelection,
-    ingestGalleryItems,
+    getSelection,
+    clearSelection,
+    ingestItems,
     galleryItems,
   } = useGalleryStore();
 
   useEffect(() => {
-    ingestGalleryItems(pageData?.dalledress || []);
-  }, [pageData?.dalledress, ingestGalleryItems]);
+    ingestItems(pageData?.dalledress || []);
+  }, [pageData?.dalledress, ingestItems]);
 
   const seriesOptions = useMemo(() => {
     const set = new Set<string>();
@@ -164,17 +164,17 @@ export function Generator({
       changed = true;
       Log('generator:pref:series:' + series);
     }
-    setSelected(getPath());
-    if (changed) clearDressSelection();
+    setSelected(getSelection());
+    if (changed) clearSelection();
   }, [
     orig,
     series,
     activeAddress,
     selectedSeries,
-    getPath,
+    getSelection,
     setActiveAddress,
     setSelectedSeries,
-    clearDressSelection,
+    clearSelection,
   ]);
 
   useEffect(() => {

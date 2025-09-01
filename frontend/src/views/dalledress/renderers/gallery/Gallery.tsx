@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { DataFacet } from '@hooks';
 import { Center, Container, Title } from '@mantine/core';
@@ -22,85 +22,74 @@ export function Gallery({
     sortMode: 'series' | 'address';
     columns: number;
   }>({ sortMode: 'series', columns: 6 });
-  const keyScopeRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const keyScopeRef = useRef<HTMLDivElement | null>(null);
 
-  const [selected, setSelected] = useState<string | null>(null);
-  const {
-    setDressSelection,
-    ingestGalleryItems,
-    galleryItems,
-    groupedBySeries,
-    groupedByAddress,
-    getSeriesNames,
-    getAddressKeys,
-  } = useGalleryStore();
+  const { getSelection, setSelection, ingestItems, galleryItems, useDerived } =
+    useGalleryStore();
+  const { groupNames, groupedItems, flattenedItems } = useDerived(
+    controls.sortMode,
+  );
 
   useEffect(() => {
-    ingestGalleryItems(pageData?.dalledress || []);
-  }, [pageData?.dalledress, ingestGalleryItems]);
-
-  const grouped =
-    controls.sortMode === 'series' ? groupedBySeries : groupedByAddress;
-  const seriesNames = useMemo(
-    () =>
-      controls.sortMode === 'series' ? getSeriesNames() : getAddressKeys(),
-    [controls.sortMode, getSeriesNames, getAddressKeys],
-  );
-
-  const flattened = useMemo(
-    () => seriesNames.flatMap((s) => grouped[s] || []),
-    [seriesNames, grouped],
-  );
+    ingestItems(pageData?.dalledress || []);
+  }, [pageData?.dalledress, ingestItems]);
 
   // --------------------------------------
-  const scrollSelectedIntoView = useCallback((annotatedPath: string | null) => {
-    if (!annotatedPath || !scrollRef.current) return;
-    const el = scrollRef.current.querySelector(
-      `[data-relpath="${annotatedPath}"]`,
-    );
+  const scrollSelectedIntoView = useCallback((selected: string | null) => {
+    if (!selected || !scrollRef.current) return;
+    const el = scrollRef.current.querySelector(`[data-relpath="${selected}"]`);
     if (el && 'scrollIntoView' in el)
       (el as HTMLElement).scrollIntoView({ block: 'nearest' });
   }, []);
 
   useEffect(() => {
-    scrollSelectedIntoView(selected);
-  }, [selected, scrollSelectedIntoView]);
+    scrollSelectedIntoView(getSelection());
+  }, [getSelection, scrollSelectedIntoView]);
 
   // --------------------------------------
-  const handleItemClick = useCallback((item: dalle.DalleDress) => {
-    setSelected(item.annotatedPath);
-  }, []);
+  const handleItemClick = useCallback(
+    (item: dalle.DalleDress) => {
+      setSelection(item.original, item.series);
+    },
+    [setSelection],
+  );
 
   const handleItemDoubleClick = useCallback(
     (item: dalle.DalleDress) => {
-      setSelected(item.annotatedPath);
-      setDressSelection(item.original, item.series);
+      setSelection(item.original, item.series);
       if (setActiveFacet)
         setActiveFacet(types.DataFacet.GENERATOR as DataFacet);
     },
-    [setActiveFacet, setDressSelection],
+    [setActiveFacet, setSelection],
   );
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!flattened.length) return;
-      const idx = flattened.findIndex((f) => f.annotatedPath === selected);
+      if (!flattenedItems.length) return;
+      const idx = flattenedItems.findIndex(
+        (f) => f.annotatedPath === getSelection(),
+      );
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         const next =
-          flattened[(idx + 1 + flattened.length) % flattened.length] || null;
-        if (next) setSelected(next.annotatedPath);
+          flattenedItems[
+            (idx + 1 + flattenedItems.length) % flattenedItems.length
+          ] || null;
+        if (next) setSelection(next.original, next.series);
         e.preventDefault();
       } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
         const next =
-          flattened[(idx - 1 + flattened.length) % flattened.length] || null;
-        if (next) setSelected(next.annotatedPath);
+          flattenedItems[
+            (idx - 1 + flattenedItems.length) % flattenedItems.length
+          ] || null;
+        if (next) setSelection(next.original, next.series);
         e.preventDefault();
       } else if (e.key === 'Enter') {
-        if (idx >= 0 && flattened[idx]) handleItemDoubleClick(flattened[idx]);
+        if (idx >= 0 && flattenedItems[idx])
+          handleItemDoubleClick(flattenedItems[idx]);
       }
     },
-    [flattened, selected, handleItemDoubleClick],
+    [flattenedItems, getSelection, handleItemDoubleClick, setSelection],
   );
 
   // --------------------------------------
@@ -112,7 +101,7 @@ export function Gallery({
       tabIndex={0}
       onKeyDown={handleKey}
       onMouseDown={() => keyScopeRef.current && keyScopeRef.current.focus()}
-      style={{ outline: 'none' }}
+      style={{ outline: 'none', width: '100%' }}
     >
       <Title order={4} mb="sm">
         Preview Gallery
@@ -143,15 +132,15 @@ export function Gallery({
           paddingRight: 4,
         }}
       >
-        {seriesNames.map((series) => (
+        {groupNames.map((series) => (
           <GalleryGrouping
             key={series || 'unknown'}
             series={series}
-            items={grouped[series] || []}
+            items={groupedItems[series] || []}
             columns={controls.columns}
             onItemClick={handleItemClick}
             onItemDoubleClick={handleItemDoubleClick}
-            selected={selected}
+            selected={getSelection()}
           />
         ))}
       </div>

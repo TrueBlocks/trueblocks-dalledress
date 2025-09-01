@@ -1,1 +1,1 @@
-export * from './dalleDressSelection';
+export * from './useGalleryStore';

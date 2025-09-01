@@ -45,6 +45,7 @@ type AppPreferences struct {
 	LastProject     string          `json:"lastProject"`
 	HelpCollapsed   bool            `json:"helpCollapsed"`
 	MenuCollapsed   bool            `json:"menuCollapsed"`
+	ChromeCollapsed bool            `json:"chromeCollapsed"`
 	DetailCollapsed bool            `json:"detailCollapsed"`
 	DebugCollapsed  bool            `json:"debugCollapsed"`
 	RecentProjects  []string        `json:"recentProjects"`
@@ -67,6 +68,7 @@ func NewAppPreferences() *AppPreferences {
 		DetailCollapsed: true,
 		HelpCollapsed:   false,
 		MenuCollapsed:   false,
+		ChromeCollapsed: false,
 		DebugCollapsed:  true,
 		RecentProjects:  []string{},
 		SilencedDialogs: make(map[string]bool),

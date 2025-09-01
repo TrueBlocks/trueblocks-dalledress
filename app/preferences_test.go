@@ -507,3 +507,36 @@ func TestSetMenuCollapsed(t *testing.T) {
 		})
 	}
 }
+
+func TestSetChromeCollapsed(t *testing.T) {
+	tests := []struct {
+		name     string
+		collapse bool
+	}{
+		{
+			name:     "collapse chrome",
+			collapse: true,
+		},
+		{
+			name:     "expand chrome",
+			collapse: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmp := t.TempDir()
+			defer preferences.SetConfigBaseForTest(t, tmp)()
+
+			app := &App{
+				Preferences: &preferences.Preferences{
+					App: *preferences.NewAppPreferences(),
+				},
+				prefsMu: sync.RWMutex{},
+			}
+
+			app.SetChromeCollapsed(tt.collapse)
+			assert.Equal(t, tt.collapse, app.Preferences.App.ChromeCollapsed)
+		})
+	}
+}

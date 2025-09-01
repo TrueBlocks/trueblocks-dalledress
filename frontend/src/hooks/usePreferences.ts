@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 import {
   GetAppPreferences,
   SetAppPreferences,
+  SetChromeCollapsed,
   SetDebugCollapsed,
   SetHelpCollapsed,
   SetLanguage,
@@ -18,6 +19,7 @@ export interface UsePreferencesReturn {
   debugCollapsed: boolean;
   menuCollapsed: boolean;
   helpCollapsed: boolean;
+  chromeCollapsed: boolean;
   detailCollapsed: boolean;
   loading: boolean;
   toggleTheme: () => Promise<void>;
@@ -25,6 +27,7 @@ export interface UsePreferencesReturn {
   setDebugCollapsed: (collapsed: boolean) => Promise<void>;
   setMenuCollapsed: (collapsed: boolean) => Promise<void>;
   setHelpCollapsed: (collapsed: boolean) => Promise<void>;
+  setChromeCollapsed: (collapsed: boolean) => Promise<void>;
   setDetailCollapsed: (enabled: boolean) => Promise<void>;
   isDarkMode: boolean;
 }
@@ -35,6 +38,7 @@ interface PreferencesState {
   debugCollapsed: boolean;
   menuCollapsed: boolean;
   helpCollapsed: boolean;
+  chromeCollapsed: boolean;
   detailCollapsed: boolean;
   loading: boolean;
 }
@@ -45,6 +49,7 @@ const initialPreferencesState: PreferencesState = {
   debugCollapsed: true,
   menuCollapsed: false,
   helpCollapsed: false,
+  chromeCollapsed: false,
   detailCollapsed: true,
   loading: false,
 };
@@ -62,6 +67,7 @@ class PreferencesStore {
         debugCollapsed: this.state.debugCollapsed,
         menuCollapsed: this.state.menuCollapsed,
         helpCollapsed: this.state.helpCollapsed,
+        chromeCollapsed: this.state.chromeCollapsed,
         detailCollapsed: this.state.detailCollapsed,
         loading: this.state.loading,
         toggleTheme: this.toggleTheme,
@@ -69,6 +75,7 @@ class PreferencesStore {
         setDebugCollapsed: this.setDebugCollapsed,
         setMenuCollapsed: this.setMenuCollapsed,
         setHelpCollapsed: this.setHelpCollapsed,
+        setChromeCollapsed: this.setChromeCollapsed,
         setDetailCollapsed: this.setDetailCollapsed,
         isDarkMode: this.isDarkMode,
       };
@@ -147,6 +154,7 @@ class PreferencesStore {
         debugCollapsed: prefs.debugCollapsed ?? true,
         menuCollapsed: prefs.menuCollapsed ?? false,
         helpCollapsed: prefs.helpCollapsed ?? false,
+        chromeCollapsed: prefs.chromeCollapsed ?? false,
         detailCollapsed: prefs.detailCollapsed ?? true,
         loading: false,
       });
@@ -193,6 +201,11 @@ class PreferencesStore {
     await SetHelpCollapsed(collapsed);
     await this.updatePreferences({ helpCollapsed: collapsed });
     this.setState({ helpCollapsed: collapsed });
+  };
+
+  setChromeCollapsed = async (collapsed: boolean): Promise<void> => {
+    await SetChromeCollapsed(collapsed);
+    this.setState({ chromeCollapsed: collapsed });
   };
 
   setDetailCollapsed = async (collapsed: boolean): Promise<void> => {

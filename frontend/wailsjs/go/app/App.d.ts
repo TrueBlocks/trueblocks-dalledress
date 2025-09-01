@@ -232,6 +232,8 @@ export function SetAppPreferences(arg1:preferences.AppPreferences):Promise<void>
 
 export function SetChain(arg1:preferences.Chain):Promise<void>;
 
+export function SetChromeCollapsed(arg1:boolean):Promise<void>;
+
 export function SetDebugCollapsed(arg1:boolean):Promise<void>;
 
 export function SetFilterState(arg1:project.ViewStateKey,arg2:project.FilterState):Promise<void>;

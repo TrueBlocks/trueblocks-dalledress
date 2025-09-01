@@ -81,24 +81,6 @@ func (p *Preferences) GetAppPreferences() *AppPreferences {
 	return &p.App
 }
 
-// SetMenuCollapsed updates the menu collapsed state and saves the preferences
-func (p *Preferences) SetMenuCollapsed(val bool) error {
-	if p.App.MenuCollapsed != val {
-		p.App.MenuCollapsed = val
-		return p.Save()
-	}
-	return nil
-}
-
-// SetHelpCollapsed updates the help collapsed state and saves the preferences
-func (p *Preferences) SetHelpCollapsed(val bool) error {
-	if p.App.HelpCollapsed != val {
-		p.App.HelpCollapsed = val
-		return p.Save() // Immediately save changes
-	}
-	return nil
-}
-
 // AddRecentProject adds a project to the recently used list
 func (p *Preferences) AddRecentProject(path string) error {
 	// Check if the path is already in the list

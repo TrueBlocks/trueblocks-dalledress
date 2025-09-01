@@ -426,6 +426,10 @@ export function SetChain(arg1) {
   return window['go']['app']['App']['SetChain'](arg1);
 }
 
+export function SetChromeCollapsed(arg1) {
+  return window['go']['app']['App']['SetChromeCollapsed'](arg1);
+}
+
 export function SetDebugCollapsed(arg1) {
   return window['go']['app']['App']['SetDebugCollapsed'](arg1);
 }

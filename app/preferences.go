@@ -200,3 +200,14 @@ func (a *App) SetMenuCollapsed(collapse bool) {
 		msgs.EmitError("failed to save menu collapsed preference", err)
 	}
 }
+
+// SetChromeCollapsed updates the chrome collapsed state
+func (a *App) SetChromeCollapsed(collapse bool) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+
+	a.Preferences.App.ChromeCollapsed = collapse
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save chrome collapsed preference", err)
+	}
+}

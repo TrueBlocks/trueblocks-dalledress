@@ -741,6 +741,7 @@ export namespace preferences {
 	    lastProject: string;
 	    helpCollapsed: boolean;
 	    menuCollapsed: boolean;
+	    chromeCollapsed: boolean;
 	    detailCollapsed: boolean;
 	    debugCollapsed: boolean;
 	    recentProjects: string[];
@@ -761,6 +762,7 @@ export namespace preferences {
 	        this.lastProject = source["lastProject"];
 	        this.helpCollapsed = source["helpCollapsed"];
 	        this.menuCollapsed = source["menuCollapsed"];
+	        this.chromeCollapsed = source["chromeCollapsed"];
 	        this.detailCollapsed = source["detailCollapsed"];
 	        this.debugCollapsed = source["debugCollapsed"];
 	        this.recentProjects = source["recentProjects"];

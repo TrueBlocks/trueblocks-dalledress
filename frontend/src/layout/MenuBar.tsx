@@ -1,4 +1,4 @@
-import { ChevronButton, getBarWidth } from '@components';
+import { ChevronButton, getBarSize } from '@components';
 import { useIconSets, usePreferences } from '@hooks';
 import { AppShell, Button, Stack } from '@mantine/core';
 import { MenuItem, MenuItems } from 'src/Menu';
@@ -49,7 +49,7 @@ export const MenuBar = ({ disabled = false }: MenuBarProps) => {
         paddingTop: 0,
         paddingBottom: 0,
         height: 'calc(100vh - 30px)',
-        width: getBarWidth(menuCollapsed, 1),
+        width: getBarSize('menu', menuCollapsed),
         transition: 'width 0.2s ease',
       }}
     >

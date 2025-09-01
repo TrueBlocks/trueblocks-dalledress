@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { NodeStatus, ProjectSelectionModal, getBarWidth } from '@components';
+import { NodeStatus, ProjectSelectionModal, getBarSize } from '@components';
 import { ViewContextProvider, WalletConnectProvider } from '@contexts';
 import {
   initializeAllViewConfigs,
@@ -117,12 +117,12 @@ export const App = () => {
   const header = { height: 60 };
   const footer = { height: 40 };
   const navbar = {
-    width: getBarWidth(menuCollapsed, 1),
+    width: getBarSize('menu', menuCollapsed),
     breakpoint: 'sm',
     collapsed: { mobile: !menuCollapsed },
   };
   const aside = {
-    width: getBarWidth(helpCollapsed, 2),
+    width: getBarSize('help', helpCollapsed),
     breakpoint: 'sm',
     collapsed: { mobile: !helpCollapsed },
   };
@@ -154,7 +154,7 @@ export const App = () => {
               style={{
                 position: 'absolute',
                 top: '84px',
-                right: `${getBarWidth(helpCollapsed, 2) + 0}px`,
+                right: `${getBarSize('help', helpCollapsed) + 0}px`,
                 zIndex: 1000,
               }}
             >

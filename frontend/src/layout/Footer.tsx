@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { GetFilename, GetOrgPreferences } from '@app';
-import { Socials, getBarWidth } from '@components';
+import { Socials, getBarSize } from '@components';
 import { useEvent, usePreferences } from '@hooks';
 import { AppShell, Flex, Text } from '@mantine/core';
 import { msgs, preferences, project } from '@models';
@@ -20,7 +20,7 @@ export const Footer = () => {
   }, []);
 
   return (
-    <AppShell.Footer ml={getBarWidth(menuCollapsed, 1) - 1}>
+    <AppShell.Footer ml={getBarSize('menu', menuCollapsed) - 1}>
       <Flex h="100%" px="md" align="center" justify="space-between">
         <FilePanel />
         <Text size="sm">{org.developerName} © 2025</Text>

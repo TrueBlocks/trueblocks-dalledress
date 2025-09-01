@@ -30,7 +30,6 @@ type DalleDressPage struct {
 	ExpectedTotal int             `json:"expectedTotal"`
 	IsFetching    bool            `json:"isFetching"`
 	State         types.LoadState `json:"state"`
-	CurrentDress  *DalleDress     `json:"currentDress"`
 }
 
 func (p *DalleDressPage) GetFacet() types.DataFacet {

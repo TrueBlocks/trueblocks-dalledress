@@ -28,9 +28,7 @@ export function Generator({
 }) {
   const { activeAddress, setActiveAddress } = useActiveProject();
   const [selectedSeries, setSelectedSeries] = useState<string | null>('empty');
-  const [current, setCurrent] = useState<dalle.DalleDress | null>(
-    pageData?.currentDress || null,
-  );
+  const [current, setCurrent] = useState<dalle.DalleDress | null>(null);
   const { speaking, audioUrl, audioRef, speak } = useSpeakPrompt({
     activeAddress: activeAddress || null,
     selectedSeries,
@@ -39,10 +37,6 @@ export function Generator({
   const thumbRowRef = useRef<HTMLDivElement | null>(null);
   const icons = useIconSets();
   const SpeakIcon = icons.Speak;
-
-  useEffect(() => {
-    setCurrent(pageData?.currentDress || null);
-  }, [pageData?.currentDress]);
 
   const {
     orig,

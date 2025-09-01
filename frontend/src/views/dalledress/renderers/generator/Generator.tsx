@@ -19,7 +19,7 @@ import { Log } from '@utils';
 
 import { DalleDressCard } from '../../components';
 import { useSpeakPrompt } from '../../hooks/useSpeakPrompt';
-import { useGalleryStore } from '../../store';
+import { getItemKey, useGalleryStore } from '../../store';
 
 export function Generator({
   pageData,
@@ -28,7 +28,6 @@ export function Generator({
 }) {
   const { activeAddress, setActiveAddress } = useActiveProject();
   const [selectedSeries, setSelectedSeries] = useState<string | null>('empty');
-  const [selected, setSelected] = useState<string | null>(null);
   const [current, setCurrent] = useState<dalle.DalleDress | null>(
     pageData?.currentDress || null,
   );
@@ -48,7 +47,8 @@ export function Generator({
   const {
     orig,
     series,
-    getSelection,
+    getSelectionKey,
+    setSelection,
     clearSelection,
     ingestItems,
     galleryItems,
@@ -92,14 +92,13 @@ export function Generator({
         (g) => g.original === activeAddress && g.series,
       );
       if (first?.series) setSelectedSeries(first.series);
-      if (!selected && first) setSelected(first.annotatedPath);
+      if (!selectedSeries && first) setSelectedSeries(first.series);
     }
-  }, [selectedSeries, selected, galleryItems, activeAddress]);
+  }, [selectedSeries, galleryItems, activeAddress]);
 
   const handleAddressChange = useCallback(
     (value: string | null) => {
       if (!value) return;
-      Log('generator:address:' + value);
       setActiveAddress(value);
     },
     [setActiveAddress],
@@ -107,23 +106,23 @@ export function Generator({
 
   const handleSeriesChange = useCallback((value: string | null) => {
     setSelectedSeries(value);
-    if (value) Log('generator:series:' + value);
   }, []);
 
   const handleGenerate = useCallback(() => {
     if (!activeAddress || !selectedSeries) return;
-    Log('generator:generate');
   }, [activeAddress, selectedSeries]);
 
-  const handleThumbSelect = useCallback((item: dalle.DalleDress) => {
-    setSelected(item.annotatedPath);
-    if (item.series) setSelectedSeries(item.series);
-    Log('generator:thumb:select:' + item.annotatedPath);
-  }, []);
+  const handleThumbSelect = useCallback(
+    (item: dalle.DalleDress) => {
+      const key = getItemKey(item);
+      setSelection(key);
+      if (item.series) setSelectedSeries(item.series);
+    },
+    [setSelection],
+  );
 
   const handleThumbDouble = useCallback(
     (item: dalle.DalleDress) => {
-      Log('generator:thumb:dbl:' + item.annotatedPath);
       handleThumbSelect(item);
     },
     [handleThumbSelect],
@@ -136,8 +135,8 @@ export function Generator({
         g.series === selectedSeries &&
         (!activeAddress || g.original === activeAddress),
     );
-    if (match) setSelected(match.annotatedPath);
-  }, [selectedSeries, activeAddress, galleryItems]);
+    if (match) setSelection(getItemKey(match));
+  }, [selectedSeries, activeAddress, galleryItems, setSelection]);
 
   useEffect(() => {
     if (!activeAddress || !selectedSeries) return;
@@ -157,57 +156,54 @@ export function Generator({
     if (orig && orig !== activeAddress) {
       setActiveAddress(orig);
       changed = true;
-      Log('generator:pref:address:' + orig);
     }
     if (series && series !== selectedSeries) {
       setSelectedSeries(series);
       changed = true;
-      Log('generator:pref:series:' + series);
     }
-    setSelected(getSelection());
     if (changed) clearSelection();
   }, [
     orig,
     series,
     activeAddress,
     selectedSeries,
-    getSelection,
     setActiveAddress,
     setSelectedSeries,
     clearSelection,
   ]);
 
   useEffect(() => {
-    if (!selected || !thumbRowRef.current) return;
-    const el = thumbRowRef.current.querySelector(
-      `[data-relpath="${selected}"]`,
-    );
+    const selectedKey = getSelectionKey();
+    if (!selectedKey || !thumbRowRef.current) return;
+    const el = thumbRowRef.current.querySelector(`[data-key="${selectedKey}"]`);
     if (el && 'scrollIntoView' in el)
       (el as HTMLElement).scrollIntoView({
         inline: 'nearest',
         block: 'nearest',
       });
-  }, [selected]);
+  }, [getSelectionKey]);
 
   const thumbItems = useMemo(() => {
-    const effectiveOrig = orig || null;
+    const effectiveOrig = orig || activeAddress || null;
     if (!effectiveOrig) return galleryItems;
     return galleryItems.filter((g) => g.original === effectiveOrig);
-  }, [galleryItems, orig]);
+  }, [galleryItems, orig, activeAddress]);
 
   useEffect(() => {
-    if (!selected) return;
-    if (!thumbItems.find((g) => g.annotatedPath === selected)) {
+    const selectedKey = getSelectionKey();
+    if (!selectedKey) return;
+    if (!thumbItems.find((g) => getItemKey(g) === selectedKey)) {
       const first = thumbItems[0];
-      if (first) setSelected(first.annotatedPath);
+      if (first) setSelection(getItemKey(first));
     }
-  }, [thumbItems, selected]);
+  }, [thumbItems, getSelectionKey, setSelection]);
 
   const handleThumbKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!thumbItems.length) return;
-      const idx = selected
-        ? thumbItems.findIndex((g) => g.annotatedPath === selected)
+      const selectedKey = getSelectionKey();
+      const idx = selectedKey
+        ? thumbItems.findIndex((g) => getItemKey(g) === selectedKey)
         : -1;
       let nextIdx = idx;
       if (e.key === 'ArrowRight') {
@@ -227,18 +223,19 @@ export function Generator({
       }
       const next = thumbItems[nextIdx];
       if (next) {
-        setSelected(next.annotatedPath);
+        setSelection(getItemKey(next));
         if (next.series) setSelectedSeries(next.series);
       }
     },
-    [thumbItems, selected, setSelectedSeries],
+    [thumbItems, getSelectionKey, setSelection, setSelectedSeries],
   );
 
   const attributes = useMemo(() => current?.attributes || [], [current]);
   const selectedGalleryItem = useMemo(() => {
-    if (!selected) return null;
-    return galleryItems.find((g) => g.annotatedPath === selected) || null;
-  }, [selected, galleryItems]);
+    const selectedKey = getSelectionKey();
+    if (!selectedKey) return null;
+    return galleryItems.find((g) => getItemKey(g) === selectedKey) || null;
+  }, [getSelectionKey, galleryItems]);
 
   const displayImageUrl = useMemo(() => {
     if (current?.imageUrl) return current.imageUrl;
@@ -460,20 +457,23 @@ export function Generator({
                 tabIndex={0}
                 onKeyDown={handleThumbKey}
               >
-                {thumbItems.map((g) => (
-                  <div
-                    key={g.annotatedPath}
-                    data-relpath={g.annotatedPath}
-                    style={{ width: 72, flex: '0 0 auto' }}
-                  >
-                    <DalleDressCard
-                      item={g}
-                      onClick={handleThumbSelect}
-                      onDoubleClick={handleThumbDouble}
-                      selected={g.annotatedPath === selected}
-                    />
-                  </div>
-                ))}
+                {thumbItems.map((g) => {
+                  const itemKey = getItemKey(g);
+                  return (
+                    <div
+                      key={itemKey}
+                      data-key={itemKey}
+                      style={{ width: 72, flex: '0 0 auto' }}
+                    >
+                      <DalleDressCard
+                        item={g}
+                        onClick={handleThumbSelect}
+                        onDoubleClick={handleThumbDouble}
+                        selected={itemKey === getSelectionKey()}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

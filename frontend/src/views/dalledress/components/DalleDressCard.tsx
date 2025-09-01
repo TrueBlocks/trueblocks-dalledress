@@ -1,7 +1,8 @@
 import { Box, Card, Image, Stack, Text } from '@mantine/core';
 import { dalle } from '@models';
 import { getDisplayAddress } from '@utils';
-import { Log } from '@utils';
+
+import { getItemKey } from '../store';
 
 export interface DalleDressCardProps {
   item: dalle.DalleDress;
@@ -16,15 +17,11 @@ export const DalleDressCard = ({
   onDoubleClick,
   selected,
 }: DalleDressCardProps) => {
-  if (selected) {
-    Log('DalleDressCard:selected=' + String(item.annotatedPath));
-  }
+  const itemKey = getItemKey(item);
   const handleClick = () => {
-    Log('DalleDressCard:click=' + String(item.annotatedPath));
     onClick?.(item);
   };
   const handleDoubleClick = () => {
-    Log('DalleDressCard:dblclick=' + String(item.annotatedPath));
     onDoubleClick?.(item);
   };
   return (
@@ -45,7 +42,7 @@ export const DalleDressCard = ({
           : undefined,
         transition: 'box-shadow 120ms, border-color 120ms, background 160ms',
       }}
-      data-relpath={item.annotatedPath}
+      data-key={itemKey}
     >
       <Stack gap={4} align="stretch">
         <Box

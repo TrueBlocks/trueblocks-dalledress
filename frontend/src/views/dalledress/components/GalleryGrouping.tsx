@@ -2,6 +2,7 @@ import { Box, SimpleGrid, Title } from '@mantine/core';
 import { dalle } from '@models';
 import { Log } from '@utils';
 
+import { getItemKey } from '../store';
 import { DalleDressCard } from './DalleDressCard';
 
 export interface GalleryGroupingProps {
@@ -25,7 +26,7 @@ export const GalleryGrouping = ({
     'GalleryGrouping:selected=' +
       String(selected) +
       ' items=' +
-      items.map((i) => i.annotatedPath).join(','),
+      items.map((i) => getItemKey(i)).join(','),
   );
   return (
     <Box mb="lg">
@@ -33,15 +34,18 @@ export const GalleryGrouping = ({
         {series || 'unknown'} ({items.length})
       </Title>
       <SimpleGrid cols={columns} spacing={6} verticalSpacing={6}>
-        {items.map((it) => (
-          <DalleDressCard
-            key={it.annotatedPath}
-            item={it}
-            onClick={onItemClick}
-            onDoubleClick={onItemDoubleClick}
-            selected={it.annotatedPath === selected}
-          />
-        ))}
+        {items.map((it) => {
+          const itemKey = getItemKey(it);
+          return (
+            <DalleDressCard
+              key={itemKey}
+              item={it}
+              onClick={onItemClick}
+              onDoubleClick={onItemDoubleClick}
+              selected={itemKey === selected}
+            />
+          );
+        })}
       </SimpleGrid>
     </Box>
   );

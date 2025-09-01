@@ -5,7 +5,7 @@ import { Center, Container, Title } from '@mantine/core';
 import { dalle, dalledress, project, types } from '@models';
 
 import { GalleryControls, GalleryGrouping } from '../../components';
-import { useGalleryStore } from '../../store';
+import { getItemKey, useGalleryStore } from '../../store';
 
 export type GalleryProps = {
   pageData: dalledress.DalleDressPage | null;
@@ -25,8 +25,13 @@ export function Gallery({
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const keyScopeRef = useRef<HTMLDivElement | null>(null);
 
-  const { getSelection, setSelection, ingestItems, galleryItems, useDerived } =
-    useGalleryStore();
+  const {
+    getSelectionKey,
+    setSelection,
+    ingestItems,
+    galleryItems,
+    useDerived,
+  } = useGalleryStore();
   const { groupNames, groupedItems, flattenedItems } = useDerived(
     controls.sortMode,
   );
@@ -38,26 +43,26 @@ export function Gallery({
   // --------------------------------------
   const scrollSelectedIntoView = useCallback((selected: string | null) => {
     if (!selected || !scrollRef.current) return;
-    const el = scrollRef.current.querySelector(`[data-relpath="${selected}"]`);
+    const el = scrollRef.current.querySelector(`[data-key="${selected}"]`);
     if (el && 'scrollIntoView' in el)
       (el as HTMLElement).scrollIntoView({ block: 'nearest' });
   }, []);
 
   useEffect(() => {
-    scrollSelectedIntoView(getSelection());
-  }, [getSelection, scrollSelectedIntoView]);
+    scrollSelectedIntoView(getSelectionKey());
+  }, [getSelectionKey, scrollSelectedIntoView]);
 
   // --------------------------------------
   const handleItemClick = useCallback(
     (item: dalle.DalleDress) => {
-      setSelection(item.original, item.series);
+      setSelection(getItemKey(item));
     },
     [setSelection],
   );
 
   const handleItemDoubleClick = useCallback(
     (item: dalle.DalleDress) => {
-      setSelection(item.original, item.series);
+      setSelection(getItemKey(item));
       if (setActiveFacet)
         setActiveFacet(types.DataFacet.GENERATOR as DataFacet);
     },
@@ -67,29 +72,30 @@ export function Gallery({
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!flattenedItems.length) return;
+      const selectedKey = getSelectionKey();
       const idx = flattenedItems.findIndex(
-        (f) => f.annotatedPath === getSelection(),
+        (f) => getItemKey(f) === selectedKey,
       );
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         const next =
           flattenedItems[
             (idx + 1 + flattenedItems.length) % flattenedItems.length
           ] || null;
-        if (next) setSelection(next.original, next.series);
+        if (next) setSelection(getItemKey(next));
         e.preventDefault();
       } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
         const next =
           flattenedItems[
             (idx - 1 + flattenedItems.length) % flattenedItems.length
           ] || null;
-        if (next) setSelection(next.original, next.series);
+        if (next) setSelection(getItemKey(next));
         e.preventDefault();
       } else if (e.key === 'Enter') {
         if (idx >= 0 && flattenedItems[idx])
           handleItemDoubleClick(flattenedItems[idx]);
       }
     },
-    [flattenedItems, getSelection, handleItemDoubleClick, setSelection],
+    [flattenedItems, getSelectionKey, handleItemDoubleClick, setSelection],
   );
 
   // --------------------------------------
@@ -140,7 +146,7 @@ export function Gallery({
             columns={controls.columns}
             onItemClick={handleItemClick}
             onItemDoubleClick={handleItemDoubleClick}
-            selected={getSelection()}
+            selected={getSelectionKey()}
           />
         ))}
       </div>

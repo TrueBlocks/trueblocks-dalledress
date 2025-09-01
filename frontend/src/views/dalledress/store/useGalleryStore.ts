@@ -2,7 +2,13 @@ import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 import { dalle } from '@models';
 
+export const getItemKey = (item: dalle.DalleDress | null): string => {
+  if (!item) return '';
+  return `${item.original}:${item.series || ''}`;
+};
+
 interface GalleryState {
+  selectedKey: string | null;
   orig: string | null;
   series: string | null;
   galleryItems: dalle.DalleDress[];
@@ -11,6 +17,7 @@ interface GalleryState {
 }
 
 const initial: GalleryState = {
+  selectedKey: null,
   orig: null,
   series: null,
   galleryItems: [],
@@ -33,8 +40,19 @@ class GalleryStore {
 
   getSnapshot = (): GalleryState => this.state;
 
-  setAll(orig: string | null, series: string | null) {
-    this.setState({ orig, series });
+  setSelection(key: string | null) {
+    if (!key) {
+      this.setState({ selectedKey: null, orig: null, series: null });
+      return;
+    }
+    const found = this.state.galleryItems.find((i) => getItemKey(i) === key);
+    if (found) {
+      this.setState({
+        selectedKey: key,
+        orig: found.original,
+        series: found.series,
+      });
+    }
   }
 
   clear() {
@@ -61,12 +79,9 @@ const store = new GalleryStore();
 
 export const useGalleryStore = () => {
   const sel = useSyncExternalStore(store.subscribe, store.getSnapshot);
-  const getSelection = useCallback(() => {
-    if (!sel.series || !sel.orig) return null;
-    return `./${sel.series}/annotated/${sel.orig}.png`;
-  }, [sel.series, sel.orig]);
+  const getSelectionKey = useCallback(() => sel.selectedKey, [sel.selectedKey]);
   const setSelection = useCallback(
-    (orig: string | null, series: string | null) => store.setAll(orig, series),
+    (key: string | null) => store.setSelection(key),
     [],
   );
   const clearSelection = useCallback(() => store.clear(), []);
@@ -98,7 +113,7 @@ export const useGalleryStore = () => {
     orig: sel.orig,
     series: sel.series,
     galleryItems: sel.galleryItems,
-    getSelection,
+    getSelectionKey,
     setSelection,
     clearSelection,
     ingestItems,

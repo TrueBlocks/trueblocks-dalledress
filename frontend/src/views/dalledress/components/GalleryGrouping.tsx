@@ -1,6 +1,5 @@
 import { Box, SimpleGrid, Title } from '@mantine/core';
 import { dalle } from '@models';
-import { Log } from '@utils';
 
 import { getItemKey } from '../store';
 import { DalleDressCard } from './DalleDressCard';
@@ -22,12 +21,6 @@ export const GalleryGrouping = ({
   onItemDoubleClick,
   selected,
 }: GalleryGroupingProps) => {
-  Log(
-    'GalleryGrouping:selected=' +
-      String(selected) +
-      ' items=' +
-      items.map((i) => getItemKey(i)).join(','),
-  );
   return (
     <Box mb="lg">
       <Title order={5} mb={6} style={{ fontFamily: 'monospace' }}>

@@ -90,19 +90,16 @@ export const useGalleryStore = () => {
     [],
   );
   const useDerived = (sortMode: 'series' | 'address') => {
+    const { groupedBySeries, groupedByAddress } = sel;
     const groupNames = useMemo(() => {
       if (sortMode === 'series')
-        return Object.keys(sel.groupedBySeries).sort((a, b) =>
-          a.localeCompare(b),
-        );
-      return Object.keys(sel.groupedByAddress).sort((a, b) =>
-        a.localeCompare(b),
-      );
-    }, [sortMode]);
+        return Object.keys(groupedBySeries).sort((a, b) => a.localeCompare(b));
+      return Object.keys(groupedByAddress).sort((a, b) => a.localeCompare(b));
+    }, [sortMode, groupedBySeries, groupedByAddress]);
     const groupedItems = useMemo(() => {
-      if (sortMode === 'series') return sel.groupedBySeries;
-      return sel.groupedByAddress;
-    }, [sortMode]);
+      if (sortMode === 'series') return groupedBySeries;
+      return groupedByAddress;
+    }, [sortMode, groupedBySeries, groupedByAddress]);
     const flattenedItems = useMemo(
       () => groupNames.flatMap((s) => groupedItems[s] || []),
       [groupNames, groupedItems],

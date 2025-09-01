@@ -40,17 +40,29 @@ export function Gallery({
     ingestItems(pageData?.dalledress || []);
   }, [pageData?.dalledress, ingestItems]);
 
+  useEffect(() => {
+    if (!getSelectionKey() && flattenedItems.length > 0) {
+      const firstItem = flattenedItems[0];
+      if (firstItem) {
+        setSelection(getItemKey(firstItem));
+      }
+    }
+  }, [flattenedItems, getSelectionKey, setSelection]);
+
   // --------------------------------------
   const scrollSelectedIntoView = useCallback((selected: string | null) => {
-    if (!selected || !scrollRef.current) return;
+    if (!selected || !scrollRef.current) {
+      return;
+    }
     const el = scrollRef.current.querySelector(`[data-key="${selected}"]`);
-    if (el && 'scrollIntoView' in el)
+    if (el && 'scrollIntoView' in el) {
       (el as HTMLElement).scrollIntoView({ block: 'nearest' });
+    }
   }, []);
 
   useEffect(() => {
     scrollSelectedIntoView(getSelectionKey());
-  }, [getSelectionKey, scrollSelectedIntoView]);
+  }, [getSelectionKey, scrollSelectedIntoView, flattenedItems]);
 
   // --------------------------------------
   const handleItemClick = useCallback(

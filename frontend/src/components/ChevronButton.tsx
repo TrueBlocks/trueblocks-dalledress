@@ -7,7 +7,7 @@ export const ChevronButton = ({
 }: {
   collapsed: boolean;
   onToggle: () => void;
-  direction?: 'left' | 'right' | 'none';
+  direction?: 'left' | 'right' | 'up' | 'down' | 'none';
 }) => {
   if (direction === 'none') {
     return (
@@ -22,9 +22,18 @@ export const ChevronButton = ({
       />
     );
   }
-
-  const icon = direction === 'left' ? 'ChevronLeft' : 'ChevronRight';
-  const iconOff = direction === 'left' ? 'ChevronRight' : 'ChevronLeft';
+  type IconName = 'ChevronLeft' | 'ChevronRight' | 'ChevronUp' | 'ChevronDown';
+  const pairs: Record<
+    'left' | 'right' | 'up' | 'down',
+    { icon: IconName; iconOff: IconName }
+  > = {
+    left: { icon: 'ChevronLeft', iconOff: 'ChevronRight' },
+    right: { icon: 'ChevronRight', iconOff: 'ChevronLeft' },
+    up: { icon: 'ChevronUp', iconOff: 'ChevronDown' },
+    down: { icon: 'ChevronDown', iconOff: 'ChevronUp' },
+  };
+  const d = direction as 'left' | 'right' | 'up' | 'down';
+  const { icon, iconOff } = pairs[d];
   return (
     <Action
       icon={icon}

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { GetFilename, GetOrgPreferences } from '@app';
 import { ChevronButton, Socials, getBarSize } from '@components';
 import { useEvent, usePreferences } from '@hooks';
-import { AppShell, Flex, Group, Text } from '@mantine/core';
+import { AppShell, Flex, Text } from '@mantine/core';
 import { msgs, preferences, project } from '@models';
 
 export const Footer = () => {
@@ -26,23 +26,27 @@ export const Footer = () => {
         h="100%"
         px={chromeCollapsed ? 4 : 'md'}
         align="center"
-        justify="space-between"
         w="100%"
+        gap={chromeCollapsed ? 4 : 'md'}
       >
-        <Group gap={4} align="center">
+        <Flex align="center" gap={4} style={{ flex: 1 }}>
           <ChevronButton
             collapsed={chromeCollapsed}
             onToggle={() => setChromeCollapsed(!chromeCollapsed)}
-            direction={chromeCollapsed ? 'right' : 'left'}
+            direction="down"
           />
-        </Group>
-        {!chromeCollapsed && (
-          <>
-            <FilePanel />
-            <Text size="sm">{org.developerName} © 2025</Text>
-            <Socials />
-          </>
-        )}
+          {!chromeCollapsed && <FilePanel />}
+        </Flex>
+        <Flex align="center" justify="center" style={{ flex: 1 }}>
+          {!chromeCollapsed && (
+            <Text size="sm" ta="center">
+              {org.developerName} © 2025
+            </Text>
+          )}
+        </Flex>
+        <Flex align="center" justify="flex-end" style={{ flex: 1 }}>
+          {!chromeCollapsed && <Socials />}
+        </Flex>
       </Flex>
     </AppShell.Footer>
   );

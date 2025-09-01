@@ -96,6 +96,7 @@ describe('useActiveFacet Hook Tests (Focused Hook implementation)', () => {
       debugCollapsed: true,
       menuCollapsed: false,
       helpCollapsed: false,
+      chromeCollapsed: false,
       detailCollapsed: true,
       isDarkMode: true,
       loading: false,
@@ -104,6 +105,7 @@ describe('useActiveFacet Hook Tests (Focused Hook implementation)', () => {
       setDebugCollapsed: vi.fn(),
       setMenuCollapsed: vi.fn(),
       setHelpCollapsed: vi.fn(),
+      setChromeCollapsed: vi.fn(),
       setDetailCollapsed: vi.fn(),
     });
   });

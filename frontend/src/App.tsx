@@ -98,7 +98,7 @@ export const App = () => {
   });
 
   const { ready, isWizard } = useAppNavigation();
-  const { menuCollapsed, helpCollapsed } = usePreferences();
+  const { menuCollapsed, helpCollapsed, chromeCollapsed } = usePreferences();
 
   useAppHotkeys();
   useAppHealth();
@@ -114,8 +114,8 @@ export const App = () => {
 
   if (!ready || viewConfigsLoading) return <div>Not ready</div>;
 
-  const header = { height: 60 };
-  const footer = { height: 40 };
+  const header = { height: getBarSize('header', chromeCollapsed) };
+  const footer = { height: getBarSize('footer', chromeCollapsed) };
   const navbar = {
     width: getBarSize('menu', menuCollapsed),
     breakpoint: 'sm',
@@ -153,8 +153,8 @@ export const App = () => {
             <div
               style={{
                 position: 'absolute',
-                top: '84px',
-                right: `${getBarSize('help', helpCollapsed) + 0}px`,
+                top: `${getBarSize('header', chromeCollapsed) + 2}px`,
+                right: `${getBarSize('help', helpCollapsed) + 2}px`,
                 zIndex: 1000,
               }}
             >

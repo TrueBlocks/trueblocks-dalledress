@@ -99,6 +99,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       debugCollapsed: true,
       menuCollapsed: false,
       helpCollapsed: false,
+      chromeCollapsed: false,
       detailCollapsed: true,
       isDarkMode: true,
       loading: false,
@@ -107,6 +108,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       setDebugCollapsed: vi.fn(),
       setMenuCollapsed: vi.fn(),
       setHelpCollapsed: vi.fn(),
+      setChromeCollapsed: vi.fn(),
       setDetailCollapsed: vi.fn(),
     });
   });

@@ -95,6 +95,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
       debugCollapsed: true,
       menuCollapsed: false,
       helpCollapsed: false,
+      chromeCollapsed: false,
       detailCollapsed: true,
       isDarkMode: true,
       loading: false,
@@ -103,6 +104,7 @@ describe('Exports View Migration Tests (useActiveFacet integration)', () => {
       setDebugCollapsed: vi.fn(),
       setMenuCollapsed: vi.fn(),
       setHelpCollapsed: vi.fn(),
+      setChromeCollapsed: vi.fn(),
       setDetailCollapsed: vi.fn(),
     });
   });

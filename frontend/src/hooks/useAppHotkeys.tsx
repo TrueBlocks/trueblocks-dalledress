@@ -41,6 +41,8 @@ export const useAppHotkeys = (): void => {
     setMenuCollapsed,
     helpCollapsed,
     setHelpCollapsed,
+    chromeCollapsed,
+    setChromeCollapsed,
     detailCollapsed,
     setDetailCollapsed,
   } = usePreferences();
@@ -121,6 +123,22 @@ export const useAppHotkeys = (): void => {
             label: 'Toggle help panel',
             action: () => {
               setHelpCollapsed(!helpCollapsed);
+            },
+          },
+          e,
+        ),
+      options: { preventDefault: true, enableOnFormTags: true },
+    },
+    {
+      key: 'mod+j',
+      handler: (e: KeyboardEvent) =>
+        handleHotkey(
+          {
+            type: 'toggle',
+            hotkey: 'mod+j',
+            label: 'Toggle header and footer',
+            action: () => {
+              setChromeCollapsed(!chromeCollapsed);
             },
           },
           e,

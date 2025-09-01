@@ -8,8 +8,13 @@ import { AppShell, Group, Text, useMantineColorScheme } from '@mantine/core';
 export const Header = () => {
   const [appName, setAppName] = useState('AppName');
   const { colorScheme, setColorScheme } = useMantineColorScheme();
-  const { toggleTheme, isDarkMode, setDebugCollapsed, debugCollapsed } =
-    usePreferences();
+  const {
+    toggleTheme,
+    isDarkMode,
+    setDebugCollapsed,
+    debugCollapsed,
+    chromeCollapsed,
+  } = usePreferences();
 
   useEffect(() => {
     GetAppId().then((id) => {
@@ -24,6 +29,8 @@ export const Header = () => {
   const handleToggleTheme = async () => {
     await toggleTheme();
   };
+
+  if (chromeCollapsed) return <></>;
 
   return (
     <AppShell.Header>

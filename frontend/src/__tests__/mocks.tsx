@@ -127,6 +127,7 @@ const createInitialFocusedHooksDefaultValue = () => ({
     debugCollapsed: true,
     helpCollapsed: false,
     menuCollapsed: false,
+    chromeCollapsed: false,
     detailCollapsed: true,
     toggleTheme: vi.fn(),
     changeLanguage: vi.fn(),
@@ -134,6 +135,7 @@ const createInitialFocusedHooksDefaultValue = () => ({
     setDetailCollapsed: vi.fn(),
     setHelpCollapsed: vi.fn(),
     setMenuCollapsed: vi.fn(),
+    setChromeCollapsed: vi.fn(),
   },
 });
 

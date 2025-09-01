@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 
 import { GetFilename, GetOrgPreferences } from '@app';
-import { Socials, getBarSize } from '@components';
+import { ChevronButton, Socials, getBarSize } from '@components';
 import { useEvent, usePreferences } from '@hooks';
-import { AppShell, Flex, Text } from '@mantine/core';
+import { AppShell, Flex, Group, Text } from '@mantine/core';
 import { msgs, preferences, project } from '@models';
 
 export const Footer = () => {
   var [org, setOrg] = useState<preferences.OrgPreferences>({});
-  const { menuCollapsed } = usePreferences();
+  const { menuCollapsed, chromeCollapsed, setChromeCollapsed } =
+    usePreferences();
 
   useEffect(() => {
     const fetchOrgName = async () => {
@@ -20,11 +21,28 @@ export const Footer = () => {
   }, []);
 
   return (
-    <AppShell.Footer ml={getBarSize('menu', menuCollapsed) - 1}>
-      <Flex h="100%" px="md" align="center" justify="space-between">
-        <FilePanel />
-        <Text size="sm">{org.developerName} © 2025</Text>
-        <Socials />
+    <AppShell.Footer ml={getBarSize('menu', menuCollapsed) - 1} p={0}>
+      <Flex
+        h="100%"
+        px={chromeCollapsed ? 4 : 'md'}
+        align="center"
+        justify="space-between"
+        w="100%"
+      >
+        <Group gap={4} align="center">
+          <ChevronButton
+            collapsed={chromeCollapsed}
+            onToggle={() => setChromeCollapsed(!chromeCollapsed)}
+            direction={chromeCollapsed ? 'right' : 'left'}
+          />
+        </Group>
+        {!chromeCollapsed && (
+          <>
+            <FilePanel />
+            <Text size="sm">{org.developerName} © 2025</Text>
+            <Socials />
+          </>
+        )}
       </Flex>
     </AppShell.Footer>
   );

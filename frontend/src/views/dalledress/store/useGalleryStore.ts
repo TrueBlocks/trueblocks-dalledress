@@ -80,6 +80,11 @@ const store = new GalleryStore();
 export const useGalleryStore = () => {
   const sel = useSyncExternalStore(store.subscribe, store.getSnapshot);
   const getSelectionKey = useCallback(() => sel.selectedKey, [sel.selectedKey]);
+  const getSelectedItem = useCallback(() => {
+    const k = sel.selectedKey;
+    if (!k) return null;
+    return sel.galleryItems.find((i) => getItemKey(i) === k) || null;
+  }, [sel.selectedKey, sel.galleryItems]);
   const setSelection = useCallback(
     (key: string | null) => store.setSelection(key),
     [],
@@ -111,6 +116,7 @@ export const useGalleryStore = () => {
     series: sel.series,
     galleryItems: sel.galleryItems,
     getSelectionKey,
+    getSelectedItem,
     setSelection,
     clearSelection,
     ingestItems,

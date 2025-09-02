@@ -5,6 +5,7 @@ import { Center, Container, Title } from '@mantine/core';
 import { dalle, dalledress, project, types } from '@models';
 
 import { GalleryControls, GalleryGrouping } from '../../components';
+import { useScrollSelectedIntoView } from '../../hooks/useScrollSelectedIntoView';
 import { getItemKey, useGalleryStore } from '../../store';
 
 export type GalleryProps = {
@@ -54,20 +55,11 @@ export function Gallery({
   }, [flattenedItems, getSelectionKey, setSelection]);
 
   // --------------------------------------
-  const scrollSelectedIntoView = useCallback((selected: string | null) => {
-    if (!selected || !scrollRef.current) {
-      return;
-    }
-    const el = scrollRef.current.querySelector(`[data-key="${selected}"]`);
-    if (el && 'scrollIntoView' in el) {
-      (el as HTMLElement).scrollIntoView({ block: 'nearest' });
-    }
-  }, []);
-
+  const selectedKey = getSelectionKey();
+  useScrollSelectedIntoView(scrollRef, selectedKey, { block: 'nearest' });
   useEffect(() => {
-    scrollSelectedIntoView(getSelectionKey());
     keyScopeRef.current?.focus({ preventScroll: true });
-  }, [getSelectionKey, scrollSelectedIntoView, flattenedItems]);
+  }, [selectedKey, flattenedItems]);
 
   // --------------------------------------
   const handleItemClick = useCallback(
@@ -277,7 +269,7 @@ export function Gallery({
             columns={controls.columns}
             onItemClick={handleItemClick}
             onItemDoubleClick={handleItemDoubleClick}
-            selected={getSelectionKey()}
+            selected={selectedKey}
           />
         ))}
       </div>

@@ -59,17 +59,6 @@ func (a *App) GetDalleDressConfig(payload types.Payload) (*types.ViewConfig, err
 }
 
 // EXISTING_CODE
-func (a *App) GetDalleDressCurrent(payload *types.Payload, series string) (*dalle.DalleDress, error) {
-	if payload == nil || payload.Address == "" { // fast track if no address
-		return &dalle.DalleDress{}, nil
-	}
-	if series == "" { // default series
-		series = "empty"
-	}
-	cd := dalledress.GetCurrentDressFor(series, payload.Address)
-	return cd, nil
-}
-
 func (a *App) Speak(payload *types.Payload, series string) (string, error) {
 	if payload == nil || payload.Address == "" {
 		return "", nil

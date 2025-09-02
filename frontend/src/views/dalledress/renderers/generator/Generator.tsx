@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { GetDalleDressCurrent } from '@app';
-import { useActiveProject, useIconSets } from '@hooks';
+import { useIconSets } from '@hooks';
 import {
   Button,
   Center,
@@ -14,10 +13,11 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { dalle, dalledress, types } from '@models';
+import { dalle, dalledress } from '@models';
 import { Log } from '@utils';
 
 import { DalleDressCard } from '../../components';
+import { useScrollSelectedIntoView } from '../../hooks/useScrollSelectedIntoView';
 import { useSpeakPrompt } from '../../hooks/useSpeakPrompt';
 import { getItemKey, useGalleryStore } from '../../store';
 
@@ -26,14 +26,6 @@ export function Generator({
 }: {
   pageData: dalledress.DalleDressPage | null;
 }) {
-  const { activeAddress, setActiveAddress } = useActiveProject();
-  const [selectedSeries, setSelectedSeries] = useState<string | null>('empty');
-  const [current, setCurrent] = useState<dalle.DalleDress | null>(null);
-  const { speaking, audioUrl, audioRef, speak } = useSpeakPrompt({
-    activeAddress: activeAddress || null,
-    selectedSeries,
-    hasEnhancedPrompt: !!current?.enhancedPrompt,
-  });
   const thumbRowRef = useRef<HTMLDivElement | null>(null);
   const icons = useIconSets();
   const SpeakIcon = icons.Speak;
@@ -42,6 +34,7 @@ export function Generator({
     orig,
     series,
     getSelectionKey,
+    getSelectedItem,
     setSelection,
     clearSelection,
     ingestItems,
@@ -54,63 +47,62 @@ export function Generator({
 
   const seriesOptions = useMemo(() => {
     const set = new Set<string>();
-    set.add('empty');
     galleryItems.forEach((g) => {
       if (g.series) set.add(g.series);
     });
-    const arr = Array.from(set).sort((a, b) => a.localeCompare(b));
-    if (arr[0] !== 'empty') {
-      const rest = arr.filter((s) => s !== 'empty');
-      return ['empty', ...rest];
-    }
-    return arr;
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [galleryItems]);
 
   const addressOptions = useMemo(() => {
     const set = new Set<string>();
-    if (activeAddress) set.add(activeAddress);
     galleryItems.forEach((g) => set.add(g.original));
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [galleryItems, activeAddress]);
+  }, [galleryItems]);
 
   useEffect(() => {
-    if (!activeAddress && addressOptions.length) {
-      const first = addressOptions[0];
-      if (first) setActiveAddress(first);
+    if (!getSelectionKey() && galleryItems.length) {
+      const first = galleryItems[0];
+      if (first) setSelection(getItemKey(first));
     }
-  }, [activeAddress, addressOptions, setActiveAddress]);
-
-  useEffect(() => {
-    if (!selectedSeries) {
-      const first = galleryItems.find(
-        (g) => g.original === activeAddress && g.series,
-      );
-      if (first?.series) setSelectedSeries(first.series);
-      if (!selectedSeries && first) setSelectedSeries(first.series);
-    }
-  }, [selectedSeries, galleryItems, activeAddress]);
+  }, [getSelectionKey, galleryItems, setSelection]);
 
   const handleAddressChange = useCallback(
     (value: string | null) => {
       if (!value) return;
-      setActiveAddress(value);
+      const match = galleryItems.find((g) => g.original === value);
+      if (match) setSelection(getItemKey(match));
     },
-    [setActiveAddress],
+    [galleryItems, setSelection],
   );
 
-  const handleSeriesChange = useCallback((value: string | null) => {
-    setSelectedSeries(value);
-  }, []);
+  const handleSeriesChange = useCallback(
+    (value: string | null) => {
+      if (!value) return;
+      const match =
+        galleryItems.find(
+          (g) => g.series === value && (!orig || g.original === orig),
+        ) || galleryItems.find((g) => g.series === value);
+      if (match) setSelection(getItemKey(match));
+    },
+    [galleryItems, orig, setSelection],
+  );
+
+  const selectedItem = getSelectedItem();
+
+  const { speaking, audioUrl, audioRef, speak } = useSpeakPrompt({
+    activeAddress: selectedItem?.original || null,
+    selectedSeries: selectedItem?.series || null,
+    hasEnhancedPrompt: !!selectedItem?.enhancedPrompt,
+  });
 
   const handleGenerate = useCallback(() => {
-    if (!activeAddress || !selectedSeries) return;
-  }, [activeAddress, selectedSeries]);
+    if (!selectedItem?.original || !selectedItem.series) return;
+  }, [selectedItem?.original, selectedItem?.series]);
 
   const handleThumbSelect = useCallback(
     (item: dalle.DalleDress) => {
       const key = getItemKey(item);
       setSelection(key);
-      if (item.series) setSelectedSeries(item.series);
     },
     [setSelection],
   );
@@ -123,65 +115,39 @@ export function Generator({
   );
 
   useEffect(() => {
-    if (!selectedSeries) return;
-    const match = galleryItems.find(
-      (g) =>
-        g.series === selectedSeries &&
-        (!activeAddress || g.original === activeAddress),
-    );
-    if (match) setSelection(getItemKey(match));
-  }, [selectedSeries, activeAddress, galleryItems, setSelection]);
-
-  useEffect(() => {
-    if (!activeAddress || !selectedSeries) return;
-    GetDalleDressCurrent(
-      {
-        collection: 'dalledress',
-        dataFacet: types.DataFacet.GENERATOR,
-        address: activeAddress,
-      },
-      selectedSeries,
-    ).then((dd) => setCurrent(dd as unknown as dalle.DalleDress));
-  }, [activeAddress, selectedSeries]);
-
-  useEffect(() => {
     if (!orig && !series) return;
     let changed = false;
-    if (orig && orig !== activeAddress) {
-      setActiveAddress(orig);
-      changed = true;
-    }
-    if (series && series !== selectedSeries) {
-      setSelectedSeries(series);
-      changed = true;
+    if (series) {
+      if (!selectedItem || selectedItem.series !== series) {
+        const match =
+          galleryItems.find(
+            (g) => g.series === series && (!orig || g.original === orig),
+          ) || galleryItems.find((g) => g.series === series);
+        if (match) {
+          setSelection(getItemKey(match));
+          changed = true;
+        }
+      }
     }
     if (changed) clearSelection();
-  }, [
-    orig,
-    series,
-    activeAddress,
-    selectedSeries,
-    setActiveAddress,
-    setSelectedSeries,
-    clearSelection,
-  ]);
+  }, [orig, series, selectedItem, galleryItems, setSelection, clearSelection]);
 
-  useEffect(() => {
-    const selectedKey = getSelectionKey();
-    if (!selectedKey || !thumbRowRef.current) return;
-    const el = thumbRowRef.current.querySelector(`[data-key="${selectedKey}"]`);
-    if (el && 'scrollIntoView' in el)
-      (el as HTMLElement).scrollIntoView({
-        inline: 'nearest',
-        block: 'nearest',
-      });
-  }, [getSelectionKey]);
+  const selectedKey = getSelectionKey();
+  useScrollSelectedIntoView(thumbRowRef, selectedKey, {
+    block: 'nearest',
+    inline: 'nearest',
+  });
 
   const thumbItems = useMemo(() => {
-    const effectiveOrig = orig || activeAddress || null;
-    if (!effectiveOrig) return galleryItems;
-    return galleryItems.filter((g) => g.original === effectiveOrig);
-  }, [galleryItems, orig, activeAddress]);
+    if (!orig) return galleryItems;
+    return galleryItems.filter((g) => g.original === orig);
+  }, [galleryItems, orig]);
+
+  useEffect(() => {
+    if (thumbRowRef.current) {
+      thumbRowRef.current.focus({ preventScroll: true });
+    }
+  }, [selectedKey, thumbItems]);
 
   useEffect(() => {
     const selectedKey = getSelectionKey();
@@ -218,28 +184,24 @@ export function Generator({
       const next = thumbItems[nextIdx];
       if (next) {
         setSelection(getItemKey(next));
-        if (next.series) setSelectedSeries(next.series);
       }
     },
-    [thumbItems, getSelectionKey, setSelection, setSelectedSeries],
+    [thumbItems, getSelectionKey, setSelection],
   );
 
-  const attributes = useMemo(() => current?.attributes || [], [current]);
-  const selectedGalleryItem = useMemo(() => {
-    const selectedKey = getSelectionKey();
-    if (!selectedKey) return null;
-    return galleryItems.find((g) => getItemKey(g) === selectedKey) || null;
-  }, [getSelectionKey, galleryItems]);
-
+  // selectedItem already defined above; maintain comment for context (Task 2).
+  const attributes = useMemo(
+    () => selectedItem?.attributes || [],
+    [selectedItem],
+  );
   const displayImageUrl = useMemo(() => {
-    if (current?.imageUrl) return current.imageUrl;
-    if (selectedGalleryItem?.imageUrl) return selectedGalleryItem.imageUrl;
-    const first = galleryItems.find((g) => g.original === activeAddress);
+    if (selectedItem?.imageUrl) return selectedItem.imageUrl;
+    const first = galleryItems.find((g) => g.original === orig);
     if (first?.imageUrl) return first.imageUrl;
     if (galleryItems.length && galleryItems[0])
       return galleryItems[0].imageUrl || '';
     return '';
-  }, [current?.imageUrl, selectedGalleryItem, galleryItems, activeAddress]);
+  }, [selectedItem, galleryItems, orig]);
 
   return (
     <Container size="xl" py="md">
@@ -249,7 +211,7 @@ export function Generator({
             label="Address"
             placeholder="Select address"
             searchable
-            value={activeAddress || null}
+            value={orig || ''}
             data={addressOptions.map((a) => ({ value: a, label: a }))}
             onChange={handleAddressChange}
             w={380}
@@ -258,10 +220,10 @@ export function Generator({
           <Select
             label="Series"
             placeholder="Series"
-            value={selectedSeries}
+            value={series || ''}
             data={seriesOptions.map((s) => ({
               value: s,
-              label: s === 'empty' ? '<empty>' : s,
+              label: s,
             }))}
             onChange={handleSeriesChange}
             w={220}
@@ -272,7 +234,7 @@ export function Generator({
             size="xs"
             variant="default"
             onClick={handleGenerate}
-            disabled={!activeAddress || !selectedSeries}
+            disabled={!selectedItem?.original || !selectedItem?.series}
             style={{ alignSelf: 'flex-end' }}
           >
             Generate
@@ -380,11 +342,11 @@ export function Generator({
                     whiteSpace: 'pre-wrap',
                   }}
                 >
-                  {current?.prompt || ''}
+                  {selectedItem?.prompt || ''}
                 </Text>
               </ScrollArea>
             </div>
-            {!!current?.enhancedPrompt && (
+            {!!selectedItem?.enhancedPrompt && (
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <Title order={6} style={{ flexGrow: 1 }}>
@@ -432,7 +394,7 @@ export function Generator({
                       whiteSpace: 'pre-wrap',
                     }}
                   >
-                    {current?.enhancedPrompt || ''}
+                    {selectedItem?.enhancedPrompt || ''}
                   </Text>
                 </ScrollArea>
               </div>

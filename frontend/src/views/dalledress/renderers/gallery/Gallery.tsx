@@ -14,11 +14,11 @@ export type GalleryProps = {
   setActiveFacet?: (f: DataFacet) => void;
 };
 
-export function Gallery({
+export const Gallery = ({
   pageData,
   viewStateKey,
   setActiveFacet,
-}: GalleryProps) {
+}: GalleryProps) => {
   const [controls, setControls] = useState<{
     sortMode: 'series' | 'address';
     columns: number;
@@ -275,4 +275,4 @@ export function Gallery({
       </div>
     </Container>
   );
-}
+};

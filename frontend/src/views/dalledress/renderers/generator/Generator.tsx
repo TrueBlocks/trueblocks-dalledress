@@ -21,11 +21,11 @@ import { useScrollSelectedIntoView } from '../../hooks/useScrollSelectedIntoView
 import { useSpeakPrompt } from '../../hooks/useSpeakPrompt';
 import { getItemKey, useGalleryStore } from '../../store';
 
-export function Generator({
-  pageData,
-}: {
+export type GeneratorProps = {
   pageData: dalledress.DalleDressPage | null;
-}) {
+};
+
+export const Generator = ({ pageData }: GeneratorProps) => {
   const thumbRowRef = useRef<HTMLDivElement | null>(null);
   const icons = useIconSets();
   const SpeakIcon = icons.Speak;
@@ -158,7 +158,7 @@ export function Generator({
     }
   }, [thumbItems, getSelectionKey, setSelection]);
 
-  const handleThumbKey = useCallback(
+  const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (!thumbItems.length) return;
       const selectedKey = getSelectionKey();
@@ -411,7 +411,7 @@ export function Generator({
                 }}
                 ref={thumbRowRef}
                 tabIndex={0}
-                onKeyDown={handleThumbKey}
+                onKeyDown={handleKey}
               >
                 {thumbItems.map((g) => {
                   const itemKey = getItemKey(g);
@@ -464,4 +464,4 @@ export function Generator({
       </Stack>
     </Container>
   );
-}
+};

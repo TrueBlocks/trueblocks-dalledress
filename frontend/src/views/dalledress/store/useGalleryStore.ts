@@ -105,11 +105,7 @@ export const useGalleryStore = () => {
       if (sortMode === 'series') return groupedBySeries;
       return groupedByAddress;
     }, [sortMode, groupedBySeries, groupedByAddress]);
-    const flattenedItems = useMemo(
-      () => groupNames.flatMap((s) => groupedItems[s] || []),
-      [groupNames, groupedItems],
-    );
-    return { groupNames, groupedItems, flattenedItems };
+    return { groupNames, groupedItems };
   };
   const handleKey = useCallback(
     (
@@ -117,11 +113,36 @@ export const useGalleryStore = () => {
       items: dalle.DalleDress[],
       columns?: number,
       onDoubleClick?: (item: dalle.DalleDress) => void,
+      groupNames?: Array<string>,
+      groupedItems?: Record<string, dalle.DalleDress[]>,
     ) => {
       if (!items.length) return;
       const selectedKey = getSelectionKey();
       if (!selectedKey) return;
       let nextIdx = items.findIndex((g) => getItemKey(g) === selectedKey);
+      // Find current group and position
+      let groupIdx = 0,
+        itemIdxInGroup = 0;
+      if (groupNames && groupedItems) {
+        let found = false;
+        for (let g = 0; g < groupNames.length; g++) {
+          const groupKey = groupNames[g] ?? '';
+          const group: Array<dalle.DalleDress> = groupedItems[groupKey] || [];
+          const idx = group.findIndex(
+            (i: dalle.DalleDress) => getItemKey(i) === selectedKey,
+          );
+          if (idx !== -1) {
+            groupIdx = g;
+            itemIdxInGroup = idx;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          groupIdx = 0;
+          itemIdxInGroup = 0;
+        }
+      }
       if (e.key === 'ArrowRight') {
         nextIdx = (nextIdx + 1 + items.length) % items.length;
         e.preventDefault();
@@ -138,21 +159,74 @@ export const useGalleryStore = () => {
         const item = items.find((g) => getItemKey(g) === selectedKey);
         if (item) onDoubleClick(item);
         return;
-      } else if (columns && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-        // Grid navigation for Gallery
-        const idx = nextIdx;
-        if (e.key === 'ArrowDown') {
-          nextIdx = Math.min(idx + columns, items.length - 1);
-          e.preventDefault();
-        } else if (e.key === 'ArrowUp') {
-          nextIdx = Math.max(idx - columns, 0);
-          e.preventDefault();
+      } else if (
+        columns &&
+        (e.key === 'ArrowDown' || e.key === 'ArrowUp') &&
+        groupNames &&
+        groupedItems
+      ) {
+        // Grid navigation for ragged rows using groupedItems
+        const groupKey = groupNames[groupIdx] ?? '';
+        const group: Array<dalle.DalleDress> = groupedItems[groupKey] || [];
+        const row = Math.floor(itemIdxInGroup / columns);
+        const col = itemIdxInGroup % columns;
+        let targetRow = e.key === 'ArrowDown' ? row + 1 : row - 1;
+        let targetGroupIdx = groupIdx;
+        let targetItemIdxInGroup = null;
+        let totalRows = Math.ceil(group.length / columns);
+        if (targetRow >= 0 && targetRow < totalRows) {
+          const start = targetRow * columns;
+          const end = Math.min(start + columns, group.length);
+          const rowLength = end - start;
+          const clampedCol = Math.min(col, rowLength - 1);
+          targetItemIdxInGroup = start + clampedCol;
+        } else if (targetRow < 0 && groupIdx > 0) {
+          // Move to previous group, last row
+          targetGroupIdx = groupIdx - 1;
+          const prevGroupKey = groupNames[targetGroupIdx] ?? '';
+          const prevGroup: Array<dalle.DalleDress> =
+            groupedItems[prevGroupKey] || [];
+          const prevTotalRows = Math.ceil(prevGroup.length / columns);
+          const start = (prevTotalRows - 1) * columns;
+          const end = prevGroup.length;
+          const rowLength = end - start;
+          const clampedCol = Math.min(col, rowLength - 1);
+          targetItemIdxInGroup = start + clampedCol;
+        } else if (targetRow >= totalRows && groupIdx < groupNames.length - 1) {
+          // Move to next group, first row
+          targetGroupIdx = groupIdx + 1;
+          const nextGroupKey = groupNames[targetGroupIdx] ?? '';
+          const nextGroup: Array<dalle.DalleDress> =
+            groupedItems[nextGroupKey] || [];
+          const start = 0;
+          const end = Math.min(columns, nextGroup.length);
+          const rowLength = end - start;
+          const clampedCol = Math.min(col, rowLength - 1);
+          targetItemIdxInGroup = start + clampedCol;
+        }
+        if (targetItemIdxInGroup !== null) {
+          const targetGroupKey = groupNames[targetGroupIdx] ?? '';
+          const targetGroup: Array<dalle.DalleDress> =
+            groupedItems[targetGroupKey] || [];
+          const targetItem = targetGroup[targetItemIdxInGroup] ?? null;
+          if (targetItem) {
+            setSelection(getItemKey(targetItem));
+            e.preventDefault();
+          }
         }
       } else {
         return;
       }
       const next = items[nextIdx];
-      if (next) setSelection(getItemKey(next));
+      if (
+        next &&
+        (e.key === 'ArrowRight' ||
+          e.key === 'ArrowLeft' ||
+          e.key === 'Home' ||
+          e.key === 'End')
+      ) {
+        setSelection(getItemKey(next));
+      }
     },
     [getSelectionKey, setSelection],
   );

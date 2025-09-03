@@ -34,9 +34,7 @@ export const Gallery = ({
     useDerived,
     handleKey: sharedHandleKey,
   } = useGalleryStore();
-  const { groupNames, groupedItems, flattenedItems } = useDerived(
-    controls.sortMode,
-  );
+  const { groupNames, groupedItems } = useDerived(controls.sortMode);
 
   useEffect(() => {
     ingestItems(pageData?.dalledress || []);
@@ -47,20 +45,20 @@ export const Gallery = ({
   }, []);
 
   useEffect(() => {
-    if (!getSelectionKey() && flattenedItems.length > 0) {
-      const firstItem = flattenedItems[0];
+    if (!getSelectionKey() && galleryItems.length > 0) {
+      const firstItem = galleryItems[0];
       if (firstItem) {
         setSelection(getItemKey(firstItem));
       }
     }
-  }, [flattenedItems, getSelectionKey, setSelection]);
+  }, [galleryItems, getSelectionKey, setSelection]);
 
   // --------------------------------------
   const selectedKey = getSelectionKey();
   useScrollSelectedIntoView(scrollRef, selectedKey, { block: 'nearest' });
   useEffect(() => {
     keyScopeRef.current?.focus({ preventScroll: true });
-  }, [selectedKey, flattenedItems]);
+  }, [selectedKey, galleryItems]);
 
   // --------------------------------------
   const handleItemClick = useCallback(
@@ -81,14 +79,26 @@ export const Gallery = ({
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
+      // Flatten all items for linear navigation
+      const allItems: dalle.DalleDress[] = groupNames.flatMap(
+        (group) => groupedItems[group] || [],
+      );
       sharedHandleKey(
         e,
-        flattenedItems,
+        allItems,
         controls.columns,
         handleItemDoubleClick,
+        groupNames,
+        groupedItems,
       );
     },
-    [sharedHandleKey, flattenedItems, controls.columns, handleItemDoubleClick],
+    [
+      sharedHandleKey,
+      groupNames,
+      groupedItems,
+      controls.columns,
+      handleItemDoubleClick,
+    ],
   );
 
   // --------------------------------------

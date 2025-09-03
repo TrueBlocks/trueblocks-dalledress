@@ -104,8 +104,14 @@ export const Generator = ({ pageData }: GeneratorProps) => {
     (item: dalle.DalleDress) => {
       const key = getItemKey(item);
       setSelection(key);
+      if (item.original !== orig) {
+        setSelection(key);
+      }
+      if (item.series !== series) {
+        setSelection(key);
+      }
     },
-    [setSelection],
+    [setSelection, orig, series],
   );
 
   const handleThumbDouble = useCallback(
@@ -167,10 +173,7 @@ export const Generator = ({ pageData }: GeneratorProps) => {
   );
 
   // selectedItem already defined above; maintain comment for context (Task 2).
-  const attributes = useMemo(
-    () => selectedItem?.attributes || [],
-    [selectedItem],
-  );
+  const attributes = selectedItem?.attributes || [];
   const displayImageUrl = useMemo(() => {
     if (selectedItem?.imageUrl) return selectedItem.imageUrl;
     const first = galleryItems.find((g) => g.original === orig);

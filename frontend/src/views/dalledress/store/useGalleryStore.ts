@@ -111,6 +111,51 @@ export const useGalleryStore = () => {
     );
     return { groupNames, groupedItems, flattenedItems };
   };
+  const handleKey = useCallback(
+    (
+      e: React.KeyboardEvent<HTMLDivElement>,
+      items: dalle.DalleDress[],
+      columns?: number,
+      onDoubleClick?: (item: dalle.DalleDress) => void,
+    ) => {
+      if (!items.length) return;
+      const selectedKey = getSelectionKey();
+      if (!selectedKey) return;
+      let nextIdx = items.findIndex((g) => getItemKey(g) === selectedKey);
+      if (e.key === 'ArrowRight') {
+        nextIdx = (nextIdx + 1 + items.length) % items.length;
+        e.preventDefault();
+      } else if (e.key === 'ArrowLeft') {
+        nextIdx = (nextIdx - 1 + items.length) % items.length;
+        e.preventDefault();
+      } else if (e.key === 'Home') {
+        nextIdx = 0;
+        e.preventDefault();
+      } else if (e.key === 'End') {
+        nextIdx = items.length - 1;
+        e.preventDefault();
+      } else if (e.key === 'Enter' && onDoubleClick) {
+        const item = items.find((g) => getItemKey(g) === selectedKey);
+        if (item) onDoubleClick(item);
+        return;
+      } else if (columns && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        // Grid navigation for Gallery
+        const idx = nextIdx;
+        if (e.key === 'ArrowDown') {
+          nextIdx = Math.min(idx + columns, items.length - 1);
+          e.preventDefault();
+        } else if (e.key === 'ArrowUp') {
+          nextIdx = Math.max(idx - columns, 0);
+          e.preventDefault();
+        }
+      } else {
+        return;
+      }
+      const next = items[nextIdx];
+      if (next) setSelection(getItemKey(next));
+    },
+    [getSelectionKey, setSelection],
+  );
   return {
     orig: sel.orig,
     series: sel.series,
@@ -121,5 +166,6 @@ export const useGalleryStore = () => {
     clearSelection,
     ingestItems,
     useDerived,
+    handleKey,
   };
 };

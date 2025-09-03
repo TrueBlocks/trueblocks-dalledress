@@ -32,6 +32,7 @@ export const Gallery = ({
     ingestItems,
     galleryItems,
     useDerived,
+    handleKey: sharedHandleKey,
   } = useGalleryStore();
   const { groupNames, groupedItems, flattenedItems } = useDerived(
     controls.sortMode,
@@ -80,145 +81,14 @@ export const Gallery = ({
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!flattenedItems.length) return;
-
-      const selectedKey = getSelectionKey();
-      if (!selectedKey) return;
-
-      const { columns } = controls;
-      let nextItem: dalle.DalleDress | null = null;
-
-      // Define handlers for different keys
-      switch (e.key) {
-        case 'ArrowRight': {
-          const idx = flattenedItems.findIndex(
-            (f) => getItemKey(f) === selectedKey,
-          );
-          if (idx !== -1) {
-            nextItem =
-              flattenedItems[
-                (idx + 1 + flattenedItems.length) % flattenedItems.length
-              ] || null;
-          }
-          break;
-        }
-        case 'ArrowLeft': {
-          const idx = flattenedItems.findIndex(
-            (f) => getItemKey(f) === selectedKey,
-          );
-          if (idx !== -1) {
-            nextItem =
-              flattenedItems[
-                (idx - 1 + flattenedItems.length) % flattenedItems.length
-              ] || null;
-          }
-          break;
-        }
-        case 'ArrowDown':
-        case 'ArrowUp': {
-          let currentGroupIndex = -1;
-          let currentItemIndexInGroup = -1;
-
-          // Find the current item's "coordinates"
-          for (let i = 0; i < groupNames.length; i++) {
-            const groupName = groupNames[i];
-            if (!groupName) continue;
-            const group = groupedItems[groupName] || [];
-            const itemIndex = group.findIndex(
-              (item: dalle.DalleDress) => getItemKey(item) === selectedKey,
-            );
-            if (itemIndex !== -1) {
-              currentGroupIndex = i;
-              currentItemIndexInGroup = itemIndex;
-              break;
-            }
-          }
-
-          if (currentGroupIndex === -1) return;
-
-          const currentColumn = currentItemIndexInGroup % columns;
-          const currentGroupName = groupNames[currentGroupIndex];
-          const currentGroup = currentGroupName
-            ? groupedItems[currentGroupName] || []
-            : [];
-
-          if (e.key === 'ArrowDown') {
-            const nextItemIndexInGroup = currentItemIndexInGroup + columns;
-            if (nextItemIndexInGroup < currentGroup.length) {
-              nextItem = currentGroup[nextItemIndexInGroup] || null;
-            } else {
-              const nextGroupIndex =
-                (currentGroupIndex + 1) % groupNames.length;
-              const nextGroupName = groupNames[nextGroupIndex];
-              const nextGroup = nextGroupName
-                ? groupedItems[nextGroupName] || []
-                : [];
-              if (nextGroup.length > 0) {
-                const targetIndex = Math.min(
-                  currentColumn,
-                  nextGroup.length - 1,
-                );
-                nextItem = nextGroup[targetIndex] || null;
-              }
-            }
-          } else {
-            // ArrowUp
-            const prevItemIndexInGroup = currentItemIndexInGroup - columns;
-            if (prevItemIndexInGroup >= 0) {
-              nextItem = currentGroup[prevItemIndexInGroup] || null;
-            } else {
-              const prevGroupIndex =
-                (currentGroupIndex - 1 + groupNames.length) % groupNames.length;
-              const prevGroupName = groupNames[prevGroupIndex];
-              const prevGroup = prevGroupName
-                ? groupedItems[prevGroupName] || []
-                : [];
-              if (prevGroup.length > 0) {
-                const lastRowStartIndex =
-                  Math.floor((prevGroup.length - 1) / columns) * columns;
-                const targetIndex = Math.min(
-                  lastRowStartIndex + currentColumn,
-                  prevGroup.length - 1,
-                );
-                nextItem = prevGroup[targetIndex] || null;
-              }
-            }
-          }
-          break;
-        }
-        case 'Home':
-          nextItem = flattenedItems[0] || null;
-          break;
-        case 'End':
-          nextItem = flattenedItems[flattenedItems.length - 1] || null;
-          break;
-        case 'Enter': {
-          const item = flattenedItems.find(
-            (f) => getItemKey(f) === selectedKey,
-          );
-          if (item) {
-            handleItemDoubleClick(item);
-          }
-          return; // No selection change, just action
-        }
-        default:
-          return; // Not a key we handle
-      }
-
-      if (nextItem) {
-        e.preventDefault();
-        setSelection(getItemKey(nextItem));
-      }
+      sharedHandleKey(
+        e,
+        flattenedItems,
+        controls.columns,
+        handleItemDoubleClick,
+      );
     },
-    [
-      flattenedItems,
-      getSelectionKey,
-      handleItemDoubleClick,
-      setSelection,
-      controls,
-      groupNames,
-      groupedItems,
-    ],
+    [sharedHandleKey, flattenedItems, controls.columns, handleItemDoubleClick],
   );
 
   // --------------------------------------

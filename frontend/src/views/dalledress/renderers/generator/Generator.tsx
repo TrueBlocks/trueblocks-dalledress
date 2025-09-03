@@ -39,6 +39,7 @@ export const Generator = ({ pageData }: GeneratorProps) => {
     clearSelection,
     ingestItems,
     galleryItems,
+    handleKey: sharedHandleKey,
   } = useGalleryStore();
 
   useEffect(() => {
@@ -160,33 +161,9 @@ export const Generator = ({ pageData }: GeneratorProps) => {
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (!thumbItems.length) return;
-      const selectedKey = getSelectionKey();
-      const idx = selectedKey
-        ? thumbItems.findIndex((g) => getItemKey(g) === selectedKey)
-        : -1;
-      let nextIdx = idx;
-      if (e.key === 'ArrowRight') {
-        nextIdx = (idx + 1 + thumbItems.length) % thumbItems.length;
-        e.preventDefault();
-      } else if (e.key === 'ArrowLeft') {
-        nextIdx = (idx - 1 + thumbItems.length) % thumbItems.length;
-        e.preventDefault();
-      } else if (e.key === 'Home') {
-        nextIdx = 0;
-        e.preventDefault();
-      } else if (e.key === 'End') {
-        nextIdx = thumbItems.length - 1;
-        e.preventDefault();
-      } else {
-        return;
-      }
-      const next = thumbItems[nextIdx];
-      if (next) {
-        setSelection(getItemKey(next));
-      }
+      sharedHandleKey(e, thumbItems);
     },
-    [thumbItems, getSelectionKey, setSelection],
+    [sharedHandleKey, thumbItems],
   );
 
   // selectedItem already defined above; maintain comment for context (Task 2).

@@ -9,6 +9,7 @@
 import {
   BiBuildings,
   BiCog,
+  BiColumns,
   BiFile,
   BiHistory,
   BiHome,
@@ -19,6 +20,7 @@ import {
 } from 'react-icons/bi';
 import {
   FaCircleNotch,
+  FaColumns,
   FaDesktop,
   FaFileContract,
   FaHistory,
@@ -40,6 +42,7 @@ import {
 // Contracts
 // Status
 // DalleDress
+// Comparitoor
 
 /*
 List of other icons sets
@@ -151,6 +154,7 @@ export const FaContracts = FaFileContract;
 export const FaAbis = FaListAlt;
 export const FaNames = FaUser;
 export const FaDalleDress = FaPalette;
+export const FaComparitoor = FaColumns;
 export const FaMissing = FaQuestionCircle;
 
 export const BiStatus = BiCog;
@@ -161,6 +165,7 @@ export const BiContracts = BiFile;
 export const BiAbis = BiListUl;
 export const BiNames = BiUser;
 export const BiDalleDress = BiPalette;
+export const BiComparitoor = BiColumns;
 export const BiMissing = BiQuestionMark;
 
 // EXISTING_CODE
@@ -174,3 +179,4 @@ export const BiMissing = BiQuestionMark;
 // Contracts
 // Status
 // DalleDress
+// Comparitoor

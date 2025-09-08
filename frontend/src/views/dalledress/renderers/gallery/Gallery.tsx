@@ -79,7 +79,24 @@ export const Gallery = ({
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      // Flatten all items for linear navigation
+      if ((e.metaKey || e.ctrlKey) && e.key === '=') {
+        e.preventDefault();
+        setControls((prev) => ({
+          ...prev,
+          columns: Math.max(1, prev.columns - 1),
+        }));
+        return;
+      }
+
+      if ((e.metaKey || e.ctrlKey) && e.key === '-') {
+        e.preventDefault();
+        setControls((prev) => ({
+          ...prev,
+          columns: Math.min(12, prev.columns + 1),
+        }));
+        return;
+      }
+
       const allItems: dalle.DalleDress[] = groupNames.flatMap(
         (group) => groupedItems[group] || [],
       );
@@ -147,6 +164,7 @@ export const Gallery = ({
             series={series}
             items={groupedItems[series] || []}
             columns={controls.columns}
+            sortMode={controls.sortMode}
             onItemClick={handleItemClick}
             onItemDoubleClick={handleItemDoubleClick}
             selected={selectedKey}

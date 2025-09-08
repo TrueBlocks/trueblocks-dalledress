@@ -58,15 +58,22 @@ class PreferencesStore {
   private state: PreferencesState = { ...initialPreferencesState };
   private listeners = new Set<() => void>();
   private cachedSnapshot: UsePreferencesReturn | null = null;
+  private overrideCollapsed: { menu?: boolean; help?: boolean } | null = null;
 
   getSnapshot = (): UsePreferencesReturn => {
+    const effectiveMenuCollapsed = this.state.chromeCollapsed
+      ? true
+      : this.state.menuCollapsed;
+    const effectiveHelpCollapsed = this.state.chromeCollapsed
+      ? true
+      : this.state.helpCollapsed;
     if (!this.cachedSnapshot) {
       this.cachedSnapshot = {
         lastTheme: this.state.lastTheme,
         lastLanguage: this.state.lastLanguage,
         debugCollapsed: this.state.debugCollapsed,
-        menuCollapsed: this.state.menuCollapsed,
-        helpCollapsed: this.state.helpCollapsed,
+        menuCollapsed: effectiveMenuCollapsed,
+        helpCollapsed: effectiveHelpCollapsed,
         chromeCollapsed: this.state.chromeCollapsed,
         detailCollapsed: this.state.detailCollapsed,
         loading: this.state.loading,

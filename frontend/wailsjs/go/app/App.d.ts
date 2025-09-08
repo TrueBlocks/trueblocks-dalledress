@@ -55,6 +55,8 @@ export function FileSave(arg1:menu.CallbackData):Promise<void>;
 
 export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
+export function FromTemplate(arg1:types.Payload,arg2:string):Promise<string>;
+
 export function GetAbisConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetAbisPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;

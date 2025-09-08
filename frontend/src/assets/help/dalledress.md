@@ -59,7 +59,7 @@ the code inside of 'EXISTING_CODE' tags.
   - ipfsHash: The ipfsHash value
   - cacheHit: The cacheHit value
   - completed: The completed value
-  - requestedSeries: The requestedSeries value
+  - series: The series value
 
 - **Databases Store (0 members)**
 

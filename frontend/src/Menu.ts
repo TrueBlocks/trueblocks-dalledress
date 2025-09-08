@@ -10,6 +10,7 @@ import { Khedra, Projects, Settings } from '@views';
 import {
   Abis,
   Chunks,
+  Comparitoor,
   Contracts,
   DalleDress,
   Exports,
@@ -113,12 +114,21 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
+    label: 'Comparitoor',
+    path: '/comparitoor',
+    position: 'top',
+    component: Comparitoor,
+    hotkey: 'mod+0',
+    altHotkey: 'alt+0',
+    type: 'navigation',
+  },
+  {
     label: 'Khedra',
     path: '/khedra',
     position: 'bottom',
     component: Khedra,
-    hotkey: 'mod+0',
-    altHotkey: 'alt+0',
+    hotkey: 'mod+shift+1',
+    altHotkey: 'alt+shift+1',
     type: 'navigation',
   },
   {
@@ -135,8 +145,8 @@ export const MenuItems: MenuItem[] = [
     label: 'Wizard',
     position: 'hidden',
     component: Wizard,
-    hotkey: 'mod+shift+1',
-    altHotkey: 'alt+shift+1',
+    hotkey: 'mod+shift+2',
+    altHotkey: 'alt+shift+2',
     type: 'dev',
     action: async () => {
       await SetInitialized(false);

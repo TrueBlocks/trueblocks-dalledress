@@ -16,6 +16,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/abis"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/comparitoor"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/contracts"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dalledress"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
@@ -45,6 +46,8 @@ func (a *App) Reload(payload *types.Payload) error {
 		return a.ReloadStatus(payload)
 	case "dalledress":
 		return a.ReloadDalleDress(payload)
+	case "comparitoor":
+		return a.ReloadComparitoor(payload)
 	default:
 		panic("unknown view in Reload" + a.GetLastView())
 	}
@@ -61,6 +64,7 @@ func (a *App) GetRegisteredViews() []string {
 		"contracts",
 		"status",
 		"dalledress",
+		"comparitoor",
 	}
 }
 
@@ -82,6 +86,8 @@ func getCollection(payload *types.Payload) types.Collection {
 		return status.GetStatusCollection(payload)
 	case "dalledress":
 		return dalledress.GetDalleDressCollection(payload)
+	case "comparitoor":
+		return comparitoor.GetComparitoorCollection(payload)
 	default:
 		logging.LogBackend(fmt.Sprintf("Warning: Unknown collection type: %s", payload.Collection))
 		return nil

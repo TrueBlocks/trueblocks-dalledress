@@ -126,6 +126,18 @@ export function GetChunksSummary(arg1) {
   return window['go']['app']['App']['GetChunksSummary'](arg1);
 }
 
+export function GetComparitoorConfig(arg1) {
+  return window['go']['app']['App']['GetComparitoorConfig'](arg1);
+}
+
+export function GetComparitoorPage(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['app']['App']['GetComparitoorPage'](arg1, arg2, arg3, arg4, arg5);
+}
+
+export function GetComparitoorSummary(arg1) {
+  return window['go']['app']['App']['GetComparitoorSummary'](arg1);
+}
+
 export function GetContext() {
   return window['go']['app']['App']['GetContext']();
 }
@@ -352,6 +364,10 @@ export function ReloadAbis(arg1) {
 
 export function ReloadChunks(arg1) {
   return window['go']['app']['App']['ReloadChunks'](arg1);
+}
+
+export function ReloadComparitoor(arg1) {
+  return window['go']['app']['App']['ReloadComparitoor'](arg1);
 }
 
 export function ReloadContracts(arg1) {

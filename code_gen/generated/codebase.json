@@ -5774,6 +5774,95 @@
                     "attributes": ""
                 }
             ]
+        },
+        {
+            "class": "Comparitoor",
+            "doc_group": "001-Comparisons",
+            "doc_route": "comparitoor",
+            "doc_descr": "Compare transactions across multiple sources for a given address",
+            "produced_by": "comparitoor",
+            "members": [
+                {
+                    "name": "nTrueBlocks",
+                    "type": "value",
+                    "docOrder": 1,
+                    "description": "The values for TrueBlocks",
+                    "num": 1
+                },
+                {
+                    "name": "nEtherScan",
+                    "type": "value",
+                    "docOrder": 2,
+                    "description": "The values for EtherScan",
+                    "num": 2
+                },
+                {
+                    "name": "nCovalent",
+                    "type": "value",
+                    "docOrder": 2,
+                    "description": "The values for Covalent",
+                    "num": 3
+                },
+                {
+                    "name": "nAlchemy",
+                    "type": "value",
+                    "docOrder": 2,
+                    "description": "The values for Alchemy",
+                    "num": 4
+                }
+            ],
+            "facets": [
+                {
+                    "name": "Comparitoor",
+                    "store": "Comparitoor",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "renderer": "facet",
+                    "attributes": ""
+                },
+                {
+                    "name": "TrueBlocks",
+                    "store": "Transaction",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "renderer": "",
+                    "attributes": ""
+                },
+                {
+                    "name": "EtherScan",
+                    "store": "Transaction",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "renderer": "",
+                    "attributes": ""
+                },
+                {
+                    "name": "Covalent",
+                    "store": "Transaction",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "renderer": "",
+                    "attributes": ""
+                },
+                {
+                    "name": "Alchemy",
+                    "store": "Transaction",
+                    "actions": [
+                        "export"
+                    ],
+                    "viewType": "",
+                    "renderer": "",
+                    "attributes": ""
+                }
+            ]
         }
     ],
     "baseTypes": [

@@ -10,6 +10,7 @@ import {abis} from '../models';
 import {preferences} from '../models';
 import {utils} from '../models';
 import {chunks} from '../models';
+import {comparitoor} from '../models';
 import {context} from '../models';
 import {contracts} from '../models';
 import {dalledress} from '../models';
@@ -80,6 +81,12 @@ export function GetChunksConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 export function GetChunksPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
 
 export function GetChunksSummary(arg1:types.Payload):Promise<types.Summary>;
+
+export function GetComparitoorConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
+export function GetComparitoorPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<comparitoor.ComparitoorPage>;
+
+export function GetComparitoorSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetContext():Promise<context.Context>;
 
@@ -194,6 +201,8 @@ export function Reload(arg1:types.Payload):Promise<void>;
 export function ReloadAbis(arg1:types.Payload):Promise<void>;
 
 export function ReloadChunks(arg1:types.Payload):Promise<void>;
+
+export function ReloadComparitoor(arg1:types.Payload):Promise<void>;
 
 export function ReloadContracts(arg1:types.Payload):Promise<void>;
 

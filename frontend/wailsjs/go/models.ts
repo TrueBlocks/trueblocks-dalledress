@@ -144,6 +144,152 @@ export namespace chunks {
 
 }
 
+export namespace comparitoor {
+	
+	export class AnnotatedTransaction {
+	    articulatedTx?: types.Function;
+	    blockHash: base.Hash;
+	    blockNumber: number;
+	    from: base.Address;
+	    gas: number;
+	    gasPrice: number;
+	    gasUsed: number;
+	    hasToken: boolean;
+	    hash: base.Hash;
+	    input: string;
+	    isError: boolean;
+	    maxFeePerGas: number;
+	    maxPriorityFeePerGas: number;
+	    nonce: number;
+	    receipt?: types.Receipt;
+	    timestamp: number;
+	    to: base.Address;
+	    traces: types.Trace[];
+	    transactionIndex: number;
+	    type: string;
+	    // Go type: base
+	    value: any;
+	    statements?: types.Statement[];
+	    missing: boolean;
+	    unique: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new AnnotatedTransaction(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.articulatedTx = this.convertValues(source["articulatedTx"], types.Function);
+	        this.blockHash = this.convertValues(source["blockHash"], base.Hash);
+	        this.blockNumber = source["blockNumber"];
+	        this.from = this.convertValues(source["from"], base.Address);
+	        this.gas = source["gas"];
+	        this.gasPrice = source["gasPrice"];
+	        this.gasUsed = source["gasUsed"];
+	        this.hasToken = source["hasToken"];
+	        this.hash = this.convertValues(source["hash"], base.Hash);
+	        this.input = source["input"];
+	        this.isError = source["isError"];
+	        this.maxFeePerGas = source["maxFeePerGas"];
+	        this.maxPriorityFeePerGas = source["maxPriorityFeePerGas"];
+	        this.nonce = source["nonce"];
+	        this.receipt = this.convertValues(source["receipt"], types.Receipt);
+	        this.timestamp = source["timestamp"];
+	        this.to = this.convertValues(source["to"], base.Address);
+	        this.traces = this.convertValues(source["traces"], types.Trace);
+	        this.transactionIndex = source["transactionIndex"];
+	        this.type = source["type"];
+	        this.value = this.convertValues(source["value"], null);
+	        this.statements = this.convertValues(source["statements"], types.Statement);
+	        this.missing = source["missing"];
+	        this.unique = source["unique"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ComparitoorPage {
+	    facet: types.DataFacet;
+	    transaction: AnnotatedTransaction[];
+	    totalItems: number;
+	    expectedTotal: number;
+	    isFetching: boolean;
+	    state: types.LoadState;
+	    trueBlocks: AnnotatedTransaction[];
+	    trueBlocksCount: number;
+	    etherscan: AnnotatedTransaction[];
+	    etherscanCount: number;
+	    covalent: AnnotatedTransaction[];
+	    covalentCount: number;
+	    alchemy: AnnotatedTransaction[];
+	    alchemyCount: number;
+	    overlapCount: number;
+	    unionCount: number;
+	    intersectionCount: number;
+	    overlapDetails?: Record<string, number>;
+	
+	    static createFrom(source: any = {}) {
+	        return new ComparitoorPage(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.facet = source["facet"];
+	        this.transaction = this.convertValues(source["transaction"], AnnotatedTransaction);
+	        this.totalItems = source["totalItems"];
+	        this.expectedTotal = source["expectedTotal"];
+	        this.isFetching = source["isFetching"];
+	        this.state = source["state"];
+	        this.trueBlocks = this.convertValues(source["trueBlocks"], AnnotatedTransaction);
+	        this.trueBlocksCount = source["trueBlocksCount"];
+	        this.etherscan = this.convertValues(source["etherscan"], AnnotatedTransaction);
+	        this.etherscanCount = source["etherscanCount"];
+	        this.covalent = this.convertValues(source["covalent"], AnnotatedTransaction);
+	        this.covalentCount = source["covalentCount"];
+	        this.alchemy = this.convertValues(source["alchemy"], AnnotatedTransaction);
+	        this.alchemyCount = source["alchemyCount"];
+	        this.overlapCount = source["overlapCount"];
+	        this.unionCount = source["unionCount"];
+	        this.intersectionCount = source["intersectionCount"];
+	        this.overlapDetails = source["overlapDetails"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+
+}
+
 export namespace contracts {
 	
 	export class ContractsPage {
@@ -1060,6 +1206,11 @@ export namespace types {
 	    INDEX = "index",
 	    BLOOMS = "blooms",
 	    MANIFEST = "manifest",
+	    COMPARITOOR = "comparitoor",
+	    TRUEBLOCKS = "trueblocks",
+	    ETHERSCAN = "etherscan",
+	    COVALENT = "covalent",
+	    ALCHEMY = "alchemy",
 	    DASHBOARD = "dashboard",
 	    EXECUTE = "execute",
 	    GENERATOR = "generator",

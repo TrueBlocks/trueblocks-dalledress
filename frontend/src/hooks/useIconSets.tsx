@@ -20,6 +20,7 @@ export type IconSet = {
   Contracts: IconType;
   Status: IconType;
   DalleDress: IconType;
+  Comparitoor: IconType;
 
   Home: IconType;
   Khedra: IconType;
@@ -70,6 +71,7 @@ const faIcons: IconSet = {
   Contracts: Icons.FaContracts,
   Status: Icons.FaStatus,
   DalleDress: Icons.FaDalleDress,
+  Comparitoor: Icons.FaComparitoor,
 
   // App navigation
   Home: Icons.FaHome,
@@ -128,6 +130,7 @@ const biIcons: IconSet = {
   Contracts: Icons.BiContracts,
   Status: Icons.BiStatus,
   DalleDress: Icons.BiDalleDress,
+  Comparitoor: Icons.BiComparitoor,
 
   // App navigation
   Home: Icons.BiHome,
@@ -221,6 +224,8 @@ export const useIconSets = (
       createElement(iconSet.Status, { size, ...props });
     const DalleDress: FC<IconProps> = (props = {}) =>
       createElement(iconSet.DalleDress, { size, ...props });
+    const Comparitoor: FC<IconProps> = (props = {}) =>
+      createElement(iconSet.Comparitoor, { size, ...props });
 
     const Home: FC<IconProps> = (props = {}) =>
       createElement(iconSet.Home, { size, ...props });
@@ -296,6 +301,7 @@ export const useIconSets = (
       Contracts,
       Status,
       DalleDress,
+      Comparitoor,
 
       Home,
       Khedra,

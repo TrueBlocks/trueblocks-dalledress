@@ -9,8 +9,6 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dalledress"
 
@@ -19,6 +17,8 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 
 	// EXISTING_CODE
+	"fmt"
+
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
 	// EXISTING_CODE
 )

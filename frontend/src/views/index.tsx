@@ -13,6 +13,7 @@ export { Chunks } from './chunks';
 export { Contracts } from './contracts';
 export { Status } from './status';
 export { DalleDress } from './dalledress';
+export { Comparitoor } from './comparitoor';
 
 export { Khedra } from './khedra';
 export { Projects } from './projects';

@@ -24,6 +24,7 @@ const iconNames = [
   'Contracts',
   'Status',
   'DalleDress',
+  'Comparitoor',
   'Settings',
   'Wizard',
   'Switch',

@@ -1,14 +1,11 @@
-# TrueBlocks Dalledress - AI Development Instructions
+# TrueBlocks Dalledress – AI Coding Agent Instructions
 
-## Project Architecture
 
-This is a **Wails desktop application** with Go backend (`app/`) and React frontend (`frontend/src/`). The app interfaces with TrueBlocks Core SDK for blockchain data analysis and uses auto-generated TypeScript bindings from Go models.
+## Architecture Overview
 
-### Core Components
-- **Backend**: Go app in `app/` with API handlers (`api_*.go`) exposing TrueBlocks functionality
-- **Frontend**: React/TypeScript with Mantine UI, organized by Views (`views/`) with Facets pattern
-- **Models**: Auto-generated TypeScript types in `frontend/wailsjs/go/models.ts` from Go structs
-- **Data Flow**: Frontend → Wails bindings → Go backend → TrueBlocks Core SDK
+- **Wails Desktop App**: Go backend (`app/`), React/Mantine frontend (`frontend/src/`), TrueBlocks Core SDK integration.
+- **Frontend**: Facet-based views, Mantine UI, TypeScript models auto-generated from Go (`frontend/wailsjs/go/models.ts`).
+- **Backend**: API handlers (`app/api_*.go`) expose all data via Wails bindings; Go structs drive frontend types. Facet configs and header actions are defined in backend `viewConfig` (see `app/view_config.go`).
 
 ## ABSOLUTE REQUIREMENTS - ZERO TOLERANCE
 
@@ -17,14 +14,14 @@ This is a **Wails desktop application** with Go backend (`app/`) and React front
 - Run commands from repo root: `yarn start`, `yarn build`, `yarn test`
 - Frontend commands run through root package.json, not `frontend/` directory
 
+
 ### Development Workflow
-- **Always use `yarn start`** (Wails dev mode) - never browser mode or localhost:5173
-- **Use `Log` from `@utils`** instead of console.log (console.log is invisible in Wails)
+- **Yarn Only**: All commands (`yarn lint`, `yarn test`) run from repo root.
+- **Lint/Test/Build**: Always run `yarn lint && yarn test` after changes. Try to fix errors if they fail. Do not run `yarn start` unless instructed.
+- **Go/TS Model Sync**: After backend changes, run `wails generate module` to update TypeScript bindings.
 - **Read file contents first** before editing - files change between requests
-- **No comments in production code** - only use comments for TODOs or explanations
-- **Use `wails generate module`** to regenerate bindings after changes to the backend go code.
-- **Always run the linter** from the root of the project with `yarn lint`.
-- **Run linting, testing, and building** together with one command `yarn lint && yarn test && yarn start`. If any fail, stop and do not try to fix it. The developer will fix and provide guidance.
+- **No comments in production code** - only use comments for TODO.
+- **Use `Log` from `@utils`** instead of console.log (console.log is invisible in Wails)
 - **Removing files**: If you delete a file, use `rm -f` and ask for confirmation before proceeding. If you need to delete a folder, use `rm -R` (do not include the `-f` flag). Again, Ask for confirmation before proceeding.
 
 ### Code Patterns
@@ -120,61 +117,32 @@ yarn test-tsx <filename> # Run a single frontend test file
 yarn test-dalle        # Dalle module tests
 ```
 
-## Component Usage
 
-### Tables
-```tsx
-import { BaseTab } from '@components';
-import { getColumns } from './columns';
+## Component & Data Flow
+- **BaseTab**: Standard for tables; pass `data`, `columns`, `viewStateKey`, `loading`, `error`, and handlers.
+- **Hooks**: Use `useActiveFacet`, `usePayload`, `useActions`, `useFiltering`, `useSorting`, `usePagination`.
+- **Renderers**: Use `frontend/src/views/[view]/renderers/` for custom facet UIs.
+- **Header Actions**: Always backend-driven via `config.headerActions` (from backend `viewConfig`); map to handlers from `useActions`.
+- **Error Handling**: Stop and report on lint/test failures; never guess requirements.
 
-<BaseTab
-  data={pageData?.monitors || []}
-  columns={getColumns(getCurrentDataFacet())}
-  viewStateKey={viewStateKey}
-  loading={pageData?.isFetching || false}
-  error={error}
-  onSubmit={handleSubmit}
-  onDelete={handleDelete}
-/>
-```
-
-### Hooks
-- `useActiveFacet()`: Manages view facets and routing
-- `usePayload()`: Creates API request payloads
-- `useActions()`: CRUD operations with error handling
-- `useFiltering()`, `useSorting()`, `usePagination()`: Table state management
-
-### Logging
-```tsx
-import { Log } from '@utils';
-Log('Debug message here'); // Single string parameter only
-```
-
-### Address Handling
-- **NEVER use manual address conversion** - use standardized utilities from `@utils`
-- **Frontend ↔ Backend consistency**: Mirror Go patterns with TypeScript equivalents
-- **Standard conversions**:
+### Examples
+- **Table Usage**:
+  ```tsx
+  <BaseTab
+    data={pageData?.monitors || []}
+    columns={getColumns(getCurrentDataFacet())}
+    viewStateKey={viewStateKey}
+    loading={pageData?.isFetching || false}
+    error={error}
+    onSubmit={handleSubmit}
+    onDelete={handleDelete}
+  />
+  ```
+- **Address Conversion**:
   ```tsx
   import { addressToHex, hexToAddress, getDisplayAddress, isValidAddress } from '@utils';
-  
-  // Convert address to hex string (equivalent to Go's addr.Hex())
   const hexString = addressToHex(address);
-  
-  // Convert hex string to address object (equivalent to Go's base.HexToAddress())
-  const addressObj = hexToAddress('0x1234...');
-  
-  // Display truncated address (0x1234...abcd)
-  const display = getDisplayAddress(address);
-  
-  // Validate non-zero address
-  const valid = isValidAddress(address);
   ```
-- **Forbidden patterns**:
-  - `String(contract.address)` ❌
-  - Manual byte array conversion ❌ 
-  - `address as string` casting ❌
-  - Custom address formatting functions ❌
-  - Legacy function names `getAddressString`, `stringToAddress` ❌
 
 ## Error Handling Protocol
 
@@ -196,26 +164,15 @@ Log('Debug message here'); // Single string parameter only
 - **Check for existing solutions** before implementing custom logic
 - **Follow the principle**: "If we've solved this problem once, reuse that solution"
 
-## File Structure Context
-
-```
-app/                    # Go backend with TrueBlocks integration
-├── api_*.go           # API handlers for each data collection
-├── app.go             # Main Wails app struct and lifecycle
-└── *.go               # Business logic and utilities
-
-frontend/src/
-├── components/        # Reusable UI components (BaseTab, Table, etc.)
-├── views/            # Main application views with Facets pattern
-├── hooks/            # Custom React hooks for data and state
-├── contexts/         # React context providers
-├── stores/           # Application state management
-├── utils/            # Utilities including Log function
-└── wailsjs/          # Auto-generated Wails bindings and types
-
 pkg/                   # Go packages for backend functionality
 dalle/                 # Separate Go module for AI/image generation
-```
+
+## File Structure References
+- `app/`: Go backend, API handlers, business logic, viewConfig.
+- `frontend/src/views/`: Facet-based React views and custom renderers.
+- `frontend/src/components/`: UI components (BaseTab, Table, etc.).
+- `frontend/src/utils/`: Utilities (Log, address helpers).
+- `frontend/wailsjs/go/models.ts`: Auto-generated TypeScript types.
 
 ## Integration Points
 
@@ -245,41 +202,8 @@ This makes the caching discussion even more interesting because:
 - Caching is still beneficial - Avoids repeated marshaling overhead
 - Cache coherence is still the real problem - Backend transforms data without frontend awareness
 
-## Information for future AI coders
 
-- All main views follow a common structure: Imports → Hooks → Data fetching → Events → Actions (useActions) → Columns/forms → Render.
-- The matrix below is the single source of truth for cross-view consistency. Treat it as the checklist when refactoring or adding views.
-- Goal: a fully parameterized, generatable view scaffold driven by backend `ViewConfig`.
-- Start by reading the matrix, then focus on the next non-green row (if any). Don’t revisit already-green rows unless new inconsistencies appear.
-- Prefer the most recently refactored view as the reference implementation.
-- Keep all changes lint- and test-compliant. Run `yarn lint && yarn test` regularly during refactors.
-
-## Cross-view consistency matrix
-
-Views in scope: Monitors, Names, Abis, Contracts, Status, Chunks, Exports
-
-Legend (Key → Aspect):
-- A: Form facet(s) present
-- B: Form rendering abstracted (useFacetForm)
-- C: Dynamic enabledActions per facet (backend-driven via ViewConfig)
-- D: Confirm modal logic abstracted (centralized, per-operation silencing for remove/clean)
-- E: Export format modal (unified, respects IsDialogSilenced)
-- F: Inline facet-specific branching minimized inside perTabContent
-- I: Header action mapping to handlers (config.headerActions → useActions handlers)
-
-All Greens (fully consistent):
-
-| Key | Monitors | Names | Abis | Contracts | Status | Chunks | Exports |
-|-----|----------|-------|------|-----------|--------|--------|---------|
-| A   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
-| B   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
-| C   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
-| D   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
-| E   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
-| F   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
-| I   | ✅        | ✅     | ✅    | ✅         | ✅      | ✅      | ✅       |
-
-Notes:
-- Header vs row actions are derived from backend `ViewConfig` per facet: `headerActions` vs `actions`, mapped through ACTION_DEFINITIONS and exposed by `useActions` as `config.headerActions` and `config.rowActions`.
-- Confirm prompts only for remove and clean, using dialog keys `confirm.remove` and `confirm.clean` with per-operation silencing.
-- Export uses ExportFormatModal unless `IsDialogSilenced('exportFormat')` is true.
+## Anti-Bloat Principles
+- Reuse existing utilities and patterns.
+- Remove redundant code when standardizing.
+- Prefer most recently refactored views as reference.

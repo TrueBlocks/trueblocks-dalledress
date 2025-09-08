@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       '@app': 'wailsjs/go/app/App',
       '@names': 'wailsjs/go/names/NamesCollection',
+      '@dalle': 'wailsjs/go/dalle/DalleDress',
       '@hooks': 'src/hooks',
       '@utils': 'src/utils',
       '@contexts': 'src/contexts',

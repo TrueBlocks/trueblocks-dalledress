@@ -120,7 +120,6 @@ export const useGalleryStore = () => {
       const selectedKey = getSelectionKey();
       if (!selectedKey) return;
       let nextIdx = items.findIndex((g) => getItemKey(g) === selectedKey);
-      // Find current group and position
       let groupIdx = 0,
         itemIdxInGroup = 0;
       if (groupNames && groupedItems) {

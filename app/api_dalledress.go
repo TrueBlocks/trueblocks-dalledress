@@ -9,6 +9,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dalledress"
 
@@ -91,6 +93,22 @@ func (a *App) GetDalleAudioURL(payload *types.Payload, series string) (string, e
 		base = a.fileServer.GetBaseURL()
 	}
 	return dalle.AudioURL(base, series, payload.Address)
+}
+
+func (a *App) FromTemplate(payload *types.Payload, templateStr string) (string, error) {
+	if payload == nil || payload.Address == "" {
+		return "", fmt.Errorf("address is required")
+	}
+	if templateStr == "" {
+		return "", fmt.Errorf("template string is required")
+	}
+
+	dd, err := a.Dalle.MakeDalleDress(payload.Address)
+	if err != nil {
+		return "", fmt.Errorf("failed to create DalleDress: %w", err)
+	}
+
+	return dd.FromTemplate(templateStr)
 }
 
 // EXISTING_CODE

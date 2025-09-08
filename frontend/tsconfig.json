@@ -26,6 +26,7 @@
       "@app": ["wailsjs/go/app/App"],
       "@components": ["src/components"],
       "@contexts": ["src/contexts"],
+      "@dalle": ["wailsjs/go/dalle/DalleDress"],
       "@hooks": ["src/hooks"],
       "@layout": ["src/layout"],
       "@mocks": ["src/__tests__/mocks"],

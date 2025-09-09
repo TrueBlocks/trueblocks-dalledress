@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import type { DataFacet } from '@hooks';
 import { Center, Container, Title } from '@mantine/core';
@@ -10,7 +10,7 @@ import { getItemKey, useGalleryStore } from '../../store';
 
 export type GalleryProps = {
   pageData: dalledress.DalleDressPage | null;
-  viewStateKey?: project.ViewStateKey;
+  viewStateKey: project.ViewStateKey; // Make required since persistence depends on it
   setActiveFacet?: (f: DataFacet) => void;
 };
 
@@ -19,22 +19,23 @@ export const Gallery = ({
   viewStateKey,
   setActiveFacet,
 }: GalleryProps) => {
-  const [controls, setControls] = useState<{
-    sortMode: 'series' | 'address';
-    columns: number;
-  }>({ sortMode: 'series', columns: 6 });
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const keyScopeRef = useRef<HTMLDivElement | null>(null);
+  const hasScrolledOnMount = useRef(false);
 
   const {
     getSelectionKey,
     setSelection,
     ingestItems,
     galleryItems,
+    sortMode,
+    columns,
+    ensureHydrated,
+    hydrated,
     useDerived,
     handleKey: sharedHandleKey,
   } = useGalleryStore();
-  const { groupNames, groupedItems } = useDerived(controls.sortMode);
+  const { groupNames, groupedItems } = useDerived(sortMode);
 
   useEffect(() => {
     ingestItems(pageData?.dalledress || []);
@@ -45,17 +46,65 @@ export const Gallery = ({
   }, []);
 
   useEffect(() => {
-    if (!getSelectionKey() && galleryItems.length > 0) {
+    ensureHydrated(viewStateKey);
+  }, [viewStateKey, ensureHydrated]);
+
+  useEffect(() => {
+    if (hydrated && !getSelectionKey() && galleryItems.length > 0) {
       const firstItem = galleryItems[0];
       if (firstItem) {
-        setSelection(getItemKey(firstItem));
+        setSelection(getItemKey(firstItem), viewStateKey);
       }
     }
-  }, [galleryItems, getSelectionKey, setSelection]);
+  }, [galleryItems, getSelectionKey, setSelection, viewStateKey, hydrated]);
 
   // --------------------------------------
   const selectedKey = getSelectionKey();
   useScrollSelectedIntoView(scrollRef, selectedKey, { block: 'nearest' });
+
+  // Force scroll on mount if we have a selected item
+  useEffect(() => {
+    if (hasScrolledOnMount.current || !scrollRef.current || !selectedKey)
+      return;
+
+    const attemptScroll = () => {
+      if (!hasScrolledOnMount.current && scrollRef.current && selectedKey) {
+        const el = scrollRef.current.querySelector(
+          `[data-key="${selectedKey}"]`,
+        );
+        if (el && 'scrollIntoView' in el) {
+          // Check if the container is visible and has dimensions
+          const containerRect = scrollRef.current.getBoundingClientRect();
+          if (containerRect.width > 0 && containerRect.height > 0) {
+            (el as HTMLElement).scrollIntoView({
+              block: 'nearest',
+              behavior: 'auto',
+            });
+            hasScrolledOnMount.current = true;
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    // Try immediate scroll first
+    if (attemptScroll()) return;
+
+    // Use ResizeObserver to detect when container becomes visible
+    if (!scrollRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      attemptScroll();
+    });
+
+    resizeObserver.observe(scrollRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [selectedKey]); // This will only scroll once due to the ref guard
+
   useEffect(() => {
     keyScopeRef.current?.focus({ preventScroll: true });
   }, [selectedKey, galleryItems]);
@@ -63,47 +112,27 @@ export const Gallery = ({
   // --------------------------------------
   const handleItemClick = useCallback(
     (item: dalle.DalleDress) => {
-      setSelection(getItemKey(item));
+      setSelection(getItemKey(item), viewStateKey);
     },
-    [setSelection],
+    [setSelection, viewStateKey],
   );
 
   const handleItemDoubleClick = useCallback(
     (item: dalle.DalleDress) => {
-      setSelection(getItemKey(item));
+      setSelection(getItemKey(item), viewStateKey);
       if (setActiveFacet)
         setActiveFacet(types.DataFacet.GENERATOR as DataFacet);
     },
-    [setActiveFacet, setSelection],
+    [setActiveFacet, setSelection, viewStateKey],
   );
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === '=') {
-        e.preventDefault();
-        setControls((prev) => ({
-          ...prev,
-          columns: Math.max(1, prev.columns - 1),
-        }));
-        return;
-      }
-
-      if ((e.metaKey || e.ctrlKey) && e.key === '-') {
-        e.preventDefault();
-        setControls((prev) => ({
-          ...prev,
-          columns: Math.min(12, prev.columns + 1),
-        }));
-        return;
-      }
-
-      const allItems: dalle.DalleDress[] = groupNames.flatMap(
-        (group) => groupedItems[group] || [],
-      );
       sharedHandleKey(
         e,
-        allItems,
-        controls.columns,
+        galleryItems,
+        viewStateKey,
+        columns,
         handleItemDoubleClick,
         groupNames,
         groupedItems,
@@ -111,10 +140,12 @@ export const Gallery = ({
     },
     [
       sharedHandleKey,
+      galleryItems,
+      viewStateKey,
+      columns,
+      handleItemDoubleClick,
       groupNames,
       groupedItems,
-      controls.columns,
-      handleItemDoubleClick,
     ],
   );
 
@@ -132,13 +163,7 @@ export const Gallery = ({
       <Title order={4} mb="sm">
         Preview Gallery
       </Title>
-      {viewStateKey && (
-        <GalleryControls
-          viewStateKey={viewStateKey}
-          value={{ sortMode: controls.sortMode, columns: controls.columns }}
-          onChange={(v) => setControls(v)}
-        />
-      )}
+      <GalleryControls />
       {!galleryItems.length && (
         <Center
           style={{
@@ -163,8 +188,8 @@ export const Gallery = ({
             key={series || 'unknown'}
             series={series}
             items={groupedItems[series] || []}
-            columns={controls.columns}
-            sortMode={controls.sortMode}
+            columns={columns}
+            sortMode={sortMode}
             onItemClick={handleItemClick}
             onItemDoubleClick={handleItemDoubleClick}
             selected={selectedKey}

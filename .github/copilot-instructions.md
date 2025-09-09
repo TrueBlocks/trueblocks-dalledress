@@ -22,7 +22,10 @@
 - **Read file contents first** before editing - files change between requests
 - **No comments in production code** - only use comments for TODO.
 - **Use `Log` from `@utils`** instead of console.log (console.log is invisible in Wails)
+- **CRITICAL: Race Condition Prevention**: Always consider race conditions when using async/parallel operations. Multiple async calls that read-modify-write the same data source WILL create race conditions. Use sequential operations or proper locking mechanisms. Common scenarios: parallel API calls updating the same backend state, multiple components calling the same store methods simultaneously, Promise.all() with state-modifying operations. When in doubt, make operations sequential with await chains rather than parallel with Promise.all().
+- **CRITICAL: Code Insertion Placement**: NEVER insert code in inappropriate locations. Always respect file structure: package declarations first in Go files, imports grouped properly in TypeScript files, class/function boundaries, etc. When editing files, carefully identify the correct insertion point and include sufficient context in oldString to ensure precise placement. Common mistakes: inserting before package line in Go, inserting between import statements in TS, inserting inside function bodies when adding new functions.
 - **Removing files**: If you delete a file, use `rm -f` and ask for confirmation before proceeding. If you need to delete a folder, use `rm -R` (do not include the `-f` flag). Again, Ask for confirmation before proceeding.
+- **CRITICAL: After removing files**: When you delete any file with `rm` or `rm -f`, you MUST immediately and explicitly remove it from your context memory. Never allow deleted files to persist in context as this causes them to be recreated as empty files in future chat sessions. State clearly: "File [filename] has been permanently removed from disk and context."
 
 ### Code Patterns
 - **Use existing patterns**: BaseTab, Table components, DataFacet enums, Collection/Store/Page architecture

@@ -8,11 +8,13 @@ import { Generator } from './generator';
 
 export function renderers(
   pageData: dalledress.DalleDressPage | null,
-  viewStateKey?: project.ViewStateKey,
+  viewStateKey: project.ViewStateKey, // Required for persistence
   setActiveFacet?: (f: DataFacet) => void,
 ) {
   return {
-    [types.DataFacet.GENERATOR]: () => <Generator pageData={pageData} />,
+    [types.DataFacet.GENERATOR]: () => (
+      <Generator pageData={pageData} viewStateKey={viewStateKey} />
+    ),
     [types.DataFacet.GALLERY]: () => (
       <Gallery
         pageData={pageData}

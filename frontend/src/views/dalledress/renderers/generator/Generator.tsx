@@ -13,7 +13,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { dalle, dalledress } from '@models';
+import { dalle, dalledress, project } from '@models';
 import { Log } from '@utils';
 
 import { DalleDressCard } from '../../components';
@@ -23,10 +23,12 @@ import { getItemKey, useGalleryStore } from '../../store';
 
 export type GeneratorProps = {
   pageData: dalledress.DalleDressPage | null;
+  viewStateKey: project.ViewStateKey; // Make required since persistence depends on it
 };
 
-export const Generator = ({ pageData }: GeneratorProps) => {
+export const Generator = ({ pageData, viewStateKey }: GeneratorProps) => {
   const thumbRowRef = useRef<HTMLDivElement | null>(null);
+  const hasScrolledOnMount = useRef(false);
   const icons = useIconSets();
   const SpeakIcon = icons.Speak;
 
@@ -39,12 +41,18 @@ export const Generator = ({ pageData }: GeneratorProps) => {
     clearSelection,
     ingestItems,
     galleryItems,
+    ensureHydrated,
+    hydrated,
     handleKey: sharedHandleKey,
   } = useGalleryStore();
 
   useEffect(() => {
     ingestItems(pageData?.dalledress || []);
   }, [pageData?.dalledress, ingestItems]);
+
+  useEffect(() => {
+    ensureHydrated(viewStateKey);
+  }, [viewStateKey, ensureHydrated]);
 
   const seriesOptions = useMemo(() => {
     const set = new Set<string>();
@@ -61,19 +69,19 @@ export const Generator = ({ pageData }: GeneratorProps) => {
   }, [galleryItems]);
 
   useEffect(() => {
-    if (!getSelectionKey() && galleryItems.length) {
+    if (hydrated && !getSelectionKey() && galleryItems.length) {
       const first = galleryItems[0];
-      if (first) setSelection(getItemKey(first));
+      if (first) setSelection(getItemKey(first), viewStateKey);
     }
-  }, [getSelectionKey, galleryItems, setSelection]);
+  }, [getSelectionKey, galleryItems, setSelection, viewStateKey, hydrated]);
 
   const handleAddressChange = useCallback(
     (value: string | null) => {
       if (!value) return;
       const match = galleryItems.find((g) => g.original === value);
-      if (match) setSelection(getItemKey(match));
+      if (match) setSelection(getItemKey(match), viewStateKey);
     },
-    [galleryItems, setSelection],
+    [galleryItems, setSelection, viewStateKey],
   );
 
   const handleSeriesChange = useCallback(
@@ -83,9 +91,9 @@ export const Generator = ({ pageData }: GeneratorProps) => {
         galleryItems.find(
           (g) => g.series === value && (!orig || g.original === orig),
         ) || galleryItems.find((g) => g.series === value);
-      if (match) setSelection(getItemKey(match));
+      if (match) setSelection(getItemKey(match), viewStateKey);
     },
-    [galleryItems, orig, setSelection],
+    [galleryItems, orig, setSelection, viewStateKey],
   );
 
   const selectedItem = getSelectedItem();
@@ -103,15 +111,15 @@ export const Generator = ({ pageData }: GeneratorProps) => {
   const handleThumbSelect = useCallback(
     (item: dalle.DalleDress) => {
       const key = getItemKey(item);
-      setSelection(key);
+      setSelection(key, viewStateKey);
       if (item.original !== orig) {
-        setSelection(key);
+        setSelection(key, viewStateKey);
       }
       if (item.series !== series) {
-        setSelection(key);
+        setSelection(key, viewStateKey);
       }
     },
-    [setSelection, orig, series],
+    [setSelection, orig, series, viewStateKey],
   );
 
   const handleThumbDouble = useCallback(
@@ -131,19 +139,71 @@ export const Generator = ({ pageData }: GeneratorProps) => {
             (g) => g.series === series && (!orig || g.original === orig),
           ) || galleryItems.find((g) => g.series === series);
         if (match) {
-          setSelection(getItemKey(match));
+          setSelection(getItemKey(match), viewStateKey);
           changed = true;
         }
       }
     }
-    if (changed) clearSelection();
-  }, [orig, series, selectedItem, galleryItems, setSelection, clearSelection]);
+    if (changed) clearSelection(viewStateKey);
+  }, [
+    orig,
+    series,
+    selectedItem,
+    galleryItems,
+    setSelection,
+    clearSelection,
+    viewStateKey,
+  ]);
 
   const selectedKey = getSelectionKey();
   useScrollSelectedIntoView(thumbRowRef, selectedKey, {
     block: 'nearest',
     inline: 'nearest',
   });
+
+  // Force scroll on mount if we have a selected item in thumbnails
+  useEffect(() => {
+    if (hasScrolledOnMount.current || !thumbRowRef.current || !selectedKey)
+      return;
+
+    const attemptScroll = () => {
+      if (!hasScrolledOnMount.current && thumbRowRef.current && selectedKey) {
+        const el = thumbRowRef.current.querySelector(
+          `[data-key="${selectedKey}"]`,
+        );
+        if (el && 'scrollIntoView' in el) {
+          // Check if the container is visible and has dimensions
+          const containerRect = thumbRowRef.current.getBoundingClientRect();
+          if (containerRect.width > 0 && containerRect.height > 0) {
+            (el as HTMLElement).scrollIntoView({
+              block: 'nearest',
+              inline: 'nearest',
+              behavior: 'auto',
+            });
+            hasScrolledOnMount.current = true;
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+
+    // Try immediate scroll first
+    if (attemptScroll()) return;
+
+    // Use ResizeObserver to detect when container becomes visible
+    if (!thumbRowRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      attemptScroll();
+    });
+
+    resizeObserver.observe(thumbRowRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [selectedKey]); // This will only scroll once due to the ref guard
 
   const thumbItems = useMemo(() => {
     if (!orig) return galleryItems;
@@ -158,18 +218,26 @@ export const Generator = ({ pageData }: GeneratorProps) => {
 
   useEffect(() => {
     const selectedKey = getSelectionKey();
-    if (!selectedKey) return;
+    if (hydrated && !selectedKey) return;
     if (!thumbItems.find((g) => getItemKey(g) === selectedKey)) {
       const first = thumbItems[0];
-      if (first) setSelection(getItemKey(first));
+      if (first) setSelection(getItemKey(first), viewStateKey);
     }
-  }, [thumbItems, getSelectionKey, setSelection]);
+  }, [thumbItems, getSelectionKey, setSelection, viewStateKey, hydrated]);
 
   const handleKey = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      sharedHandleKey(e, thumbItems);
+      sharedHandleKey(
+        e,
+        thumbItems,
+        viewStateKey,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
     },
-    [sharedHandleKey, thumbItems],
+    [sharedHandleKey, thumbItems, viewStateKey],
   );
 
   // selectedItem already defined above; maintain comment for context (Task 2).

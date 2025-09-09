@@ -60,6 +60,7 @@ func (c *DalleDressCollection) GetPage(
 ) (types.Page, error) {
 	dataFacet := payload.DataFacet
 	// BINGY_JOE
+	// TODO: BOGUS - CLEAN THIS UP?
 	const UnpaginatedPageSize = 1_000_000_000
 	if dataFacet == DalleDressGenerator || dataFacet == DalleDressGallery {
 		first = 0

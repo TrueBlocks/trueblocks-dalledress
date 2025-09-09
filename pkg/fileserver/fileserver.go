@@ -30,7 +30,7 @@ var currentInstance *FileServer
 func NewFileServer(basePath string) *FileServer {
 	return &FileServer{
 		basePath:  basePath,
-		port:      0,
+		port:      0, // Will be determined
 		running:   false,
 		urlPrefix: "/images/",
 	}
@@ -177,11 +177,6 @@ func findAvailablePort(basePort int) (int, error) {
 	}
 	return 0, fmt.Errorf("no available ports found in range %d-%d", basePort, basePort+100)
 }
-
-// getStorageLocation returns the directory path where images should be stored.
-// It always uses a subdirectory named "images" inside the application's folder
-// within the user's Documents directory. If the user's home directory cannot be
-// determined, it returns an error.
 
 // GetURL returns the URL for accessing a specific image
 func (fs *FileServer) GetURL(relativePath string) string {

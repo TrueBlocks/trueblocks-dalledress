@@ -168,12 +168,16 @@ export const DalleDress = () => {
     setPageData,
     setTotalItems,
     crudFunc: async (
-      payload: types.Payload,
-      op: crud.Operation,
-      item: unknown,
+      _payload: types.Payload,
+      _op: crud.Operation,
+      _item: unknown,
     ) => {
-      if (getCurrentDataFacet() === types.DataFacet.SERIES) {
-        await DalleDressCrud(payload, op, item as unknown as dalle.Series);
+      if (getCurrentDataFacet() !== types.DataFacet.SERIES) {
+        await DalleDressCrud(
+          _payload,
+          _op,
+          _item as unknown as dalle.DalleDress,
+        );
       }
     },
     pageFunc: GetDalleDressPage,

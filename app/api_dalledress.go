@@ -15,7 +15,6 @@ import (
 	//
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
-
 	// EXISTING_CODE
 	"fmt"
 
@@ -36,7 +35,7 @@ func (a *App) GetDalleDressPage(
 func (a *App) DalleDressCrud(
 	payload *types.Payload,
 	op crud.Operation,
-	item *any,
+	item *dalledress.DalleDress,
 ) error {
 	collection := dalledress.GetDalleDressCollection(payload)
 	return collection.Crud(payload, op, item)

@@ -35,7 +35,9 @@ export const useSeriesModal = ({
         seriesModalState.mode === 'edit'
           ? crud.Operation.UPDATE
           : crud.Operation.CREATE;
-      DalleDressCrud(payload, op, s).then(() => {});
+      DalleDressCrud(payload, op, dalle.DalleDress.createFrom(s)).then(
+        () => {},
+      );
       setSeriesModalState((prev) => ({ ...prev, opened: false }));
     },
     [getCurrentDataFacet, createPayload, collection, seriesModalState.mode],

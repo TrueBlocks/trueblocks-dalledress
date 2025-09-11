@@ -450,6 +450,15 @@ export const DalleDress = () => {
         },
         [getCurrentDataFacet],
       ),
+      getCanToggle: useCallback(
+        (row: unknown) => {
+          if (getCurrentDataFacet() !== types.DataFacet.SERIES) return true;
+          const seriesItem = row as { suffix?: string };
+          if (!seriesItem.suffix) return true;
+          return seriesItem.suffix !== 'empty';
+        },
+        [getCurrentDataFacet],
+      ),
       getId: useCallback(
         (row: unknown) => {
           // For Series objects, use suffix as identifier, otherwise use address

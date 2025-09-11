@@ -12,6 +12,7 @@ interface ColumnConfig<T extends Record<string, unknown>> {
   showActions?: boolean | ((pageData: PageDataUnion) => boolean);
   actions: ActionType[];
   getCanRemove?: (row: T, pageData?: PageDataUnion) => boolean;
+  getCanToggle?: (row: T, pageData?: PageDataUnion) => boolean;
   getId?: (row: T) => string;
 }
 
@@ -70,6 +71,9 @@ export const useColumns = (
         <div className="action-buttons-container">
           {actionConfig.rowActions.map((action) => {
             if (action.type === 'delete' && handlers.handleToggle) {
+              const canToggle = config.getCanToggle
+                ? config.getCanToggle(row as Record<string, unknown>, pageData)
+                : true;
               return (
                 <Action
                   key={action.type}
@@ -77,7 +81,7 @@ export const useColumns = (
                   iconOff="Undelete"
                   isOn={!newState}
                   onClick={() => handlers.handleToggle?.(actionData.addressStr)}
-                  disabled={actionData.isProcessing}
+                  disabled={actionData.isProcessing || !canToggle}
                   title={newState ? 'Undelete' : 'Delete'}
                   size="sm"
                 />

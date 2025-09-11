@@ -155,7 +155,7 @@ export const DalleDress = () => {
   const handleReload = useCallback(async () => {
     clearError();
     try {
-      Reload(createPayload(getCurrentDataFacet())).then(() => {});
+      await Reload(createPayload(getCurrentDataFacet()));
     } catch (err: unknown) {
       handleError(err, `Failed to reload ${getCurrentDataFacet()}`);
     }
@@ -206,6 +206,8 @@ export const DalleDress = () => {
     try {
       // Force gallery cache refresh by calling reload on gallery facet
       await Reload(createPayload(types.DataFacet.GALLERY));
+    } catch {
+      // TODO: handle error if needed
     }
   }, [createPayload]);
 
@@ -257,6 +259,8 @@ export const DalleDress = () => {
             galleryState.clearSelection(viewStateKey);
           }
         }
+      } catch {
+        // TODO: handle error if needed
       }
     },
     [galleryState, pageData, viewStateKey],

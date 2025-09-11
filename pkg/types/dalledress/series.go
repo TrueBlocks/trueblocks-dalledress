@@ -1,6 +1,7 @@
 package dalledress
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -43,11 +44,31 @@ func (c *DalleDressCollection) seriesCrud(
 			item.ModifiedAt = fi.ModTime().UTC().Format(time.RFC3339)
 		}
 	case crud.Remove:
-		_ = dalle.DeleteSeries(seriesDir, item.Suffix)
+		err := dalle.RemoveSeries(seriesDir, item.Suffix)
+		if err != nil {
+			return err
+		}
+	case crud.Delete:
+		err := dalle.DeleteSeries(seriesDir, item.Suffix)
+		if err != nil {
+			return err
+		}
+		if data, err := os.ReadFile(filepath.Join(seriesDir, item.Suffix+".json")); err == nil {
+			var updatedSeries dalle.Series
+			if err := json.Unmarshal(data, &updatedSeries); err == nil {
+				item.Deleted = updatedSeries.Deleted
+			}
+		}
+	case crud.Undelete:
+		_ = dalle.UndeleteSeries(seriesDir, item.Suffix)
+		if data, err := os.ReadFile(filepath.Join(seriesDir, item.Suffix+".json")); err == nil {
+			var updatedSeries dalle.Series
+			if err := json.Unmarshal(data, &updatedSeries); err == nil {
+				item.Deleted = updatedSeries.Deleted
+			}
+		}
 	case crud.Autoname:
 		// not applicable
-	case crud.Delete, crud.Undelete:
-		// unsupported logical deletion
 	default:
 		return fmt.Errorf("unsupported op %v", op)
 	}
@@ -70,7 +91,7 @@ func (c *DalleDressCollection) seriesCrud(
 				}
 			}
 			return append(data, item)
-		case crud.Update:
+		case crud.Update, crud.Delete, crud.Undelete:
 			for _, s := range data {
 				if s.Suffix == item.Suffix {
 					*s = *item
@@ -92,6 +113,10 @@ func (c *DalleDressCollection) seriesCrud(
 		operation = "create"
 	case crud.Update:
 		operation = "update"
+	case crud.Delete:
+		operation = "delete"
+	case crud.Undelete:
+		operation = "undelete"
 	case crud.Remove:
 		operation = "remove"
 	}

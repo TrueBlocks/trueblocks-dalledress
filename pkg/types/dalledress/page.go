@@ -81,10 +81,21 @@ func (c *DalleDressCollection) GetPage(
 	case DalleDressGenerator:
 		facet := c.generatorFacet
 		var filterFunc func(*DalleDress) bool
-		if filter != "" {
-			filterFunc = func(item *DalleDress) bool {
+		filterFunc = func(item *DalleDress) bool {
+			// First check if the dalledress belongs to a deleted series
+			if item.Series != "" {
+				seriesItems := c.seriesFacet.GetStore().GetItems()
+				for _, s := range seriesItems {
+					if s != nil && s.Suffix == item.Series && s.Deleted {
+						return false // Exclude dalledresses from deleted series
+					}
+				}
+			}
+			// Then apply text filter if provided
+			if filter != "" {
 				return c.matchesGeneratorFilter(item, filter)
 			}
+			return true
 		}
 		sortFunc := func(items []DalleDress, sort sdk.SortSpec) error {
 			return dalle.SortDalleDress(items, sort)
@@ -169,10 +180,21 @@ func (c *DalleDressCollection) GetPage(
 	case DalleDressGallery:
 		facet := c.galleryFacet
 		var filterFunc func(*DalleDress) bool
-		if filter != "" {
-			filterFunc = func(item *DalleDress) bool {
+		filterFunc = func(item *DalleDress) bool {
+			// First check if the dalledress belongs to a deleted series
+			if item.Series != "" {
+				seriesItems := c.seriesFacet.GetStore().GetItems()
+				for _, s := range seriesItems {
+					if s != nil && s.Suffix == item.Series && s.Deleted {
+						return false // Exclude dalledresses from deleted series
+					}
+				}
+			}
+			// Then apply text filter if provided
+			if filter != "" {
 				return c.matchesGalleryFilter(item, filter)
 			}
+			return true
 		}
 		sortFunc := func(items []DalleDress, sort sdk.SortSpec) error {
 			return dalle.SortDalleDress(items, sort)

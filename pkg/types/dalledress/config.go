@@ -31,7 +31,8 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			IsForm:        false,
 			DividerBefore: false,
 			Fields:        getSeriesFields(),
-			Actions:       []string{"update", "delete", "remove"},
+			// TODO: BOGUS - DO WE INCLUDE "undeleted" here?
+			Actions:       []string{"update", "delete", "undelete", "remove"},
 			HeaderActions: []string{"create", "export"},
 			RendererTypes: "",
 		},
@@ -72,11 +73,13 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 		Facets:     facets,
 		FacetOrder: []string{"generator", "series", "databases", "events", "gallery"},
 		Actions: map[string]types.ActionConfig{
-			"create": {Name: "create", Label: "Create", Icon: "Create"},
-			"delete": {Name: "delete", Label: "Delete", Icon: "Delete"},
-			"export": {Name: "export", Label: "Export", Icon: "Export"},
-			"remove": {Name: "remove", Label: "Remove", Icon: "Remove"},
-			"update": {Name: "update", Label: "Update", Icon: "Update"},
+			"create":   {Name: "create", Label: "Create", Icon: "Create"},
+			"delete":   {Name: "delete", Label: "Delete", Icon: "Delete"},
+			"export":   {Name: "export", Label: "Export", Icon: "Export"},
+			"remove":   {Name: "remove", Label: "Remove", Icon: "Remove"},
+			// TODO: BOGUS - do we include "undelete" here?
+			"undelete": {Name: "undelete", Label: "Undelete", Icon: "Undelete"},
+			"update":   {Name: "update", Label: "Update", Icon: "Update"},
 		},
 	}
 	types.DeriveFacets(cfg)
@@ -149,6 +152,7 @@ func getSeriesFields() []types.FieldConfig {
 		// EXISTING_CODE
 		{Key: "suffix", Label: "Series Name", ColumnLabel: "Series", DetailLabel: "Series Name", Section: "General", Width: 150, Order: 1, DetailOrder: 1},
 		{Key: "last", Label: "Last Index", ColumnLabel: "Last", DetailLabel: "Last Index", Section: "General", Width: 80, Order: 2, DetailOrder: 2},
+		{Key: "deleted", Label: "Deleted", ColumnLabel: "Deleted", DetailLabel: "Deleted", Section: "Status", Width: 80, Order: 3, DetailOrder: 13, Formatter: "boolean"},
 		{Key: "adverbs", Label: "Adverbs", ColumnLabel: "", DetailLabel: "Adverbs", Section: "Content", NoTable: true, DetailOrder: 3},
 		{Key: "adjectives", Label: "Adjectives", ColumnLabel: "", DetailLabel: "Adjectives", Section: "Content", NoTable: true, DetailOrder: 4},
 		{Key: "nouns", Label: "Nouns", ColumnLabel: "", DetailLabel: "Nouns", Section: "Content", NoTable: true, DetailOrder: 5},
@@ -158,7 +162,7 @@ func getSeriesFields() []types.FieldConfig {
 		{Key: "orientations", Label: "Orientations", ColumnLabel: "", DetailLabel: "Orientations", Section: "Style", NoTable: true, DetailOrder: 9},
 		{Key: "gazes", Label: "Gazes", ColumnLabel: "", DetailLabel: "Gazes", Section: "Style", NoTable: true, DetailOrder: 10},
 		{Key: "backstyles", Label: "Back Styles", ColumnLabel: "", DetailLabel: "Back Styles", Section: "Style", NoTable: true, DetailOrder: 11},
-		{Key: "modifiedAt", Label: "Modified At", ColumnLabel: "Modified", DetailLabel: "Modified At", Section: "General", Width: 120, Order: 3, DetailOrder: 12},
+		{Key: "modifiedAt", Label: "Modified At", ColumnLabel: "Modified", DetailLabel: "Modified At", Section: "General", Width: 120, Order: 4, DetailOrder: 12},
 		{Key: "actions", Label: "Actions", Section: "General", NoDetail: true, Width: 80, Order: 7},
 		// EXISTING_CODE
 	}

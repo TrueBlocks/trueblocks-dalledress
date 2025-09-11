@@ -111,7 +111,7 @@ func TestSeriesExportCSV(t *testing.T) {
 		t.Fatalf("read export: %v", err)
 	}
 	text := string(b)
-	if !strings.HasPrefix(text, "suffix,last,modifiedAt,") {
+	if !strings.HasPrefix(text, "suffix,last,deleted,modifiedAt,") {
 		t.Fatalf("unexpected header: %s", text)
 	}
 	if !strings.Contains(text, "one,3") || !strings.Contains(text, "two,4") {

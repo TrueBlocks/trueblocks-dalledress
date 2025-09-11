@@ -37,8 +37,10 @@ export const Gallery = ({
   } = useGalleryStore();
   const { groupNames, groupedItems } = useDerived(sortMode);
 
+  // Ingest all dalledress data - backend now filters out deleted series
   useEffect(() => {
-    ingestItems(pageData?.dalledress || []);
+    const allDalledresses = pageData?.dalledress || [];
+    ingestItems(allDalledresses);
   }, [pageData?.dalledress, ingestItems]);
 
   useEffect(() => {

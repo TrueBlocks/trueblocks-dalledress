@@ -22,6 +22,7 @@ import {
   useFacetColumns,
   useFacetForm,
   usePayload,
+  useSilencedDialog,
   useViewConfig,
 } from '@hooks';
 import { TabView } from '@layout';
@@ -36,6 +37,7 @@ import { createDetailPanel } from '../utils/detailPanel';
 import { SeriesModal } from './components';
 import { useSeriesModal } from './hooks/seriesModal';
 import { renderers } from './renderers';
+import { getItemKey, useGalleryStore } from './store/useGalleryStore';
 
 const ROUTE: ViewRoute = 'dalledress';
 export const DalleDress = () => {
@@ -73,6 +75,12 @@ export const DalleDress = () => {
   const { pagination, setTotalItems, goToPage } = usePagination(viewStateKey);
   const { sort } = useSorting(viewStateKey);
   const { filter } = useFiltering(viewStateKey);
+
+  // Check if series removal dialog is silenced
+  const seriesRemoveSilencedDialog = useSilencedDialog('confirm.removeSeries');
+
+  // Gallery store for selection management
+  const galleryState = useGalleryStore();
 
   // === SECTION 3: Data Fetching ===
   const fetchData = useCallback(async () => {
@@ -186,6 +194,198 @@ export const DalleDress = () => {
     createPayload,
     getCurrentDataFacet,
   });
+
+  // State for custom series removal confirmation
+  const [seriesRemoveConfirm, setSeriesRemoveConfirm] = useState<{
+    opened: boolean;
+    suffix: string;
+  }>({ opened: false, suffix: '' });
+
+  // Helper function to refresh gallery cache
+  const refreshGalleryCache = useCallback(async () => {
+    try {
+      // Force gallery cache refresh by calling reload on gallery facet
+      await Reload(createPayload(types.DataFacet.GALLERY));
+    }
+  }, [createPayload]);
+
+  // Helper function to handle selected series management
+  const handleSelectedSeriesUpdate = useCallback(
+    async (affectedSuffix: string, operation: crud.Operation) => {
+      try {
+        // Get currently selected dalledress from gallery store
+        const selectedItem = galleryState.getSelectedItem();
+        if (!selectedItem) {
+          return;
+        }
+
+        // Check if the selected dalledress belongs to the affected series
+        if (selectedItem.series !== affectedSuffix) {
+          return;
+        }
+
+        // If selected dalledress series was deleted or removed, select a reasonable alternative
+        if (
+          operation === crud.Operation.DELETE ||
+          operation === crud.Operation.REMOVE
+        ) {
+          // Get all available dalledresses from the gallery
+          const allDalledresses = galleryState.galleryItems || [];
+
+          // Find first dalledress from a non-deleted series that isn't the affected one
+          const availableDalledresses = allDalledresses.filter(
+            (d: dalle.DalleDress) => {
+              const dalledressSeries = pageData?.series?.find(
+                (s) => s.suffix === d.series,
+              );
+              return (
+                dalledressSeries &&
+                !dalledressSeries.deleted &&
+                d.series !== affectedSuffix
+              );
+            },
+          );
+
+          if (availableDalledresses.length > 0 && availableDalledresses[0]) {
+            const newSelection = availableDalledresses[0];
+            const newKey = getItemKey(newSelection);
+
+            // Update gallery selection
+            galleryState.setSelection(newKey, viewStateKey);
+          } else {
+            // Clear selection if no alternatives available
+            galleryState.clearSelection(viewStateKey);
+          }
+        }
+      }
+    },
+    [galleryState, pageData, viewStateKey],
+  );
+
+  // Custom handlers for Series facet operations
+  const handleSeriesToggle = useCallback(
+    async (suffix: string) => {
+      try {
+        // Find the current series to check its deleted state
+        const currentSeries = pageData?.series?.find(
+          (s) => s.suffix === suffix,
+        );
+        if (!currentSeries) {
+          return;
+        }
+
+        const isCurrentlyDeleted = Boolean(currentSeries.deleted);
+        const operation = isCurrentlyDeleted
+          ? crud.Operation.UNDELETE
+          : crud.Operation.DELETE;
+
+        await DalleDressCrud(createPayload(types.DataFacet.SERIES), operation, {
+          suffix,
+        });
+
+        // Force a complete data refresh FIRST
+        await fetchData();
+
+        // Then invalidate gallery cache to ensure UI updates
+        await refreshGalleryCache();
+
+        // Finally handle selected item management with fresh data
+        await handleSelectedSeriesUpdate(suffix, operation);
+
+        // Also try to force a reload from the backend
+        await Reload(createPayload(types.DataFacet.SERIES));
+
+        // Fetch data again after reload
+        await fetchData();
+      } catch (err) {
+        handleError(err, 'Toggle operation failed');
+      }
+    },
+    [
+      createPayload,
+      fetchData,
+      handleError,
+      pageData,
+      refreshGalleryCache,
+      handleSelectedSeriesUpdate,
+    ],
+  );
+
+  const performSeriesRemove = useCallback(
+    async (suffix: string) => {
+      if (!suffix) return;
+
+      try {
+        await DalleDressCrud(
+          createPayload(types.DataFacet.SERIES),
+          crud.Operation.REMOVE,
+          { suffix },
+        );
+        // Refresh data first, then cache, then handle selection
+        await fetchData();
+        await refreshGalleryCache();
+        await handleSelectedSeriesUpdate(suffix, crud.Operation.REMOVE);
+      } catch (err) {
+        handleError(err, 'Remove operation failed');
+      }
+    },
+    [
+      createPayload,
+      fetchData,
+      handleError,
+      refreshGalleryCache,
+      handleSelectedSeriesUpdate,
+    ],
+  );
+
+  const handleSeriesRemove = useCallback(
+    async (suffix: string) => {
+      // Check if dialog is silenced - if so, proceed directly
+      if (
+        seriesRemoveSilencedDialog.isSilenced &&
+        !seriesRemoveSilencedDialog.isLoading
+      ) {
+        await performSeriesRemove(suffix);
+        return;
+      }
+
+      // Show custom confirmation for series removal
+      setSeriesRemoveConfirm({ opened: true, suffix });
+    },
+    [
+      seriesRemoveSilencedDialog.isSilenced,
+      seriesRemoveSilencedDialog.isLoading,
+      performSeriesRemove,
+    ],
+  );
+
+  const confirmSeriesRemove = useCallback(async () => {
+    const { suffix } = seriesRemoveConfirm;
+    setSeriesRemoveConfirm({ opened: false, suffix: '' });
+    await performSeriesRemove(suffix);
+  }, [seriesRemoveConfirm, performSeriesRemove]);
+
+  const cancelSeriesRemove = useCallback(() => {
+    setSeriesRemoveConfirm({ opened: false, suffix: '' });
+  }, []);
+
+  // Override handlers for Series facet
+  const customHandlers = useMemo(() => {
+    if (getCurrentDataFacet() === types.DataFacet.SERIES) {
+      const result = {
+        ...handlers,
+        handleToggle: (suffix: string) => {
+          handleSeriesToggle(suffix);
+        },
+        handleRemove: (suffix: string) => {
+          handleSeriesRemove(suffix);
+        },
+      };
+      return result;
+    }
+    return handlers;
+  }, [handlers, getCurrentDataFacet, handleSeriesToggle, handleSeriesRemove]);
+
   const { seriesModal, closeSeriesModal, submitSeriesModal } = useSeriesModal({
     getCurrentDataFacet,
     createPayload,
@@ -235,9 +435,31 @@ export const DalleDress = () => {
       actions: config.rowActions.map(
         (a) => a.type as unknown as import('@hooks').ActionType,
       ),
-      getCanRemove: useCallback((_row: unknown) => false, []),
+      getCanRemove: useCallback(
+        (row: unknown) => {
+          // Only allow removal for series facet and if the row is deleted
+          if (getCurrentDataFacet() !== types.DataFacet.SERIES) {
+            return false;
+          }
+          const seriesItem = row as { deleted?: boolean };
+          return Boolean(seriesItem.deleted);
+        },
+        [getCurrentDataFacet],
+      ),
+      getId: useCallback(
+        (row: unknown) => {
+          // For Series objects, use suffix as identifier, otherwise use address
+          if (getCurrentDataFacet() === types.DataFacet.SERIES) {
+            const seriesItem = row as { suffix?: string };
+            return String(seriesItem.suffix || '');
+          }
+          // Default behavior for other facets (will fallback to addressToHex in useColumns)
+          return ''; // Let useColumns handle the default case
+        },
+        [getCurrentDataFacet],
+      ),
     },
-    handlers,
+    customHandlers,
     pageData,
     config,
   );
@@ -337,6 +559,14 @@ export const DalleDress = () => {
         title={confirmModal.title}
         message={confirmModal.message}
         dialogKey={confirmModal.dialogKey}
+      />
+      <ConfirmModal
+        opened={seriesRemoveConfirm.opened}
+        onClose={cancelSeriesRemove}
+        onConfirm={confirmSeriesRemove}
+        title="Confirm Series Removal"
+        message={`This will permanently remove the series "${seriesRemoveConfirm.suffix}" and all associated images. This action cannot be undone.`}
+        dialogKey="confirm.removeSeries"
       />
       <ExportFormatModal
         opened={exportFormatModal.opened}

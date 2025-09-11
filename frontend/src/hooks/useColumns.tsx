@@ -12,6 +12,7 @@ interface ColumnConfig<T extends Record<string, unknown>> {
   showActions?: boolean | ((pageData: PageDataUnion) => boolean);
   actions: ActionType[];
   getCanRemove?: (row: T, pageData?: PageDataUnion) => boolean;
+  getId?: (row: T) => string;
 }
 
 type PageDataUnion = {
@@ -24,9 +25,9 @@ export function toPageDataProp<T>(pageData: T | null): PageDataUnion {
 }
 
 interface ActionHandlers {
-  handleToggle?: (addressStr: string) => void;
-  handleRemove?: (addressStr: string) => void;
-  handleAutoname?: (addressStr: string) => void;
+  handleToggle?: (id: string) => void;
+  handleRemove?: (id: string) => void;
+  handleAutoname?: (id: string) => void;
   handleUpdate?: (row: Record<string, unknown>) => void;
 }
 
@@ -136,7 +137,9 @@ export const useColumns = (
       visible: true,
       render: (row: Record<string, unknown>) => {
         const canRemove = config.getCanRemove ? config.getCanRemove(row) : true;
-        const addressStr = addressToHex(row.address);
+        const addressStr = config.getId
+          ? config.getId(row)
+          : addressToHex(row.address);
         const isProcessing = Boolean(row.processing);
         const isDeleted = Boolean(row.deleted);
         const actionData = {

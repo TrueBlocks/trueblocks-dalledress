@@ -13,6 +13,7 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/file"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 // ------------------------------------------------------------------------------------
@@ -444,4 +445,44 @@ func (p *Project) SetViewAndFacet(view, facet string) error {
 		return p.Save()
 	}
 	return nil
+}
+
+// ------------------------------------------------------------------------------------
+// GetViewStates safely retrieves all filter states for a given view name
+func (p *Project) GetViewStates(viewName string) map[string]FilterState {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	result := make(map[string]FilterState)
+	for key, state := range p.FilterStates {
+		if key.ViewName == viewName {
+			result[string(key.FacetName)] = state
+		}
+	}
+	return result
+}
+
+// ------------------------------------------------------------------------------------
+// SetViewStates safely sets all filter states for a given view name
+func (p *Project) SetViewStates(viewName string, states map[string]FilterState) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	// Clear existing states for this view
+	for key := range p.FilterStates {
+		if key.ViewName == viewName {
+			delete(p.FilterStates, key)
+		}
+	}
+
+	// Set new states
+	for facetName, state := range states {
+		key := ViewStateKey{
+			ViewName:  viewName,
+			FacetName: types.DataFacet(facetName),
+		}
+		p.FilterStates[key] = state
+	}
+
+	return p.Save()
 }

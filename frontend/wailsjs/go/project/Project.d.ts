@@ -35,6 +35,8 @@ export function GetName():Promise<string>;
 
 export function GetPath():Promise<string>;
 
+export function GetViewStates(arg1:string):Promise<Record<string, project.FilterState>>;
+
 export function RemoveAddress(arg1:base.Address):Promise<void>;
 
 export function RemoveContract(arg1:string):Promise<void>;
@@ -60,3 +62,5 @@ export function SetLastView(arg1:string):Promise<void>;
 export function SetName(arg1:string):Promise<void>;
 
 export function SetViewAndFacet(arg1:string,arg2:string):Promise<void>;
+
+export function SetViewStates(arg1:string,arg2:Record<string, project.FilterState>):Promise<void>;

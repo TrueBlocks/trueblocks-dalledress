@@ -4,7 +4,6 @@ import {types} from '../models';
 import {crud} from '../models';
 import {project} from '../models';
 import {base} from '../models';
-import {dalle} from '../models';
 import {menu} from '../models';
 import {sdk} from '../models';
 import {abis} from '../models';
@@ -41,7 +40,7 @@ export function CloseProject(arg1:string):Promise<void>;
 
 export function ConvertToAddress(arg1:string):Promise<base.Address|boolean>;
 
-export function DalleDressCrud(arg1:types.Payload,arg2:crud.Operation,arg3:dalle.DalleDress):Promise<void>;
+export function DalleDressCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function Encode(arg1:types.Function,arg2:Array<any>):Promise<string>;
 

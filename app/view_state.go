@@ -6,7 +6,6 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
 
 // GetLastView returns the last visited view/route in the active project.
@@ -89,13 +88,7 @@ func (a *App) GetWizardReturn() string {
 // GetProjectViewState retrieves all filter states for a given view name from the active project
 func (a *App) GetProjectViewState(viewName string) (map[string]project.FilterState, error) {
 	if active := a.GetActiveProject(); active != nil {
-		result := make(map[string]project.FilterState)
-		for key, state := range active.FilterStates {
-			if key.ViewName == viewName {
-				result[string(key.FacetName)] = state
-			}
-		}
-		return result, nil
+		return active.GetViewStates(viewName), nil
 	}
 	return nil, fmt.Errorf("no active project")
 }
@@ -103,27 +96,8 @@ func (a *App) GetProjectViewState(viewName string) (map[string]project.FilterSta
 // SetProjectViewState sets all filter states for a given view name in the active project
 func (a *App) SetProjectViewState(viewName string, states map[string]project.FilterState) error {
 	if active := a.GetActiveProject(); active != nil {
-		for key := range active.FilterStates {
-			if key.ViewName == viewName {
-				if err := active.ClearFilterState(key); err != nil {
-					return err
-				}
-			}
-		}
-
-		for facetName, state := range states {
-			key := project.ViewStateKey{
-				ViewName:  viewName,
-				FacetName: types.DataFacet(facetName),
-			}
-			if err := active.SetFilterState(key, state); err != nil {
-				return err
-			}
-		}
-
-		return nil
+		return active.SetViewStates(viewName, states)
 	}
-
 	return fmt.Errorf("no active project")
 }
 

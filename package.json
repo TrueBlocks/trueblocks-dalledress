@@ -9,6 +9,7 @@
     "start": "yarn dev",
     "test-go": "go test ./...",
     "test-go-detail": "echo 'detailed testing may take 30 seconds...' ; cd ./pkg/types ; go test -tags=detailed ./... ; cd -",
+    "test-dalle": "cd dalle && go test .",
     "test-tsx": "cd frontend && yarn test",
     "test": "export $(grep -v '^#' ./.env | xargs) >/dev/null && yarn test-go && yarn test-tsx",
     "test-detail": "export $(grep -v '^#' ./.env | xargs) >/dev/null && yarn test-go-detail",

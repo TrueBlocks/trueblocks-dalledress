@@ -35,7 +35,7 @@ func (a *App) GetDalleDressPage(
 func (a *App) DalleDressCrud(
 	payload *types.Payload,
 	op crud.Operation,
-	item *dalledress.DalleDress,
+	item any,
 ) error {
 	collection := dalledress.GetDalleDressCollection(payload)
 	return collection.Crud(payload, op, item)

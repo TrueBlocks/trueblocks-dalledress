@@ -66,6 +66,10 @@ export function GetPath() {
   return window['go']['project']['Project']['GetPath']();
 }
 
+export function GetViewStates(arg1) {
+  return window['go']['project']['Project']['GetViewStates'](arg1);
+}
+
 export function RemoveAddress(arg1) {
   return window['go']['project']['Project']['RemoveAddress'](arg1);
 }
@@ -116,4 +120,8 @@ export function SetName(arg1) {
 
 export function SetViewAndFacet(arg1, arg2) {
   return window['go']['project']['Project']['SetViewAndFacet'](arg1, arg2);
+}
+
+export function SetViewStates(arg1, arg2) {
+  return window['go']['project']['Project']['SetViewStates'](arg1, arg2);
 }

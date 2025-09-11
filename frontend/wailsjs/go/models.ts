@@ -467,6 +467,7 @@ export namespace dalle {
 	export class Series {
 	    last?: number;
 	    suffix: string;
+	    deleted?: boolean;
 	    adverbs: string[];
 	    adjectives: string[];
 	    nouns: string[];
@@ -489,6 +490,7 @@ export namespace dalle {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.last = source["last"];
 	        this.suffix = source["suffix"];
+	        this.deleted = source["deleted"];
 	        this.adverbs = source["adverbs"];
 	        this.adjectives = source["adjectives"];
 	        this.nouns = source["nouns"];

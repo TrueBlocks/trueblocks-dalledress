@@ -25,8 +25,6 @@ export interface MenuItem {
   path: string;
   position: 'top' | 'bottom' | 'hidden';
   component?: React.ComponentType;
-  hotkey?: string;
-  altHotkey?: string;
   type?: 'navigation' | 'dev' | 'toggle';
   action?: () => void | Promise<void>;
 }
@@ -37,8 +35,6 @@ export const MenuItems: MenuItem[] = [
     path: '/',
     position: 'top',
     component: Projects,
-    hotkey: 'mod+1',
-    altHotkey: 'alt+1',
     type: 'navigation',
   },
   {
@@ -46,8 +42,6 @@ export const MenuItems: MenuItem[] = [
     path: '/exports',
     position: 'top',
     component: Exports,
-    hotkey: 'mod+2',
-    altHotkey: 'alt+2',
     type: 'navigation',
   },
   {
@@ -55,8 +49,6 @@ export const MenuItems: MenuItem[] = [
     path: '/monitors',
     position: 'top',
     component: Monitors,
-    hotkey: 'mod+3',
-    altHotkey: 'alt+3',
     type: 'navigation',
   },
   {
@@ -64,8 +56,6 @@ export const MenuItems: MenuItem[] = [
     path: '/abis',
     position: 'top',
     component: Abis,
-    hotkey: 'mod+4',
-    altHotkey: 'alt+4',
     type: 'navigation',
   },
   {
@@ -73,8 +63,6 @@ export const MenuItems: MenuItem[] = [
     path: '/names',
     position: 'top',
     component: Names,
-    hotkey: 'mod+5',
-    altHotkey: 'alt+5',
     type: 'navigation',
   },
   {
@@ -82,8 +70,6 @@ export const MenuItems: MenuItem[] = [
     path: '/chunks',
     position: 'top',
     component: Chunks,
-    hotkey: 'mod+6',
-    altHotkey: 'alt+6',
     type: 'navigation',
   },
   {
@@ -91,8 +77,6 @@ export const MenuItems: MenuItem[] = [
     path: '/contracts',
     position: 'top',
     component: Contracts,
-    hotkey: 'mod+7',
-    altHotkey: 'alt+7',
     type: 'navigation',
   },
   {
@@ -100,8 +84,6 @@ export const MenuItems: MenuItem[] = [
     path: '/status',
     position: 'top',
     component: Status,
-    hotkey: 'mod+8',
-    altHotkey: 'alt+8',
     type: 'navigation',
   },
   {
@@ -109,8 +91,6 @@ export const MenuItems: MenuItem[] = [
     path: '/dalledress',
     position: 'top',
     component: DalleDress,
-    hotkey: 'mod+9',
-    altHotkey: 'alt+9',
     type: 'navigation',
   },
   {
@@ -118,8 +98,6 @@ export const MenuItems: MenuItem[] = [
     path: '/comparitoor',
     position: 'top',
     component: Comparitoor,
-    hotkey: 'mod+0',
-    altHotkey: 'alt+0',
     type: 'navigation',
   },
   {
@@ -127,8 +105,6 @@ export const MenuItems: MenuItem[] = [
     path: '/khedra',
     position: 'bottom',
     component: Khedra,
-    hotkey: 'mod+shift+1',
-    altHotkey: 'alt+shift+1',
     type: 'navigation',
   },
   {
@@ -136,8 +112,6 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+comma',
-    altHotkey: 'alt+comma',
     type: 'navigation',
   },
   {
@@ -145,8 +119,6 @@ export const MenuItems: MenuItem[] = [
     label: 'Wizard',
     position: 'hidden',
     component: Wizard,
-    hotkey: 'mod+shift+2',
-    altHotkey: 'alt+shift+2',
     type: 'dev',
     action: async () => {
       await SetInitialized(false);

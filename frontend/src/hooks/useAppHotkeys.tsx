@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useMemo } from 'react';
+
 import { CancelFetch, Reload } from '@app';
 import {
   useActiveProject,
@@ -6,34 +8,16 @@ import {
   usePreferences,
 } from '@hooks';
 import { msgs, types } from '@models';
-import { LogError, emitEvent, registerHotkeys, useEmitters } from '@utils';
-import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
-import { MenuItems } from 'src/Menu';
+import { LogError, emitEvent, useEmitters } from '@utils';
 import { useLocation } from 'wouter';
 
-interface BaseHotkey {
+type Hotkey = {
   type: 'navigation' | 'dev' | 'toggle';
   hotkey: string;
   label: string;
-}
-
-interface NavigationHotkey extends BaseHotkey {
-  type: 'navigation';
-  path: string;
-}
-
-interface DevHotkey extends BaseHotkey {
-  type: 'dev';
-  path: string;
-  action?: () => Promise<void>;
-}
-
-interface ToggleHotkey extends BaseHotkey {
-  type: 'toggle';
-  action: () => void;
-}
-
-type Hotkey = NavigationHotkey | DevHotkey | ToggleHotkey;
+  path?: string;
+  action?: (() => void) | (() => Promise<void>);
+};
 
 export const useAppHotkeys = (): void => {
   const [currentLocation] = useLocation();
@@ -60,49 +44,51 @@ export const useAppHotkeys = (): void => {
   const [, navigate] = useLocation();
   const { emitStatus, emitError } = useEmitters();
 
-  const handleHotkey = async (
-    hkType: Hotkey,
-    _e: KeyboardEvent,
-  ): Promise<void> => {
-    try {
-      switch (hkType.type) {
-        case 'navigation':
-          if (
-            currentLocation === hkType.path ||
-            currentLocation.startsWith(hkType.path + '/')
-          ) {
-            emitEvent(msgs.EventType.TAB_CYCLE, 'Tab cycle triggered', {
-              route: hkType.path,
-              key: hkType.hotkey,
-            });
-          } else {
-            navigate(hkType.path);
-          }
-          break;
+  const handleHotkey = useCallback(
+    async (hkType: Hotkey, _e: KeyboardEvent): Promise<void> => {
+      try {
+        switch (hkType.type) {
+          case 'navigation':
+            if (hkType.path) {
+              if (
+                currentLocation === hkType.path ||
+                currentLocation.startsWith(hkType.path + '/')
+              ) {
+                emitEvent(msgs.EventType.TAB_CYCLE, 'Tab cycle triggered', {
+                  route: hkType.path,
+                  key: hkType.hotkey,
+                });
+              } else {
+                navigate(hkType.path);
+              }
+            }
+            break;
 
-        case 'dev':
-          if (!import.meta.env.DEV) return;
-          if (hkType.action) await hkType.action();
-          navigate(hkType.path);
-          break;
+          case 'dev':
+            if (!import.meta.env.DEV) return;
+            if (hkType.action) await hkType.action();
+            if (hkType.path) navigate(hkType.path);
+            break;
 
-        case 'toggle':
-          hkType.action();
-          break;
+          case 'toggle':
+            if (hkType.action) hkType.action();
+            break;
+        }
+      } catch (error) {
+        LogError(error instanceof Error ? error.message : String(error));
+
+        if (
+          (hkType.type === 'navigation' || hkType.type === 'dev') &&
+          hkType.path
+        ) {
+          window.location.href = hkType.path;
+        }
       }
-    } catch (error) {
-      LogError(error instanceof Error ? error.message : String(error));
+    },
+    [currentLocation, navigate],
+  );
 
-      if (
-        (hkType.type === 'navigation' || hkType.type === 'dev') &&
-        hkType.path
-      ) {
-        window.location.href = hkType.path;
-      }
-    }
-  };
-
-  const toggleHotkeys: HotkeyConfig[] = [
+  const toggleHotkeys = [
     {
       key: 'mod+m',
       handler: (e: KeyboardEvent) =>
@@ -203,168 +189,125 @@ export const useAppHotkeys = (): void => {
     },
   ];
 
-  // Use the full static MenuItems list to keep hook registration count stable across renders.
-  // Handlers early-return if the corresponding menu item is not currently enabled.
-  const menuItemHotkeys = MenuItems.flatMap((item) => {
-    const hotkeyConfigs: HotkeyConfig[] = [];
-
-    if (item.hotkey) {
-      hotkeyConfigs.push({
-        key: item.hotkey,
-        handler: (e: KeyboardEvent) => {
-          let hotkeyObj: Hotkey;
-          const hotkey = item.hotkey || '';
-          const isEnabled = enabledMenuItems.some(
-            (enabled) => enabled.path === item.path,
+  // Dynamically assign hotkeys based on menu order and rules
+  // Build hotkey registry: key -> handler
+  const hotkeyRegistry = useMemo(() => {
+    const registry: Record<string, (e: KeyboardEvent) => void> = {};
+    let idx = 1;
+    enabledMenuItems.forEach((item) => {
+      if (item.path === '/wizard') {
+        registry['mod+w'] = (e: KeyboardEvent) => {
+          handleHotkey(
+            {
+              type: item.type || 'navigation',
+              hotkey: 'mod+w',
+              path: item.path,
+              label: `Navigate to ${item.label}`,
+              action: item.action,
+            },
+            e,
           );
-          if (!isEnabled) return;
-
-          switch (item.type) {
-            case 'dev':
-              hotkeyObj = {
-                type: 'dev',
-                hotkey,
-                path: item.path,
-                label: `Navigate to ${item.label}`,
-                action: item.action as () => Promise<void>,
-              };
-              break;
-            case 'toggle':
-              hotkeyObj = {
-                type: 'toggle',
-                hotkey,
-                label: `Toggle ${item.label}`,
-                action: item.action as () => void,
-              };
-              break;
-            case 'navigation':
-            default:
-              hotkeyObj = {
-                type: 'navigation',
-                hotkey,
-                path: item.path,
-                label: `Navigate to ${item.label}`,
-              };
-              break;
-          }
-          handleHotkey(hotkeyObj, e);
-        },
-        options: { preventDefault: true },
-      });
-    }
-
-    if (item.altHotkey) {
-      hotkeyConfigs.push({
-        key: item.altHotkey,
-        handler: (e: KeyboardEvent) => {
-          let hotkeyObj: Hotkey;
-          const hotkey = item.altHotkey || '';
-          const isEnabled = enabledMenuItems.some(
-            (enabled) => enabled.path === item.path,
+        };
+        return; // do not increment idx, no alt variant
+      }
+      if (item.path === '/settings') {
+        registry['mod+comma'] = (e: KeyboardEvent) => {
+          handleHotkey(
+            {
+              type: item.type || 'navigation',
+              hotkey: 'mod+comma',
+              path: item.path,
+              label: `Navigate to ${item.label}`,
+              action: item.action,
+            },
+            e,
           );
-          if (!isEnabled) return;
+        };
+        registry['alt+comma'] = (e: KeyboardEvent) => {
+          handleHotkey(
+            {
+              type: item.type || 'navigation',
+              hotkey: 'alt+comma',
+              path: item.path,
+              label: `Navigate to ${item.label} (alt)`,
+              action: item.action,
+            },
+            e,
+          );
+        };
+        return; // Do not increment idx so numbering unaffected
+      }
+      let hotkey: string;
+      if (idx <= 9) hotkey = `mod+${idx}`;
+      else if (idx === 10) hotkey = 'mod+0';
+      else hotkey = `mod+shift+${idx - 10}`;
+      registry[hotkey] = (e: KeyboardEvent) => {
+        handleHotkey(
+          {
+            type: item.type || 'navigation',
+            hotkey,
+            path: item.path,
+            label: `Navigate to ${item.label}`,
+            action: item.action,
+          },
+          e,
+        );
+      };
+      if (idx <= 10) {
+        const altHotkey = idx === 10 ? 'alt+0' : `alt+${idx}`;
+        registry[altHotkey] = (e: KeyboardEvent) => {
+          handleHotkey(
+            {
+              type: item.type || 'navigation',
+              hotkey: altHotkey,
+              path: item.path,
+              label: `Navigate to ${item.label} (alt)`,
+              action: item.action,
+            },
+            e,
+          );
+        };
+      }
+      idx++;
+    });
+    return registry;
+  }, [enabledMenuItems, handleHotkey]);
 
-          switch (item.type) {
-            case 'dev':
-              hotkeyObj = {
-                type: 'dev',
-                hotkey,
-                path: item.path,
-                label: `Navigate to ${item.label} (reverse)`,
-                action: item.action as () => Promise<void>,
-              };
-              break;
-            case 'toggle':
-              hotkeyObj = {
-                type: 'toggle',
-                hotkey,
-                label: `Toggle ${item.label} (reverse)`,
-                action: item.action as () => void,
-              };
-              break;
-            case 'navigation':
-            default:
-              hotkeyObj = {
-                type: 'navigation',
-                hotkey,
-                path: item.path,
-                label: `Navigate to ${item.label} (reverse)`,
-              };
-              break;
-          }
-          handleHotkey(hotkeyObj, e);
-        },
-        options: { preventDefault: true },
-      });
-    }
-
-    return hotkeyConfigs;
-  });
-
-  const editHotkeys: HotkeyConfig[] = [
+  // Edit (text) hotkeys (allow native behavior)
+  const editHotkeys = [
     {
       key: 'mod+c',
-      handler: (_e: KeyboardEvent) => {
-        // Allow default browser action
-      },
-      options: {
-        preventDefault: false,
-        enableOnFormTags: true,
-      } as RegisterHotkeyOptions,
+      handler: (_e: KeyboardEvent) => {},
+      options: { preventDefault: false, enableOnFormTags: true },
     },
     {
       key: 'mod+v',
-      handler: (_e: KeyboardEvent) => {
-        // Allow default browser action
-      },
-      options: {
-        preventDefault: false,
-        enableOnFormTags: true,
-      } as RegisterHotkeyOptions,
+      handler: (_e: KeyboardEvent) => {},
+      options: { preventDefault: false, enableOnFormTags: true },
     },
     {
       key: 'mod+x',
-      handler: (_e: KeyboardEvent) => {
-        // Allow default browser action
-      },
-      options: {
-        preventDefault: false,
-        enableOnFormTags: true,
-      } as RegisterHotkeyOptions,
+      handler: (_e: KeyboardEvent) => {},
+      options: { preventDefault: false, enableOnFormTags: true },
     },
     {
       key: 'mod+z',
-      handler: (_e: KeyboardEvent) => {
-        // Allow default browser action
-      },
-      options: {
-        preventDefault: false,
-        enableOnFormTags: true,
-      } as RegisterHotkeyOptions,
+      handler: (_e: KeyboardEvent) => {},
+      options: { preventDefault: false, enableOnFormTags: true },
     },
     {
       key: 'mod+shift+z',
-      handler: (_e: KeyboardEvent) => {
-        // Allow default browser action
-      },
-      options: {
-        preventDefault: false,
-        enableOnFormTags: true,
-      } as RegisterHotkeyOptions,
+      handler: (_e: KeyboardEvent) => {},
+      options: { preventDefault: false, enableOnFormTags: true },
     },
     {
-      key: 'mod+y', // Redo (alternative to mod+shift+z)
-      handler: (_e: KeyboardEvent) => {
-        // Allow default browser action
-      },
-      options: {
-        preventDefault: false,
-        enableOnFormTags: true,
-      } as RegisterHotkeyOptions,
+      key: 'mod+y',
+      handler: (_e: KeyboardEvent) => {},
+      options: { preventDefault: false, enableOnFormTags: true },
     },
   ];
 
-  const globalHotkeys: HotkeyConfig[] = [
+  const globalHotkeys = [
     {
       key: 'escape',
       handler: (_e: KeyboardEvent) => {
@@ -380,18 +323,65 @@ export const useAppHotkeys = (): void => {
             );
           });
       },
-      options: {
-        enableOnFormTags: true,
-        preventDefault: true,
-      } as RegisterHotkeyOptions,
+      options: { enableOnFormTags: true, preventDefault: true },
     },
   ];
 
-  const hotkeysConfig: HotkeyConfig[] = [
-    ...menuItemHotkeys,
-    ...toggleHotkeys,
-    ...editHotkeys,
-    ...globalHotkeys,
-  ];
-  registerHotkeys(hotkeysConfig);
+  function normalizeHotkey(e: KeyboardEvent): string {
+    if (
+      e.key === 'Alt' ||
+      e.key === 'Meta' ||
+      e.key === 'Control' ||
+      e.key === 'Shift'
+    )
+      return '';
+    let key = '';
+    if (e.metaKey || e.ctrlKey) key += 'mod+';
+    if (e.altKey) key += 'alt+';
+    if (e.shiftKey) key += 'shift+';
+    if (e.code.startsWith('Digit')) key += e.code.replace('Digit', '');
+    else if (e.code === 'Comma') key += 'comma';
+    else key += e.key.toLowerCase();
+    return key;
+  }
+
+  const memoToggleHotkeys = toggleHotkeys;
+  const memoEditHotkeys = editHotkeys;
+  const memoGlobalHotkeys = globalHotkeys;
+
+  useEffect(() => {
+    function onKeydown(e: KeyboardEvent) {
+      const key = normalizeHotkey(e);
+      if (!key) return;
+      let handled = false;
+      if (hotkeyRegistry[key]) {
+        hotkeyRegistry[key](e);
+        handled = true;
+      }
+      memoToggleHotkeys.forEach((hk) => {
+        if (hk.key === key) {
+          hk.handler(e);
+          handled = true;
+        }
+      });
+      memoEditHotkeys.forEach((hk) => {
+        if (hk.key === key) {
+          hk.handler(e);
+          handled = true;
+        }
+      });
+      memoGlobalHotkeys.forEach((hk) => {
+        if (hk.key === key) {
+          hk.handler(e);
+          handled = true;
+        }
+      });
+      if (handled) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+    window.addEventListener('keydown', onKeydown);
+    return () => window.removeEventListener('keydown', onKeydown);
+  }, [hotkeyRegistry, memoToggleHotkeys, memoEditHotkeys, memoGlobalHotkeys]);
 };

@@ -352,121 +352,10 @@ export namespace crud {
 
 export namespace dalle {
 	
-	export class Attribute {
-	    database: string;
-	    name: string;
-	    bytes: string;
-	    number: number;
-	    factor: number;
-	    count: number;
-	    selector: number;
-	    value: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Attribute(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.database = source["database"];
-	        this.name = source["name"];
-	        this.bytes = source["bytes"];
-	        this.number = source["number"];
-	        this.factor = source["factor"];
-	        this.count = source["count"];
-	        this.selector = source["selector"];
-	        this.value = source["value"];
-	    }
-	}
-	export class DalleDress {
-	    original: string;
-	    fileName: string;
-	    fileSize: number;
-	    modifiedAt: number;
-	    seed: string;
-	    prompt: string;
-	    dataPrompt: string;
-	    titlePrompt: string;
-	    tersePrompt: string;
-	    enhancedPrompt: string;
-	    attributes: Attribute[];
-	    seedChunks: string[];
-	    selectedTokens: string[];
-	    selectedRecords: string[];
-	    imageUrl: string;
-	    generatedPath: string;
-	    annotatedPath: string;
-	    downloadMode: string;
-	    ipfsHash: string;
-	    cacheHit: boolean;
-	    completed: boolean;
-	    series: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new DalleDress(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.original = source["original"];
-	        this.fileName = source["fileName"];
-	        this.fileSize = source["fileSize"];
-	        this.modifiedAt = source["modifiedAt"];
-	        this.seed = source["seed"];
-	        this.prompt = source["prompt"];
-	        this.dataPrompt = source["dataPrompt"];
-	        this.titlePrompt = source["titlePrompt"];
-	        this.tersePrompt = source["tersePrompt"];
-	        this.enhancedPrompt = source["enhancedPrompt"];
-	        this.attributes = this.convertValues(source["attributes"], Attribute);
-	        this.seedChunks = source["seedChunks"];
-	        this.selectedTokens = source["selectedTokens"];
-	        this.selectedRecords = source["selectedRecords"];
-	        this.imageUrl = source["imageUrl"];
-	        this.generatedPath = source["generatedPath"];
-	        this.annotatedPath = source["annotatedPath"];
-	        this.downloadMode = source["downloadMode"];
-	        this.ipfsHash = source["ipfsHash"];
-	        this.cacheHit = source["cacheHit"];
-	        this.completed = source["completed"];
-	        this.series = source["series"];
-	    }
-	
-		convertValues(a: any, classs: any, asMap: boolean = false): any {
-		    if (!a) {
-		        return a;
-		    }
-		    if (a.slice && a.map) {
-		        return (a as any[]).map(elem => this.convertValues(elem, classs));
-		    } else if ("object" === typeof a) {
-		        if (asMap) {
-		            for (const key of Object.keys(a)) {
-		                a[key] = new classs(a[key]);
-		            }
-		            return a;
-		        }
-		        return new classs(a);
-		    }
-		    return a;
-		}
-	}
-	export class Database {
-	    id: string;
-	    name: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Database(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.id = source["id"];
-	        this.name = source["name"];
-	    }
-	}
 	export class Series {
 	    last?: number;
 	    suffix: string;
+	    purpose?: string;
 	    deleted?: boolean;
 	    adverbs: string[];
 	    adjectives: string[];
@@ -490,6 +379,7 @@ export namespace dalle {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.last = source["last"];
 	        this.suffix = source["suffix"];
+	        this.purpose = source["purpose"];
 	        this.deleted = source["deleted"];
 	        this.adverbs = source["adverbs"];
 	        this.adjectives = source["adjectives"];
@@ -514,8 +404,8 @@ export namespace dalledress {
 	export class DalleDressPage {
 	    facet: types.DataFacet;
 	    logs: types.Log[];
-	    dalledress: dalle.DalleDress[];
-	    databases: dalle.Database[];
+	    dalledress: model.DalleDress[];
+	    databases: model.Database[];
 	    series: dalle.Series[];
 	    totalItems: number;
 	    expectedTotal: number;
@@ -530,8 +420,8 @@ export namespace dalledress {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.facet = source["facet"];
 	        this.logs = this.convertValues(source["logs"], types.Log);
-	        this.dalledress = this.convertValues(source["dalledress"], dalle.DalleDress);
-	        this.databases = this.convertValues(source["databases"], dalle.Database);
+	        this.dalledress = this.convertValues(source["dalledress"], model.DalleDress);
+	        this.databases = this.convertValues(source["databases"], model.Database);
 	        this.series = this.convertValues(source["series"], dalle.Series);
 	        this.totalItems = source["totalItems"];
 	        this.expectedTotal = source["expectedTotal"];
@@ -747,6 +637,97 @@ export namespace menu {
 		}
 	}
 	
+
+}
+
+export namespace model {
+	
+	export class DalleDress {
+	    original: string;
+	    fileName: string;
+	    fileSize: number;
+	    modifiedAt: number;
+	    seed: string;
+	    prompt: string;
+	    dataPrompt: string;
+	    titlePrompt: string;
+	    tersePrompt: string;
+	    enhancedPrompt: string;
+	    attributes: prompt.Attribute[];
+	    seedChunks: string[];
+	    selectedTokens: string[];
+	    selectedRecords: string[];
+	    imageUrl: string;
+	    generatedPath: string;
+	    annotatedPath: string;
+	    downloadMode: string;
+	    ipfsHash: string;
+	    cacheHit: boolean;
+	    completed: boolean;
+	    series: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new DalleDress(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.original = source["original"];
+	        this.fileName = source["fileName"];
+	        this.fileSize = source["fileSize"];
+	        this.modifiedAt = source["modifiedAt"];
+	        this.seed = source["seed"];
+	        this.prompt = source["prompt"];
+	        this.dataPrompt = source["dataPrompt"];
+	        this.titlePrompt = source["titlePrompt"];
+	        this.tersePrompt = source["tersePrompt"];
+	        this.enhancedPrompt = source["enhancedPrompt"];
+	        this.attributes = this.convertValues(source["attributes"], prompt.Attribute);
+	        this.seedChunks = source["seedChunks"];
+	        this.selectedTokens = source["selectedTokens"];
+	        this.selectedRecords = source["selectedRecords"];
+	        this.imageUrl = source["imageUrl"];
+	        this.generatedPath = source["generatedPath"];
+	        this.annotatedPath = source["annotatedPath"];
+	        this.downloadMode = source["downloadMode"];
+	        this.ipfsHash = source["ipfsHash"];
+	        this.cacheHit = source["cacheHit"];
+	        this.completed = source["completed"];
+	        this.series = source["series"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class Database {
+	    id: string;
+	    name: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Database(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	    }
+	}
 
 }
 
@@ -1129,6 +1110,37 @@ export namespace project {
 
 }
 
+export namespace prompt {
+	
+	export class Attribute {
+	    database: string;
+	    name: string;
+	    bytes: string;
+	    number: number;
+	    factor: number;
+	    count: number;
+	    selector: number;
+	    value: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new Attribute(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.database = source["database"];
+	        this.name = source["name"];
+	        this.bytes = source["bytes"];
+	        this.number = source["number"];
+	        this.factor = source["factor"];
+	        this.count = source["count"];
+	        this.selector = source["selector"];
+	        this.value = source["value"];
+	    }
+	}
+
+}
+
 export namespace sdk {
 	
 	export class SortSpec {
@@ -1199,14 +1211,6 @@ export namespace status {
 
 export namespace types {
 	
-	export enum LoadState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    PARTIAL = "partial",
-	    LOADED = "loaded",
-	    PENDING = "pending",
-	    ERROR = "error",
-	}
 	export enum DataFacet {
 	    DOWNLOADED = "downloaded",
 	    KNOWN = "known",
@@ -1245,6 +1249,14 @@ export namespace types {
 	    STATUS = "status",
 	    CACHES = "caches",
 	    CHAINS = "chains",
+	}
+	export enum LoadState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    PARTIAL = "partial",
+	    LOADED = "loaded",
+	    PENDING = "pending",
+	    ERROR = "error",
 	}
 	export class Parameter {
 	    components?: Parameter[];

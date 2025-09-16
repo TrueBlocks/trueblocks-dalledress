@@ -9,6 +9,7 @@ import (
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/storage"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 )
@@ -25,7 +26,7 @@ func (c *DalleDressCollection) seriesCrud(
 	if item == nil {
 		return fmt.Errorf("seriesCrud missing item")
 	}
-	seriesDir := filepath.Join(dalle.DataDir(), "series")
+	seriesDir := filepath.Join(storage.DataDir(), "series")
 	// Support a pseudo duplicate operation encoded by passing an item whose Suffix ends with "-copy" pattern AND op == crud.Create with a source indicated in item.Last (temporary convention) is overkill.
 	// Instead, frontend will call Create with full cloned object; so duplicate maps to plain Create here.
 	switch op {

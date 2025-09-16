@@ -6,23 +6,24 @@ import (
 	"path/filepath"
 	"strings"
 
-	dallev2 "github.com/TrueBlocks/trueblocks-dalle/v2"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/model"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/storage"
 )
 
-// loadCurrentDressFromSidecars attempts to reconstruct a dalle.DalleDress from existing sidecar files
+// loadCurrentDressFromSidecars attempts to reconstruct a model.DalleDress from existing sidecar files
 // without triggering any generation. Returns nil if no relevant sidecars exist.
-func loadCurrentDressFromSidecars(series, address string) *dallev2.DalleDress {
+func loadCurrentDressFromSidecars(series, address string) *model.DalleDress {
 	if address == "" || series == "" {
 		return nil
 	}
 	addrLower := strings.ToLower(address)
-	root := dallev2.OutputDir()
+	root := storage.OutputDir()
 	filename := sanitizeFilename(addrLower)
 	selectorPath := filepath.Join(root, series, "selector", filename+".json")
 
-	var dd *dallev2.DalleDress
+	var dd *model.DalleDress
 	if b, err := os.ReadFile(selectorPath); err == nil {
-		tmp := dallev2.DalleDress{}
+		tmp := model.DalleDress{}
 		if json.Unmarshal(b, &tmp) == nil {
 			dd = &tmp
 		}
@@ -31,7 +32,7 @@ func loadCurrentDressFromSidecars(series, address string) *dallev2.DalleDress {
 	// If no selector JSON, attempt to assemble prompts directly
 	if dd == nil {
 		// Minimal reconstruction; seed/attributes intentionally omitted to avoid re-execution logic
-		dd = &dallev2.DalleDress{
+		dd = &model.DalleDress{
 			Original: address,
 			FileName: filename,
 		}

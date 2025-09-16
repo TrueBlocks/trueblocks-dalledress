@@ -1,9 +1,9 @@
 import { Badge, Card, Image, Stack, Text } from '@mantine/core';
-import { dalle } from '@models';
+import { model } from '@models';
 
 export interface GeneratorThumbProps {
-  item: dalle.DalleDress;
-  onSelect?: (item: dalle.DalleDress) => void;
+  item: model.DalleDress;
+  onSelect?: (item: model.DalleDress) => void;
   selected?: boolean;
 }
 

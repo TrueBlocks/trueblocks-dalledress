@@ -17,6 +17,9 @@ import (
 
 	// EXISTING_CODE
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/model"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/storage"
+
 	// EXISTING_CODE
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver"
@@ -31,8 +34,8 @@ import (
 // EXISTING_CODE
 
 type Log = sdk.Log
-type DalleDress = dalle.DalleDress
-type Database = dalle.Database
+type DalleDress = model.DalleDress
+type Database = model.Database
 type Series = dalle.Series
 
 var (
@@ -112,7 +115,7 @@ func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet 
 				dd := loadCurrentDressFromSidecars(gi.Series, gi.Original)
 				if dd == nil {
 					filename := sanitizeFilename(gi.Original)
-					annotatedPath := filepath.Join(dalle.OutputDir(), gi.AnnotatedPath)
+					annotatedPath := filepath.Join(storage.OutputDir(), gi.AnnotatedPath)
 					dd = &DalleDress{
 						Original:      gi.Original,
 						FileName:      filename,
@@ -122,7 +125,7 @@ func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet 
 					}
 				}
 				if dd.AnnotatedPath == "" && gi.AnnotatedPath != "" {
-					dd.AnnotatedPath = filepath.Join(dalle.OutputDir(), gi.AnnotatedPath)
+					dd.AnnotatedPath = filepath.Join(storage.OutputDir(), gi.AnnotatedPath)
 				}
 				if gi.ImageURL != "" {
 					dd.ImageURL = gi.ImageURL
@@ -223,7 +226,7 @@ func (c *DalleDressCollection) getSeriesStore(payload *types.Payload, facet type
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			seriesDir := filepath.Join(dalle.DataDir(), "series")
+			seriesDir := filepath.Join(storage.DataDir(), "series")
 			models, _ := dalle.LoadSeriesModels(seriesDir)
 			_ = dalle.SortSeries(models, sdk.SortSpec{
 				Fields: []string{"suffix"},
@@ -311,7 +314,7 @@ func GetDalleDressCollection(payload *types.Payload) *DalleDressCollection {
 // EXISTING_CODE
 // getGalleryItems returns cached items performing incremental scan per series
 func (c *DalleDressCollection) getGalleryItems() (items []*DalleDress) {
-	root := dalle.OutputDir()
+	root := storage.OutputDir()
 	seriesList := make([]*DalleDress, 0, 512)
 
 	entries, err := os.ReadDir(root)

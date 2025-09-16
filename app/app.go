@@ -23,6 +23,7 @@ import (
 	coreTypes "github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/types"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/utils"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/storage"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -117,7 +118,7 @@ func (a *App) Startup(ctx context.Context) {
 	a.Preferences.App = appPrefs
 
 	// Initialize file server directly on the dalle OutputDir
-	if out := dalle.OutputDir(); out != "" {
+	if out := storage.OutputDir(); out != "" {
 		if _, err := os.Stat(out); err == nil {
 			a.fileServer = fileserver.NewFileServer(out)
 			if err := a.fileServer.Start(); err != nil {

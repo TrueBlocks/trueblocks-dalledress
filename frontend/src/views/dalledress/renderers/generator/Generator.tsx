@@ -13,7 +13,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { dalle, dalledress, project } from '@models';
+import { dalledress, model, project } from '@models';
 import { Log } from '@utils';
 
 import { DalleDressCard } from '../../components';
@@ -111,7 +111,7 @@ export const Generator = ({ pageData, viewStateKey }: GeneratorProps) => {
   }, [selectedItem?.original, selectedItem?.series]);
 
   const handleThumbSelect = useCallback(
-    (item: dalle.DalleDress) => {
+    (item: model.DalleDress) => {
       const key = getItemKey(item);
       setSelection(key, viewStateKey);
       if (item.original !== orig) {
@@ -125,7 +125,7 @@ export const Generator = ({ pageData, viewStateKey }: GeneratorProps) => {
   );
 
   const handleThumbDouble = useCallback(
-    (item: dalle.DalleDress) => {
+    (item: model.DalleDress) => {
       handleThumbSelect(item);
     },
     [handleThumbSelect],

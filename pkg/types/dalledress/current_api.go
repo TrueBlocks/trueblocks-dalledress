@@ -2,18 +2,20 @@ package dalledress
 
 import (
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/model"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/progress"
 )
 
-func GetCurrentDressFor(series, address string) *dalle.DalleDress {
+func GetCurrentDressFor(series, address string) *model.DalleDress {
 	if address == "" {
-		return &dalle.DalleDress{}
+		return &model.DalleDress{}
 	}
 	if series == "" {
 		series = "empty"
 	}
 	// Always attempt generation (cached path is fast if image exists)
 	_, _ = dalle.GenerateAnnotatedImage(series, address, false, 0)
-	if pr := dalle.GetProgress(series, address); pr != nil && pr.DalleDress != nil {
+	if pr := progress.GetProgress(series, address); pr != nil && pr.DalleDress != nil {
 		dd := *pr.DalleDress
 		if dd.AnnotatedPath != "" {
 			dd.Completed = true
@@ -23,5 +25,5 @@ func GetCurrentDressFor(series, address string) *dalle.DalleDress {
 		}
 		return &dd
 	}
-	return &dalle.DalleDress{}
+	return &model.DalleDress{}
 }

@@ -28,7 +28,7 @@ import {
 import { TabView } from '@layout';
 import { Group, Stack } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { dalle, dalledress } from '@models';
+import { dalle, dalledress, model } from '@models';
 import { crud, msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
@@ -184,13 +184,13 @@ export const DalleDress = () => {
         await DalleDressCrud(
           _payload,
           _op,
-          _item as unknown as dalle.DalleDress,
+          _item as unknown as model.DalleDress,
         );
       }
     },
     pageFunc: GetDalleDressPage,
     pageClass: dalledress.DalleDressPage,
-    updateItem: dalle.DalleDress.createFrom({}),
+    updateItem: model.DalleDress.createFrom({}),
     createPayload,
     getCurrentDataFacet,
   });
@@ -236,7 +236,7 @@ export const DalleDress = () => {
 
           // Find first dalledress from a non-deleted series that isn't the affected one
           const availableDalledresses = allDalledresses.filter(
-            (d: dalle.DalleDress) => {
+            (d: model.DalleDress) => {
               const dalledressSeries = pageData?.series?.find(
                 (s) => s.suffix === d.series,
               );

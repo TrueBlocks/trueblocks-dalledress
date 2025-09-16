@@ -111,11 +111,14 @@ func TestSeriesExportCSV(t *testing.T) {
 		t.Fatalf("read export: %v", err)
 	}
 	text := string(b)
-	if !strings.HasPrefix(text, "suffix,last,deleted,modifiedAt,") {
+	if !strings.HasPrefix(text, "suffix,purpose,last,deleted,modifiedAt,") && !strings.HasPrefix(text, "suffix,last,deleted,modifiedAt,") {
 		t.Fatalf("unexpected header: %s", text)
 	}
-	if !strings.Contains(text, "one,3") || !strings.Contains(text, "two,4") {
-		t.Fatalf("rows missing: %s", text)
+	if !strings.Contains(text, "one,,3") && !strings.Contains(text, "one,3") {
+		t.Fatalf("row for 'one' missing: %s", text)
+	}
+	if !strings.Contains(text, "two,,4") && !strings.Contains(text, "two,4") {
+		t.Fatalf("row for 'two' missing: %s", text)
 	}
 	// ensure file is placed under Exports dir
 	if !strings.Contains(out, ".Exports") {

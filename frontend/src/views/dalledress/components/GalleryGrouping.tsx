@@ -2,19 +2,19 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FromTemplate } from '@app';
 import { Box, SimpleGrid, Text, Title } from '@mantine/core';
-import { dalle, types } from '@models';
+import { model, types } from '@models';
 
 import { getItemKey } from '../store';
 import { DalleDressCard } from './DalleDressCard';
 
 export interface GalleryGroupingProps {
-  items: dalle.DalleDress[];
+  items: model.DalleDress[];
   series: string;
   columns: number;
   sortMode: 'series' | 'address';
   selected?: string | null;
-  onItemClick?: (item: dalle.DalleDress) => void;
-  onItemDoubleClick?: (item: dalle.DalleDress) => void;
+  onItemClick?: (item: model.DalleDress) => void;
+  onItemDoubleClick?: (item: model.DalleDress) => void;
 }
 
 export const GalleryGrouping = ({

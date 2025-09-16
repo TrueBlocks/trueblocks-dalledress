@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import type { DataFacet } from '@hooks';
 import { Center, Container, Title } from '@mantine/core';
-import { dalle, dalledress, project, types } from '@models';
+import { dalledress, model, project, types } from '@models';
 
 import { GalleryControls, GalleryGrouping } from '../../components';
 import { useScrollSelectedIntoView } from '../../hooks/useScrollSelectedIntoView';
@@ -113,14 +113,14 @@ export const Gallery = ({
 
   // --------------------------------------
   const handleItemClick = useCallback(
-    (item: dalle.DalleDress) => {
+    (item: model.DalleDress) => {
       setSelection(getItemKey(item), viewStateKey);
     },
     [setSelection, viewStateKey],
   );
 
   const handleItemDoubleClick = useCallback(
-    (item: dalle.DalleDress) => {
+    (item: model.DalleDress) => {
       setSelection(getItemKey(item), viewStateKey);
       if (setActiveFacet)
         setActiveFacet(types.DataFacet.GENERATOR as DataFacet);

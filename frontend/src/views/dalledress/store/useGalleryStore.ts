@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 import { GetProjectViewState, SetProjectViewState } from '@app';
-import { dalle, project, types } from '@models';
+import { model, project, types } from '@models';
 import { LogError } from '@utils';
 
-export const getItemKey = (item: dalle.DalleDress | null): string => {
+export const getItemKey = (item: model.DalleDress | null): string => {
   if (!item) return '';
   return `${item.original}:${item.series || ''}`;
 };
@@ -13,9 +13,9 @@ interface GalleryState {
   selectedKey: string | null;
   orig: string | null;
   series: string | null;
-  galleryItems: dalle.DalleDress[];
-  groupedBySeries: Record<string, dalle.DalleDress[]>;
-  groupedByAddress: Record<string, dalle.DalleDress[]>;
+  galleryItems: model.DalleDress[];
+  groupedBySeries: Record<string, model.DalleDress[]>;
+  groupedByAddress: Record<string, model.DalleDress[]>;
   sortMode: 'series' | 'address';
   columns: number;
   hydrated: boolean;
@@ -95,10 +95,10 @@ class GalleryStore {
     );
   }
 
-  ingest(items: dalle.DalleDress[] | null) {
+  ingest(items: model.DalleDress[] | null) {
     const list = items ? [...items] : [];
-    const groupedBySeries: Record<string, dalle.DalleDress[]> = {};
-    const groupedByAddress: Record<string, dalle.DalleDress[]> = {};
+    const groupedBySeries: Record<string, model.DalleDress[]> = {};
+    const groupedByAddress: Record<string, model.DalleDress[]> = {};
     for (const it of list) {
       const sKey = it.series || '';
       if (!groupedBySeries[sKey]) groupedBySeries[sKey] = [];
@@ -240,7 +240,7 @@ export const useGalleryStore = () => {
     [],
   );
   const ingestItems = useCallback(
-    (items: dalle.DalleDress[] | null) => store.ingest(items),
+    (items: model.DalleDress[] | null) => store.ingest(items),
     [],
   );
 
@@ -275,12 +275,12 @@ export const useGalleryStore = () => {
   const handleKey = useCallback(
     (
       e: React.KeyboardEvent<HTMLDivElement>,
-      items: dalle.DalleDress[],
+      items: model.DalleDress[],
       viewStateKey: project.ViewStateKey,
       columns?: number,
-      onDoubleClick?: (item: dalle.DalleDress) => void,
+      onDoubleClick?: (item: model.DalleDress) => void,
       groupNames?: Array<string>,
-      groupedItems?: Record<string, dalle.DalleDress[]>,
+      groupedItems?: Record<string, model.DalleDress[]>,
     ) => {
       if (!items.length) return;
       const selectedKey = getSelectionKey();
@@ -310,9 +310,9 @@ export const useGalleryStore = () => {
         let found = false;
         for (let g = 0; g < groupNames.length; g++) {
           const groupKey = groupNames[g] ?? '';
-          const group: Array<dalle.DalleDress> = groupedItems[groupKey] || [];
+          const group: Array<model.DalleDress> = groupedItems[groupKey] || [];
           const idx = group.findIndex(
-            (i: dalle.DalleDress) => getItemKey(i) === selectedKey,
+            (i: model.DalleDress) => getItemKey(i) === selectedKey,
           );
           if (idx !== -1) {
             groupIdx = g;
@@ -339,7 +339,7 @@ export const useGalleryStore = () => {
       // Grid-based navigation when we have columns and grouping
       if (columns && groupNames && groupedItems) {
         const groupKey = groupNames[groupIdx] ?? '';
-        const group: Array<dalle.DalleDress> = groupedItems[groupKey] || [];
+        const group: Array<model.DalleDress> = groupedItems[groupKey] || [];
         const row = Math.floor(itemIdxInGroup / columns);
         const col = itemIdxInGroup % columns;
         let targetGroupIdx = groupIdx;
@@ -368,14 +368,14 @@ export const useGalleryStore = () => {
             // Move to last item of previous group
             targetGroupIdx = groupIdx - 1;
             const prevGroupKey = groupNames[targetGroupIdx] ?? '';
-            const prevGroup: Array<dalle.DalleDress> =
+            const prevGroup: Array<model.DalleDress> =
               groupedItems[prevGroupKey] || [];
             targetItemIdxInGroup = prevGroup.length - 1;
           } else {
             // Wrap to last item of last group
             targetGroupIdx = groupNames.length - 1;
             const lastGroupKey = groupNames[targetGroupIdx] ?? '';
-            const lastGroup: Array<dalle.DalleDress> =
+            const lastGroup: Array<model.DalleDress> =
               groupedItems[lastGroupKey] || [];
             targetItemIdxInGroup = lastGroup.length - 1;
           }
@@ -394,7 +394,7 @@ export const useGalleryStore = () => {
             // Move to next group, first row
             targetGroupIdx = groupIdx + 1;
             const nextGroupKey = groupNames[targetGroupIdx] ?? '';
-            const nextGroup: Array<dalle.DalleDress> =
+            const nextGroup: Array<model.DalleDress> =
               groupedItems[nextGroupKey] || [];
             const end = Math.min(columns, nextGroup.length);
             const rowLength = end;
@@ -415,7 +415,7 @@ export const useGalleryStore = () => {
             // Move to previous group, last row
             targetGroupIdx = groupIdx - 1;
             const prevGroupKey = groupNames[targetGroupIdx] ?? '';
-            const prevGroup: Array<dalle.DalleDress> =
+            const prevGroup: Array<model.DalleDress> =
               groupedItems[prevGroupKey] || [];
             const prevTotalRows = Math.ceil(prevGroup.length / columns);
             const start = (prevTotalRows - 1) * columns;
@@ -434,7 +434,7 @@ export const useGalleryStore = () => {
           // Go to last item of last group
           targetGroupIdx = groupNames.length - 1;
           const lastGroupKey = groupNames[targetGroupIdx] ?? '';
-          const lastGroup: Array<dalle.DalleDress> =
+          const lastGroup: Array<model.DalleDress> =
             groupedItems[lastGroupKey] || [];
           targetItemIdxInGroup = lastGroup.length - 1;
         }
@@ -442,7 +442,7 @@ export const useGalleryStore = () => {
         // Apply the navigation if we found a target
         if (targetItemIdxInGroup !== null) {
           const targetGroupKey = groupNames[targetGroupIdx] ?? '';
-          const targetGroup: Array<dalle.DalleDress> =
+          const targetGroup: Array<model.DalleDress> =
             groupedItems[targetGroupKey] || [];
           const targetItem = targetGroup[targetItemIdxInGroup] ?? null;
           if (targetItem) {

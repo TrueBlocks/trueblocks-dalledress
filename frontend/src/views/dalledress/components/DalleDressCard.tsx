@@ -1,13 +1,13 @@
 import { Box, Card, Image, Stack, Text } from '@mantine/core';
-import { dalle } from '@models';
+import { model } from '@models';
 import { getDisplayAddress } from '@utils';
 
 import { getItemKey } from '../store';
 
 export interface DalleDressCardProps {
-  item: dalle.DalleDress;
-  onClick?: (item: dalle.DalleDress) => void;
-  onDoubleClick?: (item: dalle.DalleDress) => void;
+  item: model.DalleDress;
+  onClick?: (item: model.DalleDress) => void;
+  onDoubleClick?: (item: model.DalleDress) => void;
   selected?: boolean;
 }
 

@@ -24,6 +24,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{},
 			RendererTypes: "facet",
+			Disabled:      false,
 		},
 		"series": {
 			Name:          "Series",
@@ -35,6 +36,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{"update", "delete", "undelete", "remove"},
 			HeaderActions: []string{"create", "export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"databases": {
 			Name:          "Databases",
@@ -45,6 +47,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"events": {
 			Name:          "Events",
@@ -55,6 +58,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"gallery": {
 			Name:          "Gallery",
@@ -65,18 +69,20 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "facet",
+			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "dalledress",
+		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"generator", "series", "databases", "events", "gallery"},
 		Actions: map[string]types.ActionConfig{
-			"create":   {Name: "create", Label: "Create", Icon: "Create"},
-			"delete":   {Name: "delete", Label: "Delete", Icon: "Delete"},
-			"export":   {Name: "export", Label: "Export", Icon: "Export"},
-			"remove":   {Name: "remove", Label: "Remove", Icon: "Remove"},
+			"create": {Name: "create", Label: "Create", Icon: "Create"},
+			"delete": {Name: "delete", Label: "Delete", Icon: "Delete"},
+			"export": {Name: "export", Label: "Export", Icon: "Export"},
+			"remove": {Name: "remove", Label: "Remove", Icon: "Remove"},
 			// TODO: BOGUS - do we include "undelete" here?
 			"undelete": {Name: "undelete", Label: "Undelete", Icon: "Undelete"},
 			"update":   {Name: "update", Label: "Update", Icon: "Update"},

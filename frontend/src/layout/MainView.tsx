@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { StatusBar } from '@layout';
 import { AppShell } from '@mantine/core';
-import { getDebugClass } from '@utils';
+import { Log, getDebugClass } from '@utils';
 import { MenuItem, MenuItems } from 'src/Menu';
 import { Route, useLocation } from 'wouter';
 
@@ -48,11 +48,14 @@ export const MainView = () => {
           position: 'relative',
         }}
       >
-        {MenuItems.filter(isComponentMenuItem).map((item) => (
-          <Route key={item.path} path={item.path}>
-            {React.createElement(item.component)}
-          </Route>
-        ))}
+        {MenuItems.filter(isComponentMenuItem).map((item) => {
+          Log(`Rendering route for path: ${item.path}`);
+          return (
+            <Route key={item.path} path={item.path}>
+              {React.createElement(item.component)}
+            </Route>
+          );
+        })}
       </div>
 
       <div

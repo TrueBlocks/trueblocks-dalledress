@@ -24,6 +24,7 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{},
 			RendererTypes: "facet",
+			Disabled:      false,
 		},
 		"execute": {
 			Name:          "Execute",
@@ -34,6 +35,7 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{},
 			RendererTypes: "facet",
+			Disabled:      false,
 		},
 		"events": {
 			Name:          "Events",
@@ -44,11 +46,13 @@ func (c *ContractsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "contracts",
+		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"dashboard", "execute", "events"},
 		Actions: map[string]types.ActionConfig{

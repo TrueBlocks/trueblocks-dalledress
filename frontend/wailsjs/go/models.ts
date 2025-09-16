@@ -1817,6 +1817,7 @@ export namespace types {
 	    store: string;
 	    isForm: boolean;
 	    dividerBefore: boolean;
+	    disabled: boolean;
 	    fields: FieldConfig[];
 	    columns: ColumnConfig[];
 	    detailPanels: DetailPanelConfig[];
@@ -1834,6 +1835,7 @@ export namespace types {
 	        this.store = source["store"];
 	        this.isForm = source["isForm"];
 	        this.dividerBefore = source["dividerBefore"];
+	        this.disabled = source["disabled"];
 	        this.fields = this.convertValues(source["fields"], FieldConfig);
 	        this.columns = this.convertValues(source["columns"], ColumnConfig);
 	        this.detailPanels = this.convertValues(source["detailPanels"], DetailPanelConfig);
@@ -2795,6 +2797,7 @@ export namespace types {
 	}
 	export class ViewConfig {
 	    viewName: string;
+	    disabled: boolean;
 	    facets: Record<string, FacetConfig>;
 	    actions: Record<string, ActionConfig>;
 	    facetOrder: string[];
@@ -2806,6 +2809,7 @@ export namespace types {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.viewName = source["viewName"];
+	        this.disabled = source["disabled"];
 	        this.facets = this.convertValues(source["facets"], FacetConfig, true);
 	        this.actions = this.convertValues(source["actions"], ActionConfig, true);
 	        this.facetOrder = source["facetOrder"];

@@ -310,6 +310,10 @@ export function IsDialogSilenced(arg1) {
   return window['go']['app']['App']['IsDialogSilenced'](arg1);
 }
 
+export function IsDisabled(arg1) {
+  return window['go']['app']['App']['IsDisabled'](arg1);
+}
+
 export function IsInitialized() {
   return window['go']['app']['App']['IsInitialized']();
 }

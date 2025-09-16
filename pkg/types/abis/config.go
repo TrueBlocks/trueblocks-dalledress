@@ -24,6 +24,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{"remove"},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"known": {
 			Name:          "Known",
@@ -34,6 +35,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"functions": {
 			Name:          "Functions",
@@ -44,6 +46,7 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"events": {
 			Name:          "Events",
@@ -54,11 +57,13 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "abis",
+		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"downloaded", "known", "functions", "events"},
 		Actions: map[string]types.ActionConfig{

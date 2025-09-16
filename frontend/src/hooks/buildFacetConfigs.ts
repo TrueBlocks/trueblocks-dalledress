@@ -7,7 +7,12 @@ export function buildFacetConfigs(
   labelTransform?: (id: string) => string,
 ): DataFacetConfig[] {
   return (viewConfig.facetOrder || [])
-    .filter((facetId: string) => Boolean(viewConfig.facets[facetId]))
+    .filter((facetId: string) => {
+      const fc = viewConfig.facets[facetId];
+      if (!fc) return false;
+      if (fc.disabled) return false;
+      return true;
+    })
     .map((facetId: string) => {
       const facetCfg = viewConfig.facets[facetId];
       return {

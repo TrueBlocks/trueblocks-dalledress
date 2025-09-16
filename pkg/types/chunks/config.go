@@ -24,6 +24,7 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"index": {
 			Name:          "Index",
@@ -34,6 +35,7 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"blooms": {
 			Name:          "Blooms",
@@ -44,6 +46,7 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"manifest": {
 			Name:          "Manifest",
@@ -54,11 +57,13 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "chunks",
+		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"stats", "index", "blooms", "manifest"},
 		Actions: map[string]types.ActionConfig{

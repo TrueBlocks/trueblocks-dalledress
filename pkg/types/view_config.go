@@ -3,6 +3,7 @@ package types
 // ViewConfig represents the complete configuration for a view
 type ViewConfig struct {
 	ViewName   string                  `json:"viewName"`
+	Disabled   bool                    `json:"disabled"`
 	Facets     map[string]FacetConfig  `json:"facets"`
 	Actions    map[string]ActionConfig `json:"actions"`
 	FacetOrder []string                `json:"facetOrder"`
@@ -14,6 +15,7 @@ type FacetConfig struct {
 	Store         string              `json:"store"`
 	IsForm        bool                `json:"isForm"`
 	DividerBefore bool                `json:"dividerBefore"`
+	Disabled      bool                `json:"disabled"`
 	Fields        []FieldConfig       `json:"fields"`
 	Columns       []ColumnConfig      `json:"columns"`
 	DetailPanels  []DetailPanelConfig `json:"detailPanels"`
@@ -72,4 +74,20 @@ type ActionConfig struct {
 	Label        string `json:"label"`
 	Icon         string `json:"icon"`
 	Confirmation bool   `json:"confirmation"`
+}
+
+// IsDisabled returns true if the view is disabled or all its facets are disabled
+func (vc *ViewConfig) IsDisabled() bool {
+	if vc.Disabled {
+		return true
+	}
+	if len(vc.Facets) == 0 {
+		return false
+	}
+	for _, facet := range vc.Facets {
+		if !facet.Disabled {
+			return false
+		}
+	}
+	return true
 }

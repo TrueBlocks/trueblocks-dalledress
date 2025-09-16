@@ -24,6 +24,7 @@ func (c *StatusCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"caches": {
 			Name:          "Caches",
@@ -34,6 +35,7 @@ func (c *StatusCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 		"chains": {
 			Name:          "Chains",
@@ -44,11 +46,13 @@ func (c *StatusCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
+			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "status",
+		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"status", "caches", "chains"},
 		Actions: map[string]types.ActionConfig{

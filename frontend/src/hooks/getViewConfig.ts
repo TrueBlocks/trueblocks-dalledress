@@ -50,12 +50,12 @@ export async function initializeAllViewConfigs(): Promise<{
 
       // Define all view configs to load
       const viewConfigs = [
-        { name: 'abis', getter: GetAbisConfig },
-        { name: 'chunks', getter: GetChunksConfig },
-        { name: 'contracts', getter: GetContractsConfig },
         { name: 'exports', getter: GetExportsConfig },
         { name: 'monitors', getter: GetMonitorsConfig },
+        { name: 'abis', getter: GetAbisConfig },
         { name: 'names', getter: GetNamesConfig },
+        { name: 'chunks', getter: GetChunksConfig },
+        { name: 'contracts', getter: GetContractsConfig },
         { name: 'status', getter: GetStatusConfig },
         { name: 'dalledress', getter: GetDalleDressConfig },
         { name: 'comparitoor', getter: GetComparitoorConfig },

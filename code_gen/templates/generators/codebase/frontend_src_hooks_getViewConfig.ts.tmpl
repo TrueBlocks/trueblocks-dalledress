@@ -1,6 +1,8 @@
 import {
 {{- range .Structures }}
+	{{- if and (not (eq .Class "")) (not .DisableGo) }}
   Get{{ .Class }}Config,
+  {{- end }}
 {{- end }}
  } from '@app';
 import { types } from '@models';
@@ -45,7 +47,9 @@ export async function initializeAllViewConfigs(): Promise<{
       // Define all view configs to load
       const viewConfigs = [
 {{- range .Structures }}
-        { name: 'abis', getter: Get{{ .Class }}Config },
+	{{- if and (not (eq .Class "")) (not .DisableGo) }}
+        { name: '{{toLower .Class}}', getter: Get{{ .Class }}Config },
+  {{- end }}
 {{- end }}
       ];
 

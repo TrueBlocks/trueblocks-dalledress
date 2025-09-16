@@ -51,5 +51,22 @@ func getCollection(payload *types.Payload, missingOk bool) types.Collection {
 		return nil
 	}
 }
+
+// IsDisabled returns true if the collection is disable or if all of its facets are disabled
+func (a *App) IsDisabled(viewName string) bool {
+	payload := &types.Payload{
+		Collection: viewName,
+	}
+	collection := getCollection(payload, true)
+	if collection == nil {
+		return false // not disabled if not found
+	}
+	if cfg, err := collection.GetConfig(); err == nil {
+		return cfg.IsDisabled()
+	} else {
+		return false // not disabled if not found
+	}
+}
+
 // EXISTING_CODE
 // EXISTING_CODE

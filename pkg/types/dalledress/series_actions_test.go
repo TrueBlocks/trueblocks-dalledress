@@ -65,7 +65,7 @@ func TestSeriesViewConfig(t *testing.T) {
 		t.Fatal("Series facet not found in config")
 	}
 
-	expectedActions := []string{"update", "delete", "undelete", "remove"}
+	expectedActions := []string{"update", "delete", "remove"}
 	if len(seriesFacet.Actions) != len(expectedActions) {
 		t.Errorf("Expected %d actions, got %d", len(expectedActions), len(seriesFacet.Actions))
 	}

@@ -32,8 +32,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			IsForm:        false,
 			DividerBefore: false,
 			Fields:        getSeriesFields(),
-			// TODO: BOGUS - DO WE INCLUDE "undeleted" here?
-			Actions:       []string{"update", "delete", "undelete", "remove"},
+			Actions:       []string{"update", "delete", "remove"},
 			HeaderActions: []string{"create", "export"},
 			RendererTypes: "",
 			Disabled:      false,
@@ -83,9 +82,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 			"delete": {Name: "delete", Label: "Delete", Icon: "Delete"},
 			"export": {Name: "export", Label: "Export", Icon: "Export"},
 			"remove": {Name: "remove", Label: "Remove", Icon: "Remove"},
-			// TODO: BOGUS - do we include "undelete" here?
-			"undelete": {Name: "undelete", Label: "Undelete", Icon: "Undelete"},
-			"update":   {Name: "update", Label: "Update", Icon: "Update"},
+			"update": {Name: "update", Label: "Update", Icon: "Update"},
 		},
 	}
 	types.DeriveFacets(cfg)

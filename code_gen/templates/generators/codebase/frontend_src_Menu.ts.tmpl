@@ -17,8 +17,6 @@ export interface MenuItem {
   path: string;
   position: 'top' | 'bottom' | 'hidden';
   component?: React.ComponentType;
-  hotkey?: string;
-  altHotkey?: string;
   type?: 'navigation' | 'dev' | 'toggle';
   action?: () => void | Promise<void>;
 }
@@ -29,11 +27,8 @@ export const MenuItems: MenuItem[] = [
     path: '/',
     position: 'top',
     component: Projects,
-    hotkey: 'mod+1',
-    altHotkey: 'alt+1',
     type: 'navigation',
   },
-{{- $n := 2 -}}
 {{- range .Structures }}
 {{- if and (ne .Class "") (not .DisableGo) }}
   {
@@ -41,10 +36,8 @@ export const MenuItems: MenuItem[] = [
     path: '/{{ toLower .Class }}',
     position: 'top',
     component: {{ .Class }},
-    {{ hotkey $n }}
     type: 'navigation',
   },
-{{- $n = add $n 1 }}
 {{- end }}
 {{- end }}
   {
@@ -52,8 +45,6 @@ export const MenuItems: MenuItem[] = [
     path: '/khedra',
     position: 'bottom',
     component: Khedra,
-    {{ hotkey $n }}
-  {{- $n = add $n 1 }}
     type: 'navigation',
   },
   {
@@ -61,8 +52,6 @@ export const MenuItems: MenuItem[] = [
     path: '/settings',
     position: 'bottom',
     component: Settings,
-    hotkey: 'mod+comma',
-    altHotkey: 'alt+comma',
     type: 'navigation',
   },
   {
@@ -70,8 +59,6 @@ export const MenuItems: MenuItem[] = [
     label: 'Wizard',
     position: 'hidden',
     component: Wizard,
-    {{ hotkey $n }}
-  {{- $n = add $n 1 }}
     type: 'dev',
     action: async () => {
       await SetInitialized(false);

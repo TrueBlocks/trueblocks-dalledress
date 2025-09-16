@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { GetKhedraControlURL } from '@app';
 import { useHotkeys } from '@mantine/hooks';
-import { Log } from '@utils';
 
 const KhedraControl = () => {
   const [dashboardURL, setDashboardURL] = useState<string>('');
@@ -15,19 +14,14 @@ const KhedraControl = () => {
       setLoading(true);
       setError('');
 
-      Log('Getting Khedra dashboard URL...');
-
       // Get the dashboard URL from the backend (reads control.json file)
       const url = await GetKhedraControlURL();
-      Log(`Got dashboard URL: ${url}`);
-
       setDashboardURL(url);
     } catch (err) {
       const errorMessage =
         err instanceof Error
           ? err.message
           : 'Failed to get Khedra dashboard URL';
-      Log(`Error getting dashboard URL: ${errorMessage}`);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -35,12 +29,10 @@ const KhedraControl = () => {
   }, []);
 
   const refreshDashboard = useCallback(() => {
-    Log('Refreshing Khedra dashboard...');
     setRefreshKey((prev) => prev + 1);
   }, []);
 
   const handleReload = useCallback(() => {
-    Log('Reloading Khedra dashboard...');
     refreshDashboard();
   }, [refreshDashboard]);
 

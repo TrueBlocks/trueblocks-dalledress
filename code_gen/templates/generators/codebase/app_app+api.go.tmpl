@@ -36,7 +36,7 @@ func (a *App) GetRegisteredViews() []string {
 	}
 }
 
-func getCollection(payload *types.Payload) types.Collection {
+func getCollection(payload *types.Payload, missingOk bool) types.Collection {
 	switch payload.Collection {
 	{{- range .Structures }}
 	{{- if and (not (eq .Class "")) (not .DisableGo) }}
@@ -45,7 +45,9 @@ func getCollection(payload *types.Payload) types.Collection {
 	{{- end }}
 	{{- end }}
 	default:
-		logging.LogBackend(fmt.Sprintf("Warning: Unknown collection type: %s", payload.Collection))
+		if !missingOk {
+			logging.LogBackend(fmt.Sprintf("Warning: Unknown collection type: %s", payload.Collection))
+		}
 		return nil
 	}
 }

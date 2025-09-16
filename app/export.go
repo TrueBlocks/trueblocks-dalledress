@@ -26,7 +26,7 @@ func (a *App) ExportData(payload *types.Payload) error {
 	}
 	payload.ProjectPath = activeProject.Path
 
-	collection := getCollection(payload)
+	collection := getCollection(payload, false)
 	if collection == nil {
 		err := fmt.Errorf("[ExportData] unsupported collection type: %s", payload.Collection)
 		msgs.EmitError("unsupported collection type", err)

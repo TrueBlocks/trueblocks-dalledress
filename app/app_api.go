@@ -68,7 +68,7 @@ func (a *App) GetRegisteredViews() []string {
 	}
 }
 
-func getCollection(payload *types.Payload) types.Collection {
+func getCollection(payload *types.Payload, missingOk bool) types.Collection {
 	switch payload.Collection {
 	case "exports":
 		return exports.GetExportsCollection(payload)
@@ -89,18 +89,26 @@ func getCollection(payload *types.Payload) types.Collection {
 	case "comparitoor":
 		return comparitoor.GetComparitoorCollection(payload)
 	default:
-		logging.LogBackend(fmt.Sprintf("Warning: Unknown collection type: %s", payload.Collection))
+		if !missingOk {
+			logging.LogBackend(fmt.Sprintf("Warning: Unknown collection type: %s", payload.Collection))
+		}
 		return nil
 	}
 }
 
 // IsDisabled returns true if the collection is disable or if all of its facets are disabled
-func (a *App) IsDisabled(payload *types.Payload) bool {
-	collection := getCollection(payload)
+func (a *App) IsDisabled(viewName string) bool {
+	payload := &types.Payload{
+		Collection: viewName,
+	}
+	collection := getCollection(payload, true)
+	if collection == nil {
+		return false // not disabled if not found
+	}
 	if cfg, err := collection.GetConfig(); err == nil {
 		return cfg.IsDisabled()
 	} else {
-		return false
+		return false // not disabled if not found
 	}
 }
 

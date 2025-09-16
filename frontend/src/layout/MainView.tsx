@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 
+import { useEnabledMenuItems } from '@hooks';
 import { StatusBar } from '@layout';
 import { AppShell } from '@mantine/core';
-import { Log, getDebugClass } from '@utils';
-import { MenuItem, MenuItems } from 'src/Menu';
+import { getDebugClass } from '@utils';
+import { MenuItem } from 'src/Menu';
 import { Route, useLocation } from 'wouter';
 
 import './MainView.css';
@@ -17,6 +18,7 @@ function isComponentMenuItem(
 export const MainView = () => {
   const [currentLocation] = useLocation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const enabledMenuItems = useEnabledMenuItems();
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -48,8 +50,7 @@ export const MainView = () => {
           position: 'relative',
         }}
       >
-        {MenuItems.filter(isComponentMenuItem).map((item) => {
-          Log(`Rendering route for path: ${item.path}`);
+        {enabledMenuItems.filter(isComponentMenuItem).map((item) => {
           return (
             <Route key={item.path} path={item.path}>
               {React.createElement(item.component)}

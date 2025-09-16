@@ -174,7 +174,7 @@ export function HasActiveProject():Promise<boolean>;
 
 export function IsDialogSilenced(arg1:string):Promise<boolean>;
 
-export function IsDisabled(arg1:types.Payload):Promise<boolean>;
+export function IsDisabled(arg1:string):Promise<boolean>;
 
 export function IsInitialized():Promise<boolean>;
 

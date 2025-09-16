@@ -215,6 +215,7 @@ const createInitialMockAppBridge = (): AppBridgeFunctions => ({
     .mockResolvedValue({ name: 'Mock User', email: 'mock@example.com' }),
   SetUserPreferences: vi.fn().mockResolvedValue({}),
   IsReady: vi.fn().mockResolvedValue(true),
+  IsDisabled: vi.fn().mockResolvedValue(false),
   GetAppPreferences: vi.fn().mockResolvedValue({
     lastView: '/mock-default-view',
     menuCollapsed: false,
@@ -270,7 +271,9 @@ export const setupWailsMocks = ({
 
   if (typeof window !== 'undefined') {
     (window as any).go = {
-      app: currentAppMock,
+      app: {
+        App: currentAppMock,
+      },
       runtime: currentRuntimeMock,
     };
   }

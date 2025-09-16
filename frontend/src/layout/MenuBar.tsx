@@ -1,7 +1,7 @@
 import { ChevronButton, getBarSize } from '@components';
-import { useIconSets, usePreferences } from '@hooks';
+import { useEnabledMenuItems, useIconSets, usePreferences } from '@hooks';
 import { AppShell, Button, Stack } from '@mantine/core';
-import { MenuItem, MenuItems } from 'src/Menu';
+import { MenuItem } from 'src/Menu';
 import { useLocation } from 'wouter';
 
 interface MenuBarProps {
@@ -17,8 +17,13 @@ export const MenuBar = ({ disabled = false }: MenuBarProps) => {
     setChromeCollapsed,
   } = usePreferences();
 
-  const topMenuItems = MenuItems.filter((item) => item.position === 'top');
-  const botMenuItems = MenuItems.filter((item) => item.position === 'bottom');
+  const enabledMenuItems = useEnabledMenuItems();
+  const topMenuItems = enabledMenuItems.filter(
+    (item) => item.position === 'top',
+  );
+  const botMenuItems = enabledMenuItems.filter(
+    (item) => item.position === 'bottom',
+  );
   const icons = useIconSets();
 
   const renderMenuItem = ({ label, path }: MenuItem) => {

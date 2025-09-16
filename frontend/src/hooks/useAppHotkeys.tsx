@@ -1,5 +1,10 @@
 import { CancelFetch, Reload } from '@app';
-import { useActiveProject, usePayload, usePreferences } from '@hooks';
+import {
+  useActiveProject,
+  useEnabledMenuItems,
+  usePayload,
+  usePreferences,
+} from '@hooks';
 import { msgs, types } from '@models';
 import { LogError, emitEvent, registerHotkeys, useEmitters } from '@utils';
 import type { HotkeyConfig, RegisterHotkeyOptions } from '@utils';
@@ -46,6 +51,7 @@ export const useAppHotkeys = (): void => {
     detailCollapsed,
     setDetailCollapsed,
   } = usePreferences();
+  const enabledMenuItems = useEnabledMenuItems();
 
   // Helper function to get current facet for the current route
   const vR = currentLocation.replace(/^\/+/, '');
@@ -197,6 +203,8 @@ export const useAppHotkeys = (): void => {
     },
   ];
 
+  // Use the full static MenuItems list to keep hook registration count stable across renders.
+  // Handlers early-return if the corresponding menu item is not currently enabled.
   const menuItemHotkeys = MenuItems.flatMap((item) => {
     const hotkeyConfigs: HotkeyConfig[] = [];
 
@@ -206,6 +214,10 @@ export const useAppHotkeys = (): void => {
         handler: (e: KeyboardEvent) => {
           let hotkeyObj: Hotkey;
           const hotkey = item.hotkey || '';
+          const isEnabled = enabledMenuItems.some(
+            (enabled) => enabled.path === item.path,
+          );
+          if (!isEnabled) return;
 
           switch (item.type) {
             case 'dev':
@@ -247,6 +259,10 @@ export const useAppHotkeys = (): void => {
         handler: (e: KeyboardEvent) => {
           let hotkeyObj: Hotkey;
           const hotkey = item.altHotkey || '';
+          const isEnabled = enabledMenuItems.some(
+            (enabled) => enabled.path === item.path,
+          );
+          if (!isEnabled) return;
 
           switch (item.type) {
             case 'dev':

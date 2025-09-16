@@ -16,6 +16,7 @@ export * from './useSilencedDialog';
 export * from './useStaggeredLoading';
 export * from './useWallet';
 export * from './useWalletGatedAction';
+export * from './useEnabledMenuItems';
 
 export * from './useActiveProject';
 export * from './usePreferences';

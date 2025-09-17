@@ -137,7 +137,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Known",
@@ -147,7 +148,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Functions",
@@ -157,7 +159,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Events",
@@ -167,7 +170,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         }
                     ]
                 },
@@ -684,7 +688,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Index",
@@ -694,7 +699,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Blooms",
@@ -704,7 +710,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Manifest",
@@ -712,7 +719,8 @@
                             "actions": null,
                             "viewType": "dashboard",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         }
                     ]
                 },
@@ -1225,7 +1233,8 @@
                             ],
                             "viewType": "",
                             "renderer": "panel",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Balances",
@@ -1235,7 +1244,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Transfers",
@@ -1245,7 +1255,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Transactions",
@@ -1255,7 +1266,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Withdrawals",
@@ -1265,7 +1277,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Assets",
@@ -1275,7 +1288,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Logs",
@@ -1285,7 +1299,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Traces",
@@ -1295,7 +1310,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Receipts",
@@ -1305,7 +1321,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         }
                     ]
                 },
@@ -1725,7 +1742,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         }
                     ]
                 }
@@ -1858,7 +1876,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Custom",
@@ -1876,7 +1895,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Prefund",
@@ -1888,7 +1908,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": "dividerBefore"
+                            "attributes": "dividerBefore",
+                            "disabled": false
                         },
                         {
                             "name": "Regular",
@@ -1901,7 +1922,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         },
                         {
                             "name": "Baddress",
@@ -1912,7 +1934,8 @@
                             ],
                             "viewType": "",
                             "renderer": "",
-                            "attributes": ""
+                            "attributes": "",
+                            "disabled": false
                         }
                     ]
                 }
@@ -2165,7 +2188,8 @@
                     ],
                     "viewType": "",
                     "renderer": "panel",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Balances",
@@ -2175,7 +2199,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Transfers",
@@ -2185,7 +2210,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Transactions",
@@ -2195,7 +2221,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Withdrawals",
@@ -2205,7 +2232,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Assets",
@@ -2215,7 +2243,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Logs",
@@ -2225,7 +2254,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Traces",
@@ -2235,7 +2265,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Receipts",
@@ -2245,7 +2276,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         },
@@ -2832,7 +2864,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         },
@@ -3532,7 +3565,37 @@
             "doc_group": "09-DalleDress",
             "doc_route": "215-database",
             "doc_descr": "Database used to generate dalle dress prompts",
-            "disable_go": true
+            "disable_go": true,
+            "members": [
+                {
+                    "name": "databaseName",
+                    "type": "string",
+                    "docOrder": 1,
+                    "description": "Name of the database",
+                    "num": 1
+                },
+                {
+                    "name": "count",
+                    "type": "value",
+                    "docOrder": 2,
+                    "description": "Number of entries",
+                    "num": 2
+                },
+                {
+                    "name": "sample",
+                    "type": "string",
+                    "docOrder": 3,
+                    "description": "Sample entry",
+                    "num": 3
+                },
+                {
+                    "name": "filtered",
+                    "type": "bool",
+                    "docOrder": 4,
+                    "description": "Is database filtered by series",
+                    "num": 4
+                }
+            ]
         },
         {
             "class": "Log",
@@ -4024,7 +4087,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Known",
@@ -4034,7 +4098,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Functions",
@@ -4044,7 +4109,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Events",
@@ -4054,7 +4120,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         },
@@ -4174,7 +4241,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Custom",
@@ -4192,7 +4260,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Prefund",
@@ -4204,7 +4273,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": "dividerBefore"
+                    "attributes": "dividerBefore",
+                    "disabled": false
                 },
                 {
                     "name": "Regular",
@@ -4217,7 +4287,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Baddress",
@@ -4228,7 +4299,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         },
@@ -4961,7 +5033,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Index",
@@ -4971,7 +5044,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Blooms",
@@ -4981,7 +5055,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Manifest",
@@ -4989,7 +5064,8 @@
                     "actions": null,
                     "viewType": "dashboard",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         },
@@ -5063,7 +5139,8 @@
                     "actions": null,
                     "viewType": "dashboard",
                     "renderer": "facet",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Execute",
@@ -5071,7 +5148,8 @@
                     "actions": null,
                     "viewType": "dashboard",
                     "renderer": "facet",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Events",
@@ -5081,7 +5159,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         },
@@ -5544,7 +5623,8 @@
                     "actions": null,
                     "viewType": "dashboard",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Caches",
@@ -5554,7 +5634,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Chains",
@@ -5564,7 +5645,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         },
@@ -5727,7 +5809,8 @@
                     "actions": [],
                     "viewType": "dashboard",
                     "renderer": "facet",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Series",
@@ -5741,7 +5824,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Databases",
@@ -5751,7 +5835,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Events",
@@ -5761,7 +5846,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Gallery",
@@ -5771,7 +5857,8 @@
                     ],
                     "viewType": "dashboard",
                     "renderer": "facet",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         },
@@ -5814,13 +5901,14 @@
             "facets": [
                 {
                     "name": "Comparitoor",
-                    "store": "Comparitoor",
+                    "store": "Transaction",
                     "actions": [
                         "export"
                     ],
                     "viewType": "",
                     "renderer": "facet",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "TrueBlocks",
@@ -5830,7 +5918,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "EtherScan",
@@ -5840,7 +5929,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Covalent",
@@ -5850,7 +5940,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 },
                 {
                     "name": "Alchemy",
@@ -5860,7 +5951,8 @@
                     ],
                     "viewType": "",
                     "renderer": "",
-                    "attributes": ""
+                    "attributes": "",
+                    "disabled": false
                 }
             ]
         }

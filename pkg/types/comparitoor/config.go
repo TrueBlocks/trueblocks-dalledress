@@ -81,9 +81,9 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 	return cfg, nil
 }
 
-// EXISTING_CODE
 func getTransactionFields() []types.FieldConfig {
 	return []types.FieldConfig{
+		// EXISTING_CODE
 		{Key: "hash", Label: "Hash", Section: "General", Order: 1, DetailOrder: 1},
 		{Key: "blockNumber", Label: "Block", Section: "General", Order: 2, DetailOrder: 2},
 		{Key: "timestamp", Label: "Timestamp", Section: "General", Order: 3, DetailOrder: 3},
@@ -97,7 +97,9 @@ func getTransactionFields() []types.FieldConfig {
 		{Key: "presentInCovalent", Label: "Covalent", Section: "Presence", Order: 11, DetailOrder: 11},
 		{Key: "presentInAlchemy", Label: "Alchemy", Section: "Presence", Order: 12, DetailOrder: 12},
 		{Key: "diffType", Label: "Diff Type", Section: "Diffs", Order: 13, DetailOrder: 13},
+		// EXISTING_CODE
 	}
 }
 
+// EXISTING_CODE
 // EXISTING_CODE

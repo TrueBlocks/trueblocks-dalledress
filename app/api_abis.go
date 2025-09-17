@@ -32,7 +32,7 @@ func (a *App) GetAbisPage(
 func (a *App) AbisCrud(
 	payload *types.Payload,
 	op crud.Operation,
-	item *abis.Abi,
+	item *any,
 ) error {
 	collection := abis.GetAbisCollection(payload)
 	return collection.Crud(payload, op, item)

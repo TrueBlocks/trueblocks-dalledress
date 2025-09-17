@@ -18,10 +18,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
-
-type Transaction = sdk.Transaction
 
 const (
 	ComparitoorComparitoor types.DataFacet = "comparitoor"

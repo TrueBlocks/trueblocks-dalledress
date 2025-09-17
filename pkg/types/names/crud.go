@@ -17,13 +17,17 @@ var namesLock atomic.Int32
 func (c *NamesCollection) Crud(
 	payload *types.Payload,
 	op crud.Operation,
-	item *Name,
+	item interface{},
 ) error {
 	dataFacet := payload.DataFacet
 
 	var name = &Name{Address: base.HexToAddress(payload.Address)}
 	if item != nil {
-		name = item
+		if n, ok := item.(*Name); ok {
+			name = n
+		} else {
+			return fmt.Errorf("item is not of type *Name")
+		}
 	}
 
 	if !namesLock.CompareAndSwap(0, 1) {

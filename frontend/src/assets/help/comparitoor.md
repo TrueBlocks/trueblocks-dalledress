@@ -13,20 +13,13 @@ the code inside of 'EXISTING_CODE' tags.
 
 ## Facets
 
-- Comparitoor Facet uses sdk.Comparitoor store.
+- Comparitoor Facet uses sdk.Transaction store.
 - TrueBlocks Facet uses sdk.Transaction store.
 - EtherScan Facet uses sdk.Transaction store.
 - Covalent Facet uses sdk.Transaction store.
 - Alchemy Facet uses sdk.Transaction store.
 
 ## Stores
-
-- **Comparitoor Store (4 members)**
-
-  - nTrueBlocks: The values for TrueBlocks
-  - nAlchemy: The values for Alchemy
-  - nCovalent: The values for Covalent
-  - nEtherScan: The values for EtherScan
 
 - **Transaction Store (27 members)**
 

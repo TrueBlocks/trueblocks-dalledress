@@ -17,6 +17,8 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
+	// EXISTING_CODE
+	// EXISTING_CODE
 )
 
 type ComparitoorPage struct {
@@ -77,22 +79,22 @@ func (c *ComparitoorCollection) GetPage(
 	// Always populate per-source arrays for frontend, with missing/unique flags
 	// First, gather all keys and counts
 	// Helper: convert []T to []*T
-	slicePtrs := func(items []sdk.Transaction) []*sdk.Transaction {
-		out := make([]*sdk.Transaction, len(items))
+	slicePtrs := func(items []Transaction) []*Transaction {
+		out := make([]*Transaction, len(items))
 		for i := range items {
 			out[i] = &items[i]
 		}
 		return out
 	}
 	// Key as string: "blockNum:txIdx"
-	key := func(tx *sdk.Transaction) string {
+	key := func(tx *Transaction) string {
 		if tx == nil {
 			return ""
 		}
 		return fmt.Sprintf("%v:%v", tx.BlockNumber, tx.TransactionIndex)
 	}
 	// Get per-source results
-	var tbResult, esResult, cvResult, alResult *facets.PageResult[sdk.Transaction]
+	var tbResult, esResult, cvResult, alResult *facets.PageResult[Transaction]
 	if c.trueblocksFacet != nil {
 		tbResult, _ = c.trueblocksFacet.GetPage(first, pageSize, nil, sortSpec, nil)
 	}
@@ -105,7 +107,7 @@ func (c *ComparitoorCollection) GetPage(
 	if c.alchemyFacet != nil {
 		alResult, _ = c.alchemyFacet.GetPage(first, pageSize, nil, sortSpec, nil)
 	}
-	sets := [][]*sdk.Transaction{
+	sets := [][]*Transaction{
 		slicePtrs(tbResult.Items),
 		slicePtrs(esResult.Items),
 		slicePtrs(cvResult.Items),
@@ -121,8 +123,8 @@ func (c *ComparitoorCollection) GetPage(
 		}
 	}
 	// Helper to build annotated array for a source
-	buildAnnotated := func(arr []sdk.Transaction) []*AnnotatedTransaction {
-		present := make(map[string]*sdk.Transaction)
+	buildAnnotated := func(arr []Transaction) []*AnnotatedTransaction {
+		present := make(map[string]*Transaction)
 		for i := range arr {
 			tx := &arr[i]
 			present[key(tx)] = tx
@@ -142,7 +144,7 @@ func (c *ComparitoorCollection) GetPage(
 				// Parse block/tx from key
 				var blk, txidx uint64
 				_, _ = fmt.Sscanf(k, "%d:%d", &blk, &txidx)
-				out = append(out, &AnnotatedTransaction{Transaction: sdk.Transaction{BlockNumber: base.Blknum(blk), TransactionIndex: base.Txnum(txidx)}, Missing: true, Unique: false})
+				out = append(out, &AnnotatedTransaction{Transaction: Transaction{BlockNumber: base.Blknum(blk), TransactionIndex: base.Txnum(txidx)}, Missing: true, Unique: false})
 			}
 		}
 		return out
@@ -182,13 +184,13 @@ func (c *ComparitoorCollection) GetPage(
 	switch dataFacet {
 	case ComparitoorComparitoor:
 		facet := c.comparitoorFacet
-		var filterFunc func(*sdk.Transaction) bool
+		var filterFunc func(*Transaction) bool
 		if filter != "" {
-			filterFunc = func(item *sdk.Transaction) bool {
+			filterFunc = func(item *Transaction) bool {
 				return c.matchesComparitoorFilter(item, filter)
 			}
 		}
-		sortFunc := func(items []sdk.Transaction, sort sdk.SortSpec) error {
+		sortFunc := func(items []Transaction, sort sdk.SortSpec) error {
 			return nil // sdk.SortTransaction(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
@@ -201,13 +203,13 @@ func (c *ComparitoorCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	case ComparitoorTrueBlocks:
 		facet := c.trueblocksFacet
-		var filterFunc func(*sdk.Transaction) bool
+		var filterFunc func(*Transaction) bool
 		if filter != "" {
-			filterFunc = func(item *sdk.Transaction) bool {
+			filterFunc = func(item *Transaction) bool {
 				return c.matchesTrueBlockFilter(item, filter)
 			}
 		}
-		sortFunc := func(items []sdk.Transaction, sort sdk.SortSpec) error {
+		sortFunc := func(items []Transaction, sort sdk.SortSpec) error {
 			return nil // sdk.SortTransaction(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
@@ -220,13 +222,13 @@ func (c *ComparitoorCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	case ComparitoorEtherScan:
 		facet := c.etherscanFacet
-		var filterFunc func(*sdk.Transaction) bool
+		var filterFunc func(*Transaction) bool
 		if filter != "" {
-			filterFunc = func(item *sdk.Transaction) bool {
+			filterFunc = func(item *Transaction) bool {
 				return c.matchesEtherScanFilter(item, filter)
 			}
 		}
-		sortFunc := func(items []sdk.Transaction, sort sdk.SortSpec) error {
+		sortFunc := func(items []Transaction, sort sdk.SortSpec) error {
 			return nil // sdk.SortTransaction(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
@@ -239,13 +241,13 @@ func (c *ComparitoorCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	case ComparitoorCovalent:
 		facet := c.covalentFacet
-		var filterFunc func(*sdk.Transaction) bool
+		var filterFunc func(*Transaction) bool
 		if filter != "" {
-			filterFunc = func(item *sdk.Transaction) bool {
+			filterFunc = func(item *Transaction) bool {
 				return c.matchesCovalentFilter(item, filter)
 			}
 		}
-		sortFunc := func(items []sdk.Transaction, sort sdk.SortSpec) error {
+		sortFunc := func(items []Transaction, sort sdk.SortSpec) error {
 			return nil // sdk.SortTransaction(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
@@ -258,13 +260,13 @@ func (c *ComparitoorCollection) GetPage(
 		page.ExpectedTotal = facet.ExpectedCount()
 	case ComparitoorAlchemy:
 		facet := c.alchemyFacet
-		var filterFunc func(*sdk.Transaction) bool
+		var filterFunc func(*Transaction) bool
 		if filter != "" {
-			filterFunc = func(item *sdk.Transaction) bool {
+			filterFunc = func(item *Transaction) bool {
 				return c.matchesAlchemyFilter(item, filter)
 			}
 		}
-		sortFunc := func(items []sdk.Transaction, sort sdk.SortSpec) error {
+		sortFunc := func(items []Transaction, sort sdk.SortSpec) error {
 			return nil // sdk.SortTransaction(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {

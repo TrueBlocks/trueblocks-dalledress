@@ -20,7 +20,7 @@ import {names} from '../models';
 import {status} from '../models';
 import {app} from '../models';
 
-export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Abi):Promise<void>;
+export function AbisCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function AddAddressToProject(arg1:string):Promise<void>;
 
@@ -186,11 +186,11 @@ export function LogFrontend(arg1:string):Promise<void>;
 
 export function MonitorsClean(arg1:types.Payload,arg2:Array<string>):Promise<void>;
 
-export function MonitorsCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Monitor):Promise<void>;
+export function MonitorsCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function NameFromAddress(arg1:string):Promise<types.Name|boolean>;
 
-export function NamesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:types.Name):Promise<void>;
+export function NamesCrud(arg1:types.Payload,arg2:crud.Operation,arg3:any):Promise<void>;
 
 export function NewProject(arg1:string,arg2:string):Promise<void>;
 

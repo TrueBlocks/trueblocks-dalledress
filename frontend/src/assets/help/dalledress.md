@@ -61,9 +61,12 @@ the code inside of 'EXISTING_CODE' tags.
   - completed: The completed value
   - series: The series value
 
-- **Databases Store (0 members)**
+- **Databases Store (4 members)**
 
-// SHOULD NOT BE EMPTY
+  - databaseName: Name of the database
+  - count: Number of entries
+  - sample: Sample entry
+  - filtered: Is database filtered by series
 
 - **Series Store (12 members)**
 

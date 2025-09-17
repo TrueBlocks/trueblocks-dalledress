@@ -11,17 +11,19 @@ package comparitoor
 import (
 	"sync"
 
+	// EXISTING_CODE
+	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
-	// Import mocks
-	// (imported via package-level visibility)
 )
 
 // EXISTING_CODE
 // EXISTING_CODE
+
+type Transaction = sdk.Transaction
 
 type transactionStoreKey struct {
 	Facet   types.DataFacet
@@ -30,11 +32,11 @@ type transactionStoreKey struct {
 }
 
 var (
-	transactionStores  = make(map[transactionStoreKey]*store.Store[sdk.Transaction])
+	transactionStores  = make(map[transactionStoreKey]*store.Store[Transaction])
 	transactionStoreMu sync.Mutex
 )
 
-func (c *ComparitoorCollection) getTransactionStore(payload *types.Payload, facet types.DataFacet) *store.Store[sdk.Transaction] {
+func (c *ComparitoorCollection) getTransactionStore(payload *types.Payload, facet types.DataFacet) *store.Store[Transaction] {
 	transactionStoreMu.Lock()
 	defer transactionStoreMu.Unlock()
 
@@ -48,11 +50,10 @@ func (c *ComparitoorCollection) getTransactionStore(payload *types.Payload, face
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
-			// EXISTING_CODE
 			go func() {
 				defer close(ctx.ModelChan)
 				defer close(ctx.ErrorChan)
-				var src []*sdk.Transaction
+				var src []*Transaction
 				// Import mock variables from mocks.go
 				// (They are package-level, so no explicit import needed)
 				switch facet {
@@ -65,7 +66,7 @@ func (c *ComparitoorCollection) getTransactionStore(payload *types.Payload, face
 				case ComparitoorAlchemy:
 					src = mockAlchemy
 				case ComparitoorComparitoor:
-					src = append([]*sdk.Transaction{}, mockTrueBlocks...)
+					src = append([]*Transaction{}, mockTrueBlocks...)
 					src = append(src, mockEtherscan...)
 					src = append(src, mockCovalent...)
 					src = append(src, mockAlchemy...)
@@ -74,17 +75,18 @@ func (c *ComparitoorCollection) getTransactionStore(payload *types.Payload, face
 					ctx.ModelChan <- tx
 				}
 			}()
+			// EXISTING_CODE
 			return nil
 		}
 
-		processFunc := func(item interface{}) *sdk.Transaction {
-			if it, ok := item.(*sdk.Transaction); ok {
+		processFunc := func(item interface{}) *Transaction {
+			if it, ok := item.(*Transaction); ok {
 				return it
 			}
 			return nil
 		}
 
-		mappingFunc := func(item *sdk.Transaction) (key interface{}, includeInMap bool) {
+		mappingFunc := func(item *Transaction) (key interface{}, includeInMap bool) {
 			// EXISTING_CODE
 			// EXISTING_CODE
 			return nil, false

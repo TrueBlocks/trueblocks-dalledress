@@ -9,7 +9,7 @@ disable_go = false
 
 [[facets]]
 name = "Comparitoor"
-store = "Comparitoor"
+store = "Transaction"
 actions = ["export"]
 viewType = ""
 renderer = "facet"

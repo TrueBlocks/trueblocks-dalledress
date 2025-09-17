@@ -37,7 +37,7 @@ func (a *App) Get{{$class}}Page(
 {{if .HasCrudActions}}func (a *App) {{$class}}Crud(
 	payload *types.Payload,
 	op crud.Operation,
-	item *{{$lower}}.{{$single}},
+	item *any,
 ) error {
 	collection := {{$lower}}.Get{{$class}}Collection(payload)
 	return collection.Crud(payload, op, item)

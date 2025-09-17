@@ -28,14 +28,12 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{ {{if ne (.RowActionsBe .Name) "\"\""}}{{.RowActionsBe .Name}}{{else}}{{end}} },
 			HeaderActions: []string{ {{if ne (.HeaderActionsBe .Name) "\"\""}}{{.HeaderActionsBe .Name}}{{else}}{{end}} },
 			RendererTypes: "{{.Renderer}}",
-			Disabled:	   false,
 		},
 		{{- end}}
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "{{$lower}}",
-		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{ {{- range .Facets}}{{printf "%q" (toLower .Name)}}, {{- end}}},
 		Actions:    map[string]types.ActionConfig{
@@ -46,6 +44,7 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 	}
 	types.DeriveFacets(cfg)
 	types.NormalizeOrders(cfg)
+	types.SetDisablements(cfg)
 	return cfg, nil
 }
 {{- range .Stores }}

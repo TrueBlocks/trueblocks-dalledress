@@ -24,7 +24,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "panel",
-			Disabled:      false,
 		},
 		"balances": {
 			Name:          "Balances",
@@ -35,7 +34,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"transfers": {
 			Name:          "Transfers",
@@ -46,7 +44,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"transactions": {
 			Name:          "Transactions",
@@ -57,7 +54,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"withdrawals": {
 			Name:          "Withdrawals",
@@ -68,7 +64,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"assets": {
 			Name:          "Assets",
@@ -79,7 +74,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"logs": {
 			Name:          "Logs",
@@ -90,7 +84,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"traces": {
 			Name:          "Traces",
@@ -101,7 +94,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"receipts": {
 			Name:          "Receipts",
@@ -112,13 +104,11 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "exports",
-		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"statements", "balances", "transfers", "transactions", "withdrawals", "assets", "logs", "traces", "receipts"},
 		Actions: map[string]types.ActionConfig{
@@ -127,6 +117,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 	}
 	types.DeriveFacets(cfg)
 	types.NormalizeOrders(cfg)
+	types.SetDisablements(cfg)
 	return cfg, nil
 }
 

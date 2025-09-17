@@ -24,7 +24,6 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{"autoname", "update"},
 			HeaderActions: []string{"create", "export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"custom": {
 			Name:          "Custom",
@@ -35,7 +34,6 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{"autoname", "delete", "remove", "update"},
 			HeaderActions: []string{"create", "export", "pin", "publish"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"prefund": {
 			Name:          "Prefund",
@@ -46,7 +44,6 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{"update"},
 			HeaderActions: []string{"create", "export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"regular": {
 			Name:          "Regular",
@@ -57,7 +54,6 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{"autoname", "update"},
 			HeaderActions: []string{"create", "export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"baddress": {
 			Name:          "Baddress",
@@ -68,13 +64,11 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"create", "export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "names",
-		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"all", "custom", "prefund", "regular", "baddress"},
 		Actions: map[string]types.ActionConfig{
@@ -91,6 +85,7 @@ func (c *NamesCollection) GetConfig() (*types.ViewConfig, error) {
 	}
 	types.DeriveFacets(cfg)
 	types.NormalizeOrders(cfg)
+	types.SetDisablements(cfg)
 	return cfg, nil
 }
 

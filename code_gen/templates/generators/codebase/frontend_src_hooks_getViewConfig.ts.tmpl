@@ -1,10 +1,10 @@
 import {
-{{- range .Structures }}
+{{- range .SortedStructs }}
 	{{- if and (not (eq .Class "")) (not .DisableGo) }}
   Get{{ .Class }}Config,
   {{- end }}
 {{- end }}
- } from '@app';
+} from '@app';
 import { types } from '@models';
 import { LogError } from '@utils';
 

@@ -24,13 +24,11 @@ func (c *MonitorsCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{"delete", "remove"},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "monitors",
-		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"monitors"},
 		Actions: map[string]types.ActionConfig{
@@ -42,6 +40,7 @@ func (c *MonitorsCollection) GetConfig() (*types.ViewConfig, error) {
 	}
 	types.DeriveFacets(cfg)
 	types.NormalizeOrders(cfg)
+	types.SetDisablements(cfg)
 	return cfg, nil
 }
 

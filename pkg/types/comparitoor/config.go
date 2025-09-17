@@ -24,7 +24,6 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "facet",
-			Disabled:      false,
 		},
 		"trueblocks": {
 			Name:          "Trueblocks",
@@ -35,7 +34,6 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"etherscan": {
 			Name:          "Etherscan",
@@ -46,7 +44,6 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"covalent": {
 			Name:          "Covalent",
@@ -57,7 +54,6 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 		"alchemy": {
 			Name:          "Alchemy",
@@ -68,13 +64,11 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
-			Disabled:      false,
 		},
 	}
 
 	cfg := &types.ViewConfig{
 		ViewName:   "comparitoor",
-		Disabled:   false,
 		Facets:     facets,
 		FacetOrder: []string{"comparitoor", "trueblocks", "etherscan", "covalent", "alchemy"},
 		Actions: map[string]types.ActionConfig{
@@ -83,6 +77,7 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 	}
 	types.DeriveFacets(cfg)
 	types.NormalizeOrders(cfg)
+	types.SetDisablements(cfg)
 	return cfg, nil
 }
 

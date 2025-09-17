@@ -274,6 +274,10 @@ export function GetRegisteredViews() {
   return window['go']['app']['App']['GetRegisteredViews']();
 }
 
+export function GetSkin() {
+  return window['go']['app']['App']['GetSkin']();
+}
+
 export function GetStatusConfig(arg1) {
   return window['go']['app']['App']['GetStatusConfig'](arg1);
 }
@@ -496,6 +500,10 @@ export function SetProjectAddress(arg1) {
 
 export function SetProjectViewState(arg1, arg2) {
   return window['go']['app']['App']['SetProjectViewState'](arg1, arg2);
+}
+
+export function SetSkin(arg1) {
+  return window['go']['app']['App']['SetSkin'](arg1);
 }
 
 export function SetTheme(arg1) {

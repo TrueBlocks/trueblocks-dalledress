@@ -863,6 +863,7 @@ export namespace preferences {
 	    version: string;
 	    name: string;
 	    lastTheme: string;
+	    lastSkin: string;
 	    lastFormat: string;
 	    lastLanguage: string;
 	    lastProject: string;
@@ -884,6 +885,7 @@ export namespace preferences {
 	        this.version = source["version"];
 	        this.name = source["name"];
 	        this.lastTheme = source["lastTheme"];
+	        this.lastSkin = source["lastSkin"];
 	        this.lastFormat = source["lastFormat"];
 	        this.lastLanguage = source["lastLanguage"];
 	        this.lastProject = source["lastProject"];

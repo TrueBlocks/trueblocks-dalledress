@@ -24,8 +24,10 @@ export const GeneratorThumb = ({
       style={{
         cursor: 'pointer',
         width: 72,
-        borderColor: selected ? 'var(--mantine-color-blue-5)' : undefined,
-        background: selected ? 'rgba(51,154,240,0.12)' : undefined,
+        borderColor: selected
+          ? 'var(--skin-primary-selected-border)'
+          : undefined,
+        background: selected ? 'var(--skin-primary-selected)' : undefined,
       }}
     >
       <Stack gap={2} align="stretch">

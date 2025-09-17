@@ -11,6 +11,7 @@ export * from './NodeStatus';
 export * from './ProjectContextBar';
 export * from './ProjectSelectionModal';
 export * from './ProjectsList';
+export * from './SkinSwitcher';
 export * from './Socials';
 export * from './StatusIndicator';
 export * from './TabDivider';

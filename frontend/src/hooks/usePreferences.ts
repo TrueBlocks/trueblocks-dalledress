@@ -8,6 +8,7 @@ import {
   SetHelpCollapsed,
   SetLanguage,
   SetMenuCollapsed,
+  SetSkin,
   SetTheme,
 } from '@app';
 import { preferences } from '@models';
@@ -15,6 +16,7 @@ import { LogError, updateAppPreferencesSafely } from '@utils';
 
 export interface UsePreferencesReturn {
   lastTheme: string;
+  lastSkin: string;
   lastLanguage: string;
   debugCollapsed: boolean;
   menuCollapsed: boolean;
@@ -23,6 +25,7 @@ export interface UsePreferencesReturn {
   detailCollapsed: boolean;
   loading: boolean;
   toggleTheme: () => Promise<void>;
+  setSkin: (skin: string) => Promise<void>;
   changeLanguage: (language: string) => Promise<void>;
   setDebugCollapsed: (collapsed: boolean) => Promise<void>;
   setMenuCollapsed: (collapsed: boolean) => Promise<void>;
@@ -34,6 +37,7 @@ export interface UsePreferencesReturn {
 
 interface PreferencesState {
   lastTheme: string;
+  lastSkin: string;
   lastLanguage: string;
   debugCollapsed: boolean;
   menuCollapsed: boolean;
@@ -45,6 +49,7 @@ interface PreferencesState {
 
 const initialPreferencesState: PreferencesState = {
   lastTheme: 'dark',
+  lastSkin: 'darkMode',
   lastLanguage: 'en',
   debugCollapsed: true,
   menuCollapsed: false,
@@ -70,6 +75,7 @@ class PreferencesStore {
     if (!this.cachedSnapshot) {
       this.cachedSnapshot = {
         lastTheme: this.state.lastTheme,
+        lastSkin: this.state.lastSkin,
         lastLanguage: this.state.lastLanguage,
         debugCollapsed: this.state.debugCollapsed,
         menuCollapsed: effectiveMenuCollapsed,
@@ -78,6 +84,7 @@ class PreferencesStore {
         detailCollapsed: this.state.detailCollapsed,
         loading: this.state.loading,
         toggleTheme: this.toggleTheme,
+        setSkin: this.setSkin,
         changeLanguage: this.changeLanguage,
         setDebugCollapsed: this.setDebugCollapsed,
         setMenuCollapsed: this.setMenuCollapsed,
@@ -157,6 +164,7 @@ class PreferencesStore {
 
       this.setState({
         lastTheme: prefs.lastTheme || 'dark',
+        lastSkin: prefs.lastSkin || 'darkMode',
         lastLanguage: prefs.lastLanguage || 'en',
         debugCollapsed: prefs.debugCollapsed ?? true,
         menuCollapsed: prefs.menuCollapsed ?? false,
@@ -184,6 +192,12 @@ class PreferencesStore {
     await SetTheme(newTheme);
     await this.updatePreferences({ lastTheme: newTheme });
     this.setState({ lastTheme: newTheme });
+  };
+
+  setSkin = async (skin: string): Promise<void> => {
+    await SetSkin(skin);
+    await this.updatePreferences({ lastSkin: skin });
+    this.setState({ lastSkin: skin });
   };
 
   changeLanguage = async (language: string): Promise<void> => {

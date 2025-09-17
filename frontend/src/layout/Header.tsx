@@ -1,34 +1,25 @@
 import { useEffect, useState } from 'react';
 
 import { GetAppId } from '@app';
-import { Action, ProjectContextBar, WalletConnectButton } from '@components';
+import {
+  Action,
+  ProjectContextBar,
+  SkinSwitcher,
+  WalletConnectButton,
+} from '@components';
 import { usePreferences } from '@hooks';
-import { AppShell, Group, Text, useMantineColorScheme } from '@mantine/core';
+import { AppShell, Group, Text } from '@mantine/core';
 
 export const Header = () => {
   const [appName, setAppName] = useState('AppName');
-  const { colorScheme, setColorScheme } = useMantineColorScheme();
-  const {
-    toggleTheme,
-    isDarkMode,
-    setDebugCollapsed,
-    debugCollapsed,
-    chromeCollapsed,
-  } = usePreferences();
+  const { setDebugCollapsed, debugCollapsed, chromeCollapsed } =
+    usePreferences();
 
   useEffect(() => {
     GetAppId().then((id) => {
       setAppName(id.appName);
     });
   }, []);
-
-  useEffect(() => {
-    setColorScheme(isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode, setColorScheme]);
-
-  const handleToggleTheme = async () => {
-    await toggleTheme();
-  };
 
   if (chromeCollapsed) return <></>;
 
@@ -53,15 +44,7 @@ export const Header = () => {
             variant="default"
             color={debugCollapsed ? 'gray' : 'red'}
           />
-          <Action
-            icon="Light"
-            iconOff="Dark"
-            isOn={colorScheme === 'light'}
-            onClick={handleToggleTheme}
-            title="Toggle color scheme"
-            variant="default"
-            color={colorScheme === 'dark' ? 'yellow' : 'blue'}
-          />
+          <SkinSwitcher collapsed />
           <WalletConnectButton />
         </Group>
       </Group>

@@ -95,6 +95,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
     // Mock usePreferences (theme, language, debug)
     mockedUsePreferences.mockReturnValue({
       lastTheme: 'dark',
+      lastSkin: 'darkMode',
       lastLanguage: 'en',
       debugCollapsed: true,
       menuCollapsed: false,
@@ -104,6 +105,7 @@ describe('Names View + useActiveFacet Integration Tests', () => {
       isDarkMode: true,
       loading: false,
       toggleTheme: vi.fn(),
+      setSkin: vi.fn(),
       changeLanguage: vi.fn(),
       setDebugCollapsed: vi.fn(),
       setMenuCollapsed: vi.fn(),

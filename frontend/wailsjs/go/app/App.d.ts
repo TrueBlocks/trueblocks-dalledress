@@ -156,6 +156,8 @@ export function GetProjectViewState(arg1:string):Promise<Record<string, project.
 
 export function GetRegisteredViews():Promise<Array<string>>;
 
+export function GetSkin():Promise<string>;
+
 export function GetStatusConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetStatusPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<status.StatusPage>;
@@ -267,6 +269,8 @@ export function SetOrgPreferences(arg1:preferences.OrgPreferences):Promise<void>
 export function SetProjectAddress(arg1:base.Address):Promise<void>;
 
 export function SetProjectViewState(arg1:string,arg2:Record<string, project.FilterState>):Promise<void>;
+
+export function SetSkin(arg1:string):Promise<void>;
 
 export function SetTheme(arg1:string):Promise<void>;
 

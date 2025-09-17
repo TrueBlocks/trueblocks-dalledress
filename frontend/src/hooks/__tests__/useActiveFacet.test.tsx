@@ -92,6 +92,7 @@ describe('useActiveFacet Hook Tests (Focused Hook implementation)', () => {
     // Mock usePreferences (theme, language, debug)
     mockedUsePreferences.mockReturnValue({
       lastTheme: 'dark',
+      lastSkin: 'darkMode',
       lastLanguage: 'en',
       debugCollapsed: true,
       menuCollapsed: false,
@@ -101,6 +102,7 @@ describe('useActiveFacet Hook Tests (Focused Hook implementation)', () => {
       isDarkMode: true,
       loading: false,
       toggleTheme: vi.fn(),
+      setSkin: vi.fn(),
       changeLanguage: vi.fn(),
       setDebugCollapsed: vi.fn(),
       setMenuCollapsed: vi.fn(),

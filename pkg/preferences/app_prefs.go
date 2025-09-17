@@ -40,6 +40,7 @@ type AppPreferences struct {
 	Version         string          `json:"version"`
 	Name            string          `json:"name"`
 	LastTheme       string          `json:"lastTheme"`
+	LastSkin        string          `json:"lastSkin"`
 	LastFormat      string          `json:"lastFormat"`
 	LastLanguage    string          `json:"lastLanguage"`
 	LastProject     string          `json:"lastProject"`

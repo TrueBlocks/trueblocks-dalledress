@@ -87,6 +87,27 @@ func (a *App) SetTheme(theme string) {
 	}
 }
 
+// GetSkin returns the currently selected skin
+func (a *App) GetSkin() string {
+	a.prefsMu.RLock()
+	defer a.prefsMu.RUnlock()
+	if a.Preferences.App.LastSkin == "" {
+		return "default"
+	}
+	return a.Preferences.App.LastSkin
+}
+
+// SetSkin updates the application skin preference
+func (a *App) SetSkin(skin string) {
+	a.prefsMu.Lock()
+	defer a.prefsMu.Unlock()
+
+	a.Preferences.App.LastSkin = skin
+	if err := preferences.SetAppPreferences(&a.Preferences.App); err != nil {
+		msgs.EmitError("failed to save skin preference", err)
+	}
+}
+
 // GetFormat returns the currently selected export format
 func (a *App) GetFormat() string {
 	a.prefsMu.RLock()

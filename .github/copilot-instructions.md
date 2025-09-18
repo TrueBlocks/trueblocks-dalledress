@@ -1,9 +1,9 @@
-# TrueBlocks Dalledress – AI Coding Agent Instructions
+# AI Agent Instructions
 
 
 ## Architecture Overview
 
-- **Wails Desktop App**: Go backend (`app/`), React/Mantine frontend (`frontend/src/`), TrueBlocks Core SDK integration.
+- **Wails Desktop App**: Go backend (`app/`), React/Mantine frontend (`frontend/src/`).
 - **Frontend**: Facet-based views, Mantine UI, TypeScript models auto-generated from Go (`frontend/wailsjs/go/models.ts`).
 - **Backend**: API handlers (`app/api_*.go`) expose all data via Wails bindings; Go structs drive frontend types. Facet configs and header actions are defined in backend `viewConfig` (see `app/view_config.go`).
 
@@ -179,7 +179,7 @@ dalle/                 # Separate Go module for AI/image generation
 
 ## Integration Points
 
-- **TrueBlocks Core**: Backend integrates via SDK for blockchain data
+- **Core**: Backend integrates via SDK for blockchain data
 - **Wails Bindings**: Auto-generated TypeScript/Go bridge
 - **External APIs**: OpenAI integration in `dalle/` module
 - **File System**: Project management and preferences via Go backend

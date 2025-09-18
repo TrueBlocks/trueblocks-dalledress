@@ -25,7 +25,7 @@ export interface PreparedTransaction {
 }
 
 /**
- * Encodes function parameters for contract calls using the TrueBlocks backend
+ * Encodes function parameters for contract calls using the core's backend
  * This leverages the robust Go implementation that uses go-ethereum's ABI encoding
  */
 export const encodeParameters = async (
@@ -39,7 +39,7 @@ export const encodeParameters = async (
       return convertInputValue(input.type, input.value);
     });
 
-    // Call the TrueBlocks backend Encode function which uses Function.Pack
+    // Call the core's backend Encode function which uses Function.Pack
     const encodedData = await Encode(functionAbi, callArguments);
 
     return encodedData;

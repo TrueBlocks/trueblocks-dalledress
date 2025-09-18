@@ -53,12 +53,12 @@ const getUserFriendlyMessage = (structured: StructuredError): string => {
         structured.message.includes('command not found') ||
         structured.message.includes('not installed')
       ) {
-        return `TrueBlocks core is not properly installed or configured. Please check your installation.`;
+        return `Core is not properly installed or configured. Please check your installation.`;
       }
       if (structured.message.includes('cache')) {
         return `Cache operation failed for ${collection}. The requested data may not be available yet.`;
       }
-      return `Failed to ${operation} ${structured.dataFacet} data from TrueBlocks. Please try again or check your configuration.`;
+      return `Failed to ${operation} ${structured.dataFacet} data from the core. Please try again or check your configuration.`;
 
     case 'cache':
       return `Cache operation not supported for ${structured.dataFacet} in ${collection}.`;

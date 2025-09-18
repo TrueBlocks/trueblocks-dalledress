@@ -18,7 +18,7 @@ export type ComparitoorSource = {
 };
 
 const sourceDefs = [
-  { key: 'trueblocks', label: 'TrueBlocks', field: 'trueBlocks' },
+  { key: 'chifra', label: 'Chifra', field: 'chifra' },
   { key: 'etherscan', label: 'EtherScan', field: 'etherscan' },
   { key: 'covalent', label: 'Covalent', field: 'covalent' },
   { key: 'alchemy', label: 'Alchemy', field: 'alchemy' },

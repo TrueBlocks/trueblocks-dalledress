@@ -1764,7 +1764,7 @@
                     "class": "Names",
                     "doc_group": "001-Route",
                     "doc_route": "400-names",
-                    "doc_descr": "an association between a human-readable name and an address used throughout TrueBlocks",
+                    "doc_descr": "an association between a human-readable name and an address",
                     "produced_by": "names",
                     "members": [
                         {
@@ -4129,7 +4129,7 @@
             "class": "Names",
             "doc_group": "001-Route",
             "doc_route": "400-names",
-            "doc_descr": "an association between a human-readable name and an address used throughout TrueBlocks",
+            "doc_descr": "an association between a human-readable name and an address",
             "produced_by": "names",
             "members": [
                 {
@@ -5870,10 +5870,10 @@
             "produced_by": "comparitoor",
             "members": [
                 {
-                    "name": "nTrueBlocks",
+                    "name": "nChifra",
                     "type": "value",
                     "docOrder": 1,
-                    "description": "The values for TrueBlocks",
+                    "description": "The values for Chifra",
                     "num": 1
                 },
                 {
@@ -5911,7 +5911,7 @@
                     "disabled": false
                 },
                 {
-                    "name": "TrueBlocks",
+                    "name": "Chifra",
                     "store": "Transaction",
                     "actions": [
                         "export"

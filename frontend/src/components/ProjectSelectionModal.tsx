@@ -160,7 +160,7 @@ export const ProjectSelectionModal = ({
           <Text c="dimmed">
             {hasActiveProject
               ? 'Choose a different project or create a new one'
-              : 'TrueBlocks requires an active project with at least one address to continue'}
+              : 'An active project with at least one address is required to continue'}
           </Text>
         </div>
 

@@ -1,5 +1,5 @@
 /**
- * Skin system for TrueBlocks DalleDress
+ * Skin system for the app
  * Centralizes colors and visual styling for easy theming
  */
 

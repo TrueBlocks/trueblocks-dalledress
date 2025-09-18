@@ -39,7 +39,7 @@ the code inside of 'EXISTING_CODE' tags.
 // EXISTING_CODE
 # Names Management
 
-Welcome to the **Names** view! This section allows you to manage address names and their associated metadata in the TrueBlocks system.
+Welcome to the **Names** view! This section allows you to manage address names and their associated metadata.
 
 ## Overview
 
@@ -74,7 +74,7 @@ The Names view provides a comprehensive interface for managing address names, wh
 - **Address**: The Ethereum address (40-character hex string)
 - **Name**: Human-readable name for the address
 - **Tags**: Categorization tags
-- **Source**: Where the name originated (TrueBlocks, custom, etc.)
+- **Source**: Where the name originated (Chifra, custom, etc.)
 - **Symbol**: Token symbol (if applicable)
 - **Decimals**: Token decimal places (if applicable)
 - **Description**: Additional information about the address

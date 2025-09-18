@@ -101,7 +101,7 @@ export const ComparitoorRenderer = ({
       onKeyDown={handleKeyDown}
     >
       <Title order={3} ta="center" style={{ flexShrink: 0 }}>
-        TrueBlocks - Comparatooor - We Find More So You Don’t Have To
+        Comparatooor - We Find More So You Don’t Have To
       </Title>
       <Group align="center" justify="center" style={{ flexShrink: 0 }}>
         <TextInput
@@ -188,7 +188,7 @@ export const ComparitoorRenderer = ({
                           {isMissing ? '[missing]' : item.value}
                         </Text>
                         {item.value === '100.100' &&
-                        src.key === 'trueblocks' ? (
+                        src.key === 'chifra' ? (
                           <MaterialIcon />
                         ) : null}
                       </Group>

@@ -14,7 +14,7 @@ the code inside of 'EXISTING_CODE' tags.
 ## Facets
 
 - Comparitoor Facet uses sdk.Transaction store.
-- TrueBlocks Facet uses sdk.Transaction store.
+- Chifra Facet uses sdk.Transaction store.
 - EtherScan Facet uses sdk.Transaction store.
 - Covalent Facet uses sdk.Transaction store.
 - Alchemy Facet uses sdk.Transaction store.

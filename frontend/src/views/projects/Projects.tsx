@@ -182,7 +182,7 @@ export const Projects = () => {
         <Group justify="space-between" align="center">
           <div>
             <Title order={2}>Project Manager</Title>
-            <Text c="dimmed">Manage your TrueBlocks analysis projects</Text>
+            <Text c="dimmed">Manage your projects</Text>
           </div>
 
           <Button

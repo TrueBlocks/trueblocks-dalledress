@@ -1,7 +1,7 @@
 module github.com/TrueBlocks/trueblocks-dalledress
 
-// GoLang version
-go 1.23.8
+// GoLang Version
+go 1.25.1
 
 require (
 	github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250907182653-03634a2d9cce

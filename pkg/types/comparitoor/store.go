@@ -57,8 +57,8 @@ func (c *ComparitoorCollection) getTransactionStore(payload *types.Payload, face
 				// Import mock variables from mocks.go
 				// (They are package-level, so no explicit import needed)
 				switch facet {
-				case ComparitoorTrueBlocks:
-					src = mockTrueBlocks
+				case ComparitoorChifra:
+					src = mockChifra
 				case ComparitoorEtherScan:
 					src = mockEtherscan
 				case ComparitoorCovalent:
@@ -66,7 +66,7 @@ func (c *ComparitoorCollection) getTransactionStore(payload *types.Payload, face
 				case ComparitoorAlchemy:
 					src = mockAlchemy
 				case ComparitoorComparitoor:
-					src = append([]*Transaction{}, mockTrueBlocks...)
+					src = append([]*Transaction{}, mockChifra...)
 					src = append(src, mockEtherscan...)
 					src = append(src, mockCovalent...)
 					src = append(src, mockAlchemy...)
@@ -111,7 +111,7 @@ func (c *ComparitoorCollection) GetStoreName(dataFacet types.DataFacet, chain, a
 	switch dataFacet {
 	case ComparitoorComparitoor:
 		name = "comparitoor-transaction"
-	case ComparitoorTrueBlocks:
+	case ComparitoorChifra:
 		name = "comparitoor-transaction"
 	case ComparitoorEtherScan:
 		name = "comparitoor-transaction"

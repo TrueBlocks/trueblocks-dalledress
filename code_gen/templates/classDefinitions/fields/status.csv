@@ -16,4 +16,4 @@ networkId    , string,           ,           ,         ,       14, the network I
 progress     , string,           ,           ,         ,       15, progress information
 rootConfig   , string,           ,           ,         ,       16, path to root configuration
 rpcProvider  , string,           ,           ,         ,       17, RPC provider URL
-version      , string,           ,           ,         ,       18, TrueBlocks version
+version      , string,           ,           ,         ,       18, Application version

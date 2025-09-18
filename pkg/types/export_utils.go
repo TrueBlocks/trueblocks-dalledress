@@ -104,7 +104,7 @@ func normalizeFilename(rawFilename, fileExtension string) string {
 	return filename
 }
 
-// writeDataToJSON writes typed data to a JSON file using TrueBlocks Model() method
+// writeDataToJSON writes typed data to a JSON file using Model() method
 func writeDataToJSON[T any](file *os.File, data []T, typeName string) error {
 	logging.LogBackend(fmt.Sprintf("[EXPORT JSON] ===== WriteDataToJSON called for %s =====", typeName))
 
@@ -140,7 +140,7 @@ func writeDataToJSON[T any](file *os.File, data []T, typeName string) error {
 	return err
 }
 
-// writeDataToCSV writes typed data to a CSV or TXT file using TrueBlocks Model() method
+// writeDataToCSV writes typed data to a CSV or TXT file using Model() method
 func writeDataToCSV[T any](file *os.File, data []T, typeName string, format string) error {
 	delimiter := ","
 	if format == "txt" {

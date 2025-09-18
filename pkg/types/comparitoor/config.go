@@ -25,7 +25,7 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 			HeaderActions: []string{"export"},
 			RendererTypes: "facet",
 		},
-		"trueblocks": {
+		"chifra": {
 			Name:          "Trueblocks",
 			Store:         "transaction",
 			IsForm:        false,
@@ -70,7 +70,7 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 	cfg := &types.ViewConfig{
 		ViewName:   "comparitoor",
 		Facets:     facets,
-		FacetOrder: []string{"comparitoor", "trueblocks", "etherscan", "covalent", "alchemy"},
+		FacetOrder: []string{"comparitoor", "chifra", "etherscan", "covalent", "alchemy"},
 		Actions: map[string]types.ActionConfig{
 			"export": {Name: "export", Label: "Export", Icon: "Export"},
 		},
@@ -92,7 +92,7 @@ func getTransactionFields() []types.FieldConfig {
 		{Key: "value", Label: "Value", Section: "General", Order: 6, DetailOrder: 6},
 		{Key: "gasUsed", Label: "Gas Used", Section: "General", Order: 7, DetailOrder: 7},
 		{Key: "status", Label: "Status", Section: "General", Order: 8, DetailOrder: 8},
-		{Key: "presentInTrueBlocks", Label: "TrueBlocks", Section: "Presence", Order: 9, DetailOrder: 9},
+		{Key: "presentInChifra", Label: "Chifra", Section: "Presence", Order: 9, DetailOrder: 9},
 		{Key: "presentInEtherscan", Label: "Etherscan", Section: "Presence", Order: 10, DetailOrder: 10},
 		{Key: "presentInCovalent", Label: "Covalent", Section: "Presence", Order: 11, DetailOrder: 11},
 		{Key: "presentInAlchemy", Label: "Alchemy", Section: "Presence", Order: 12, DetailOrder: 12},

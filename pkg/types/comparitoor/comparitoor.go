@@ -22,7 +22,7 @@ import (
 
 const (
 	ComparitoorComparitoor types.DataFacet = "comparitoor"
-	ComparitoorTrueBlocks  types.DataFacet = "trueblocks"
+	ComparitoorChifra      types.DataFacet = "chifra"
 	ComparitoorEtherScan   types.DataFacet = "etherscan"
 	ComparitoorCovalent    types.DataFacet = "covalent"
 	ComparitoorAlchemy     types.DataFacet = "alchemy"
@@ -30,7 +30,7 @@ const (
 
 func init() {
 	types.RegisterDataFacet(ComparitoorComparitoor)
-	types.RegisterDataFacet(ComparitoorTrueBlocks)
+	types.RegisterDataFacet(ComparitoorChifra)
 	types.RegisterDataFacet(ComparitoorEtherScan)
 	types.RegisterDataFacet(ComparitoorCovalent)
 	types.RegisterDataFacet(ComparitoorAlchemy)
@@ -38,7 +38,7 @@ func init() {
 
 type ComparitoorCollection struct {
 	comparitoorFacet *facets.Facet[Transaction]
-	trueblocksFacet  *facets.Facet[Transaction]
+	chifraFacet      *facets.Facet[Transaction]
 	etherscanFacet   *facets.Facet[Transaction]
 	covalentFacet    *facets.Facet[Transaction]
 	alchemyFacet     *facets.Facet[Transaction]
@@ -63,11 +63,11 @@ func (c *ComparitoorCollection) initializeFacets(payload *types.Payload) {
 		c,
 	)
 
-	c.trueblocksFacet = facets.NewFacet(
-		ComparitoorTrueBlocks,
+	c.chifraFacet = facets.NewFacet(
+		ComparitoorChifra,
 		isTrueBlock,
 		isDupTransaction(),
-		c.getTransactionStore(payload, ComparitoorTrueBlocks),
+		c.getTransactionStore(payload, ComparitoorChifra),
 		"comparitoor",
 		c,
 	)
@@ -160,8 +160,8 @@ func (c *ComparitoorCollection) LoadData(dataFacet types.DataFacet) {
 			if err := c.comparitoorFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
 			}
-		case ComparitoorTrueBlocks:
-			if err := c.trueblocksFacet.Load(); err != nil {
+		case ComparitoorChifra:
+			if err := c.chifraFacet.Load(); err != nil {
 				logging.LogError(fmt.Sprintf("LoadData.%s from store: %%v", dataFacet), err, facets.ErrAlreadyLoading)
 			}
 		case ComparitoorEtherScan:
@@ -187,8 +187,8 @@ func (c *ComparitoorCollection) Reset(dataFacet types.DataFacet) {
 	switch dataFacet {
 	case ComparitoorComparitoor:
 		c.comparitoorFacet.GetStore().Reset()
-	case ComparitoorTrueBlocks:
-		c.trueblocksFacet.GetStore().Reset()
+	case ComparitoorChifra:
+		c.chifraFacet.GetStore().Reset()
 	case ComparitoorEtherScan:
 		c.etherscanFacet.GetStore().Reset()
 	case ComparitoorCovalent:
@@ -204,8 +204,8 @@ func (c *ComparitoorCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 	switch dataFacet {
 	case ComparitoorComparitoor:
 		return c.comparitoorFacet.NeedsUpdate()
-	case ComparitoorTrueBlocks:
-		return c.trueblocksFacet.NeedsUpdate()
+	case ComparitoorChifra:
+		return c.chifraFacet.NeedsUpdate()
 	case ComparitoorEtherScan:
 		return c.etherscanFacet.NeedsUpdate()
 	case ComparitoorCovalent:
@@ -220,7 +220,7 @@ func (c *ComparitoorCollection) NeedsUpdate(dataFacet types.DataFacet) bool {
 func (c *ComparitoorCollection) GetSupportedFacets() []types.DataFacet {
 	return []types.DataFacet{
 		ComparitoorComparitoor,
-		ComparitoorTrueBlocks,
+		ComparitoorChifra,
 		ComparitoorEtherScan,
 		ComparitoorCovalent,
 		ComparitoorAlchemy,
@@ -276,8 +276,8 @@ func (c *ComparitoorCollection) ExportData(payload *types.Payload) (string, erro
 	switch payload.DataFacet {
 	case ComparitoorComparitoor:
 		return c.comparitoorFacet.ExportData(payload, string(ComparitoorComparitoor))
-	case ComparitoorTrueBlocks:
-		return c.trueblocksFacet.ExportData(payload, string(ComparitoorTrueBlocks))
+	case ComparitoorChifra:
+		return c.chifraFacet.ExportData(payload, string(ComparitoorChifra))
 	case ComparitoorEtherScan:
 		return c.etherscanFacet.ExportData(payload, string(ComparitoorEtherScan))
 	case ComparitoorCovalent:

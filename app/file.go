@@ -41,7 +41,7 @@ func (a *App) FileSaveAs(_ *menu.CallbackData) {
 		Title: "Save Project As",
 		Filters: []wailsRuntime.FileFilter{
 			{
-				DisplayName: "TrueBlocks Project Files (*.tbx)",
+				DisplayName: "Project Files (*.tbx)",
 				Pattern:     "*.tbx",
 			},
 		},

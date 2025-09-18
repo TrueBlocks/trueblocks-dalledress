@@ -41,7 +41,7 @@ func (a *App) OpenProjectFile(path string) error {
 			Title: "Open Project File",
 			Filters: []runtime.FileFilter{
 				{
-					DisplayName: "TrueBlocks Project Files (*.tbx)",
+					DisplayName: "Project Files (*.tbx)",
 					Pattern:     "*.tbx",
 				},
 			},
@@ -102,7 +102,7 @@ func (a *App) SaveProject() error {
 			Title: "Save Project",
 			Filters: []runtime.FileFilter{
 				{
-					DisplayName: "TrueBlocks Project Files (*.tbx)",
+					DisplayName: "Project Files (*.tbx)",
 					Pattern:     "*.tbx",
 				},
 			},

@@ -29,14 +29,14 @@ type ComparitoorPage struct {
 	IsFetching    bool                    `json:"isFetching"`
 	State         types.LoadState         `json:"state"`
 	// Per-source arrays and counts
-	TrueBlocks      []*AnnotatedTransaction `json:"trueBlocks"`
-	TrueBlocksCount int                     `json:"trueBlocksCount"`
-	Etherscan       []*AnnotatedTransaction `json:"etherscan"`
-	EtherscanCount  int                     `json:"etherscanCount"`
-	Covalent        []*AnnotatedTransaction `json:"covalent"`
-	CovalentCount   int                     `json:"covalentCount"`
-	Alchemy         []*AnnotatedTransaction `json:"alchemy"`
-	AlchemyCount    int                     `json:"alchemyCount"`
+	Chifra         []*AnnotatedTransaction `json:"chifra"`
+	ChifraCount    int                     `json:"chifraCount"`
+	Etherscan      []*AnnotatedTransaction `json:"etherscan"`
+	EtherscanCount int                     `json:"etherscanCount"`
+	Covalent       []*AnnotatedTransaction `json:"covalent"`
+	CovalentCount  int                     `json:"covalentCount"`
+	Alchemy        []*AnnotatedTransaction `json:"alchemy"`
+	AlchemyCount   int                     `json:"alchemyCount"`
 	// Overlap/union/intersection statistics
 	OverlapCount      int `json:"overlapCount"`
 	UnionCount        int `json:"unionCount"`
@@ -94,9 +94,9 @@ func (c *ComparitoorCollection) GetPage(
 		return fmt.Sprintf("%v:%v", tx.BlockNumber, tx.TransactionIndex)
 	}
 	// Get per-source results
-	var tbResult, esResult, cvResult, alResult *facets.PageResult[Transaction]
-	if c.trueblocksFacet != nil {
-		tbResult, _ = c.trueblocksFacet.GetPage(first, pageSize, nil, sortSpec, nil)
+	var chifraResult, esResult, cvResult, alResult *facets.PageResult[Transaction]
+	if c.chifraFacet != nil {
+		chifraResult, _ = c.chifraFacet.GetPage(first, pageSize, nil, sortSpec, nil)
 	}
 	if c.etherscanFacet != nil {
 		esResult, _ = c.etherscanFacet.GetPage(first, pageSize, nil, sortSpec, nil)
@@ -108,7 +108,7 @@ func (c *ComparitoorCollection) GetPage(
 		alResult, _ = c.alchemyFacet.GetPage(first, pageSize, nil, sortSpec, nil)
 	}
 	sets := [][]*Transaction{
-		slicePtrs(tbResult.Items),
+		slicePtrs(chifraResult.Items),
 		slicePtrs(esResult.Items),
 		slicePtrs(cvResult.Items),
 		slicePtrs(alResult.Items),
@@ -149,11 +149,11 @@ func (c *ComparitoorCollection) GetPage(
 		}
 		return out
 	}
-	page.TrueBlocks = buildAnnotated(tbResult.Items)
+	page.Chifra = buildAnnotated(chifraResult.Items)
 	page.Etherscan = buildAnnotated(esResult.Items)
 	page.Covalent = buildAnnotated(cvResult.Items)
 	page.Alchemy = buildAnnotated(alResult.Items)
-	page.TrueBlocksCount = len(tbResult.Items)
+	page.ChifraCount = len(chifraResult.Items)
 	page.EtherscanCount = len(esResult.Items)
 	page.CovalentCount = len(cvResult.Items)
 	page.AlchemyCount = len(alResult.Items)
@@ -201,8 +201,8 @@ func (c *ComparitoorCollection) GetPage(
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
-	case ComparitoorTrueBlocks:
-		facet := c.trueblocksFacet
+	case ComparitoorChifra:
+		facet := c.chifraFacet
 		var filterFunc func(*Transaction) bool
 		if filter != "" {
 			filterFunc = func(item *Transaction) bool {

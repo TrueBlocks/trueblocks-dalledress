@@ -14,8 +14,8 @@ import (
 //go:embed testdata/alchemy.csv
 var alchemyCSV []byte
 
-//go:embed testdata/trueblocks.csv
-var trueblocksCSV []byte
+//go:embed testdata/chifra.csv
+var chifraCSV []byte
 
 //go:embed testdata/etherscan.csv
 var etherscanCSV []byte
@@ -47,7 +47,7 @@ func parseCSVToTransactions(data []byte) []*sdk.Transaction {
 	return out
 }
 
-var mockTrueBlocks = parseCSVToTransactions(trueblocksCSV)
+var mockChifra = parseCSVToTransactions(chifraCSV)
 var mockEtherscan = parseCSVToTransactions(etherscanCSV)
 var mockCovalent = parseCSVToTransactions(covalentCSV)
 var mockAlchemy = parseCSVToTransactions(alchemyCSV)

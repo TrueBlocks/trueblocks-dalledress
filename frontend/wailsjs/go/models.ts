@@ -230,8 +230,8 @@ export namespace comparitoor {
 	    expectedTotal: number;
 	    isFetching: boolean;
 	    state: types.LoadState;
-	    trueBlocks: AnnotatedTransaction[];
-	    trueBlocksCount: number;
+	    chifra: AnnotatedTransaction[];
+	    chifraCount: number;
 	    etherscan: AnnotatedTransaction[];
 	    etherscanCount: number;
 	    covalent: AnnotatedTransaction[];
@@ -255,8 +255,8 @@ export namespace comparitoor {
 	        this.expectedTotal = source["expectedTotal"];
 	        this.isFetching = source["isFetching"];
 	        this.state = source["state"];
-	        this.trueBlocks = this.convertValues(source["trueBlocks"], AnnotatedTransaction);
-	        this.trueBlocksCount = source["trueBlocksCount"];
+	        this.chifra = this.convertValues(source["chifra"], AnnotatedTransaction);
+	        this.chifraCount = source["chifraCount"];
 	        this.etherscan = this.convertValues(source["etherscan"], AnnotatedTransaction);
 	        this.etherscanCount = source["etherscanCount"];
 	        this.covalent = this.convertValues(source["covalent"], AnnotatedTransaction);
@@ -1223,7 +1223,7 @@ export namespace types {
 	    BLOOMS = "blooms",
 	    MANIFEST = "manifest",
 	    COMPARITOOR = "comparitoor",
-	    TRUEBLOCKS = "trueblocks",
+	    CHIFRA = "chifra",
 	    ETHERSCAN = "etherscan",
 	    COVALENT = "covalent",
 	    ALCHEMY = "alchemy",

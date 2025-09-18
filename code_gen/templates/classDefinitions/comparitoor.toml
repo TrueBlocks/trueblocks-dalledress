@@ -15,7 +15,7 @@ viewType = ""
 renderer = "facet"
 
 [[facets]]
-name = "TrueBlocks"
+name = "Chifra"
 store = "Transaction"
 actions = ["export"]
 viewType = ""

@@ -12,7 +12,7 @@ import {
   Chunks,
   Comparitoor,
   Contracts,
-  DalleDress,
+  Dresses,
   Exports,
   Monitors,
   Names,
@@ -87,10 +87,10 @@ export const MenuItems: MenuItem[] = [
     type: 'navigation',
   },
   {
-    label: 'DalleDress',
-    path: '/dalledress',
+    label: 'Dresses',
+    path: '/dresses',
     position: 'top',
-    component: DalleDress,
+    component: Dresses,
     type: 'navigation',
   },
   {

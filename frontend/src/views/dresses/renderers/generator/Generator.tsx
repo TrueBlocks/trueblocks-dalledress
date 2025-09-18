@@ -13,7 +13,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { dalledress, model, project } from '@models';
+import { dresses, model, project } from '@models';
 import { Log } from '@utils';
 
 import { DalleDressCard } from '../../components';
@@ -22,7 +22,7 @@ import { useSpeakPrompt } from '../../hooks/useSpeakPrompt';
 import { getItemKey, useGalleryStore } from '../../store';
 
 export type GeneratorProps = {
-  pageData: dalledress.DalleDressPage | null;
+  pageData: dresses.DalleDressPage | null;
   viewStateKey: project.ViewStateKey; // Make required since persistence depends on it
 };
 
@@ -46,11 +46,11 @@ export const Generator = ({ pageData, viewStateKey }: GeneratorProps) => {
     handleKey: sharedHandleKey,
   } = useGalleryStore();
 
-  // Ingest all dalledress data - backend now filters out deleted series
+  // Ingest all dresses data - backend now filters out deleted series
   useEffect(() => {
-    const allDalledresses = pageData?.dalledress || [];
-    ingestItems(allDalledresses);
-  }, [pageData?.dalledress, ingestItems]);
+    const allDresseses = pageData?.dresses || [];
+    ingestItems(allDresseses);
+  }, [pageData?.dresses, ingestItems]);
 
   useEffect(() => {
     ensureHydrated(viewStateKey);

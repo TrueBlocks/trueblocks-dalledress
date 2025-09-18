@@ -27,7 +27,7 @@ export const useSpeakPrompt = ({
       setSpeaking(true);
       const url = await GetDalleAudioURL(
         {
-          collection: 'dalledress',
+          collection: 'dresses',
           dataFacet: types.DataFacet.GENERATOR,
           address: activeAddress,
         },

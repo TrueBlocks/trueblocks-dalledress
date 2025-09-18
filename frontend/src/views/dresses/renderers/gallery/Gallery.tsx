@@ -2,14 +2,14 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import type { DataFacet } from '@hooks';
 import { Center, Container, Title } from '@mantine/core';
-import { dalledress, model, project, types } from '@models';
+import { dresses, model, project, types } from '@models';
 
 import { GalleryControls, GalleryGrouping } from '../../components';
 import { useScrollSelectedIntoView } from '../../hooks/useScrollSelectedIntoView';
 import { getItemKey, useGalleryStore } from '../../store';
 
 export type GalleryProps = {
-  pageData: dalledress.DalleDressPage | null;
+  pageData: dresses.DalleDressPage | null;
   viewStateKey: project.ViewStateKey; // Make required since persistence depends on it
   setActiveFacet?: (f: DataFacet) => void;
 };
@@ -37,11 +37,11 @@ export const Gallery = ({
   } = useGalleryStore();
   const { groupNames, groupedItems } = useDerived(sortMode);
 
-  // Ingest all dalledress data - backend now filters out deleted series
+  // Ingest all dresses data - backend now filters out deleted series
   useEffect(() => {
-    const allDalledresses = pageData?.dalledress || [];
-    ingestItems(allDalledresses);
-  }, [pageData?.dalledress, ingestItems]);
+    const allDresseses = pageData?.dresses || [];
+    ingestItems(allDresseses);
+  }, [pageData?.dresses, ingestItems]);
 
   useEffect(() => {
     keyScopeRef.current?.focus({ preventScroll: true });

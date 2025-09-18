@@ -3,8 +3,8 @@
         {
             "num": 6000,
             "group": "Types",
-            "description": "TrueBlocks Types",
-            "summary": "TrueBlocks Types"
+            "description": "Shared Types",
+            "summary": "Shared Types"
         },
         {
             "num": 6100,
@@ -5612,7 +5612,7 @@
                     "name": "version",
                     "type": "string",
                     "docOrder": 18,
-                    "description": "TrueBlocks version",
+                    "description": "version",
                     "num": 18
                 }
             ],
@@ -5653,9 +5653,9 @@
         {
             "class": "DalleDress",
             "doc_group": "001-Route",
-            "doc_route": "700-dalledress",
+            "doc_route": "700-dresses",
             "doc_descr": "multi-facet generative art collection for DalleDress",
-            "produced_by": "dalledress",
+            "produced_by": "dresses",
             "members": [
                 {
                     "name": "original",

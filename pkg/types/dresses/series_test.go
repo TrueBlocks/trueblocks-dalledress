@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 
-package dalledress
+package dresses
 
 import (
 	"os"
@@ -36,7 +36,7 @@ func TestSeriesCrudEmitsOperation(t *testing.T) {
 
 	_ = os.Setenv("TRUEBLOCKS_DALLE_DATA_DIR", tmp)
 	defer func() { _ = os.Unsetenv("TRUEBLOCKS_DALLE_DATA_DIR") }()
-	payload := &types.Payload{Collection: "dalledress", DataFacet: DalleDressSeries, ProjectPath: tmp}
+	payload := &types.Payload{Collection: "dresses", DataFacet: DalleDressSeries, ProjectPath: tmp}
 	coll := GetDalleDressCollection(payload)
 
 	gotOps := []string{}
@@ -89,7 +89,7 @@ func TestSeriesExportCSV(t *testing.T) {
 
 	_ = os.Setenv("TRUEBLOCKS_DALLE_DATA_DIR", tmp)
 	defer func() { _ = os.Unsetenv("TRUEBLOCKS_DALLE_DATA_DIR") }()
-	payload := &types.Payload{Collection: "dalledress", DataFacet: DalleDressSeries, ProjectPath: tmp, Format: "csv"}
+	payload := &types.Payload{Collection: "dresses", DataFacet: DalleDressSeries, ProjectPath: tmp, Format: "csv"}
 	coll := GetDalleDressCollection(payload)
 
 	// seed two series

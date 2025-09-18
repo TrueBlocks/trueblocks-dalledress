@@ -10,7 +10,7 @@ package app
 
 import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dalledress"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dresses"
 
 	//
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/crud"
@@ -27,9 +27,9 @@ func (a *App) GetDalleDressPage(
 	first, pageSize int,
 	sort sdk.SortSpec,
 	filter string,
-) (*dalledress.DalleDressPage, error) {
-	collection := dalledress.GetDalleDressCollection(payload)
-	return getCollectionPage[*dalledress.DalleDressPage](collection, payload, first, pageSize, sort, filter)
+) (*dresses.DalleDressPage, error) {
+	collection := dresses.GetDalleDressCollection(payload)
+	return getCollectionPage[*dresses.DalleDressPage](collection, payload, first, pageSize, sort, filter)
 }
 
 func (a *App) DalleDressCrud(
@@ -37,25 +37,25 @@ func (a *App) DalleDressCrud(
 	op crud.Operation,
 	item *any,
 ) error {
-	collection := dalledress.GetDalleDressCollection(payload)
+	collection := dresses.GetDalleDressCollection(payload)
 	return collection.Crud(payload, op, item)
 }
 
 func (a *App) GetDalleDressSummary(payload *types.Payload) types.Summary {
-	collection := dalledress.GetDalleDressCollection(payload)
+	collection := dresses.GetDalleDressCollection(payload)
 	return collection.GetSummary()
 }
 
 func (a *App) ReloadDalleDress(payload *types.Payload) error {
-	collection := dalledress.GetDalleDressCollection(payload)
+	collection := dresses.GetDalleDressCollection(payload)
 	collection.Reset(payload.DataFacet)
 	collection.LoadData(payload.DataFacet)
 	return nil
 }
 
-// GetDalleDressConfig returns the view configuration for dalledress
-func (a *App) GetDalleDressConfig(payload types.Payload) (*types.ViewConfig, error) {
-	collection := dalledress.GetDalleDressCollection(&payload)
+// GetDressesConfig returns the view configuration for dresses
+func (a *App) GetDressesConfig(payload types.Payload) (*types.ViewConfig, error) {
+	collection := dresses.GetDalleDressCollection(&payload)
 	return collection.GetConfig()
 }
 

@@ -1,4 +1,4 @@
-package dalledress
+package dresses
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestDalleDressGalleryPageUsesDresses(t *testing.T) {
-	payload := &types.Payload{Collection: "dalledress", DataFacet: DalleDressGallery}
+	payload := &types.Payload{Collection: "dresses", DataFacet: DalleDressGallery}
 	coll := GetDalleDressCollection(payload)
 	coll.LoadData(DalleDressGallery)
 	pageAny, err := coll.GetPage(payload, 0, 25, sdk.SortSpec{}, "")
@@ -19,7 +19,7 @@ func TestDalleDressGalleryPageUsesDresses(t *testing.T) {
 	if !ok {
 		t.Fatalf("unexpected page type: %T", pageAny)
 	}
-	if page.DalleDress == nil {
+	if page.Dresses == nil {
 		t.Fatalf("expected Dresses slice to be non-nil")
 	}
 	if len(page.Logs) != 0 {
@@ -28,7 +28,7 @@ func TestDalleDressGalleryPageUsesDresses(t *testing.T) {
 }
 
 func TestDalleDressEventsPageStillUsesLogs(t *testing.T) {
-	payload := &types.Payload{Collection: "dalledress", DataFacet: DalleDressEvents}
+	payload := &types.Payload{Collection: "dresses", DataFacet: DalleDressEvents}
 	coll := GetDalleDressCollection(payload)
 	coll.LoadData(DalleDressEvents)
 	pageAny, err := coll.GetPage(payload, 0, 25, sdk.SortSpec{}, "")
@@ -42,7 +42,7 @@ func TestDalleDressEventsPageStillUsesLogs(t *testing.T) {
 	if page.Logs == nil {
 		t.Fatalf("expected Logs slice non-nil for events facet")
 	}
-	if len(page.DalleDress) != 0 {
-		t.Fatalf("expected Dresses nil or empty for events facet; got len=%d", len(page.DalleDress))
+	if len(page.Dresses) != 0 {
+		t.Fatalf("expected Dresses nil or empty for events facet; got len=%d", len(page.Dresses))
 	}
 }

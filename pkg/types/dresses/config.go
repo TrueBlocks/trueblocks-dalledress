@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 
-package dalledress
+package dresses
 
 import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -17,10 +17,10 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 	facets := map[string]types.FacetConfig{
 		"generator": {
 			Name:          "Generator",
-			Store:         "dalledress",
+			Store:         "dresses",
 			IsForm:        true,
 			DividerBefore: false,
-			Fields:        getDalledressFields(),
+			Fields:        getDressesFields(),
 			Actions:       []string{},
 			HeaderActions: []string{},
 			RendererTypes: "facet",
@@ -57,10 +57,10 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 		},
 		"gallery": {
 			Name:          "Gallery",
-			Store:         "dalledress",
+			Store:         "dresses",
 			IsForm:        true,
 			DividerBefore: false,
-			Fields:        getDalledressFields(),
+			Fields:        getDressesFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "facet",
@@ -68,7 +68,7 @@ func (c *DalleDressCollection) GetConfig() (*types.ViewConfig, error) {
 	}
 
 	cfg := &types.ViewConfig{
-		ViewName:   "dalledress",
+		ViewName:   "dresses",
 		Facets:     facets,
 		FacetOrder: []string{"generator", "series", "databases", "events", "gallery"},
 		Actions: map[string]types.ActionConfig{
@@ -107,7 +107,7 @@ func getLogsFields() []types.FieldConfig {
 	}
 }
 
-func getDalledressFields() []types.FieldConfig {
+func getDressesFields() []types.FieldConfig {
 	return []types.FieldConfig{
 		// EXISTING_CODE
 		{Key: "original", Label: "Original", ColumnLabel: "Original", DetailLabel: "Original Value", Section: "General", Order: 1, DetailOrder: 1},

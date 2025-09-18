@@ -28,7 +28,7 @@ import {
 import { TabView } from '@layout';
 import { Group, Stack } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { dalle, dalledress, model } from '@models';
+import { dalle, dresses, model } from '@models';
 import { crud, msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
@@ -39,8 +39,8 @@ import { useSeriesModal } from './hooks/seriesModal';
 import { renderers } from './renderers';
 import { getItemKey, useGalleryStore } from './store/useGalleryStore';
 
-const ROUTE: ViewRoute = 'dalledress';
-export const DalleDress = () => {
+const ROUTE: ViewRoute = 'dresses';
+export const Dresses = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
   const createPayload = usePayload();
@@ -60,9 +60,7 @@ export const DalleDress = () => {
   const { availableFacets, getCurrentDataFacet, setActiveFacet } =
     activeFacetHook;
 
-  const [pageData, setPageData] = useState<dalledress.DalleDressPage | null>(
-    null,
-  );
+  const [pageData, setPageData] = useState<dresses.DalleDressPage | null>(null);
   const viewStateKey = useMemo(
     (): project.ViewStateKey => ({
       viewName: ROUTE,
@@ -115,7 +113,7 @@ export const DalleDress = () => {
     const facet = getCurrentDataFacet();
     switch (facet) {
       case types.DataFacet.GENERATOR:
-        return pageData.dalledress || [];
+        return pageData.dresses || [];
       case types.DataFacet.SERIES:
         return pageData.series || [];
       case types.DataFacet.DATABASES:
@@ -123,7 +121,7 @@ export const DalleDress = () => {
       case types.DataFacet.EVENTS:
         return pageData.logs || [];
       case types.DataFacet.GALLERY:
-        return pageData.dalledress || [];
+        return pageData.dresses || [];
       default:
         LogError('[DalleDress] unexpected facet=' + String(facet));
         return [];
@@ -189,7 +187,7 @@ export const DalleDress = () => {
       }
     },
     pageFunc: GetDalleDressPage,
-    pageClass: dalledress.DalleDressPage,
+    pageClass: dresses.DalleDressPage,
     updateItem: model.DalleDress.createFrom({}),
     createPayload,
     getCurrentDataFacet,
@@ -215,41 +213,39 @@ export const DalleDress = () => {
   const handleSelectedSeriesUpdate = useCallback(
     async (affectedSuffix: string, operation: crud.Operation) => {
       try {
-        // Get currently selected dalledress from gallery store
+        // Get currently selected dresses from gallery store
         const selectedItem = galleryState.getSelectedItem();
         if (!selectedItem) {
           return;
         }
 
-        // Check if the selected dalledress belongs to the affected series
+        // Check if the selected dresses belongs to the affected series
         if (selectedItem.series !== affectedSuffix) {
           return;
         }
 
-        // If selected dalledress series was deleted or removed, select a reasonable alternative
+        // If selected dresses series was deleted or removed, select a reasonable alternative
         if (
           operation === crud.Operation.DELETE ||
           operation === crud.Operation.REMOVE
         ) {
-          // Get all available dalledresses from the gallery
-          const allDalledresses = galleryState.galleryItems || [];
+          // Get all available dresseses from the gallery
+          const allDresses = galleryState.galleryItems || [];
 
-          // Find first dalledress from a non-deleted series that isn't the affected one
-          const availableDalledresses = allDalledresses.filter(
-            (d: model.DalleDress) => {
-              const dalledressSeries = pageData?.series?.find(
-                (s) => s.suffix === d.series,
-              );
-              return (
-                dalledressSeries &&
-                !dalledressSeries.deleted &&
-                d.series !== affectedSuffix
-              );
-            },
-          );
+          // Find first dresses from a non-deleted series that isn't the affected one
+          const availableDresses = allDresses.filter((d: model.DalleDress) => {
+            const dressesSeries = pageData?.series?.find(
+              (s) => s.suffix === d.series,
+            );
+            return (
+              dressesSeries &&
+              !dressesSeries.deleted &&
+              d.series !== affectedSuffix
+            );
+          });
 
-          if (availableDalledresses.length > 0 && availableDalledresses[0]) {
-            const newSelection = availableDalledresses[0];
+          if (availableDresses.length > 0 && availableDresses[0]) {
+            const newSelection = availableDresses[0];
             const newKey = getItemKey(newSelection);
 
             // Update gallery selection
@@ -478,8 +474,7 @@ export const DalleDress = () => {
   );
 
   const detailPanel = useMemo(
-    () =>
-      createDetailPanel(viewConfig, getCurrentDataFacet, 'Dalledress Details'),
+    () => createDetailPanel(viewConfig, getCurrentDataFacet, 'Dresses Details'),
     [viewConfig, getCurrentDataFacet],
   );
 

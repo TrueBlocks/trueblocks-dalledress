@@ -83,7 +83,13 @@ export function GetAbisConfig(arg1) {
 }
 
 export function GetAbisPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetAbisPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetAbisPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetAbisSummary(arg1) {
@@ -119,7 +125,13 @@ export function GetChunksConfig(arg1) {
 }
 
 export function GetChunksPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetChunksPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetChunksPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetChunksSummary(arg1) {
@@ -131,7 +143,13 @@ export function GetComparitoorConfig(arg1) {
 }
 
 export function GetComparitoorPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetComparitoorPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetComparitoorPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetComparitoorSummary(arg1) {
@@ -147,7 +165,13 @@ export function GetContractsConfig(arg1) {
 }
 
 export function GetContractsPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetContractsPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetContractsPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetContractsSummary(arg1) {
@@ -158,12 +182,18 @@ export function GetDalleAudioURL(arg1, arg2) {
   return window['go']['app']['App']['GetDalleAudioURL'](arg1, arg2);
 }
 
-export function GetDalleDressConfig(arg1) {
-  return window['go']['app']['App']['GetDalleDressConfig'](arg1);
+export function GetDressesConfig(arg1) {
+  return window['go']['app']['App']['GetDressesConfig'](arg1);
 }
 
 export function GetDalleDressPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetDalleDressPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetDalleDressPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetDalleDressSummary(arg1) {
@@ -183,7 +213,13 @@ export function GetExportsConfig(arg1) {
 }
 
 export function GetExportsPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetExportsPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetExportsPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetExportsSummary(arg1) {
@@ -231,7 +267,13 @@ export function GetMonitorsConfig(arg1) {
 }
 
 export function GetMonitorsPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetMonitorsPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetMonitorsPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetMonitorsSummary(arg1) {
@@ -243,7 +285,13 @@ export function GetNamesConfig(arg1) {
 }
 
 export function GetNamesPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetNamesPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetNamesPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetNamesSummary(arg1) {
@@ -283,7 +331,13 @@ export function GetStatusConfig(arg1) {
 }
 
 export function GetStatusPage(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetStatusPage'](arg1, arg2, arg3, arg4, arg5);
+  return window['go']['app']['App']['GetStatusPage'](
+    arg1,
+    arg2,
+    arg3,
+    arg4,
+    arg5,
+  );
 }
 
 export function GetStatusSummary(arg1) {

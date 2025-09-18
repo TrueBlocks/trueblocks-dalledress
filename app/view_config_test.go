@@ -38,7 +38,7 @@ func TestViewConfigIntegrity(t *testing.T) {
 		{"monitors", a.GetMonitorsConfig, "monitors", types.DataFacet("monitors")},
 		{"names", a.GetNamesConfig, "names", types.DataFacet("all")},
 		{"status", a.GetStatusConfig, "status", types.DataFacet("status")},
-		{"dalledress", a.GetDalleDressConfig, "dalledress", types.DataFacet("generator")},
+		{"dresses", a.GetDressesConfig, "dresses", types.DataFacet("generator")},
 	}
 
 	// Shared baseline payload fields.
@@ -85,7 +85,7 @@ func TestViewConfigIntegrity(t *testing.T) {
 
 	t.Run("HeaderActionsExport", func(t *testing.T) {
 		exceptions := map[string]map[string]bool{
-			"dalledress": {"gallery": true},
+			"dresses": {"gallery": true},
 		}
 		for _, tc := range tests {
 			t.Run(tc.name, func(t *testing.T) {

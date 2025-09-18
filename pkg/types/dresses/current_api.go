@@ -1,4 +1,4 @@
-package dalledress
+package dresses
 
 import (
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"

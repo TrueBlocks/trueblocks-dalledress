@@ -18,7 +18,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/comparitoor"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/contracts"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dalledress"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dresses"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
@@ -44,7 +44,7 @@ func (a *App) Reload(payload *types.Payload) error {
 		return a.ReloadContracts(payload)
 	case "status":
 		return a.ReloadStatus(payload)
-	case "dalledress":
+	case "dresses":
 		return a.ReloadDalleDress(payload)
 	case "comparitoor":
 		return a.ReloadComparitoor(payload)
@@ -63,7 +63,7 @@ func (a *App) GetRegisteredViews() []string {
 		"chunks",
 		"contracts",
 		"status",
-		"dalledress",
+		"dresses",
 		"comparitoor",
 	}
 }
@@ -84,8 +84,8 @@ func getCollection(payload *types.Payload, missingOk bool) types.Collection {
 		return contracts.GetContractsCollection(payload)
 	case "status":
 		return status.GetStatusCollection(payload)
-	case "dalledress":
-		return dalledress.GetDalleDressCollection(payload)
+	case "dresses":
+		return dresses.GetDalleDressCollection(payload)
 	case "comparitoor":
 		return comparitoor.GetComparitoorCollection(payload)
 	default:

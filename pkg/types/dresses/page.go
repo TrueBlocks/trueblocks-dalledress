@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 
-package dalledress
+package dresses
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ import (
 type DalleDressPage struct {
 	Facet         types.DataFacet `json:"facet"`
 	Logs          []*Log          `json:"logs"`
-	DalleDress    []*DalleDress   `json:"dalledress"`
+	Dresses       []*DalleDress   `json:"dresses"`
 	Databases     []*Database     `json:"databases"`
 	Series        []*Series       `json:"series"`
 	TotalItems    int             `json:"totalItems"`
@@ -83,12 +83,12 @@ func (c *DalleDressCollection) GetPage(
 		facet := c.generatorFacet
 		var filterFunc func(*DalleDress) bool
 		filterFunc = func(item *DalleDress) bool {
-			// First check if the dalledress belongs to a deleted series
+			// First check if the dresses belongs to a deleted series
 			if item.Series != "" {
 				seriesItems := c.seriesFacet.GetStore().GetItems()
 				for _, s := range seriesItems {
 					if s != nil && s.Suffix == item.Series && s.Deleted {
-						return false // Exclude dalledresses from deleted series
+						return false // Exclude dresses from deleted series
 					}
 				}
 			}
@@ -102,13 +102,13 @@ func (c *DalleDressCollection) GetPage(
 			return model.SortDalleDress(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
+			return nil, types.NewStoreError("dresses", dataFacet, "GetPage", err)
 		} else {
 			generator := make([]*DalleDress, 0, len(result.Items))
 			for i := range result.Items {
 				generator = append(generator, &result.Items[i])
 			}
-			page.DalleDress, page.TotalItems, page.State = generator, result.TotalItems, result.State
+			page.Dresses, page.TotalItems, page.State = generator, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
@@ -124,7 +124,7 @@ func (c *DalleDressCollection) GetPage(
 			return dalle.SortSeries(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
+			return nil, types.NewStoreError("dresses", dataFacet, "GetPage", err)
 		} else {
 			series := make([]*Series, 0, len(result.Items))
 			for i := range result.Items {
@@ -146,7 +146,7 @@ func (c *DalleDressCollection) GetPage(
 			return dalle.SortDatabases(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
+			return nil, types.NewStoreError("dresses", dataFacet, "GetPage", err)
 		} else {
 			database := make([]*Database, 0, len(result.Items))
 			for i := range result.Items {
@@ -168,7 +168,7 @@ func (c *DalleDressCollection) GetPage(
 			return sdk.SortLogs(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
+			return nil, types.NewStoreError("dresses", dataFacet, "GetPage", err)
 		} else {
 			event := make([]*Log, 0, len(result.Items))
 			for i := range result.Items {
@@ -182,12 +182,12 @@ func (c *DalleDressCollection) GetPage(
 		facet := c.galleryFacet
 		var filterFunc func(*DalleDress) bool
 		filterFunc = func(item *DalleDress) bool {
-			// First check if the dalledress belongs to a deleted series
+			// First check if the dresses belongs to a deleted series
 			if item.Series != "" {
 				seriesItems := c.seriesFacet.GetStore().GetItems()
 				for _, s := range seriesItems {
 					if s != nil && s.Suffix == item.Series && s.Deleted {
-						return false // Exclude dalledresses from deleted series
+						return false // Exclude dresseses from deleted series
 					}
 				}
 			}
@@ -201,18 +201,18 @@ func (c *DalleDressCollection) GetPage(
 			return model.SortDalleDress(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
-			return nil, types.NewStoreError("dalledress", dataFacet, "GetPage", err)
+			return nil, types.NewStoreError("dresses", dataFacet, "GetPage", err)
 		} else {
 			gallery := make([]*DalleDress, 0, len(result.Items))
 			for i := range result.Items {
 				gallery = append(gallery, &result.Items[i])
 			}
-			page.DalleDress, page.TotalItems, page.State = gallery, result.TotalItems, result.State
+			page.Dresses, page.TotalItems, page.State = gallery, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
 	default:
-		return nil, types.NewValidationError("dalledress", dataFacet, "GetPage",
+		return nil, types.NewValidationError("dresses", dataFacet, "GetPage",
 			fmt.Errorf("[GetPage] unsupported dataFacet: %v", dataFacet))
 	}
 
@@ -257,7 +257,7 @@ func (c *DalleDressCollection) getSummaryPage(
 	// EXISTING_CODE
 	// EXISTING_CODE
 	default:
-		return nil, types.NewValidationError("dalledress", dataFacet, "getSummaryPage",
+		return nil, types.NewValidationError("dresses", dataFacet, "getSummaryPage",
 			fmt.Errorf("[getSummaryPage] unsupported dataFacet: %v %v", dataFacet, page.Facet))
 	}
 }

@@ -1,13 +1,13 @@
 import { ReactElement } from 'react';
 
 import type { DataFacet } from '@hooks';
-import { dalledress, project, types } from '@models';
+import { dresses, project, types } from '@models';
 
 import { Gallery } from './gallery';
 import { Generator } from './generator';
 
 export function renderers(
-  pageData: dalledress.DalleDressPage | null,
+  pageData: dresses.DalleDressPage | null,
   viewStateKey: project.ViewStateKey, // Required for persistence
   setActiveFacet?: (f: DataFacet) => void,
 ) {

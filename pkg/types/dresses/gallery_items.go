@@ -1,4 +1,4 @@
-package dalledress
+package dresses
 
 import (
 	"os"

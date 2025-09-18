@@ -5,4 +5,4 @@
  * This file was auto generated. Do not edit.
  */
 
-export { DalleDress } from './DalleDress';
+export { Dresses } from './Dresses';

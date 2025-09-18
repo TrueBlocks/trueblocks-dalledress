@@ -20,7 +20,7 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/chunks"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/comparitoor"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/contracts"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dalledress"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/dresses"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/monitors"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
@@ -63,7 +63,7 @@ func main() {
 			&chunks.ChunksCollection{},
 			&contracts.ContractsCollection{},
 			&status.StatusCollection{},
-			&dalledress.DalleDressCollection{},
+			&dresses.DalleDressCollection{},
 			&comparitoor.ComparitoorCollection{},
 		},
 		EnumBind: []interface{}{

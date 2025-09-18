@@ -1,4 +1,4 @@
-package dalledress
+package dresses
 
 import (
 	"encoding/json"
@@ -122,7 +122,7 @@ func (c *DalleDressCollection) seriesCrud(
 		operation = "remove"
 	}
 	msgs.EmitLoaded(types.DataLoadedPayload{
-		Payload:       types.Payload{Collection: "dalledress", DataFacet: DalleDressSeries},
+		Payload:       types.Payload{Collection: "dresses", DataFacet: DalleDressSeries},
 		CurrentCount:  currentCount,
 		ExpectedTotal: currentCount,
 		State:         types.StateLoaded,

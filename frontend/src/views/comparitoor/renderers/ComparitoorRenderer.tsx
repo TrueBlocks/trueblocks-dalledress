@@ -187,8 +187,7 @@ export const ComparitoorRenderer = ({
                         >
                           {isMissing ? '[missing]' : item.value}
                         </Text>
-                        {item.value === '100.100' &&
-                        src.key === 'chifra' ? (
+                        {item.value === '100.100' && src.key === 'chifra' ? (
                           <MaterialIcon />
                         ) : null}
                       </Group>

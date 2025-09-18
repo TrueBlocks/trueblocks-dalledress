@@ -17,7 +17,7 @@ export function GalleryControls({ disabled = false }: GalleryControlsProps) {
 
   const viewStateKey = useMemo(
     () => ({
-      viewName: 'dalledress',
+      viewName: 'dresses',
       facetName: types.DataFacet.GALLERY,
     }),
     [],

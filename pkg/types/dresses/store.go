@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 
-package dalledress
+package dresses
 
 import (
 	"os"
@@ -41,8 +41,8 @@ var (
 	logsStore   *store.Store[Log]
 	logsStoreMu sync.Mutex
 
-	dalledressStore   *store.Store[DalleDress]
-	dalledressStoreMu sync.Mutex
+	dressesStore   *store.Store[DalleDress]
+	dressesStoreMu sync.Mutex
 
 	databasesStore   *store.Store[Database]
 	databasesStoreMu sync.Mutex
@@ -94,15 +94,15 @@ func (c *DalleDressCollection) getLogsStore(payload *types.Payload, facet types.
 }
 
 func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet types.DataFacet) *store.Store[DalleDress] {
-	dalledressStoreMu.Lock()
-	defer dalledressStoreMu.Unlock()
+	dressesStoreMu.Lock()
+	defer dressesStoreMu.Unlock()
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
-	theStore := dalledressStore
+	theStore := dressesStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
@@ -164,7 +164,7 @@ func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet 
 		// EXISTING_CODE
 		// EXISTING_CODE
 
-		dalledressStore = theStore
+		dressesStore = theStore
 	}
 
 	return theStore
@@ -273,15 +273,15 @@ func (c *DalleDressCollection) GetStoreName(dataFacet types.DataFacet, chain, ad
 	name := ""
 	switch dataFacet {
 	case DalleDressGenerator:
-		name = "dalledress-dalledress"
+		name = "dresses-dresses"
 	case DalleDressSeries:
-		name = "dalledress-series"
+		name = "dresses-series"
 	case DalleDressDatabases:
-		name = "dalledress-databases"
+		name = "dresses-databases"
 	case DalleDressEvents:
-		name = "dalledress-logs"
+		name = "dresses-logs"
 	case DalleDressGallery:
-		name = "dalledress-dalledress"
+		name = "dresses-dresses"
 	default:
 		return ""
 	}

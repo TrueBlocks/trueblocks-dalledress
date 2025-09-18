@@ -6,7 +6,7 @@
  * the code inside of 'EXISTING_CODE' tags.
  */
 
-package dalledress
+package dresses
 
 import (
 	"fmt"
@@ -60,7 +60,7 @@ func (c *DalleDressCollection) initializeFacets(payload *types.Payload) {
 		isGenerator,
 		isDupDalleDress(),
 		c.getDalleDressStore(payload, DalleDressGenerator),
-		"dalledress",
+		"dresses",
 		c,
 	)
 
@@ -69,7 +69,7 @@ func (c *DalleDressCollection) initializeFacets(payload *types.Payload) {
 		isSeries,
 		isDupSeries(),
 		c.getSeriesStore(payload, DalleDressSeries),
-		"dalledress",
+		"dresses",
 		c,
 	)
 
@@ -78,7 +78,7 @@ func (c *DalleDressCollection) initializeFacets(payload *types.Payload) {
 		isDatabase,
 		isDupDatabase(),
 		c.getDatabasesStore(payload, DalleDressDatabases),
-		"dalledress",
+		"dresses",
 		c,
 	)
 
@@ -87,7 +87,7 @@ func (c *DalleDressCollection) initializeFacets(payload *types.Payload) {
 		isEvent,
 		isDupLog(),
 		c.getLogsStore(payload, DalleDressEvents),
-		"dalledress",
+		"dresses",
 		c,
 	)
 
@@ -96,7 +96,7 @@ func (c *DalleDressCollection) initializeFacets(payload *types.Payload) {
 		isGallery,
 		isDupDalleDress(),
 		c.getDalleDressStore(payload, DalleDressGallery),
-		"dalledress",
+		"dresses",
 		c,
 	)
 }
@@ -282,7 +282,7 @@ func (c *DalleDressCollection) ExportData(payload *types.Payload) (string, error
 	case DalleDressGallery:
 		return c.galleryFacet.ExportData(payload, string(DalleDressGallery))
 	default:
-		return "", fmt.Errorf("[ExportData] unsupported dalledress facet: %s", payload.DataFacet)
+		return "", fmt.Errorf("[ExportData] unsupported dresses facet: %s", payload.DataFacet)
 	}
 }
 

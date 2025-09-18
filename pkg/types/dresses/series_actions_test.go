@@ -1,4 +1,4 @@
-package dalledress
+package dresses
 
 import (
 	"testing"
@@ -13,7 +13,7 @@ func TestSeriesDeleteUndeleteActions(t *testing.T) {
 
 	// Setup payload
 	payload := &types.Payload{
-		Collection: "dalledress",
+		Collection: "dresses",
 		DataFacet:  DalleDressSeries,
 	}
 

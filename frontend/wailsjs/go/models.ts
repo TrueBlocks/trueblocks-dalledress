@@ -399,12 +399,12 @@ export namespace dalle {
 
 }
 
-export namespace dalledress {
+export namespace dresses {
 	
 	export class DalleDressPage {
 	    facet: types.DataFacet;
 	    logs: types.Log[];
-	    dalledress: model.DalleDress[];
+	    dresses: model.DalleDress[];
 	    databases: model.Database[];
 	    series: dalle.Series[];
 	    totalItems: number;
@@ -420,7 +420,7 @@ export namespace dalledress {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.facet = source["facet"];
 	        this.logs = this.convertValues(source["logs"], types.Log);
-	        this.dalledress = this.convertValues(source["dalledress"], model.DalleDress);
+	        this.dresses = this.convertValues(source["dresses"], model.DalleDress);
 	        this.databases = this.convertValues(source["databases"], model.Database);
 	        this.series = this.convertValues(source["series"], dalle.Series);
 	        this.totalItems = source["totalItems"];

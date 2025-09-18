@@ -3,7 +3,7 @@ import {
   GetChunksConfig,
   GetComparitoorConfig,
   GetContractsConfig,
-  GetDalleDressConfig,
+  GetDressesConfig,
   GetExportsConfig,
   GetMonitorsConfig,
   GetNamesConfig,
@@ -57,7 +57,7 @@ export async function initializeAllViewConfigs(): Promise<{
         { name: 'chunks', getter: GetChunksConfig },
         { name: 'contracts', getter: GetContractsConfig },
         { name: 'status', getter: GetStatusConfig },
-        { name: 'dalledress', getter: GetDalleDressConfig },
+        { name: 'dresses', getter: GetDressesConfig },
         { name: 'comparitoor', getter: GetComparitoorConfig },
       ];
 

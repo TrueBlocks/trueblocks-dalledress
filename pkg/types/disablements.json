@@ -1,6 +1,6 @@
 {
   "views": {
-    "dalledress": {
+    "dresses": {
       "disabled": false,
       "facets": {
         "generator": false,

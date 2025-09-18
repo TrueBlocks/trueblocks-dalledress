@@ -20,7 +20,7 @@ func TestProject(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp directory: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Save the project
 	tempPath := filepath.Join(tempDir, "test-project.json")

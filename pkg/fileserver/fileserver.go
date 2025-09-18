@@ -171,7 +171,7 @@ func findAvailablePort(basePort int) (int, error) {
 		addr := fmt.Sprintf("127.0.0.1:%d", port)
 		ln, err := net.Listen("tcp", addr)
 		if err == nil {
-			ln.Close()
+			_ = ln.Close()
 			return port, nil
 		}
 	}

@@ -32,7 +32,7 @@ func TestFileNew(t *testing.T) {
 			tt.setupApp(app)
 
 			// Test that the method exists and has correct signature
-			var fileNewFunc func(*menu.CallbackData) = app.FileNew
+			var fileNewFunc = app.FileNew
 			assert.NotNil(t, fileNewFunc)
 
 			// Note: Cannot safely call without full App initialization
@@ -89,7 +89,7 @@ func TestFileSave(t *testing.T) {
 			tt.setupApp(app)
 
 			// Test that the method exists and has correct signature
-			var fileSaveFunc func(*menu.CallbackData) = app.FileSave
+			var fileSaveFunc = app.FileSave
 			assert.NotNil(t, fileSaveFunc)
 
 			// Note: Cannot safely call without full App initialization
@@ -116,7 +116,7 @@ func TestFileSaveAs(t *testing.T) {
 			tt.setupApp(app)
 
 			// Test that the method exists and has correct signature
-			var fileSaveAsFunc func(*menu.CallbackData) = app.FileSaveAs
+			var fileSaveAsFunc = app.FileSaveAs
 			assert.NotNil(t, fileSaveAsFunc)
 
 			// Note: Cannot safely call without Wails context initialization
@@ -145,7 +145,7 @@ func TestFileQuit(t *testing.T) {
 
 			// Note: We can't easily test FileQuit as it calls os.Exit(0)
 			// Instead we test that the method exists and is callable
-			var quitFunc func(*menu.CallbackData) = app.FileQuit
+			var quitFunc = app.FileQuit
 			assert.NotNil(t, quitFunc)
 
 			// Testing actual quit behavior would terminate the test process
@@ -184,7 +184,7 @@ func TestFileNewInternal(t *testing.T) {
 			})
 
 			// For high-level testing, we verify the method exists
-			var fileNewFunc func(base.Address) error = app.fileNew
+			var fileNewFunc = app.fileNew
 			assert.NotNil(t, fileNewFunc)
 		})
 	}
@@ -231,7 +231,7 @@ func TestFileSaveInternal(t *testing.T) {
 			}
 
 			// Verify the method exists
-			var fileSaveFunc func() error = app.fileSave
+			var fileSaveFunc = app.fileSave
 			assert.NotNil(t, fileSaveFunc)
 		})
 	}
@@ -241,8 +241,8 @@ func TestFileSaveAsInternal(t *testing.T) {
 	// Create temp file for testing file existence
 	tempFile, err := os.CreateTemp("", "test_*.tbx")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
-	tempFile.Close()
+	defer func() { _ = os.Remove(tempFile.Name()) }()
+	_ = tempFile.Close()
 
 	tests := []struct {
 		name               string
@@ -289,7 +289,7 @@ func TestFileSaveAsInternal(t *testing.T) {
 			}
 
 			// Verify the method exists
-			var fileSaveAsFunc func(string, bool) error = app.fileSaveAs
+			var fileSaveAsFunc = app.fileSaveAs
 			assert.NotNil(t, fileSaveAsFunc)
 		})
 	}
@@ -299,8 +299,8 @@ func TestFileOpenInternal(t *testing.T) {
 	// Create temp file for testing
 	tempFile, err := os.CreateTemp("", "test_*.tbx")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
-	tempFile.Close()
+	defer func() { _ = os.Remove(tempFile.Name()) }()
+	_ = tempFile.Close()
 
 	tests := []struct {
 		name        string
@@ -356,11 +356,11 @@ func TestFileOperations_Integration(t *testing.T) {
 		callbackData := &menu.CallbackData{}
 
 		// Test that all menu functions exist and have correct signatures
-		var fileNewFunc func(*menu.CallbackData) = app.FileNew
-		var fileOpenFunc func(*menu.CallbackData) = app.FileOpen
-		var fileSaveFunc func(*menu.CallbackData) = app.FileSave
-		var fileSaveAsFunc func(*menu.CallbackData) = app.FileSaveAs
-		var fileQuitFunc func(*menu.CallbackData) = app.FileQuit
+		var fileNewFunc = app.FileNew
+		var fileOpenFunc = app.FileOpen
+		var fileSaveFunc = app.FileSave
+		var fileSaveAsFunc = app.FileSaveAs
+		var fileQuitFunc = app.FileQuit
 
 		assert.NotNil(t, fileNewFunc)
 		assert.NotNil(t, fileOpenFunc)
@@ -410,7 +410,7 @@ func TestFileOperations_Integration(t *testing.T) {
 		// Create temp directory and file for testing
 		tempDir, err := os.MkdirTemp("", "file_test_*")
 		require.NoError(t, err)
-		defer os.RemoveAll(tempDir)
+		defer func() { _ = os.RemoveAll(tempDir) }()
 
 		tempFile := filepath.Join(tempDir, "test.tbx")
 		err = os.WriteFile(tempFile, []byte("test content"), 0644)

@@ -8,6 +8,8 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250907182653-03634a2d9cce h1:q1CEESwvWVZcY0NQ6SJjRNQosVrG9vIV4WbUuWwQi9k=
 github.com/TrueBlocks/trueblocks-core/src/apps/chifra v0.0.0-20250907182653-03634a2d9cce/go.mod h1:7CyEQUtzQLAvsZjUVdrA3vzQbOVyIWlr+ykbJd8ml8I=
+github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250916045324-1c57f89ffee4 h1:DKZstnUEOpBvHGdgdHGpSwi2xexr5wGIiCx0KdIiJNE=
+github.com/TrueBlocks/trueblocks-dalle/v2 v2.0.0-20250916045324-1c57f89ffee4/go.mod h1:e+Q1AzmlegKj7Tiixx8ZQLQ/Vv6ywSvC0Sk/TaIT6Ec=
 github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250907182642-62fdfe423665 h1:VxwcJr5pIhUttf4GTmmVHnozB0ORiTtvwwYmdxVaKbg=
 github.com/TrueBlocks/trueblocks-sdk/v5 v5.3.1-0.20250907182642-62fdfe423665/go.mod h1:TaxD0BqmhM/1DkqLVdxQCVEHVQ07JwwDviYCx178o0w=
 github.com/VictoriaMetrics/fastcache v1.12.2 h1:N0y9ASrJ0F6h0QaC3o6uJb3NIZ9VKLjCM7NQbSmF7WI=
@@ -315,8 +317,8 @@ github.com/wailsapp/go-webview2 v1.0.19 h1:7U3QcDj1PrBPaxJNCui2k1SkWml+Q5kvFUFyT
 github.com/wailsapp/go-webview2 v1.0.19/go.mod h1:qJmWAmAmaniuKGZPWwne+uor3AHMB5PFhqiK0Bbj8kc=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
-github.com/wailsapp/wails/v2 v2.10.1 h1:QWHvWMXII2nI/nXz77gpPG8P3ehl6zKe+u4su5BWIns=
-github.com/wailsapp/wails/v2 v2.10.1/go.mod h1:zrebnFV6MQf9kx8HI4iAv63vsR5v67oS7GTEZ7Pz1TY=
+github.com/wailsapp/wails/v2 v2.10.2 h1:29U+c5PI4K4hbx8yFbFvwpCuvqK9VgNv8WGobIlKlXk=
+github.com/wailsapp/wails/v2 v2.10.2/go.mod h1:XuN4IUOPpzBrHUkEd7sCU5ln4T/p1wQedfxP7fKik+4=
 github.com/wealdtech/go-ens/v3 v3.6.0 h1:EAByZlHRQ3vxqzzwNi0GvEq1AjVozfWO4DMldHcoVg8=
 github.com/wealdtech/go-ens/v3 v3.6.0/go.mod h1:hcmMr9qPoEgVSEXU2Bwzrn/9NczTWZ1rE53jIlqUpzw=
 github.com/wealdtech/go-multicodec v1.4.0 h1:iq5PgxwssxnXGGPTIK1srvt6U5bJwIp7k6kBrudIWxg=

@@ -32,10 +32,10 @@ func TestSeriesCrudEmitsOperation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmp)
+	defer func() { _ = os.RemoveAll(tmp) }()
 
 	_ = os.Setenv("TRUEBLOCKS_DALLE_DATA_DIR", tmp)
-	defer os.Unsetenv("TRUEBLOCKS_DALLE_DATA_DIR")
+	defer func() { _ = os.Unsetenv("TRUEBLOCKS_DALLE_DATA_DIR") }()
 	payload := &types.Payload{Collection: "dalledress", DataFacet: DalleDressSeries, ProjectPath: tmp}
 	coll := GetDalleDressCollection(payload)
 
@@ -85,10 +85,10 @@ func TestSeriesExportCSV(t *testing.T) {
 	if err != nil {
 		t.Fatalf("temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmp)
+	defer func() { _ = os.RemoveAll(tmp) }()
 
 	_ = os.Setenv("TRUEBLOCKS_DALLE_DATA_DIR", tmp)
-	defer os.Unsetenv("TRUEBLOCKS_DALLE_DATA_DIR")
+	defer func() { _ = os.Unsetenv("TRUEBLOCKS_DALLE_DATA_DIR") }()
 	payload := &types.Payload{Collection: "dalledress", DataFacet: DalleDressSeries, ProjectPath: tmp, Format: "csv"}
 	coll := GetDalleDressCollection(payload)
 

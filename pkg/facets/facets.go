@@ -383,7 +383,7 @@ func (r *Facet[T]) ForEvery(actionFunc func(itemMatched *T) (error, bool), match
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	var matchCount int = 0
+	var matchCount = 0
 	filteredData := make([]*T, 0, len(r.view))
 	for _, itemPtr := range r.view {
 		if !matchFunc(itemPtr) {

@@ -65,7 +65,7 @@ func ExportData[T any](data []T, payload *Payload, typeName string) (string, err
 	if err != nil {
 		return finalPath, fmt.Errorf("failed to create file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// Export based on format
 	if format == "json" {
@@ -148,7 +148,7 @@ func writeDataToCSV[T any](file *os.File, data []T, typeName string, format stri
 	}
 
 	if len(data) == 0 {
-		_, err := file.WriteString(fmt.Sprintf("# No %s data available\n", typeName))
+		_, err := fmt.Fprintf(file, "# No %s data available\n", typeName)
 		return err
 	}
 
@@ -164,7 +164,7 @@ func writeDataToCSV[T any](file *os.File, data []T, typeName string, format stri
 	}
 
 	if len(models) == 0 {
-		_, err := file.WriteString(fmt.Sprintf("# No %s data available\n", typeName))
+		_, err := fmt.Fprintf(file, "# No %s data available\n", typeName)
 		return err
 	}
 

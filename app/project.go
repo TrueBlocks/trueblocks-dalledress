@@ -327,10 +327,7 @@ func (a *App) uniqueProjectName(baseName string) string {
 
 	count := 1
 	uniqueName := baseName
-	for {
-		if !projectExists(uniqueName) {
-			break
-		}
+	for projectExists(uniqueName) {
 		uniqueName = baseName + " " + fmt.Sprintf("%d", count)
 		count++
 	}

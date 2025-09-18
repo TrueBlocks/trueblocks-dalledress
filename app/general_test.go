@@ -27,7 +27,7 @@ func TestReload(t *testing.T) {
 		_ = payload
 
 		// For high-level testing, we verify the method signature is correct
-		var reloadFunc func(*types.Payload) error = app.Reload
+		var reloadFunc = app.Reload
 		assert.NotNil(t, reloadFunc)
 	})
 }

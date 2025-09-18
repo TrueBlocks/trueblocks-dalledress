@@ -75,7 +75,7 @@ func Load(path string) (*Project, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open project file: %w", err)
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// For small files like our projects, ReadAll is actually quite efficient
 	// It avoids multiple small reads and allocations

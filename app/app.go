@@ -188,7 +188,7 @@ func (a *App) SetInitialized(isInit bool) error {
 	fn := filepath.Join(appFolder, ".initialized")
 	if isInit {
 		if !file.Touch(fn) {
-			return fmt.Errorf("failed to create " + fn + " file")
+			return fmt.Errorf("failed to create %s file", fn)
 		} else {
 			return nil
 		}

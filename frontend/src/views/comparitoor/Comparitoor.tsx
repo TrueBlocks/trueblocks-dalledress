@@ -105,7 +105,7 @@ export const Comparitoor = () => {
     switch (facet) {
       case types.DataFacet.COMPARITOOR:
         return pageData.transaction || [];
-      case types.DataFacet.TRUEBLOCKS:
+      case types.DataFacet.CHIFRA:
         return pageData.transaction || [];
       case types.DataFacet.ETHERSCAN:
         return pageData.transaction || [];

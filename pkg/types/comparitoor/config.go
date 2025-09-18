@@ -26,7 +26,7 @@ func (c *ComparitoorCollection) GetConfig() (*types.ViewConfig, error) {
 			RendererTypes: "facet",
 		},
 		"chifra": {
-			Name:          "Trueblocks",
+			Name:          "Chifra",
 			Store:         "transaction",
 			IsForm:        false,
 			DividerBefore: false,

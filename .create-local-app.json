@@ -4,8 +4,5 @@
   "Github": "github.com/TrueBlocks/trueblocks-core",
   "Domain": "trueblocks.io",
   "Template": "default",
-  "PreserveFiles": [
-    "go.mod",
-    "pkg/types/disablements.json",
-  ]
+  "PreserveFiles": []
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { StyledButton, StyledSelect, StyledText } from '@components';
-import { useIconSets } from '@hooks';
+import { useIconSets, usePreferences } from '@hooks';
 import {
   Center,
   Grid,
@@ -29,6 +29,7 @@ export const Generator = ({ pageData, viewStateKey }: GeneratorProps) => {
   const hasScrolledOnMount = useRef(false);
   const icons = useIconSets();
   const SpeakIcon = icons.Speak;
+  const { chromeCollapsed } = usePreferences();
 
   const {
     orig,
@@ -269,8 +270,8 @@ export const Generator = ({ pageData, viewStateKey }: GeneratorProps) => {
       }}
     >
       <Grid gutter="md">
-        <Grid.Col span={1}></Grid.Col>
-        <Grid.Col span={6}>
+        {!chromeCollapsed && <Grid.Col span={1}></Grid.Col>}
+        <Grid.Col span={chromeCollapsed ? 7 : 6}>
           <Stack gap="md">
             <Group align="flex-end" gap="sm" wrap="nowrap">
               <StyledSelect
@@ -342,7 +343,7 @@ export const Generator = ({ pageData, viewStateKey }: GeneratorProps) => {
             </div>
           </Stack>
         </Grid.Col>
-        <Grid.Col span={4}>
+        <Grid.Col span={chromeCollapsed ? 5 : 4}>
           <Grid gutter="sm">
             <Grid.Col span={10}>
               <Stack gap="sm">
@@ -506,7 +507,7 @@ export const Generator = ({ pageData, viewStateKey }: GeneratorProps) => {
             </Grid.Col>
           </Grid>
         </Grid.Col>
-        <Grid.Col span={1}></Grid.Col>
+        {!chromeCollapsed && <Grid.Col span={1}></Grid.Col>}
       </Grid>
     </div>
   );

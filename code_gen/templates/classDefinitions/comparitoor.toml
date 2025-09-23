@@ -5,7 +5,7 @@ doc_descr = "Compare transactions across multiple sources for a given address"
 doc_route = "comparitoor"
 attributes = ""
 produced_by = "comparitoor"
-disable_go = false
+disable_go = true
 
 [[facets]]
 name = "Comparitoor"

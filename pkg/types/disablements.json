@@ -11,7 +11,7 @@
       }
     },
     "exports": {
-      "disabled": false,
+      "disabled": true,
       "facets": {
         "statements": false,
         "balances": false,
@@ -25,7 +25,7 @@
       }
     },
     "chunks": {
-      "disabled": false,
+      "disabled": true,
       "facets": {
         "stats": false,
         "index": false,
@@ -34,7 +34,7 @@
       }
     },
     "status": {
-      "disabled": false,
+      "disabled": true,
       "facets": {
         "status": false,
         "caches": false,
@@ -42,7 +42,7 @@
       }
     },
     "contracts": {
-      "disabled": false,
+      "disabled": true,
       "facets": {
         "dashboard": false,
         "execute": false,
@@ -50,7 +50,7 @@
       }
     },
     "comparitoor": {
-      "disabled": false,
+      "disabled": true,
       "facets": {
         "comparitoor": false,
         "chifra": false,
@@ -70,7 +70,7 @@
       }
     },
     "abis": {
-      "disabled": false,
+      "disabled": true,
       "facets": {
         "downloaded": false,
         "known": false,
@@ -79,7 +79,7 @@
       }
     },
     "monitors": {
-      "disabled": false,
+      "disabled": true,
       "facets": {
         "monitors": false
       }

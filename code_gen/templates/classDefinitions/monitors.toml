@@ -7,7 +7,7 @@ attributes = ""
 produced_by = "monitors, list, export, slurp"
 contains = "appearance, appearancetable"
 cache_type = "marshal_only"
-disable_go = true
+disable_go = false
 
 [[facets]]
 name = "Monitors"

@@ -6,7 +6,7 @@
     attributes = ""
     produced_by = "contracts"
     contains = "function"
-disable_go = true
+    disable_go = false
 
 [[facets]]
     name = "Dashboard"

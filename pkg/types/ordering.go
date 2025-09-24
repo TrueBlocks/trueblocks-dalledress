@@ -1,62 +1,15 @@
 package types
 
 import (
-	_ "embed"
-	"encoding/json"
 	"fmt"
 	"sort"
-	"strings"
 
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 )
 
-//go:embed disablements.json
-var disablementsJSON string
-
-// EnableFacets enables or disables facets based on the view's enablement file.
-type DisablementsConfig struct {
-	Views map[string]struct {
-		Disabled bool            `json:"disabled"`
-		Facets   map[string]bool `json:"facets"`
-	} `json:"views"`
-}
-
-func SetDisablements(vc *ViewConfig) {
-	if vc == nil || vc.Facets == nil {
-		return
-	}
-
-	var disablements DisablementsConfig
-	dec := json.NewDecoder(strings.NewReader(disablementsJSON))
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&disablements); err != nil {
-		fmt.Printf("Failed to decode embedded disablements: %v\n", err)
-		return
-	}
-
-	disablement, ok := disablements.Views[vc.ViewName]
-	if !ok {
-		vc.Disabled = false
-		for key, facet := range vc.Facets {
-			facet.Disabled = false
-			vc.Facets[key] = facet
-		}
-		return
-	}
-	vc.Disabled = disablement.Disabled
-	for key, facet := range vc.Facets {
-		if disabled, exists := disablement.Facets[key]; exists {
-			facet.Disabled = disabled
-		} else {
-			facet.Disabled = false
-		}
-		vc.Facets[key] = facet
-	}
-}
-
-// NormalizeOrders sorts columns and detail fields by their explicit order values.
+// NormalizeFields sorts columns and detail fields by their explicit order values.
 // It does not assign defaults; ordering must be provided in config.
-func NormalizeOrders(vc *ViewConfig) {
+func NormalizeFields(vc *ViewConfig) {
 	if vc == nil || vc.Facets == nil {
 		return
 	}
@@ -94,9 +47,7 @@ func SetMenuOrder(vc *ViewConfig) {
 	// Load app config
 	config, err := preferences.LoadAppConfig()
 	if err != nil {
-		// If config fails to load, use default order (999)
-		vc.MenuOrder = 999
-		return
+		panic(fmt.Sprintf("FATAL: Failed to load app config from .create-local-app.json: %v", err))
 	}
 
 	// Check if this view has configuration

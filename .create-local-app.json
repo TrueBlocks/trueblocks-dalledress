@@ -4,5 +4,16 @@
   "Github": "github.com/TrueBlocks/trueblocks-core",
   "Domain": "trueblocks.io",
   "Template": "default",
-  "PreserveFiles": []
+  "PreserveFiles": [],
+  "ViewConfig": {
+    "exports": { "menuOrder": 20, "disabled": true },
+    "monitors": { "menuOrder": 30, "disabled": true },
+    "abis": { "menuOrder": 40, "disabled": true },
+    "names": { "menuOrder": 50 },
+    "chunks": { "menuOrder": 60, "disabled": true },
+    "contracts": { "menuOrder": 70, "disabled": true },
+    "status": { "menuOrder": 80, "disabled": true },
+    "dresses": { "menuOrder": 15, "disabledFacets": {"databases": true} },
+    "comparitoor": { "menuOrder": 100, "disabled": true }
+  }
 }

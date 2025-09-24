@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 )
 
 //go:embed disablements.json
@@ -80,5 +82,46 @@ func NormalizeOrders(vc *ViewConfig) {
 		}
 
 		vc.Facets[key] = facet
+	}
+}
+
+// SetMenuOrder applies menu ordering and facet configurations from .create-local-app.json to ViewConfig
+func SetMenuOrder(vc *ViewConfig) {
+	if vc == nil {
+		return
+	}
+
+	// Load app config
+	config, err := preferences.LoadAppConfig()
+	if err != nil {
+		// If config fails to load, use default order (999)
+		vc.MenuOrder = 999
+		return
+	}
+
+	// Check if this view has configuration
+	if viewConfig, exists := config.ViewConfig[vc.ViewName]; exists {
+		// Apply menu order
+		if viewConfig.MenuOrder > 0 {
+			vc.MenuOrder = viewConfig.MenuOrder
+		} else {
+			vc.MenuOrder = 999 // Default order for views without explicit order
+		}
+
+		// Apply view-level disabled state
+		vc.Disabled = viewConfig.Disabled
+
+		// Apply facet configurations if both exist
+		if len(viewConfig.DisabledFacets) > 0 && vc.Facets != nil {
+			for facetName, facetConfig := range vc.Facets {
+				if disabledState, facetExists := viewConfig.DisabledFacets[facetName]; facetExists {
+					// Apply the configured disabled state directly (true = disabled, false = enabled)
+					facetConfig.Disabled = disabledState
+					vc.Facets[facetName] = facetConfig
+				}
+			}
+		}
+	} else {
+		vc.MenuOrder = 999 // Default order for views not in config
 	}
 }

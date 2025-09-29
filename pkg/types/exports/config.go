@@ -55,6 +55,16 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			HeaderActions: []string{"export"},
 			RendererTypes: "",
 		},
+		"approvals": {
+			Name:          "Approvals",
+			Store:         "approvals",
+			IsForm:        false,
+			DividerBefore: false,
+			Fields:        getApprovalsFields(),
+			Actions:       []string{},
+			HeaderActions: []string{"export"},
+			RendererTypes: "",
+		},
 		"withdrawals": {
 			Name:          "Withdrawals",
 			Store:         "withdrawals",
@@ -110,7 +120,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 	cfg := &types.ViewConfig{
 		ViewName:   "exports",
 		Facets:     facets,
-		FacetOrder: []string{"statements", "balances", "transfers", "transactions", "withdrawals", "assets", "logs", "traces", "receipts"},
+		FacetOrder: []string{"statements", "balances", "transfers", "transactions", "approvals", "withdrawals", "assets", "logs", "traces", "receipts"},
 		Actions: map[string]types.ActionConfig{
 			"export": {Name: "export", Label: "Export", Icon: "Export"},
 		},
@@ -119,6 +129,24 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 	types.NormalizeFields(cfg)
 	types.SetMenuOrder(cfg)
 	return cfg, nil
+}
+
+func getApprovalsFields() []types.FieldConfig {
+	return []types.FieldConfig{
+		// EXISTING_CODE
+		{Key: "blockNumber", Label: "Block", ColumnLabel: "Block", DetailLabel: "Block Number", Section: "Transaction Context", Width: 100, Order: 1, DetailOrder: 8},
+		{Key: "owner", Label: "Owner", ColumnLabel: "Owner", DetailLabel: "Token Owner", Formatter: "address", Section: "Approval Details", Width: 340, Order: 2, DetailOrder: 1},
+		{Key: "spender", Label: "Spender", ColumnLabel: "Spender", DetailLabel: "Approved Spender", Formatter: "address", Section: "Approval Details", Width: 340, Order: 3, DetailOrder: 2},
+		{Key: "token", Label: "Token", ColumnLabel: "Token", DetailLabel: "Token Address", Formatter: "address", Section: "Token Details", Width: 340, Order: 4, DetailOrder: 3},
+		{Key: "allowance", Label: "Allowance", ColumnLabel: "Allowance", DetailLabel: "Approved Amount", Formatter: "wei", Section: "Approval Details", Width: 150, Order: 5, DetailOrder: 4},
+		{Key: "timestamp", Label: "Date", ColumnLabel: "Date", DetailLabel: "Timestamp", Formatter: "datetime", Section: "Transaction Context", Width: 120, Order: 6, DetailOrder: 5},
+		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", NoDetail: true, Width: 80, Order: 7},
+		{Key: "lastAppBlock", Label: "Last App Block", DetailLabel: "Last App Block", Section: "Additional Data", NoTable: true, DetailOrder: 9},
+		{Key: "lastAppLogID", Label: "Last App Log ID", DetailLabel: "Last App Log ID", Section: "Additional Data", NoTable: true, DetailOrder: 10},
+		{Key: "lastAppTs", Label: "Last App Timestamp", DetailLabel: "Last App Timestamp", Formatter: "datetime", Section: "Additional Data", NoTable: true, DetailOrder: 11},
+		{Key: "lastAppTxID", Label: "Last App Tx ID", DetailLabel: "Last App Transaction ID", Section: "Additional Data", NoTable: true, DetailOrder: 12},
+		// EXISTING_CODE
+	}
 }
 
 func getAssetsFields() []types.FieldConfig {

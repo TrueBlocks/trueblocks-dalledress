@@ -8,12 +8,11 @@
 
 package names
 
+// EXISTING_CODE
 import (
 	"fmt"
 	"sync"
 
-	// EXISTING_CODE
-	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
@@ -22,10 +21,9 @@ import (
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-// EXISTING_CODE
-// EXISTING_CODE
-
 type Name = sdk.Name
+
+// EXISTING_CODE
 
 var (
 	namesStore   *store.Store[Name]

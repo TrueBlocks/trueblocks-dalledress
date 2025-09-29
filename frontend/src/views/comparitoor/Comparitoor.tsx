@@ -1,4 +1,3 @@
-import type { ReactElement } from 'react';
 // Copyright 2016, 2026 The Authors. All rights reserved.
 // Use of this source code is governed by a license that can
 // be found in the LICENSE file.
@@ -7,6 +6,7 @@ import type { ReactElement } from 'react';
  * the code inside of 'EXISTING_CODE' tags.
  */
 // === SECTION 1: Imports & Dependencies ===
+import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { GetComparitoorPage, Reload } from '@app';
@@ -35,7 +35,7 @@ import { Debugger, LogError, useErrorHandler } from '@utils';
 import { ViewRoute, assertRouteConsistency } from '../routes';
 import { renderers } from './renderers';
 
-const ROUTE = 'comparitoor' as ViewRoute;
+const ROUTE: ViewRoute = 'comparitoor';
 export const Comparitoor = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
@@ -167,11 +167,11 @@ export const Comparitoor = () => {
     crudFunc: async (
       _payload: types.Payload,
       _op: crud.Operation,
-      _item: types.Transaction,
+      _item: unknown,
     ) => {},
     pageFunc: GetComparitoorPage,
     pageClass: comparitoor.ComparitoorPage,
-    updateItem: types.Transaction.createFrom({}),
+    updateItem: undefined,
     createPayload,
     getCurrentDataFacet,
   });

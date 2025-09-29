@@ -8,6 +8,7 @@
 
 package dresses
 
+// EXISTING_CODE
 import (
 	"os"
 	"path/filepath"
@@ -15,94 +16,48 @@ import (
 	"strings"
 	"sync"
 
-	// EXISTING_CODE
-	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
-	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/model"
-	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/storage"
-
-	// EXISTING_CODE
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/output"
+	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/model"
+	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/storage"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
-// EXISTING_CODE
-// EXISTING_CODE
-
-type Log = sdk.Log
 type DalleDress = model.DalleDress
 type Database = model.Database
+type Log = sdk.Log
 type Series = dalle.Series
 
-var (
-	logsStore   *store.Store[Log]
-	logsStoreMu sync.Mutex
+// EXISTING_CODE
 
-	dressesStore   *store.Store[DalleDress]
-	dressesStoreMu sync.Mutex
+var (
+	dalledressStore   *store.Store[DalleDress]
+	dalledressStoreMu sync.Mutex
 
 	databasesStore   *store.Store[Database]
 	databasesStoreMu sync.Mutex
+
+	logsStore   *store.Store[Log]
+	logsStoreMu sync.Mutex
 
 	seriesStore   *store.Store[Series]
 	seriesStoreMu sync.Mutex
 )
 
-func (c *DalleDressCollection) getLogsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Log] {
-	logsStoreMu.Lock()
-	defer logsStoreMu.Unlock()
+func (c *DressesCollection) getDalleDressStore(payload *types.Payload, facet types.DataFacet) *store.Store[DalleDress] {
+	dalledressStoreMu.Lock()
+	defer dalledressStoreMu.Unlock()
 
 	// EXISTING_CODE
 	// EXISTING_CODE
 
 	chain := payload.Chain
 	address := payload.Address
-	theStore := logsStore
-	if theStore == nil {
-		queryFunc := func(ctx *output.RenderCtx) error {
-			// EXISTING_CODE
-			// EXISTING_CODE
-			return nil
-		}
-
-		processFunc := func(item interface{}) *Log {
-			if it, ok := item.(*Log); ok {
-				return it
-			}
-			return nil
-		}
-
-		mappingFunc := func(item *Log) (key interface{}, includeInMap bool) {
-			// EXISTING_CODE
-			// EXISTING_CODE
-			return nil, false
-		}
-
-		storeName := c.GetStoreName(facet, chain, address)
-		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
-
-		// EXISTING_CODE
-		// EXISTING_CODE
-
-		logsStore = theStore
-	}
-
-	return theStore
-}
-
-func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet types.DataFacet) *store.Store[DalleDress] {
-	dressesStoreMu.Lock()
-	defer dressesStoreMu.Unlock()
-
-	// EXISTING_CODE
-	// EXISTING_CODE
-
-	chain := payload.Chain
-	address := payload.Address
-	theStore := dressesStore
+	theStore := dalledressStore
 	if theStore == nil {
 		queryFunc := func(ctx *output.RenderCtx) error {
 			// EXISTING_CODE
@@ -164,13 +119,13 @@ func (c *DalleDressCollection) getDalleDressStore(payload *types.Payload, facet 
 		// EXISTING_CODE
 		// EXISTING_CODE
 
-		dressesStore = theStore
+		dalledressStore = theStore
 	}
 
 	return theStore
 }
 
-func (c *DalleDressCollection) getDatabasesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Database] {
+func (c *DressesCollection) getDatabasesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Database] {
 	databasesStoreMu.Lock()
 	defer databasesStoreMu.Unlock()
 
@@ -212,7 +167,49 @@ func (c *DalleDressCollection) getDatabasesStore(payload *types.Payload, facet t
 	return theStore
 }
 
-func (c *DalleDressCollection) getSeriesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Series] {
+func (c *DressesCollection) getLogsStore(payload *types.Payload, facet types.DataFacet) *store.Store[Log] {
+	logsStoreMu.Lock()
+	defer logsStoreMu.Unlock()
+
+	// EXISTING_CODE
+	// EXISTING_CODE
+
+	chain := payload.Chain
+	address := payload.Address
+	theStore := logsStore
+	if theStore == nil {
+		queryFunc := func(ctx *output.RenderCtx) error {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil
+		}
+
+		processFunc := func(item interface{}) *Log {
+			if it, ok := item.(*Log); ok {
+				return it
+			}
+			return nil
+		}
+
+		mappingFunc := func(item *Log) (key interface{}, includeInMap bool) {
+			// EXISTING_CODE
+			// EXISTING_CODE
+			return nil, false
+		}
+
+		storeName := c.GetStoreName(facet, chain, address)
+		theStore = store.NewStore(storeName, queryFunc, processFunc, mappingFunc)
+
+		// EXISTING_CODE
+		// EXISTING_CODE
+
+		logsStore = theStore
+	}
+
+	return theStore
+}
+
+func (c *DressesCollection) getSeriesStore(payload *types.Payload, facet types.DataFacet) *store.Store[Series] {
 	seriesStoreMu.Lock()
 	defer seriesStoreMu.Unlock()
 
@@ -267,21 +264,21 @@ func (c *DalleDressCollection) getSeriesStore(payload *types.Payload, facet type
 	return theStore
 }
 
-func (c *DalleDressCollection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
+func (c *DressesCollection) GetStoreName(dataFacet types.DataFacet, chain, address string) string {
 	_ = chain
 	_ = address
 	name := ""
 	switch dataFacet {
-	case DalleDressGenerator:
-		name = "dresses-dresses"
-	case DalleDressSeries:
+	case DressesGenerator:
+		name = "dresses-dalledress"
+	case DressesSeries:
 		name = "dresses-series"
-	case DalleDressDatabases:
+	case DressesDatabases:
 		name = "dresses-databases"
-	case DalleDressEvents:
+	case DressesEvents:
 		name = "dresses-logs"
-	case DalleDressGallery:
-		name = "dresses-dresses"
+	case DressesGallery:
+		name = "dresses-dalledress"
 	default:
 		return ""
 	}
@@ -289,11 +286,11 @@ func (c *DalleDressCollection) GetStoreName(dataFacet types.DataFacet, chain, ad
 }
 
 var (
-	collections   = make(map[store.CollectionKey]*DalleDressCollection)
+	collections   = make(map[store.CollectionKey]*DressesCollection)
 	collectionsMu sync.Mutex
 )
 
-func GetDalleDressCollection(payload *types.Payload) *DalleDressCollection {
+func GetDressesCollection(payload *types.Payload) *DressesCollection {
 	collectionsMu.Lock()
 	defer collectionsMu.Unlock()
 
@@ -305,14 +302,14 @@ func GetDalleDressCollection(payload *types.Payload) *DalleDressCollection {
 		return collection
 	}
 
-	collection := NewDalleDressCollection(payload)
+	collection := NewDressesCollection(payload)
 	collections[key] = collection
 	return collection
 }
 
 // EXISTING_CODE
 // getGalleryItems returns cached items performing incremental scan per series
-func (c *DalleDressCollection) getGalleryItems() (items []*DalleDress) {
+func (c *DressesCollection) getGalleryItems() (items []*DalleDress) {
 	root := storage.OutputDir()
 	seriesList := make([]*DalleDress, 0, 512)
 

@@ -14,17 +14,32 @@ This is the help file for the Exports view.
 
 ## Facets
 
-- Statements Facet uses sdk.Statements store.
-- Balances Facet uses sdk.Balances store.
-- Transfers Facet uses sdk.Transfers store.
-- Transactions Facet uses sdk.Transactions store.
-- Withdrawals Facet uses sdk.Withdrawals store.
-- Assets Facet uses sdk.Assets store.
-- Logs Facet uses sdk.Logs store.
-- Traces Facet uses sdk.Traces store.
-- Receipts Facet uses sdk.Receipts store.
+- Statements Facet uses the Statements store.
+- Balances Facet uses the Balances store.
+- Transfers Facet uses the Transfers store.
+- Transactions Facet uses the Transactions store.
+- Approvals Facet uses the Approvals store.
+- Withdrawals Facet uses the Withdrawals store.
+- Assets Facet uses the Assets store.
+- Logs Facet uses the Logs store.
+- Traces Facet uses the Traces store.
+- Receipts Facet uses the Receipts store.
 
 ## Stores
+
+- **Approvals Store (11 members)**
+
+  - allowance: the amount of tokens approved for spending
+  - blockNumber: the current block number when the report was generated
+  - timestamp: the current timestamp when the report was generated
+  - date: the timestamp as a date
+  - owner: the address of the owner of the token (the approver)
+  - spender: the address being granted approval to spend tokens
+  - token: the address of the ERC-20 token being approved
+  - lastAppBlock: the block number of the last approval event
+  - lastAppTs: the timestamp of the last approval event
+  - lastAppTxID: the transaction index of the last approval event
+  - lastAppLogID: the log index of the last approval event
 
 - **Assets Store (6 members)**
 
@@ -69,10 +84,10 @@ This is the help file for the Exports view.
 - **Receipts Store (14 members)**
 
   - logsBloom: 
+  - to: 
   - cumulativeGasUsed: 
   - effectiveGasPrice: 
   - from: 
-  - to: 
   - blockHash: 
   - blockNumber: 
   - contractAddress: the address of the newly created contract, if any

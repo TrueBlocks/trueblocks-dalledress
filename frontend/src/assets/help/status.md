@@ -13,9 +13,9 @@ the code inside of 'EXISTING_CODE' tags.
 
 ## Facets
 
-- Status Facet uses sdk.Status store.
-- Caches Facet uses sdk.Caches store.
-- Chains Facet uses sdk.Chains store.
+- Status Facet uses the Status store.
+- Caches Facet uses the Caches store.
+- Chains Facet uses the Chains store.
 
 ## Stores
 
@@ -57,7 +57,7 @@ the code inside of 'EXISTING_CODE' tags.
   - progress: progress information
   - rootConfig: path to root configuration
   - rpcProvider: RPC provider URL
-  - version: package version
+  - version: Application version
 
 // EXISTING_CODE
 // EXISTING_CODE

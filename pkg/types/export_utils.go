@@ -1,7 +1,3 @@
-// Copyright 2016, 2026 The Authors. All rights reserved.
-// Use of this source code is governed by a license that can
-// be found in the LICENSE file.
-
 package types
 
 import (
@@ -140,6 +136,31 @@ func writeDataToJSON[T any](file *os.File, data []T, typeName string) error {
 	return err
 }
 
+// writeCSVHeaderWithNoData writes the CSV header and a "no data" message for empty datasets
+func writeCSVHeaderWithNoData[T any](file *os.File, typeName string, format string) error {
+	delimiter := ","
+	if format == "txt" {
+		delimiter = "\t"
+	}
+
+	// Create a dummy instance to get the header structure
+	var dummy T
+	dummyPtr := &dummy
+	if modeler, ok := interface{}(dummyPtr).(sdk.Modeler); ok {
+		model := modeler.Model("csv", "", false, map[string]any{})
+		if len(model.Order) > 0 {
+			header := strings.Join(model.Order, delimiter)
+			_, err := file.WriteString(header + "\n")
+			if err != nil {
+				return fmt.Errorf("failed to write CSV header: %w", err)
+			}
+		}
+	}
+
+	_, err := fmt.Fprintf(file, "# No %s data available\n", typeName)
+	return err
+}
+
 // writeDataToCSV writes typed data to a CSV or TXT file using Model() method
 func writeDataToCSV[T any](file *os.File, data []T, typeName string, format string) error {
 	delimiter := ","
@@ -148,8 +169,7 @@ func writeDataToCSV[T any](file *os.File, data []T, typeName string, format stri
 	}
 
 	if len(data) == 0 {
-		_, err := fmt.Fprintf(file, "# No %s data available\n", typeName)
-		return err
+		return writeCSVHeaderWithNoData[T](file, typeName, format)
 	}
 
 	var models []sdk.Model

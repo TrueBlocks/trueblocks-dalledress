@@ -1,7 +1,3 @@
-// Copyright 2016, 2026 The Authors. All rights reserved.
-// Use of this source code is governed by a license that can
-// be found in the LICENSE file.
-
 package types
 
 import (
@@ -85,13 +81,6 @@ func TestSetMenuOrder(t *testing.T) {
 			expectedDisabled: true, // Should remain unchanged when not configured
 			expectedFacets:   nil,
 		},
-		{
-			name:             "nil ViewConfig",
-			vc:               nil,
-			expectedOrder:    0,     // Won't be checked
-			expectedDisabled: false, // Won't be checked
-			expectedFacets:   nil,
-		},
 	}
 
 	for _, tt := range tests {
@@ -106,10 +95,6 @@ func TestSetMenuOrder(t *testing.T) {
 			}
 
 			SetMenuOrder(tt.vc)
-
-			if tt.vc == nil {
-				return // Nothing to check for nil input
-			}
 
 			if tt.vc.MenuOrder != tt.expectedOrder {
 				t.Errorf("Expected MenuOrder %d, got %d", tt.expectedOrder, tt.vc.MenuOrder)

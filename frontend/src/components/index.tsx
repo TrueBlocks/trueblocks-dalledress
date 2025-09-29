@@ -16,6 +16,7 @@ export * from './ProjectsList';
 export * from './ShouldNotHappen';
 export * from './SkinSwitcher';
 export * from './Socials';
+export * from './SplashScreen';
 export * from './StatusIndicator';
 export * from './StyledBadge';
 export * from './StyledButton';

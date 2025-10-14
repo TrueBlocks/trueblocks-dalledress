@@ -18,7 +18,6 @@ import (
 )
 
 // EXISTING_CODE
-
 type ContractsPage struct {
 	Facet         types.DataFacet `json:"facet"`
 	Contracts     []*Contract     `json:"contracts"`
@@ -69,6 +68,7 @@ func (c *ContractsCollection) GetPage(
 	}
 
 	switch dataFacet {
+
 	case ContractsDashboard:
 		facet := c.dashboardFacet
 		var filterFunc func(*Contract) bool

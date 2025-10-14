@@ -72,8 +72,8 @@ func (c *{{.Class}}Collection) GetPage(
 	}
 
 	switch dataFacet {
-	{{range .Facets -}}
-	{{- $sing := toSingular .Name -}}
+	{{range .Facets}}
+	{{$sing := toSingular .Name -}}
 	{{- $sing2 := toSingular .Store -}}
 	case {{$class}}{{.Name}}:
 		facet := c.{{toLower .Name}}Facet
@@ -97,7 +97,7 @@ func (c *{{.Class}}Collection) GetPage(
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
-		{{end -}}
+{{- end}}
 	default:
 		return nil, types.NewValidationError("{{toLower .Class}}", dataFacet, "GetPage",
 			fmt.Errorf("[GetPage] unsupported dataFacet: %v", dataFacet))

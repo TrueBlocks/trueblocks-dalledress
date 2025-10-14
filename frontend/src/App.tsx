@@ -78,7 +78,7 @@ export const App = () => {
     // Set minimum splash screen display time
     const splashTimer = setTimeout(() => {
       setSplashDelayComplete(true);
-    }, 1000);
+    }, 750);
 
     window.addEventListener('keydown', globalNavKeySquelcher, {
       capture: true,

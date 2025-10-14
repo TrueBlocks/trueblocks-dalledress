@@ -26,7 +26,18 @@ func (a *App) GetMonitorsPage(
 	filter string,
 ) (*monitors.MonitorsPage, error) {
 	collection := monitors.GetMonitorsCollection(payload)
-	return getCollectionPage[*monitors.MonitorsPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*monitors.MonitorsPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	if err == nil {
+		for i := range ret.Monitors {
+			address := ret.Monitors[i].Address.Hex()
+			if namePtr, ok := a.NameFromAddress(address); ok && namePtr != nil {
+				ret.Monitors[i].Name = namePtr.Name
+			}
+		}
+	}
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) MonitorsCrud(
@@ -54,6 +65,12 @@ func (a *App) ReloadMonitors(payload *types.Payload) error {
 func (a *App) GetMonitorsConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := monitors.GetMonitorsCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetMonitorsBuckets returns bucket visualization data for monitors
+func (a *App) GetMonitorsBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := monitors.GetMonitorsCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

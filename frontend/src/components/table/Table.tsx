@@ -67,7 +67,7 @@ export const Table = <T extends Record<string, unknown>>({
   // When detailCollapsed is false, the detail panel is showing, so show fewer columns
   const displayColumns = detailCollapsed
     ? processedColumns
-    : processedColumns.slice(0, 3);
+    : processedColumns.slice(0, 6);
 
   const { pagination } = usePagination(viewStateKey);
   const { filter, setFiltering } = useFiltering(viewStateKey);
@@ -185,9 +185,29 @@ export const Table = <T extends Record<string, unknown>>({
   useEffect(() => {
     if (data.length > 0 && !loading) {
       const safeFocusTable = () => {
-        if (!isModalOpenRef.current) {
-          focusTable();
+        // Check if table's own modal is open
+        if (isModalOpenRef.current) {
+          return;
         }
+
+        // Check for any modal overlay in the DOM (more comprehensive)
+        const modalOverlay = document.querySelector('.mantine-Modal-overlay');
+        if (modalOverlay) {
+          return;
+        }
+
+        // Check if focus is already intentionally placed somewhere specific
+        const activeElement = document.activeElement;
+        if (
+          activeElement &&
+          activeElement !== document.body &&
+          activeElement.tagName !== 'HTML' &&
+          activeElement.closest('.mantine-Modal-content')
+        ) {
+          return;
+        }
+
+        focusTable();
       };
 
       const timer = setTimeout(() => {
@@ -197,15 +217,6 @@ export const Table = <T extends Record<string, unknown>>({
       return () => clearTimeout(timer);
     }
   }, [data, loading, focusTable]);
-
-  useEffect(() => {
-    if (isModalOpen) {
-      const firstInput = document.querySelector(
-        '.mantine-Modal input',
-      ) as HTMLInputElement | null;
-      firstInput?.focus();
-    }
-  }, [isModalOpen]);
 
   const handleFormKeyDown = (e: React.KeyboardEvent) => {
     const navigationKeys = [
@@ -302,8 +313,8 @@ export const Table = <T extends Record<string, unknown>>({
                     textAlign: 'left',
                     padding: '20px',
                     color: loading
-                      ? 'var(--skin-primary)'
-                      : 'var(--skin-text-secondary)',
+                      ? 'var(--mantine-color-primary-6)'
+                      : 'var(--mantine-color-dimmed)',
                   }}
                 >
                   {loading ? 'Loading...' : 'No data found.'}
@@ -344,7 +355,7 @@ export const Table = <T extends Record<string, unknown>>({
         styles={{
           header: { display: 'none' },
           overlay: {
-            backgroundColor: 'var(--skin-surface-sunken)',
+            backgroundColor: 'var(--mantine-color-gray-2)',
             backdropFilter: 'blur(1px)', // Optional slight blur effect
           },
           inner: {
@@ -353,7 +364,7 @@ export const Table = <T extends Record<string, unknown>>({
           content: {
             // Target the modal content itself
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)', // Add a subtle box shadow
-            border: '1px solid var(--skin-border-default)', // Add a light border, theme-aware
+            border: '1px solid var(--mantine-color-gray-4)', // Add a light border, theme-aware
           },
         }}
       >

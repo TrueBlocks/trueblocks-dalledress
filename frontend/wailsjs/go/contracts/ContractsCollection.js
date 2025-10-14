@@ -10,6 +10,10 @@ export function ExportData(arg1) {
   return window['go']['contracts']['ContractsCollection']['ExportData'](arg1);
 }
 
+export function GetBuckets(arg1) {
+  return window['go']['contracts']['ContractsCollection']['GetBuckets'](arg1);
+}
+
 export function GetConfig() {
   return window['go']['contracts']['ContractsCollection']['GetConfig']();
 }

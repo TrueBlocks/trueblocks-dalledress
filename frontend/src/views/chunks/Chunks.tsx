@@ -31,9 +31,10 @@ import { chunks } from '@models';
 import { msgs, project, types } from '@models';
 import { Debugger, LogError, useErrorHandler } from '@utils';
 
-import { ViewRoute, assertRouteConsistency } from '../routes';
+import { assertRouteConsistency } from '../routes';
+import { ROUTE } from './constants';
+import { renderers } from './renderers';
 
-const ROUTE: ViewRoute = 'chunks';
 export const Chunks = () => {
   // === SECTION 2: Hook Initialization ===
   const renderCnt = useRef(0);
@@ -211,7 +212,7 @@ export const Chunks = () => {
   );
 
   const detailPanel = useMemo(
-    () => createDetailPanel(viewConfig, getCurrentDataFacet),
+    () => createDetailPanel(viewConfig, getCurrentDataFacet, renderers),
     [viewConfig, getCurrentDataFacet],
   );
 

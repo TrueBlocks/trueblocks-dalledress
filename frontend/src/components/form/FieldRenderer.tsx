@@ -1,6 +1,6 @@
 import { ChangeEvent, forwardRef, isValidElement } from 'react';
 
-import { FormField, StyledText } from '@components';
+import { FormField, StyledBadge, StyledText } from '@components';
 import { Fieldset, Stack, TextInput } from '@mantine/core';
 import { formatWeiToEther, formatWeiToGigawei } from '@utils';
 
@@ -44,15 +44,104 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
       return <div key={keyProp}>{field.customRender}</div>;
     }
 
-    const isEtherField = field.type === 'ether';
     const isGasField = field.type === 'gas';
 
     if (mode === 'display') {
       let displayValue;
-      if (field.type === 'ether' && field.value) {
-        displayValue = formatWeiToEther(field.value as string);
+      if (field.type === 'wei' && field.value) {
+        // Try to format as Wei, but if it fails (e.g., already in Ether format), format as ether
+        try {
+          displayValue = formatWeiToEther(field.value as string);
+        } catch {
+          // If Wei formatting fails, field might already be in Ether format - format consistently
+          const etherValue = String(field.value);
+          const numericValue = parseFloat(etherValue);
+          if (isNaN(numericValue)) {
+            displayValue = '0.000000';
+          } else {
+            displayValue = numericValue.toFixed(6);
+          }
+        }
+      } else if (field.type === 'ether') {
+        // Fields with type 'ether' are already in Ether format - format to exactly 6 decimal places
+        if (!field.value) {
+          displayValue = '0.000000';
+        } else {
+          const etherValue = String(field.value);
+          const numericValue = parseFloat(etherValue);
+          if (isNaN(numericValue)) {
+            displayValue = '0.000000';
+          } else {
+            // Format to exactly 6 decimal places, ensuring at least one digit before decimal
+            displayValue = numericValue.toFixed(6);
+          }
+        }
       } else if (field.type === 'gas' && field.value) {
         displayValue = formatWeiToGigawei(field.value as string);
+      } else if (field.type === 'timestamp' && field.value) {
+        // Convert numerical Unix timestamp to formatted date
+        displayValue = new Date(Number(field.value) * 1000).toLocaleString();
+      } else if (
+        (field.type as string) === 'fileSize' &&
+        field.value !== undefined &&
+        field.value !== null
+      ) {
+        // Format file size in bytes to human readable format
+        const bytes = Number(field.value);
+        if (bytes === 0 || isNaN(bytes)) {
+          displayValue = '0 b';
+        } else {
+          const k = 1024;
+          const sizes = ['b', 'kb', 'mb', 'gb'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          const sizeUnit = sizes[i] || 'gb'; // Fallback to 'gb' for very large values
+          const value = bytes / Math.pow(k, i);
+
+          // If kb > 100, show as mb with 3 decimal places
+          if (sizeUnit === 'kb' && value > 100) {
+            const mbValue = bytes / Math.pow(k, 2);
+            displayValue = mbValue.toFixed(2) + ' mb';
+          } else {
+            displayValue = parseFloat(value.toFixed(2)) + ' ' + sizeUnit;
+          }
+        }
+      } else if ((field.type as string) === 'fileSize') {
+        // Handle empty/null fileSize values
+        displayValue = '0 b';
+      } else if (
+        field.type === 'number' &&
+        (field.value === undefined ||
+          field.value === null ||
+          field.value === '')
+      ) {
+        // Handle empty/null number values
+        displayValue = '0';
+      } else if (field.type === 'number') {
+        // Handle non-empty number values
+        displayValue = Number(field.value).toLocaleString();
+      } else if ((field.type as string) === 'boolean') {
+        // Handle boolean values - show badge only for true, nothing for false
+        const isTrue = field.value === true || field.value === 'true';
+        displayValue = isTrue ? (
+          <StyledBadge variant="boolean">true</StyledBadge>
+        ) : (
+          ''
+        );
+      } else if (
+        (field.type as string) === 'float64' &&
+        field.value !== undefined &&
+        field.value !== null
+      ) {
+        // Handle float64 values - always show two decimal places with at least one zero before decimal
+        const floatValue = Number(field.value);
+        if (isNaN(floatValue)) {
+          displayValue = '0.00';
+        } else {
+          displayValue = floatValue.toFixed(2);
+        }
+      } else if ((field.type as string) === 'float64') {
+        // Handle empty/null float64 values
+        displayValue = '0.00';
       } else {
         displayValue = field.value || 'N/A';
       }
@@ -68,6 +157,18 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
       }
 
       if (tableCell) {
+        // Right align fileSize and number types like numeric data
+        const shouldRightAlign =
+          (field.type as string) === 'fileSize' ||
+          (field.type as string) === 'float64' ||
+          field.type === 'number' ||
+          field.type === 'gas' ||
+          field.type === 'ether' ||
+          field.type === 'wei';
+
+        if (shouldRightAlign) {
+          return <div style={{ textAlign: 'right' }}>{displayValue}</div>;
+        }
         return <>{displayValue}</>;
       }
 
@@ -97,9 +198,11 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
     }
 
     let placeHolder;
-    if (isEtherField) {
+    if (field.type === 'wei') {
       placeHolder =
         field.placeholder || 'Wei value (e.g., 1000000000000000000 for 1 ETH)';
+    } else if (field.type === 'ether') {
+      placeHolder = field.placeholder || 'Ether value (e.g., 1.000000)';
     } else if (isGasField) {
       placeHolder =
         field.placeholder || 'Wei value (e.g., 21000000000000 for 21 Gwei)';
@@ -108,8 +211,11 @@ export const FieldRenderer = forwardRef<HTMLInputElement, FieldRendererProps>(
     }
 
     let hint;
-    if (isEtherField) {
+    if (field.type === 'wei') {
       hint = field.hint || 'Enter value in Wei (smallest unit of Ether)';
+    } else if (field.type === 'ether') {
+      hint =
+        field.hint || 'Enter value in Ether (will be displayed as entered)';
     } else if (isGasField) {
       hint = field.hint || 'Enter value in Wei (will display as Gigawei)';
     } else {

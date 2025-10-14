@@ -28,6 +28,7 @@ export interface MenuItem {
   type?: 'navigation' | 'dev' | 'toggle';
   action?: () => void | Promise<void>;
   menuOrder?: number;
+  separator?: boolean;
 }
 
 export const MenuItems: MenuItem[] = [

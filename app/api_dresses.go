@@ -29,7 +29,10 @@ func (a *App) GetDressesPage(
 	filter string,
 ) (*dresses.DressesPage, error) {
 	collection := dresses.GetDressesCollection(payload)
-	return getCollectionPage[*dresses.DressesPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*dresses.DressesPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) DressesCrud(
@@ -57,6 +60,12 @@ func (a *App) ReloadDresses(payload *types.Payload) error {
 func (a *App) GetDressesConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := dresses.GetDressesCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetDressesBuckets returns bucket visualization data for dresses
+func (a *App) GetDressesBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := dresses.GetDressesCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

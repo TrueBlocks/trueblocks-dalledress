@@ -65,6 +65,8 @@ export function FileSaveAs(arg1:menu.CallbackData):Promise<void>;
 
 export function FromTemplate(arg1:types.Payload,arg2:string):Promise<string>;
 
+export function GetAbisBuckets(arg1:types.Payload):Promise<types.Buckets>;
+
 export function GetAbisConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetAbisPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<abis.AbisPage>;
@@ -87,11 +89,17 @@ export function GetAvailableSkins():Promise<Array<skin.SkinMetadata>>;
 
 export function GetChainList():Promise<utils.ChainList>;
 
+export function GetChunksBuckets(arg1:types.Payload):Promise<types.Buckets>;
+
 export function GetChunksConfig(arg1:types.Payload):Promise<types.ViewConfig>;
+
+export function GetChunksMetric(arg1:string):Promise<string>;
 
 export function GetChunksPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<chunks.ChunksPage>;
 
 export function GetChunksSummary(arg1:types.Payload):Promise<types.Summary>;
+
+export function GetComparitoorBuckets(arg1:types.Payload):Promise<types.Buckets>;
 
 export function GetComparitoorConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
@@ -100,6 +108,8 @@ export function GetComparitoorPage(arg1:types.Payload,arg2:number,arg3:number,ar
 export function GetComparitoorSummary(arg1:types.Payload):Promise<types.Summary>;
 
 export function GetContext():Promise<context.Context>;
+
+export function GetContractsBuckets(arg1:types.Payload):Promise<types.Buckets>;
 
 export function GetContractsConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
@@ -113,11 +123,15 @@ export function GetDebugCollapsed():Promise<boolean>;
 
 export function GetDefaultAppPreferences():Promise<preferences.AppPreferences>;
 
+export function GetDressesBuckets(arg1:types.Payload):Promise<types.Buckets>;
+
 export function GetDressesConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetDressesPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<dresses.DressesPage>;
 
 export function GetDressesSummary(arg1:types.Payload):Promise<types.Summary>;
+
+export function GetExportsBuckets(arg1:types.Payload):Promise<types.Buckets>;
 
 export function GetExportsConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
@@ -143,11 +157,15 @@ export function GetLastView():Promise<string>;
 
 export function GetMarkdown(arg1:string,arg2:string,arg3:string):Promise<string>;
 
+export function GetMonitorsBuckets(arg1:types.Payload):Promise<types.Buckets>;
+
 export function GetMonitorsConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
 export function GetMonitorsPage(arg1:types.Payload,arg2:number,arg3:number,arg4:sdk.SortSpec,arg5:string):Promise<monitors.MonitorsPage>;
 
 export function GetMonitorsSummary(arg1:types.Payload):Promise<types.Summary>;
+
+export function GetNamesBuckets(arg1:types.Payload):Promise<types.Buckets>;
 
 export function GetNamesConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
@@ -170,6 +188,8 @@ export function GetRegisteredViews():Promise<Array<string>>;
 export function GetSkin():Promise<string>;
 
 export function GetSkinByName(arg1:string):Promise<skin.Skin>;
+
+export function GetStatusBuckets(arg1:types.Payload):Promise<types.Buckets>;
 
 export function GetStatusConfig(arg1:types.Payload):Promise<types.ViewConfig>;
 
@@ -262,6 +282,8 @@ export function SetAppPreferences(arg1:preferences.AppPreferences):Promise<void>
 export function SetChain(arg1:preferences.Chain):Promise<void>;
 
 export function SetChromeCollapsed(arg1:boolean):Promise<void>;
+
+export function SetChunksMetric(arg1:string,arg2:string):Promise<void>;
 
 export function SetDebugCollapsed(arg1:boolean):Promise<void>;
 

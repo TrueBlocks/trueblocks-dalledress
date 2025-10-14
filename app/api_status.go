@@ -25,7 +25,10 @@ func (a *App) GetStatusPage(
 	filter string,
 ) (*status.StatusPage, error) {
 	collection := status.GetStatusCollection(payload)
-	return getCollectionPage[*status.StatusPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*status.StatusPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) GetStatusSummary(payload *types.Payload) types.Summary {
@@ -44,6 +47,12 @@ func (a *App) ReloadStatus(payload *types.Payload) error {
 func (a *App) GetStatusConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := status.GetStatusCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetStatusBuckets returns bucket visualization data for status
+func (a *App) GetStatusBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := status.GetStatusCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

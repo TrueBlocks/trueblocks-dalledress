@@ -14,14 +14,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/facets"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
 
 // EXISTING_CODE
-
 type ComparitoorPage struct {
 	Facet         types.DataFacet `json:"facet"`
 	Transaction   []*Transaction  `json:"transaction"`
@@ -193,6 +192,7 @@ func (c *ComparitoorCollection) GetPage(
 	}
 
 	switch dataFacet {
+
 	case ComparitoorComparitoor:
 		facet := c.comparitoorFacet
 		var filterFunc func(*Transaction) bool

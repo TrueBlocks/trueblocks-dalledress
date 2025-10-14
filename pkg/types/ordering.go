@@ -8,9 +8,9 @@ import (
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 )
 
-// NormalizeFields sorts columns and detail fields by their explicit order values.
+// SortFields sorts columns and detail fields by their explicit order values.
 // It does not assign defaults; ordering must be provided in config.
-func NormalizeFields(vc *ViewConfig) {
+func SortFields(vc *ViewConfig) {
 	if vc == nil || vc.Facets == nil {
 		return
 	}

@@ -25,7 +25,10 @@ func (a *App) GetChunksPage(
 	filter string,
 ) (*chunks.ChunksPage, error) {
 	collection := chunks.GetChunksCollection(payload)
-	return getCollectionPage[*chunks.ChunksPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*chunks.ChunksPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) GetChunksSummary(payload *types.Payload) types.Summary {
@@ -44,6 +47,12 @@ func (a *App) ReloadChunks(payload *types.Payload) error {
 func (a *App) GetChunksConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := chunks.GetChunksCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetChunksBuckets returns bucket visualization data for chunks
+func (a *App) GetChunksBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := chunks.GetChunksCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

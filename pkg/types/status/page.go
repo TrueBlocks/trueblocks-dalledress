@@ -18,7 +18,6 @@ import (
 )
 
 // EXISTING_CODE
-
 type StatusPage struct {
 	Facet         types.DataFacet `json:"facet"`
 	Caches        []*Cache        `json:"caches"`
@@ -70,6 +69,7 @@ func (c *StatusCollection) GetPage(
 	}
 
 	switch dataFacet {
+
 	case StatusStatus:
 		facet := c.statusFacet
 		var filterFunc func(*Status) bool

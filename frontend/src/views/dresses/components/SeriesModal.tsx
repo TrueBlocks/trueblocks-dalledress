@@ -119,7 +119,6 @@ export const SeriesModal = ({
           error={isDup ? 'Suffix already exists' : undefined}
           placeholder="unique-suffix"
           withAsterisk
-          data-autofocus
         />
         <TextInput
           label="Last Index"

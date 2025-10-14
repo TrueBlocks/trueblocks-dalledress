@@ -68,7 +68,7 @@ the code inside of 'EXISTING_CODE' tags.
   - compressedLog: a truncated, more readable version of the articulation
   - isNFT: true if the log is an NFT transfer
 
-- **Series Store (12 members)**
+- **Series Store (14 members)**
 
   - suffix: Series identifier
   - last: Last used index
@@ -78,9 +78,11 @@ the code inside of 'EXISTING_CODE' tags.
   - emotions: List of emotions
   - artstyles: List of art styles
   - colors: List of colors
-  - orientations: List of orientations
+  - viewpoints: List of viewpoints
   - gazes: List of gazes
   - backstyles: List of back styles
+  - compositions: List of compositions
+  - createdAt: Creation timestamp
   - modifiedAt: Last modified timestamp
 
 // EXISTING_CODE

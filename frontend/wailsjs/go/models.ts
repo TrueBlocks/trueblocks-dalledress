@@ -169,6 +169,7 @@ export namespace comparitoor {
 	    type: string;
 	    // Go type: base
 	    value: any;
+	    calcs?: types.TransactionCalcs;
 	    statements?: types.Statement[];
 	    missing: boolean;
 	    unique: boolean;
@@ -200,6 +201,7 @@ export namespace comparitoor {
 	        this.transactionIndex = source["transactionIndex"];
 	        this.type = source["type"];
 	        this.value = this.convertValues(source["value"], null);
+	        this.calcs = this.convertValues(source["calcs"], types.TransactionCalcs);
 	        this.statements = this.convertValues(source["statements"], types.Statement);
 	        this.missing = source["missing"];
 	        this.unique = source["unique"];
@@ -457,6 +459,7 @@ export namespace exports {
 	export class ExportsPage {
 	    facet: types.DataFacet;
 	    approvals: types.Approval[];
+	    approves: types.Log[];
 	    assets: types.Name[];
 	    balances: types.Token[];
 	    logs: types.Log[];
@@ -479,6 +482,7 @@ export namespace exports {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.facet = source["facet"];
 	        this.approvals = this.convertValues(source["approvals"], types.Approval);
+	        this.approves = this.convertValues(source["approves"], types.Log);
 	        this.assets = this.convertValues(source["assets"], types.Name);
 	        this.balances = this.convertValues(source["balances"], types.Token);
 	        this.logs = this.convertValues(source["logs"], types.Log);
@@ -791,6 +795,7 @@ export namespace msgs {
 	    CHAIN_CHANGED = "chain:changed",
 	    PERIOD_CHANGED = "period:changed",
 	    DATA_LOADED = "data:loaded",
+	    DATA_RELOADED = "data:reloaded",
 	    TAB_CYCLE = "hotkey:tab-cycle",
 	    IMAGES_CHANGED = "images:changed",
 	    PROJECT_OPENED = "project:opened",
@@ -878,6 +883,7 @@ export namespace preferences {
 	    debugCollapsed: boolean;
 	    recentProjects: string[];
 	    silencedDialogs: Record<string, boolean>;
+	    chunksMetrics?: Record<string, string>;
 	    bounds?: Bounds;
 	
 	    static createFrom(source: any = {}) {
@@ -900,6 +906,7 @@ export namespace preferences {
 	        this.debugCollapsed = source["debugCollapsed"];
 	        this.recentProjects = source["recentProjects"];
 	        this.silencedDialogs = source["silencedDialogs"];
+	        this.chunksMetrics = source["chunksMetrics"];
 	        this.bounds = this.convertValues(source["bounds"], Bounds);
 	    }
 	
@@ -1319,6 +1326,7 @@ export namespace types {
 	    TRANSFERS = "transfers",
 	    TRANSACTIONS = "transactions",
 	    APPROVALS = "approvals",
+	    APPROVES = "approves",
 	    WITHDRAWALS = "withdrawals",
 	    ASSETS = "assets",
 	    LOGS = "logs",
@@ -1342,6 +1350,46 @@ export namespace types {
 	    PENDING = "pending",
 	    ERROR = "error",
 	}
+	export class AbiCalcs {
+	    name?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new AbiCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	    }
+	}
+	export class FunctionCalcs {
+	    inputs?: any[];
+	    outputs?: any[];
+	
+	    static createFrom(source: any = {}) {
+	        return new FunctionCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.inputs = source["inputs"];
+	        this.outputs = source["outputs"];
+	    }
+	}
+	export class ParameterCalcs {
+	    indexed?: boolean;
+	    internalType?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ParameterCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.indexed = source["indexed"];
+	        this.internalType = source["internalType"];
+	    }
+	}
 	export class Parameter {
 	    components?: Parameter[];
 	    indexed?: boolean;
@@ -1350,6 +1398,7 @@ export namespace types {
 	    strDefault?: string;
 	    type: string;
 	    value?: any;
+	    calcs?: ParameterCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new Parameter(source);
@@ -1364,6 +1413,7 @@ export namespace types {
 	        this.strDefault = source["strDefault"];
 	        this.type = source["type"];
 	        this.value = source["value"];
+	        this.calcs = this.convertValues(source["calcs"], ParameterCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1395,6 +1445,7 @@ export namespace types {
 	    signature?: string;
 	    stateMutability?: string;
 	    type: string;
+	    calcs?: FunctionCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new Function(source);
@@ -1412,6 +1463,7 @@ export namespace types {
 	        this.signature = source["signature"];
 	        this.stateMutability = source["stateMutability"];
 	        this.type = source["type"];
+	        this.calcs = this.convertValues(source["calcs"], FunctionCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1445,6 +1497,7 @@ export namespace types {
 	    nFunctions: number;
 	    name: string;
 	    path: string;
+	    calcs?: AbiCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new Abi(source);
@@ -1464,6 +1517,7 @@ export namespace types {
 	        this.nFunctions = source["nFunctions"];
 	        this.name = source["name"];
 	        this.path = source["path"];
+	        this.calcs = this.convertValues(source["calcs"], AbiCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1484,6 +1538,7 @@ export namespace types {
 		    return a;
 		}
 	}
+	
 	export class ActionConfig {
 	    name: string;
 	    label: string;
@@ -1502,6 +1557,20 @@ export namespace types {
 	        this.confirmation = source["confirmation"];
 	    }
 	}
+	export class ApprovalCalcs {
+	    date: string;
+	    lastAppDate: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ApprovalCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.date = source["date"];
+	        this.lastAppDate = source["lastAppDate"];
+	    }
+	}
 	export class Approval {
 	    // Go type: base
 	    allowance: any;
@@ -1514,6 +1583,7 @@ export namespace types {
 	    spender: base.Address;
 	    timestamp: number;
 	    token: base.Address;
+	    calcs?: ApprovalCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new Approval(source);
@@ -1531,6 +1601,7 @@ export namespace types {
 	        this.spender = this.convertValues(source["spender"], base.Address);
 	        this.timestamp = source["timestamp"];
 	        this.token = this.convertValues(source["token"], base.Address);
+	        this.calcs = this.convertValues(source["calcs"], ApprovalCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1551,6 +1622,125 @@ export namespace types {
 		    return a;
 		}
 	}
+	
+	export class Bucket {
+	    bucketIndex: string;
+	    startBlock: number;
+	    endBlock: number;
+	    total: number;
+	    colorValue: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Bucket(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.bucketIndex = source["bucketIndex"];
+	        this.startBlock = source["startBlock"];
+	        this.endBlock = source["endBlock"];
+	        this.total = source["total"];
+	        this.colorValue = source["colorValue"];
+	    }
+	}
+	export class BucketStats {
+	    total: number;
+	    average: number;
+	    min: number;
+	    max: number;
+	    count: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new BucketStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.total = source["total"];
+	        this.average = source["average"];
+	        this.min = source["min"];
+	        this.max = source["max"];
+	        this.count = source["count"];
+	    }
+	}
+	export class GridInfo {
+	    rows: number;
+	    columns: number;
+	    maxBlock: number;
+	    size: number;
+	    bucketCount: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new GridInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.rows = source["rows"];
+	        this.columns = source["columns"];
+	        this.maxBlock = source["maxBlock"];
+	        this.size = source["size"];
+	        this.bucketCount = source["bucketCount"];
+	    }
+	}
+	export class Buckets {
+	    series0: Bucket[];
+	    series0Stats: BucketStats;
+	    series1: Bucket[];
+	    series1Stats: BucketStats;
+	    series2: Bucket[];
+	    series2Stats: BucketStats;
+	    series3: Bucket[];
+	    series3Stats: BucketStats;
+	    gridInfo: GridInfo;
+	
+	    static createFrom(source: any = {}) {
+	        return new Buckets(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.series0 = this.convertValues(source["series0"], Bucket);
+	        this.series0Stats = this.convertValues(source["series0Stats"], BucketStats);
+	        this.series1 = this.convertValues(source["series1"], Bucket);
+	        this.series1Stats = this.convertValues(source["series1Stats"], BucketStats);
+	        this.series2 = this.convertValues(source["series2"], Bucket);
+	        this.series2Stats = this.convertValues(source["series2Stats"], BucketStats);
+	        this.series3 = this.convertValues(source["series3"], Bucket);
+	        this.series3Stats = this.convertValues(source["series3Stats"], BucketStats);
+	        this.gridInfo = this.convertValues(source["gridInfo"], GridInfo);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class CacheItemCalcs {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new CacheItemCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
+	    }
+	}
 	export class CacheItem {
 	    items: any[];
 	    lastCached?: string;
@@ -1559,6 +1749,8 @@ export namespace types {
 	    path: string;
 	    sizeInBytes: number;
 	    type: string;
+	    // Go type: CacheItemCalcs
+	    calcs?: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new CacheItem(source);
@@ -1573,6 +1765,37 @@ export namespace types {
 	        this.path = source["path"];
 	        this.sizeInBytes = source["sizeInBytes"];
 	        this.type = source["type"];
+	        this.calcs = this.convertValues(source["calcs"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChainCalcs {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new ChainCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
 	    }
 	}
 	export class Chain {
@@ -1583,6 +1806,8 @@ export namespace types {
 	    remoteExplorer: string;
 	    rpcProvider: string;
 	    symbol: string;
+	    // Go type: ChainCalcs
+	    calcs?: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new Chain(source);
@@ -1597,6 +1822,61 @@ export namespace types {
 	        this.remoteExplorer = source["remoteExplorer"];
 	        this.rpcProvider = source["rpcProvider"];
 	        this.symbol = source["symbol"];
+	        this.calcs = this.convertValues(source["calcs"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class ChunkBloomCalcs {
+	    hash: string;
+	    hashValue?: string;
+	    rangeDates?: any;
+	    firstTs?: number;
+	    firstDate?: string;
+	    lastTs?: number;
+	    lastDate?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunkBloomCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hash = source["hash"];
+	        this.hashValue = source["hashValue"];
+	        this.rangeDates = source["rangeDates"];
+	        this.firstTs = source["firstTs"];
+	        this.firstDate = source["firstDate"];
+	        this.lastTs = source["lastTs"];
+	        this.lastDate = source["lastDate"];
+	    }
+	}
+	export class RangeDatesCalcs {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new RangeDatesCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
 	    }
 	}
 	export class RangeDates {
@@ -1604,6 +1884,8 @@ export namespace types {
 	    firstTs?: number;
 	    lastDate?: string;
 	    lastTs?: number;
+	    // Go type: RangeDatesCalcs
+	    calcs?: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new RangeDates(source);
@@ -1615,7 +1897,26 @@ export namespace types {
 	        this.firstTs = source["firstTs"];
 	        this.lastDate = source["lastDate"];
 	        this.lastTs = source["lastTs"];
+	        this.calcs = this.convertValues(source["calcs"], null);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class ChunkBloom {
 	    byteWidth: number;
@@ -1626,6 +1927,7 @@ export namespace types {
 	    nInserted: number;
 	    range: string;
 	    rangeDates?: RangeDates;
+	    calcs?: ChunkBloomCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new ChunkBloom(source);
@@ -1641,6 +1943,7 @@ export namespace types {
 	        this.nInserted = source["nInserted"];
 	        this.range = source["range"];
 	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
+	        this.calcs = this.convertValues(source["calcs"], ChunkBloomCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1661,6 +1964,31 @@ export namespace types {
 		    return a;
 		}
 	}
+	
+	export class ChunkIndexCalcs {
+	    hash: string;
+	    hashValue?: string;
+	    rangeDates?: any;
+	    firstTs?: number;
+	    firstDate?: string;
+	    lastTs?: number;
+	    lastDate?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunkIndexCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.hash = source["hash"];
+	        this.hashValue = source["hashValue"];
+	        this.rangeDates = source["rangeDates"];
+	        this.firstTs = source["firstTs"];
+	        this.firstDate = source["firstDate"];
+	        this.lastTs = source["lastTs"];
+	        this.lastDate = source["lastDate"];
+	    }
+	}
 	export class ChunkIndex {
 	    fileSize: number;
 	    hash: base.Hash;
@@ -1669,6 +1997,7 @@ export namespace types {
 	    nAppearances: number;
 	    range: string;
 	    rangeDates?: RangeDates;
+	    calcs?: ChunkIndexCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new ChunkIndex(source);
@@ -1683,6 +2012,7 @@ export namespace types {
 	        this.nAppearances = source["nAppearances"];
 	        this.range = source["range"];
 	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
+	        this.calcs = this.convertValues(source["calcs"], ChunkIndexCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1703,6 +2033,27 @@ export namespace types {
 		    return a;
 		}
 	}
+	
+	export class ChunkRecordCalcs {
+	    rangeDates?: any;
+	    firstTs?: number;
+	    firstDate?: string;
+	    lastTs?: number;
+	    lastDate?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunkRecordCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.rangeDates = source["rangeDates"];
+	        this.firstTs = source["firstTs"];
+	        this.firstDate = source["firstDate"];
+	        this.lastTs = source["lastTs"];
+	        this.lastDate = source["lastDate"];
+	    }
+	}
 	export class ChunkRecord {
 	    bloomHash: string;
 	    bloomSize: number;
@@ -1710,6 +2061,7 @@ export namespace types {
 	    indexSize: number;
 	    range: string;
 	    rangeDates?: RangeDates;
+	    calcs?: ChunkRecordCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new ChunkRecord(source);
@@ -1723,6 +2075,7 @@ export namespace types {
 	        this.indexSize = source["indexSize"];
 	        this.range = source["range"];
 	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
+	        this.calcs = this.convertValues(source["calcs"], ChunkRecordCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1742,6 +2095,27 @@ export namespace types {
 		    }
 		    return a;
 		}
+	}
+	
+	export class ChunkStatsCalcs {
+	    rangeDates?: any;
+	    firstTs?: number;
+	    firstDate?: string;
+	    lastTs?: number;
+	    lastDate?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ChunkStatsCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.rangeDates = source["rangeDates"];
+	        this.firstTs = source["firstTs"];
+	        this.firstDate = source["firstDate"];
+	        this.lastTs = source["lastTs"];
+	        this.lastDate = source["lastDate"];
+	    }
 	}
 	export class ChunkStats {
 	    addrsPerBlock: number;
@@ -1757,6 +2131,7 @@ export namespace types {
 	    rangeDates?: RangeDates;
 	    ratio: number;
 	    recWid: number;
+	    calcs?: ChunkStatsCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new ChunkStats(source);
@@ -1777,6 +2152,7 @@ export namespace types {
 	        this.rangeDates = this.convertValues(source["rangeDates"], RangeDates);
 	        this.ratio = source["ratio"];
 	        this.recWid = source["recWid"];
+	        this.calcs = this.convertValues(source["calcs"], ChunkStatsCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1797,12 +2173,12 @@ export namespace types {
 		    return a;
 		}
 	}
+	
 	export class ColumnConfig {
 	    key: string;
 	    header: string;
 	    width: number;
 	    sortable: boolean;
-	    filterable: boolean;
 	    formatter: string;
 	    order: number;
 	
@@ -1816,9 +2192,20 @@ export namespace types {
 	        this.header = source["header"];
 	        this.width = source["width"];
 	        this.sortable = source["sortable"];
-	        this.filterable = source["filterable"];
 	        this.formatter = source["formatter"];
 	        this.order = source["order"];
+	    }
+	}
+	export class ContractCalcs {
+	    date?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ContractCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.date = source["date"];
 	    }
 	}
 	export class Contract {
@@ -1828,6 +2215,7 @@ export namespace types {
 	    lastError: string;
 	    lastUpdated: number;
 	    name: string;
+	    calcs?: ContractCalcs;
 	    readResults: Record<string, any>;
 	
 	    static createFrom(source: any = {}) {
@@ -1842,6 +2230,7 @@ export namespace types {
 	        this.lastError = source["lastError"];
 	        this.lastUpdated = source["lastUpdated"];
 	        this.name = source["name"];
+	        this.calcs = this.convertValues(source["calcs"], ContractCalcs);
 	        this.readResults = source["readResults"];
 	    }
 	
@@ -1863,6 +2252,7 @@ export namespace types {
 		    return a;
 		}
 	}
+	
 	export class DetailFieldConfig {
 	    key: string;
 	    label: string;
@@ -1915,6 +2305,64 @@ export namespace types {
 		    return a;
 		}
 	}
+	export class MetricConfig {
+	    key: string;
+	    label: string;
+	    bucketsField: string;
+	    statsField: string;
+	    bytes: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new MetricConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.key = source["key"];
+	        this.label = source["label"];
+	        this.bucketsField = source["bucketsField"];
+	        this.statsField = source["statsField"];
+	        this.bytes = source["bytes"];
+	    }
+	}
+	export class PanelConfig {
+	    type: string;
+	    defaultMetric: string;
+	    skipUntil?: string;
+	    timeGroupBy?: string;
+	    metrics: MetricConfig[];
+	
+	    static createFrom(source: any = {}) {
+	        return new PanelConfig(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.type = source["type"];
+	        this.defaultMetric = source["defaultMetric"];
+	        this.skipUntil = source["skipUntil"];
+	        this.timeGroupBy = source["timeGroupBy"];
+	        this.metrics = this.convertValues(source["metrics"], MetricConfig);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class FieldConfig {
 	    key: string;
 	    label: string;
@@ -1922,7 +2370,6 @@ export namespace types {
 	    section: string;
 	    width: number;
 	    sortable: boolean;
-	    filterable: boolean;
 	    order: number;
 	    detailOrder: number;
 	
@@ -1938,7 +2385,6 @@ export namespace types {
 	        this.section = source["section"];
 	        this.width = source["width"];
 	        this.sortable = source["sortable"];
-	        this.filterable = source["filterable"];
 	        this.order = source["order"];
 	        this.detailOrder = source["detailOrder"];
 	    }
@@ -1955,6 +2401,7 @@ export namespace types {
 	    actions: string[];
 	    headerActions: string[];
 	    rendererTypes: string;
+	    panelConfig?: PanelConfig;
 	
 	    static createFrom(source: any = {}) {
 	        return new FacetConfig(source);
@@ -1973,6 +2420,7 @@ export namespace types {
 	        this.actions = source["actions"];
 	        this.headerActions = source["headerActions"];
 	        this.rendererTypes = source["rendererTypes"];
+	        this.panelConfig = this.convertValues(source["panelConfig"], PanelConfig);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -1995,6 +2443,38 @@ export namespace types {
 	}
 	
 	
+	
+	
+	export class LogCalcs {
+	    date: string;
+	    isNFT?: boolean;
+	    data?: string;
+	    articulatedLog?: Record<string, any>;
+	    topics?: string[];
+	    compressedLog?: string;
+	    topic0?: string;
+	    topic1?: string;
+	    topic2?: string;
+	    topic3?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new LogCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.date = source["date"];
+	        this.isNFT = source["isNFT"];
+	        this.data = source["data"];
+	        this.articulatedLog = source["articulatedLog"];
+	        this.topics = source["topics"];
+	        this.compressedLog = source["compressedLog"];
+	        this.topic0 = source["topic0"];
+	        this.topic1 = source["topic1"];
+	        this.topic2 = source["topic2"];
+	        this.topic3 = source["topic3"];
+	    }
+	}
 	export class Log {
 	    address: base.Address;
 	    articulatedLog?: Function;
@@ -2006,6 +2486,7 @@ export namespace types {
 	    topics?: base.Hash[];
 	    transactionHash: base.Hash;
 	    transactionIndex: number;
+	    calcs?: LogCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new Log(source);
@@ -2023,6 +2504,7 @@ export namespace types {
 	        this.topics = this.convertValues(source["topics"], base.Hash);
 	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
 	        this.transactionIndex = source["transactionIndex"];
+	        this.calcs = this.convertValues(source["calcs"], LogCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2043,11 +2525,26 @@ export namespace types {
 		    return a;
 		}
 	}
+	
+	export class ManifestCalcs {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new ManifestCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
+	    }
+	}
 	export class Manifest {
 	    chain: string;
 	    chunks: ChunkRecord[];
 	    specification: string;
 	    version: string;
+	    // Go type: ManifestCalcs
+	    calcs?: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new Manifest(source);
@@ -2059,6 +2556,7 @@ export namespace types {
 	        this.chunks = this.convertValues(source["chunks"], ChunkRecord);
 	        this.specification = source["specification"];
 	        this.version = source["version"];
+	        this.calcs = this.convertValues(source["calcs"], null);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2079,6 +2577,24 @@ export namespace types {
 		    return a;
 		}
 	}
+	export class MetaDataCalcs {
+	    indexHeight: number;
+	    nextIndexHeight: number;
+	    chainHeight: number;
+	    stageHeight: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new MetaDataCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.indexHeight = source["indexHeight"];
+	        this.nextIndexHeight = source["nextIndexHeight"];
+	        this.chainHeight = source["chainHeight"];
+	        this.stageHeight = source["stageHeight"];
+	    }
+	}
 	export class MetaData {
 	    client: number;
 	    finalized: number;
@@ -2088,6 +2604,7 @@ export namespace types {
 	    chainId?: number;
 	    networkId?: number;
 	    chain?: string;
+	    calcs?: MetaDataCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new MetaData(source);
@@ -2103,32 +2620,7 @@ export namespace types {
 	        this.chainId = source["chainId"];
 	        this.networkId = source["networkId"];
 	        this.chain = source["chain"];
-	    }
-	}
-	export class Monitor {
-	    address: base.Address;
-	    deleted: boolean;
-	    fileSize: number;
-	    isEmpty: boolean;
-	    isStaged: boolean;
-	    lastScanned: number;
-	    nRecords: number;
-	    name: string;
-	
-	    static createFrom(source: any = {}) {
-	        return new Monitor(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.address = this.convertValues(source["address"], base.Address);
-	        this.deleted = source["deleted"];
-	        this.fileSize = source["fileSize"];
-	        this.isEmpty = source["isEmpty"];
-	        this.isStaged = source["isStaged"];
-	        this.lastScanned = source["lastScanned"];
-	        this.nRecords = source["nRecords"];
-	        this.name = source["name"];
+	        this.calcs = this.convertValues(source["calcs"], MetaDataCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2149,6 +2641,81 @@ export namespace types {
 		    return a;
 		}
 	}
+	
+	
+	export class MonitorCalcs {
+	    isEmpty?: boolean;
+	    isStaged?: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new MonitorCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.isEmpty = source["isEmpty"];
+	        this.isStaged = source["isStaged"];
+	    }
+	}
+	export class Monitor {
+	    address: base.Address;
+	    deleted: boolean;
+	    fileSize: number;
+	    isEmpty: boolean;
+	    isStaged: boolean;
+	    lastScanned: number;
+	    nRecords: number;
+	    name: string;
+	    calcs?: MonitorCalcs;
+	
+	    static createFrom(source: any = {}) {
+	        return new Monitor(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.address = this.convertValues(source["address"], base.Address);
+	        this.deleted = source["deleted"];
+	        this.fileSize = source["fileSize"];
+	        this.isEmpty = source["isEmpty"];
+	        this.isStaged = source["isStaged"];
+	        this.lastScanned = source["lastScanned"];
+	        this.nRecords = source["nRecords"];
+	        this.name = source["name"];
+	        this.calcs = this.convertValues(source["calcs"], MonitorCalcs);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class NameCalcs {
+	
+	
+	    static createFrom(source: any = {}) {
+	        return new NameCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	
+	    }
+	}
 	export class Name {
 	    address: base.Address;
 	    decimals: number;
@@ -2162,6 +2729,8 @@ export namespace types {
 	    source: string;
 	    symbol: string;
 	    tags: string;
+	    // Go type: NameCalcs
+	    calcs?: any;
 	    // Go type: base
 	    prefund?: any;
 	    parts?: number;
@@ -2184,6 +2753,7 @@ export namespace types {
 	        this.source = source["source"];
 	        this.symbol = source["symbol"];
 	        this.tags = source["tags"];
+	        this.calcs = this.convertValues(source["calcs"], null);
 	        this.prefund = this.convertValues(source["prefund"], null);
 	        this.parts = source["parts"];
 	    }
@@ -2206,6 +2776,8 @@ export namespace types {
 		    return a;
 		}
 	}
+	
+	
 	
 	export class Payload {
 	    collection: string;
@@ -2256,40 +2828,18 @@ export namespace types {
 	    }
 	}
 	
-	export class Receipt {
-	    blockHash?: base.Hash;
-	    blockNumber: number;
+	export class ReceiptCalcs {
 	    contractAddress?: base.Address;
-	    cumulativeGasUsed?: number;
-	    effectiveGasPrice?: number;
-	    from?: base.Address;
-	    gasUsed: number;
 	    isError?: boolean;
-	    logs: Log[];
-	    status: number;
-	    to?: base.Address;
-	    transactionHash: base.Hash;
-	    transactionIndex: number;
 	
 	    static createFrom(source: any = {}) {
-	        return new Receipt(source);
+	        return new ReceiptCalcs(source);
 	    }
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.blockHash = this.convertValues(source["blockHash"], base.Hash);
-	        this.blockNumber = source["blockNumber"];
 	        this.contractAddress = this.convertValues(source["contractAddress"], base.Address);
-	        this.cumulativeGasUsed = source["cumulativeGasUsed"];
-	        this.effectiveGasPrice = source["effectiveGasPrice"];
-	        this.from = this.convertValues(source["from"], base.Address);
-	        this.gasUsed = source["gasUsed"];
 	        this.isError = source["isError"];
-	        this.logs = this.convertValues(source["logs"], Log);
-	        this.status = source["status"];
-	        this.to = this.convertValues(source["to"], base.Address);
-	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
-	        this.transactionIndex = source["transactionIndex"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2310,6 +2860,63 @@ export namespace types {
 		    return a;
 		}
 	}
+	export class Receipt {
+	    blockHash?: base.Hash;
+	    blockNumber: number;
+	    contractAddress?: base.Address;
+	    cumulativeGasUsed?: number;
+	    effectiveGasPrice?: number;
+	    from?: base.Address;
+	    gasUsed: number;
+	    isError?: boolean;
+	    logs: Log[];
+	    status: number;
+	    to?: base.Address;
+	    transactionHash: base.Hash;
+	    transactionIndex: number;
+	    calcs?: ReceiptCalcs;
+	
+	    static createFrom(source: any = {}) {
+	        return new Receipt(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.blockHash = this.convertValues(source["blockHash"], base.Hash);
+	        this.blockNumber = source["blockNumber"];
+	        this.contractAddress = this.convertValues(source["contractAddress"], base.Address);
+	        this.cumulativeGasUsed = source["cumulativeGasUsed"];
+	        this.effectiveGasPrice = source["effectiveGasPrice"];
+	        this.from = this.convertValues(source["from"], base.Address);
+	        this.gasUsed = source["gasUsed"];
+	        this.isError = source["isError"];
+	        this.logs = this.convertValues(source["logs"], Log);
+	        this.status = source["status"];
+	        this.to = this.convertValues(source["to"], base.Address);
+	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
+	        this.transactionIndex = source["transactionIndex"];
+	        this.calcs = this.convertValues(source["calcs"], ReceiptCalcs);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
 	export class Rewards {
 	    // Go type: base
 	    block: any;
@@ -2330,6 +2937,110 @@ export namespace types {
 	        this.nephew = this.convertValues(source["nephew"], null);
 	        this.txFee = this.convertValues(source["txFee"], null);
 	        this.uncle = this.convertValues(source["uncle"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class StatementCalcs {
+	    // Go type: base
+	    amountNet: any;
+	    // Go type: base
+	    begBalDiff: any;
+	    date: string;
+	    // Go type: base
+	    endBalCalc: any;
+	    // Go type: base
+	    endBalDiff: any;
+	    reconciled: boolean;
+	    // Go type: base
+	    totalIn: any;
+	    // Go type: base
+	    totalOut: any;
+	    amountInEth?: string;
+	    amountNetEth?: string;
+	    amountOutEth?: string;
+	    begBalDiffEth?: string;
+	    begBalEth?: string;
+	    correctAmountInEth?: string;
+	    correctAmountOutEth?: string;
+	    correctBegBalInEth?: string;
+	    correctBegBalOutEth?: string;
+	    correctEndBalInEth?: string;
+	    correctEndBalOutEth?: string;
+	    endBalCalcEth?: string;
+	    endBalDiffEth?: string;
+	    endBalEth?: string;
+	    gasOutEth?: string;
+	    internalInEth?: string;
+	    internalOutEth?: string;
+	    minerBaseRewardInEth?: string;
+	    minerNephewRewardInEth?: string;
+	    minerTxFeeInEth?: string;
+	    minerUncleRewardInEth?: string;
+	    prefundInEth?: string;
+	    prevBalEth?: string;
+	    selfDestructInEth?: string;
+	    selfDestructOutEth?: string;
+	    totalInEth?: string;
+	    totalOutEth?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new StatementCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.amountNet = this.convertValues(source["amountNet"], null);
+	        this.begBalDiff = this.convertValues(source["begBalDiff"], null);
+	        this.date = source["date"];
+	        this.endBalCalc = this.convertValues(source["endBalCalc"], null);
+	        this.endBalDiff = this.convertValues(source["endBalDiff"], null);
+	        this.reconciled = source["reconciled"];
+	        this.totalIn = this.convertValues(source["totalIn"], null);
+	        this.totalOut = this.convertValues(source["totalOut"], null);
+	        this.amountInEth = source["amountInEth"];
+	        this.amountNetEth = source["amountNetEth"];
+	        this.amountOutEth = source["amountOutEth"];
+	        this.begBalDiffEth = source["begBalDiffEth"];
+	        this.begBalEth = source["begBalEth"];
+	        this.correctAmountInEth = source["correctAmountInEth"];
+	        this.correctAmountOutEth = source["correctAmountOutEth"];
+	        this.correctBegBalInEth = source["correctBegBalInEth"];
+	        this.correctBegBalOutEth = source["correctBegBalOutEth"];
+	        this.correctEndBalInEth = source["correctEndBalInEth"];
+	        this.correctEndBalOutEth = source["correctEndBalOutEth"];
+	        this.endBalCalcEth = source["endBalCalcEth"];
+	        this.endBalDiffEth = source["endBalDiffEth"];
+	        this.endBalEth = source["endBalEth"];
+	        this.gasOutEth = source["gasOutEth"];
+	        this.internalInEth = source["internalInEth"];
+	        this.internalOutEth = source["internalOutEth"];
+	        this.minerBaseRewardInEth = source["minerBaseRewardInEth"];
+	        this.minerNephewRewardInEth = source["minerNephewRewardInEth"];
+	        this.minerTxFeeInEth = source["minerTxFeeInEth"];
+	        this.minerUncleRewardInEth = source["minerUncleRewardInEth"];
+	        this.prefundInEth = source["prefundInEth"];
+	        this.prevBalEth = source["prevBalEth"];
+	        this.selfDestructInEth = source["selfDestructInEth"];
+	        this.selfDestructOutEth = source["selfDestructOutEth"];
+	        this.totalInEth = source["totalInEth"];
+	        this.totalOutEth = source["totalOutEth"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2408,6 +3119,7 @@ export namespace types {
 	    timestamp: number;
 	    transactionHash: base.Hash;
 	    transactionIndex: number;
+	    calcs?: StatementCalcs;
 	    correctionId: number;
 	    holder: base.Address;
 	    statementId: number;
@@ -2453,9 +3165,43 @@ export namespace types {
 	        this.timestamp = source["timestamp"];
 	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
 	        this.transactionIndex = source["transactionIndex"];
+	        this.calcs = this.convertValues(source["calcs"], StatementCalcs);
 	        this.correctionId = source["correctionId"];
 	        this.holder = this.convertValues(source["holder"], base.Address);
 	        this.statementId = source["statementId"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class StatusCalcs {
+	    caches?: CacheItem[];
+	    chains?: Chain[];
+	
+	    static createFrom(source: any = {}) {
+	        return new StatusCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.caches = this.convertValues(source["caches"], CacheItem);
+	        this.chains = this.convertValues(source["chains"], Chain);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2497,6 +3243,7 @@ export namespace types {
 	    rootConfig?: string;
 	    rpcProvider?: string;
 	    version?: string;
+	    calcs?: StatusCalcs;
 	    meta?: MetaData;
 	    diffs?: MetaData;
 	
@@ -2526,6 +3273,7 @@ export namespace types {
 	        this.rootConfig = source["rootConfig"];
 	        this.rpcProvider = source["rpcProvider"];
 	        this.version = source["version"];
+	        this.calcs = this.convertValues(source["calcs"], StatusCalcs);
 	        this.meta = this.convertValues(source["meta"], MetaData);
 	        this.diffs = this.convertValues(source["diffs"], MetaData);
 	    }
@@ -2548,6 +3296,7 @@ export namespace types {
 		    return a;
 		}
 	}
+	
 	export class Summary {
 	    totalCount: number;
 	    facetCounts: Record<string, number>;
@@ -2566,6 +3315,24 @@ export namespace types {
 	        this.lastUpdated = source["lastUpdated"];
 	    }
 	}
+	export class TokenCalcs {
+	    balanceDec?: string;
+	    date?: string;
+	    diff?: string;
+	    totalSupply?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TokenCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.balanceDec = source["balanceDec"];
+	        this.date = source["date"];
+	        this.diff = source["diff"];
+	        this.totalSupply = source["totalSupply"];
+	    }
+	}
 	export class Token {
 	    address: base.Address;
 	    // Go type: base
@@ -2582,6 +3349,7 @@ export namespace types {
 	    totalSupply: any;
 	    transactionIndex?: number;
 	    type: number;
+	    calcs?: TokenCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new Token(source);
@@ -2601,6 +3369,7 @@ export namespace types {
 	        this.totalSupply = this.convertValues(source["totalSupply"], null);
 	        this.transactionIndex = source["transactionIndex"];
 	        this.type = source["type"];
+	        this.calcs = this.convertValues(source["calcs"], TokenCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2621,11 +3390,55 @@ export namespace types {
 		    return a;
 		}
 	}
+	
+	export class TraceCalcs {
+	    date: string;
+	    articulatedTrace?: Record<string, any>;
+	    "action::from"?: string;
+	    "action::to"?: string;
+	    "action::value"?: string;
+	    "action::ether"?: string;
+	    "action::input"?: string;
+	    "action::callType"?: string;
+	    compressedTrace?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TraceCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.date = source["date"];
+	        this.articulatedTrace = source["articulatedTrace"];
+	        this["action::from"] = source["action::from"];
+	        this["action::to"] = source["action::to"];
+	        this["action::value"] = source["action::value"];
+	        this["action::ether"] = source["action::ether"];
+	        this["action::input"] = source["action::input"];
+	        this["action::callType"] = source["action::callType"];
+	        this.compressedTrace = source["compressedTrace"];
+	    }
+	}
+	export class TraceResultCalcs {
+	    code?: string;
+	    address?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TraceResultCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.code = source["code"];
+	        this.address = source["address"];
+	    }
+	}
 	export class TraceResult {
 	    address?: base.Address;
 	    code?: string;
 	    gasUsed?: number;
 	    output?: string;
+	    calcs?: TraceResultCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new TraceResult(source);
@@ -2637,6 +3450,7 @@ export namespace types {
 	        this.code = source["code"];
 	        this.gasUsed = source["gasUsed"];
 	        this.output = source["output"];
+	        this.calcs = this.convertValues(source["calcs"], TraceResultCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2656,6 +3470,20 @@ export namespace types {
 		    }
 		    return a;
 		}
+	}
+	export class TraceActionCalcs {
+	    ether?: string;
+	    balanceEth?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TraceActionCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.ether = source["ether"];
+	        this.balanceEth = source["balanceEth"];
+	    }
 	}
 	export class TraceAction {
 	    address?: base.Address;
@@ -2673,6 +3501,7 @@ export namespace types {
 	    to: base.Address;
 	    // Go type: base
 	    value: any;
+	    calcs?: TraceActionCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new TraceAction(source);
@@ -2693,6 +3522,7 @@ export namespace types {
 	        this.selfDestructed = this.convertValues(source["selfDestructed"], base.Address);
 	        this.to = this.convertValues(source["to"], base.Address);
 	        this.value = this.convertValues(source["value"], null);
+	        this.calcs = this.convertValues(source["calcs"], TraceActionCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2726,6 +3556,7 @@ export namespace types {
 	    transactionHash: base.Hash;
 	    transactionIndex: number;
 	    type?: string;
+	    calcs?: TraceCalcs;
 	    transactionPosition?: number;
 	
 	    static createFrom(source: any = {}) {
@@ -2746,6 +3577,7 @@ export namespace types {
 	        this.transactionHash = this.convertValues(source["transactionHash"], base.Hash);
 	        this.transactionIndex = source["transactionIndex"];
 	        this.type = source["type"];
+	        this.calcs = this.convertValues(source["calcs"], TraceCalcs);
 	        this.transactionPosition = source["transactionPosition"];
 	    }
 	
@@ -2769,6 +3601,62 @@ export namespace types {
 	}
 	
 	
+	
+	
+	
+	export class TransactionCalcs {
+	    date: string;
+	    // Go type: base
+	    gasCost: any;
+	    articulatedTx?: Record<string, any>;
+	    statements?: any[];
+	    receipt?: Record<string, any>;
+	    traces?: any[];
+	    message?: string;
+	    ethGasPrice?: string;
+	    encoding?: string;
+	    compressedTx?: string;
+	    nTraces?: number;
+	    ether: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TransactionCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.date = source["date"];
+	        this.gasCost = this.convertValues(source["gasCost"], null);
+	        this.articulatedTx = source["articulatedTx"];
+	        this.statements = source["statements"];
+	        this.receipt = source["receipt"];
+	        this.traces = source["traces"];
+	        this.message = source["message"];
+	        this.ethGasPrice = source["ethGasPrice"];
+	        this.encoding = source["encoding"];
+	        this.compressedTx = source["compressedTx"];
+	        this.nTraces = source["nTraces"];
+	        this.ether = source["ether"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class Transaction {
 	    articulatedTx?: Function;
 	    blockHash: base.Hash;
@@ -2792,6 +3680,7 @@ export namespace types {
 	    type: string;
 	    // Go type: base
 	    value: any;
+	    calcs?: TransactionCalcs;
 	    statements?: Statement[];
 	
 	    static createFrom(source: any = {}) {
@@ -2821,7 +3710,42 @@ export namespace types {
 	        this.transactionIndex = source["transactionIndex"];
 	        this.type = source["type"];
 	        this.value = this.convertValues(source["value"], null);
+	        this.calcs = this.convertValues(source["calcs"], TransactionCalcs);
 	        this.statements = this.convertValues(source["statements"], Statement);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	
+	export class TransferCalcs {
+	    // Go type: base
+	    amount: any;
+	    amountEth?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TransferCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.amount = this.convertValues(source["amount"], null);
+	        this.amountEth = source["amountEth"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -2875,6 +3799,7 @@ export namespace types {
 	    selfDestructOut?: any;
 	    sender: base.Address;
 	    transactionIndex: number;
+	    calcs?: TransferCalcs;
 	    log?: Log;
 	    transaction?: Transaction;
 	
@@ -2904,6 +3829,7 @@ export namespace types {
 	        this.selfDestructOut = this.convertValues(source["selfDestructOut"], null);
 	        this.sender = this.convertValues(source["sender"], base.Address);
 	        this.transactionIndex = source["transactionIndex"];
+	        this.calcs = this.convertValues(source["calcs"], TransferCalcs);
 	        this.log = this.convertValues(source["log"], Log);
 	        this.transaction = this.convertValues(source["transaction"], Transaction);
 	    }
@@ -2926,6 +3852,7 @@ export namespace types {
 		    return a;
 		}
 	}
+	
 	export class ViewConfig {
 	    viewName: string;
 	    disabled: boolean;
@@ -2966,6 +3893,20 @@ export namespace types {
 		    return a;
 		}
 	}
+	export class WithdrawalCalcs {
+	    date: string;
+	    ether?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new WithdrawalCalcs(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.date = source["date"];
+	        this.ether = source["ether"];
+	    }
+	}
 	export class Withdrawal {
 	    address: base.Address;
 	    // Go type: base
@@ -2974,6 +3915,7 @@ export namespace types {
 	    index: number;
 	    timestamp: number;
 	    validatorIndex: number;
+	    calcs?: WithdrawalCalcs;
 	
 	    static createFrom(source: any = {}) {
 	        return new Withdrawal(source);
@@ -2987,6 +3929,7 @@ export namespace types {
 	        this.index = source["index"];
 	        this.timestamp = source["timestamp"];
 	        this.validatorIndex = source["validatorIndex"];
+	        this.calcs = this.convertValues(source["calcs"], WithdrawalCalcs);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

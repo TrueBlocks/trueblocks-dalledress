@@ -66,47 +66,52 @@ func (c *AbisCollection) GetConfig() (*types.ViewConfig, error) {
 			"remove": {Name: "remove", Label: "Remove", Icon: "Remove"},
 		},
 	}
+
 	types.DeriveFacets(cfg)
-	types.NormalizeFields(cfg)
+	types.SortFields(cfg)
 	types.SetMenuOrder(cfg)
 	return cfg, nil
 }
 
 func getAbisFields() []types.FieldConfig {
-	return []types.FieldConfig{
+	ret := []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "address", Label: "Address", ColumnLabel: "Address", DetailLabel: "Address", Formatter: "address", Section: "ABI Identity", Width: 340, Order: 1, DetailOrder: 1},
-		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Name", Section: "ABI Identity", Width: 200, Order: 2, DetailOrder: 2},
-		{Key: "path", Label: "File Path", Section: "ABI Identity", NoTable: true, DetailOrder: 3},
-		{Key: "nFunctions", Label: "Functions", ColumnLabel: "Functions", DetailLabel: "Number of Functions", Formatter: "number", Section: "Content Statistics", Width: 100, Order: 3, DetailOrder: 4},
-		{Key: "nEvents", Label: "Events", ColumnLabel: "Events", DetailLabel: "Number of Events", Formatter: "number", Section: "Content Statistics", Width: 100, Order: 4, DetailOrder: 5},
-		{Key: "fileSize", Label: "File Size", ColumnLabel: "File Size", DetailLabel: "File Size", Formatter: "fileSize", Section: "Content Statistics", Width: 120, Order: 5, DetailOrder: 6},
-		{Key: "isEmpty", Label: "Empty", ColumnLabel: "Empty", DetailLabel: "Is Empty", Formatter: "boolean", Section: "ABI Properties", Width: 80, Order: 6, DetailOrder: 7},
-		{Key: "isKnown", Label: "Known", ColumnLabel: "Known", DetailLabel: "Is Known", Formatter: "boolean", Section: "ABI Properties", Width: 80, Order: 7, DetailOrder: 8},
-		{Key: "hasConstructor", Label: "Has Constructor", ColumnLabel: "Has Constructor", DetailLabel: "Has Constructor", Formatter: "boolean", Section: "ABI Properties", NoTable: true, DetailOrder: 9},
-		{Key: "hasFallback", Label: "Has Fallback Function", ColumnLabel: "Has Fallback Function", DetailLabel: "Has Fallback Function", Formatter: "boolean", Section: "ABI Properties", NoTable: true, DetailOrder: 10},
-		{Key: "lastModDate", Label: "Last Modified", ColumnLabel: "Last Modified", DetailLabel: "Last Modified", Formatter: "timestamp", Section: "File Metadata", Width: 150, Order: 8, DetailOrder: 11},
-		{Key: "functions", Label: "Available Functions", ColumnLabel: "Available Functions", DetailLabel: "Available Functions", Formatter: "json", Section: "Functions List", NoTable: true, DetailOrder: 12},
-		{Key: "actions", Label: "Actions", ColumnLabel: "Actions", DetailLabel: "Actions", Section: "", NoDetail: true, Width: 80, Order: 9},
+		{Section: "Identity", Key: "address", Formatter: "address"},
+		{Section: "Identity", Key: "name"},
+		{Section: "Identity", Key: "path", NoTable: true, Formatter: "path"},
+		{Section: "Statistics", Key: "nFunctions"},
+		{Section: "Statistics", Key: "nEvents"},
+		{Section: "Statistics", Key: "fileSize"},
+		{Section: "Properties", Key: "isEmpty", NoTable: true},
+		{Section: "Properties", Key: "isKnown", NoTable: true},
+		{Section: "Properties", Key: "hasConstructor", NoTable: true},
+		{Section: "Properties", Key: "hasFallback", NoTable: true},
+		{Section: "Metadata", Key: "lastModDate", Formatter: "datetime"},
+		{Section: "Metadata", Key: "functions", Formatter: "json", NoTable: true},
+		{Section: "", Key: "actions", Formatter: "actions", NoDetail: true},
 		// EXISTING_CODE
 	}
+	types.NormalizeFields(ret)
+	return ret
 }
 
 func getFunctionsFields() []types.FieldConfig {
-	return []types.FieldConfig{
+	ret := []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "name", Label: "Name", ColumnLabel: "Name", DetailLabel: "Function Name", Section: "Function Overview", Width: 200, Order: 1, DetailOrder: 1},
-		{Key: "type", Label: "Type", ColumnLabel: "Type", DetailLabel: "Function Type", Section: "Function Overview", Width: 100, Order: 2, DetailOrder: 2},
-		{Key: "encoding", Label: "Encoding", ColumnLabel: "Encoding", DetailLabel: "Encoding Hash", Section: "Function Overview", Width: 250, Order: 3, DetailOrder: 3},
-		{Key: "signature", Label: "Signature", ColumnLabel: "Signature", DetailLabel: "Function Signature", Section: "Function Overview", Width: 300, Order: 4, DetailOrder: 4},
-		{Key: "stateMutability", Label: "State Mutability", ColumnLabel: "State Mutability", DetailLabel: "State Mutability", Section: "Function Properties", Width: 150, Order: 5, DetailOrder: 5},
-		{Key: "constant", Label: "Constant", ColumnLabel: "Constant", DetailLabel: "Constant", Formatter: "boolean", Section: "Function Properties", Width: 100, Order: 6, DetailOrder: 6},
-		{Key: "anonymous", Label: "Anonymous", ColumnLabel: "Anonymous", DetailLabel: "Anonymous", Formatter: "boolean", Section: "Function Properties", Width: 100, Order: 7, DetailOrder: 7},
-		{Key: "inputs", Label: "Input Parameters", ColumnLabel: "Input Parameters", DetailLabel: "Input Parameters", Formatter: "json", Section: "Input Parameters", NoTable: true, DetailOrder: 8},
-		{Key: "outputs", Label: "Output Parameters", ColumnLabel: "Output Parameters", DetailLabel: "Output Parameters", Formatter: "json", Section: "Output Parameters", NoTable: true, DetailOrder: 9},
-		{Key: "message", Label: "Error Message", ColumnLabel: "Error Message", DetailLabel: "Error Message", Section: "Additional Information", NoTable: true, DetailOrder: 10},
+		{Section: "Overview", Key: "name"},
+		{Section: "Overview", Key: "type", NoTable: true},
+		{Section: "Overview", Key: "encoding"},
+		{Section: "Overview", Key: "signature"},
+		{Section: "Properties", Key: "stateMutability"},
+		{Section: "Properties", Key: "constant", Formatter: "boolean"},
+		{Section: "Properties", Key: "anonymous", Formatter: "boolean", NoTable: true},
+		{Section: "Parameters", Key: "inputs", NoTable: true},
+		{Section: "Parameters", Key: "outputs", NoTable: true},
+		{Section: "Parameters", Key: "message", NoTable: true},
 		// EXISTING_CODE
 	}
+	types.NormalizeFields(ret)
+	return ret
 }
 
 // EXISTING_CODE

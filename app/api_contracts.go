@@ -25,7 +25,10 @@ func (a *App) GetContractsPage(
 	filter string,
 ) (*contracts.ContractsPage, error) {
 	collection := contracts.GetContractsCollection(payload)
-	return getCollectionPage[*contracts.ContractsPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*contracts.ContractsPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) GetContractsSummary(payload *types.Payload) types.Summary {
@@ -44,6 +47,12 @@ func (a *App) ReloadContracts(payload *types.Payload) error {
 func (a *App) GetContractsConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := contracts.GetContractsCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetContractsBuckets returns bucket visualization data for contracts
+func (a *App) GetContractsBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := contracts.GetContractsCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

@@ -1,15 +1,7 @@
 import { Badge, BadgeProps } from '@mantine/core';
 
 export interface StyledBadgeProps extends Omit<BadgeProps, 'variant'> {
-  variant?:
-    | 'filled'
-    | 'light'
-    | 'outline'
-    | 'dot'
-    | 'default'
-    | 'error'
-    | 'healthy'
-    | 'inactive';
+  variant?: 'filled' | 'light' | 'error' | 'healthy' | 'inactive' | 'boolean';
 }
 
 export const StyledBadge = ({
@@ -20,68 +12,44 @@ export const StyledBadge = ({
     switch (variant) {
       case 'filled':
         return {
-          backgroundColor: 'var(--skin-primary)',
-          color: 'var(--skin-text-inverse)',
+          backgroundColor: 'var(--mantine-color-primary-6)',
+          color: 'var(--mantine-color-white)',
           border: 'none',
         };
       case 'light':
         return {
-          backgroundColor: 'var(--skin-surface-raised)',
-          color: 'var(--skin-primary)',
+          backgroundColor: 'var(--mantine-color-gray-2)',
+          color: 'var(--mantine-color-primary-6)',
           border: 'none',
-        };
-      case 'outline':
-        return {
-          backgroundColor: 'transparent',
-          color: 'var(--skin-primary)',
-          border: '1px solid var(--skin-primary)',
-        };
-      case 'dot':
-        return {
-          backgroundColor: 'var(--skin-surface-base)',
-          color: 'var(--skin-text-primary)',
-          border: 'none',
-          position: 'relative' as const,
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            left: '6px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--skin-primary)',
-          },
-        };
-      case 'default':
-        return {
-          backgroundColor: 'var(--skin-surface-base)',
-          color: 'var(--skin-text-primary)',
-          border: '1px solid var(--skin-border-subtle)',
         };
       case 'error':
         return {
-          backgroundColor: 'var(--skin-error-background)',
-          color: 'var(--skin-error)',
-          border: '1px solid var(--skin-error)',
+          backgroundColor: 'var(--mantine-color-error-1)',
+          color: 'var(--mantine-color-error-6)',
+          border: '1px solid var(--mantine-color-error-6)',
         };
       case 'healthy':
         return {
-          backgroundColor: 'var(--skin-success-background)',
-          color: 'var(--skin-success)',
+          backgroundColor: 'var(--mantine-color-success-1)',
+          color: 'var(--mantine-color-success-6)',
           border: 'none',
         };
       case 'inactive':
         return {
-          backgroundColor: 'var(--skin-surface-subtle)',
-          color: 'var(--skin-text-dimmed)',
+          backgroundColor: 'var(--mantine-color-gray-2)',
+          color: 'var(--mantine-color-gray-5)',
+          border: 'none',
+        };
+      case 'boolean':
+        return {
+          backgroundColor: 'var(--mantine-color-success-6)',
+          color: 'var(--mantine-color-white)',
           border: 'none',
         };
       default:
         return {
-          backgroundColor: 'var(--skin-primary)',
-          color: 'var(--skin-text-inverse)',
+          backgroundColor: 'var(--mantine-color-primary-6)',
+          color: 'var(--mantine-color-white)',
           border: 'none',
         };
     }

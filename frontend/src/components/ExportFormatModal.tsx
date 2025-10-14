@@ -69,21 +69,15 @@ export const ExportFormatModal = ({
     [dontShowAgain, onClose, onFormatSelected],
   );
 
-  // Handle Enter key to trigger export
-  useEffect(() => {
-    if (!opened || loading) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleFormatSelect(selectedFormat);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [opened, selectedFormat, loading, handleFormatSelect]);
-
   const handleCancel = () => {
     onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !loading) {
+      e.preventDefault();
+      handleFormatSelect(selectedFormat);
+    }
   };
 
   return (
@@ -94,6 +88,7 @@ export const ExportFormatModal = ({
       size="md"
       centered
       withCloseButton={false}
+      onKeyDown={handleKeyDown}
     >
       <Stack gap="md">
         <StyledText variant="dimmed" size="sm">

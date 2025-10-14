@@ -25,7 +25,10 @@ func (a *App) GetExportsPage(
 	filter string,
 ) (*exports.ExportsPage, error) {
 	collection := exports.GetExportsCollection(payload)
-	return getCollectionPage[*exports.ExportsPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*exports.ExportsPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) GetExportsSummary(payload *types.Payload) types.Summary {
@@ -44,6 +47,12 @@ func (a *App) ReloadExports(payload *types.Payload) error {
 func (a *App) GetExportsConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := exports.GetExportsCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetExportsBuckets returns bucket visualization data for exports
+func (a *App) GetExportsBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := exports.GetExportsCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

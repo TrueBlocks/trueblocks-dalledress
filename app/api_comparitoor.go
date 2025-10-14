@@ -25,7 +25,10 @@ func (a *App) GetComparitoorPage(
 	filter string,
 ) (*comparitoor.ComparitoorPage, error) {
 	collection := comparitoor.GetComparitoorCollection(payload)
-	return getCollectionPage[*comparitoor.ComparitoorPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*comparitoor.ComparitoorPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) GetComparitoorSummary(payload *types.Payload) types.Summary {
@@ -44,6 +47,12 @@ func (a *App) ReloadComparitoor(payload *types.Payload) error {
 func (a *App) GetComparitoorConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := comparitoor.GetComparitoorCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetComparitoorBuckets returns bucket visualization data for comparitoor
+func (a *App) GetComparitoorBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := comparitoor.GetComparitoorCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

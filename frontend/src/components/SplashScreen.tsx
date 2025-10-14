@@ -11,19 +11,19 @@ export const SplashScreen = ({
 }: SplashScreenProps) => {
   return (
     <Center
+      bg="body"
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: 'var(--mantine-color-body)',
         zIndex: 9999,
       }}
     >
       <Stack align="center" gap="md">
-        {showSpinner && <Loader size="lg" />}
-        <Text size="lg" c="dimmed">
+        {showSpinner && <Loader size="lg" color="primary.6" />}
+        <Text size="lg" c="primary.6">
           {message}
         </Text>
       </Stack>

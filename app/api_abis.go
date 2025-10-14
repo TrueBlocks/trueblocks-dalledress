@@ -26,7 +26,10 @@ func (a *App) GetAbisPage(
 	filter string,
 ) (*abis.AbisPage, error) {
 	collection := abis.GetAbisCollection(payload)
-	return getCollectionPage[*abis.AbisPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*abis.AbisPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) AbisCrud(
@@ -54,6 +57,12 @@ func (a *App) ReloadAbis(payload *types.Payload) error {
 func (a *App) GetAbisConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := abis.GetAbisCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetAbisBuckets returns bucket visualization data for abis
+func (a *App) GetAbisBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := abis.GetAbisCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

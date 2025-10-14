@@ -26,7 +26,10 @@ func (a *App) GetNamesPage(
 	filter string,
 ) (*names.NamesPage, error) {
 	collection := names.GetNamesCollection(payload)
-	return getCollectionPage[*names.NamesPage](collection, payload, first, pageSize, sort, filter)
+	ret, err := getCollectionPage[*names.NamesPage](collection, payload, first, pageSize, sort, filter)
+	// EXISTING_CODE
+	// EXISTING_CODE
+	return ret, err
 }
 
 func (a *App) NamesCrud(
@@ -54,6 +57,12 @@ func (a *App) ReloadNames(payload *types.Payload) error {
 func (a *App) GetNamesConfig(payload types.Payload) (*types.ViewConfig, error) {
 	collection := names.GetNamesCollection(&payload)
 	return collection.GetConfig()
+}
+
+// GetNamesBuckets returns bucket visualization data for names
+func (a *App) GetNamesBuckets(payload *types.Payload) (*types.Buckets, error) {
+	collection := names.GetNamesCollection(payload)
+	return collection.GetBuckets(payload)
 }
 
 // EXISTING_CODE

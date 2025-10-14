@@ -10,6 +10,10 @@ export function ExportData(arg1) {
   return window['go']['comparitoor']['ComparitoorCollection']['ExportData'](arg1);
 }
 
+export function GetBuckets(arg1) {
+  return window['go']['comparitoor']['ComparitoorCollection']['GetBuckets'](arg1);
+}
+
 export function GetConfig() {
   return window['go']['comparitoor']['ComparitoorCollection']['GetConfig']();
 }

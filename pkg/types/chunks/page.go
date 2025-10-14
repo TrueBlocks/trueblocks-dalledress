@@ -18,7 +18,6 @@ import (
 )
 
 // EXISTING_CODE
-
 type ChunksPage struct {
 	Facet         types.DataFacet `json:"facet"`
 	Blooms        []*Bloom        `json:"blooms"`
@@ -71,6 +70,7 @@ func (c *ChunksCollection) GetPage(
 	}
 
 	switch dataFacet {
+
 	case ChunksStats:
 		facet := c.statsFacet
 		var filterFunc func(*Stats) bool

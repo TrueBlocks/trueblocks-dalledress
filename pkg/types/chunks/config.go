@@ -23,7 +23,8 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getStatsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
-			RendererTypes: "",
+			RendererTypes: "panel",
+			PanelConfig:   getStatsPanelConfig(),
 		},
 		"index": {
 			Name:          "Index",
@@ -33,7 +34,8 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getIndexFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
-			RendererTypes: "",
+			RendererTypes: "panel",
+			PanelConfig:   getIndexPanelConfig(),
 		},
 		"blooms": {
 			Name:          "Blooms",
@@ -43,7 +45,8 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			Fields:        getBloomsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
-			RendererTypes: "",
+			RendererTypes: "panel",
+			PanelConfig:   getBloomsPanelConfig(),
 		},
 		"manifest": {
 			Name:          "Manifest",
@@ -54,6 +57,7 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{},
 			HeaderActions: []string{},
 			RendererTypes: "",
+			PanelConfig:   nil, // Form facet - no panel
 		},
 	}
 
@@ -65,67 +69,168 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			"export": {Name: "export", Label: "Export", Icon: "Export"},
 		},
 	}
+
 	types.DeriveFacets(cfg)
-	types.NormalizeFields(cfg)
+	types.SortFields(cfg)
 	types.SetMenuOrder(cfg)
 	return cfg, nil
 }
 
 func getBloomsFields() []types.FieldConfig {
-	return []types.FieldConfig{
+	ret := []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "range", Label: "Range", ColumnLabel: "Range", DetailLabel: "Range", Formatter: "blkrange", Section: "Range", Width: 150, Sortable: true, Filterable: true, Order: 1, DetailOrder: 1},
-		{Key: "magic", Label: "Magic", ColumnLabel: "Magic", DetailLabel: "Magic", Formatter: "text", Section: "Identity", Width: 150, Sortable: true, Filterable: true, Order: 2, DetailOrder: 2},
-		{Key: "hash", Label: "Hash", ColumnLabel: "Hash", DetailLabel: "Hash", Formatter: "hash", Section: "Identity", Width: 150, Sortable: true, Filterable: true, Order: 3, DetailOrder: 3},
-		{Key: "nBlooms", Label: "Blooms", ColumnLabel: "Blooms", DetailLabel: "Blooms", Formatter: "number", Section: "Counts", Width: 150, Sortable: true, Filterable: true, Order: 4, DetailOrder: 4},
-		{Key: "nInserted", Label: "Inserted", ColumnLabel: "Inserted", DetailLabel: "Inserted", Formatter: "number", Section: "Counts", Width: 150, Sortable: true, Filterable: true, Order: 5, DetailOrder: 5},
-		{Key: "size", Label: "Size", ColumnLabel: "Size", DetailLabel: "Size", Formatter: "number", Section: "Sizes", Width: 150, Sortable: true, Filterable: true, Order: 6, DetailOrder: 6},
-		{Key: "byteWidth", Label: "Byte Width", ColumnLabel: "Byte Width", DetailLabel: "Byte Width", Formatter: "number", Section: "Sizes", Width: 150, Sortable: true, Filterable: true, Order: 7, DetailOrder: 7},
+		{Section: "Range", Key: "range", Formatter: "blkrange", Sortable: true},
+		{Section: "Identity", Key: "magic", NoTable: true},
+		{Section: "Identity", Key: "hash", Formatter: "hash", NoTable: true, Sortable: true},
+		{Section: "Counts", Key: "nBlooms", Sortable: true},
+		// {Section: "Counts", Key: "nInserted", Sortable: true},
+		{Section: "Sizes", Key: "calcs.fileSize", Sortable: true},
+		{Section: "Sizes", Key: "byteWidth", Formatter: "number", Sortable: true},
 		// EXISTING_CODE
 	}
+	types.NormalizeFields(ret)
+	return ret
 }
 
 func getIndexFields() []types.FieldConfig {
-	return []types.FieldConfig{
+	ret := []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "range", Label: "Range", ColumnLabel: "Range", DetailLabel: "Range", Formatter: "blkrange", Section: "Range", Width: 150, Sortable: true, Filterable: true, Order: 1, DetailOrder: 1},
-		{Key: "magic", Label: "Magic", ColumnLabel: "Magic", DetailLabel: "Magic", Formatter: "text", Section: "Identity", Width: 150, Sortable: true, Filterable: true, Order: 2, DetailOrder: 2},
-		{Key: "hash", Label: "Hash", ColumnLabel: "Hash", DetailLabel: "Hash", Formatter: "hash", Section: "Identity", Width: 150, Sortable: true, Filterable: true, Order: 3, DetailOrder: 3},
-		{Key: "nAddresses", Label: "Addresses", ColumnLabel: "Addresses", DetailLabel: "Addresses", Formatter: "number", Section: "Counts", Width: 150, Sortable: true, Filterable: true, Order: 4, DetailOrder: 4},
-		{Key: "nAppearances", Label: "Appearances", ColumnLabel: "Appearances", DetailLabel: "Appearances", Formatter: "number", Section: "Counts", Width: 150, Sortable: true, Filterable: true, Order: 5, DetailOrder: 5},
-		{Key: "size", Label: "Size", ColumnLabel: "Size", DetailLabel: "Size", Formatter: "number", Section: "Sizes", Width: 150, Sortable: true, Filterable: true, Order: 6, DetailOrder: 6},
+		{Section: "Range", Key: "range", Formatter: "blkrange", Sortable: true},
+		{Section: "Identity", Key: "magic", NoTable: true},
+		{Section: "Identity", Key: "hash", Formatter: "hash", NoTable: true, Sortable: true},
+		{Section: "Counts", Key: "nAddresses", Sortable: true},
+		{Section: "Counts", Key: "nAppearances", Sortable: true},
+		{Section: "Sizes", Key: "size", Sortable: true},
 		// EXISTING_CODE
 	}
+	types.NormalizeFields(ret)
+	return ret
 }
 
 func getManifestFields() []types.FieldConfig {
-	return []types.FieldConfig{
+	ret := []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "version", Label: "Version", ColumnLabel: "Version", DetailLabel: "Version", Section: "Manifest", Width: 100, Order: 1, DetailOrder: 1},
-		{Key: "chain", Label: "Chain", ColumnLabel: "Chain", DetailLabel: "Chain", Section: "Manifest", Width: 120, Order: 2, DetailOrder: 2},
-		{Key: "specification", Label: "Specification", ColumnLabel: "Specification", DetailLabel: "Specification", Formatter: "hash", Section: "Manifest", Width: 200, Order: 3, DetailOrder: 3},
+		{Section: "Manifest", Key: "version"},
+		{Section: "Manifest", Key: "chain"},
+		{Section: "Manifest", Key: "specification", Formatter: "hash"},
 		// EXISTING_CODE
 	}
+	types.NormalizeFields(ret)
+	return ret
 }
 
 func getStatsFields() []types.FieldConfig {
-	return []types.FieldConfig{
+	ret := []types.FieldConfig{
 		// EXISTING_CODE
-		{Key: "range", Label: "Range", ColumnLabel: "Range", DetailLabel: "Range", Formatter: "blkrange", Section: "Range", Width: 150, Sortable: true, Filterable: true, Order: 1, DetailOrder: 1},
-		{Key: "nAddrs", Label: "Addresses", ColumnLabel: "Addrs", DetailLabel: "Addresses", Formatter: "number", Section: "Counts", Width: 120, Sortable: true, Filterable: true, Order: 2, DetailOrder: 2},
-		{Key: "nApps", Label: "Apps", ColumnLabel: "Apps", DetailLabel: "Apps", Formatter: "number", Section: "Counts", Width: 100, Sortable: true, Filterable: true, Order: 3, DetailOrder: 3},
-		{Key: "nBlocks", Label: "Blocks", ColumnLabel: "Blocks", DetailLabel: "Blocks", Formatter: "number", Section: "Counts", Width: 120, Sortable: true, Filterable: true, Order: 4, DetailOrder: 4},
-		{Key: "nBlooms", Label: "Blooms", ColumnLabel: "Blooms", DetailLabel: "Blooms", Formatter: "number", Section: "Counts", Width: 120, Sortable: true, Filterable: true, Order: 5, DetailOrder: 5},
-		{Key: "recWid", Label: "Record Width", ColumnLabel: "Rec Wid", DetailLabel: "Record Width", Formatter: "number", Section: "Sizes", Width: 120, Sortable: true, Filterable: true, Order: 6, DetailOrder: 6},
-		{Key: "bloomSz", Label: "Bloom Size", ColumnLabel: "Bloom Sz", DetailLabel: "Bloom Size", Formatter: "number", Section: "Sizes", Width: 120, Sortable: true, Filterable: true, Order: 7, DetailOrder: 7},
-		{Key: "chunkSz", Label: "Chunk Size", ColumnLabel: "Chunk Sz", DetailLabel: "Chunk Size", Formatter: "number", Section: "Sizes", Width: 120, Sortable: true, Filterable: true, Order: 8, DetailOrder: 8},
-		{Key: "addrsPerBlock", Label: "Addrs/Block", ColumnLabel: "Addrs Per Block", DetailLabel: "Addrs/Block", Formatter: "float64", Section: "Efficiency", Width: 100, Sortable: true, Filterable: true, Order: 9, DetailOrder: 9},
-		{Key: "appsPerBlock", Label: "Apps/Block", ColumnLabel: "Apps Per Block", DetailLabel: "Apps/Block", Formatter: "float64", Section: "Efficiency", Width: 100, Sortable: true, Filterable: true, Order: 10, DetailOrder: 10},
-		{Key: "appsPerAddr", Label: "Apps/Addr", ColumnLabel: "Apps Per Addr", DetailLabel: "Apps/Addr", Formatter: "float64", Section: "Efficiency", Width: 100, Sortable: true, Filterable: true, Order: 11, DetailOrder: 11},
-		{Key: "ratio", Label: "Ratio", ColumnLabel: "Ratio", DetailLabel: "Ratio", Formatter: "float64", Section: "Efficiency", Width: 100, Sortable: true, Filterable: true, Order: 12, DetailOrder: 12},
+		{Section: "Range", Key: "range", Formatter: "blkrange", Sortable: true},
+		{Section: "Efficiency", Key: "ratio", Formatter: "float64", Sortable: true},
+		{Section: "Efficiency", Key: "addrsPerBlock", Sortable: true},
+		{Section: "Efficiency", Key: "appsPerBlock", Sortable: true},
+		{Section: "Efficiency", Key: "appsPerAddr", Sortable: true},
+		{Section: "Sizes", Key: "bloomSz", NoTable: true, Sortable: true},
+		{Section: "Sizes", Key: "chunkSz", NoTable: true, Sortable: true},
+		{Section: "Counts", Key: "nAddrs", NoTable: true, Sortable: true},
+		{Section: "Counts", Key: "nApps", NoTable: true, Sortable: true},
+		{Section: "Counts", Key: "nBlocks", NoTable: true, Sortable: true},
+		{Section: "Counts", Key: "nBlooms", NoTable: true, Sortable: true},
+		{Section: "Sizes", Key: "recWid", Formatter: "number", NoTable: true, Sortable: true},
 		// EXISTING_CODE
 	}
+	types.NormalizeFields(ret)
+	return ret
 }
 
 // EXISTING_CODE
 // EXISTING_CODE
+
+func getStatsPanelConfig() *types.PanelConfig {
+	return &types.PanelConfig{
+		Type:          "barchart",
+		DefaultMetric: "ratio",
+		SkipUntil:     "2017",
+		TimeGroupBy:   "quarterly",
+		Metrics: []types.MetricConfig{
+			{
+				Key:          "ratio",
+				Label:        "Compressed",
+				BucketsField: "series0",
+				StatsField:   "series0Stats",
+				Bytes:        false,
+			},
+			{
+				Key:          "appsPerBlk",
+				Label:        "Apps per Block",
+				BucketsField: "series1",
+				StatsField:   "series1Stats",
+				Bytes:        false,
+			},
+			{
+				Key:          "addrsPerBlk",
+				Label:        "Addrs per Block",
+				BucketsField: "series2",
+				StatsField:   "series2Stats",
+				Bytes:        false,
+			},
+			{
+				Key:          "appsPerAddr",
+				Label:        "Apps per Addr",
+				BucketsField: "series3",
+				StatsField:   "series3Stats",
+				Bytes:        false,
+			},
+		},
+	}
+}
+
+func getIndexPanelConfig() *types.PanelConfig {
+	return &types.PanelConfig{
+		Type:          "heatmap",
+		DefaultMetric: "nAddresses",
+		Metrics: []types.MetricConfig{
+			{
+				Key:          "nAddresses",
+				Label:        "Number of Addresses",
+				BucketsField: "series0",
+				StatsField:   "series0Stats",
+				Bytes:        false,
+			},
+			{
+				Key:          "nAppearances",
+				Label:        "Number of Appearances",
+				BucketsField: "series1",
+				StatsField:   "series1Stats",
+				Bytes:        false,
+			},
+			{
+				Key:          "fileSize",
+				Label:        "File Size",
+				BucketsField: "series2",
+				StatsField:   "series2Stats",
+				Bytes:        true,
+			},
+		},
+	}
+}
+
+func getBloomsPanelConfig() *types.PanelConfig {
+	return &types.PanelConfig{
+		Type:          "heatmap",
+		DefaultMetric: "nBlooms",
+		Metrics: []types.MetricConfig{
+			{
+				Key:          "nBlooms",
+				Label:        "Number of Blooms",
+				BucketsField: "series3",
+				StatsField:   "series3Stats",
+				Bytes:        false,
+			},
+			{
+				Key:          "fileSize",
+				Label:        "File Size",
+				BucketsField: "series2",
+				StatsField:   "series2Stats",
+				Bytes:        true,
+			},
+		},
+	}
+}

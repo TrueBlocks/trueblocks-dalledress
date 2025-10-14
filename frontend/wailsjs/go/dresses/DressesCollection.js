@@ -14,6 +14,10 @@ export function ExportData(arg1) {
   return window['go']['dresses']['DressesCollection']['ExportData'](arg1);
 }
 
+export function GetBuckets(arg1) {
+  return window['go']['dresses']['DressesCollection']['GetBuckets'](arg1);
+}
+
 export function GetConfig() {
   return window['go']['dresses']['DressesCollection']['GetConfig']();
 }

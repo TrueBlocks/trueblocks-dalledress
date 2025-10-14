@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/base"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/logging"
 	storePkg "github.com/TrueBlocks/trueblocks-dalledress/pkg/store"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
@@ -25,6 +26,7 @@ import (
 type ExportsPage struct {
 	Facet         types.DataFacet `json:"facet"`
 	Approvals     []Approval      `json:"approvals"`
+	Approves      []Approve       `json:"approves"`
 	Assets        []Asset         `json:"assets"`
 	Balances      []Balance       `json:"balances"`
 	Logs          []Log           `json:"logs"`
@@ -80,6 +82,7 @@ func (c *ExportsCollection) GetPage(
 	}
 
 	switch dataFacet {
+
 	case ExportsStatements:
 		facet := c.statementsFacet
 		var filterFunc func(*Statement) bool
@@ -94,7 +97,19 @@ func (c *ExportsCollection) GetPage(
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
 		} else {
-
+			props := &sdk.ModelProps{
+				Chain:   payload.Chain,
+				Format:  "json",
+				Verbose: true,
+				ExtraOpts: map[string]any{
+					"ether": true,
+				},
+			}
+			for i := range result.Items {
+				if err := result.Items[i].EnsureCalcs(props, nil); err != nil {
+					logging.LogBackend(fmt.Sprintf("Failed to calculate fields for statement %d: %v", i, err))
+				}
+			}
 			page.Statements, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
@@ -172,6 +187,25 @@ func (c *ExportsCollection) GetPage(
 		} else {
 
 			page.Approvals, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
+		}
+		page.IsFetching = facet.IsFetching()
+		page.ExpectedTotal = facet.ExpectedCount()
+	case ExportsApproves:
+		facet := c.approvesFacet
+		var filterFunc func(*Approve) bool
+		if filter != "" {
+			filterFunc = func(item *Approve) bool {
+				return c.matchesApproveFilter(item, filter)
+			}
+		}
+		sortFunc := func(items []Approve, sort sdk.SortSpec) error {
+			return sdk.SortApproves(items, sort)
+		}
+		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
+			return nil, types.NewStoreError("exports", dataFacet, "GetPage", err)
+		} else {
+
+			page.Approves, page.TotalItems, page.State = result.Items, result.TotalItems, result.State
 		}
 		page.IsFetching = facet.IsFetching()
 		page.ExpectedTotal = facet.ExpectedCount()
@@ -546,6 +580,13 @@ func (c *ExportsCollection) matchesReceiptFilter(item *Receipt, filter string) b
 }
 
 func (c *ExportsCollection) matchesApprovalFilter(item *Approval, filter string) bool {
+	_ = item    // delint
+	_ = filter  // delint
+	return true // strings.Contains(strings.ToLower(item.TransactionHash.Hex()), filter) ||
+	// strings.Contains(strings.ToLower(item.ContractAddress.Hex()), filter)
+}
+
+func (c *ExportsCollection) matchesApproveFilter(item *Approve, filter string) bool {
 	_ = item    // delint
 	_ = filter  // delint
 	return true // strings.Contains(strings.ToLower(item.TransactionHash.Hex()), filter) ||

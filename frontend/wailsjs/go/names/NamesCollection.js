@@ -14,6 +14,10 @@ export function ExportData(arg1) {
   return window['go']['names']['NamesCollection']['ExportData'](arg1);
 }
 
+export function GetBuckets(arg1) {
+  return window['go']['names']['NamesCollection']['GetBuckets'](arg1);
+}
+
 export function GetConfig() {
   return window['go']['names']['NamesCollection']['GetConfig']();
 }

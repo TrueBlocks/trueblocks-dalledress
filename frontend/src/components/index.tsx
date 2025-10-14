@@ -20,10 +20,10 @@ export * from './SplashScreen';
 export * from './StatusIndicator';
 export * from './StyledBadge';
 export * from './StyledButton';
+export * from './StyledDivider';
 export * from './StyledModal';
 export * from './StyledSelect';
 export * from './StyledText';
-export * from './TabDivider';
 export * from './ThemeProvider';
 export * from './WalletConnectButton';
 
@@ -31,3 +31,4 @@ export * from './form';
 export * from './table';
 export * from './utils';
 export * from './detail';
+export * from './panels';

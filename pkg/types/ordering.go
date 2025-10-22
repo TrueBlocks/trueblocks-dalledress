@@ -40,7 +40,8 @@ func SortFields(vc *ViewConfig) {
 	}
 }
 
-// SetMenuOrder applies menu ordering and facet configurations from embedded or file-based config to ViewConfig
+// SetMenuOrder applies menu ordering and facet configurations from embedded or file-based config to ViewConfig.
+// When TB_ALLVIEWS environment variable is set, ordering and disabled state configurations are ignored.
 func SetMenuOrder(vc *ViewConfig) {
 	if vc == nil {
 		logger.ShouldNotHappen("SetMenuOrder called with nil ViewConfig")
@@ -55,16 +56,13 @@ func SetMenuOrder(vc *ViewConfig) {
 
 	// Check if this view has configuration
 	if viewConfig, exists := config.ViewConfig[vc.ViewName]; exists {
-		// Apply menu order
-		if viewConfig.MenuOrder > 0 {
-			vc.MenuOrder = viewConfig.MenuOrder
-		} else {
-			vc.MenuOrder = 999 // Default order for views without explicit order
-		}
-
-		// Apply view-level disabled state (unless TB_ALLVIEWS is set)
-		noDisable := os.Getenv("TB_ALLVIEWS") != ""
-		if !noDisable {
+		skipOrdering := os.Getenv("TB_ALLVIEWS") != ""
+		if !skipOrdering {
+			if viewConfig.MenuOrder > 0 {
+				vc.MenuOrder = viewConfig.MenuOrder
+			} else {
+				vc.MenuOrder = 999 // Default order for views without explicit order
+			}
 			vc.Disabled = viewConfig.Disabled
 			if len(viewConfig.DisabledFacets) > 0 && vc.Facets != nil {
 				for facetName, facetConfig := range vc.Facets {
@@ -75,10 +73,12 @@ func SetMenuOrder(vc *ViewConfig) {
 					}
 				}
 			}
+		} else {
+			vc.MenuOrder = 999 // Default order when TB_ALLVIEWS is set
 		}
 
-		// Apply custom facet ordering if provided
-		if len(viewConfig.FacetOrder) > 0 && vc.Facets != nil {
+		// Apply custom facet ordering if provided (unless TB_ALLVIEWS is set)
+		if !skipOrdering && len(viewConfig.FacetOrder) > 0 && vc.Facets != nil {
 			// Validate that all facets in the custom order exist and build valid order
 			validOrder := []string{}
 			customOrderSet := make(map[string]bool)

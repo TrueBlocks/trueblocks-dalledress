@@ -2,10 +2,11 @@ package types
 
 import (
 	"fmt"
+	"os"
 	"sort"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 	"github.com/TrueBlocks/trueblocks-core/src/apps/chifra/pkg/logger"
+	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
 )
 
 // SortFields sorts columns and detail fields by their explicit order values.
@@ -61,16 +62,17 @@ func SetMenuOrder(vc *ViewConfig) {
 			vc.MenuOrder = 999 // Default order for views without explicit order
 		}
 
-		// Apply view-level disabled state
-		vc.Disabled = viewConfig.Disabled
-
-		// Apply facet configurations if both exist
-		if len(viewConfig.DisabledFacets) > 0 && vc.Facets != nil {
-			for facetName, facetConfig := range vc.Facets {
-				if disabledState, facetExists := viewConfig.DisabledFacets[facetName]; facetExists {
-					// Apply the configured disabled state directly (true = disabled, false = enabled)
-					facetConfig.Disabled = disabledState
-					vc.Facets[facetName] = facetConfig
+		// Apply view-level disabled state (unless TB_ALLVIEWS is set)
+		noDisable := os.Getenv("TB_ALLVIEWS") != ""
+		if !noDisable {
+			vc.Disabled = viewConfig.Disabled
+			if len(viewConfig.DisabledFacets) > 0 && vc.Facets != nil {
+				for facetName, facetConfig := range vc.Facets {
+					if disabledState, facetExists := viewConfig.DisabledFacets[facetName]; facetExists {
+						// Apply the configured disabled state directly (true = disabled, false = enabled)
+						facetConfig.Disabled = disabledState
+						vc.Facets[facetName] = facetConfig
+					}
 				}
 			}
 		}

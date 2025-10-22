@@ -31,8 +31,14 @@ func (c *{{$class}}Collection) GetConfig() (*types.ViewConfig, error) {
 			Actions:       []string{ {{if ne (.RowActionsBe .Name) "\"\""}}{{.RowActionsBe .Name}}{{else}}{{end}} },
 			HeaderActions: []string{ {{if ne (.HeaderActionsBe .Name) "\"\""}}{{.HeaderActionsBe .Name}}{{else}}{{end}} },
 			RendererTypes: "{{.Renderer}}",
-			{{- if $isChunks}}
-						PanelChartConfig:   get{{.Name}}PanelChartConfig(),
+			{{- if .PanelChart }}
+				PanelChartConfig:   get{{.Name}}PanelConfig(),
+			{{- end}}
+			{{- if .FacetChart }}
+				FacetChartConfig:   get{{.Name}}FacetConfig(),
+			{{- end}}
+			{{- if .NavigateTo }}
+				RowAction:   {{.NavigateTo}},
 			{{- end}}
 		},
 		{{- end}}

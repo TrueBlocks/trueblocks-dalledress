@@ -140,9 +140,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Known",
@@ -153,9 +156,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Functions",
@@ -166,9 +172,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Events",
@@ -179,9 +188,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         }
                     ]
                 },
@@ -707,9 +719,12 @@
                             ],
                             "viewType": "",
                             "renderer": "panel",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": true,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Index",
@@ -720,9 +735,12 @@
                             ],
                             "viewType": "",
                             "renderer": "panel",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": true,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Blooms",
@@ -733,9 +751,12 @@
                             ],
                             "viewType": "",
                             "renderer": "panel",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": true,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Manifest",
@@ -744,9 +765,12 @@
                             "actions": null,
                             "viewType": "canvas",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         }
                     ]
                 },
@@ -1590,9 +1614,12 @@
                             ],
                             "viewType": "",
                             "renderer": "panel",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": true
+                            "needsCalcs": true,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Balances",
@@ -1603,9 +1630,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Transfers",
@@ -1616,9 +1646,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Transactions",
@@ -1629,9 +1662,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "OpenApprovals",
@@ -1642,9 +1678,12 @@
                             ],
                             "viewType": "",
                             "renderer": "panel",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "ApprovalLogs",
@@ -1655,9 +1694,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "ApprovalTxs",
@@ -1668,9 +1710,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Withdrawals",
@@ -1681,9 +1726,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Assets",
@@ -1694,9 +1742,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "AssetCharts",
@@ -1707,9 +1758,12 @@
                             ],
                             "viewType": "canvas",
                             "renderer": "facet",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": true
+                            "needsCalcs": true,
+                            "panelChart": false,
+                            "facetChart": true
                         },
                         {
                             "display_name": "Logs",
@@ -1720,9 +1774,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Traces",
@@ -1733,9 +1790,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Receipts",
@@ -1746,9 +1806,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         }
                     ]
                 },
@@ -2171,9 +2234,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "exports|\u003clatest\u003e|address|address",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         }
                     ]
                 }
@@ -2308,9 +2374,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Custom",
@@ -2329,9 +2398,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Prefund",
@@ -2344,9 +2416,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "dividerBefore",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Regular",
@@ -2360,9 +2435,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         },
                         {
                             "display_name": "Baddress",
@@ -2374,9 +2452,12 @@
                             ],
                             "viewType": "",
                             "renderer": "",
+                            "navigate": "",
                             "attributes": "",
                             "disabled": false,
-                            "needsCalcs": false
+                            "needsCalcs": false,
+                            "panelChart": false,
+                            "facetChart": false
                         }
                     ]
                 }
@@ -2454,9 +2535,12 @@
                     ],
                     "viewType": "",
                     "renderer": "panel",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": true
+                    "needsCalcs": true,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Balances",
@@ -2467,9 +2551,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Transfers",
@@ -2480,9 +2567,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Transactions",
@@ -2493,9 +2583,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "OpenApprovals",
@@ -2506,9 +2599,12 @@
                     ],
                     "viewType": "",
                     "renderer": "panel",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "ApprovalLogs",
@@ -2519,9 +2615,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "ApprovalTxs",
@@ -2532,9 +2631,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Withdrawals",
@@ -2545,9 +2647,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Assets",
@@ -2558,9 +2663,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "AssetCharts",
@@ -2571,9 +2679,12 @@
                     ],
                     "viewType": "canvas",
                     "renderer": "facet",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": true
+                    "needsCalcs": true,
+                    "panelChart": false,
+                    "facetChart": true
                 },
                 {
                     "display_name": "Logs",
@@ -2584,9 +2695,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Traces",
@@ -2597,9 +2711,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Receipts",
@@ -2610,9 +2727,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         },
@@ -3615,9 +3735,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "exports|\u003clatest\u003e|address|address",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         },
@@ -5346,9 +5469,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Known",
@@ -5359,9 +5485,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Functions",
@@ -5372,9 +5501,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Events",
@@ -5385,9 +5517,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         },
@@ -5509,9 +5644,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Custom",
@@ -5530,9 +5668,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Prefund",
@@ -5545,9 +5686,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "dividerBefore",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Regular",
@@ -5561,9 +5705,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Baddress",
@@ -5575,9 +5722,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         },
@@ -6322,9 +6472,12 @@
                     ],
                     "viewType": "",
                     "renderer": "panel",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": true,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Index",
@@ -6335,9 +6488,12 @@
                     ],
                     "viewType": "",
                     "renderer": "panel",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": true,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Blooms",
@@ -6348,9 +6504,12 @@
                     ],
                     "viewType": "",
                     "renderer": "panel",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": true,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Manifest",
@@ -6359,9 +6518,12 @@
                     "actions": null,
                     "viewType": "canvas",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         },
@@ -6437,9 +6599,12 @@
                     "actions": null,
                     "viewType": "canvas",
                     "renderer": "facet",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Execute",
@@ -6448,9 +6613,12 @@
                     "actions": null,
                     "viewType": "canvas",
                     "renderer": "facet",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Events",
@@ -6461,9 +6629,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         },
@@ -6994,9 +7165,12 @@
                     "actions": null,
                     "viewType": "canvas",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Caches",
@@ -7007,9 +7181,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Chains",
@@ -7020,9 +7197,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         },
@@ -7342,9 +7522,12 @@
                     "actions": [],
                     "viewType": "canvas",
                     "renderer": "facet",
+                    "navigate": "dresses|gallery|address|original",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Series",
@@ -7359,9 +7542,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Databases",
@@ -7372,9 +7558,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Events",
@@ -7385,9 +7574,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Gallery",
@@ -7398,9 +7590,12 @@
                     ],
                     "viewType": "canvas",
                     "renderer": "facet",
+                    "navigate": "dresses|generator|address|original",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         },
@@ -7451,9 +7646,12 @@
                     ],
                     "viewType": "",
                     "renderer": "facet",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Chifra",
@@ -7464,9 +7662,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Etherscan",
@@ -7477,9 +7678,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Covalent",
@@ -7490,9 +7694,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 },
                 {
                     "display_name": "Alchemy",
@@ -7503,9 +7710,12 @@
                     ],
                     "viewType": "",
                     "renderer": "",
+                    "navigate": "",
                     "attributes": "",
                     "disabled": false,
-                    "needsCalcs": false
+                    "needsCalcs": false,
+                    "panelChart": false,
+                    "facetChart": false
                 }
             ]
         }

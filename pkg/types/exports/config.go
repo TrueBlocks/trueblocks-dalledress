@@ -56,7 +56,7 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 			Store:         "openapprovals",
 			DividerBefore: false,
 			Fields:        getOpenapprovalsFields(),
-			Actions:       []string{"revoke"},
+			Actions:       []string{},
 			HeaderActions: []string{"export"},
 			RendererTypes: "panel",
 		},
@@ -142,7 +142,6 @@ func (c *ExportsCollection) GetConfig() (*types.ViewConfig, error) {
 		FacetOrder: []string{"statements", "balances", "transfers", "transactions", "openapprovals", "approvallogs", "approvaltxs", "withdrawals", "assets", "assetcharts", "logs", "traces", "receipts"},
 		Actions: map[string]types.ActionConfig{
 			"export": {Name: "export", Label: "Export", Icon: "Export"},
-			"revoke": {Name: "revoke", Label: "Revoke", Icon: "Revoke"},
 		},
 	}
 

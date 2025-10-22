@@ -46,15 +46,14 @@ func (c *ChunksCollection) GetConfig() (*types.ViewConfig, error) {
 			PanelChartConfig: getBloomsPanelConfig(),
 		},
 		"manifest": {
-			Name:             "Manifest",
-			Store:            "manifest",
-			ViewType:         "canvas",
-			DividerBefore:    false,
-			Fields:           getManifestFields(),
-			Actions:          []string{},
-			HeaderActions:    []string{},
-			RendererTypes:    "",
-			PanelChartConfig: getManifestPanelConfig(),
+			Name:          "Manifest",
+			Store:         "manifest",
+			ViewType:      "canvas",
+			DividerBefore: false,
+			Fields:        getManifestFields(),
+			Actions:       []string{},
+			HeaderActions: []string{},
+			RendererTypes: "",
 		},
 	}
 
@@ -219,10 +218,6 @@ func getBloomsPanelConfig() *types.PanelChartConfig {
 			},
 		},
 	}
-}
-
-func getManifestPanelConfig() *types.PanelChartConfig {
-	return nil
 }
 
 // EXISTING_CODE

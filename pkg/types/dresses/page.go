@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v2"
-	"github.com/TrueBlocks/trueblocks-dalle/v2/pkg/model"
 	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
 	sdk "github.com/TrueBlocks/trueblocks-sdk/v5"
 )
@@ -96,7 +95,7 @@ func (c *DressesCollection) GetPage(
 			return true
 		}
 		sortFunc := func(items []DalleDress, sort sdk.SortSpec) error {
-			return model.SortDalleDress(items, sort)
+			return dalle.SortDalleDress(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dresses", dataFacet, "GetPage", err)
@@ -191,7 +190,7 @@ func (c *DressesCollection) GetPage(
 			return true
 		}
 		sortFunc := func(items []DalleDress, sort sdk.SortSpec) error {
-			return model.SortDalleDress(items, sort)
+			return dalle.SortDalleDress(items, sort)
 		}
 		if result, err := facet.GetPage(first, pageSize, filterFunc, sortSpec, sortFunc); err != nil {
 			return nil, types.NewStoreError("dresses", dataFacet, "GetPage", err)

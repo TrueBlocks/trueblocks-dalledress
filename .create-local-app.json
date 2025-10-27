@@ -22,10 +22,7 @@
       "disabled": true
     },
     "dresses": {
-      "menuOrder": 15,
-      "disabledFacets": {
-        "databases": true
-      }
+      "menuOrder": 15
     },
     "exports": {
       "menuOrder": 20,

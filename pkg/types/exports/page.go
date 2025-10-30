@@ -713,7 +713,7 @@ func (c *ExportsCollection) GetPageForRecord(
 			var fieldValue string
 			switch recordIdField {
 			case "address":
-				fieldValue = asset.Address.Hex()
+				fieldValue = asset.Asset.Hex()
 			default:
 				return nil, fmt.Errorf("unsupported record ID field: %s", recordIdField)
 			}

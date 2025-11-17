@@ -25,12 +25,10 @@
       "menuOrder": 15
     },
     "exports": {
-      "menuOrder": 20,
-      "disabled": true
+      "menuOrder": 20
     },
     "monitors": {
-      "menuOrder": 30,
-      "disabled": true
+      "menuOrder": 30
     },
     "names": {
       "menuOrder": 50

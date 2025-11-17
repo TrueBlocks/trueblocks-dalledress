@@ -1290,20 +1290,6 @@ export namespace status {
 
 export namespace types {
 	
-	export enum StoreState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    LOADED = "loaded",
-	}
-	export enum Period {
-	    BLOCKLY = "blockly",
-	    HOURLY = "hourly",
-	    DAILY = "daily",
-	    WEEKLY = "weekly",
-	    MONTHLY = "monthly",
-	    QUARTERLY = "quarterly",
-	    ANNUAL = "annual",
-	}
 	export enum DataFacet {
 	    STATS = "stats",
 	    INDEX = "index",
@@ -1347,6 +1333,20 @@ export namespace types {
 	    STATUS = "status",
 	    CACHES = "caches",
 	    CHAINS = "chains",
+	}
+	export enum StoreState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    LOADED = "loaded",
+	}
+	export enum Period {
+	    BLOCKLY = "blockly",
+	    HOURLY = "hourly",
+	    DAILY = "daily",
+	    WEEKLY = "weekly",
+	    MONTHLY = "monthly",
+	    QUARTERLY = "quarterly",
+	    ANNUAL = "annual",
 	}
 	export class AbiCalcs {
 	    name?: string;
@@ -2534,8 +2534,7 @@ export namespace types {
 	    viewType?: string;
 	    dividerBefore: boolean;
 	    disabled: boolean;
-	    hideable: boolean;
-	    hidden: boolean;
+	    canClose: boolean;
 	    fields: FieldConfig[];
 	    columns: ColumnConfig[];
 	    detailPanels: DetailPanelConfig[];
@@ -2557,8 +2556,7 @@ export namespace types {
 	        this.viewType = source["viewType"];
 	        this.dividerBefore = source["dividerBefore"];
 	        this.disabled = source["disabled"];
-	        this.hideable = source["hideable"];
-	        this.hidden = source["hidden"];
+	        this.canClose = source["canClose"];
 	        this.fields = this.convertValues(source["fields"], FieldConfig);
 	        this.columns = this.convertValues(source["columns"], ColumnConfig);
 	        this.detailPanels = this.convertValues(source["detailPanels"], DetailPanelConfig);

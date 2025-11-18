@@ -1,16 +1,22 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { ProjectCard } from '@components';
+import { ProjectCard, RendererParams } from '@components';
 import { useActiveProject } from '@hooks';
-import { project, projects } from '@models';
-import { Log, useEmitters } from '@utils';
+import { msgs, project, projects, types } from '@models';
+import { emitEvent, useEmitters } from '@utils';
 
-export type ManageFacetProps = {
-  pageData: projects.ProjectsPage | null;
-  viewStateKey: project.ViewStateKey;
-};
-
-export const ManageFacet = ({ pageData: _pageData }: ManageFacetProps) => {
+export const ManageFacet = ({ params }: { params: RendererParams }) => {
+  const { data } = params;
+  const _pageData = {
+    projects: data || [],
+  } as unknown as projects.ProjectsPage;
+  const _viewStateKey: project.ViewStateKey = useMemo(
+    () => ({
+      viewName: 'projects',
+      facetName: types.DataFacet.MANAGE,
+    }),
+    [],
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const {
     projects: projectInfos,
@@ -41,20 +47,14 @@ export const ManageFacet = ({ pageData: _pageData }: ManageFacetProps) => {
 
   const handleDeleteProject = useCallback(
     async (projectId: string) => {
-      Log(`[ManageFacet] Attempting to close project: ${projectId}`);
-
       try {
         // Find project name for status message
         const project = projectInfos.find((p) => p.id === projectId);
         const projectName = project?.name || projectId;
-
         await closeProject(projectId);
-
-        Log(`[ManageFacet] Successfully closed project: ${projectId}`);
         emitStatus(`Project "${projectName}" was closed successfully`);
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        Log(`[ManageFacet] Error closing project ${projectId}: ${errorMsg}`);
         emitError(`Failed to close project: ${errorMsg}`);
       }
     },
@@ -62,10 +62,7 @@ export const ManageFacet = ({ pageData: _pageData }: ManageFacetProps) => {
   );
 
   const handleNewProject = useCallback(() => {
-    // New project functionality - could navigate to project creation
-    Log('Create new project');
-    // TODO: Implement new project creation if needed
-    // This might require opening a project creation modal or navigating to a creation page
+    emitEvent(msgs.EventType.PROJECT_MODAL, 'show_project_modal');
   }, []);
 
   // Memoize the props to prevent unnecessary re-renders of ProjectCard

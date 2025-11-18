@@ -19,10 +19,10 @@ Welcome to the **Projects** view! This section provides information about managi
 
 - **AddressList Store (4 members)**
 
-  - address: unique identifier for the project
-  - name: human-readable name of the project
-  - appearances: file system path to the project
-  - lastUpdated: whether this project is currently active
+  - address: an Ethereum address
+  - addressName: the name for this address
+  - nAppearances: number of appearances in the address
+  - lastUpdated: the last time this file was written to
 
 - **Projects Store (4 members)**
 

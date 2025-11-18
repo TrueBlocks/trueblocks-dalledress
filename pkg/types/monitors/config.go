@@ -33,11 +33,11 @@ func (c *MonitorsCollection) buildStaticFacets() map[string]types.FacetConfig {
 		"monitors": {
 			Name:          "Monitors",
 			Store:         "monitors",
+			ViewType:      "table",
 			DividerBefore: false,
 			Fields:        getMonitorsFields(),
 			Actions:       []string{"autoname", "delete", "remove"},
 			HeaderActions: []string{"export"},
-			RendererTypes: "",
 			RowAction:     types.NewRowActionNavigation("exports", "<latest>", "address", "address"),
 		},
 	}
@@ -62,13 +62,13 @@ func (c *MonitorsCollection) buildActions() map[string]types.ActionConfig {
 func getMonitorsFields() []types.FieldConfig {
 	ret := []types.FieldConfig{
 		{Section: "Overview", Key: "address", Type: "address"},
-		{Section: "Overview", Key: "name"},
+		{Section: "Overview", Key: "addressName", Type: "string"},
 		{Section: "Overview", Key: "deleted", Type: "boolean", NoTable: true},
-		{Section: "Overview", Key: "isStaged", NoTable: true},
-		{Section: "Statistics", Key: "nRecords"},
-		{Section: "Statistics", Key: "fileSize"},
-		{Section: "Statistics", Key: "isEmpty", NoTable: true},
-		{Section: "Statistics", Key: "lastScanned", Type: "number"},
+		{Section: "Overview", Key: "isStaged", Type: "boolean", NoTable: true},
+		{Section: "Statistics", Key: "nRecords", Type: "uint64"},
+		{Section: "Statistics", Key: "fileSize", Type: "fileSize"},
+		{Section: "Statistics", Key: "isEmpty", Type: "boolean", NoTable: true},
+		{Section: "Statistics", Key: "lastScanned", Type: "blknum"},
 		{Section: "", Key: "actions", Type: "actions", NoDetail: true},
 	}
 	types.NormalizeFields(&ret)

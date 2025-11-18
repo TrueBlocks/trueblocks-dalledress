@@ -33,31 +33,29 @@ func (c *ContractsCollection) buildStaticFacets() map[string]types.FacetConfig {
 		"dashboard": {
 			Name:          "Dashboard",
 			Store:         "contracts",
-			ViewType:      "canvas",
+			ViewType:      "custom",
 			DividerBefore: false,
 			Fields:        getContractsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{},
-			RendererTypes: "facet",
 		},
 		"execute": {
 			Name:          "Execute",
 			Store:         "contracts",
-			ViewType:      "canvas",
+			ViewType:      "custom",
 			DividerBefore: false,
 			Fields:        getContractsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{},
-			RendererTypes: "facet",
 		},
 		"events": {
 			Name:          "Events",
 			Store:         "logs",
+			ViewType:      "table",
 			DividerBefore: false,
 			Fields:        getLogsFields(),
 			Actions:       []string{},
 			HeaderActions: []string{"export"},
-			RendererTypes: "",
 		},
 	}
 }
@@ -79,12 +77,12 @@ func (c *ContractsCollection) buildActions() map[string]types.ActionConfig {
 func getContractsFields() []types.FieldConfig {
 	ret := []types.FieldConfig{
 		{Section: "Overview", Key: "address", Type: "address"},
-		{Section: "Overview", Key: "name"},
+		{Section: "Overview", Key: "addressName", Type: "string"},
 		{Section: "Technical", Key: "abi"},
 		{Section: "Status", Key: "lastUpdated", Type: "datetime"},
-		{Section: "Status", Key: "date"},
-		{Section: "Status", Key: "errorCount"},
-		{Section: "Status", Key: "lastError"},
+		{Section: "Status", Key: "date", Type: "datetime"},
+		{Section: "Status", Key: "errorCount", Type: "int64"},
+		{Section: "Status", Key: "lastError", Type: "string"},
 	}
 	types.NormalizeFields(&ret)
 	return ret
@@ -92,20 +90,21 @@ func getContractsFields() []types.FieldConfig {
 
 func getLogsFields() []types.FieldConfig {
 	ret := []types.FieldConfig{
-		{Section: "Context", Key: "blockNumber", Type: "number"},
-		{Section: "Context", Key: "transactionIndex", Type: "number"},
-		{Section: "Context", Key: "logIndex", Type: "number"},
+		{Section: "Context", Key: "blockNumber", Type: "blknum"},
+		{Section: "Context", Key: "transactionIndex", Type: "txnum"},
+		{Section: "Context", Key: "logIndex", Type: "lognum"},
 		{Section: "Context", Key: "address", Type: "address"},
-		{Section: "Context", Key: "timestamp", Type: "datetime", NoTable: true},
+		{Section: "Context", Key: "addressName", Type: "string"},
+		{Section: "Context", Key: "timestamp", Type: "timestamp", NoTable: true},
 		{Section: "Context", Key: "blockHash", Type: "hash", NoTable: true},
 		{Section: "Context", Key: "transactionHash", Type: "hash", NoTable: true},
 		{Section: "Details", Key: "topic0", Type: "hash"},
 		{Section: "Details", Key: "topic1", Type: "hash"},
 		{Section: "Details", Key: "topic2", Type: "hash", NoTable: true},
 		{Section: "Details", Key: "topic3", Type: "hash", NoTable: true},
-		{Section: "Details", Key: "data", NoTable: true},
+		{Section: "Details", Key: "data", Type: "bytes", NoTable: true},
 		{Section: "Articulation", Key: "articulatedLog", NoTable: true},
-		{Section: "Articulation", Key: "compressedLog", NoTable: true},
+		{Section: "Articulation", Key: "compressedLog", Type: "string", NoTable: true},
 		{Section: "", Key: "actions", Type: "actions", NoDetail: true},
 	}
 	types.NormalizeFields(&ret)

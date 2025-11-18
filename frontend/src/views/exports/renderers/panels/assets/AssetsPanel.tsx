@@ -2,17 +2,13 @@ import { DetailPanelContainer } from '@components';
 import { Code, ScrollArea } from '@mantine/core';
 import { types } from '@models';
 
-export const renderApprovalDetailPanel = (
-  rowData: Record<string, unknown> | null,
-) => {
+export const AssetsPanel = (rowData: Record<string, unknown> | null) => {
   if (!rowData) return null;
-
-  const approval = rowData as unknown as types.Transaction;
-
+  const asset = rowData as unknown as types.Statement;
   return (
     <DetailPanelContainer>
       <ScrollArea h={400}>
-        <Code block>{JSON.stringify(approval, null, 2)}</Code>
+        <Code block>{JSON.stringify(asset, null, 2)}</Code>
       </ScrollArea>
     </DetailPanelContainer>
   );

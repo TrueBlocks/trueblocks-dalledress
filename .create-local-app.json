@@ -25,7 +25,8 @@
       "menuOrder": 15
     },
     "exports": {
-      "menuOrder": 20
+      "menuOrder": 20,
+      "disabled": true
     },
     "monitors": {
       "menuOrder": 30

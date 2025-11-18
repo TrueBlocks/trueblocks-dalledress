@@ -47,7 +47,7 @@ import { Debugger, LogError, useErrorHandler } from '@utils';
 import { assertRouteConsistency } from '../routes';
 import { ROUTE } from './constants';
 import { createDetailPanel } from '@components';
-{{- if ne .RendererTypes "" }}
+{{- if or .HasCustomPanel .HasCustomFacet }}
 import { renderers } from './renderers';
 {{- end }}
 
@@ -298,10 +298,10 @@ export const {{$class}} = () => {
       renderers.facets,
       facet,
     )
-      ? (renderers.facets as Record<string, typeof renderers.facets.default>)[
+      ? (renderers.facets as Record<string, typeof renderers.facets.dynamic>)[
           facet
         ]
-      : renderers.facets.default;
+      : renderers.facets.dynamic;
     if (renderer) {
       return renderer({
         data: currentData as unknown as Record<string, unknown>[],

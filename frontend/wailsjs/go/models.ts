@@ -1304,6 +1304,11 @@ export namespace status {
 
 export namespace types {
 	
+	export enum StoreState {
+	    STALE = "stale",
+	    FETCHING = "fetching",
+	    LOADED = "loaded",
+	}
 	export enum Period {
 	    BLOCKLY = "blockly",
 	    HOURLY = "hourly",
@@ -1356,11 +1361,6 @@ export namespace types {
 	    STATUS = "status",
 	    CACHES = "caches",
 	    CHAINS = "chains",
-	}
-	export enum StoreState {
-	    STALE = "stale",
-	    FETCHING = "fetching",
-	    LOADED = "loaded",
 	}
 	export class AbiCalcs {
 	    name?: string;

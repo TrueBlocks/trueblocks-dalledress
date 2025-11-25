@@ -1,14 +1,18 @@
 import { createAddressLink } from '@utils';
 
-import { BorderedSection, PanelRow, PanelTable } from '.';
+import { CustomSection, PanelRow, PanelTable } from '.';
 
 export interface AddressInfo {
   from?: unknown;
   fromName?: string;
+  fromLabel?: string;
+  showFromLabel?: boolean;
   to?: unknown;
   toName?: string;
-  showFromLabel?: boolean;
-  toLabel?: string; // Custom label for 'to' field (e.g., 'Contract' for logs)
+  toLabel?: string;
+  extra?: unknown;
+  extraName?: string;
+  extraLabel?: string;
 }
 
 interface InfoAddressProps {
@@ -16,14 +20,25 @@ interface InfoAddressProps {
 }
 
 export const InfoAddressRenderer = ({ addressInfo }: InfoAddressProps) => {
-  const { from, fromName, to, toName, showFromLabel, toLabel } = addressInfo;
+  const {
+    from,
+    fromName,
+    fromLabel,
+    showFromLabel,
+    to,
+    toName,
+    toLabel,
+    extra,
+    extraName,
+    extraLabel,
+  } = addressInfo;
 
   return (
-    <BorderedSection>
+    <CustomSection>
       <PanelTable>
         {showFromLabel && !!from && (
           <PanelRow
-            label="From"
+            label={fromLabel || 'From'}
             value={
               <>
                 {fromName && (
@@ -31,6 +46,21 @@ export const InfoAddressRenderer = ({ addressInfo }: InfoAddressProps) => {
                 )}
                 <div className="panel-nested-address">
                   {createAddressLink(from)}
+                </div>
+              </>
+            }
+          />
+        )}
+        {!!extra && (
+          <PanelRow
+            label={extraLabel || 'Extra'}
+            value={
+              <>
+                {extraName && (
+                  <div className="panel-nested-name">{extraName}</div>
+                )}
+                <div className="panel-nested-address">
+                  {createAddressLink(extra)}
                 </div>
               </>
             }
@@ -50,7 +80,7 @@ export const InfoAddressRenderer = ({ addressInfo }: InfoAddressProps) => {
           />
         )}
       </PanelTable>
-    </BorderedSection>
+    </CustomSection>
   );
 };
 
@@ -67,6 +97,28 @@ export const txToAddressInfo = (
     toName,
     showFromLabel: true,
     toLabel: 'To',
+  };
+};
+
+export const approvalToAddressInfo = (
+  from?: unknown,
+  fromName?: string,
+  to?: unknown,
+  toName?: string,
+  extra?: unknown,
+  extraName?: string,
+): AddressInfo => {
+  return {
+    from,
+    fromName,
+    fromLabel: 'Owner',
+    showFromLabel: true,
+    to,
+    toName,
+    toLabel: 'Spender',
+    extra,
+    extraName,
+    extraLabel: 'Token',
   };
 };
 

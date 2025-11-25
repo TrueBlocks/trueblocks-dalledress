@@ -42,18 +42,22 @@ name = "OpenApprovals"
 store = "OpenApprovals"
 actions = ["export"]
 viewType = "table"
+panel = "custom"
 
 [[facets]]
 name = "ApprovalLogs"
 store = "ApprovalLogs"
 actions = ["export"]
 viewType = "table"
+panel = "custom"
+needsCalcs = true
 
 [[facets]]
 name = "ApprovalTxs"
 store = "ApprovalTxs"
 actions = ["export"]
 viewType = "table"
+panel = "custom"
 
 [[facets]]
 name = "Withdrawals"

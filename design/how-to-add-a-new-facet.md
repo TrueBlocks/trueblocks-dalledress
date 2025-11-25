@@ -1,12 +1,12 @@
-# How to Add a New Facet to TrueBlocks Dalledress
+# How to Add a New Facet to a TrueBlocks mini-dApps project
 
 **Version**: 1.0  
 **Date**: October 13, 2025  
-**Audience**: Developers working on TrueBlocks Dalledress
+**Audience**: Developers working on TrueBlocks projects
 
 ## Overview
 
-This guide provides a generic process for adding new facets to any view in the TrueBlocks Dalledress. A facet represents a tab within a view that displays a specific type of data (e.g., transactions, balances, logs, etc.).
+This guide provides a generic process for adding new facets to any view in a TrueBlocks mini-dApps project. A facet represents a tab within a view that displays a specific type of data (e.g., transactions, balances, logs, etc.).
 
 ## Architecture Context
 
@@ -263,14 +263,14 @@ store = "Balances"      # Same store, potentially different filtering
 ### SDK Integration Patterns
 ```go
 // Basic export
-exportOpts.Export()
+opts.Export()
 
 // Specific export type
-exportOpts.ExportLogs()
-exportOpts.ExportBalances()
+opts.ExportLogs()
+opts.ExportBalances()
 
 // With options
-exportOpts := sdk.ExportOptions{
+opts := sdk.ExportOptions{
     Globals:    sdk.Globals{Cache: true, Chain: payload.ActiveChain},
     Addrs:      []string{address},
     Articulate: true,    // For detailed log parsing

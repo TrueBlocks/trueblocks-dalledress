@@ -105,6 +105,8 @@ export const Dresses = () => {
         return pageData.series || [];
       case types.DataFacet.DATABASES:
         return pageData.databases || [];
+      case types.DataFacet.ITEMS:
+        return pageData.items || [];
       case types.DataFacet.EVENTS:
         return pageData.logs || [];
       case types.DataFacet.GALLERY:
@@ -128,10 +130,13 @@ export const Dresses = () => {
     },
   );
 
-  // Listen for active address/chain/period changes to refresh data
+  // Listen for active address/chain/contract/period changes to refresh data
   useEvent(msgs.EventType.ADDRESS_CHANGED, fetchData);
   useEvent(msgs.EventType.CHAIN_CHANGED, fetchData);
   useEvent(msgs.EventType.PERIOD_CHANGED, fetchData);
+  useEvent(msgs.EventType.CONTRACT_CHANGED, () => {
+    fetchData();
+  });
 
   useEffect(() => {
     fetchData();
@@ -214,7 +219,13 @@ export const Dresses = () => {
   );
 
   const detailPanel = useMemo(
-    () => createDetailPanel(viewConfig, getCurrentDataFacet),
+    () =>
+      createDetailPanel(
+        viewConfig,
+        getCurrentDataFacet,
+        {},
+        (_rowKey: string, _newValue: string, _txHash: string) => {},
+      ),
     [viewConfig, getCurrentDataFacet],
   );
 
@@ -228,6 +239,7 @@ export const Dresses = () => {
       >[],
     renderers: renderers.facets,
     viewName: ROUTE,
+    onRowAction: handleRowAction,
   });
 
   const perTabContent = useMemo(() => {

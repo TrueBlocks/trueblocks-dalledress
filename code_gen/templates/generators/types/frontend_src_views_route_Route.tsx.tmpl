@@ -150,10 +150,13 @@ export const {{$class}} = () => {
     },
   );
 
-  // Listen for active address/chain/period changes to refresh data
+  // Listen for active address/chain/contract/period changes to refresh data
   useEvent(msgs.EventType.ADDRESS_CHANGED, fetchData);
   useEvent(msgs.EventType.CHAIN_CHANGED, fetchData);
   useEvent(msgs.EventType.PERIOD_CHANGED, fetchData);
+  useEvent(msgs.EventType.CONTRACT_CHANGED, () => {
+    fetchData();
+  });
 
   {{- if .HasDynamicFacets}}
   
@@ -270,7 +273,10 @@ export const {{$class}} = () => {
         getCurrentDataFacet,
 {{- if .HasCustomPanel }}
         renderers.panels,
+{{- else}}
+        {},
 {{- end }}
+        (_rowKey: string, _newValue: string, _txHash: string) => {},
       ),
     [viewConfig, getCurrentDataFacet],
   );
@@ -287,6 +293,9 @@ export const {{$class}} = () => {
     renderers: renderers.facets,
 {{- end }}
     viewName: ROUTE,
+{{- if .HasRowActions}}
+    onRowAction: handleRowAction,
+{{- end}}
   });
 
   const perTabContent = useMemo(() => {

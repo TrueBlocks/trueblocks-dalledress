@@ -7,7 +7,6 @@
 // EXISTING_CODE
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { OpenLink } from '@app';
 import {
   DetailContainer,
   DetailHeader,
@@ -16,6 +15,8 @@ import {
   PanelRow,
   PanelTable,
   StyledButton,
+  StyledValue,
+  TransactionSuccessModal,
   approvalToAddressInfo,
 } from '@components';
 import { useViewContext } from '@contexts';
@@ -23,9 +24,12 @@ import { usePayload } from '@hooks';
 import { Group, Text } from '@mantine/core';
 import { types } from '@models';
 import {
+  Log,
   LogError,
   addressToHex,
   displayHash,
+  emitError,
+  emitStatus,
   formatNumericValue,
 } from '@utils';
 import {
@@ -71,8 +75,13 @@ export const ERC20_APPROVE_FUNCTION: types.Function = {
 
 // EXISTING_CODE
 
-export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
+export const OpenApprovalsPanel = (
+  rowData: Record<string, unknown>,
+  onFinal: (rowKey: string, newValue: string, txHash: string) => void,
+) => {
   // EXISTING_CODE
+  const facet = 'openapprovals';
+
   const { currentView } = useViewContext();
   const createPayload = usePayload(currentView);
   const payload = useMemo(
@@ -91,6 +100,15 @@ export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
     opened: boolean;
     txHash: string | null;
   }>({ opened: false, txHash: null });
+
+  // State to track pending transaction amount
+  const [pendingAmount, setPendingAmount] = useState<string>('');
+  const [isPreparingTransaction] = useState(false);
+
+  // Wallet hooks
+  const { createWalletGatedAction, isWalletConnected, isConnecting } =
+    useWalletGatedAction();
+  useWallet();
 
   const approval = useMemo(
     () =>
@@ -131,18 +149,28 @@ export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
     ];
   }, [approval]);
 
-  const [isPreparingTransaction] = useState(false);
-  const { createWalletGatedAction, isWalletConnected, isConnecting } =
-    useWalletGatedAction();
-  useWallet();
   const { sendTransaction } = useWalletConnection({
     onTransactionSigned: (txHash: string) => {
       setRevokeModal({ opened: false, transactionData: null });
       setApproveModal({ opened: false, transactionData: null });
       setSuccessModal({ opened: true, txHash });
+      emitStatus('Transaction submitted successfully');
+
+      // Call onFinal callback for demo hack
+      if (onFinal && pendingAmount !== '') {
+        // Generate the same row key used in the facet: owner-token-spender
+        const rowKey = `${approval.owner}-${approval.token}-${approval.spender}`;
+        Log(
+          `[OpenApprovalsPanel] POST-CONFIRM: Calling onFinal: rowKey=${rowKey}, amount=${pendingAmount}, txHash=${txHash}`,
+        );
+        onFinal(rowKey, pendingAmount, txHash);
+        setPendingAmount(''); // Clear pending amount
+      }
     },
     onError: (error: string) => {
       LogError('Transaction error:', error);
+      emitError('Transaction rejected by wallet');
+      setPendingAmount(''); // Clear pending amount on error
     },
   });
 
@@ -154,13 +182,24 @@ export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
   const handleConfirmTransaction = useCallback(
     async (preparedTx: PreparedTransaction) => {
       try {
+        // For approve transactions, use current allowance as demo hack amount
+        // (revoke already sets to '0' in createRevokeTransaction)
+        if (pendingAmount === '') {
+          const currentAllowance = approval.allowance || '0';
+          setPendingAmount(currentAllowance);
+          Log(
+            `[OpenApprovalsPanel] CONFIRM: Setting pendingAmount from current allowance: ${currentAllowance}`,
+          );
+        }
+
         await sendTransaction(preparedTx);
       } catch (error) {
         LogError('Failed to send transaction:', String(error));
+        emitError('Failed to submit transaction to network');
         throw error;
       }
     },
-    [sendTransaction],
+    [sendTransaction, approval.allowance, pendingAmount],
   );
 
   const createRevokeTransaction = useCallback(() => {
@@ -176,12 +215,17 @@ export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
         ],
       );
 
+      // Track revoke amount for demo hack
+      setPendingAmount('0');
+      Log(`[OpenApprovalsPanel] CONFIRM: Setting pendingAmount for revoke: 0`);
+
       setRevokeModal({
         opened: true,
         transactionData,
       });
     } catch (error) {
       LogError('Creating revoke transaction:', String(error));
+      emitError('Failed to prepare revoke transaction');
     }
   }, [approval]);
 
@@ -207,6 +251,7 @@ export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
       });
     } catch (error) {
       LogError('Creating approval transaction:', String(error));
+      emitError('Failed to prepare approval transaction');
     }
   }, [approval, getTokenAddress]);
 
@@ -253,7 +298,7 @@ export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
                   ? 'Connecting...'
                   : isPreparingTransaction
                     ? 'Preparing...'
-                    : 'Revoke'}
+                    : 'Pending...'}
               </StyledButton>
               <StyledButton
                 onClick={handleApprove}
@@ -283,55 +328,55 @@ export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
                 </Text>
               )}
             </div>
-            <Text variant="primary" size="md" fw={600}>
+            <StyledValue variant="blue" weight="strong">
               {hasApprovalData
                 ? `Approval ${displayHash(approval.token)} ${approval.tokenName || 'Token'}`
                 : 'Token Approval Management'}
-            </Text>
+            </StyledValue>
           </Group>
         </DetailHeader>
         {!hasApprovalData && (
-          <DetailSection title={'No Open Approvals'}>
-            <div
-              style={{ padding: '16px', textAlign: 'center', color: '#666' }}
-            >
-              <p style={{ margin: '0', fontSize: '14px' }}>
+          <DetailSection facet={facet} title={'No Open Approvals'}>
+            <div style={{ padding: '16px', textAlign: 'center', margin: '0' }}>
+              <StyledValue variant="dimmed" size="sm">
                 You may still create new token approvals using the Approve
                 button above.
-              </p>
+              </StyledValue>
             </div>
           </DetailSection>
         )}
         {hasApprovalData && (
-          <DetailSection title={'Information'}>
+          <DetailSection facet={facet} title={'Information'}>
             <InfoAddressRenderer addressInfo={addressInfo} />
           </DetailSection>
         )}
         <DetailSection
+          facet={facet}
           title={'Allowance Details'}
           cond={Boolean(hasApprovalData && allowanceInfo)}
         >
           <PanelTable>
             {allowanceInfo.map((item, index) => (
               <PanelRow
-                key={index}
+                key={`allowance-${item.label}-${index}`}
                 label={item.label}
                 value={
-                  <span
+                  <div
                     style={{
                       fontFamily: item.label.includes('Allowance')
                         ? 'monospace'
                         : 'inherit',
-                      fontSize: '14px',
-                      fontWeight: item.isHighlight ? 600 : 'normal',
-                      color: item.isHighlight
-                        ? 'var(--mantine-color-red-6)'
-                        : 'inherit',
                     }}
                     title={String(item.value)}
                   >
-                    {item.value}
-                  </span>
+                    <StyledValue
+                      variant={item.isHighlight ? 'error' : 'default'}
+                      weight={item.isHighlight ? 'strong' : 'normal'}
+                      size="sm"
+                    >
+                      {item.value}
+                    </StyledValue>
+                  </div>
                 }
               />
             ))}
@@ -362,108 +407,13 @@ export const OpenApprovalsPanel = (rowData: Record<string, unknown> | null) => {
             : undefined,
         }}
       />
-      {successModal.opened && successModal.txHash && (
-        <>
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: 'rgba(0,0,0,0.5)',
-              zIndex: 999,
-            }}
-            onClick={handleSuccessModalClose}
-          />
-          <div
-            style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: 'white',
-              padding: '24px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              zIndex: 1000,
-              minWidth: '400px',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ fontSize: '48px', marginBottom: '8px' }}>✅</div>
-              <h3 style={{ margin: '0 0 8px 0', color: '#28a745' }}>
-                Transaction Sent!
-              </h3>
-              <p style={{ margin: '0', color: '#666', fontSize: '14px' }}>
-                Your revoke transaction has been submitted to the network.
-              </p>
-            </div>
-            <div
-              style={{
-                padding: '12px',
-                background: '#f8f9fa',
-                borderRadius: '4px',
-                marginBottom: '20px',
-              }}
-            >
-              <p
-                style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#666' }}
-              >
-                Transaction Hash:
-              </p>
-              <code
-                style={{
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                  wordBreak: 'break-all',
-                  display: 'block',
-                  padding: '4px',
-                }}
-              >
-                {successModal.txHash}
-              </code>
-            </div>
-            <div
-              style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}
-            >
-              <button
-                onClick={() =>
-                  OpenLink('transactionHash', successModal.txHash!)
-                }
-                style={{
-                  padding: '10px 16px',
-                  background: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                }}
-              >
-                View on Etherscan
-              </button>
-              <button
-                onClick={handleSuccessModalClose}
-                style={{
-                  padding: '10px 16px',
-                  background: '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                }}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      <TransactionSuccessModal
+        opened={successModal.opened}
+        transactionHash={successModal.txHash}
+        onClose={handleSuccessModalClose}
+        title="Transaction Sent!"
+        message="Your revoke transaction has been submitted to the network."
+      />
       {revokeModal.opened && revokeModal.transactionData && (
         <TxReviewModal
           opened={revokeModal.opened}

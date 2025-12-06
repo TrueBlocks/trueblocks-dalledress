@@ -19,7 +19,7 @@ import {
 import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
 import { AppShell } from '@mantine/core';
 import { msgs, project, types } from '@models';
-import { LogError, initializePreferencesDefaults, useEmitters } from '@utils';
+import { LogError, emitError, initializePreferencesDefaults } from '@utils';
 import { WalletProvider } from '@wallet';
 import { WalletConnectModalSign } from '@walletconnect/modal-sign-react';
 import { Router, useLocation } from 'wouter';
@@ -57,7 +57,7 @@ function globalNavKeySquelcher(e: KeyboardEvent) {
 // NavigationHandler component that listens for navigation events
 // Must be inside ViewContextProvider to access setPendingRowAction
 const NavigationHandler = () => {
-  const { setPendingRowAction } = useViewContext();
+  const { setPendingRowAction, updateFiltering } = useViewContext();
   const {
     setViewAndFacet,
     activeAddress,
@@ -115,6 +115,14 @@ const NavigationHandler = () => {
         facetName: rowActionPayload.dataFacet,
       };
 
+      // Set filter from contextValues if databaseName is present
+      if (contextValues?.databaseName) {
+        updateFiltering(
+          targetViewStateKey,
+          contextValues.databaseName as string,
+        );
+      }
+
       // Store complete row action payload in ViewState
       setPendingRowAction(targetViewStateKey, rowActionPayload);
 
@@ -151,7 +159,6 @@ const AppContent = ({
   handleProjectModalCancel: () => void;
 }) => {
   const { menuCollapsed, helpCollapsed, chromeCollapsed } = usePreferences();
-  const { emitError } = useEmitters();
 
   // These hooks need WalletProvider
   useAppHotkeys();
@@ -199,9 +206,9 @@ const AppContent = ({
         <div
           style={{
             position: 'absolute',
-            top: `${getBarSize('header', chromeCollapsed) + 2}px`,
+            bottom: `${getBarSize('footer', chromeCollapsed) + 27}px`,
             right: `${getBarSize('help', helpCollapsed) + 2}px`,
-            zIndex: 1000,
+            zIndex: 500,
           }}
         >
           <NodeStatus />

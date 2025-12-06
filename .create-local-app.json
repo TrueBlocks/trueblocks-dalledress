@@ -6,36 +6,24 @@
   "Template": "default",
   "ViewConfig": {
     "abis": {
-      "menuOrder": 40,
       "disabled": true
     },
     "chunks": {
-      "menuOrder": 60,
       "disabled": true
     },
     "comparitoor": {
-      "menuOrder": 100,
       "disabled": true
     },
     "contracts": {
-      "menuOrder": 70,
       "disabled": true
     },
-    "dresses": {
-      "menuOrder": 15
-    },
+    "dresses": {},
     "exports": {
-      "menuOrder": 20,
       "disabled": true
     },
-    "monitors": {
-      "menuOrder": 30
-    },
-    "names": {
-      "menuOrder": 50
-    },
+    "monitors": {},
+    "names": {},
     "status": {
-      "menuOrder": 80,
       "disabled": true
     }
   }

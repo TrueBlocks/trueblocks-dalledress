@@ -5,3 +5,4 @@
  * This file was auto generated. Do not edit.
  */
 export { AssetChartsFacet } from './assetcharts';
+export { OpenApprovalsFacet } from './openapprovals';

@@ -4,6 +4,8 @@ import {dalle} from '../models';
 import {storage} from '../models';
 import {app} from '../models';
 
+export function DeleteImage(arg1:string):Promise<void>;
+
 export function ExportImage(arg1:string,arg2:dalle.ExportImageOptions):Promise<dalle.ExportImageResult>;
 
 export function Generate(arg1:dalle.GenerateRequest):Promise<dalle.GenerateResult>;
@@ -39,6 +41,8 @@ export function ListSeries(arg1:boolean,arg2:boolean):Promise<Array<dalle.Series
 export function OpenImageArtifact(arg1:string,arg2:string):Promise<void>;
 
 export function Preview(arg1:dalle.GenerateRequest):Promise<dalle.GenerateResult>;
+
+export function RegenerateImage(arg1:string):Promise<dalle.GenerateResult>;
 
 export function RevealImageArtifact(arg1:string,arg2:string):Promise<void>;
 

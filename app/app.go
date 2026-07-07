@@ -87,6 +87,14 @@ func (a *App) GetImage(id string) (dalle.ImageMetadataRecord, error) {
 	return a.engine.GetImage(id)
 }
 
+func (a *App) DeleteImage(id string) error {
+	return a.engine.DeleteImage(id)
+}
+
+func (a *App) RegenerateImage(id string) (dalle.GenerateResult, error) {
+	return a.engine.RegenerateImage(id)
+}
+
 func (a *App) GetImageArtifactDataURL(id string, artifact string) (string, error) {
 	path, err := a.imageArtifactPath(id, artifact)
 	if err != nil {

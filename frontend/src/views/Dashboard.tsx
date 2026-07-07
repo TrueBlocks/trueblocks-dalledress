@@ -11,7 +11,14 @@ import {
   Title,
 } from '@mantine/core';
 import { StatusBar, StatusLevel } from '../components/StatusBar';
-import { Generate, GetGenerationProgress, ListSeries, Preview } from '../../wailsjs/go/app/App';
+import {
+  Generate,
+  GetGenerationProgress,
+  GetPref,
+  ListSeries,
+  Preview,
+  SetPref,
+} from '../../wailsjs/go/app/App';
 import { app } from '../../wailsjs/go/models';
 import { dalle } from '../../wailsjs/go/models';
 
@@ -47,6 +54,17 @@ const PHASE_LABELS: Record<string, string> = {
   completed: 'Generation complete',
 };
 
+const DASHBOARD_PREFS = {
+  input: 'dashboard.input',
+  series: 'dashboard.series',
+  generateImage: 'dashboard.generateImage',
+  annotate: 'dashboard.annotate',
+};
+
+function booleanPref(value: string): boolean {
+  return value === 'true';
+}
+
 function statusForProgress(progress: app.GenerationProgress): StatusState {
   if (progress.error) {
     return { visible: true, level: 'error', message: progress.error };
@@ -73,6 +91,7 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
   const [result, setResult] = useState<dalle.GenerateResult | null>(null);
   const [working, setWorking] = useState(false);
   const [progressTarget, setProgressTarget] = useState<ProgressTarget | null>(null);
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [status, setStatus] = useState<StatusState>({
     visible: false,
     level: 'progress',
@@ -81,14 +100,46 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    ListSeries(false, false)
-      .then((items) => {
+    Promise.all([
+      ListSeries(false, false),
+      GetPref(DASHBOARD_PREFS.input),
+      GetPref(DASHBOARD_PREFS.series),
+      GetPref(DASHBOARD_PREFS.generateImage),
+      GetPref(DASHBOARD_PREFS.annotate),
+    ])
+      .then(([items, savedInput, savedSeries, savedGenerateImage, savedAnnotate]) => {
         const next = items ?? [];
         setSeries(next);
-        setSelectedSeries((current) => current || next[0]?.suffix || '');
+        setInput(savedInput || 'Person Tour Coordinates');
+        setGenerateImage(booleanPref(savedGenerateImage));
+        setAnnotate(booleanPref(savedAnnotate));
+        setSelectedSeries(
+          next.some((item) => item.suffix === savedSeries) ? savedSeries : next[0]?.suffix || '',
+        );
+        setPrefsLoaded(true);
       })
       .catch((err: unknown) => setError(messageFromError(err)));
   }, []);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    SetPref(DASHBOARD_PREFS.input, input);
+  }, [input, prefsLoaded]);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    SetPref(DASHBOARD_PREFS.series, selectedSeries);
+  }, [prefsLoaded, selectedSeries]);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    SetPref(DASHBOARD_PREFS.generateImage, String(generateImage));
+  }, [generateImage, prefsLoaded]);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    SetPref(DASHBOARD_PREFS.annotate, String(annotate));
+  }, [annotate, prefsLoaded]);
 
   const request = () =>
     dalle.GenerateRequest.createFrom({

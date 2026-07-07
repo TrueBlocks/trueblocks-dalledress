@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
+  ActionIcon,
   Badge,
   Button,
   Group,
@@ -13,9 +14,12 @@ import {
   Text,
   TextInput,
   Title,
+  Tooltip,
 } from '@mantine/core';
-import { GetImageArtifactDataURL, ListImages } from '../../wailsjs/go/app/App';
+import { IconRefresh, IconX } from '@tabler/icons-react';
+import { DeleteImage, GetImageArtifactDataURL, ListImages } from '../../wailsjs/go/app/App';
 import { ExportImage, OpenImageArtifact, RevealImageArtifact } from '../../wailsjs/go/app/App';
+import { RegenerateImage } from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
 
 type ArtifactKind = 'annotated' | 'generated';
@@ -61,6 +65,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   const [artifactURL, setArtifactURL] = useState('');
   const [error, setError] = useState('');
   const [actionMessage, setActionMessage] = useState('');
+  const [imageActionId, setImageActionId] = useState('');
 
   const selected = images.find((record) => recordKey(record) === selectedId) ?? images[0];
   const selectedRecordId = selected ? recordKey(selected) : '';
@@ -80,7 +85,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   const load = useCallback(
     (seriesFilter = series, preferredId = selectedImageId) => {
       setError('');
-      ListImages(seriesFilter)
+      return ListImages(seriesFilter)
         .then((items) => {
           const next = items ?? [];
           setImages(next);
@@ -99,6 +104,34 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
     operation(selectedRecordId, artifact)
       .then(() => setActionMessage(action === 'open' ? 'Opened image.' : 'Opened in Finder.'))
       .catch((err: unknown) => setError(messageFromError(err)));
+  };
+
+  const deleteImage = (id: string) => {
+    if (!window.confirm('Delete this image and its metadata?')) return;
+    setError('');
+    setActionMessage('');
+    setImageActionId(id);
+    DeleteImage(id)
+      .then(() => {
+        setActionMessage('Deleted image and metadata.');
+        return load(series, '');
+      })
+      .catch((err: unknown) => setError(messageFromError(err)))
+      .finally(() => setImageActionId(''));
+  };
+
+  const refreshSelected = () => {
+    if (!selectedRecordId) return;
+    setError('');
+    setActionMessage('');
+    setImageActionId(selectedRecordId);
+    RegenerateImage(selectedRecordId)
+      .then((next) => {
+        setActionMessage('Regenerated image from scratch.');
+        return load(series, next.metadata?.imageId || next.seed);
+      })
+      .catch((err: unknown) => setError(messageFromError(err)))
+      .finally(() => setImageActionId(''));
   };
 
   const exportText = () => {
@@ -163,7 +196,17 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
             value={series}
             onChange={(event) => setSeries(event.currentTarget.value)}
           />
-          <Button onClick={() => load()}>Refresh</Button>
+          <Button variant="light" onClick={() => load()} disabled={Boolean(imageActionId)}>
+            Reload
+          </Button>
+          <Button
+            leftSection={<IconRefresh size={16} />}
+            onClick={refreshSelected}
+            loading={Boolean(imageActionId && imageActionId === selectedRecordId)}
+            disabled={!selectedRecordId}
+          >
+            Refresh
+          </Button>
         </Group>
       </Group>
 
@@ -196,7 +239,23 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
                       <Text fw={700} lineClamp={2}>
                         {displayTitle(record)}
                       </Text>
-                      <Badge variant="light">{statusLabel(record)}</Badge>
+                      <Group gap="xs" wrap="nowrap">
+                        <Badge variant="light">{statusLabel(record)}</Badge>
+                        <Tooltip label="Delete image and metadata">
+                          <ActionIcon
+                            aria-label="Delete image and metadata"
+                            variant="subtle"
+                            color="red"
+                            loading={imageActionId === key}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              deleteImage(key);
+                            }}
+                          >
+                            <IconX size={14} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
                     </Group>
                     <Text size="xs" c="dimmed" lineClamp={1}>
                       {record.metadata.series?.name} · {record.metadata.seed}

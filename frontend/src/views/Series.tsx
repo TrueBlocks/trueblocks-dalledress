@@ -5,6 +5,7 @@ import {
   Checkbox,
   Group,
   Paper,
+  Select,
   SimpleGrid,
   Stack,
   Tabs,
@@ -42,12 +43,14 @@ type SeriesDraft = Record<FilterField, string> & {
   suffix: string;
   purpose: string;
   last: string;
+  colorLimit: string;
 };
 
 const emptyDraft: SeriesDraft = {
   suffix: '',
   purpose: '',
   last: '0',
+  colorLimit: '',
   adverbs: '',
   adjectives: '',
   nouns: '',
@@ -83,6 +86,7 @@ function draftFromSeries(series: dalle.Series): SeriesDraft {
     suffix: series.suffix ?? '',
     purpose: series.purpose ?? '',
     last: String(series.last ?? 0),
+    colorLimit: series.colorLimit ?? '',
     adverbs: valuesToText(series.adverbs),
     adjectives: valuesToText(series.adjectives),
     nouns: valuesToText(series.nouns),
@@ -104,6 +108,7 @@ function seriesFromDraft(draft: SeriesDraft): dalle.Series {
     suffix: draft.suffix,
     purpose: draft.purpose,
     last: Number.parseInt(draft.last || '0', 10) || 0,
+    colorLimit: draft.colorLimit || undefined,
     adverbs: textToValues(draft.adverbs),
     adjectives: textToValues(draft.adjectives),
     nouns: textToValues(draft.nouns),
@@ -446,6 +451,22 @@ export function Series() {
                   label="Purpose"
                   value={draft.purpose}
                   onChange={(event) => updateDraft('purpose', event.currentTarget.value)}
+                />
+                <Select
+                  label="Color limit"
+                  description="Empty = colors are palette suggestions. N-tone = strict color constraint."
+                  value={draft.colorLimit || null}
+                  data={[
+                    { value: 'two-tone', label: 'Two-tone' },
+                    { value: 'three-tone', label: 'Three-tone' },
+                    { value: 'four-tone', label: 'Four-tone' },
+                    { value: 'five-tone', label: 'Five-tone' },
+                    { value: 'six-tone', label: 'Six-tone' },
+                    { value: 'seven-tone', label: 'Seven-tone' },
+                  ]}
+                  onChange={(value) => updateDraft('colorLimit', value ?? '')}
+                  clearable
+                  placeholder="No limit (full palette)"
                 />
                 <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
                   {FILTER_FIELDS.map((field) => (

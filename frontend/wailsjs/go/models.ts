@@ -465,6 +465,7 @@ export namespace dalle {
 	    gazes: string[];
 	    backstyles: string[];
 	    compositions: string[];
+	    colorLimit?: string;
 	    modifiedAt?: string;
 	
 	    static createFrom(source: any = {}) {
@@ -490,6 +491,7 @@ export namespace dalle {
 	        this.gazes = source["gazes"];
 	        this.backstyles = source["backstyles"];
 	        this.compositions = source["compositions"];
+	        this.colorLimit = source["colorLimit"];
 	        this.modifiedAt = source["modifiedAt"];
 	    }
 	}

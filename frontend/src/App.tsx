@@ -25,6 +25,7 @@ const VIEWS = [
 
 export function App() {
   const [route, setRoute] = useState('dashboard');
+  const [selectedImageId, setSelectedImageId] = useState('');
   const [initialSidebarWidth, setInitialSidebarWidth] = useState(220);
   const [ready, setReady] = useState(false);
 
@@ -45,6 +46,11 @@ export function App() {
     SetLastRoute(id);
   };
 
+  const showGeneratedImage = (imageId: string) => {
+    setSelectedImageId(imageId);
+    navigate('images');
+  };
+
   useViewHotkeys({ views: VIEWS, activeView: route, onNavigate: navigate });
 
   if (!ready) return null;
@@ -57,8 +63,8 @@ export function App() {
       initialSidebarWidth={initialSidebarWidth}
       saveSidebarWidth={SetSidebarWidth}
     >
-      {route === 'dashboard' && <Dashboard />}
-      {route === 'images' && <Images />}
+      {route === 'dashboard' && <Dashboard onGeneratedImage={showGeneratedImage} />}
+      {route === 'images' && <Images selectedImageId={selectedImageId} />}
       {route === 'series' && <Series />}
       {route === 'databases' && <Databases />}
       {route === 'settings' && <Settings />}

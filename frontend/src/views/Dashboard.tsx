@@ -13,17 +13,22 @@ import {
 import { Generate, ListSeries, Preview } from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
 
+type DashboardProps = {
+  onGeneratedImage: (imageId: string) => void;
+};
+
 function messageFromError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-export function Dashboard() {
+export function Dashboard({ onGeneratedImage }: DashboardProps) {
   const [series, setSeries] = useState<dalle.Series[]>([]);
   const [selectedSeries, setSelectedSeries] = useState<string>('');
   const [input, setInput] = useState('Person Tour Coordinates');
   const [generateImage, setGenerateImage] = useState(false);
   const [annotate, setAnnotate] = useState(false);
   const [result, setResult] = useState<dalle.GenerateResult | null>(null);
+  const [working, setWorking] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -46,16 +51,27 @@ export function Dashboard() {
 
   const runPreview = () => {
     setError('');
+    setWorking(true);
     Preview(request())
       .then(setResult)
-      .catch((err: unknown) => setError(messageFromError(err)));
+      .catch((err: unknown) => setError(messageFromError(err)))
+      .finally(() => setWorking(false));
   };
 
   const runGenerate = () => {
     setError('');
+    setWorking(true);
     Generate(request())
-      .then(setResult)
-      .catch((err: unknown) => setError(messageFromError(err)));
+      .then((next) => {
+        setResult(next);
+        const imageId = next.metadata?.imageId || next.seed;
+        setWorking(false);
+        if (generateImage && imageId) onGeneratedImage(imageId);
+      })
+      .catch((err: unknown) => {
+        setError(messageFromError(err));
+        setWorking(false);
+      });
   };
 
   return (
@@ -85,8 +101,12 @@ export function Dashboard() {
           disabled={!generateImage}
           onChange={(event) => setAnnotate(event.currentTarget.checked)}
         />
-        <Button onClick={runPreview}>Preview</Button>
-        <Button onClick={runGenerate}>Generate</Button>
+        <Button onClick={runPreview} loading={working}>
+          Preview
+        </Button>
+        <Button onClick={runGenerate} loading={working}>
+          Generate
+        </Button>
       </Group>
       {error && <Text c="red">{error}</Text>}
       {result && (

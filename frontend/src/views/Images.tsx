@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Badge,
   Button,
@@ -19,6 +19,10 @@ import { dalle } from '../../wailsjs/go/models';
 
 type ArtifactKind = 'annotated' | 'generated';
 
+type ImagesProps = {
+  selectedImageId?: string;
+};
+
 function messageFromError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
@@ -38,7 +42,17 @@ function statusLabel(record: dalle.ImageMetadataRecord): string {
   return 'pending';
 }
 
-export function Images() {
+function selectRecordId(
+  records: dalle.ImageMetadataRecord[],
+  current: string,
+  preferred: string,
+): string {
+  if (preferred && records.some((record) => recordKey(record) === preferred)) return preferred;
+  if (current && records.some((record) => recordKey(record) === current)) return current;
+  return records[0] ? recordKey(records[0]) : '';
+}
+
+export function Images({ selectedImageId = '' }: ImagesProps) {
   const [series, setSeries] = useState('');
   const [images, setImages] = useState<dalle.ImageMetadataRecord[]>([]);
   const [selectedId, setSelectedId] = useState('');
@@ -48,31 +62,58 @@ export function Images() {
 
   const selected = images.find((record) => recordKey(record) === selectedId) ?? images[0];
   const selectedRecordId = selected ? recordKey(selected) : '';
+  const selectedIndex = selected
+    ? images.findIndex((record) => recordKey(record) === selectedRecordId)
+    : -1;
 
-  const load = () => {
-    setError('');
-    ListImages(series)
-      .then((items) => {
-        const next = items ?? [];
-        setImages(next);
-        setSelectedId((current) => {
-          if (next.some((record) => recordKey(record) === current)) return current;
-          return next[0] ? recordKey(next[0]) : '';
-        });
-      })
-      .catch((err: unknown) => setError(messageFromError(err)));
-  };
+  const selectByOffset = useCallback(
+    (offset: number) => {
+      if (selectedIndex < 0) return;
+      const next = images[selectedIndex + offset];
+      if (next) setSelectedId(recordKey(next));
+    },
+    [images, selectedIndex],
+  );
+
+  const load = useCallback(
+    (seriesFilter = series, preferredId = selectedImageId) => {
+      setError('');
+      ListImages(seriesFilter)
+        .then((items) => {
+          const next = items ?? [];
+          setImages(next);
+          setSelectedId((current) => selectRecordId(next, current, preferredId));
+        })
+        .catch((err: unknown) => setError(messageFromError(err)));
+    },
+    [selectedImageId, series],
+  );
 
   useEffect(() => {
-    setError('');
-    ListImages('')
-      .then((items) => {
-        const next = items ?? [];
-        setImages(next);
-        setSelectedId(next[0] ? recordKey(next[0]) : '');
-      })
-      .catch((err: unknown) => setError(messageFromError(err)));
-  }, []);
+    if (selectedImageId) setSeries('');
+    load(selectedImageId ? '' : series, selectedImageId);
+  }, [load, selectedImageId, series]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.target instanceof HTMLElement) {
+        const editableTags = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'];
+        if (editableTags.includes(event.target.tagName)) return;
+      }
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        selectByOffset(-1);
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        selectByOffset(1);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectByOffset]);
 
   useEffect(() => {
     if (!selectedRecordId) {
@@ -101,7 +142,7 @@ export function Images() {
             value={series}
             onChange={(event) => setSeries(event.currentTarget.value)}
           />
-          <Button onClick={load}>Refresh</Button>
+          <Button onClick={() => load()}>Refresh</Button>
         </Group>
       </Group>
 
@@ -153,15 +194,34 @@ export function Images() {
                   <Text size="sm" c="dimmed">
                     {selected.metadata.series?.name} · {selected.metadata.seed}
                   </Text>
+                  <Text size="xs" c="dimmed">
+                    {selectedIndex + 1} of {images.length}
+                  </Text>
                 </Stack>
-                <SegmentedControl
-                  value={artifact}
-                  onChange={(value) => setArtifact(value as ArtifactKind)}
-                  data={[
-                    { value: 'annotated', label: 'Annotated' },
-                    { value: 'generated', label: 'Generated' },
-                  ]}
-                />
+                <Group>
+                  <Button
+                    variant="light"
+                    disabled={selectedIndex <= 0}
+                    onClick={() => selectByOffset(-1)}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="light"
+                    disabled={selectedIndex < 0 || selectedIndex >= images.length - 1}
+                    onClick={() => selectByOffset(1)}
+                  >
+                    Next
+                  </Button>
+                  <SegmentedControl
+                    value={artifact}
+                    onChange={(value) => setArtifact(value as ArtifactKind)}
+                    data={[
+                      { value: 'annotated', label: 'Annotated' },
+                      { value: 'generated', label: 'Generated' },
+                    ]}
+                  />
+                </Group>
               </Group>
 
               {artifactURL ? (

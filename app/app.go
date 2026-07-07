@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"os/exec"
 
 	appkit "github.com/TrueBlocks/trueblocks-art/packages/appkit/v2"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v6"
@@ -56,22 +57,51 @@ func (a *App) GetImage(id string) (dalle.ImageMetadataRecord, error) {
 }
 
 func (a *App) GetImageArtifactDataURL(id string, artifact string) (string, error) {
-	record, err := a.engine.GetImage(id)
+	path, err := a.imageArtifactPath(id, artifact)
 	if err != nil {
 		return "", err
-	}
-	path := record.Metadata.Artifacts.Annotated
-	if artifact == "generated" {
-		path = record.Metadata.Artifacts.Generated
-	}
-	if path == "" {
-		return "", fmt.Errorf("%s artifact is not available", artifact)
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
 	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(data), nil
+}
+
+func (a *App) OpenImageArtifact(id string, artifact string) error {
+	path, err := a.imageArtifactPath(id, artifact)
+	if err != nil {
+		return err
+	}
+	return exec.Command("open", path).Run()
+}
+
+func (a *App) RevealImageArtifact(id string, artifact string) error {
+	path, err := a.imageArtifactPath(id, artifact)
+	if err != nil {
+		return err
+	}
+	return exec.Command("open", "-R", path).Run()
+}
+
+func (a *App) imageArtifactPath(id string, artifact string) (string, error) {
+	record, err := a.engine.GetImage(id)
+	if err != nil {
+		return "", err
+	}
+	path := ""
+	switch artifact {
+	case "annotated":
+		path = record.Metadata.Artifacts.Annotated
+	case "generated":
+		path = record.Metadata.Artifacts.Generated
+	default:
+		return "", fmt.Errorf("unknown artifact %q", artifact)
+	}
+	if path == "" {
+		return "", fmt.Errorf("%s artifact is not available", artifact)
+	}
+	return path, nil
 }
 
 func (a *App) ExportImage(id string, options dalle.ExportImageOptions) (dalle.ExportImageResult, error) {

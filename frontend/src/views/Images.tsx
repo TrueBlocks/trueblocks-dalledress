@@ -15,6 +15,7 @@ import {
   Title,
 } from '@mantine/core';
 import { GetImageArtifactDataURL, ListImages } from '../../wailsjs/go/app/App';
+import { ExportImage, OpenImageArtifact, RevealImageArtifact } from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
 
 type ArtifactKind = 'annotated' | 'generated';
@@ -59,6 +60,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   const [artifact, setArtifact] = useState<ArtifactKind>('annotated');
   const [artifactURL, setArtifactURL] = useState('');
   const [error, setError] = useState('');
+  const [actionMessage, setActionMessage] = useState('');
 
   const selected = images.find((record) => recordKey(record) === selectedId) ?? images[0];
   const selectedRecordId = selected ? recordKey(selected) : '';
@@ -88,6 +90,25 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
     },
     [selectedImageId, series],
   );
+
+  const runArtifactAction = (action: 'open' | 'reveal') => {
+    if (!selectedRecordId) return;
+    setError('');
+    setActionMessage('');
+    const operation = action === 'open' ? OpenImageArtifact : RevealImageArtifact;
+    operation(selectedRecordId, artifact)
+      .then(() => setActionMessage(action === 'open' ? 'Opened image.' : 'Opened in Finder.'))
+      .catch((err: unknown) => setError(messageFromError(err)));
+  };
+
+  const exportText = () => {
+    if (!selectedRecordId) return;
+    setError('');
+    setActionMessage('');
+    ExportImage(selectedRecordId, dalle.ExportImageOptions.createFrom({}))
+      .then((result) => setActionMessage(`Exported text files to ${result.dir}.`))
+      .catch((err: unknown) => setError(messageFromError(err)));
+  };
 
   useEffect(() => {
     if (selectedImageId) setSeries('');
@@ -147,6 +168,11 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
       </Group>
 
       {error && <Text c="red">{error}</Text>}
+      {actionMessage && (
+        <Text c="dimmed" size="sm">
+          {actionMessage}
+        </Text>
+      )}
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
         <ScrollArea h="calc(100vh - 220px)">
@@ -199,6 +225,23 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
                   </Text>
                 </Stack>
                 <Group>
+                  <Button
+                    variant="light"
+                    disabled={!artifactURL}
+                    onClick={() => runArtifactAction('open')}
+                  >
+                    Open
+                  </Button>
+                  <Button
+                    variant="light"
+                    disabled={!artifactURL}
+                    onClick={() => runArtifactAction('reveal')}
+                  >
+                    Show in Finder
+                  </Button>
+                  <Button variant="light" onClick={exportText}>
+                    Export Text
+                  </Button>
                   <Button
                     variant="light"
                     disabled={selectedIndex <= 0}

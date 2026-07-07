@@ -62,8 +62,16 @@ export function ListSeries(arg1, arg2) {
   return window['go']['app']['App']['ListSeries'](arg1, arg2);
 }
 
+export function OpenImageArtifact(arg1, arg2) {
+  return window['go']['app']['App']['OpenImageArtifact'](arg1, arg2);
+}
+
 export function Preview(arg1) {
   return window['go']['app']['App']['Preview'](arg1);
+}
+
+export function RevealImageArtifact(arg1, arg2) {
+  return window['go']['app']['App']['RevealImageArtifact'](arg1, arg2);
 }
 
 export function SaveSeries(arg1) {

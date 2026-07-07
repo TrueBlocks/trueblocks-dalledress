@@ -14,11 +14,12 @@ import {
   Tabs,
   Text,
   TextInput,
-  Title,
   Tooltip,
 } from '@mantine/core';
-import { IconX } from '@tabler/icons-react';
-import { usePersistedTab } from '@trueblocks/ui';
+import { notifications } from '@mantine/notifications';
+import { IconExternalLink, IconFolderOpen, IconPhoto, IconX } from '@tabler/icons-react';
+import { DetailHeader, usePersistedTab } from '@trueblocks/ui';
+import { StatusBar, StatusLevel } from '../components/StatusBar';
 import { DeleteImage, GetImageArtifactDataURL, GetTab, ListImages } from '../../wailsjs/go/app/App';
 import { ExportImage, OpenImageArtifact, RevealImageArtifact } from '../../wailsjs/go/app/App';
 import { RegenerateImage, SetTab } from '../../wailsjs/go/app/App';
@@ -28,6 +29,13 @@ type ArtifactKind = 'annotated' | 'generated';
 
 type ImagesProps = {
   selectedImageId?: string;
+};
+
+type StatusState = {
+  visible: boolean;
+  level: StatusLevel;
+  message: string;
+  meta?: string;
 };
 
 function messageFromError(error: unknown): string {
@@ -68,6 +76,11 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   const [error, setError] = useState('');
   const [actionMessage, setActionMessage] = useState('');
   const [imageActionId, setImageActionId] = useState('');
+  const [status, setStatus] = useState<StatusState>({
+    visible: false,
+    level: 'progress',
+    message: '',
+  });
   const { activeTab, setActiveTab } = usePersistedTab({
     key: 'images',
     defaultTab: 'gallery',
@@ -79,9 +92,12 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
 
   const selected = images.find((record) => recordKey(record) === selectedId) ?? images[0];
   const selectedRecordId = selected ? recordKey(selected) : '';
+  const selectedTitle = selected ? displayTitle(selected) : '';
   const selectedIndex = selected
     ? images.findIndex((record) => recordKey(record) === selectedRecordId)
     : -1;
+  const hasPrevious = selectedIndex > 0;
+  const hasNext = selectedIndex >= 0 && selectedIndex < images.length - 1;
 
   const selectByOffset = useCallback(
     (offset: number) => {
@@ -91,6 +107,10 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
     },
     [images, selectedIndex],
   );
+
+  const returnToGallery = useCallback(() => {
+    setActiveTab('gallery');
+  }, [setActiveTab]);
 
   const load = useCallback(
     (seriesFilter = series, preferredId = selectedImageId) => {
@@ -108,25 +128,58 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
 
   const runArtifactAction = (action: 'open' | 'reveal') => {
     if (!selectedRecordId) return;
+    const label = action === 'open' ? 'Opening image' : 'Showing image in Finder';
     setError('');
     setActionMessage('');
+    setStatus({ visible: true, level: 'progress', message: label, meta: displayTitle(selected) });
     const operation = action === 'open' ? OpenImageArtifact : RevealImageArtifact;
     operation(selectedRecordId, artifact)
-      .then(() => setActionMessage(action === 'open' ? 'Opened image.' : 'Opened in Finder.'))
-      .catch((err: unknown) => setError(messageFromError(err)));
+      .then(() => {
+        const message = action === 'open' ? 'Opened image.' : 'Opened in Finder.';
+        setActionMessage(message);
+        setStatus({ visible: true, level: 'success', message, meta: displayTitle(selected) });
+        notifications.show({ title: 'Image', message, color: 'green', autoClose: 2000 });
+      })
+      .catch((err: unknown) => {
+        const message = messageFromError(err);
+        setError(message);
+        setStatus({ visible: true, level: 'error', message });
+        notifications.show({
+          title: 'Image action failed',
+          message,
+          color: 'red',
+          autoClose: 5000,
+        });
+      });
   };
 
   const deleteImage = (id: string) => {
     if (!window.confirm('Delete this image and its metadata?')) return;
+    const deleting = images.find((record) => recordKey(record) === id);
+    const title = deleting ? displayTitle(deleting) : id;
     setError('');
     setActionMessage('');
     setImageActionId(id);
+    setStatus({ visible: true, level: 'progress', message: 'Deleting image', meta: title });
     DeleteImage(id)
       .then(() => {
-        setActionMessage('Deleted image and metadata.');
+        const message = 'Deleted image and metadata.';
+        setActionMessage(message);
+        setStatus({ visible: true, level: 'success', message, meta: title });
+        notifications.show({
+          title: 'Image deleted',
+          message: title,
+          color: 'green',
+          autoClose: 2500,
+        });
         return load(series, '');
       })
-      .catch((err: unknown) => setError(messageFromError(err)))
+      .catch((err: unknown) => {
+        const message = messageFromError(err);
+        setError(message);
+        setStatus({ visible: true, level: 'error', message, meta: title });
+        notifications.show({ title: 'Delete failed', message, color: 'red', autoClose: 5000 });
+      })
       .finally(() => setImageActionId(''));
   };
 
@@ -135,22 +188,72 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
     setError('');
     setActionMessage('');
     setImageActionId(selectedRecordId);
+    setStatus({
+      visible: true,
+      level: 'progress',
+      message: 'Regenerating image',
+      meta: selectedTitle,
+    });
     RegenerateImage(selectedRecordId)
       .then((next) => {
-        setActionMessage('Regenerated image from scratch.');
+        const message = 'Regenerated image from scratch.';
+        setActionMessage(message);
+        setStatus({
+          visible: true,
+          level: 'success',
+          message,
+          meta: next.metadata?.prompts?.titlePrompt || next.seed,
+        });
+        notifications.show({
+          title: 'Image regenerated',
+          message: next.metadata?.prompts?.titlePrompt || next.seed,
+          color: 'green',
+          autoClose: 2500,
+        });
         return load(series, next.metadata?.imageId || next.seed);
       })
-      .catch((err: unknown) => setError(messageFromError(err)))
+      .catch((err: unknown) => {
+        const message = messageFromError(err);
+        setError(message);
+        setStatus({ visible: true, level: 'error', message, meta: selectedTitle });
+        notifications.show({
+          title: 'Regeneration failed',
+          message,
+          color: 'red',
+          autoClose: 5000,
+        });
+      })
       .finally(() => setImageActionId(''));
-  }, [load, selectedRecordId, series]);
+  }, [load, selectedRecordId, selectedTitle, series]);
 
   const exportText = () => {
     if (!selectedRecordId) return;
     setError('');
     setActionMessage('');
+    setStatus({
+      visible: true,
+      level: 'progress',
+      message: 'Exporting text artifacts',
+      meta: displayTitle(selected),
+    });
     ExportImage(selectedRecordId, dalle.ExportImageOptions.createFrom({}))
-      .then((result) => setActionMessage(`Exported text files to ${result.dir}.`))
-      .catch((err: unknown) => setError(messageFromError(err)));
+      .then((result) => {
+        const message = `Exported text files to ${result.dir}.`;
+        setActionMessage(message);
+        setStatus({ visible: true, level: 'success', message });
+        notifications.show({
+          title: 'Image text exported',
+          message: result.dir,
+          color: 'green',
+          autoClose: 3000,
+        });
+      })
+      .catch((err: unknown) => {
+        const message = messageFromError(err);
+        setError(message);
+        setStatus({ visible: true, level: 'error', message });
+        notifications.show({ title: 'Export failed', message, color: 'red', autoClose: 5000 });
+      });
   };
 
   useEffect(() => {
@@ -177,6 +280,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (activeTab !== 'detail') return;
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.target instanceof HTMLElement) {
         const editableTags = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'];
@@ -194,7 +298,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectByOffset]);
+  }, [activeTab, selectByOffset]);
 
   useEffect(() => {
     if (!selectedRecordId) {
@@ -239,7 +343,9 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
     <Stack gap="md">
       <Group justify="space-between" align="end">
         <Stack gap={2}>
-          <Title order={2}>Images</Title>
+          <Text fw={700} size="xl">
+            Images
+          </Text>
           <Text c="dimmed" size="sm">
             {images.length} records
           </Text>
@@ -336,58 +442,57 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
           <Paper withBorder p="md">
             {selected ? (
               <Stack gap="md">
-                <Group justify="space-between" align="start">
-                  <Stack gap={2}>
-                    <Title order={3}>{displayTitle(selected)}</Title>
+                <DetailHeader
+                  hasPrev={hasPrevious}
+                  hasNext={hasNext}
+                  onPrev={() => selectByOffset(-1)}
+                  onNext={() => selectByOffset(1)}
+                  onBack={returnToGallery}
+                  currentIndex={selectedIndex}
+                  totalCount={images.length}
+                  icon={<IconPhoto size={24} />}
+                  title={<Text fw={700}>{displayTitle(selected)}</Text>}
+                  subtitle={
                     <Text size="sm" c="dimmed">
                       {selected.metadata.series?.name} · {selected.metadata.seed}
                     </Text>
-                    <Text size="xs" c="dimmed">
-                      {selectedIndex + 1} of {images.length}
-                    </Text>
-                  </Stack>
-                  <Group>
-                    <Button
-                      variant="light"
-                      disabled={!artifactURL}
-                      onClick={() => runArtifactAction('open')}
-                    >
-                      Open
-                    </Button>
-                    <Button
-                      variant="light"
-                      disabled={!artifactURL}
-                      onClick={() => runArtifactAction('reveal')}
-                    >
-                      Show in Finder
-                    </Button>
-                    <Button variant="light" onClick={exportText}>
-                      Export Text
-                    </Button>
-                    <Button
-                      variant="light"
-                      disabled={selectedIndex <= 0}
-                      onClick={() => selectByOffset(-1)}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      variant="light"
-                      disabled={selectedIndex < 0 || selectedIndex >= images.length - 1}
-                      onClick={() => selectByOffset(1)}
-                    >
-                      Next
-                    </Button>
-                    <SegmentedControl
-                      value={artifact}
-                      onChange={(value) => setArtifact(value as ArtifactKind)}
-                      data={[
-                        { value: 'annotated', label: 'Annotated' },
-                        { value: 'generated', label: 'Generated' },
-                      ]}
-                    />
-                  </Group>
-                </Group>
+                  }
+                  actionsRight={
+                    <Group gap="xs" wrap="nowrap">
+                      <Tooltip label="Open image">
+                        <ActionIcon
+                          variant="light"
+                          disabled={!artifactURL}
+                          onClick={() => runArtifactAction('open')}
+                          aria-label="Open image"
+                        >
+                          <IconExternalLink size={18} />
+                        </ActionIcon>
+                      </Tooltip>
+                      <Tooltip label="Show in Finder">
+                        <ActionIcon
+                          variant="light"
+                          disabled={!artifactURL}
+                          onClick={() => runArtifactAction('reveal')}
+                          aria-label="Show in Finder"
+                        >
+                          <IconFolderOpen size={18} />
+                        </ActionIcon>
+                      </Tooltip>
+                      <Button variant="light" onClick={exportText}>
+                        Export Text
+                      </Button>
+                      <SegmentedControl
+                        value={artifact}
+                        onChange={(value) => setArtifact(value as ArtifactKind)}
+                        data={[
+                          { value: 'annotated', label: 'Annotated' },
+                          { value: 'generated', label: 'Generated' },
+                        ]}
+                      />
+                    </Group>
+                  }
+                />
 
                 {artifactURL ? (
                   <Image src={artifactURL} radius="sm" fit="contain" mah="60vh" />
@@ -447,6 +552,12 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
           </Paper>
         </Tabs.Panel>
       </Tabs>
+      <StatusBar
+        visible={status.visible}
+        level={status.level}
+        message={status.message}
+        meta={status.meta}
+      />
     </Stack>
   );
 }

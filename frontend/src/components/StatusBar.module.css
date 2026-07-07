@@ -20,7 +20,7 @@
 
 .inner {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
   gap: 12px;
   align-items: center;
   min-height: 30px;
@@ -54,4 +54,22 @@
 .meta {
   color: rgba(216, 246, 224, 0.7);
   white-space: nowrap;
+}
+
+.copyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: #ff7a7a;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 120ms;
+}
+
+.copyButton:hover {
+  opacity: 1;
 }

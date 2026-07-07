@@ -10,14 +10,22 @@ import {
   Textarea,
   Title,
 } from '@mantine/core';
-import { DASHBOARD_PREFS, booleanPref, serializeBooleanPref } from '../dallePrefs';
+import {
+  DASHBOARD_PREFS,
+  DEFAULT_IMAGE_MODEL,
+  IMAGE_MODELS,
+  booleanPref,
+  serializeBooleanPref,
+} from '../dallePrefs';
 import { StatusBar, StatusLevel } from '../components/StatusBar';
 import {
   Generate,
   GetGenerationProgress,
+  GetImageModel,
   GetPref,
   ListSeries,
   Preview,
+  SetImageModel,
   SetPref,
 } from '../../wailsjs/go/app/App';
 import { app } from '../../wailsjs/go/models';
@@ -83,6 +91,7 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
   const [working, setWorking] = useState(false);
   const [progressTarget, setProgressTarget] = useState<ProgressTarget | null>(null);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
+  const [imageModel, setImageModelState] = useState(DEFAULT_IMAGE_MODEL);
   const [status, setStatus] = useState<StatusState>({
     visible: false,
     level: 'progress',
@@ -98,19 +107,35 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
       GetPref(DASHBOARD_PREFS.enhance),
       GetPref(DASHBOARD_PREFS.generateImage),
       GetPref(DASHBOARD_PREFS.annotate),
+      GetPref(DASHBOARD_PREFS.imageModel),
+      GetImageModel(),
     ])
-      .then(([items, savedInput, savedSeries, savedEnhance, savedGenerateImage, savedAnnotate]) => {
-        const next = items ?? [];
-        setSeries(next);
-        setInput(savedInput || 'Person Tour Coordinates');
-        setEnhance(booleanPref(savedEnhance));
-        setGenerateImage(booleanPref(savedGenerateImage));
-        setAnnotate(booleanPref(savedAnnotate));
-        setSelectedSeries(
-          next.some((item) => item.suffix === savedSeries) ? savedSeries : next[0]?.suffix || '',
-        );
-        setPrefsLoaded(true);
-      })
+      .then(
+        ([
+          items,
+          savedInput,
+          savedSeries,
+          savedEnhance,
+          savedGenerateImage,
+          savedAnnotate,
+          savedModel,
+          engineModel,
+        ]) => {
+          const next = items ?? [];
+          setSeries(next);
+          setInput(savedInput || 'Person Tour Coordinates');
+          setEnhance(booleanPref(savedEnhance));
+          setGenerateImage(booleanPref(savedGenerateImage));
+          setAnnotate(booleanPref(savedAnnotate));
+          setSelectedSeries(
+            next.some((item) => item.suffix === savedSeries) ? savedSeries : next[0]?.suffix || '',
+          );
+          const model = savedModel || engineModel || DEFAULT_IMAGE_MODEL;
+          setImageModelState(model);
+          SetImageModel(model);
+          setPrefsLoaded(true);
+        },
+      )
       .catch((err: unknown) => setError(messageFromError(err)));
   }, []);
 
@@ -138,6 +163,13 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
     if (!prefsLoaded) return;
     SetPref(DASHBOARD_PREFS.annotate, serializeBooleanPref(annotate));
   }, [annotate, prefsLoaded]);
+
+  const handleModelChange = (value: string | null) => {
+    if (!value) return;
+    setImageModelState(value);
+    SetPref(DASHBOARD_PREFS.imageModel, value);
+    SetImageModel(value);
+  };
 
   const request = () =>
     dalle.GenerateRequest.createFrom({
@@ -238,6 +270,13 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
           value={selectedSeries}
           data={series.map((item) => ({ value: item.suffix, label: item.suffix }))}
           onChange={(value) => setSelectedSeries(value ?? '')}
+        />
+        <Select
+          label="Model"
+          value={imageModel}
+          data={IMAGE_MODELS.map((m) => ({ value: m.value, label: m.label }))}
+          onChange={handleModelChange}
+          allowDeselect={false}
         />
         <Checkbox
           label="Enhance prompt"

@@ -59,6 +59,14 @@ func (a *App) Startup(ctx context.Context) { a.ctx = ctx }
 
 func (a *App) Shutdown(_ context.Context) {}
 
+func (a *App) GetImageModel() string {
+	return a.engine.ImageModel()
+}
+
+func (a *App) SetImageModel(model string) {
+	a.engine.SetImageModel(model)
+}
+
 func (a *App) Preview(request dalle.GenerateRequest) (dalle.GenerateResult, error) {
 	return a.engine.Preview(request)
 }

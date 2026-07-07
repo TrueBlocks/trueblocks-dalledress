@@ -1,11 +1,30 @@
 import { useEffect, useState } from 'react';
-import { Button, Checkbox, Group, Paper, Stack, Tabs, Text, Textarea, Title } from '@mantine/core';
-import { usePersistedTab } from '@trueblocks/ui';
-import { DASHBOARD_PREFS, booleanPref, serializeBooleanPref } from '../dallePrefs';
 import {
+  Button,
+  Checkbox,
+  Group,
+  Paper,
+  Select,
+  Stack,
+  Tabs,
+  Text,
+  Textarea,
+  Title,
+} from '@mantine/core';
+import { usePersistedTab } from '@trueblocks/ui';
+import {
+  DASHBOARD_PREFS,
+  DEFAULT_IMAGE_MODEL,
+  IMAGE_MODELS,
+  booleanPref,
+  serializeBooleanPref,
+} from '../dallePrefs';
+import {
+  GetImageModel,
   GetPref,
   GetRuntimeInfo,
   GetTab,
+  SetImageModel,
   SetPref,
   SetTab,
   ValidateDalle,
@@ -25,6 +44,7 @@ export function Settings() {
   const [enhance, setEnhance] = useState(false);
   const [generateImage, setGenerateImage] = useState(false);
   const [annotate, setAnnotate] = useState(false);
+  const [imageModel, setImageModel] = useState(DEFAULT_IMAGE_MODEL);
   const [loaded, setLoaded] = useState(false);
   const { activeTab, setActiveTab } = usePersistedTab({
     key: 'settings',
@@ -42,15 +62,30 @@ export function Settings() {
       GetPref(DASHBOARD_PREFS.enhance),
       GetPref(DASHBOARD_PREFS.generateImage),
       GetPref(DASHBOARD_PREFS.annotate),
+      GetPref(DASHBOARD_PREFS.imageModel),
+      GetImageModel(),
     ])
-      .then(([info, savedInput, savedEnhance, savedGenerateImage, savedAnnotate]) => {
-        setRuntime(info);
-        setDefaultInput(savedInput || 'Person Tour Coordinates');
-        setEnhance(booleanPref(savedEnhance));
-        setGenerateImage(booleanPref(savedGenerateImage));
-        setAnnotate(booleanPref(savedAnnotate));
-        setLoaded(true);
-      })
+      .then(
+        ([
+          info,
+          savedInput,
+          savedEnhance,
+          savedGenerateImage,
+          savedAnnotate,
+          savedModel,
+          engineModel,
+        ]) => {
+          setRuntime(info);
+          setDefaultInput(savedInput || 'Person Tour Coordinates');
+          setEnhance(booleanPref(savedEnhance));
+          setGenerateImage(booleanPref(savedGenerateImage));
+          setAnnotate(booleanPref(savedAnnotate));
+          const model = savedModel || engineModel || DEFAULT_IMAGE_MODEL;
+          setImageModel(model);
+          SetImageModel(model);
+          setLoaded(true);
+        },
+      )
       .catch((error: unknown) => setStatus(messageFromError(error)));
   }, []);
 
@@ -73,6 +108,12 @@ export function Settings() {
     if (!loaded) return;
     SetPref(DASHBOARD_PREFS.annotate, serializeBooleanPref(annotate));
   }, [annotate, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    SetPref(DASHBOARD_PREFS.imageModel, imageModel);
+    SetImageModel(imageModel);
+  }, [imageModel, loaded]);
 
   const validate = () => {
     ValidateDalle()
@@ -109,6 +150,14 @@ export function Settings() {
         <Tabs.Panel value="defaults">
           <Paper withBorder p="md">
             <Stack gap="md">
+              <Select
+                label="Image generation model"
+                description="DALL-E 3 produces richer art; GPT Image 1 is the current OpenAI default"
+                data={IMAGE_MODELS.map((m) => ({ value: m.value, label: m.label }))}
+                value={imageModel}
+                onChange={(value) => value && setImageModel(value)}
+                allowDeselect={false}
+              />
               <Textarea
                 label="Default seed text"
                 value={defaultInput}

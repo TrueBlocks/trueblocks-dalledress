@@ -18,6 +18,8 @@ export function GetImage(arg1:string):Promise<dalle.ImageMetadataRecord>;
 
 export function GetImageArtifactDataURL(arg1:string,arg2:string):Promise<string>;
 
+export function GetImageModel():Promise<string>;
+
 export function GetLastRoute():Promise<string>;
 
 export function GetPref(arg1:string):Promise<string>;
@@ -53,6 +55,8 @@ export function RevealImageArtifact(arg1:string,arg2:string):Promise<void>;
 export function SaveSeries(arg1:dalle.Series):Promise<dalle.Series>;
 
 export function SaveWindowGeometry(arg1:number,arg2:number,arg3:number,arg4:number):Promise<void>;
+
+export function SetImageModel(arg1:string):Promise<void>;
 
 export function SetLastRoute(arg1:string):Promise<void>;
 

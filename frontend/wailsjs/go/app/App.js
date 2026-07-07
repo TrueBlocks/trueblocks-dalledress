@@ -30,6 +30,10 @@ export function GetImageArtifactDataURL(arg1, arg2) {
   return window['go']['app']['App']['GetImageArtifactDataURL'](arg1, arg2);
 }
 
+export function GetImageModel() {
+  return window['go']['app']['App']['GetImageModel']();
+}
+
 export function GetLastRoute() {
   return window['go']['app']['App']['GetLastRoute']();
 }
@@ -100,6 +104,10 @@ export function SaveSeries(arg1) {
 
 export function SaveWindowGeometry(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['SaveWindowGeometry'](arg1, arg2, arg3, arg4);
+}
+
+export function SetImageModel(arg1) {
+  return window['go']['app']['App']['SetImageModel'](arg1);
 }
 
 export function SetLastRoute(arg1) {

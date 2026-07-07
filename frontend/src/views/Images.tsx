@@ -41,6 +41,13 @@ type ArtifactKind = 'annotated' | 'generated';
 type ImagesProps = {
   selectedImageId?: string;
   onCurrentImageChange?: (record: dalle.ImageMetadataRecord | null) => void;
+  onStatusChange?: (status: {
+    visible: boolean;
+    level: StatusLevel;
+    message: string;
+    meta?: string;
+  }) => void;
+  onProgressStart?: (series: string, seed: string) => void;
 };
 
 type StatusState = {
@@ -78,7 +85,12 @@ function selectRecordId(
   return records[0] ? recordKey(records[0]) : '';
 }
 
-export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesProps) {
+export function Images({
+  selectedImageId = '',
+  onCurrentImageChange,
+  onStatusChange,
+  onProgressStart,
+}: ImagesProps) {
   const [series, setSeries] = useState('');
   const [images, setImages] = useState<dalle.ImageMetadataRecord[]>([]);
   const [selectedId, setSelectedId] = useState('');
@@ -253,21 +265,24 @@ export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesPro
   };
 
   const refreshSelected = useCallback(() => {
-    if (!selectedRecordId) return;
+    if (!selectedRecordId || !selected) return;
     setError('');
     setActionMessage('');
     setImageActionId(selectedRecordId);
-    setStatus({
+    const seriesName = selected.metadata.series?.name ?? '';
+    const seed = selected.metadata.seed ?? '';
+    onStatusChange?.({
       visible: true,
       level: 'progress',
       message: 'Regenerating image',
       meta: selectedTitle,
     });
+    onProgressStart?.(seriesName, seed);
     RegenerateImage(selectedRecordId)
       .then((next) => {
         const message = 'Regenerated image from scratch.';
         setActionMessage(message);
-        setStatus({
+        onStatusChange?.({
           visible: true,
           level: 'success',
           message,
@@ -284,7 +299,12 @@ export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesPro
       .catch((err: unknown) => {
         const message = messageFromError(err);
         setError(message);
-        setStatus({ visible: true, level: 'error', message, meta: selectedTitle });
+        onStatusChange?.({
+          visible: true,
+          level: 'error',
+          message,
+          meta: selectedTitle,
+        });
         notifications.show({
           title: 'Regeneration failed',
           message,
@@ -293,7 +313,7 @@ export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesPro
         });
       })
       .finally(() => setImageActionId(''));
-  }, [load, selectedRecordId, selectedTitle, series]);
+  }, [load, onProgressStart, onStatusChange, selected, selectedRecordId, selectedTitle, series]);
 
   const exportText = () => {
     if (!selectedRecordId) return;

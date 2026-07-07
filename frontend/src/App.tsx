@@ -163,7 +163,12 @@ export function App() {
           />
         )}
         {route === 'images' && (
-          <Images selectedImageId={selectedImageId} onCurrentImageChange={setCurrentImage} />
+          <Images
+            selectedImageId={selectedImageId}
+            onCurrentImageChange={setCurrentImage}
+            onStatusChange={setGlobalStatus}
+            onProgressStart={handleProgressStart}
+          />
         )}
         {route === 'series' && <Series />}
         {route === 'databases' && <Databases />}

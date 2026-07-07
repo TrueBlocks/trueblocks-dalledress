@@ -164,6 +164,13 @@ export function Dashboard({ onGeneratedImage, currentImage }: DashboardProps) {
     SetPref(DASHBOARD_PREFS.annotate, serializeBooleanPref(annotate));
   }, [annotate, prefsLoaded]);
 
+  useEffect(() => {
+    if (!prefsLoaded || !currentImage) return;
+    const meta = currentImage.metadata;
+    if (meta.input) setInput(meta.input);
+    if (meta.series?.name) setSelectedSeries(meta.series.name);
+  }, [currentImage, prefsLoaded]);
+
   const handleModelChange = (value: string | null) => {
     if (!value) return;
     setImageModelState(value);

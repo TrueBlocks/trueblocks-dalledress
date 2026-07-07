@@ -56,6 +56,32 @@
   white-space: nowrap;
 }
 
+.progressTrack {
+  width: 120px;
+  height: 16px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.progressFill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 28px;
+  border-radius: 3px;
+  background: #2d9c4a;
+  transition: width 400ms ease-out;
+}
+
+.progressLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
 .copyButton {
   display: flex;
   align-items: center;

@@ -49,6 +49,7 @@ type StatusState = {
   level: StatusLevel;
   message: string;
   meta?: string;
+  percent?: number;
 };
 
 const PHASE_LABELS: Record<string, string> = {
@@ -70,13 +71,11 @@ function statusForProgress(progress: app.GenerationProgress): StatusState {
   const message = progress.cacheHit
     ? 'Using cached image artifacts'
     : PHASE_LABELS[progress.phase] || 'Working';
-  const percent = progress.percent > 0 ? `${Math.round(progress.percent)}%` : '';
-  const eta = progress.etaSeconds > 0 ? `${Math.ceil(progress.etaSeconds)}s left` : '';
   return {
     visible: true,
     level: progress.done ? 'success' : 'progress',
     message,
-    meta: [percent, eta].filter(Boolean).join(' · '),
+    percent: progress.percent > 0 ? progress.percent : undefined,
   };
 }
 
@@ -320,6 +319,7 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
         level={status.level}
         message={status.message}
         meta={status.meta}
+        percent={status.percent}
       />
     </Stack>
   );

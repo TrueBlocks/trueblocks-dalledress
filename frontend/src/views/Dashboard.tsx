@@ -1,5 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Button, Checkbox, Group, Paper, Select, Stack, Text, Textarea, Title } from '@mantine/core';
+import {
+  Button,
+  Checkbox,
+  Group,
+  Paper,
+  Select,
+  Stack,
+  Text,
+  Textarea,
+  Title,
+} from '@mantine/core';
 import { Generate, ListSeries, Preview } from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
 

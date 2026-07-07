@@ -10,17 +10,15 @@ import (
 	appkit "github.com/TrueBlocks/trueblocks-art/packages/appkit/v2"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v6"
 	"github.com/TrueBlocks/trueblocks-dalle/v6/pkg/storage"
-	"github.com/TrueBlocks/trueblocks-dalledress/v2/internal/db"
 )
 
 type App struct {
 	*appkit.NavState
 	ctx    context.Context
-	db     *db.DB
 	engine *dalle.Engine
 }
 
-func NewApp(prefsPath string, database *db.DB) (*App, error) {
+func NewApp(prefsPath string) (*App, error) {
 	engine, err := dalle.New(dalle.Config{})
 	if err != nil {
 		return nil, err
@@ -30,7 +28,6 @@ func NewApp(prefsPath string, database *db.DB) (*App, error) {
 			Route:        "dashboard",
 			SidebarWidth: 220,
 		}),
-		db:     database,
 		engine: engine,
 	}, nil
 }
@@ -38,10 +35,6 @@ func NewApp(prefsPath string, database *db.DB) (*App, error) {
 func (a *App) Startup(ctx context.Context) { a.ctx = ctx }
 
 func (a *App) Shutdown(_ context.Context) {}
-
-func (a *App) ListItems() ([]db.Item, error) { return a.db.ListItems() }
-
-func (a *App) AddItem(name string) error { return a.db.AddItem(name) }
 
 func (a *App) Preview(request dalle.GenerateRequest) (dalle.GenerateResult, error) {
 	return a.engine.Preview(request)

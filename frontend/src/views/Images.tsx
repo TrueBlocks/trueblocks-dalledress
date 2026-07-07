@@ -30,7 +30,11 @@ export function Images() {
     <Stack>
       <Title order={2}>Images</Title>
       <Group align="end">
-        <TextInput label="Series filter" value={series} onChange={(event) => setSeries(event.currentTarget.value)} />
+        <TextInput
+          label="Series filter"
+          value={series}
+          onChange={(event) => setSeries(event.currentTarget.value)}
+        />
         <Button onClick={load}>Refresh</Button>
       </Group>
       {error && <Text c="red">{error}</Text>}

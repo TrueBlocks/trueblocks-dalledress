@@ -8,7 +8,6 @@ import (
 
 	appkit "github.com/TrueBlocks/trueblocks-art/packages/appkit/v2"
 	"github.com/TrueBlocks/trueblocks-dalledress/v2/app"
-	"github.com/TrueBlocks/trueblocks-dalledress/v2/internal/db"
 	"github.com/wailsapp/wails/v2/pkg/options"
 )
 
@@ -21,13 +20,7 @@ func main() {
 		log.Fatalf("data dir: %v", err)
 	}
 
-	database, err := db.Open(filepath.Join(dataDir, "dalledress.db"))
-	if err != nil {
-		log.Fatalf("open db: %v", err)
-	}
-	defer func() { _ = database.Close() }()
-
-	application, err := app.NewApp(filepath.Join(dataDir, "prefs.json"), database)
+	application, err := app.NewApp(filepath.Join(dataDir, "prefs.json"))
 	if err != nil {
 		log.Fatalf("new app: %v", err)
 	}

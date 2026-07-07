@@ -17,10 +17,9 @@ import {
   booleanPref,
   serializeBooleanPref,
 } from '../dallePrefs';
-import { StatusBar, StatusLevel } from '../components/StatusBar';
+import { StatusLevel } from '../components/StatusBar';
 import {
   Generate,
-  GetGenerationProgress,
   GetImage,
   GetImageModel,
   GetPref,
@@ -30,63 +29,32 @@ import {
   SetImageModel,
   SetPref,
 } from '../../wailsjs/go/app/App';
-import { app } from '../../wailsjs/go/models';
 import { dalle } from '../../wailsjs/go/models';
 
 type DashboardProps = {
   onGeneratedImage: (imageId: string) => void;
   currentImage: dalle.ImageMetadataRecord | null;
   onCurrentImageChange: (record: dalle.ImageMetadataRecord | null) => void;
+  onStatusChange: (status: {
+    visible: boolean;
+    level: StatusLevel;
+    message: string;
+    meta?: string;
+    percent?: number;
+  }) => void;
+  onProgressStart: (series: string, seed: string) => void;
 };
 
 function messageFromError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-type ProgressTarget = {
-  series: string;
-  seed: string;
-};
-
-type StatusState = {
-  visible: boolean;
-  level: StatusLevel;
-  message: string;
-  meta?: string;
-  percent?: number;
-};
-
-const PHASE_LABELS: Record<string, string> = {
-  setup: 'Preparing generation run',
-  base_prompts: 'Selecting records and building prompts',
-  enhance_prompt: 'Enhancing prompt',
-  image_prep: 'Preparing image request',
-  image_wait: 'Waiting for image provider',
-  image_download: 'Receiving image artifact',
-  annotate: 'Annotating generated image',
-  failed: 'Generation failed',
-  completed: 'Generation complete',
-};
-
-function statusForProgress(progress: app.GenerationProgress): StatusState {
-  if (progress.error) {
-    return { visible: true, level: 'error', message: progress.error };
-  }
-  const message = progress.cacheHit
-    ? 'Using cached image artifacts'
-    : PHASE_LABELS[progress.phase] || 'Working';
-  return {
-    visible: true,
-    level: progress.done ? 'success' : 'progress',
-    message,
-    percent: progress.percent > 0 ? progress.percent : undefined,
-  };
-}
-
 export function Dashboard({
   onGeneratedImage,
   currentImage,
   onCurrentImageChange,
+  onStatusChange,
+  onProgressStart,
 }: DashboardProps) {
   const [series, setSeries] = useState<dalle.Series[]>([]);
   const [selectedSeries, setSelectedSeries] = useState<string>('');
@@ -96,14 +64,8 @@ export function Dashboard({
   const [annotate, setAnnotate] = useState(false);
   const [result, setResult] = useState<dalle.GenerateResult | null>(null);
   const [working, setWorking] = useState(false);
-  const [progressTarget, setProgressTarget] = useState<ProgressTarget | null>(null);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [imageModel, setImageModelState] = useState(DEFAULT_IMAGE_MODEL);
-  const [status, setStatus] = useState<StatusState>({
-    visible: false,
-    level: 'progress',
-    message: '',
-  });
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -207,17 +169,17 @@ export function Dashboard({
 
   const runPreview = () => {
     setError('');
-    setStatus({ visible: true, level: 'progress', message: 'Building preview prompt' });
+    onStatusChange({ visible: true, level: 'progress', message: 'Building preview prompt' });
     setWorking(true);
     Preview(request())
       .then((next) => {
         setResult(next);
-        setStatus({ visible: true, level: 'success', message: 'Preview ready' });
+        onStatusChange({ visible: true, level: 'success', message: 'Preview ready' });
       })
       .catch((err: unknown) => {
         const message = messageFromError(err);
         setError(message);
-        setStatus({ visible: true, level: 'error', message });
+        onStatusChange({ visible: true, level: 'error', message });
       })
       .finally(() => setWorking(false));
   };
@@ -225,14 +187,13 @@ export function Dashboard({
   const runGenerate = () => {
     const nextRequest = request();
     setError('');
-    setProgressTarget(null);
-    setStatus({ visible: true, level: 'progress', message: 'Preparing generation' });
+    onStatusChange({ visible: true, level: 'progress', message: 'Preparing generation' });
     setWorking(true);
     Preview(nextRequest)
       .then((preview) => {
         setResult(preview);
-        setProgressTarget({ series: preview.series, seed: preview.seed });
-        setStatus({
+        onProgressStart(preview.series, preview.seed);
+        onStatusChange({
           visible: true,
           level: 'progress',
           message: generateImage ? 'Starting image generation' : 'Writing prompt metadata',
@@ -243,8 +204,7 @@ export function Dashboard({
       .then((next) => {
         setResult(next);
         const imageId = next.metadata?.imageId || next.seed;
-        setProgressTarget(null);
-        setStatus({
+        onStatusChange({
           visible: true,
           level: 'success',
           message: generateImage ? 'Image generation complete' : 'Generation metadata complete',
@@ -256,29 +216,10 @@ export function Dashboard({
       .catch((err: unknown) => {
         const message = messageFromError(err);
         setError(message);
-        setStatus({ visible: true, level: 'error', message });
-        setProgressTarget(null);
+        onStatusChange({ visible: true, level: 'error', message });
         setWorking(false);
       });
   };
-
-  useEffect(() => {
-    if (!working || !progressTarget) return;
-
-    const poll = () => {
-      GetGenerationProgress(progressTarget.series, progressTarget.seed)
-        .then((progress) => {
-          if (progress.active) setStatus(statusForProgress(progress));
-        })
-        .catch((err: unknown) => {
-          setStatus({ visible: true, level: 'error', message: messageFromError(err) });
-        });
-    };
-
-    poll();
-    const interval = window.setInterval(poll, 750);
-    return () => window.clearInterval(interval);
-  }, [progressTarget, working]);
 
   return (
     <Stack>
@@ -345,13 +286,6 @@ export function Dashboard({
           </Stack>
         </Paper>
       )}
-      <StatusBar
-        visible={status.visible}
-        level={status.level}
-        message={status.message}
-        meta={status.meta}
-        percent={status.percent}
-      />
     </Stack>
   );
 }

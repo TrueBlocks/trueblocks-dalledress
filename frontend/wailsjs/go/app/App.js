@@ -74,8 +74,8 @@ export function ListDatabaseRecords(arg1, arg2) {
   return window['go']['app']['App']['ListDatabaseRecords'](arg1, arg2);
 }
 
-export function ListImages(arg1) {
-  return window['go']['app']['App']['ListImages'](arg1);
+export function ListImages(arg1, arg2) {
+  return window['go']['app']['App']['ListImages'](arg1, arg2);
 }
 
 export function ListSeries(arg1, arg2) {

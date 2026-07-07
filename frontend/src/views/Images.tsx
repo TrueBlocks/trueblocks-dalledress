@@ -3,11 +3,13 @@ import {
   ActionIcon,
   Box,
   Button,
+  Checkbox,
   Group,
   Image,
   Paper,
   ScrollArea,
   SegmentedControl,
+  Select,
   SimpleGrid,
   Stack,
   Tabs,
@@ -80,6 +82,8 @@ export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesPro
   const [series, setSeries] = useState('');
   const [images, setImages] = useState<dalle.ImageMetadataRecord[]>([]);
   const [selectedId, setSelectedId] = useState('');
+  const [includeArchived, setIncludeArchived] = useState(false);
+  const [sortBy, setSortBy] = useState<'path' | 'series' | 'seed'>('path');
   const [artifact, setArtifact] = useState<ArtifactKind>('annotated');
   const [artifactURL, setArtifactURL] = useState('');
   const [thumbnailURLs, setThumbnailURLs] = useState<Record<string, string>>({});
@@ -172,15 +176,24 @@ export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesPro
   const load = useCallback(
     (seriesFilter = series, preferredId = selectedImageId) => {
       setError('');
-      return ListImages(seriesFilter)
+      return ListImages(seriesFilter, includeArchived)
         .then((items) => {
-          const next = items ?? [];
+          let next = items ?? [];
+          if (sortBy === 'series') {
+            next = [...next].sort((a, b) =>
+              (a.metadata.series?.name ?? '').localeCompare(b.metadata.series?.name ?? ''),
+            );
+          } else if (sortBy === 'seed') {
+            next = [...next].sort((a, b) =>
+              (a.metadata.input ?? '').localeCompare(b.metadata.input ?? ''),
+            );
+          }
           setImages(next);
           setSelectedId((current) => selectRecordId(next, current, preferredId));
         })
         .catch((err: unknown) => setError(messageFromError(err)));
     },
-    [selectedImageId, series],
+    [includeArchived, selectedImageId, series, sortBy],
   );
 
   const runArtifactAction = (action: 'open' | 'reveal') => {
@@ -451,6 +464,23 @@ export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesPro
             value={series}
             onChange={(event) => setSeries(event.currentTarget.value)}
           />
+          <Select
+            label="Sort by"
+            value={sortBy}
+            data={[
+              { value: 'path', label: 'Default' },
+              { value: 'series', label: 'Series' },
+              { value: 'seed', label: 'Seed text' },
+            ]}
+            onChange={(value) => setSortBy((value as 'path' | 'series' | 'seed') ?? 'path')}
+            allowDeselect={false}
+            w={120}
+          />
+          <Checkbox
+            label="Show archived"
+            checked={includeArchived}
+            onChange={(event) => setIncludeArchived(event.currentTarget.checked)}
+          />
         </Group>
       </Group>
 
@@ -476,6 +506,7 @@ export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesPro
                 const key = recordKey(record);
                 const isSelected = key === selectedRecordId;
                 const thumbnailURL = thumbnailURLs[key];
+                const isArchived = record.archived;
                 return (
                   <Paper
                     key={key}
@@ -484,6 +515,7 @@ export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesPro
                     style={{
                       cursor: 'pointer',
                       borderColor: isSelected ? 'var(--mantine-color-blue-6)' : undefined,
+                      opacity: isArchived ? 0.45 : 1,
                     }}
                     onClick={() => {
                       setSelectedId(key);

@@ -97,8 +97,8 @@ func (a *App) GetGenerationProgress(series string, seed string) GenerationProgre
 	}
 }
 
-func (a *App) ListImages(series string) ([]dalle.ImageMetadataRecord, error) {
-	return a.engine.ListImages(dalle.ImageFilter{Series: series})
+func (a *App) ListImages(series string, includeArchived bool) ([]dalle.ImageMetadataRecord, error) {
+	return a.engine.ListImages(dalle.ImageFilter{Series: series, IncludeArchived: includeArchived})
 }
 
 func (a *App) GetImage(id string) (dalle.ImageMetadataRecord, error) {

@@ -40,7 +40,7 @@ export function ListDatabaseArchives():Promise<Array<storage.DatabaseArchiveMani
 
 export function ListDatabaseRecords(arg1:string,arg2:number):Promise<dalle.DatabaseRecordsResult>;
 
-export function ListImages(arg1:string):Promise<Array<dalle.ImageMetadataRecord>>;
+export function ListImages(arg1:string,arg2:boolean):Promise<Array<dalle.ImageMetadataRecord>>;
 
 export function ListSeries(arg1:boolean,arg2:boolean):Promise<Array<dalle.Series>>;
 

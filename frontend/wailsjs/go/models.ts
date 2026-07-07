@@ -411,6 +411,7 @@ export namespace dalle {
 	export class ImageMetadataRecord {
 	    path: string;
 	    metadata: ImageMetadata;
+	    archived: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new ImageMetadataRecord(source);
@@ -420,6 +421,7 @@ export namespace dalle {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.path = source["path"];
 	        this.metadata = this.convertValues(source["metadata"], ImageMetadata);
+	        this.archived = source["archived"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

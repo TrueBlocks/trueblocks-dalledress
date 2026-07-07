@@ -14,6 +14,7 @@ import { Dashboard } from './views/Dashboard';
 import { Images } from './views/Images';
 import { Series } from './views/Series';
 import { Settings } from './views/Settings';
+import { dalle } from '../wailsjs/go/models';
 
 const VIEWS = [
   { num: 1, id: 'dashboard', label: 'Dashboard', icon: IconHome },
@@ -26,6 +27,7 @@ const VIEWS = [
 export function App() {
   const [route, setRoute] = useState('dashboard');
   const [selectedImageId, setSelectedImageId] = useState('');
+  const [currentImage, setCurrentImage] = useState<dalle.ImageMetadataRecord | null>(null);
   const [initialSidebarWidth, setInitialSidebarWidth] = useState(220);
   const [ready, setReady] = useState(false);
 
@@ -79,8 +81,12 @@ export function App() {
       initialSidebarWidth={initialSidebarWidth}
       saveSidebarWidth={SetSidebarWidth}
     >
-      {route === 'dashboard' && <Dashboard onGeneratedImage={showGeneratedImage} />}
-      {route === 'images' && <Images selectedImageId={selectedImageId} />}
+      {route === 'dashboard' && (
+        <Dashboard onGeneratedImage={showGeneratedImage} currentImage={currentImage} />
+      )}
+      {route === 'images' && (
+        <Images selectedImageId={selectedImageId} onCurrentImageChange={setCurrentImage} />
+      )}
       {route === 'series' && <Series />}
       {route === 'databases' && <Databases />}
       {route === 'settings' && <Settings />}

@@ -5,6 +5,7 @@ export const DASHBOARD_PREFS = {
   generateImage: 'dashboard.generateImage',
   annotate: 'dashboard.annotate',
   imageModel: 'settings.imageModel',
+  currentImageId: 'images.currentImageId',
 };
 
 export const IMAGE_MODELS = [

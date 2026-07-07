@@ -22,15 +22,23 @@ import { Column, DataTable } from '../components/DataTable';
 import { StatusBar, StatusLevel } from '../components/StatusBar';
 import { isEditableElement } from '../utils/keyboard';
 import { uniqueSortedValues } from '../utils/table';
-import { DeleteImage, GetImageArtifactDataURL, GetTab, ListImages } from '../../wailsjs/go/app/App';
+import { DASHBOARD_PREFS } from '../dallePrefs';
+import {
+  DeleteImage,
+  GetImageArtifactDataURL,
+  GetPref,
+  GetTab,
+  ListImages,
+} from '../../wailsjs/go/app/App';
 import { ExportImage, OpenImageArtifact, RevealImageArtifact } from '../../wailsjs/go/app/App';
-import { RegenerateImage, SetTab } from '../../wailsjs/go/app/App';
+import { RegenerateImage, SetPref, SetTab } from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
 
 type ArtifactKind = 'annotated' | 'generated';
 
 type ImagesProps = {
   selectedImageId?: string;
+  onCurrentImageChange?: (record: dalle.ImageMetadataRecord | null) => void;
 };
 
 type StatusState = {
@@ -68,7 +76,7 @@ function selectRecordId(
   return records[0] ? recordKey(records[0]) : '';
 }
 
-export function Images({ selectedImageId = '' }: ImagesProps) {
+export function Images({ selectedImageId = '', onCurrentImageChange }: ImagesProps) {
   const [series, setSeries] = useState('');
   const [images, setImages] = useState<dalle.ImageMetadataRecord[]>([]);
   const [selectedId, setSelectedId] = useState('');
@@ -309,8 +317,25 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
       setSeries('');
       setActiveTab('detail');
     }
-    load(selectedImageId ? '' : series, selectedImageId);
+    if (!selectedImageId) {
+      GetPref(DASHBOARD_PREFS.currentImageId).then((savedId) => {
+        load(series, savedId || '');
+      });
+    } else {
+      load('', selectedImageId);
+    }
   }, [load, selectedImageId, series, setActiveTab]);
+
+  useEffect(() => {
+    if (!selected) {
+      onCurrentImageChange?.(null);
+      return;
+    }
+    onCurrentImageChange?.(selected);
+    if (activeTab === 'detail') {
+      SetPref(DASHBOARD_PREFS.currentImageId, recordKey(selected));
+    }
+  }, [selected, activeTab, onCurrentImageChange]);
 
   useEffect(() => {
     const handleRefresh = (event: Event) => {
@@ -465,7 +490,11 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
                       setActiveTab('detail');
                     }}
                   >
-                    <Tooltip label={displayTitle(record)}>
+                    <Tooltip
+                      label={`${displayTitle(record)}\n${record.metadata.input || record.metadata.seed}`}
+                      multiline
+                      maw={300}
+                    >
                       <Box
                         pos="relative"
                         style={{
@@ -524,9 +553,16 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
                   icon={<IconPhoto size={24} />}
                   title={<Text fw={700}>{displayTitle(selected)}</Text>}
                   subtitle={
-                    <Text size="sm" c="dimmed">
-                      {selected.metadata.series?.name} · {selected.metadata.seed}
-                    </Text>
+                    <Stack gap={0}>
+                      <Text size="sm" c="dimmed">
+                        {selected.metadata.series?.name} · {selected.metadata.seed}
+                      </Text>
+                      {selected.metadata.input && (
+                        <Text size="xs" c="dimmed" lineClamp={1}>
+                          Seed: {selected.metadata.input}
+                        </Text>
+                      )}
+                    </Stack>
                   }
                   actionsRight={
                     <Group gap="xs" wrap="nowrap">

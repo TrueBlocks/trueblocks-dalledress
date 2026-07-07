@@ -33,6 +33,7 @@ import { dalle } from '../../wailsjs/go/models';
 
 type DashboardProps = {
   onGeneratedImage: (imageId: string) => void;
+  currentImage: dalle.ImageMetadataRecord | null;
 };
 
 function messageFromError(error: unknown): string {
@@ -79,7 +80,7 @@ function statusForProgress(progress: app.GenerationProgress): StatusState {
   };
 }
 
-export function Dashboard({ onGeneratedImage }: DashboardProps) {
+export function Dashboard({ onGeneratedImage, currentImage }: DashboardProps) {
   const [series, setSeries] = useState<dalle.Series[]>([]);
   const [selectedSeries, setSelectedSeries] = useState<string>('');
   const [input, setInput] = useState('Person Tour Coordinates');
@@ -168,6 +169,13 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
     setImageModelState(value);
     SetPref(DASHBOARD_PREFS.imageModel, value);
     SetImageModel(value);
+  };
+
+  const loadFromCurrentImage = () => {
+    if (!currentImage) return;
+    const meta = currentImage.metadata;
+    if (meta.input) setInput(meta.input);
+    if (meta.series?.name) setSelectedSeries(meta.series.name);
   };
 
   const request = () =>
@@ -299,6 +307,11 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
         <Button onClick={runGenerate} loading={working}>
           Generate
         </Button>
+        {currentImage && (
+          <Button variant="light" onClick={loadFromCurrentImage}>
+            Load from current image
+          </Button>
+        )}
       </Group>
       {error && <Text c="red">{error}</Text>}
       {result && (

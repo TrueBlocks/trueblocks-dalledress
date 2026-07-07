@@ -1,0 +1,57 @@
+.statusBar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: var(--app-shell-navbar-offset, 0px);
+  z-index: 1000;
+  min-height: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 12, 16, 0.96);
+  color: #d8f6e0;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  transform: translateY(100%);
+  transition: transform 160ms ease-out;
+}
+
+.visible {
+  transform: translateY(0);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+}
+
+.level {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.message {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress {
+  color: #8ff0a4;
+}
+
+.success {
+  color: #70f5c5;
+}
+
+.error {
+  color: #ff7a7a;
+}
+
+.meta {
+  color: rgba(216, 246, 224, 0.7);
+  white-space: nowrap;
+}

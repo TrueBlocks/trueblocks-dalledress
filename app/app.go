@@ -13,6 +13,7 @@ import (
 
 	appkit "github.com/TrueBlocks/trueblocks-art/packages/appkit/v2"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v6"
+	"github.com/TrueBlocks/trueblocks-dalle/v6/pkg/progress"
 	"github.com/TrueBlocks/trueblocks-dalle/v6/pkg/storage"
 )
 
@@ -20,6 +21,18 @@ type App struct {
 	*appkit.NavState
 	ctx    context.Context
 	engine *dalle.Engine
+}
+
+type GenerationProgress struct {
+	Active     bool    `json:"active"`
+	Series     string  `json:"series"`
+	Seed       string  `json:"seed"`
+	Phase      string  `json:"phase"`
+	Percent    float64 `json:"percent"`
+	ETASeconds float64 `json:"etaSeconds"`
+	Done       bool    `json:"done"`
+	CacheHit   bool    `json:"cacheHit"`
+	Error      string  `json:"error"`
 }
 
 func NewApp(prefsPath string) (*App, error) {
@@ -46,6 +59,24 @@ func (a *App) Preview(request dalle.GenerateRequest) (dalle.GenerateResult, erro
 
 func (a *App) Generate(request dalle.GenerateRequest) (dalle.GenerateResult, error) {
 	return a.engine.Generate(request)
+}
+
+func (a *App) GetGenerationProgress(series string, seed string) GenerationProgress {
+	report := progress.GetProgress(series, seed)
+	if report == nil {
+		return GenerationProgress{Series: series, Seed: seed}
+	}
+	return GenerationProgress{
+		Active:     true,
+		Series:     report.Series,
+		Seed:       report.Address,
+		Phase:      string(report.Current),
+		Percent:    report.Percent,
+		ETASeconds: report.ETASeconds,
+		Done:       report.Done,
+		CacheHit:   report.CacheHit,
+		Error:      report.Error,
+	}
 }
 
 func (a *App) ListImages(series string) ([]dalle.ImageMetadataRecord, error) {

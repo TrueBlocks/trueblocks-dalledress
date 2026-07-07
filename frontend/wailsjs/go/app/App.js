@@ -14,6 +14,10 @@ export function GetDatabaseArchive(arg1) {
   return window['go']['app']['App']['GetDatabaseArchive'](arg1);
 }
 
+export function GetGenerationProgress(arg1, arg2) {
+  return window['go']['app']['App']['GetGenerationProgress'](arg1, arg2);
+}
+
 export function GetImage(arg1) {
   return window['go']['app']['App']['GetImage'](arg1);
 }

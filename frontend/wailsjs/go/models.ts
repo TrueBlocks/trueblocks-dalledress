@@ -1,3 +1,36 @@
+export namespace app {
+	
+	export class GenerationProgress {
+	    active: boolean;
+	    series: string;
+	    seed: string;
+	    phase: string;
+	    percent: number;
+	    etaSeconds: number;
+	    done: boolean;
+	    cacheHit: boolean;
+	    error: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new GenerationProgress(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.active = source["active"];
+	        this.series = source["series"];
+	        this.seed = source["seed"];
+	        this.phase = source["phase"];
+	        this.percent = source["percent"];
+	        this.etaSeconds = source["etaSeconds"];
+	        this.done = source["done"];
+	        this.cacheHit = source["cacheHit"];
+	        this.error = source["error"];
+	    }
+	}
+
+}
+
 export namespace dalle {
 	
 	export class ArtifactSet {

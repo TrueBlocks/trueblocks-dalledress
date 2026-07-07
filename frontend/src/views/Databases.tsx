@@ -3,7 +3,6 @@ import { Group, Stack, Tabs, Text, Title } from '@mantine/core';
 import { IconDatabase } from '@tabler/icons-react';
 import { DetailHeader, usePersistedTab } from '@trueblocks/ui';
 import { Column, DataTable } from '../components/DataTable';
-import { isEditableElement } from '../utils/keyboard';
 import { uniqueSortedValues } from '../utils/table';
 import {
   GetTab,
@@ -234,22 +233,12 @@ export function Databases() {
       if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'ArrowLeft') {
         event.preventDefault();
         returnToList();
-        return;
-      }
-      if (event.metaKey || event.ctrlKey || event.altKey || isEditableElement(event.target)) return;
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        selectPrevious();
-      }
-      if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        selectNext();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeTab, returnToList, selectNext, selectPrevious]);
+  }, [activeTab, returnToList]);
 
   return (
     <Stack gap="md">

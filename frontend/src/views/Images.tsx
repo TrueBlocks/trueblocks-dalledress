@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActionIcon,
   Box,
@@ -10,7 +10,6 @@ import {
   SegmentedControl,
   SimpleGrid,
   Stack,
-  Table,
   Tabs,
   Text,
   TextInput,
@@ -19,7 +18,10 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconExternalLink, IconFolderOpen, IconPhoto, IconX } from '@tabler/icons-react';
 import { DetailHeader, usePersistedTab } from '@trueblocks/ui';
+import { Column, DataTable } from '../components/DataTable';
 import { StatusBar, StatusLevel } from '../components/StatusBar';
+import { isEditableElement } from '../utils/keyboard';
+import { uniqueSortedValues } from '../utils/table';
 import { DeleteImage, GetImageArtifactDataURL, GetTab, ListImages } from '../../wailsjs/go/app/App';
 import { ExportImage, OpenImageArtifact, RevealImageArtifact } from '../../wailsjs/go/app/App';
 import { RegenerateImage, SetTab } from '../../wailsjs/go/app/App';
@@ -98,6 +100,44 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
     : -1;
   const hasPrevious = selectedIndex > 0;
   const hasNext = selectedIndex >= 0 && selectedIndex < images.length - 1;
+  const selectedRecords = useMemo(() => selected?.metadata.selectedRecords ?? [], [selected]);
+  const selectedRecordColumns: Column<dalle.SelectedRecord>[] = useMemo(
+    () => [
+      {
+        key: 'attribute',
+        label: 'Attribute',
+        width: '20%',
+        render: (record) => record.attribute,
+        sortValue: (record) => record.attribute,
+        filterOptions: uniqueSortedValues(selectedRecords.map((record) => record.attribute)),
+      },
+      {
+        key: 'database',
+        label: 'Database',
+        width: '20%',
+        render: (record) => record.database,
+        sortValue: (record) => record.database,
+        filterOptions: uniqueSortedValues(selectedRecords.map((record) => record.database)),
+      },
+      {
+        key: 'rowIndex',
+        label: 'Row',
+        width: '10%',
+        render: (record) => record.rowIndex,
+        sortValue: (record) => record.rowIndex,
+        filterRange: true,
+      },
+      {
+        key: 'record',
+        label: 'Record',
+        width: '50%',
+        render: (record) => record.record,
+        sortValue: (record) => record.record,
+        filterOptions: uniqueSortedValues(selectedRecords.map((record) => record.record)),
+      },
+    ],
+    [selectedRecords],
+  );
 
   const selectByIndex = useCallback(
     (index: number) => {
@@ -299,11 +339,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
         returnToGallery();
         return;
       }
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      if (event.target instanceof HTMLElement) {
-        const editableTags = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'];
-        if (editableTags.includes(event.target.tagName)) return;
-      }
+      if (event.metaKey || event.ctrlKey || event.altKey || isEditableElement(event.target)) return;
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
         selectByOffset(-1);
@@ -562,24 +598,20 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
                   </Paper>
                 </SimpleGrid>
 
-                <Table>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>Attribute</Table.Th>
-                      <Table.Th>Database</Table.Th>
-                      <Table.Th>Record</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {(selected.metadata.selectedRecords ?? []).map((record) => (
-                      <Table.Tr key={`${record.attribute}-${record.database}-${record.rowIndex}`}>
-                        <Table.Td>{record.attribute}</Table.Td>
-                        <Table.Td>{record.database}</Table.Td>
-                        <Table.Td>{record.record}</Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
+                <DataTable<dalle.SelectedRecord>
+                  tableName={`dalle-image-records-${selectedRecordId}`}
+                  data={selectedRecords}
+                  columns={selectedRecordColumns}
+                  getRowKey={(record) =>
+                    `${record.attribute}-${record.database}-${record.rowIndex}`
+                  }
+                  searchFn={(record, search) => {
+                    const query = search.toLowerCase();
+                    return [record.attribute, record.database, record.record].some((value) =>
+                      value.toLowerCase().includes(query),
+                    );
+                  }}
+                />
               </Stack>
             ) : (
               <Text c="dimmed">No image selected.</Text>

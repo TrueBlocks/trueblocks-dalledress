@@ -13,7 +13,11 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { Column, DataTable, usePersistedTab } from '@trueblocks/ui';
+import { IconStack2 } from '@tabler/icons-react';
+import { DetailHeader, usePersistedTab } from '@trueblocks/ui';
+import { Column, DataTable } from '../components/DataTable';
+import { isEditableElement } from '../utils/keyboard';
+import { uniqueSortedValues } from '../utils/table';
 import { GetTab, ListSeries, SaveSeries, SetSeriesHidden, SetTab } from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
 
@@ -119,6 +123,7 @@ function seriesFromDraft(draft: SeriesDraft): dalle.Series {
 export function Series() {
   const [includeHidden, setIncludeHidden] = useState(false);
   const [items, setItems] = useState<dalle.Series[]>([]);
+  const [filteredItems, setFilteredItems] = useState<dalle.Series[]>([]);
   const [selectedSuffix, setSelectedSuffix] = useState('');
   const [draft, setDraft] = useState<SeriesDraft>(emptyDraft);
   const [error, setError] = useState('');
@@ -134,6 +139,39 @@ export function Series() {
   });
 
   const selected = items.find((item) => item.suffix === selectedSuffix);
+  const seriesList = filteredItems.length > 0 ? filteredItems : items;
+  const selectedIndex = seriesList.findIndex((item) => item.suffix === selectedSuffix);
+  const hasPrevious = selectedIndex > 0;
+  const hasNext = selectedIndex >= 0 && selectedIndex < seriesList.length - 1;
+  const suffixOptions = useMemo(
+    () => uniqueSortedValues(items.map((item) => item.suffix)),
+    [items],
+  );
+  const purposeOptions = useMemo(
+    () => uniqueSortedValues(items.map((item) => item.purpose)),
+    [items],
+  );
+  const modifiedOptions = useMemo(
+    () => uniqueSortedValues(items.map((item) => item.modifiedAt)),
+    [items],
+  );
+
+  const seriesValueGetter = (series: dalle.Series, column: string) => {
+    switch (column) {
+      case 'suffix':
+        return series.suffix;
+      case 'purpose':
+        return series.purpose || '';
+      case 'last':
+        return series.last ?? 0;
+      case 'state':
+        return series.deleted ? 'hidden' : 'active';
+      case 'modifiedAt':
+        return series.modifiedAt || '';
+      default:
+        return '';
+    }
+  };
 
   const columns: Column<dalle.Series>[] = useMemo(
     () => [
@@ -143,6 +181,7 @@ export function Series() {
         width: '30%',
         render: (item) => item.suffix,
         sortValue: (item) => item.suffix.toLowerCase(),
+        filterOptions: suffixOptions,
         scrollOnSelect: true,
       },
       {
@@ -151,6 +190,7 @@ export function Series() {
         width: '35%',
         render: (item) => item.purpose || '',
         sortValue: (item) => item.purpose || '',
+        filterOptions: purposeOptions,
       },
       {
         key: 'last',
@@ -158,6 +198,7 @@ export function Series() {
         width: '10%',
         render: (item) => item.last ?? 0,
         sortValue: (item) => item.last ?? 0,
+        filterRange: true,
       },
       {
         key: 'state',
@@ -169,6 +210,7 @@ export function Series() {
           </Badge>
         ),
         sortValue: (item) => (item.deleted ? 'hidden' : 'active'),
+        filterOptions: ['active', 'hidden'],
       },
       {
         key: 'modifiedAt',
@@ -176,9 +218,10 @@ export function Series() {
         width: '10%',
         render: (item) => item.modifiedAt || '',
         sortValue: (item) => item.modifiedAt || '',
+        filterOptions: modifiedOptions,
       },
     ],
-    [],
+    [modifiedOptions, purposeOptions, suffixOptions],
   );
 
   const load = useCallback(
@@ -214,13 +257,36 @@ export function Series() {
     return () => window.removeEventListener('view:refresh', handleRefresh);
   }, [load, selectedSuffix]);
 
-  const selectSeries = (series: dalle.Series) => {
-    setSelectedSuffix(series.suffix);
-    setDraft(draftFromSeries(series));
-    setMessage('');
-    setError('');
-    setActiveTab('detail');
-  };
+  const selectSeries = useCallback(
+    (series: dalle.Series) => {
+      setSelectedSuffix(series.suffix);
+      setDraft(draftFromSeries(series));
+      setMessage('');
+      setError('');
+      setActiveTab('detail');
+    },
+    [setActiveTab],
+  );
+
+  const selectSeriesByIndex = useCallback(
+    (index: number) => {
+      const next = seriesList[index];
+      if (next) selectSeries(next);
+    },
+    [selectSeries, seriesList],
+  );
+
+  const returnToList = useCallback(() => {
+    setActiveTab('list');
+  }, [setActiveTab]);
+
+  const selectPrevious = useCallback(() => {
+    if (hasPrevious) selectSeriesByIndex(selectedIndex - 1);
+  }, [hasPrevious, selectSeriesByIndex, selectedIndex]);
+
+  const selectNext = useCallback(() => {
+    if (hasNext) selectSeriesByIndex(selectedIndex + 1);
+  }, [hasNext, selectSeriesByIndex, selectedIndex]);
 
   const newSeries = () => {
     setSelectedSuffix('');
@@ -282,6 +348,29 @@ export function Series() {
     ].some((value) => value.toLowerCase().includes(query));
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (activeTab !== 'detail') return;
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'ArrowLeft') {
+        event.preventDefault();
+        returnToList();
+        return;
+      }
+      if (event.metaKey || event.ctrlKey || event.altKey || isEditableElement(event.target)) return;
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        selectPrevious();
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        selectNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, returnToList, selectNext, selectPrevious]);
+
   return (
     <Stack gap="md">
       <Group justify="space-between" align="end">
@@ -315,66 +404,86 @@ export function Series() {
             columns={columns}
             getRowKey={(item) => item.suffix}
             onRowClick={selectSeries}
+            onFilteredSortedChange={setFilteredItems}
             searchFn={searchSeries}
+            valueGetter={seriesValueGetter}
           />
         </Tabs.Panel>
         <Tabs.Panel value="detail" pt="md">
-          <Paper withBorder p="md">
-            <Stack gap="sm">
-              <Group grow>
-                <TextInput
-                  label="Suffix"
-                  value={draft.suffix}
-                  onChange={(event) => updateDraft('suffix', event.currentTarget.value)}
-                />
-                <TextInput
-                  label="Last index"
-                  type="number"
-                  value={draft.last}
-                  onChange={(event) => updateDraft('last', event.currentTarget.value)}
-                />
-              </Group>
-              <TextInput
-                label="Purpose"
-                value={draft.purpose}
-                onChange={(event) => updateDraft('purpose', event.currentTarget.value)}
-              />
-              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-                {FILTER_FIELDS.map((field) => (
-                  <Textarea
-                    key={field}
-                    label={field}
-                    value={draft[field]}
-                    minRows={3}
-                    autosize
-                    onChange={(event) => updateDraft(field, event.currentTarget.value)}
+          <Stack gap="md">
+            <DetailHeader
+              hasPrev={hasPrevious}
+              hasNext={hasNext}
+              onPrev={selectPrevious}
+              onNext={selectNext}
+              onBack={returnToList}
+              currentIndex={selectedIndex >= 0 ? selectedIndex : undefined}
+              totalCount={seriesList.length}
+              icon={<IconStack2 size={24} />}
+              title={<Text fw={700}>{selected?.suffix || 'New Series'}</Text>}
+              subtitle={
+                <Text size="sm" c="dimmed">
+                  {selected?.purpose || draft.purpose || 'Series definition'}
+                </Text>
+              }
+            />
+            <Paper withBorder p="md">
+              <Stack gap="sm">
+                <Group grow>
+                  <TextInput
+                    label="Suffix"
+                    value={draft.suffix}
+                    onChange={(event) => updateDraft('suffix', event.currentTarget.value)}
                   />
-                ))}
-              </SimpleGrid>
-              <Group justify="space-between">
-                <Group>
-                  <Button onClick={save} loading={saving} disabled={!draft.suffix.trim()}>
-                    Save
-                  </Button>
-                  {selected && !selected.deleted && (
-                    <Button variant="light" color="gray" onClick={() => setHidden(true)}>
-                      Hide
+                  <TextInput
+                    label="Last index"
+                    type="number"
+                    value={draft.last}
+                    onChange={(event) => updateDraft('last', event.currentTarget.value)}
+                  />
+                </Group>
+                <TextInput
+                  label="Purpose"
+                  value={draft.purpose}
+                  onChange={(event) => updateDraft('purpose', event.currentTarget.value)}
+                />
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
+                  {FILTER_FIELDS.map((field) => (
+                    <Textarea
+                      key={field}
+                      label={field}
+                      value={draft[field]}
+                      minRows={3}
+                      autosize
+                      onChange={(event) => updateDraft(field, event.currentTarget.value)}
+                    />
+                  ))}
+                </SimpleGrid>
+                <Group justify="space-between">
+                  <Group>
+                    <Button onClick={save} loading={saving} disabled={!draft.suffix.trim()}>
+                      Save
                     </Button>
-                  )}
-                  {selected?.deleted && (
-                    <Button variant="light" onClick={() => setHidden(false)}>
-                      Restore
-                    </Button>
+                    {selected && !selected.deleted && (
+                      <Button variant="light" color="gray" onClick={() => setHidden(true)}>
+                        Hide
+                      </Button>
+                    )}
+                    {selected?.deleted && (
+                      <Button variant="light" onClick={() => setHidden(false)}>
+                        Restore
+                      </Button>
+                    )}
+                  </Group>
+                  {selected?.modifiedAt && (
+                    <Text size="xs" c="dimmed">
+                      Modified {selected.modifiedAt}
+                    </Text>
                   )}
                 </Group>
-                {selected?.modifiedAt && (
-                  <Text size="xs" c="dimmed">
-                    Modified {selected.modifiedAt}
-                  </Text>
-                )}
-              </Group>
-            </Stack>
-          </Paper>
+              </Stack>
+            </Paper>
+          </Stack>
         </Tabs.Panel>
       </Tabs>
     </Stack>

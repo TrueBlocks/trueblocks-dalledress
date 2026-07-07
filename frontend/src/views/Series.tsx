@@ -149,6 +149,16 @@ export function Series() {
     load();
   }, [load]);
 
+  useEffect(() => {
+    const handleRefresh = (event: Event) => {
+      if ((event as CustomEvent).detail !== 'series') return;
+      load(selectedSuffix);
+    };
+
+    window.addEventListener('view:refresh', handleRefresh);
+    return () => window.removeEventListener('view:refresh', handleRefresh);
+  }, [load, selectedSuffix]);
+
   const selectSeries = (series: dalle.Series) => {
     setSelectedSuffix(series.suffix);
     setDraft(draftFromSeries(series));
@@ -209,9 +219,6 @@ export function Series() {
             checked={includeHidden}
             onChange={(event) => setIncludeHidden(event.currentTarget.checked)}
           />
-          <Button variant="light" onClick={() => load(selectedSuffix)}>
-            Refresh
-          </Button>
           <Button onClick={newSeries}>New Series</Button>
         </Group>
       </Group>

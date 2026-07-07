@@ -53,6 +53,22 @@ export function App() {
 
   useViewHotkeys({ views: VIEWS, activeView: route, onNavigate: navigate });
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.shiftKey || event.altKey) return;
+      if (event.key.toLowerCase() !== 'r') return;
+      if (event.target instanceof HTMLElement) {
+        const editableTags = ['INPUT', 'TEXTAREA', 'SELECT'];
+        if (editableTags.includes(event.target.tagName) || event.target.isContentEditable) return;
+      }
+      event.preventDefault();
+      window.dispatchEvent(new CustomEvent('view:refresh', { detail: route }));
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [route]);
+
   if (!ready) return null;
 
   return (

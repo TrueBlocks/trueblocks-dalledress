@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActionIcon,
-  Badge,
+  Box,
   Button,
   Group,
   Image,
@@ -17,10 +17,11 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
-import { IconRefresh, IconX } from '@tabler/icons-react';
-import { DeleteImage, GetImageArtifactDataURL, ListImages } from '../../wailsjs/go/app/App';
+import { IconX } from '@tabler/icons-react';
+import { usePersistedTab } from '@trueblocks/ui';
+import { DeleteImage, GetImageArtifactDataURL, GetTab, ListImages } from '../../wailsjs/go/app/App';
 import { ExportImage, OpenImageArtifact, RevealImageArtifact } from '../../wailsjs/go/app/App';
-import { RegenerateImage } from '../../wailsjs/go/app/App';
+import { RegenerateImage, SetTab } from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
 
 type ArtifactKind = 'annotated' | 'generated';
@@ -41,11 +42,10 @@ function displayTitle(record: dalle.ImageMetadataRecord): string {
   return record.metadata.prompts?.titlePrompt || record.metadata.input || record.metadata.seed;
 }
 
-function statusLabel(record: dalle.ImageMetadataRecord): string {
+function thumbnailArtifact(record: dalle.ImageMetadataRecord): ArtifactKind | '' {
   if (record.metadata.artifacts?.annotated) return 'annotated';
   if (record.metadata.artifacts?.generated) return 'generated';
-  if (record.metadata.status?.completed) return 'metadata';
-  return 'pending';
+  return '';
 }
 
 function selectRecordId(
@@ -64,10 +64,18 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   const [selectedId, setSelectedId] = useState('');
   const [artifact, setArtifact] = useState<ArtifactKind>('annotated');
   const [artifactURL, setArtifactURL] = useState('');
+  const [thumbnailURLs, setThumbnailURLs] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
   const [actionMessage, setActionMessage] = useState('');
   const [imageActionId, setImageActionId] = useState('');
-  const [activeTab, setActiveTab] = useState<string | null>(selectedImageId ? 'detail' : 'gallery');
+  const { activeTab, setActiveTab } = usePersistedTab({
+    key: 'images',
+    defaultTab: 'gallery',
+    loadTab: GetTab,
+    saveTab: SetTab,
+    tabs: ['gallery', 'detail'],
+    cycleViewId: 'images',
+  });
 
   const selected = images.find((record) => recordKey(record) === selectedId) ?? images[0];
   const selectedRecordId = selected ? recordKey(selected) : '';
@@ -122,7 +130,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
       .finally(() => setImageActionId(''));
   };
 
-  const refreshSelected = () => {
+  const refreshSelected = useCallback(() => {
     if (!selectedRecordId) return;
     setError('');
     setActionMessage('');
@@ -134,7 +142,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
       })
       .catch((err: unknown) => setError(messageFromError(err)))
       .finally(() => setImageActionId(''));
-  };
+  }, [load, selectedRecordId, series]);
 
   const exportText = () => {
     if (!selectedRecordId) return;
@@ -151,7 +159,21 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
       setActiveTab('detail');
     }
     load(selectedImageId ? '' : series, selectedImageId);
-  }, [load, selectedImageId, series]);
+  }, [load, selectedImageId, series, setActiveTab]);
+
+  useEffect(() => {
+    const handleRefresh = (event: Event) => {
+      if ((event as CustomEvent).detail !== 'images') return;
+      if (activeTab === 'detail' && selectedRecordId) {
+        refreshSelected();
+        return;
+      }
+      load(series, '');
+    };
+
+    window.addEventListener('view:refresh', handleRefresh);
+    return () => window.removeEventListener('view:refresh', handleRefresh);
+  }, [activeTab, load, refreshSelected, selectedRecordId, series]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -186,6 +208,33 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
       .catch(() => setArtifactURL(''));
   }, [artifact, selected, selectedRecordId]);
 
+  useEffect(() => {
+    let cancelled = false;
+    setThumbnailURLs({});
+
+    Promise.all(
+      images.map(async (record) => {
+        const key = recordKey(record);
+        const thumbnail = thumbnailArtifact(record);
+        if (!thumbnail) return [key, ''] as const;
+        try {
+          return [key, await GetImageArtifactDataURL(key, thumbnail)] as const;
+        } catch {
+          return [key, ''] as const;
+        }
+      }),
+    ).then((entries) => {
+      if (cancelled) return;
+      setThumbnailURLs(
+        Object.fromEntries(entries.filter((entry) => Boolean(entry[1]))) as Record<string, string>,
+      );
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [images]);
+
   return (
     <Stack gap="md">
       <Group justify="space-between" align="end">
@@ -201,17 +250,6 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
             value={series}
             onChange={(event) => setSeries(event.currentTarget.value)}
           />
-          <Button variant="light" onClick={() => load()} disabled={Boolean(imageActionId)}>
-            Reload
-          </Button>
-          <Button
-            leftSection={<IconRefresh size={16} />}
-            onClick={refreshSelected}
-            loading={Boolean(imageActionId && imageActionId === selectedRecordId)}
-            disabled={!selectedRecordId}
-          >
-            Refresh
-          </Button>
         </Group>
       </Group>
 
@@ -222,7 +260,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
         </Text>
       )}
 
-      <Tabs value={activeTab} onChange={setActiveTab}>
+      <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
         <Tabs.List>
           <Tabs.Tab value="gallery">Gallery</Tabs.Tab>
           <Tabs.Tab value="detail" disabled={!selected}>
@@ -232,15 +270,16 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
 
         <Tabs.Panel value="gallery" pt="md">
           <ScrollArea h="calc(100vh - 230px)">
-            <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} spacing="sm">
+            <SimpleGrid cols={{ base: 2, sm: 3, md: 4, xl: 5 }} spacing="xs">
               {images.map((record) => {
                 const key = recordKey(record);
                 const isSelected = key === selectedRecordId;
+                const thumbnailURL = thumbnailURLs[key];
                 return (
                   <Paper
                     key={key}
                     withBorder
-                    p="sm"
+                    p={4}
                     style={{
                       cursor: 'pointer',
                       borderColor: isSelected ? 'var(--mantine-color-blue-6)' : undefined,
@@ -250,36 +289,42 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
                       setActiveTab('detail');
                     }}
                   >
-                    <Stack gap="xs">
-                      <Group justify="space-between" align="start">
-                        <Text fw={700} lineClamp={2}>
-                          {displayTitle(record)}
-                        </Text>
-                        <Group gap="xs" wrap="nowrap">
-                          <Badge variant="light">{statusLabel(record)}</Badge>
-                          <Tooltip label="Delete image and metadata">
-                            <ActionIcon
-                              aria-label="Delete image and metadata"
-                              variant="subtle"
-                              color="red"
-                              loading={imageActionId === key}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                deleteImage(key);
-                              }}
-                            >
-                              <IconX size={14} />
-                            </ActionIcon>
-                          </Tooltip>
-                        </Group>
-                      </Group>
-                      <Text size="xs" c="dimmed" lineClamp={1}>
-                        {record.metadata.series?.name} · {record.metadata.seed}
-                      </Text>
-                      <Text size="sm" lineClamp={3}>
-                        {record.metadata.input}
-                      </Text>
-                    </Stack>
+                    <Tooltip label={displayTitle(record)}>
+                      <Box
+                        pos="relative"
+                        style={{
+                          aspectRatio: '1 / 1',
+                          overflow: 'hidden',
+                          borderRadius: 'var(--mantine-radius-sm)',
+                        }}
+                      >
+                        {thumbnailURL ? (
+                          <Image src={thumbnailURL} h="100%" w="100%" fit="cover" />
+                        ) : (
+                          <Paper h="100%" bg="gray.0" radius="sm">
+                            <Stack h="100%" align="center" justify="center" gap={2}>
+                              <Text size="xs" c="dimmed">
+                                No image
+                              </Text>
+                            </Stack>
+                          </Paper>
+                        )}
+                        <ActionIcon
+                          aria-label="Delete image and metadata"
+                          variant="filled"
+                          color="red"
+                          size="sm"
+                          loading={imageActionId === key}
+                          style={{ position: 'absolute', top: 6, right: 6 }}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            deleteImage(key);
+                          }}
+                        >
+                          <IconX size={13} />
+                        </ActionIcon>
+                      </Box>
+                    </Tooltip>
                   </Paper>
                 );
               })}

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Button,
   Group,
   Paper,
   ScrollArea,
@@ -62,6 +61,16 @@ export function Databases() {
     load();
   }, [load]);
 
+  useEffect(() => {
+    const handleRefresh = (event: Event) => {
+      if ((event as CustomEvent).detail !== 'databases') return;
+      load(selectedName);
+    };
+
+    window.addEventListener('view:refresh', handleRefresh);
+    return () => window.removeEventListener('view:refresh', handleRefresh);
+  }, [load, selectedName]);
+
   return (
     <Stack gap="md">
       <Group justify="space-between" align="end">
@@ -71,7 +80,6 @@ export function Databases() {
             {files.length} tables
           </Text>
         </Stack>
-        <Button onClick={() => load(selectedName)}>Refresh</Button>
       </Group>
       {error && <Text c="red">{error}</Text>}
       {archives.map((archive) => (

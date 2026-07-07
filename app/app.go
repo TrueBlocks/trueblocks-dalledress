@@ -6,6 +6,9 @@ package app
 
 import (
 	"context"
+	"encoding/base64"
+	"fmt"
+	"os"
 
 	appkit "github.com/TrueBlocks/trueblocks-art/packages/appkit/v2"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v6"
@@ -50,6 +53,25 @@ func (a *App) ListImages(series string) ([]dalle.ImageMetadataRecord, error) {
 
 func (a *App) GetImage(id string) (dalle.ImageMetadataRecord, error) {
 	return a.engine.GetImage(id)
+}
+
+func (a *App) GetImageArtifactDataURL(id string, artifact string) (string, error) {
+	record, err := a.engine.GetImage(id)
+	if err != nil {
+		return "", err
+	}
+	path := record.Metadata.Artifacts.Annotated
+	if artifact == "generated" {
+		path = record.Metadata.Artifacts.Generated
+	}
+	if path == "" {
+		return "", fmt.Errorf("%s artifact is not available", artifact)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(data), nil
 }
 
 func (a *App) ExportImage(id string, options dalle.ExportImageOptions) (dalle.ExportImageResult, error) {

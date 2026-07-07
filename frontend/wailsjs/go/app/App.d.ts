@@ -11,6 +11,8 @@ export function GetDatabaseArchive(arg1:string):Promise<storage.DatabaseArchiveM
 
 export function GetImage(arg1:string):Promise<dalle.ImageMetadataRecord>;
 
+export function GetImageArtifactDataURL(arg1:string,arg2:string):Promise<string>;
+
 export function GetLastRoute():Promise<string>;
 
 export function GetPref(arg1:string):Promise<string>;

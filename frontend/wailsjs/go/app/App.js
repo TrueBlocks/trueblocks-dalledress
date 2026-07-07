@@ -18,6 +18,10 @@ export function GetImage(arg1) {
   return window['go']['app']['App']['GetImage'](arg1);
 }
 
+export function GetImageArtifactDataURL(arg1, arg2) {
+  return window['go']['app']['App']['GetImageArtifactDataURL'](arg1, arg2);
+}
+
 export function GetLastRoute() {
   return window['go']['app']['App']['GetLastRoute']();
 }

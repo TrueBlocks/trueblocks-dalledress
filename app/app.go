@@ -67,6 +67,10 @@ func (a *App) SetImageModel(model string) {
 	a.engine.SetImageModel(model)
 }
 
+func (a *App) NormalizeSeed(input string, seed string) (string, error) {
+	return dalle.NormalizeSeed(input, seed)
+}
+
 func (a *App) Preview(request dalle.GenerateRequest) (dalle.GenerateResult, error) {
 	return a.engine.Preview(request)
 }

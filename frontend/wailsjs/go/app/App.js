@@ -82,6 +82,10 @@ export function ListSeries(arg1, arg2) {
   return window['go']['app']['App']['ListSeries'](arg1, arg2);
 }
 
+export function NormalizeSeed(arg1, arg2) {
+  return window['go']['app']['App']['NormalizeSeed'](arg1, arg2);
+}
+
 export function OpenImageArtifact(arg1, arg2) {
   return window['go']['app']['App']['OpenImageArtifact'](arg1, arg2);
 }

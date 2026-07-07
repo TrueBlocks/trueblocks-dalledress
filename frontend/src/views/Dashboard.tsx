@@ -21,9 +21,11 @@ import { StatusBar, StatusLevel } from '../components/StatusBar';
 import {
   Generate,
   GetGenerationProgress,
+  GetImage,
   GetImageModel,
   GetPref,
   ListSeries,
+  NormalizeSeed,
   Preview,
   SetImageModel,
   SetPref,
@@ -34,6 +36,7 @@ import { dalle } from '../../wailsjs/go/models';
 type DashboardProps = {
   onGeneratedImage: (imageId: string) => void;
   currentImage: dalle.ImageMetadataRecord | null;
+  onCurrentImageChange: (record: dalle.ImageMetadataRecord | null) => void;
 };
 
 function messageFromError(error: unknown): string {
@@ -80,7 +83,11 @@ function statusForProgress(progress: app.GenerationProgress): StatusState {
   };
 }
 
-export function Dashboard({ onGeneratedImage, currentImage }: DashboardProps) {
+export function Dashboard({
+  onGeneratedImage,
+  currentImage,
+  onCurrentImageChange,
+}: DashboardProps) {
   const [series, setSeries] = useState<dalle.Series[]>([]);
   const [selectedSeries, setSelectedSeries] = useState<string>('');
   const [input, setInput] = useState('Person Tour Coordinates');
@@ -142,7 +149,11 @@ export function Dashboard({ onGeneratedImage, currentImage }: DashboardProps) {
   useEffect(() => {
     if (!prefsLoaded) return;
     SetPref(DASHBOARD_PREFS.input, input);
-  }, [input, prefsLoaded]);
+    NormalizeSeed(input, '')
+      .then((hash) => GetImage(hash))
+      .then((record) => onCurrentImageChange(record))
+      .catch(() => onCurrentImageChange(null));
+  }, [input, onCurrentImageChange, prefsLoaded]);
 
   useEffect(() => {
     if (!prefsLoaded) return;

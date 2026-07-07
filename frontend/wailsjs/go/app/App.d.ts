@@ -44,6 +44,8 @@ export function ListImages(arg1:string):Promise<Array<dalle.ImageMetadataRecord>
 
 export function ListSeries(arg1:boolean,arg2:boolean):Promise<Array<dalle.Series>>;
 
+export function NormalizeSeed(arg1:string,arg2:string):Promise<string>;
+
 export function OpenImageArtifact(arg1:string,arg2:string):Promise<void>;
 
 export function Preview(arg1:dalle.GenerateRequest):Promise<dalle.GenerateResult>;

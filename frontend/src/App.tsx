@@ -82,7 +82,11 @@ export function App() {
       saveSidebarWidth={SetSidebarWidth}
     >
       {route === 'dashboard' && (
-        <Dashboard onGeneratedImage={showGeneratedImage} currentImage={currentImage} />
+        <Dashboard
+          onGeneratedImage={showGeneratedImage}
+          currentImage={currentImage}
+          onCurrentImageChange={setCurrentImage}
+        />
       )}
       {route === 'images' && (
         <Images selectedImageId={selectedImageId} onCurrentImageChange={setCurrentImage} />

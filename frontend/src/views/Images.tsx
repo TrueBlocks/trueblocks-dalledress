@@ -99,13 +99,22 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   const hasPrevious = selectedIndex > 0;
   const hasNext = selectedIndex >= 0 && selectedIndex < images.length - 1;
 
+  const selectByIndex = useCallback(
+    (index: number) => {
+      if (images.length === 0) return;
+      const nextIndex = Math.max(0, Math.min(index, images.length - 1));
+      const next = images[nextIndex];
+      if (next) setSelectedId(recordKey(next));
+    },
+    [images],
+  );
+
   const selectByOffset = useCallback(
     (offset: number) => {
       if (selectedIndex < 0) return;
-      const next = images[selectedIndex + offset];
-      if (next) setSelectedId(recordKey(next));
+      selectByIndex(selectedIndex + offset);
     },
-    [images, selectedIndex],
+    [selectByIndex, selectedIndex],
   );
 
   const returnToGallery = useCallback(() => {
@@ -154,7 +163,6 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   };
 
   const deleteImage = (id: string) => {
-    if (!window.confirm('Delete this image and its metadata?')) return;
     const deleting = images.find((record) => recordKey(record) === id);
     const title = deleting ? displayTitle(deleting) : id;
     setError('');
@@ -281,6 +289,16 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (activeTab !== 'detail') return;
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'ArrowLeft') {
+        event.preventDefault();
+        returnToGallery();
+        return;
+      }
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key === 'ArrowUp') {
+        event.preventDefault();
+        returnToGallery();
+        return;
+      }
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.target instanceof HTMLElement) {
         const editableTags = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'];
@@ -294,11 +312,27 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
         event.preventDefault();
         selectByOffset(1);
       }
+      if (event.key === 'Home') {
+        event.preventDefault();
+        selectByIndex(0);
+      }
+      if (event.key === 'End') {
+        event.preventDefault();
+        selectByIndex(images.length - 1);
+      }
+      if (event.key === 'PageUp') {
+        event.preventDefault();
+        selectByOffset(-10);
+      }
+      if (event.key === 'PageDown') {
+        event.preventDefault();
+        selectByOffset(10);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeTab, selectByOffset]);
+  }, [activeTab, images.length, returnToGallery, selectByIndex, selectByOffset]);
 
   useEffect(() => {
     if (!selectedRecordId) {
@@ -423,6 +457,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
                           loading={imageActionId === key}
                           style={{ position: 'absolute', top: 6, right: 6 }}
                           onClick={(event) => {
+                            event.preventDefault();
                             event.stopPropagation();
                             deleteImage(key);
                           }}

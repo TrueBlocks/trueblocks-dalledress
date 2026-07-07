@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Badge,
   Button,
@@ -7,13 +7,14 @@ import {
   Paper,
   SimpleGrid,
   Stack,
-  Table,
+  Tabs,
   Text,
   Textarea,
   TextInput,
   Title,
 } from '@mantine/core';
-import { ListSeries, SaveSeries, SetSeriesHidden } from '../../wailsjs/go/app/App';
+import { Column, DataTable, usePersistedTab } from '@trueblocks/ui';
+import { GetTab, ListSeries, SaveSeries, SetSeriesHidden, SetTab } from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
 
 const FILTER_FIELDS = [
@@ -123,8 +124,62 @@ export function Series() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
+  const { activeTab, setActiveTab } = usePersistedTab({
+    key: 'series',
+    defaultTab: 'list',
+    loadTab: GetTab,
+    saveTab: SetTab,
+    tabs: ['list', 'detail'],
+    cycleViewId: 'series',
+  });
 
   const selected = items.find((item) => item.suffix === selectedSuffix);
+
+  const columns: Column<dalle.Series>[] = useMemo(
+    () => [
+      {
+        key: 'suffix',
+        label: 'Suffix',
+        width: '30%',
+        render: (item) => item.suffix,
+        sortValue: (item) => item.suffix.toLowerCase(),
+        scrollOnSelect: true,
+      },
+      {
+        key: 'purpose',
+        label: 'Purpose',
+        width: '35%',
+        render: (item) => item.purpose || '',
+        sortValue: (item) => item.purpose || '',
+      },
+      {
+        key: 'last',
+        label: 'Last',
+        width: '10%',
+        render: (item) => item.last ?? 0,
+        sortValue: (item) => item.last ?? 0,
+      },
+      {
+        key: 'state',
+        label: 'State',
+        width: '15%',
+        render: (item) => (
+          <Badge variant="light" color={item.deleted ? 'gray' : 'green'}>
+            {item.deleted ? 'hidden' : 'active'}
+          </Badge>
+        ),
+        sortValue: (item) => (item.deleted ? 'hidden' : 'active'),
+      },
+      {
+        key: 'modifiedAt',
+        label: 'Modified',
+        width: '10%',
+        render: (item) => item.modifiedAt || '',
+        sortValue: (item) => item.modifiedAt || '',
+      },
+    ],
+    [],
+  );
 
   const load = useCallback(
     (preferred = '') => {
@@ -164,6 +219,7 @@ export function Series() {
     setDraft(draftFromSeries(series));
     setMessage('');
     setError('');
+    setActiveTab('detail');
   };
 
   const newSeries = () => {
@@ -171,6 +227,7 @@ export function Series() {
     setDraft(emptyDraft);
     setMessage('');
     setError('');
+    setActiveTab('detail');
   };
 
   const save = () => {
@@ -204,6 +261,27 @@ export function Series() {
     setDraft((current) => ({ ...current, [key]: value }));
   };
 
+  const searchSeries = (series: dalle.Series, search: string) => {
+    const query = search.toLowerCase();
+    return [
+      series.suffix,
+      series.purpose || '',
+      ...(series.adverbs ?? []),
+      ...(series.adjectives ?? []),
+      ...(series.nouns ?? []),
+      ...(series.emotions ?? []),
+      ...(series.occupations ?? []),
+      ...(series.actions ?? []),
+      ...(series.artstyles ?? []),
+      ...(series.litstyles ?? []),
+      ...(series.colors ?? []),
+      ...(series.viewpoints ?? []),
+      ...(series.gazes ?? []),
+      ...(series.backstyles ?? []),
+      ...(series.compositions ?? []),
+    ].some((value) => value.toLowerCase().includes(query));
+  };
+
   return (
     <Stack gap="md">
       <Group justify="space-between" align="end">
@@ -225,101 +303,80 @@ export function Series() {
       {error && <Text c="red">{error}</Text>}
       {message && <Text c="dimmed">{message}</Text>}
 
-      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
-        <Paper withBorder p="md">
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Suffix</Table.Th>
-                <Table.Th>Purpose</Table.Th>
-                <Table.Th>Last</Table.Th>
-                <Table.Th>State</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {items.map((item) => (
-                <Table.Tr
-                  key={item.suffix}
-                  onClick={() => selectSeries(item)}
-                  style={{
-                    cursor: 'pointer',
-                    background:
-                      item.suffix === selectedSuffix
-                        ? 'var(--mantine-color-blue-light)'
-                        : undefined,
-                  }}
-                >
-                  <Table.Td>{item.suffix}</Table.Td>
-                  <Table.Td>{item.purpose}</Table.Td>
-                  <Table.Td>{item.last ?? 0}</Table.Td>
-                  <Table.Td>
-                    <Badge variant="light" color={item.deleted ? 'gray' : 'green'}>
-                      {item.deleted ? 'hidden' : 'active'}
-                    </Badge>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Paper>
-
-        <Paper withBorder p="md">
-          <Stack gap="sm">
-            <Group grow>
-              <TextInput
-                label="Suffix"
-                value={draft.suffix}
-                onChange={(event) => updateDraft('suffix', event.currentTarget.value)}
-              />
-              <TextInput
-                label="Last index"
-                type="number"
-                value={draft.last}
-                onChange={(event) => updateDraft('last', event.currentTarget.value)}
-              />
-            </Group>
-            <TextInput
-              label="Purpose"
-              value={draft.purpose}
-              onChange={(event) => updateDraft('purpose', event.currentTarget.value)}
-            />
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-              {FILTER_FIELDS.map((field) => (
-                <Textarea
-                  key={field}
-                  label={field}
-                  value={draft[field]}
-                  minRows={3}
-                  autosize
-                  onChange={(event) => updateDraft(field, event.currentTarget.value)}
+      <Tabs value={activeTab} onChange={(value) => value && setActiveTab(value)}>
+        <Tabs.List>
+          <Tabs.Tab value="list">List</Tabs.Tab>
+          <Tabs.Tab value="detail">Detail</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="list" pt="md">
+          <DataTable<dalle.Series>
+            tableName="dalle-series"
+            data={items}
+            columns={columns}
+            getRowKey={(item) => item.suffix}
+            onRowClick={selectSeries}
+            searchFn={searchSeries}
+          />
+        </Tabs.Panel>
+        <Tabs.Panel value="detail" pt="md">
+          <Paper withBorder p="md">
+            <Stack gap="sm">
+              <Group grow>
+                <TextInput
+                  label="Suffix"
+                  value={draft.suffix}
+                  onChange={(event) => updateDraft('suffix', event.currentTarget.value)}
                 />
-              ))}
-            </SimpleGrid>
-            <Group justify="space-between">
-              <Group>
-                <Button onClick={save} loading={saving} disabled={!draft.suffix.trim()}>
-                  Save
-                </Button>
-                {selected && !selected.deleted && (
-                  <Button variant="light" color="gray" onClick={() => setHidden(true)}>
-                    Hide
+                <TextInput
+                  label="Last index"
+                  type="number"
+                  value={draft.last}
+                  onChange={(event) => updateDraft('last', event.currentTarget.value)}
+                />
+              </Group>
+              <TextInput
+                label="Purpose"
+                value={draft.purpose}
+                onChange={(event) => updateDraft('purpose', event.currentTarget.value)}
+              />
+              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
+                {FILTER_FIELDS.map((field) => (
+                  <Textarea
+                    key={field}
+                    label={field}
+                    value={draft[field]}
+                    minRows={3}
+                    autosize
+                    onChange={(event) => updateDraft(field, event.currentTarget.value)}
+                  />
+                ))}
+              </SimpleGrid>
+              <Group justify="space-between">
+                <Group>
+                  <Button onClick={save} loading={saving} disabled={!draft.suffix.trim()}>
+                    Save
                   </Button>
-                )}
-                {selected?.deleted && (
-                  <Button variant="light" onClick={() => setHidden(false)}>
-                    Restore
-                  </Button>
+                  {selected && !selected.deleted && (
+                    <Button variant="light" color="gray" onClick={() => setHidden(true)}>
+                      Hide
+                    </Button>
+                  )}
+                  {selected?.deleted && (
+                    <Button variant="light" onClick={() => setHidden(false)}>
+                      Restore
+                    </Button>
+                  )}
+                </Group>
+                {selected?.modifiedAt && (
+                  <Text size="xs" c="dimmed">
+                    Modified {selected.modifiedAt}
+                  </Text>
                 )}
               </Group>
-              {selected?.modifiedAt && (
-                <Text size="xs" c="dimmed">
-                  Modified {selected.modifiedAt}
-                </Text>
-              )}
-            </Group>
-          </Stack>
-        </Paper>
-      </SimpleGrid>
+            </Stack>
+          </Paper>
+        </Tabs.Panel>
+      </Tabs>
     </Stack>
   );
 }

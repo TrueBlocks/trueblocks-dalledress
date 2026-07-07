@@ -1,13 +1,19 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "TrueBlocks Dalledress",
-  "outputfilename": "trueblocks-dalledress",
+  "name": "dalledress",
+  "outputfilename": "dalledress",
   "frontend:install": "yarn install",
   "frontend:build": "yarn build",
   "frontend:dev:watcher": "yarn dev",
-  "frontend:dev:serverUrl": "http://localhost:5173",
+  "frontend:dev:serverUrl": "auto",
   "author": {
-    "name": "TrueBlocks",
-    "email": "info@trueblocks.io"
+    "name": "Thomas Jay Rush",
+    "email": "jrush@quickblocks.io"
+  },
+  "info": {
+    "companyName": "TrueBlocks, LLC",
+    "productName": "Dalledress",
+    "productVersion": "0.1.0",
+    "copyright": "Copyright © 2026 TrueBlocks, LLC"
   }
 }

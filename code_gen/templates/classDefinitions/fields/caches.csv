@@ -1,7 +1,0 @@
-name       , type  , strDefault, attributes, section   , upgrades, docOrder, description
-type       , string,           ,           , General   ,         ,        1, the type of cache
-path       , path  ,           ,           , General   ,         ,        2, the path to the cache
-nFiles     , uint64,           ,           , Statistics,         ,        3, the number of files in the cache
-nFolders   , uint64,           ,           , Statistics,         ,        4, the number of folders in the cache
-sizeInBytes, uint64,           ,           , Statistics,         ,        5, the size of the cache in bytes
-lastCached , string,           ,           , Timestamps,         ,        6, the last time this cache was updated

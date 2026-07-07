@@ -1,326 +1,67 @@
 import { useEffect, useState } from 'react';
-
+import { IconDatabase, IconHome, IconPhoto, IconSettings, IconStack2 } from '@tabler/icons-react';
+import { AppLayout, useViewHotkeys, useWindowGeometry } from '@trueblocks/ui';
 import {
-  NodeStatus,
-  ProjectSelectionModal,
-  SplashScreen,
-  getBarSize,
-} from '@components';
-import { ViewContextProvider, useViewContext } from '@contexts';
-import {
-  initializeAllViewConfigs,
-  useActiveProject,
-  useAppHealth,
-  useAppHotkeys,
-  useAppNavigation,
-  useEvent,
-  usePreferences,
-} from '@hooks';
-import { Footer, Header, HelpBar, MainView, MenuBar } from '@layout';
-import { AppShell } from '@mantine/core';
-import { msgs, project, types } from '@models';
-import { LogError, emitError, initializePreferencesDefaults } from '@utils';
-import { WalletProvider } from '@wallet';
-import { WalletConnectModalSign } from '@walletconnect/modal-sign-react';
-import { Router, useLocation } from 'wouter';
+  GetLastRoute,
+  GetSidebarWidth,
+  SaveWindowGeometry,
+  SetLastRoute,
+  SetSidebarWidth,
+} from '../wailsjs/go/app/App';
+import { WindowGetPosition, WindowGetSize } from '../wailsjs/runtime/runtime';
+import { Databases } from './views/Databases';
+import { Dashboard } from './views/Dashboard';
+import { Images } from './views/Images';
+import { Series } from './views/Series';
+import { Settings } from './views/Settings';
 
-import './debug-layout.css';
-import { useGlobalEscape } from './hooks/useGlobalEscape';
+const VIEWS = [
+  { num: 1, id: 'dashboard', label: 'Dashboard', icon: IconHome },
+  { num: 2, id: 'images', label: 'Images', icon: IconPhoto },
+  { num: 3, id: 'series', label: 'Series', icon: IconStack2 },
+  { num: 4, id: 'databases', label: 'Databases', icon: IconDatabase },
+  { num: 5, id: 'settings', label: 'Settings', icon: IconSettings },
+];
 
-// Add at the top level, outside the component
-function globalNavKeySquelcher(e: KeyboardEvent) {
-  const navKeys = [
-    'ArrowUp',
-    'ArrowDown',
-    'ArrowLeft',
-    'ArrowRight',
-    'PageUp',
-    'PageDown',
-    'Home',
-    'End',
-  ];
-
-  const activeElement = document.activeElement as HTMLElement;
-  const isFormElement =
-    activeElement &&
-    (activeElement.tagName === 'INPUT' ||
-      activeElement.tagName === 'TEXTAREA' ||
-      activeElement.tagName === 'SELECT' ||
-      activeElement.isContentEditable);
-
-  if (navKeys.includes(e.key) && !isFormElement) {
-    // Only squelch if not handled by a focused form control
-    e.preventDefault();
-  }
-}
-
-// NavigationHandler component that listens for navigation events
-// Must be inside ViewContextProvider to access setPendingRowAction
-const NavigationHandler = () => {
-  const { setPendingRowAction, updateFiltering } = useViewContext();
-  const {
-    setViewAndFacet,
-    activeAddress,
-    activeChain,
-    activePeriod,
-    setActiveAddress,
-    setActiveChain,
-    setActivePeriod,
-  } = useActiveProject();
-  const [_, navigate] = useLocation();
-
-  // Listen for row action events from backend
-  useEvent(
-    msgs.EventType.ROW_ACTION,
-    async (message: string, payload?: unknown) => {
-      // Parse the payload as RowActionPayload
-      const rowActionPayload = payload as types.RowActionPayload;
-      const target = rowActionPayload.rowAction?.target;
-      if (!target) {
-        LogError('RowAction missing target configuration');
-        return;
-      }
-
-      // Check if context needs to change (use processed contextValues)
-      const contextChanges: Promise<void>[] = [];
-
-      // Generic context handling - no view-specific knowledge
-      const contextValues = rowActionPayload.contextValues;
-      if (contextValues?.address && contextValues.address !== activeAddress) {
-        contextChanges.push(setActiveAddress(contextValues.address as string));
-      }
-
-      if (
-        rowActionPayload.activeChain &&
-        rowActionPayload.activeChain !== activeChain
-      ) {
-        contextChanges.push(setActiveChain(rowActionPayload.activeChain));
-      }
-
-      if (
-        rowActionPayload.activePeriod &&
-        rowActionPayload.activePeriod !== activePeriod
-      ) {
-        contextChanges.push(setActivePeriod(rowActionPayload.activePeriod));
-      }
-
-      // Wait for all context changes to complete before proceeding
-      if (contextChanges.length > 0) {
-        await Promise.all(contextChanges);
-      }
-
-      // Create ViewStateKey from the target configuration
-      const targetViewStateKey: project.ViewStateKey = {
-        viewName: target.view,
-        facetName: rowActionPayload.dataFacet,
-      };
-
-      // Set filter from contextValues if databaseName is present
-      if (contextValues?.databaseName) {
-        updateFiltering(
-          targetViewStateKey,
-          contextValues.databaseName as string,
-        );
-      }
-
-      // Store complete row action payload in ViewState
-      setPendingRowAction(targetViewStateKey, rowActionPayload);
-
-      // Set the target facet state BEFORE navigation (await completion)
-      await setViewAndFacet(target.view, rowActionPayload.dataFacet);
-
-      // Navigate to target view (handles both intra-view and inter-view navigation)
-      const targetRoute = `/${target.view}`;
-      navigate(targetRoute);
-    },
-  );
-
-  return null; // This component only handles events, no UI
-};
-
-// Inner component that uses hooks requiring WalletProvider
-const AppContent = ({
-  showProjectModal,
-  hasActiveProject,
-  ready,
-  isWizard,
-  viewConfigsLoading,
-  splashDelayComplete,
-  handleProjectModalClose,
-  handleProjectModalCancel,
-}: {
-  showProjectModal: boolean;
-  hasActiveProject: boolean;
-  ready: boolean;
-  isWizard: boolean;
-  viewConfigsLoading: boolean;
-  splashDelayComplete: boolean;
-  handleProjectModalClose: () => void;
-  handleProjectModalCancel: () => void;
-}) => {
-  const { menuCollapsed, helpCollapsed, chromeCollapsed } = usePreferences();
-
-  // These hooks need WalletProvider
-  useAppHotkeys();
-  useAppHealth();
-  useGlobalEscape();
-
-  if (!ready || viewConfigsLoading || !splashDelayComplete)
-    return <SplashScreen />;
-
-  const header = { height: getBarSize('header', chromeCollapsed) };
-  const footer = { height: getBarSize('footer', chromeCollapsed) };
-  const navbar = {
-    width: getBarSize('menu', menuCollapsed),
-    breakpoint: 'sm',
-    collapsed: { mobile: !menuCollapsed },
-  };
-  const aside = {
-    width: getBarSize('help', helpCollapsed),
-    breakpoint: 'sm',
-    collapsed: { mobile: !helpCollapsed },
-  };
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-      }}
-    >
-      <AppShell
-        layout="default"
-        header={header}
-        footer={footer}
-        navbar={navbar}
-        aside={aside}
-      >
-        <Header />
-        <MenuBar disabled={isWizard} />
-        <ViewContextProvider>
-          <NavigationHandler />
-          <MainView />
-        </ViewContextProvider>
-        <HelpBar />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: `${getBarSize('footer', chromeCollapsed) + 27}px`,
-            right: `${getBarSize('help', helpCollapsed) + 2}px`,
-            zIndex: 500,
-          }}
-        >
-          <NodeStatus />
-        </div>
-        <Footer />
-      </AppShell>
-      <WalletConnectModalSign
-        projectId={
-          (import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string) ||
-          (() => {
-            emitError(
-              'VITE_WALLETCONNECT_PROJECT_ID not set in environment variables',
-            );
-            return 'MISSING_PROJECT_ID';
-          })()
-        }
-        metadata={{
-          name: 'TrueBlocks Dalledress',
-          description: 'A TrueBlocks desktop application for naming addresses',
-          url: 'https://trueblocks.io',
-          icons: ['https://trueblocks.io/favicon.ico'],
-        }}
-      />
-      <ProjectSelectionModal
-        opened={showProjectModal}
-        onProjectSelected={handleProjectModalClose}
-        onCancel={hasActiveProject ? handleProjectModalCancel : undefined}
-      />
-    </div>
-  );
-};
-
-export const App = () => {
-  const [showProjectModal, setShowProjectModal] = useState(false);
-  const [viewConfigsLoading, setViewConfigsLoading] = useState(true);
-  const [splashDelayComplete, setSplashDelayComplete] = useState(false);
-  const { hasActiveProject } = useActiveProject();
+export function App() {
+  const [route, setRoute] = useState('dashboard');
+  const [initialSidebarWidth, setInitialSidebarWidth] = useState(220);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Initialize view configurations at app startup
-    initializeAllViewConfigs()
-      .then(({ isLoading }) => {
-        setViewConfigsLoading(isLoading);
-      })
-      .catch((error: unknown) => {
-        LogError('Failed to initialize view configurations: ' + String(error));
-        setViewConfigsLoading(false);
-      });
-
-    // Initialize preferences defaults cache on app startup
-    initializePreferencesDefaults().catch((error: unknown) => {
-      LogError('Failed to initialize preferences defaults: ' + String(error));
-    });
-
-    // Set minimum splash screen display time
-    const splashTimer = setTimeout(() => {
-      setSplashDelayComplete(true);
-    }, 750);
-
-    window.addEventListener('keydown', globalNavKeySquelcher, {
-      capture: true,
-    });
-    return () => {
-      clearTimeout(splashTimer);
-      window.removeEventListener('keydown', globalNavKeySquelcher, {
-        capture: true,
-      });
-    };
+    Promise.all([GetLastRoute().catch(() => 'dashboard'), GetSidebarWidth().catch(() => 220)]).then(
+      ([savedRoute, savedWidth]) => {
+        if (VIEWS.some((v) => v.id === savedRoute)) setRoute(savedRoute);
+        if (savedWidth > 0) setInitialSidebarWidth(savedWidth);
+        setReady(true);
+      },
+    );
   }, []);
 
-  // Show project modal only if we don't have a valid project AND it's not a user-requested modal
-  useEffect(() => {
-    if (!hasActiveProject && !showProjectModal) {
-      setShowProjectModal(true);
-    }
-  }, [hasActiveProject, showProjectModal]);
+  useWindowGeometry(SaveWindowGeometry, WindowGetPosition, WindowGetSize);
 
-  // Listen for project modal events
-  useEvent(msgs.EventType.PROJECT_MODAL, (message: string) => {
-    if (message === 'show_project_modal') {
-      setShowProjectModal(true);
-    }
-  });
-
-  useEvent(msgs.EventType.PROJECT_OPENED, () => {
-    setShowProjectModal(false);
-  });
-
-  const { ready, isWizard } = useAppNavigation();
-
-  const handleProjectModalClose = () => {
-    setShowProjectModal(false);
+  const navigate = (id: string) => {
+    setRoute(id);
+    SetLastRoute(id);
   };
 
-  const handleProjectModalCancel = () => {
-    setShowProjectModal(false);
-  };
+  useViewHotkeys({ views: VIEWS, activeView: route, onNavigate: navigate });
+
+  if (!ready) return null;
 
   return (
-    <Router>
-      <WalletProvider>
-        <AppContent
-          showProjectModal={showProjectModal}
-          hasActiveProject={hasActiveProject}
-          ready={ready}
-          isWizard={isWizard}
-          viewConfigsLoading={viewConfigsLoading}
-          splashDelayComplete={splashDelayComplete}
-          handleProjectModalClose={handleProjectModalClose}
-          handleProjectModalCancel={handleProjectModalCancel}
-        />
-      </WalletProvider>
-    </Router>
+    <AppLayout
+      navItems={VIEWS.map(({ id, label, icon }) => ({ id, label, icon }))}
+      activeNav={route}
+      onNavigate={navigate}
+      initialSidebarWidth={initialSidebarWidth}
+      saveSidebarWidth={SetSidebarWidth}
+    >
+      {route === 'dashboard' && <Dashboard />}
+      {route === 'images' && <Images />}
+      {route === 'series' && <Series />}
+      {route === 'databases' && <Databases />}
+      {route === 'settings' && <Settings />}
+    </AppLayout>
   );
-};
+}

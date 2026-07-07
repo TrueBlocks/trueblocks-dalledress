@@ -1,8 +1,0 @@
-name          , type  , strDefault, attributes, section  , upgrades, docOrder, description
-chain         , string,           ,           , General  ,         ,        1, the chain identifier
-chainId       , uint64,           ,           , General  ,         ,        2, the chain ID
-symbol        , string,           ,           , General  ,         ,        3, the chain's native token symbol
-rpcProvider   , url   ,           ,           , Providers,         ,        4, the RPC provider URL
-ipfsGateway   , url   ,           ,           , Providers,         ,        5, the IPFS gateway URL
-localExplorer , url   ,           ,           , Explorers,         ,        6, the local block explorer URL
-remoteExplorer, url   ,           ,           , Explorers,         ,        7, the remote block explorer URL

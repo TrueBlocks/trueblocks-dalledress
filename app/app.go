@@ -1,356 +1,92 @@
+// Package app holds the Wails-bound application object. The embedded NavState
+// provides the standard persistence surface (GetTab/SetTab, GetLastRoute/
+// SetLastRoute, window geometry, sidebar width, prefs, table states) as bound
+// methods; see ai/Architecture.md §7 in the trueblocks-art repo.
 package app
 
 import (
 	"context"
-	"embed"
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"sync"
-	"time"
 
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/fileserver"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/filewriter"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/manager"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/msgs"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/preferences"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/project"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/skin"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/exports"
-	"github.com/TrueBlocks/trueblocks-dalledress/pkg/types/names"
-
-	"github.com/joho/godotenv"
-	"github.com/wailsapp/wails/v2/pkg/menu"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
-
-	"github.com/TrueBlocks/trueblocks-chifra/v6/pkg/base"
-	"github.com/TrueBlocks/trueblocks-chifra/v6/pkg/config"
-	"github.com/TrueBlocks/trueblocks-chifra/v6/pkg/file"
-	"github.com/TrueBlocks/trueblocks-chifra/v6/pkg/logger"
-	coreTypes "github.com/TrueBlocks/trueblocks-chifra/v6/pkg/types"
-	"github.com/TrueBlocks/trueblocks-chifra/v6/pkg/utils"
+	appkit "github.com/TrueBlocks/trueblocks-art/packages/appkit/v2"
 	dalle "github.com/TrueBlocks/trueblocks-dalle/v6"
 	"github.com/TrueBlocks/trueblocks-dalle/v6/pkg/storage"
-	sdk "github.com/TrueBlocks/trueblocks-sdk/v6"
+	"github.com/TrueBlocks/trueblocks-dalledress/v2/internal/db"
 )
 
 type App struct {
-	Assets      embed.FS
-	Preferences *preferences.Preferences
-	Projects    *manager.Manager[*project.Project]
-	chainList   *utils.ChainList
-	// ADD_ROUTE
-	// QUESTION: DO WE ACTUALLY NEED THIS?
-	exports *exports.ExportsCollection
-	// ADD_ROUTE
-	collections []types.Collection
-	meta        *coreTypes.MetaData
-	fileServer  *fileserver.FileServer
-	prefsMu     sync.RWMutex
-	ctx         context.Context
-	apiKeys     map[string]string
-	ensMap      map[string]base.Address
-	Dalle       *dalle.Context
-	skinManager *skin.SkinManager
+	*appkit.NavState
+	ctx    context.Context
+	db     *db.DB
+	engine *dalle.Engine
 }
 
-func NewApp(assets embed.FS) (*App, *menu.Menu) {
-	app := &App{
-		Projects: manager.NewManager[*project.Project]("project"),
-		Preferences: &preferences.Preferences{
-			Org:  preferences.OrgPreferences{},
-			User: preferences.UserPreferences{},
-			App:  *preferences.NewAppPreferences(),
-		},
-		Assets:  assets,
-		apiKeys: make(map[string]string),
-		ensMap:  make(map[string]base.Address),
-	}
-	// ADD_ROUTE
-	// QUESTION: DO WE ACTUALLY NEED THIS?
-	// Note: exports created on-demand per chain/address when needed
-	app.exports = nil
-	// ADD_ROUTE
-
-	app.collections = make([]types.Collection, 0, 4)
-
-	app.chainList, _ = utils.UpdateChainList(config.PathToRootConfig())
-
-	if file.FileExists(".env") {
-		if err := godotenv.Load(); err != nil {
-			log.Fatal("Error loading .env file")
-		} else if app.apiKeys["openAi"] = os.Getenv("OPENAI_API_KEY"); app.apiKeys["openAi"] == "" {
-			log.Fatal("No OPENAI_API_KEY key found")
-		}
-	}
-
-	app.Dalle = dalle.NewContext()
-
-	configPath := config.PathToRootConfig()
-	app.skinManager = skin.NewSkinManager(configPath)
-	if err := app.skinManager.Initialize(); err != nil {
-		log.Printf("Warning: Failed to initialize skin manager: %v", err)
-	}
-
-	appMenu := app.buildAppMenu()
-	return app, appMenu
-}
-
-// GetContext returns the application's context instance
-func (a *App) GetContext() context.Context {
-	return a.ctx
-}
-
-// Startup initializes the application with context, preferences, and services
-func (a *App) Startup(ctx context.Context) {
-	a.ctx = ctx
-
-	msgs.InitializeContext(ctx)
-
-	org, err := preferences.GetOrgPreferences()
+func NewApp(prefsPath string, database *db.DB) (*App, error) {
+	engine, err := dalle.New(dalle.Config{})
 	if err != nil {
-		msgs.EmitError("Loading org preferences failed", err)
-		return
+		return nil, err
 	}
-
-	user, err := preferences.GetUserPreferences()
-	if err != nil {
-		msgs.EmitError("Loading user preferences failed", err)
-		return
-	}
-
-	appPrefs, err := preferences.GetAppPreferences()
-	if err != nil {
-		msgs.EmitError("Loading app preferences failed", err)
-		return
-	}
-
-	a.Preferences.Org = org
-	a.Preferences.User = user
-	a.Preferences.App = appPrefs
-
-	// Initialize global file writer to eliminate race conditions (auto-starts)
-	_ = filewriter.GetGlobalWriter()
-
-	// Restore previously opened projects from last session
-	a.restoreLastProjects()
-
-	// Initialize file server directly on the dalle OutputDir
-	if out := storage.OutputDir(); out != "" {
-		if _, err := os.Stat(out); err == nil {
-			a.fileServer = fileserver.NewFileServer(out)
-			if err := a.fileServer.Start(); err != nil {
-				msgs.EmitError("Failed to start image file server", err)
-			}
-		}
-	}
+	return &App{
+		NavState: appkit.NewNavState(prefsPath, appkit.NavDefaults{
+			Route:        "dashboard",
+			SidebarWidth: 220,
+		}),
+		db:     database,
+		engine: engine,
+	}, nil
 }
 
-// DomReady configures the window and starts monitoring after DOM is ready
-func (a *App) DomReady(ctx context.Context) {
-	a.ctx = ctx
-	if a.IsReady() {
-		if !a.Preferences.App.Bounds.IsValid() {
-			// Sometimes, during development, the window size is corrupted
-			// and we need to reset it to a default value. Should really
-			// happen in production.
-			a.Preferences.App.Bounds = preferences.NewBounds()
-		}
-		runtime.WindowSetSize(ctx, a.Preferences.App.Bounds.Width, a.Preferences.App.Bounds.Height)
-		runtime.WindowSetPosition(ctx, a.Preferences.App.Bounds.X, a.Preferences.App.Bounds.Y)
-		runtime.WindowShow(ctx)
-	}
-	go a.watchWindowBounds() // if the window moves or resizes, we want to know
+func (a *App) Startup(ctx context.Context) { a.ctx = ctx }
+
+func (a *App) Shutdown(_ context.Context) {}
+
+func (a *App) ListItems() ([]db.Item, error) { return a.db.ListItems() }
+
+func (a *App) AddItem(name string) error { return a.db.AddItem(name) }
+
+func (a *App) Preview(request dalle.GenerateRequest) (dalle.GenerateResult, error) {
+	return a.engine.Preview(request)
 }
 
-// BeforeClose saves window bounds and shuts down services before closing
-func (a *App) BeforeClose(ctx context.Context) bool {
-	x, y := runtime.WindowGetPosition(ctx)
-	w, h := runtime.WindowGetSize(ctx)
-	a.SaveBounds(x, y, w, h)
-
-	if a.fileServer != nil {
-		if err := a.fileServer.Stop(); err != nil {
-			log.Printf("Error shutting down file server: %v", err)
-		}
-	}
-
-	// Shutdown global file writer and flush any pending writes
-	writer := filewriter.GetGlobalWriter()
-	_ = writer.Shutdown()
-
-	return false // allow window to close
+func (a *App) Generate(request dalle.GenerateRequest) (dalle.GenerateResult, error) {
+	return a.engine.Generate(request)
 }
 
-// IsReady returns true if the application context is initialized
-func (a *App) IsReady() bool {
-	return a.ctx != nil
+func (a *App) ListImages(series string) ([]dalle.ImageMetadataRecord, error) {
+	return a.engine.ListImages(dalle.ImageFilter{Series: series})
 }
 
-// IsInitialized checks if the application has been initialized by looking for a marker file
-func (a *App) IsInitialized() bool {
-	_, appFolder := preferences.GetConfigFolders()
-	fn := filepath.Join(appFolder, ".initialized")
-	return file.FileExists(fn)
+func (a *App) GetImage(id string) (dalle.ImageMetadataRecord, error) {
+	return a.engine.GetImage(id)
 }
 
-// SetInitialized creates or removes the initialization marker file
-func (a *App) SetInitialized(isInit bool) error {
-	_, appFolder := preferences.GetConfigFolders()
-	fn := filepath.Join(appFolder, ".initialized")
-	if isInit {
-		if !file.Touch(fn) {
-			return fmt.Errorf("failed to create %s file", fn)
-		} else {
-			return nil
-		}
-	} else {
-		_ = os.Remove(fn)
-		return nil // do not fail even if not found
-	}
+func (a *App) ExportImage(id string, options dalle.ExportImageOptions) (dalle.ExportImageResult, error) {
+	return a.engine.ExportImage(id, options)
 }
 
-// watchWindowBounds monitors window position and size changes
-func (a *App) watchWindowBounds() {
-	ticker := time.NewTicker(500 * time.Millisecond)
-	defer ticker.Stop()
-
-	var lastX, lastY, lastW, lastH int
-	for range ticker.C {
-		if !a.IsReady() {
-			continue
-		}
-		x, y := runtime.WindowGetPosition(a.ctx)
-		w, h := runtime.WindowGetSize(a.ctx)
-		if x != lastX || y != lastY || w != lastW || h != lastH {
-			a.SaveBounds(x, y, w, h)
-			lastX, lastY, lastW, lastH = x, y, w, h
-		}
-	}
+func (a *App) ListSeries(includeHidden bool, onlyHidden bool) ([]dalle.Series, error) {
+	return a.engine.ListSeries(dalle.SeriesFilter{IncludeHidden: includeHidden, OnlyHidden: onlyHidden})
 }
 
-// SaveBounds updates and persists the window bounds to preferences
-func (a *App) SaveBounds(x, y, w, h int) {
-	if !a.IsReady() {
-		return
-	}
-
-	a.Preferences.App.Bounds = preferences.Bounds{
-		X:      x,
-		Y:      y,
-		Width:  w,
-		Height: h,
-	}
-
-	_ = preferences.SetAppPreferences(&a.Preferences.App)
+func (a *App) GetSeries(name string) (dalle.Series, error) {
+	return a.engine.GetSeries(name)
 }
 
-// GetAppId returns the application identifier
-func (a *App) GetAppId() preferences.Id {
-	return preferences.GetAppId()
+func (a *App) SaveSeries(series dalle.Series) (dalle.Series, error) {
+	return a.engine.SaveSeries(series)
 }
 
-// OpenURL opens the given URL in the default browser
-func (a *App) OpenURL(url string) {
-	logger.InfoBY("OpenURL:", url)
-	if a.ctx != nil {
-		logger.InfoBY("Opening...")
-		runtime.BrowserOpenURL(a.ctx, url)
-	}
+func (a *App) SetSeriesHidden(name string, hidden bool) (dalle.Series, error) {
+	return a.engine.SetSeriesHidden(name, hidden)
 }
 
-// OpenLink opens website for the given key and value
-func (a *App) OpenLink(key string, value string) {
-	var url string
-	if key == "blockHash" {
-		url = "https://etherscan.io/block/" + value
-	} else if key == "transactionHash" || key == "hash" {
-		url = "https://etherscan.io/tx/" + value
-	} else if base.IsValidAddress(value) {
-		url = "https://etherscan.io/address/" + value
-	} else {
-		logger.InfoBY("OpenLink: unknown key type:", key)
-		return
-	}
-
-	logger.InfoBY("OpenLink:", key, value, "->", url)
-	if a.ctx != nil {
-		runtime.BrowserOpenURL(a.ctx, url)
-	}
+func (a *App) ListDatabaseArchives() ([]storage.DatabaseArchiveManifest, error) {
+	return a.engine.ListDatabaseArchives()
 }
 
-// RegisterCollection adds a collection to the application's collection registry
-func (a *App) RegisterCollection(collection types.Collection) {
-	a.collections = append(a.collections, collection)
+func (a *App) GetDatabaseArchive(version string) (storage.DatabaseArchiveManifest, error) {
+	return a.engine.GetDatabaseArchive(version)
 }
 
-// getCollectionPage is a generic helper that fetches a typed Page from a collection using the provided payload, pagination, sorting, and filtering parameters.
-func getCollectionPage[T any](
-	collection interface {
-		GetPage(*types.Payload, int, int, sdk.SortSpec, string) (types.Page, error)
-	},
-	payload *types.Payload,
-	first, pageSize int,
-	sort sdk.SortSpec,
-	filter string,
-) (T, error) {
-	var zero T
-
-	dataFacet := payload.DataFacet
-	page, err := collection.GetPage(payload, first, pageSize, sort, filter)
-	if err != nil {
-		return zero, err
-	}
-
-	typedPage, ok := page.(T)
-	if !ok {
-		return zero, types.NewValidationError("app", dataFacet, "getCollectionPage",
-			fmt.Errorf("GetPage returned unexpected type %T, expected %T", page, zero))
-	}
-
-	return typedPage, nil
-}
-
-// ConfigOk checks the configuration - with embedded config, this always succeeds
-// but can still emit errors if there are issues loading the configuration
-func (a *App) ConfigOk() {
-	// Try to load the configuration to ensure it's valid
-	_, err := preferences.LoadAppConfig()
-	if err != nil {
-		msgs.EmitError("Configuration error", err)
-	}
-}
-
-// ChangeVisibility delegates facet visibility change to the correct collection
-func (a *App) ChangeVisibility(payload *types.Payload) error {
-	collection := a.getCollection(payload, false)
-	return collection.ChangeVisibility(payload)
-}
-
-// CloseActiveProject closes the currently active project facet using backend state
-func (a *App) CloseActiveProject() error {
-	currentView := a.GetLastView()
-	if currentView == "" {
-		currentView = "projects"
-	}
-
-	currentFacet := a.GetLastFacet(currentView)
-	if currentFacet == "" {
-		return fmt.Errorf("no current facet available for view: %s", currentView)
-	}
-
-	payload := &types.Payload{
-		Collection:   currentView,
-		DataFacet:    types.DataFacet(currentFacet),
-		TargetSwitch: true, // true = hide/close
-	}
-
-	return a.ChangeVisibility(payload)
-}
-
-// GetAddressName returns the name for an address if found, empty string otherwise
-func (a *App) GetAddressName(address string) string {
-	return names.NameAddressStr(address)
+func (a *App) ValidateDalle() error {
+	return a.engine.Validate()
 }

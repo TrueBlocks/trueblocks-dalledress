@@ -1,24 +1,19 @@
-module github.com/TrueBlocks/trueblocks-dalledress
+module github.com/TrueBlocks/trueblocks-dalledress/v2
 
-// GoLang Version
 go 1.25.1
 
 require (
-	github.com/TrueBlocks/trueblocks-chifra/v6 v6.6.6-0.20251201032710-ec810bb48eb0
-	github.com/TrueBlocks/trueblocks-dalle/v6 v6.6.5
-	github.com/TrueBlocks/trueblocks-sdk/v6 v6.6.5
-	github.com/google/go-cmp v0.7.0
-	github.com/joho/godotenv v1.5.1
-	github.com/kbinani/screenshot v0.0.0-20250624051815-089614a94018
-	github.com/stretchr/testify v1.11.1
+	github.com/TrueBlocks/trueblocks-art/packages/appkit/v2 v2.0.0
+	github.com/TrueBlocks/trueblocks-dalle/v6 v6.6.6
 	github.com/wailsapp/wails/v2 v2.10.2
-	golang.org/x/text v0.30.0
 )
 
 require (
 	git.sr.ht/~sbinet/gg v0.7.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProjectZKM/Ziren/crates/go-runtime/zkvm_runtime v0.0.0-20251001021608-1fe7b43fc4d6 // indirect
+	github.com/TrueBlocks/trueblocks-chifra/v6 v6.6.6-0.20251201032710-ec810bb48eb0 // indirect
+	github.com/TrueBlocks/trueblocks-sdk/v6 v6.6.5 // indirect
 	github.com/alecthomas/participle/v2 v2.1.4 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
@@ -29,7 +24,6 @@ require (
 	github.com/crackcomm/go-gitignore v0.0.0-20241020182519-7843d2ba8fdf // indirect
 	github.com/crate-crypto/go-eth-kzg v1.4.0 // indirect
 	github.com/crate-crypto/go-ipa v0.0.0-20240724233137-53bbb0ceb27a // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/deckarep/golang-set/v2 v2.8.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -37,7 +31,6 @@ require (
 	github.com/ethereum/go-ethereum v1.16.6 // indirect
 	github.com/ethereum/go-verkle v0.2.2 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
-	github.com/gen2brain/shm v0.1.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/gocarina/gocsv v0.0.0-20240520201108-78e41c74b4b1 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
@@ -51,7 +44,6 @@ require (
 	github.com/ipfs/go-cid v0.6.0 // indirect
 	github.com/ipfs/go-ipfs-api v0.7.0 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
-	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/labstack/echo/v4 v4.13.3 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
@@ -63,7 +55,6 @@ require (
 	github.com/libp2p/go-flow-metrics v0.2.0 // indirect
 	github.com/libp2p/go-libp2p v0.41.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
-	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
@@ -77,11 +68,12 @@ require (
 	github.com/multiformats/go-multihash v0.2.3 // indirect
 	github.com/multiformats/go-multistream v0.6.0 // indirect
 	github.com/multiformats/go-varint v0.1.0 // indirect
+	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/panjf2000/ants/v2 v2.11.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/samber/lo v1.49.1 // indirect
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
@@ -100,14 +92,20 @@ require (
 	github.com/wealdtech/go-multicodec v1.4.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
-	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
+	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
 	golang.org/x/image v0.30.0 // indirect
 	golang.org/x/net v0.45.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/term v0.36.0 // indirect
+	golang.org/x/text v0.30.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.4.1 // indirect
+	modernc.org/libc v1.72.3 // indirect
+	modernc.org/mathutil v1.7.1 // indirect
+	modernc.org/memory v1.11.0 // indirect
+	modernc.org/sqlite v1.52.0 // indirect
 )
+
+replace github.com/TrueBlocks/trueblocks-art/packages/appkit/v2 => ../packages/appkit

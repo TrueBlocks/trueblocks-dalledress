@@ -1,5 +1,0 @@
-name        , type    , section , docOrder, description
-address     , address , Identity,        1, an Ethereum address
-addressName , string  , Identity,        2, the name for this address
-nAppearances, uint64  , Identity,        3, number of appearances in the address
-lastUpdated , datetime, State   ,        4, the last time this file was written to

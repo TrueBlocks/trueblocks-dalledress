@@ -1,5 +1,0 @@
-name        , type  , attributes, section, docOrder, label   , description
-databaseName, string,           , General,        1, Database, Name of the database
-count       , uint64,           , General,        2,         , Number of entries
-sample      , string,           , General,        3,         , Sample entry
-filtered    , string,           , General,        4,         , Is database filtered by series

@@ -22,6 +22,8 @@ export function GetLastRoute():Promise<string>;
 
 export function GetPref(arg1:string):Promise<string>;
 
+export function GetRuntimeInfo():Promise<app.RuntimeInfo>;
+
 export function GetSeries(arg1:string):Promise<dalle.Series>;
 
 export function GetSidebarWidth():Promise<number>;
@@ -33,6 +35,8 @@ export function GetTableState(arg1:string):Promise<Record<string, any>>;
 export function GetWindowGeometry():Promise<number>;
 
 export function ListDatabaseArchives():Promise<Array<storage.DatabaseArchiveManifest>>;
+
+export function ListDatabaseRecords(arg1:string,arg2:number):Promise<dalle.DatabaseRecordsResult>;
 
 export function ListImages(arg1:string):Promise<Array<dalle.ImageMetadataRecord>>;
 

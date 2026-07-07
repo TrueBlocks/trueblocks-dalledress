@@ -28,6 +28,22 @@ export namespace app {
 	        this.error = source["error"];
 	    }
 	}
+	export class RuntimeInfo {
+	    dataDir: string;
+	    databaseVersion: string;
+	    archiveHash: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new RuntimeInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.dataDir = source["dataDir"];
+	        this.databaseVersion = source["databaseVersion"];
+	        this.archiveHash = source["archiveHash"];
+	    }
+	}
 
 }
 
@@ -46,6 +62,40 @@ export namespace dalle {
 	        this.generated = source["generated"];
 	        this.annotated = source["annotated"];
 	    }
+	}
+	export class DatabaseRecordsResult {
+	    name: string;
+	    version: string;
+	    records: storage.DatabaseRecord[];
+	
+	    static createFrom(source: any = {}) {
+	        return new DatabaseRecordsResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.version = source["version"];
+	        this.records = this.convertValues(source["records"], storage.DatabaseRecord);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class ExportImageOptions {
 	    Dir: string;
@@ -501,6 +551,21 @@ export namespace storage {
 		    }
 		    return a;
 		}
+	}
+	
+	export class DatabaseRecord {
+	    key: string;
+	    values: string[];
+	
+	    static createFrom(source: any = {}) {
+	        return new DatabaseRecord(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.key = source["key"];
+	        this.values = source["values"];
+	    }
 	}
 
 }

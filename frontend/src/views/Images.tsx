@@ -11,6 +11,7 @@ import {
   SimpleGrid,
   Stack,
   Table,
+  Tabs,
   Text,
   TextInput,
   Title,
@@ -66,6 +67,7 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   const [error, setError] = useState('');
   const [actionMessage, setActionMessage] = useState('');
   const [imageActionId, setImageActionId] = useState('');
+  const [activeTab, setActiveTab] = useState<string | null>(selectedImageId ? 'detail' : 'gallery');
 
   const selected = images.find((record) => recordKey(record) === selectedId) ?? images[0];
   const selectedRecordId = selected ? recordKey(selected) : '';
@@ -144,7 +146,10 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
   };
 
   useEffect(() => {
-    if (selectedImageId) setSeries('');
+    if (selectedImageId) {
+      setSeries('');
+      setActiveTab('detail');
+    }
     load(selectedImageId ? '' : series, selectedImageId);
   }, [load, selectedImageId, series]);
 
@@ -217,172 +222,186 @@ export function Images({ selectedImageId = '' }: ImagesProps) {
         </Text>
       )}
 
-      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
-        <ScrollArea h="calc(100vh - 220px)">
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-            {images.map((record) => {
-              const key = recordKey(record);
-              const isSelected = key === selectedRecordId;
-              return (
-                <Paper
-                  key={key}
-                  withBorder
-                  p="sm"
-                  style={{
-                    cursor: 'pointer',
-                    borderColor: isSelected ? 'var(--mantine-color-blue-6)' : undefined,
-                  }}
-                  onClick={() => setSelectedId(key)}
-                >
-                  <Stack gap="xs">
-                    <Group justify="space-between" align="start">
-                      <Text fw={700} lineClamp={2}>
-                        {displayTitle(record)}
-                      </Text>
-                      <Group gap="xs" wrap="nowrap">
-                        <Badge variant="light">{statusLabel(record)}</Badge>
-                        <Tooltip label="Delete image and metadata">
-                          <ActionIcon
-                            aria-label="Delete image and metadata"
-                            variant="subtle"
-                            color="red"
-                            loading={imageActionId === key}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              deleteImage(key);
-                            }}
-                          >
-                            <IconX size={14} />
-                          </ActionIcon>
-                        </Tooltip>
+      <Tabs value={activeTab} onChange={setActiveTab}>
+        <Tabs.List>
+          <Tabs.Tab value="gallery">Gallery</Tabs.Tab>
+          <Tabs.Tab value="detail" disabled={!selected}>
+            Detail
+          </Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel value="gallery" pt="md">
+          <ScrollArea h="calc(100vh - 230px)">
+            <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} spacing="sm">
+              {images.map((record) => {
+                const key = recordKey(record);
+                const isSelected = key === selectedRecordId;
+                return (
+                  <Paper
+                    key={key}
+                    withBorder
+                    p="sm"
+                    style={{
+                      cursor: 'pointer',
+                      borderColor: isSelected ? 'var(--mantine-color-blue-6)' : undefined,
+                    }}
+                    onClick={() => {
+                      setSelectedId(key);
+                      setActiveTab('detail');
+                    }}
+                  >
+                    <Stack gap="xs">
+                      <Group justify="space-between" align="start">
+                        <Text fw={700} lineClamp={2}>
+                          {displayTitle(record)}
+                        </Text>
+                        <Group gap="xs" wrap="nowrap">
+                          <Badge variant="light">{statusLabel(record)}</Badge>
+                          <Tooltip label="Delete image and metadata">
+                            <ActionIcon
+                              aria-label="Delete image and metadata"
+                              variant="subtle"
+                              color="red"
+                              loading={imageActionId === key}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                deleteImage(key);
+                              }}
+                            >
+                              <IconX size={14} />
+                            </ActionIcon>
+                          </Tooltip>
+                        </Group>
                       </Group>
-                    </Group>
-                    <Text size="xs" c="dimmed" lineClamp={1}>
-                      {record.metadata.series?.name} · {record.metadata.seed}
+                      <Text size="xs" c="dimmed" lineClamp={1}>
+                        {record.metadata.series?.name} · {record.metadata.seed}
+                      </Text>
+                      <Text size="sm" lineClamp={3}>
+                        {record.metadata.input}
+                      </Text>
+                    </Stack>
+                  </Paper>
+                );
+              })}
+            </SimpleGrid>
+          </ScrollArea>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="detail" pt="md">
+          <Paper withBorder p="md">
+            {selected ? (
+              <Stack gap="md">
+                <Group justify="space-between" align="start">
+                  <Stack gap={2}>
+                    <Title order={3}>{displayTitle(selected)}</Title>
+                    <Text size="sm" c="dimmed">
+                      {selected.metadata.series?.name} · {selected.metadata.seed}
                     </Text>
-                    <Text size="sm" lineClamp={2}>
-                      {record.metadata.input}
+                    <Text size="xs" c="dimmed">
+                      {selectedIndex + 1} of {images.length}
                     </Text>
                   </Stack>
-                </Paper>
-              );
-            })}
-          </SimpleGrid>
-        </ScrollArea>
-
-        <Paper withBorder p="md">
-          {selected ? (
-            <Stack gap="md">
-              <Group justify="space-between" align="start">
-                <Stack gap={2}>
-                  <Title order={3}>{displayTitle(selected)}</Title>
-                  <Text size="sm" c="dimmed">
-                    {selected.metadata.series?.name} · {selected.metadata.seed}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    {selectedIndex + 1} of {images.length}
-                  </Text>
-                </Stack>
-                <Group>
-                  <Button
-                    variant="light"
-                    disabled={!artifactURL}
-                    onClick={() => runArtifactAction('open')}
-                  >
-                    Open
-                  </Button>
-                  <Button
-                    variant="light"
-                    disabled={!artifactURL}
-                    onClick={() => runArtifactAction('reveal')}
-                  >
-                    Show in Finder
-                  </Button>
-                  <Button variant="light" onClick={exportText}>
-                    Export Text
-                  </Button>
-                  <Button
-                    variant="light"
-                    disabled={selectedIndex <= 0}
-                    onClick={() => selectByOffset(-1)}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="light"
-                    disabled={selectedIndex < 0 || selectedIndex >= images.length - 1}
-                    onClick={() => selectByOffset(1)}
-                  >
-                    Next
-                  </Button>
-                  <SegmentedControl
-                    value={artifact}
-                    onChange={(value) => setArtifact(value as ArtifactKind)}
-                    data={[
-                      { value: 'annotated', label: 'Annotated' },
-                      { value: 'generated', label: 'Generated' },
-                    ]}
-                  />
+                  <Group>
+                    <Button
+                      variant="light"
+                      disabled={!artifactURL}
+                      onClick={() => runArtifactAction('open')}
+                    >
+                      Open
+                    </Button>
+                    <Button
+                      variant="light"
+                      disabled={!artifactURL}
+                      onClick={() => runArtifactAction('reveal')}
+                    >
+                      Show in Finder
+                    </Button>
+                    <Button variant="light" onClick={exportText}>
+                      Export Text
+                    </Button>
+                    <Button
+                      variant="light"
+                      disabled={selectedIndex <= 0}
+                      onClick={() => selectByOffset(-1)}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="light"
+                      disabled={selectedIndex < 0 || selectedIndex >= images.length - 1}
+                      onClick={() => selectByOffset(1)}
+                    >
+                      Next
+                    </Button>
+                    <SegmentedControl
+                      value={artifact}
+                      onChange={(value) => setArtifact(value as ArtifactKind)}
+                      data={[
+                        { value: 'annotated', label: 'Annotated' },
+                        { value: 'generated', label: 'Generated' },
+                      ]}
+                    />
+                  </Group>
                 </Group>
-              </Group>
 
-              {artifactURL ? (
-                <Image src={artifactURL} radius="sm" fit="contain" mah="52vh" />
-              ) : (
-                <Paper withBorder p="xl">
-                  <Text c="dimmed">No {artifact} artifact is available for this image.</Text>
-                </Paper>
-              )}
+                {artifactURL ? (
+                  <Image src={artifactURL} radius="sm" fit="contain" mah="60vh" />
+                ) : (
+                  <Paper withBorder p="xl">
+                    <Text c="dimmed">No {artifact} artifact is available for this image.</Text>
+                  </Paper>
+                )}
 
-              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-                <Paper withBorder p="sm">
-                  <Text fw={700} size="sm">
-                    Prompt
-                  </Text>
-                  <Text size="sm">
-                    {selected.metadata.prompts?.prompt || 'No prompt recorded.'}
-                  </Text>
-                </Paper>
-                <Paper withBorder p="sm">
-                  <Text fw={700} size="sm">
-                    Artifacts
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    Generated: {selected.metadata.artifacts?.generated || 'none'}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    Annotated: {selected.metadata.artifacts?.annotated || 'none'}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    Metadata: {selected.path}
-                  </Text>
-                </Paper>
-              </SimpleGrid>
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
+                  <Paper withBorder p="sm">
+                    <Text fw={700} size="sm">
+                      Prompt
+                    </Text>
+                    <Text size="sm">
+                      {selected.metadata.prompts?.prompt || 'No prompt recorded.'}
+                    </Text>
+                  </Paper>
+                  <Paper withBorder p="sm">
+                    <Text fw={700} size="sm">
+                      Artifacts
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      Generated: {selected.metadata.artifacts?.generated || 'none'}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      Annotated: {selected.metadata.artifacts?.annotated || 'none'}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      Metadata: {selected.path}
+                    </Text>
+                  </Paper>
+                </SimpleGrid>
 
-              <Table>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Attribute</Table.Th>
-                    <Table.Th>Database</Table.Th>
-                    <Table.Th>Record</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {(selected.metadata.selectedRecords ?? []).map((record) => (
-                    <Table.Tr key={`${record.attribute}-${record.database}-${record.rowIndex}`}>
-                      <Table.Td>{record.attribute}</Table.Td>
-                      <Table.Td>{record.database}</Table.Td>
-                      <Table.Td>{record.record}</Table.Td>
+                <Table>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Attribute</Table.Th>
+                      <Table.Th>Database</Table.Th>
+                      <Table.Th>Record</Table.Th>
                     </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-            </Stack>
-          ) : (
-            <Text c="dimmed">No images found.</Text>
-          )}
-        </Paper>
-      </SimpleGrid>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {(selected.metadata.selectedRecords ?? []).map((record) => (
+                      <Table.Tr key={`${record.attribute}-${record.database}-${record.rowIndex}`}>
+                        <Table.Td>{record.attribute}</Table.Td>
+                        <Table.Td>{record.database}</Table.Td>
+                        <Table.Td>{record.record}</Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </Stack>
+            ) : (
+              <Text c="dimmed">No image selected.</Text>
+            )}
+          </Paper>
+        </Tabs.Panel>
+      </Tabs>
     </Stack>
   );
 }

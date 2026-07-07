@@ -38,6 +38,10 @@ export function GetPref(arg1) {
   return window['go']['app']['App']['GetPref'](arg1);
 }
 
+export function GetRuntimeInfo() {
+  return window['go']['app']['App']['GetRuntimeInfo']();
+}
+
 export function GetSeries(arg1) {
   return window['go']['app']['App']['GetSeries'](arg1);
 }
@@ -60,6 +64,10 @@ export function GetWindowGeometry() {
 
 export function ListDatabaseArchives() {
   return window['go']['app']['App']['ListDatabaseArchives']();
+}
+
+export function ListDatabaseRecords(arg1, arg2) {
+  return window['go']['app']['App']['ListDatabaseRecords'](arg1, arg2);
 }
 
 export function ListImages(arg1) {

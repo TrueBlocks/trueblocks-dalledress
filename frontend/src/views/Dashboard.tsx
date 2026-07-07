@@ -10,6 +10,7 @@ import {
   Textarea,
   Title,
 } from '@mantine/core';
+import { DASHBOARD_PREFS, booleanPref, serializeBooleanPref } from '../dallePrefs';
 import { StatusBar, StatusLevel } from '../components/StatusBar';
 import {
   Generate,
@@ -54,17 +55,6 @@ const PHASE_LABELS: Record<string, string> = {
   completed: 'Generation complete',
 };
 
-const DASHBOARD_PREFS = {
-  input: 'dashboard.input',
-  series: 'dashboard.series',
-  generateImage: 'dashboard.generateImage',
-  annotate: 'dashboard.annotate',
-};
-
-function booleanPref(value: string): boolean {
-  return value === 'true';
-}
-
 function statusForProgress(progress: app.GenerationProgress): StatusState {
   if (progress.error) {
     return { visible: true, level: 'error', message: progress.error };
@@ -86,6 +76,7 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
   const [series, setSeries] = useState<dalle.Series[]>([]);
   const [selectedSeries, setSelectedSeries] = useState<string>('');
   const [input, setInput] = useState('Person Tour Coordinates');
+  const [enhance, setEnhance] = useState(false);
   const [generateImage, setGenerateImage] = useState(false);
   const [annotate, setAnnotate] = useState(false);
   const [result, setResult] = useState<dalle.GenerateResult | null>(null);
@@ -104,13 +95,15 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
       ListSeries(false, false),
       GetPref(DASHBOARD_PREFS.input),
       GetPref(DASHBOARD_PREFS.series),
+      GetPref(DASHBOARD_PREFS.enhance),
       GetPref(DASHBOARD_PREFS.generateImage),
       GetPref(DASHBOARD_PREFS.annotate),
     ])
-      .then(([items, savedInput, savedSeries, savedGenerateImage, savedAnnotate]) => {
+      .then(([items, savedInput, savedSeries, savedEnhance, savedGenerateImage, savedAnnotate]) => {
         const next = items ?? [];
         setSeries(next);
         setInput(savedInput || 'Person Tour Coordinates');
+        setEnhance(booleanPref(savedEnhance));
         setGenerateImage(booleanPref(savedGenerateImage));
         setAnnotate(booleanPref(savedAnnotate));
         setSelectedSeries(
@@ -133,18 +126,24 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
 
   useEffect(() => {
     if (!prefsLoaded) return;
-    SetPref(DASHBOARD_PREFS.generateImage, String(generateImage));
+    SetPref(DASHBOARD_PREFS.enhance, serializeBooleanPref(enhance));
+  }, [enhance, prefsLoaded]);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    SetPref(DASHBOARD_PREFS.generateImage, serializeBooleanPref(generateImage));
   }, [generateImage, prefsLoaded]);
 
   useEffect(() => {
     if (!prefsLoaded) return;
-    SetPref(DASHBOARD_PREFS.annotate, String(annotate));
+    SetPref(DASHBOARD_PREFS.annotate, serializeBooleanPref(annotate));
   }, [annotate, prefsLoaded]);
 
   const request = () =>
     dalle.GenerateRequest.createFrom({
       input,
       series: selectedSeries || undefined,
+      enhance,
       image: generateImage,
       annotate: generateImage && annotate,
     });
@@ -239,6 +238,11 @@ export function Dashboard({ onGeneratedImage }: DashboardProps) {
           value={selectedSeries}
           data={series.map((item) => ({ value: item.suffix, label: item.suffix }))}
           onChange={(value) => setSelectedSeries(value ?? '')}
+        />
+        <Checkbox
+          label="Enhance prompt"
+          checked={enhance}
+          onChange={(event) => setEnhance(event.currentTarget.checked)}
         />
         <Checkbox
           label="Generate image"

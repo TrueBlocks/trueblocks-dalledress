@@ -35,6 +35,12 @@ type GenerationProgress struct {
 	Error      string  `json:"error"`
 }
 
+type RuntimeInfo struct {
+	DataDir         string `json:"dataDir"`
+	DatabaseVersion string `json:"databaseVersion"`
+	ArchiveHash     string `json:"archiveHash"`
+}
+
 func NewApp(prefsPath string) (*App, error) {
 	engine, err := dalle.New(dalle.Config{})
 	if err != nil {
@@ -169,6 +175,19 @@ func (a *App) ListDatabaseArchives() ([]storage.DatabaseArchiveManifest, error) 
 
 func (a *App) GetDatabaseArchive(version string) (storage.DatabaseArchiveManifest, error) {
 	return a.engine.GetDatabaseArchive(version)
+}
+
+func (a *App) ListDatabaseRecords(name string, limit int) (dalle.DatabaseRecordsResult, error) {
+	return a.engine.ListDatabaseRecords(name, limit)
+}
+
+func (a *App) GetRuntimeInfo() RuntimeInfo {
+	archive := a.engine.DatabaseArchive()
+	return RuntimeInfo{
+		DataDir:         a.engine.DataDir(),
+		DatabaseVersion: archive.Version,
+		ArchiveHash:     archive.ArchiveHash,
+	}
 }
 
 func (a *App) ValidateDalle() error {

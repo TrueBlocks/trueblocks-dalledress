@@ -1,4 +1,5 @@
 node_modules/
 build/bin/
+build/darwin/Info.dev.plist
 frontend/dist/
 *.tsbuildinfo

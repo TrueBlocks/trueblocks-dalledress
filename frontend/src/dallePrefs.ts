@@ -17,7 +17,7 @@ export const IMAGE_MODELS = [
   { value: 'dall-e-2', label: 'DALL-E 2 (legacy)' },
 ] as const;
 
-export const DEFAULT_IMAGE_MODEL = 'gpt-image-1';
+export const DEFAULT_IMAGE_MODEL = 'gpt-image-2';
 
 export function booleanPref(value: string): boolean {
   return value === 'true';

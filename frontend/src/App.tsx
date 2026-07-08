@@ -52,6 +52,27 @@ const PHASE_LABELS: Record<string, string> = {
   completed: 'Generation complete',
 };
 
+export function playCompletionBeep() {
+  new Audio(
+    'data:audio/wav;base64,UklGRl9vT19teleVBMQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU' +
+      'tvT19XAFoAXABeAGAAYgBkAGYAaABqAGwAbgBwAHIAdAB2AHgAegB8AH4A',
+  )
+    .play()
+    .catch(() => {
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type = 'sine';
+      gain.gain.value = 0.3;
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.stop(ctx.currentTime + 0.3);
+    });
+}
+
 function statusForProgress(progress: app.GenerationProgress): GlobalStatus {
   if (progress.error) {
     return { visible: true, level: 'error', message: progress.error };
@@ -59,11 +80,19 @@ function statusForProgress(progress: app.GenerationProgress): GlobalStatus {
   const message = progress.cacheHit
     ? 'Using cached image artifacts'
     : PHASE_LABELS[progress.phase] || 'Working';
+  const stepLabel =
+    progress.phaseIndex > 0 && progress.phaseCount > 0
+      ? `Step ${progress.phaseIndex}/${progress.phaseCount}`
+      : '';
+  const etaLabel =
+    progress.phaseETASeconds > 0 ? `${Math.ceil(progress.phaseETASeconds)}s left` : '';
+  const meta = [stepLabel, etaLabel].filter(Boolean).join(' · ');
   return {
     visible: true,
     level: progress.done ? 'success' : 'progress',
     message,
-    percent: progress.percent > 0 ? progress.percent : undefined,
+    meta: meta || undefined,
+    percent: progress.phasePercent > 0 ? progress.phasePercent : undefined,
   };
 }
 
@@ -115,25 +144,7 @@ export function App() {
           if (progress.active) {
             const status = statusForProgress(progress);
             setGlobalStatus(status);
-            if (progress.done && status.level === 'success') {
-              new Audio(
-                'data:audio/wav;base64,UklGRl9vT19teleVBMQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU' +
-                  'tvT19XAFoAXABeAGAAYgBkAGYAaABqAGwAbgBwAHIAdAB2AHgAegB8AH4A',
-              )
-                .play()
-                .catch(() => {
-                  const ctx = new AudioContext();
-                  const osc = ctx.createOscillator();
-                  const gain = ctx.createGain();
-                  osc.connect(gain);
-                  gain.connect(ctx.destination);
-                  osc.frequency.value = 880;
-                  osc.type = 'sine';
-                  gain.gain.value = 0.3;
-                  osc.start();
-                  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-                  osc.stop(ctx.currentTime + 0.3);
-                });
+            if (progress.done) {
               setProgressTarget(null);
             }
           }

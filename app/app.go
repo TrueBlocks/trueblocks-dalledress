@@ -24,15 +24,19 @@ type App struct {
 }
 
 type GenerationProgress struct {
-	Active     bool    `json:"active"`
-	Series     string  `json:"series"`
-	Seed       string  `json:"seed"`
-	Phase      string  `json:"phase"`
-	Percent    float64 `json:"percent"`
-	ETASeconds float64 `json:"etaSeconds"`
-	Done       bool    `json:"done"`
-	CacheHit   bool    `json:"cacheHit"`
-	Error      string  `json:"error"`
+	Active          bool    `json:"active"`
+	Series          string  `json:"series"`
+	Seed            string  `json:"seed"`
+	Phase           string  `json:"phase"`
+	Percent         float64 `json:"percent"`
+	ETASeconds      float64 `json:"etaSeconds"`
+	PhasePercent    float64 `json:"phasePercent"`
+	PhaseETASeconds float64 `json:"phaseETASeconds"`
+	PhaseIndex      int     `json:"phaseIndex"`
+	PhaseCount      int     `json:"phaseCount"`
+	Done            bool    `json:"done"`
+	CacheHit        bool    `json:"cacheHit"`
+	Error           string  `json:"error"`
 }
 
 type RuntimeInfo struct {
@@ -85,15 +89,19 @@ func (a *App) GetGenerationProgress(series string, seed string) GenerationProgre
 		return GenerationProgress{Series: series, Seed: seed}
 	}
 	return GenerationProgress{
-		Active:     true,
-		Series:     report.Series,
-		Seed:       report.Address,
-		Phase:      string(report.Current),
-		Percent:    report.Percent,
-		ETASeconds: report.ETASeconds,
-		Done:       report.Done,
-		CacheHit:   report.CacheHit,
-		Error:      report.Error,
+		Active:          true,
+		Series:          report.Series,
+		Seed:            report.Address,
+		Phase:           string(report.Current),
+		Percent:         report.Percent,
+		ETASeconds:      report.ETASeconds,
+		PhasePercent:    report.PhasePercent,
+		PhaseETASeconds: report.PhaseETASeconds,
+		PhaseIndex:      report.PhaseIndex,
+		PhaseCount:      report.PhaseCount,
+		Done:            report.Done,
+		CacheHit:        report.CacheHit,
+		Error:           report.Error,
 	}
 }
 

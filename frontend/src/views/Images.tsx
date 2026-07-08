@@ -22,6 +22,7 @@ import { IconExternalLink, IconFolderOpen, IconPhoto, IconX } from '@tabler/icon
 import { DetailHeader, usePersistedTab } from '@trueblocks/ui';
 import { Column, DataTable } from '../components/DataTable';
 import { StatusBar, StatusLevel } from '../components/StatusBar';
+import { playCompletionBeep } from '../App';
 import { isEditableElement } from '../utils/keyboard';
 import { uniqueSortedValues } from '../utils/table';
 import { DASHBOARD_PREFS } from '../dallePrefs';
@@ -280,6 +281,7 @@ export function Images({
     onProgressStart?.(seriesName, seed);
     RegenerateImage(selectedRecordId)
       .then((next) => {
+        playCompletionBeep();
         const message = 'Regenerated image from scratch.';
         setActionMessage(message);
         onStatusChange?.({

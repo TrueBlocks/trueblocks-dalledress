@@ -18,6 +18,7 @@ import {
   serializeBooleanPref,
 } from '../dallePrefs';
 import { StatusLevel } from '../components/StatusBar';
+import { playCompletionBeep } from '../App';
 import {
   Generate,
   GetImage,
@@ -204,6 +205,7 @@ export function Dashboard({
       .then((next) => {
         setResult(next);
         const imageId = next.metadata?.imageId || next.seed;
+        playCompletionBeep();
         onStatusChange({
           visible: true,
           level: 'success',

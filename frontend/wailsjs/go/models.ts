@@ -7,6 +7,10 @@ export namespace app {
 	    phase: string;
 	    percent: number;
 	    etaSeconds: number;
+	    phasePercent: number;
+	    phaseETASeconds: number;
+	    phaseIndex: number;
+	    phaseCount: number;
 	    done: boolean;
 	    cacheHit: boolean;
 	    error: string;
@@ -23,6 +27,10 @@ export namespace app {
 	        this.phase = source["phase"];
 	        this.percent = source["percent"];
 	        this.etaSeconds = source["etaSeconds"];
+	        this.phasePercent = source["phasePercent"];
+	        this.phaseETASeconds = source["phaseETASeconds"];
+	        this.phaseIndex = source["phaseIndex"];
+	        this.phaseCount = source["phaseCount"];
 	        this.done = source["done"];
 	        this.cacheHit = source["cacheHit"];
 	        this.error = source["error"];

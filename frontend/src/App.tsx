@@ -112,7 +112,31 @@ export function App() {
     const poll = () => {
       GetGenerationProgress(progressTarget.series, progressTarget.seed)
         .then((progress) => {
-          if (progress.active) setGlobalStatus(statusForProgress(progress));
+          if (progress.active) {
+            const status = statusForProgress(progress);
+            setGlobalStatus(status);
+            if (progress.done && status.level === 'success') {
+              new Audio(
+                'data:audio/wav;base64,UklGRl9vT19teleVBMQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU' +
+                  'tvT19XAFoAXABeAGAAYgBkAGYAaABqAGwAbgBwAHIAdAB2AHgAegB8AH4A',
+              )
+                .play()
+                .catch(() => {
+                  const ctx = new AudioContext();
+                  const osc = ctx.createOscillator();
+                  const gain = ctx.createGain();
+                  osc.connect(gain);
+                  gain.connect(ctx.destination);
+                  osc.frequency.value = 880;
+                  osc.type = 'sine';
+                  gain.gain.value = 0.3;
+                  osc.start();
+                  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                  osc.stop(ctx.currentTime + 0.3);
+                });
+              setProgressTarget(null);
+            }
+          }
         })
         .catch((err: unknown) => {
           const message = err instanceof Error ? err.message : String(err);

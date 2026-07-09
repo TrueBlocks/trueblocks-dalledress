@@ -158,6 +158,9 @@ func (a *App) imageArtifactPath(id string, artifact string) (string, error) {
 	switch artifact {
 	case "annotated":
 		path = record.Metadata.Artifacts.Annotated
+		if path == "" {
+			path = record.Metadata.Artifacts.Generated
+		}
 	case "generated":
 		path = record.Metadata.Artifacts.Generated
 	default:

@@ -77,6 +77,7 @@ function statusForProgress(progress: app.GenerationProgress): GlobalStatus {
   if (progress.error) {
     return { visible: true, level: 'error', message: progress.error };
   }
+  const percent = progress.phasePercent > 0 ? progress.phasePercent : progress.percent;
   const message = progress.cacheHit
     ? 'Using cached image artifacts'
     : PHASE_LABELS[progress.phase] || 'Working';
@@ -92,7 +93,7 @@ function statusForProgress(progress: app.GenerationProgress): GlobalStatus {
     level: progress.done ? 'success' : 'progress',
     message,
     meta: meta || undefined,
-    percent: progress.phasePercent > 0 ? progress.phasePercent : undefined,
+    percent: percent > 0 ? percent : undefined,
   };
 }
 

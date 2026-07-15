@@ -479,6 +479,8 @@ export namespace dalle {
 	    compositions: string[];
 	    colorLimit?: string;
 	    modifiedAt?: string;
+	    version?: string;
+	    source?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Series(source);
@@ -505,6 +507,8 @@ export namespace dalle {
 	        this.compositions = source["compositions"];
 	        this.colorLimit = source["colorLimit"];
 	        this.modifiedAt = source["modifiedAt"];
+	        this.version = source["version"];
+	        this.source = source["source"];
 	    }
 	}
 

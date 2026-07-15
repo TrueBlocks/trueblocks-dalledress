@@ -144,6 +144,7 @@ export function Series() {
   });
 
   const selected = items.find((item) => item.suffix === selectedSuffix);
+  const isBuiltin = selected?.source === 'builtin';
   const seriesList = filteredItems.length > 0 ? filteredItems : items;
   const selectedIndex = seriesList.findIndex((item) => item.suffix === selectedSuffix);
   const hasPrevious = selectedIndex > 0;
@@ -427,9 +428,16 @@ export function Series() {
               icon={<IconStack2 size={24} />}
               title={<Text fw={700}>{selected?.suffix || 'New Series'}</Text>}
               subtitle={
-                <Text size="sm" c="dimmed">
-                  {selected?.purpose || draft.purpose || 'Series definition'}
-                </Text>
+                <Group gap="xs">
+                  <Text size="sm" c="dimmed">
+                    {selected?.purpose || draft.purpose || 'Series definition'}
+                  </Text>
+                  {isBuiltin && (
+                    <Badge variant="light" color="blue">
+                      Built-in
+                    </Badge>
+                  )}
+                </Group>
               }
             />
             <Paper withBorder p="md">
@@ -438,18 +446,21 @@ export function Series() {
                   <TextInput
                     label="Suffix"
                     value={draft.suffix}
+                    disabled={isBuiltin}
                     onChange={(event) => updateDraft('suffix', event.currentTarget.value)}
                   />
                   <TextInput
                     label="Last index"
                     type="number"
                     value={draft.last}
+                    disabled={isBuiltin}
                     onChange={(event) => updateDraft('last', event.currentTarget.value)}
                   />
                 </Group>
                 <TextInput
                   label="Purpose"
                   value={draft.purpose}
+                  disabled={isBuiltin}
                   onChange={(event) => updateDraft('purpose', event.currentTarget.value)}
                 />
                 <Select
@@ -465,6 +476,7 @@ export function Series() {
                     { value: 'seven-tone', label: 'Seven-tone' },
                   ]}
                   onChange={(value) => updateDraft('colorLimit', value ?? '')}
+                  disabled={isBuiltin}
                   clearable
                   placeholder="No limit (full palette)"
                 />
@@ -476,21 +488,24 @@ export function Series() {
                       value={draft[field]}
                       minRows={3}
                       autosize
+                      disabled={isBuiltin}
                       onChange={(event) => updateDraft(field, event.currentTarget.value)}
                     />
                   ))}
                 </SimpleGrid>
                 <Group justify="space-between">
                   <Group>
-                    <Button onClick={save} loading={saving} disabled={!draft.suffix.trim()}>
-                      Save
-                    </Button>
-                    {selected && !selected.deleted && (
+                    {!isBuiltin && (
+                      <Button onClick={save} loading={saving} disabled={!draft.suffix.trim()}>
+                        Save
+                      </Button>
+                    )}
+                    {selected && !selected.deleted && !isBuiltin && (
                       <Button variant="light" color="gray" onClick={() => setHidden(true)}>
                         Hide
                       </Button>
                     )}
-                    {selected?.deleted && (
+                    {selected?.deleted && !isBuiltin && (
                       <Button variant="light" onClick={() => setHidden(false)}>
                         Restore
                       </Button>

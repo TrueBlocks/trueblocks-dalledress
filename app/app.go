@@ -210,8 +210,10 @@ func (a *App) ListBackstyles(limit int) ([]string, error) {
 		return nil, err
 	}
 	styles := make([]string, 0, len(res.Records))
+	seen := make(map[string]bool)
 	for _, rec := range res.Records {
-		if rec.Key != "" {
+		if rec.Key != "" && !seen[rec.Key] {
+			seen[rec.Key] = true
 			styles = append(styles, rec.Key)
 		}
 	}

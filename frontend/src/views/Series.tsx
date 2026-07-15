@@ -19,8 +19,16 @@ import { DetailHeader, usePersistedTab } from '@trueblocks/ui';
 import { Column, DataTable } from '../components/DataTable';
 import { isEditableElement } from '../utils/keyboard';
 import { uniqueSortedValues } from '../utils/table';
-import { GetTab, ListSeries, SaveSeries, SetSeriesHidden, SetTab } from '../../wailsjs/go/app/App';
+import {
+  GetTab,
+  ListDatabaseRecords,
+  ListSeries,
+  SaveSeries,
+  SetSeriesHidden,
+  SetTab,
+} from '../../wailsjs/go/app/App';
 import { dalle } from '../../wailsjs/go/models';
+import { storage } from '../../wailsjs/go/models';
 
 const FILTER_FIELDS = [
   'adverbs',
@@ -134,6 +142,7 @@ export function Series() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
+  const [nounsMap, setNounsMap] = useState<Record<string, string[]>>({});
   const { activeTab, setActiveTab } = usePersistedTab({
     key: 'series',
     defaultTab: 'list',
@@ -254,6 +263,19 @@ export function Series() {
   }, [load]);
 
   useEffect(() => {
+    setError('');
+    ListDatabaseRecords('nouns', 10000)
+      .then((result) => {
+        const map: Record<string, string[]> = {};
+        (result?.records ?? []).forEach((record: storage.DatabaseRecord) => {
+          map[record.key] = record.values;
+        });
+        setNounsMap(map);
+      })
+      .catch((err: unknown) => setError(messageFromError(err)));
+  }, []);
+
+  useEffect(() => {
     const handleRefresh = (event: Event) => {
       if ((event as CustomEvent).detail !== 'series') return;
       load(selectedSuffix);
@@ -335,12 +357,13 @@ export function Series() {
 
   const searchSeries = (series: dalle.Series, search: string) => {
     const query = search.toLowerCase();
+    const nounValues = (series.nouns ?? []).flatMap((noun) => nounsMap[noun] ?? [noun]);
     return [
       series.suffix,
       series.purpose || '',
       ...(series.adverbs ?? []),
       ...(series.adjectives ?? []),
-      ...(series.nouns ?? []),
+      ...nounValues,
       ...(series.emotions ?? []),
       ...(series.occupations ?? []),
       ...(series.actions ?? []),

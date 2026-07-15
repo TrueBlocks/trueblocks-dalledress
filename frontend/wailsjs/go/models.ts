@@ -74,6 +74,7 @@ export namespace dalle {
 	export class DatabaseRecordsResult {
 	    name: string;
 	    version: string;
+	    columns?: string[];
 	    records: storage.DatabaseRecord[];
 	
 	    static createFrom(source: any = {}) {
@@ -84,6 +85,7 @@ export namespace dalle {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.name = source["name"];
 	        this.version = source["version"];
+	        this.columns = source["columns"];
 	        this.records = this.convertValues(source["records"], storage.DatabaseRecord);
 	    }
 	

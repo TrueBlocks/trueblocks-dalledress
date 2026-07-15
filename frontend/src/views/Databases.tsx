@@ -22,6 +22,28 @@ type DatabaseRecordRow = storage.DatabaseRecord & {
   rowIndex: number;
 };
 
+const DATABASE_DESCRIPTIONS: Record<string, string> = {
+  adverbs: 'Manner modifiers for actions',
+  adjectives: 'Descriptive attributes',
+  nouns: 'Core subjects and entities',
+  emotions: 'Emotional states and expressions',
+  occupations: 'Professional roles and vocations',
+  actions: 'Physical activities and poses',
+  artstyles: 'Artistic movements and styles',
+  litstyles: 'Literary styles and genres',
+  colors: 'Color palettes and values',
+  viewpoints: 'Camera angles and perspectives',
+  gazes: 'Gaze directions and focus',
+  backstyles: 'Background styles and treatments',
+  compositions: 'Composition rules and structures',
+  places: 'Real-world locations and landmarks',
+  tropes: 'Narrative tropes and story patterns',
+  families: 'Taxonomic families and their orders',
+  orders: 'Taxonomic orders and their classes',
+  classes: 'Taxonomic classes and their phyla',
+  phyla: 'Taxonomic phyla and common names',
+};
+
 function messageFromError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
@@ -62,11 +84,17 @@ export function Databases() {
     () => uniqueSortedValues(files.flatMap(({ file }) => file.columns)),
     [files],
   );
+  const fileDescriptions = useMemo(
+    () => uniqueSortedValues(files.map(({ file }) => DATABASE_DESCRIPTIONS[file.name] ?? '')),
+    [files],
+  );
 
   const databaseValueGetter = (row: DatabaseFileRow, column: string) => {
     switch (column) {
       case 'name':
         return row.file.name;
+      case 'description':
+        return DATABASE_DESCRIPTIONS[row.file.name] ?? '';
       case 'rows':
         return row.file.rows;
       case 'columns':
@@ -92,11 +120,19 @@ export function Databases() {
       {
         key: 'name',
         label: 'Name',
-        width: '30%',
+        width: '22%',
         render: ({ file }) => file.name,
         sortValue: ({ file }) => file.name.toLowerCase(),
         filterOptions: fileNames,
         scrollOnSelect: true,
+      },
+      {
+        key: 'description',
+        label: 'Description',
+        width: '28%',
+        render: ({ file }) => DATABASE_DESCRIPTIONS[file.name] ?? '',
+        sortValue: ({ file }) => DATABASE_DESCRIPTIONS[file.name] ?? '',
+        filterOptions: fileDescriptions,
       },
       {
         key: 'rows',
@@ -109,7 +145,7 @@ export function Databases() {
       {
         key: 'columns',
         label: 'Columns',
-        width: '43%',
+        width: '28%',
         render: ({ file }) => file.columns.join(', '),
         sortValue: ({ file }) => file.columns.length,
         filterOptions: fileColumnOptions,
@@ -118,17 +154,18 @@ export function Databases() {
       {
         key: 'version',
         label: 'Version',
-        width: '15%',
+        width: '10%',
         render: ({ archive }) => archive.version,
         sortValue: ({ archive }) => archive.version,
         filterOptions: fileVersions,
       },
     ],
-    [fileColumnOptions, fileNames, fileVersions],
+    [fileColumnOptions, fileDescriptions, fileNames, fileVersions],
   );
 
   const recordColumns: Column<DatabaseRecordRow>[] = useMemo(() => {
-    const valueColumns = (selectedFile?.columns ?? []).map((column, index) => ({
+    const columnNames = records?.columns ?? selectedFile?.columns ?? [];
+    const valueColumns = columnNames.map((column, index) => ({
       key: `value-${index}`,
       label: column,
       render: (record: DatabaseRecordRow) => record.values[index] ?? '',
@@ -147,12 +184,13 @@ export function Databases() {
       },
       ...valueColumns,
     ];
-  }, [recordRows, selectedFile]);
+  }, [recordRows, records?.columns, selectedFile]);
 
   const loadRecords = useCallback((name: string) => {
     setSelectedName(name);
     setError('');
-    ListDatabaseRecords(name, 200)
+    const limit = name === 'nouns' ? 10000 : 200;
+    ListDatabaseRecords(name, limit)
       .then(setRecords)
       .catch((err: unknown) => setError(messageFromError(err)));
   }, []);
@@ -217,9 +255,13 @@ export function Databases() {
 
   const searchFiles = (row: DatabaseFileRow, search: string) => {
     const query = search.toLowerCase();
-    return [row.file.name, row.archive.version, row.file.path, ...row.file.columns].some((value) =>
-      value.toLowerCase().includes(query),
-    );
+    return [
+      row.file.name,
+      DATABASE_DESCRIPTIONS[row.file.name] ?? '',
+      row.archive.version,
+      row.file.path,
+      ...row.file.columns,
+    ].some((value) => value.toLowerCase().includes(query));
   };
 
   const searchRecords = (record: storage.DatabaseRecord, search: string) => {
@@ -273,6 +315,7 @@ export function Databases() {
             onFilteredSortedChange={setFilteredFiles}
             searchFn={searchFiles}
             valueGetter={databaseValueGetter}
+            disableEnterKey
           />
         </Tabs.Panel>
         <Tabs.Panel value="detail" pt="md">
@@ -302,6 +345,8 @@ export function Databases() {
               getRowKey={(record) => `${record.key}-${record.rowIndex}`}
               searchFn={searchRecords}
               valueGetter={recordValueGetter}
+              wrapCells
+              disableEnterKey
             />
           </Stack>
         </Tabs.Panel>

@@ -24,6 +24,7 @@ import {
   GetImage,
   GetImageModel,
   GetPref,
+  ListBackstyles,
   ListSeries,
   NormalizeSeed,
   Preview,
@@ -67,13 +68,17 @@ export function Dashboard({
   const [working, setWorking] = useState(false);
   const [prefsLoaded, setPrefsLoaded] = useState(false);
   const [imageModel, setImageModelState] = useState(DEFAULT_IMAGE_MODEL);
+  const [backstyles, setBackstyles] = useState<string[]>([]);
+  const [selectedBackstyle, setSelectedBackstyle] = useState<string>('');
   const [error, setError] = useState('');
 
   useEffect(() => {
     Promise.all([
       ListSeries(false, false),
+      ListBackstyles(200),
       GetPref(DASHBOARD_PREFS.input),
       GetPref(DASHBOARD_PREFS.series),
+      GetPref(DASHBOARD_PREFS.backstyle),
       GetPref(DASHBOARD_PREFS.enhance),
       GetPref(DASHBOARD_PREFS.generateImage),
       GetPref(DASHBOARD_PREFS.annotate),
@@ -83,8 +88,10 @@ export function Dashboard({
       .then(
         ([
           items,
+          loadedBackstyles,
           savedInput,
           savedSeries,
+          savedBackstyle,
           savedEnhance,
           savedGenerateImage,
           savedAnnotate,
@@ -93,7 +100,11 @@ export function Dashboard({
         ]) => {
           const next = items ?? [];
           setSeries(next);
+          setBackstyles(loadedBackstyles);
           setInput(savedInput || 'Person Tour Coordinates');
+          setSelectedBackstyle(
+            loadedBackstyles.includes(savedBackstyle) ? savedBackstyle : loadedBackstyles[0] || '',
+          );
           setEnhance(booleanPref(savedEnhance));
           setGenerateImage(booleanPref(savedGenerateImage));
           setAnnotate(booleanPref(savedAnnotate));
@@ -122,6 +133,11 @@ export function Dashboard({
     if (!prefsLoaded) return;
     SetPref(DASHBOARD_PREFS.series, selectedSeries);
   }, [prefsLoaded, selectedSeries]);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    SetPref(DASHBOARD_PREFS.backstyle, selectedBackstyle);
+  }, [prefsLoaded, selectedBackstyle]);
 
   useEffect(() => {
     if (!prefsLoaded) return;
@@ -163,6 +179,7 @@ export function Dashboard({
     dalle.GenerateRequest.createFrom({
       input,
       series: selectedSeries || undefined,
+      backstyle: selectedBackstyle || undefined,
       enhance,
       image: generateImage,
       annotate: generateImage && annotate,
@@ -244,6 +261,14 @@ export function Dashboard({
           value={imageModel}
           data={IMAGE_MODELS.map((m) => ({ value: m.value, label: m.label }))}
           onChange={handleModelChange}
+          allowDeselect={false}
+        />
+        <Select
+          label="Background"
+          value={selectedBackstyle}
+          data={backstyles.map((style) => ({ value: style, label: style }))}
+          onChange={(value) => setSelectedBackstyle(value ?? '')}
+          disabled={backstyles.length === 0}
           allowDeselect={false}
         />
         <Checkbox

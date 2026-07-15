@@ -1,6 +1,7 @@
 export const DASHBOARD_PREFS = {
   input: 'dashboard.input',
   series: 'dashboard.series',
+  backstyle: 'dashboard.backstyle',
   enhance: 'dashboard.enhance',
   generateImage: 'dashboard.generateImage',
   annotate: 'dashboard.annotate',

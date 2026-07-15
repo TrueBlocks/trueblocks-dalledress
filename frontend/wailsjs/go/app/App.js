@@ -66,6 +66,10 @@ export function GetWindowGeometry() {
   return window['go']['app']['App']['GetWindowGeometry']();
 }
 
+export function ListBackstyles(arg1) {
+  return window['go']['app']['App']['ListBackstyles'](arg1);
+}
+
 export function ListDatabaseArchives() {
   return window['go']['app']['App']['ListDatabaseArchives']();
 }

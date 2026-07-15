@@ -36,6 +36,8 @@ export function GetTableState(arg1:string):Promise<Record<string, any>>;
 
 export function GetWindowGeometry():Promise<number>;
 
+export function ListBackstyles(arg1:number):Promise<Array<string>>;
+
 export function ListDatabaseArchives():Promise<Array<storage.DatabaseArchiveManifest>>;
 
 export function ListDatabaseRecords(arg1:string,arg2:number):Promise<dalle.DatabaseRecordsResult>;

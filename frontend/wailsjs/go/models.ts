@@ -148,6 +148,7 @@ export namespace dalle {
 	    seed?: string;
 	    series?: string;
 	    recipe?: string;
+	    backstyle?: string;
 	    enhance?: boolean;
 	    image?: boolean;
 	    annotate?: boolean;
@@ -163,6 +164,7 @@ export namespace dalle {
 	        this.seed = source["seed"];
 	        this.series = source["series"];
 	        this.recipe = source["recipe"];
+	        this.backstyle = source["backstyle"];
 	        this.enhance = source["enhance"];
 	        this.image = source["image"];
 	        this.annotate = source["annotate"];

@@ -204,6 +204,20 @@ func (a *App) ListDatabaseRecords(name string, limit int) (dalle.DatabaseRecords
 	return a.engine.ListDatabaseRecords(name, limit)
 }
 
+func (a *App) ListBackstyles(limit int) ([]string, error) {
+	res, err := a.engine.ListDatabaseRecords("backstyles", limit)
+	if err != nil {
+		return nil, err
+	}
+	styles := make([]string, 0, len(res.Records))
+	for _, rec := range res.Records {
+		if rec.Key != "" {
+			styles = append(styles, rec.Key)
+		}
+	}
+	return styles, nil
+}
+
 func (a *App) GetRuntimeInfo() RuntimeInfo {
 	archive := a.engine.DatabaseArchive()
 	return RuntimeInfo{

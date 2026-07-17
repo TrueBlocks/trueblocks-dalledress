@@ -21,7 +21,7 @@ import { StatusLevel } from '../components/StatusBar';
 import { playCompletionBeep } from '../App';
 import {
   Generate,
-  GetImage,
+  GetImageInSeries,
   GetImageModel,
   GetPref,
   ListBackstyles,
@@ -123,11 +123,13 @@ export function Dashboard({
   useEffect(() => {
     if (!prefsLoaded) return;
     SetPref(DASHBOARD_PREFS.input, input);
-    NormalizeSeed(input, '')
-      .then((hash) => GetImage(hash))
+    // Seeds are stable across series, so the series is required to resolve the
+    // right record: a bare seed now matches one image per series.
+    NormalizeSeed(input, '', selectedSeries)
+      .then((hash) => GetImageInSeries(hash, selectedSeries))
       .then((record) => onCurrentImageChange(record))
       .catch(() => onCurrentImageChange(null));
-  }, [input, onCurrentImageChange, prefsLoaded]);
+  }, [input, onCurrentImageChange, prefsLoaded, selectedSeries]);
 
   useEffect(() => {
     if (!prefsLoaded) return;
@@ -244,7 +246,7 @@ export function Dashboard({
     <Stack>
       <Title order={2}>Dashboard</Title>
       <Textarea
-        label="Seed"
+        label="Seed (within series)"
         value={input}
         minRows={3}
         onChange={(event) => setInput(event.currentTarget.value)}

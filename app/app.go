@@ -71,8 +71,8 @@ func (a *App) SetImageModel(model string) {
 	a.engine.SetImageModel(model)
 }
 
-func (a *App) NormalizeSeed(input string, seed string) (string, error) {
-	return dalle.NormalizeSeed(input, seed)
+func (a *App) NormalizeSeed(input string, seed string, series string) (string, error) {
+	return dalle.NormalizeSeed(input, seed, series)
 }
 
 func (a *App) Preview(request dalle.GenerateRequest) (dalle.GenerateResult, error) {
@@ -111,6 +111,10 @@ func (a *App) ListImages(series string, includeArchived bool) ([]dalle.ImageMeta
 
 func (a *App) GetImage(id string) (dalle.ImageMetadataRecord, error) {
 	return a.engine.GetImage(id)
+}
+
+func (a *App) GetImageInSeries(id string, series string) (dalle.ImageMetadataRecord, error) {
+	return a.engine.GetImageInSeries(id, series)
 }
 
 func (a *App) DeleteImage(id string) error {

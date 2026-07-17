@@ -18,6 +18,8 @@ export function GetImage(arg1:string):Promise<dalle.ImageMetadataRecord>;
 
 export function GetImageArtifactDataURL(arg1:string,arg2:string):Promise<string>;
 
+export function GetImageInSeries(arg1:string,arg2:string):Promise<dalle.ImageMetadataRecord>;
+
 export function GetImageModel():Promise<string>;
 
 export function GetLastRoute():Promise<string>;
@@ -46,7 +48,7 @@ export function ListImages(arg1:string,arg2:boolean):Promise<Array<dalle.ImageMe
 
 export function ListSeries(arg1:boolean,arg2:boolean):Promise<Array<dalle.Series>>;
 
-export function NormalizeSeed(arg1:string,arg2:string):Promise<string>;
+export function NormalizeSeed(arg1:string,arg2:string,arg3:string):Promise<string>;
 
 export function OpenImageArtifact(arg1:string,arg2:string):Promise<void>;
 

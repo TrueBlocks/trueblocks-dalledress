@@ -30,6 +30,10 @@ export function GetImageArtifactDataURL(arg1, arg2) {
   return window['go']['app']['App']['GetImageArtifactDataURL'](arg1, arg2);
 }
 
+export function GetImageInSeries(arg1, arg2) {
+  return window['go']['app']['App']['GetImageInSeries'](arg1, arg2);
+}
+
 export function GetImageModel() {
   return window['go']['app']['App']['GetImageModel']();
 }
@@ -86,8 +90,8 @@ export function ListSeries(arg1, arg2) {
   return window['go']['app']['App']['ListSeries'](arg1, arg2);
 }
 
-export function NormalizeSeed(arg1, arg2) {
-  return window['go']['app']['App']['NormalizeSeed'](arg1, arg2);
+export function NormalizeSeed(arg1, arg2, arg3) {
+  return window['go']['app']['App']['NormalizeSeed'](arg1, arg2, arg3);
 }
 
 export function OpenImageArtifact(arg1, arg2) {

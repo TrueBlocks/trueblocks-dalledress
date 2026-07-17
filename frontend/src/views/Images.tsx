@@ -192,14 +192,17 @@ export function Images({
       return ListImages(seriesFilter, includeArchived)
         .then((items) => {
           let next = items ?? [];
+          // The backend already orders by seed phrase, then series. These sorts
+          // override the primary key but keep the other field as the tiebreaker,
+          // so equal keys stay grouped rather than falling back to walk order.
+          const bySeed = (a: dalle.ImageMetadataRecord, b: dalle.ImageMetadataRecord) =>
+            (a.metadata.input ?? '').localeCompare(b.metadata.input ?? '');
+          const bySeries = (a: dalle.ImageMetadataRecord, b: dalle.ImageMetadataRecord) =>
+            (a.metadata.series?.name ?? '').localeCompare(b.metadata.series?.name ?? '');
           if (sortBy === 'series') {
-            next = [...next].sort((a, b) =>
-              (a.metadata.series?.name ?? '').localeCompare(b.metadata.series?.name ?? ''),
-            );
+            next = [...next].sort((a, b) => bySeries(a, b) || bySeed(a, b));
           } else if (sortBy === 'seed') {
-            next = [...next].sort((a, b) =>
-              (a.metadata.input ?? '').localeCompare(b.metadata.input ?? ''),
-            );
+            next = [...next].sort((a, b) => bySeed(a, b) || bySeries(a, b));
           }
           setImages(next);
           setSelectedId((current) => selectRecordId(next, current, preferredId));

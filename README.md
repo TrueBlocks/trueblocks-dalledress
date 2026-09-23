@@ -34,4 +34,4 @@ caches them under the dalle data directory.
 - `frontend/` — React + Mantine UI using `@trueblocks/ui` (AppLayout,
   useViewHotkeys, usePersistedTab)
 
-![README infographic](README-infographic.png)
+![README infographic](README-infographic.jpg)
